@@ -1,0 +1,954 @@
+ERC report (2026-08-03T00:50:17, Encoding UTF8)
+Report includes: Errors, Warnings
+
+***** Sheet /
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 0.96 mm): Symbol U_ADR5 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 3.50 mm): Symbol U_ADR5 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -4.12 mm): Symbol U_ADR5 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -9.20 mm): Symbol U_ADR5 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -14.28 mm): Symbol U_ADR5 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -19.36 mm): Symbol U_ADR5 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -21.90 mm): Symbol U_ADR5 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -24.44 mm): Symbol U_ADR5 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -26.98 mm): Symbol U_ADR5 Pin J13 [RX1, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 38.00 mm): Label 'VCC3V3'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -29.52 mm): Symbol U_ADR5 Pin N2 [RX_LOAD, Input, Line]
+[missing_power_pin]: El símbolo U_ADR4 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, 30.00 mm): Symbol U_ADR4 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 30.00 mm): Symbol U_ADR4 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 32.54 mm): Symbol U_ADR4 Pin N5 [ADDR1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -34.60 mm): Symbol U_ADR5 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 37.62 mm): Symbol U_ADR4 Pin M3 [CSB, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -39.68 mm): Symbol U_ADR5 Pin G1 [DET4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -42.22 mm): Symbol U_ADR5 Pin A1 [DET3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 42.70 mm): Symbol U_ADR4 Pin N13 [DET1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -44.76 mm): Symbol U_ADR5 Pin G13 [DET2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 45.24 mm): Symbol U_ADR4 Pin G13 [DET2, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 38.00 mm): Label 'RF_ANT_4'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -47.30 mm): Symbol U_ADR5 Pin N13 [DET1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 47.78 mm): Symbol U_ADR4 Pin A1 [DET3, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 42.00 mm): Label 'SPI_SDO_4'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 50.32 mm): Symbol U_ADR4 Pin G1 [DET4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -52.38 mm): Symbol U_ADR5 Pin M3 [CSB, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 55.40 mm): Symbol U_ADR4 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -57.46 mm): Symbol U_ADR5 Pin N5 [ADDR1, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, -52.00 mm): Label 'RF_ANT_5'
+[missing_power_pin]: El símbolo U_ADR5 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, -60.00 mm): Symbol U_ADR5 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -60.00 mm): Symbol U_ADR5 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 60.48 mm): Symbol U_ADR4 Pin N2 [RX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 63.02 mm): Symbol U_ADR4 Pin J13 [RX1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 65.56 mm): Symbol U_ADR4 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 68.10 mm): Symbol U_ADR4 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 70.64 mm): Symbol U_ADR4 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 75.72 mm): Symbol U_ADR4 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 80.80 mm): Symbol U_ADR4 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 85.88 mm): Symbol U_ADR4 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -86.50 mm): Symbol U_ADR6 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -89.04 mm): Symbol U_ADR6 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 90.96 mm): Symbol U_ADR4 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 93.50 mm): Symbol U_ADR4 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -94.12 mm): Symbol U_ADR6 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -99.20 mm): Symbol U_ADR6 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -24.44 mm): Symbol U_ADR5 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -26.98 mm): Symbol U_ADR5 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 27.46 mm): Symbol U_ADR4 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -29.52 mm): Symbol U_ADR5 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 30.00 mm): Symbol U_ADR4 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -32.06 mm): Symbol U_ADR5 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -104.28 mm): Symbol U_ADR6 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 32.54 mm): Symbol U_ADR4 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 35.08 mm): Symbol U_ADR4 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -37.14 mm): Symbol U_ADR5 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 37.62 mm): Symbol U_ADR4 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -39.68 mm): Symbol U_ADR5 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -42.22 mm): Symbol U_ADR5 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 42.70 mm): Symbol U_ADR4 Pin M4 [SDO, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(30.00 mm, -120.00 mm): Label 'VCC5V'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -109.36 mm): Symbol U_ADR6 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -47.30 mm): Symbol U_ADR5 Pin M4 [SDO, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 47.78 mm): Symbol U_ADR4 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 50.32 mm): Symbol U_ADR4 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -111.90 mm): Symbol U_ADR6 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -52.38 mm): Symbol U_ADR5 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 52.86 mm): Symbol U_ADR4 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -54.92 mm): Symbol U_ADR5 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -114.44 mm): Symbol U_ADR6 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -57.46 mm): Symbol U_ADR5 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 57.94 mm): Symbol U_ADR4 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -60.00 mm): Symbol U_ADR5 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 60.48 mm): Symbol U_ADR4 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -116.98 mm): Symbol U_ADR6 Pin J13 [RX1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -62.54 mm): Symbol U_ADR5 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 63.02 mm): Symbol U_ADR4 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 65.56 mm): Symbol U_ADR4 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -119.52 mm): Symbol U_ADR6 Pin N2 [RX_LOAD, Input, Line]
+[missing_power_pin]: El símbolo U_ADR3 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, 120.00 mm): Symbol U_ADR3 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 120.00 mm): Symbol U_ADR3 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 122.54 mm): Symbol U_ADR3 Pin N5 [ADDR1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -124.60 mm): Symbol U_ADR6 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 127.62 mm): Symbol U_ADR3 Pin M3 [CSB, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -129.68 mm): Symbol U_ADR6 Pin G1 [DET4, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 128.00 mm): Label 'RF_ANT_3'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -132.22 mm): Symbol U_ADR6 Pin A1 [DET3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 132.70 mm): Symbol U_ADR3 Pin N13 [DET1, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 132.00 mm): Label 'SPI_SDO_3'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -134.76 mm): Symbol U_ADR6 Pin G13 [DET2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 135.24 mm): Symbol U_ADR3 Pin G13 [DET2, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, -138.00 mm): Label 'SPI_SDO_5'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -137.30 mm): Symbol U_ADR6 Pin N13 [DET1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 137.78 mm): Symbol U_ADR3 Pin A1 [DET3, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, -138.00 mm): Label 'SPI_SDO_6'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 140.32 mm): Symbol U_ADR3 Pin G1 [DET4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -142.38 mm): Symbol U_ADR6 Pin M3 [CSB, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, -142.00 mm): Label 'RF_ANT_6'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 145.40 mm): Symbol U_ADR3 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -147.46 mm): Symbol U_ADR6 Pin N5 [ADDR1, Input, Line]
+[missing_power_pin]: El símbolo U_ADR6 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, -150.00 mm): Symbol U_ADR6 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -150.00 mm): Symbol U_ADR6 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 150.48 mm): Symbol U_ADR3 Pin N2 [RX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -114.44 mm): Symbol U_ADR6 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 153.02 mm): Symbol U_ADR3 Pin J13 [RX1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -116.98 mm): Symbol U_ADR6 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 117.46 mm): Symbol U_ADR3 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -119.52 mm): Symbol U_ADR6 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 155.56 mm): Symbol U_ADR3 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 120.00 mm): Symbol U_ADR3 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -122.06 mm): Symbol U_ADR6 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 122.54 mm): Symbol U_ADR3 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 158.10 mm): Symbol U_ADR3 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 125.08 mm): Symbol U_ADR3 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 160.64 mm): Symbol U_ADR3 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -127.14 mm): Symbol U_ADR6 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 127.62 mm): Symbol U_ADR3 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -129.68 mm): Symbol U_ADR6 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -132.22 mm): Symbol U_ADR6 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 132.70 mm): Symbol U_ADR3 Pin M4 [SDO, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 165.72 mm): Symbol U_ADR3 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -137.30 mm): Symbol U_ADR6 Pin M4 [SDO, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 137.78 mm): Symbol U_ADR3 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 170.80 mm): Symbol U_ADR3 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 140.32 mm): Symbol U_ADR3 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -142.38 mm): Symbol U_ADR6 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 142.86 mm): Symbol U_ADR3 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -144.92 mm): Symbol U_ADR6 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 175.88 mm): Symbol U_ADR3 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -176.50 mm): Symbol U_ADR7 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -147.46 mm): Symbol U_ADR6 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 147.94 mm): Symbol U_ADR3 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -179.04 mm): Symbol U_ADR7 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -150.00 mm): Symbol U_ADR6 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 150.48 mm): Symbol U_ADR3 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 180.96 mm): Symbol U_ADR3 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -152.54 mm): Symbol U_ADR6 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 153.02 mm): Symbol U_ADR3 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 183.50 mm): Symbol U_ADR3 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -184.12 mm): Symbol U_ADR7 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 155.56 mm): Symbol U_ADR3 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -189.20 mm): Symbol U_ADR7 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -194.28 mm): Symbol U_ADR7 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -199.36 mm): Symbol U_ADR7 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -201.90 mm): Symbol U_ADR7 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -204.44 mm): Symbol U_ADR7 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -206.98 mm): Symbol U_ADR7 Pin J13 [RX1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -209.52 mm): Symbol U_ADR7 Pin N2 [RX_LOAD, Input, Line]
+[missing_power_pin]: El símbolo U_ADR2 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, 210.00 mm): Symbol U_ADR2 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 210.00 mm): Symbol U_ADR2 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 212.54 mm): Symbol U_ADR2 Pin N5 [ADDR1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -214.60 mm): Symbol U_ADR7 Pin B3 [PA_ON, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 218.00 mm): Label 'GND'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 217.62 mm): Symbol U_ADR2 Pin M3 [CSB, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 218.00 mm): Label 'RF_ANT_2'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -219.68 mm): Symbol U_ADR7 Pin G1 [DET4, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 222.00 mm): Label 'SPI_SDO_1'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -222.22 mm): Symbol U_ADR7 Pin A1 [DET3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 222.70 mm): Symbol U_ADR2 Pin N13 [DET1, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 222.00 mm): Label 'SPI_SDO_2'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -224.76 mm): Symbol U_ADR7 Pin G13 [DET2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 225.24 mm): Symbol U_ADR2 Pin G13 [DET2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -204.44 mm): Symbol U_ADR7 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -227.30 mm): Symbol U_ADR7 Pin N13 [DET1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 227.78 mm): Symbol U_ADR2 Pin A1 [DET3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -206.98 mm): Symbol U_ADR7 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 207.46 mm): Symbol U_ADR2 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 230.32 mm): Symbol U_ADR2 Pin G1 [DET4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -209.52 mm): Symbol U_ADR7 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 210.00 mm): Symbol U_ADR2 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -232.38 mm): Symbol U_ADR7 Pin M3 [CSB, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, -232.00 mm): Label 'RF_ANT_7'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -212.06 mm): Symbol U_ADR7 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 212.54 mm): Symbol U_ADR2 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 235.40 mm): Symbol U_ADR2 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 215.08 mm): Symbol U_ADR2 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -237.46 mm): Symbol U_ADR7 Pin N5 [ADDR1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -217.14 mm): Symbol U_ADR7 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 217.62 mm): Symbol U_ADR2 Pin A4 [PA_BIAS4, Output, Line]
+[missing_power_pin]: El símbolo U_ADR7 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, -240.00 mm): Symbol U_ADR7 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -240.00 mm): Symbol U_ADR7 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 240.48 mm): Symbol U_ADR2 Pin N2 [RX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -219.68 mm): Symbol U_ADR7 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 243.02 mm): Symbol U_ADR2 Pin J13 [RX1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -222.22 mm): Symbol U_ADR7 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 222.70 mm): Symbol U_ADR2 Pin M4 [SDO, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 245.56 mm): Symbol U_ADR2 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -227.30 mm): Symbol U_ADR7 Pin M4 [SDO, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 248.10 mm): Symbol U_ADR2 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 227.78 mm): Symbol U_ADR2 Pin B4 [TR_POL, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(92.38 mm, 240.00 mm): Label 'RF_COMBINED_IN'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 250.64 mm): Symbol U_ADR2 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 230.32 mm): Symbol U_ADR2 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -232.38 mm): Symbol U_ADR7 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 232.86 mm): Symbol U_ADR2 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -234.92 mm): Symbol U_ADR7 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 255.72 mm): Symbol U_ADR2 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -237.46 mm): Symbol U_ADR7 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 237.94 mm): Symbol U_ADR2 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -240.00 mm): Symbol U_ADR7 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 240.48 mm): Symbol U_ADR2 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 260.80 mm): Symbol U_ADR2 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -242.54 mm): Symbol U_ADR7 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 243.02 mm): Symbol U_ADR2 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 245.56 mm): Symbol U_ADR2 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 265.88 mm): Symbol U_ADR2 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -266.50 mm): Symbol U_ADR8 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -269.04 mm): Symbol U_ADR8 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 270.96 mm): Symbol U_ADR2 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 273.50 mm): Symbol U_ADR2 Pin M5 [SDIO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -274.12 mm): Symbol U_ADR8 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -279.20 mm): Symbol U_ADR8 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -284.28 mm): Symbol U_ADR8 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -289.36 mm): Symbol U_ADR8 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -291.90 mm): Symbol U_ADR8 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -294.44 mm): Symbol U_ADR8 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -296.98 mm): Symbol U_ADR8 Pin J13 [RX1, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 300.00 mm): Label 'TX_LOAD'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -299.52 mm): Symbol U_ADR8 Pin N2 [RX_LOAD, Input, Line]
+[missing_power_pin]: El símbolo U_ADR1 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, 300.00 mm): Symbol U_ADR1 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 300.00 mm): Symbol U_ADR1 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 302.54 mm): Symbol U_ADR1 Pin N5 [ADDR1, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 305.00 mm): Label 'TR_CTRL'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -304.60 mm): Symbol U_ADR8 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 307.62 mm): Symbol U_ADR1 Pin M3 [CSB, Input, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, 308.00 mm): Label 'RF_ANT_1'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -309.68 mm): Symbol U_ADR8 Pin G1 [DET4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -294.44 mm): Symbol U_ADR8 Pin J1 [TX4, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 312.00 mm): Label 'SPI_SDIO_IN'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -312.22 mm): Symbol U_ADR8 Pin A1 [DET3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 312.70 mm): Symbol U_ADR1 Pin N13 [DET1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -296.98 mm): Symbol U_ADR8 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 297.46 mm): Symbol U_ADR1 Pin A11 [LNA_BIAS, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 315.00 mm): Label 'SPI_CSB'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -314.76 mm): Symbol U_ADR8 Pin G13 [DET2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 315.24 mm): Symbol U_ADR1 Pin G13 [DET2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -299.52 mm): Symbol U_ADR8 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 300.00 mm): Symbol U_ADR1 Pin A10 [PA_BIAS1, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, -318.00 mm): Label 'SPI_SDO_7'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -317.30 mm): Symbol U_ADR8 Pin N13 [DET1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 317.78 mm): Symbol U_ADR1 Pin A1 [DET3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -302.06 mm): Symbol U_ADR8 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 302.54 mm): Symbol U_ADR1 Pin A9 [PA_BIAS2, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, -318.00 mm): Label 'SPI_SDO_8'
+[label_dangling]: Label not connected
+    ; error
+    @(55.00 mm, 320.00 mm): Label 'SPI_SCLK'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 320.32 mm): Symbol U_ADR1 Pin G1 [DET4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 305.08 mm): Symbol U_ADR1 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -322.38 mm): Symbol U_ADR8 Pin M3 [CSB, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -307.14 mm): Symbol U_ADR8 Pin B5 [TR_SW_POS, Output, Line]
+[label_dangling]: Label not connected
+    ; error
+    @(65.00 mm, -322.00 mm): Label 'RF_ANT_8'
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 307.62 mm): Symbol U_ADR1 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -309.68 mm): Symbol U_ADR8 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 325.40 mm): Symbol U_ADR1 Pin B3 [PA_ON, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -327.46 mm): Symbol U_ADR8 Pin N5 [ADDR1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -312.22 mm): Symbol U_ADR8 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 312.70 mm): Symbol U_ADR1 Pin M4 [SDO, Output, Line]
+[missing_power_pin]: El símbolo U_ADR8 tiene pines de entrada de alimentación en las unidades [ B ] que no están colocados
+    ; error
+    @(60.00 mm, -330.00 mm): Symbol U_ADR8 [ADAR1000ACCZN]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, -330.00 mm): Symbol U_ADR8 Pin N4 [ADDR0, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 330.48 mm): Symbol U_ADR1 Pin N2 [RX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -317.30 mm): Symbol U_ADR8 Pin M4 [SDO, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 317.78 mm): Symbol U_ADR1 Pin B4 [TR_POL, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 333.02 mm): Symbol U_ADR1 Pin J13 [RX1, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 320.32 mm): Symbol U_ADR1 Pin A3 [TR_SW_NEG, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 335.56 mm): Symbol U_ADR1 Pin C13 [RX2, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -322.38 mm): Symbol U_ADR8 Pin A4 [PA_BIAS4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 322.86 mm): Symbol U_ADR1 Pin B5 [TR_SW_POS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 338.10 mm): Symbol U_ADR1 Pin E1 [RX3, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -324.92 mm): Symbol U_ADR8 Pin A5 [PA_BIAS3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 340.64 mm): Symbol U_ADR1 Pin L1 [RX4, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -327.46 mm): Symbol U_ADR8 Pin A9 [PA_BIAS2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 327.94 mm): Symbol U_ADR1 Pin L13 [TX1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -330.00 mm): Symbol U_ADR8 Pin A10 [PA_BIAS1, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 330.48 mm): Symbol U_ADR1 Pin E13 [TX2, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 345.72 mm): Symbol U_ADR1 Pin M6 [SCLK, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, -332.54 mm): Symbol U_ADR8 Pin A11 [LNA_BIAS, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 333.02 mm): Symbol U_ADR1 Pin C1 [TX3, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(115.88 mm, 335.56 mm): Symbol U_ADR1 Pin J1 [TX4, Output, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 350.80 mm): Symbol U_ADR1 Pin N6 [TR, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 355.88 mm): Symbol U_ADR1 Pin N3 [TX_LOAD, Input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 360.96 mm): Symbol U_ADR1 Pin A7 [RF_IO, Bidirectional, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(60.00 mm, 363.50 mm): Symbol U_ADR1 Pin M5 [SDIO, Bidirectional, Line]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(60.00 mm, 0.96 mm): Symbol U_ADR5 Pin A7 [RF_IO, Bidirectional, Line]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, 30.00 mm): Symbol U_ADR4 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR4 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, 30.00 mm): Symbol U_ADR4 [ADAR1000ACCZN]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, -60.00 mm): Symbol U_ADR5 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR5 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, -60.00 mm): Symbol U_ADR5 [ADAR1000ACCZN]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(115.88 mm, 63.02 mm): Symbol U_ADR4 Pin C1 [TX3, Output, Line]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, 120.00 mm): Symbol U_ADR3 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR3 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, 120.00 mm): Symbol U_ADR3 [ADAR1000ACCZN]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(60.00 mm, -124.60 mm): Symbol U_ADR6 Pin B3 [PA_ON, Input, Line]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, -150.00 mm): Symbol U_ADR6 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR6 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, -150.00 mm): Symbol U_ADR6 [ADAR1000ACCZN]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(115.88 mm, 127.62 mm): Symbol U_ADR3 Pin A4 [PA_BIAS4, Output, Line]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, 210.00 mm): Symbol U_ADR2 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR2 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, 210.00 mm): Symbol U_ADR2 [ADAR1000ACCZN]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(60.00 mm, 235.40 mm): Symbol U_ADR2 Pin B3 [PA_ON, Input, Line]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, -240.00 mm): Symbol U_ADR7 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR7 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, -240.00 mm): Symbol U_ADR7 [ADAR1000ACCZN]
+[footprint_link_issues]: Huella 'SMA_Amphenol_132255-11' no encontrada en la biblioteca 'Connector_Coaxial'
+    ; warning
+    @(100.00 mm, 240.00 mm): Symbol J_SMA_RF [SMA_EdgeMount]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(115.88 mm, -237.46 mm): Symbol U_ADR7 Pin A9 [PA_BIAS2, Output, Line]
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(55.00 mm, 295.00 mm): Global Label 'SPI_SDIO_IN'
+    @(55.00 mm, 312.00 mm): Label 'SPI_SDIO_IN'
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(50.00 mm, 300.00 mm): Global Label 'SPI_CSB'
+    @(55.00 mm, 315.00 mm): Label 'SPI_CSB'
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, 300.00 mm): Symbol U_ADR1 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR1 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, 300.00 mm): Symbol U_ADR1 [ADAR1000ACCZN]
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(45.00 mm, 305.00 mm): Global Label 'SPI_SCLK'
+    @(55.00 mm, 320.00 mm): Label 'SPI_SCLK'
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(40.00 mm, 310.00 mm): Global Label 'GND'
+    @(55.00 mm, 218.00 mm): Label 'GND'
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(35.00 mm, 315.00 mm): Global Label 'VCC3V3'
+    @(55.00 mm, 38.00 mm): Label 'VCC3V3'
+[same_local_global_label]: Local and global labels have same name
+    ; warning
+    @(30.00 mm, 320.00 mm): Global Label 'VCC5V'
+    @(30.00 mm, -120.00 mm): Label 'VCC5V'
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(115.88 mm, 302.54 mm): Symbol U_ADR1 Pin A9 [PA_BIAS2, Output, Line]
+[lib_symbol_mismatch]: El símbolo 'ADAR1000ACCZN' no coincide con la copia en la biblioteca 'EasyEDA'
+    ; warning
+    @(60.00 mm, -330.00 mm): Symbol U_ADR8 [ADAR1000ACCZN]
+[missing_unit]: El símbolo U_ADR8 tiene unidades no colocadas [ B, C ]
+    ; warning
+    @(60.00 mm, -330.00 mm): Symbol U_ADR8 [ADAR1000ACCZN]
+[endpoint_off_grid]: Symbol pin or wire end off connection grid
+    ; warning
+    @(115.88 mm, -322.38 mm): Symbol U_ADR8 Pin A4 [PA_BIAS4, Output, Line]
+
+ ** ERC messages: 312  Errors 281  Warnings 31
+
+ ** Ignored checks:
+    - Global label only appears once in the schematic
+    - Four connection points are joined together
+    - SPICE model issue
+    - Assigned footprint doesn't match footprint filters

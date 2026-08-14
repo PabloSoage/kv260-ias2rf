@@ -1,0 +1,227 @@
+===== INVENTARIO CSI2-KRIA-KV260_Rev01-2.kicad_sch =====
+Archivo: E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch
+Lineas totales: 19431
+Rango (lib_symbols ...): 12..8469
+Total (symbol) top-level instanciados: 85
+
+----- 1. CLASIFICACION DE COMPONENTES (por bucket) -----
+
+== HIROSE_IAS  (n=1) ==
+  L 14972-L15188  ( 217 ln) | J8       | BM20B(0.8)-34DP-0.4V(51)         | fp='J-BM20B(0.8)-34DP' | lib=AVT_KHK_Lib:IAS1_0_CON BM20B(0.8)-34DP_AVT_KHK_Lib.IntLib
+
+== MOUNT_HOLE  (n=1) ==
+  L 16374-L16455  (  82 ln) | X1       | Hole                             | fp='HOLE-3.4-6.0-DK' | lib=AVT_KHK_Lib:IAS1_0_PCB HOLE 3.4-6-DK_AVT_KHK_Lib.IntLib
+
+== TESTPOINT  (n=6) ==
+  L 11469-L11551  (  83 ln) | TP6      | TP                               | fp='TP_16_10' | lib=AVT_KHK_Lib:IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib
+  L 13078-L13160  (  83 ln) | TP1      | TP                               | fp='TP_16_10' | lib=AVT_KHK_Lib:IAS1_1_TP_16_10_AVT_KHK_Lib.IntLib
+  L 15189-L15271  (  83 ln) | TP5      | TP                               | fp='TP_16_10' | lib=AVT_KHK_Lib:IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib
+  L 16212-L16294  (  83 ln) | TP3      | TP                               | fp='TP_16_10' | lib=AVT_KHK_Lib:IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib
+  L 17735-L17817  (  83 ln) | TP2      | TP                               | fp='TP_16_10' | lib=AVT_KHK_Lib:IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib
+  L 19034-L19116  (  83 ln) | TP4      | TP                               | fp='TP_16_10' | lib=AVT_KHK_Lib:IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib
+
+== RESISTOR  (n=10) ==
+  L 12259-L12427  ( 169 ln) | R24      | 0R0                              | fp='R-0603_0.6' | lib=Passive:IAS1_1_R 0R0 1% 0603_Passive.SCHLIB
+  L 12663-L12842  ( 180 ln) | C3       | 10u                              | fp='C-0805_1.4' | lib=Passive:IAS1_0_mirrored_C 10U 16V X5R 0805_Passive.SCHLIB
+  L 13946-L14149  ( 204 ln) | C8       | 100n                             | fp='C-0402_0.55' | lib=Passive:IAS1_0_C 100N 10% 16V X7R 402_Passive.SCHLIB
+  L 14387-L14555  ( 169 ln) | R1       | 0R0                              | fp='R-0603_0.6' | lib=AVT_KHK_Lib:IAS1_2_R 0R0 1% 0603_AVT_KHK_Lib.IntLib
+  L 14556-L14735  ( 180 ln) | C4       | 10u                              | fp='C-0805_1.4' | lib=Passive:IAS1_0_mirrored_C 10U 16V X5R 0805_Passive.SCHLIB
+  L 16691-L16870  ( 180 ln) | C52      | 4u7                              | fp='C-0603_1.0' | lib=Passive:IAS1_1_C 4U7 10V X5R 0603_Passive.SCHLIB
+  L 17897-L18101  ( 205 ln) | C9       | 100n                             | fp='C-0402_0.55' | lib=Passive:IAS1_0_mirrored_C 100N 10% 16V X7R 402_Passive.SCHLIB
+  L 18102-L18281  ( 180 ln) | C11      | 4u7                              | fp='C-0603_1.0' | lib=Passive:IAS1_0_C 4U7 10V X5R 0603_Passive.SCHLIB
+  L 18439-L18618  ( 180 ln) | C51      | 4u7                              | fp='C-0603_1.0' | lib=Passive:IAS1_1_C 4U7 10V X5R 0603_Passive.SCHLIB
+  L 18775-L18954  ( 180 ln) | C50      | 4u7                              | fp='C-0603_1.0' | lib=Passive:IAS1_1_C 4U7 10V X5R 0603_Passive.SCHLIB
+
+== POWER_SYMBOL  (n=66) ==
+  L 11708-L11786  (  79 ln) | #PWR?    | VCC-EXT-IN                       | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC-EXT-IN_CIRCLE
+  L 11787-L11864  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 11865-L11943  (  79 ln) | #PWR?    | VCC2V75                          | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC2V75_CIRCLE
+  L 11944-L12021  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 12022-L12100  (  79 ln) | #PWR?    | VCC5V-EXT                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE
+  L 12101-L12179  (  79 ln) | #PWR?    | VCC-EXT-IN                       | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC-EXT-IN_CIRCLE
+  L 12180-L12258  (  79 ln) | #PWR?    | VCC-EXT-IN                       | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC-EXT-IN_CIRCLE
+  L 12428-L12505  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 12506-L12583  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 12584-L12662  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 12843-L12920  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 12921-L12999  (  79 ln) | #PWR?    | VCC1V8                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V8_CIRCLE
+  L 13000-L13077  (  78 ln) | #PWR?    | VCC5V-EXT                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE
+  L 13161-L13238  (  78 ln) | #PWR?    | C-GND                            | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:C-GND_POWER_GROUND
+  L 13239-L13316  (  78 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 13317-L13394  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 13395-L13472  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 13473-L13550  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 13551-L13629  (  79 ln) | #PWR?    | VCC5V-EXT                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE
+  L 13630-L13708  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 13709-L13787  (  79 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 13788-L13866  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 13867-L13945  (  79 ln) | #PWR?    | VCC5V-EXT                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE
+  L 14150-L14228  (  79 ln) | #PWR?    | VCC1V2                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V2_CIRCLE
+  L 14229-L14307  (  79 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 14308-L14386  (  79 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 14736-L14813  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 14814-L14892  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 14893-L14971  (  79 ln) | #PWR?    | VCC1V2                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V2_CIRCLE
+  L 15272-L15349  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15350-L15427  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15428-L15505  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15506-L15584  (  79 ln) | #PWR?    | VCC5V-EXT                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE
+  L 15585-L15663  (  79 ln) | #PWR?    | VCC-EXT-IN                       | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC-EXT-IN_CIRCLE
+  L 15664-L15741  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15742-L15819  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15820-L15897  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15898-L15976  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 15977-L16054  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 16055-L16133  (  79 ln) | #PWR?    | VCC5V-EXT                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE
+  L 16134-L16211  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 16295-L16373  (  79 ln) | #PWR?    | VCC1V8                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V8_CIRCLE
+  L 16456-L16534  (  79 ln) | #PWR?    | VCC5V-CAM                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-CAM_CIRCLE
+  L 16535-L16612  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 16613-L16690  (  78 ln) | #PWR?    | VCC1V8                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V8_CIRCLE
+  L 16871-L16949  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 16950-L17027  (  78 ln) | #PWR?    | VCC1V8                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V8_CIRCLE
+  L 17028-L17106  (  79 ln) | #PWR?    | VCC2V75                          | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC2V75_CIRCLE
+  L 17107-L17184  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 17185-L17263  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 17264-L17341  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 17342-L17419  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 17420-L17498  (  79 ln) | #PWR?    | C-GND                            | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:C-GND_POWER_GROUND
+  L 17499-L17576  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 17577-L17655  (  79 ln) | #PWR?    | VCC-EXT-IN                       | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC-EXT-IN_CIRCLE
+  L 17656-L17734  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 17818-L17896  (  79 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 18282-L18359  (  78 ln) | #PWR?    | VCC1V8                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC1V8_CIRCLE
+  L 18360-L18438  (  79 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 18619-L18696  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 18697-L18774  (  78 ln) | #PWR?    | C-GND                            | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:C-GND_POWER_GROUND
+  L 18955-L19033  (  79 ln) | #PWR?    | VCC5V-CAM                        | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-CAM_CIRCLE
+  L 19117-L19194  (  78 ln) | #PWR?    | VCC3V3                           | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC3V3_CIRCLE
+  L 19195-L19273  (  79 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+  L 19274-L19352  (  79 ln) | #PWR?    | VCC2V75                          | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:VCC2V75_CIRCLE
+  L 19353-L19430  (  78 ln) | #PWR?    | GND                              | fp='' | lib=CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR
+
+== OTHER  (n=1) ==
+  L 11552-L11707  ( 156 ln) | C10      | NL                               | fp='C-0603_1.0' | lib=AVT_KHK_Lib:IAS1_0_C X 0603_AVT_KHK_Lib.IntLib
+
+
+----- 2. ETIQUETAS -----
+
+[global_label] n=0
+
+[hierarchical_label] n=2
+  L11447: VCC5V-EXT
+  L11458: GND
+
+[label locales] n=54
+  L10907: I2C_SCL_3V3
+  L10917: GPIO2_3V3
+  L10927: B7-CSI2-TXC_N
+  L10937: PWDN
+  L10947: EXT-GPIO3
+  L10957: B7-CSI2-TXD2_P
+  L10967: I2C_SDA
+  L10977: B7-CSI2-TXD2_N
+  L10987: B7-CSI2-TXD3_N
+  L10997: B7-CSI2-TXD1_P
+  L11007: EXT-GPIO1-I2C-SDA
+  L11017: EXT-GPIO0-I2C-SCL
+  L11027: B7-CSI2-TXD3_P
+  L11037: PWDN
+  L11047: I2C_SDA_3V3
+  L11057: EXT-GPIO0-I2C-SCL
+  L11067: I2C_SDA_3V3
+  L11077: B7-CSI2-TXD0_P
+  L11087: B7-CSI2-TXD1_P
+  L11097: GPIO2
+  L11107: B7-CSI2-TXC_P
+  L11117: I2C_SCL_3V3
+  L11127: PWDN_3V3
+  L11137: B7-CSI2-TXD1_N
+  L11147: B7-CSI2-TXD2_N
+  L11157: I2C_SCL_3V3
+  L11167: B7-CSI2-TXD0_P
+  L11177: EXT-GPIO1-I2C-SDA
+  L11187: B7-CSI2-TXC_N
+  L11197: PWDN_3V3
+  L11207: B7-CSI2-TXD1_N
+  L11217: B7-CSI2-TXD0_N
+  L11227: EXT-GPIO2
+  L11237: I2C_SCL_3V3
+  L11247: B7-CSI2-TXD0_N
+  L11257: B7-CSI2-TXC_P
+  L11267: I2C_SDA_3V3
+  L11277: I2C_SDA_3V3
+  L11287: PWDN
+  L11297: I2C_SCL_3V3
+  L11307: EXT-GPIO2
+  L11317: GPIO2
+  L11327: GPIO2_3V3
+  L11337: I2C_SDA_3V3
+  L11347: I2C_SCL
+  L11357: B7-CSI2-TXD3_P
+  L11367: EXT-GPIO3
+  L11377: GPIO3_3V3
+  L11387: B7-CSI2-TXD3_N
+  L11397: GPIO3_3V3
+  L11407: GPIO2
+  L11417: B7-CSI2-TXD2_P
+  L11427: I2C_SDA
+  L11437: I2C_SCL
+
+
+----- 3. LIBRERIAS DEFINIDAS EN (lib_symbols) -----
+Total simbolos definidos: 49
+  Passive: 15 simbolos
+  AVT_KHK_Lib: 12 simbolos
+  CSI2-KRIA-KV260_Rev01-altium-import: 9 simbolos
+  Connector: 6 simbolos
+  Bipolar: 3 simbolos
+  Logic: 2 simbolos
+  Power: 2 simbolos
+
+
+----- 4. CHIPS NUEVOS: presentes en lib_symbols? -----
+  AD9268: NO (faltan por importar)
+  AD9779: NO (faltan por importar)
+  ADAR1000: NO (faltan por importar)
+  HMC547: NO (faltan por importar)
+  ADL5801: NO (faltan por importar)
+  8132H: NO (faltan por importar)
+  ADCLK944: NO (faltan por importar)
+
+
+----- 5. PINES DEL HIROSE BM20B(0.8)-34DP -----
+Total pins detectados en la definicion: 0
+
+
+----- 6. OTROS DATOS UTILES -----
+Menciones de palabras clave en el archivo (excluye lib_symbols):
+  MIPI           : 0
+  CSI            : 172
+  MIPI           : 0
+  Camera         : 1
+  Sensor         : 0
+  TCAM           : 0
+  Focus          : 0
+  Actuator       : 0
+  EEPROM         : 0
+  XCLK           : 0
+  FSIN           : 0
+  AUTOM          : 0
+  PWM            : 0
+  RESET          : 1
+  XSHUT          : 0
+  TRIGGER        : 0
+  SCL            : 9
+  SDA            : 9
+  I2C            : 20
+  SPI            : 5
+  FPGA           : 0
+  LVDS           : 0
+  VCC1V8         : 10
+  VCC1V2         : 4
+  VCC3V3         : 14
+  VCC5V          : 17
+  VCC2V75        : 6
+  VCC5V-CAM      : 4
+  VCC-EXT        : 11

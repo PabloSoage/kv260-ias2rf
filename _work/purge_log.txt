@@ -1,0 +1,22 @@
+# Purge log - 2026-08-02T17:05:19.555760
+# Archivo: E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch
+# Lineas antes: 29298
+
+  BORRADO J5    L28279-L28418 (140 ln): Jumper 2.54
+  BORRADO J1    L27626-L27791 (166 ln): USB 2.0 Type B (camara/alim)
+  BORRADO U3    L26307-L26469 (163 ln): PCA9306 I2C level shifter
+  BORRADO D1    L26161-L26306 (146 ln): ESD9B5.0ST5G (ESD USB)
+  BORRADO U5    L23525-L23687 (163 ln): NCP114 LDO 3V3 camara
+  BORRADO J10   L22416-L22566 (151 ln): CON1x4 2.54
+  BORRADO J2    L19103-L19247 (145 ln): CON1x2 2.54
+  BORRADO J7    L17595-L17806 (212 ln): FFC22 camara MIPI
+  BORRADO J9    L16962-L17112 (151 ln): CON1x4 2.54
+  BORRADO U1    L15920-L16106 (187 ln): INA260 monitor corriente camara
+  BORRADO U2    L15738-L15919 (182 ln): TPS25200 USB power switch
+  BORRADO J6    L14860-L15008 (149 ln): CON1x3 2.54
+  BORRADO U4    L14279-L14453 (175 ln): NTB0104 level shifter 4-bit
+  BORRADO D3    L14109-L14278 (170 ln): LED verde camara
+  BORRADO D2    L13862-L14030 (169 ln): LED rojo camara
+
+# Total borradas: 2469 lineas
+# Lineas despues: 26829

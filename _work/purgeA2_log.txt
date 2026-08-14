@@ -1,0 +1,5 @@
+# Purge A2 - 2026-08-02T17:18:15.763676
+# Coords orphanas en ERC: 105
+# Borrado: {'wire': 133, 'label': 0, 'global_label': 0, 'hierarchical_label': 0, 'junction': 22, 'no_connect': 0}
+# Conservado: {'wire': 86, 'label': 58, 'global_label': 0, 'hierarchical_label': 2, 'junction': 45, 'no_connect': 21}
+# Lineas antes: 26829, despues: 25367
