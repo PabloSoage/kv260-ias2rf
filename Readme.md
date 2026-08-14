@@ -43,7 +43,9 @@ una placa adaptadora de cámaras Allied Vision.** Si buscas eso, usa el proyecto
 
 | Documento | Contenido |
 |---|---|
-| **[HANDOFF.md](HANDOFF.md)** | **Empieza aquí si retomas el proyecto.** Resumen autocontenido: estado, hallazgos, decisión pendiente y reglas de trabajo |
+| **[HANDOFF.md](HANDOFF.md)** | **Empieza aquí si retomas el proyecto.** Resumen autocontenido: estado, hallazgos, decisiones pendientes y reglas de trabajo |
+| **[docs/PLATAFORMA_4X4.md](docs/PLATAFORMA_4X4.md)** | **Visión de sistema.** Esta placa es un subsistema de una plataforma de sensores y comunicaciones para un 4×4 de expedición: LiDAR, SDR, radar, OBD2 |
+| **[docs/LISTA_COMPRA.md](docs/LISTA_COMPRA.md)** | Lista de material y checklist por etapas, con costes orientativos |
 | **[ARCHITECTURE_draft_es.md](ARCHITECTURE_draft_es.md)** | **Documento maestro.** Arquitectura Rev03: FPGA de front-end, enlace con la Kria, conversores, plan de frecuencias, integración con AERIS-10, BOM |
 | [docs/AUDITORIA_Rev01.md](docs/AUDITORIA_Rev01.md) | Auditoría de los ficheros actuales: qué hay realmente en el repo frente a lo que la documentación anterior afirmaba |
 | [docs/RIESGOS.md](docs/RIESGOS.md) | Bloqueantes y riesgos abiertos, priorizados, con acción concreta para cerrar cada uno |
