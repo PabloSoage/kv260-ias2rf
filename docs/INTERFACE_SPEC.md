@@ -174,7 +174,12 @@ body, or simplified out.
 So the envelope is known, but **which way the board may grow is not**. Two ways to close it, the
 second faster than the first:
 
-1. **XTP681**, the carrier card PCB layout (Allegro), which gives exact connector placements.
+1. **XTP681**, the carrier card PCB layout — but **not by parsing it**. The `.brd` is binary
+   Allegro and an attempt to recover the connector coordinates from it failed; see
+   [`_work/brd_probe_NEGATIVE.md`](../_work/brd_probe_NEGATIVE.md) for what was tried and why it
+   is not worth retrying. It has to be opened in the viewer, which needs the board passed as a
+   command-line argument — from its shortcut the viewer starts in APD+ mode and will not offer
+   `.brd` at all.
 2. **A ruler.** Mount the existing adapter and measure the clearance from its edges to the fansink
    and to the rear connectors. Five minutes, and it settles it.
 
