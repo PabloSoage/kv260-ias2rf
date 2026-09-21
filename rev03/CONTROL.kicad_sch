@@ -1,0 +1,454 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "2a562916-9265-5dd3-868e-d77f6a94272f")
+	(paper "A3")
+	(title_block
+		(title "CONTROL - Front-end FPGA, Pmod, AERIS-10 control IDC")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "LINK_RX_D0_P"
+		(shape output)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a770dce6-e83b-52e5-b528-7fa30814f01b")
+	)
+	(hierarchical_label "LINK_RX_D0_N"
+		(shape output)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6410a4ea-dd8f-5ce3-83f3-3dd3b40e8e86")
+	)
+	(hierarchical_label "LINK_RX_D1_P"
+		(shape output)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f7bc2a07-e276-5053-9345-49f1290b8b8f")
+	)
+	(hierarchical_label "LINK_RX_D1_N"
+		(shape output)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ab1e22a9-1af7-515f-a6f9-d05b7c8dde39")
+	)
+	(hierarchical_label "LINK_RX_CLK_P"
+		(shape output)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ed2ebc1a-e5cd-5677-8193-ddf62be7d8fa")
+	)
+	(hierarchical_label "LINK_RX_CLK_N"
+		(shape output)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a024eb7e-457a-56e5-b97f-a20620e37189")
+	)
+	(hierarchical_label "LINK_TX_D0_P"
+		(shape input)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e2fed018-94bb-51eb-bf63-bad1600e2ea5")
+	)
+	(hierarchical_label "LINK_TX_D0_N"
+		(shape input)
+		(at 25.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f3542a18-bee3-55cb-a42f-302cf2a10000")
+	)
+	(hierarchical_label "LINK_TX_CLK_P"
+		(shape input)
+		(at 25.4 66.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "015a3109-f358-504d-bed3-e8185a2d8029")
+	)
+	(hierarchical_label "LINK_TX_CLK_N"
+		(shape input)
+		(at 25.4 71.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "de953f2c-5b11-5469-9961-68be31aa5641")
+	)
+	(hierarchical_label "HK_SCL"
+		(shape bidirectional)
+		(at 25.4 76.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "03e9519e-7348-51cd-8499-69533768b5f1")
+	)
+	(hierarchical_label "HK_SDA"
+		(shape bidirectional)
+		(at 25.4 81.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "dcd12979-de5c-5be4-b879-8f49e2d76561")
+	)
+	(hierarchical_label "FPGA_PROG_B"
+		(shape input)
+		(at 25.4 86.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fd4ef826-e8b7-52c8-9fc9-3544259c21b0")
+	)
+	(hierarchical_label "FPGA_IRQ"
+		(shape output)
+		(at 25.4 91.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "2ee91c14-e498-53cb-8ef1-889c3b15f257")
+	)
+	(hierarchical_label "ADCR_D_P[7..0]"
+		(shape output)
+		(at 25.4 96.5200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5dfe6049-d6e8-5ee0-91de-d43794ea5c1e")
+	)
+	(hierarchical_label "ADCR_D_N[7..0]"
+		(shape output)
+		(at 25.4 101.6000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4275d1c8-d8be-5abf-9bcc-b0097e7c0ed5")
+	)
+	(hierarchical_label "ADCR_DCO_P"
+		(shape output)
+		(at 25.4 106.6800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "043efae5-8a43-5af6-8c65-d825c3ff987b")
+	)
+	(hierarchical_label "ADCR_DCO_N"
+		(shape output)
+		(at 25.4 111.7600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c59ad230-583a-5043-b9f9-697c37a02b5e")
+	)
+	(hierarchical_label "ADCR_OR_P"
+		(shape output)
+		(at 25.4 116.8400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e6bfd059-be7b-527a-bc0c-823135478292")
+	)
+	(hierarchical_label "ADCR_OR_N"
+		(shape output)
+		(at 25.4 121.9200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ef1c7ce7-b02e-5cb3-9252-b0a69fc139f4")
+	)
+	(hierarchical_label "ADCS_D0_P"
+		(shape output)
+		(at 25.4 127.0000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4e4be1c1-249c-5942-9b16-4661a3268b6a")
+	)
+	(hierarchical_label "ADCS_D0_N"
+		(shape output)
+		(at 25.4 132.0800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "14f2d3a6-7bc4-5884-a928-96cfb2a77393")
+	)
+	(hierarchical_label "ADCS_D1_P"
+		(shape output)
+		(at 25.4 137.1600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "262e0a72-633b-52a8-a41a-5c883e2d6ddd")
+	)
+	(hierarchical_label "ADCS_D1_N"
+		(shape output)
+		(at 25.4 142.2400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "88b38ed5-f7a9-5290-b571-01c1f6f79562")
+	)
+	(hierarchical_label "ADCS_DCO_P"
+		(shape output)
+		(at 25.4 147.3200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "605d28c0-525e-5a74-9873-92f7707f93ab")
+	)
+	(hierarchical_label "ADCS_DCO_N"
+		(shape output)
+		(at 25.4 152.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6b4b7b12-b5f1-5e61-83bd-bd0d94d228fe")
+	)
+	(hierarchical_label "ADCS_FCO_P"
+		(shape output)
+		(at 25.4 157.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9e1bc378-997a-5a95-a995-983b349fec53")
+	)
+	(hierarchical_label "ADCS_FCO_N"
+		(shape output)
+		(at 25.4 162.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8b06af7f-2c3d-52c8-9976-6adef080f572")
+	)
+	(hierarchical_label "DACR_D[7..0]"
+		(shape input)
+		(at 25.4 167.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3ba38d69-3651-5c65-914e-593c6236aac4")
+	)
+	(hierarchical_label "DACR_CLK"
+		(shape input)
+		(at 25.4 172.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5f031f74-1218-5328-9c8c-eccb65c8d819")
+	)
+	(hierarchical_label "DACS_D[13..0]"
+		(shape input)
+		(at 25.4 177.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3d1d2138-4d26-5b2d-a0de-6084e25dca97")
+	)
+	(hierarchical_label "DACS_IQWRT"
+		(shape input)
+		(at 25.4 182.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "57830432-4907-5498-b008-faa9f9333a94")
+	)
+	(hierarchical_label "DACS_IQSEL"
+		(shape input)
+		(at 25.4 187.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c9cf782d-f888-5e48-bd32-94b7985241d5")
+	)
+	(hierarchical_label "CONV_SPI_SCLK"
+		(shape input)
+		(at 25.4 193.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "2994f08e-3a75-52e8-9bd1-f699875dd3fb")
+	)
+	(hierarchical_label "CONV_SPI_SDIO"
+		(shape bidirectional)
+		(at 25.4 198.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b7037647-9fb2-5f3f-97db-4ee5178e8a0f")
+	)
+	(hierarchical_label "CONV_SPI_CSB_R"
+		(shape input)
+		(at 25.4 203.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5074ed8b-24e3-5dfa-99a6-779d2683c0f1")
+	)
+	(hierarchical_label "CONV_SPI_CSB_S"
+		(shape input)
+		(at 25.4 208.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9eaa0dad-d436-5868-9482-e4e22c18096d")
+	)
+	(hierarchical_label "CLK_FPGA_P"
+		(shape input)
+		(at 25.4 213.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1f8db986-6967-5069-b0a0-6c867660ac38")
+	)
+	(hierarchical_label "CLK_FPGA_N"
+		(shape input)
+		(at 25.4 218.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "693a6dde-b4f8-5579-8880-5e310f5187da")
+	)
+	(hierarchical_label "SW_CTRL[3..0]"
+		(shape output)
+		(at 25.4 223.5200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "eef1c9cb-c8c9-5a08-bc49-5fcab33a85ee")
+	)
+)

@@ -130,6 +130,14 @@ with `kicad-cli 10.0.1`:
 | `label_multiple_wires` | 1 | 0 |
 | **Total** | **1130** | **427** |
 
+Two further passes since, both measured:
+
+| Stage | Total | Notable |
+|---|---|---|
+| Dead sheets removed | 427 | `pin_to_pin` 63 → 0 |
+| Multi-channel annotation fixed | **411** | netlist exports: 48 components, 61 nets |
+| Rev03 hierarchy skeleton added | 496 | **`hier_label_mismatch` 36 → 0**; +121 `label_dangling`, which is the 108 new interface labels awaiting their circuits |
+
 What remains is pre-existing noise from the Altium import (off-grid endpoints, library symbols
 the CLI cannot resolve) plus leftovers of the purge. The serious electrical categories are gone.
 

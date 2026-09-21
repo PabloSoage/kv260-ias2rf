@@ -1,0 +1,421 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "033a9d06-aab2-5543-9442-caa30e977956")
+	(paper "A3")
+	(title_block
+		(title "CONVERTERS - AD9484, AD9253, AD9708, AD9767, AD8352 drivers")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "ADCR_D_P[7..0]"
+		(shape input)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "023c23ee-45b9-5f04-81fd-293d512a8737")
+	)
+	(hierarchical_label "ADCR_D_N[7..0]"
+		(shape input)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0028f531-b331-5823-8cb4-6e0d6d042e47")
+	)
+	(hierarchical_label "ADCR_DCO_P"
+		(shape input)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f2b2ce47-6eae-5dbd-ba01-42788ce69081")
+	)
+	(hierarchical_label "ADCR_DCO_N"
+		(shape input)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0231fc9a-da93-5091-a922-7ede5cea8cf6")
+	)
+	(hierarchical_label "ADCR_OR_P"
+		(shape input)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7e5e59ca-1c38-53ca-ad7c-ae8f4211b76c")
+	)
+	(hierarchical_label "ADCR_OR_N"
+		(shape input)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "711a7045-36e0-5b8f-bc8f-383fded5b39f")
+	)
+	(hierarchical_label "ADCS_D0_P"
+		(shape input)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9fc3a1fc-747c-5c01-bac5-ac213f800620")
+	)
+	(hierarchical_label "ADCS_D0_N"
+		(shape input)
+		(at 25.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8d64ee8b-39cb-50ed-be9a-ca8577d3ee9b")
+	)
+	(hierarchical_label "ADCS_D1_P"
+		(shape input)
+		(at 25.4 66.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "000de619-33c5-53b3-a0a9-5d82a712034b")
+	)
+	(hierarchical_label "ADCS_D1_N"
+		(shape input)
+		(at 25.4 71.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "90ee3bfd-1557-5c1a-bfd1-741804c8d035")
+	)
+	(hierarchical_label "ADCS_DCO_P"
+		(shape input)
+		(at 25.4 76.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fd91662f-8b3c-5221-8b6a-ad9c06898a93")
+	)
+	(hierarchical_label "ADCS_DCO_N"
+		(shape input)
+		(at 25.4 81.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "411590e7-6a90-5094-b904-eb857a58a9cc")
+	)
+	(hierarchical_label "ADCS_FCO_P"
+		(shape input)
+		(at 25.4 86.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ee8cc499-51ab-58f0-ba41-8d1d554955aa")
+	)
+	(hierarchical_label "ADCS_FCO_N"
+		(shape input)
+		(at 25.4 91.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c75eb497-f8b7-58e1-a0be-e013ce35579d")
+	)
+	(hierarchical_label "DACR_D[7..0]"
+		(shape output)
+		(at 25.4 96.5200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "69c5014e-3587-53f9-983a-bec4c4a70395")
+	)
+	(hierarchical_label "DACR_CLK"
+		(shape output)
+		(at 25.4 101.6000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1399bc9f-e989-510e-bde7-2b914aa6dba9")
+	)
+	(hierarchical_label "DACS_D[13..0]"
+		(shape output)
+		(at 25.4 106.6800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f2c8c37a-b406-5228-900c-cf3efedc2842")
+	)
+	(hierarchical_label "DACS_IQWRT"
+		(shape output)
+		(at 25.4 111.7600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0a0cecc1-2e0b-5454-90ef-327cca996c64")
+	)
+	(hierarchical_label "DACS_IQSEL"
+		(shape output)
+		(at 25.4 116.8400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "169754ad-8487-5651-b7ba-d769b6e19e83")
+	)
+	(hierarchical_label "CONV_SPI_SCLK"
+		(shape output)
+		(at 25.4 121.9200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "966075bb-2133-5b79-9d58-4e89d8ce0a0b")
+	)
+	(hierarchical_label "CONV_SPI_SDIO"
+		(shape bidirectional)
+		(at 25.4 127.0000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "bfbfa1f2-e03f-5406-aad2-83fab3e447ed")
+	)
+	(hierarchical_label "CONV_SPI_CSB_R"
+		(shape output)
+		(at 25.4 132.0800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a804c840-d229-5df5-999e-81ccbecbd24b")
+	)
+	(hierarchical_label "CONV_SPI_CSB_S"
+		(shape output)
+		(at 25.4 137.1600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fa8f93f3-f134-5a6a-b4fe-7698e0d7865a")
+	)
+	(hierarchical_label "CLK_ADCR_P"
+		(shape input)
+		(at 25.4 142.2400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "17f4c6b2-9094-5822-b9cd-18fd18af063c")
+	)
+	(hierarchical_label "CLK_ADCR_N"
+		(shape input)
+		(at 25.4 147.3200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "581eb167-b76f-5831-8fef-bde5544f5e4b")
+	)
+	(hierarchical_label "CLK_ADCS_P"
+		(shape input)
+		(at 25.4 152.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7d733dca-22d6-5211-8b78-3623b01abebb")
+	)
+	(hierarchical_label "CLK_ADCS_N"
+		(shape input)
+		(at 25.4 157.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a3dff546-3bfd-5126-9b49-05585f804aec")
+	)
+	(hierarchical_label "CLK_DAC_P"
+		(shape input)
+		(at 25.4 162.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "719439d6-03c8-509c-8d4c-53ec807afffd")
+	)
+	(hierarchical_label "CLK_DAC_N"
+		(shape input)
+		(at 25.4 167.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0bf6fdd9-811e-5bc6-ba24-ddde0a6a9890")
+	)
+	(hierarchical_label "IF_RX_A_P"
+		(shape bidirectional)
+		(at 25.4 172.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e334e33a-49d4-5cb7-a0f9-30dde7fbef38")
+	)
+	(hierarchical_label "IF_RX_A_N"
+		(shape bidirectional)
+		(at 25.4 177.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f0a248c4-d743-54be-90f6-8b2c0bf5fd7e")
+	)
+	(hierarchical_label "IF_RX_B_P"
+		(shape bidirectional)
+		(at 25.4 182.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3d12aacb-a32d-5267-8a34-7180fca0b361")
+	)
+	(hierarchical_label "IF_RX_B_N"
+		(shape bidirectional)
+		(at 25.4 187.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6f8e9328-1ee4-5f12-850b-81f565d9816e")
+	)
+	(hierarchical_label "IF_TX_A_P"
+		(shape bidirectional)
+		(at 25.4 193.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "dd6be12b-d4ab-5bc7-b0fb-a49c9258128c")
+	)
+	(hierarchical_label "IF_TX_A_N"
+		(shape bidirectional)
+		(at 25.4 198.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1d476923-26d0-5b45-b127-51f3dd125741")
+	)
+	(hierarchical_label "IF_TX_B_P"
+		(shape bidirectional)
+		(at 25.4 203.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c525b4e2-da71-5e3f-8d4a-91035e151e25")
+	)
+	(hierarchical_label "IF_TX_B_N"
+		(shape bidirectional)
+		(at 25.4 208.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "487506d7-0c64-5bac-9297-14bce1eb16c7")
+	)
+)

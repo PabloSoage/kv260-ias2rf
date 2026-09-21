@@ -1,0 +1,102 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "423bdb5f-8c25-5c72-9810-ebc4bd82ce94")
+	(paper "A3")
+	(title_block
+		(title "CLOCK - Reference selector, TCXO, ADCLK944 fan-out")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "CLK_ADCR_P"
+		(shape output)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "03cf87f9-607f-5b24-88a0-c309d34f27f8")
+	)
+	(hierarchical_label "CLK_ADCR_N"
+		(shape output)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "db222c2e-7de1-5114-a08c-865bbfd514ab")
+	)
+	(hierarchical_label "CLK_ADCS_P"
+		(shape output)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3e7b06aa-0690-5a85-835d-e46d3111c886")
+	)
+	(hierarchical_label "CLK_ADCS_N"
+		(shape output)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "dc3d3251-c622-55a4-9f5e-afeed09fee52")
+	)
+	(hierarchical_label "CLK_DAC_P"
+		(shape output)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "05b9bc41-4eab-5019-a32e-7dcff35e6f4a")
+	)
+	(hierarchical_label "CLK_DAC_N"
+		(shape output)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7b5dedc1-d538-5d34-9aa3-d53832e034c6")
+	)
+	(hierarchical_label "CLK_FPGA_P"
+		(shape output)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6d925f52-7e7f-5ea9-ab12-1e3214a315d3")
+	)
+	(hierarchical_label "CLK_FPGA_N"
+		(shape output)
+		(at 25.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "77180812-d871-5167-8eb6-6c6abd041d27")
+	)
+)

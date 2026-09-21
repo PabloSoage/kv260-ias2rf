@@ -1,0 +1,3629 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "56c49378-41a8-4cbc-b1f4-3d0ea65d2366")
+	(paper "A3")
+	(title_block
+		(title "CSI2-KRIA-KV260_Rev01")
+		(rev "01")
+		(company "Allied Vision Technologies GmbH")
+	)
+	(lib_symbols
+		(symbol "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Position Marker for PCBs"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "*PCB_Marker_Pad_top*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib_1_0"
+				(circle
+					(center 0 0)
+					(radius 2.54)
+					(stroke
+						(width 0)
+						(type solid)
+						(color 0 156 202 1)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -2.54) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 0) (xy -2.54 0)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "AVT_KHK_Lib:root_0_PCB TEXT FIELD BOT_AVT_KHK_Lib.IntLib"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "PCB Textfield BOT"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "*PCB{space}TEXTFIELD{space}BOT{space}2*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "root_0_PCB TEXT FIELD BOT_AVT_KHK_Lib.IntLib_1_0"
+				(polyline
+					(pts
+						(xy -7.62 -6.35) (xy -7.62 -11.43) (xy 1.27 -11.43) (xy 1.27 5.08) (xy -7.62 5.08) (xy -7.62 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 -6.35) (xy -5.08 -11.43)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -6.35) (xy -3.81 -11.43)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 -6.35) (xy -7.62 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 -11.43) (xy -2.54 5.08)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 1.27 -11.43)
+					(end -7.62 5.08)
+					(stroke
+						(width 0.0254)
+						(type solid)
+						(color 128 0 0 1)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(text "PCB Text Field"
+					(at -1.27 2.54 900)
+					(effects
+						(font
+							(size 1.016 1.016)
+						)
+						(justify right bottom)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "AVT_KHK_Lib:root_0_PCB TEXT FIELD TOP_AVT_KHK_Lib.IntLib"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "PCB Textfield TOP"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "*PCB{space}TEXTFIELD{space}TOP{space}2*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "root_0_PCB TEXT FIELD TOP_AVT_KHK_Lib.IntLib_1_0"
+				(polyline
+					(pts
+						(xy -7.62 -6.35) (xy -7.62 -11.43) (xy 1.27 -11.43) (xy 1.27 5.08) (xy -7.62 5.08) (xy -7.62 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.08 -6.35) (xy -5.08 -11.43)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -3.81 -6.35) (xy -3.81 -11.43)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 -6.35) (xy -7.62 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 -11.43) (xy -2.54 5.08)
+					)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start 1.27 -11.43)
+					(end -7.62 5.08)
+					(stroke
+						(width 0.0254)
+						(type solid)
+						(color 128 0 0 1)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(text "PCB Text Field"
+					(at -1.27 2.54 900)
+					(effects
+						(font
+							(size 1.016 1.016)
+						)
+						(justify right bottom)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "AVT_KHK_Lib:root_0_PCB_AVT_KHK_Lib.IntLib"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "PCB ML06"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "root_0_PCB_AVT_KHK_Lib.IntLib_1_0"
+				(rectangle
+					(start 2.54 -7.62)
+					(end -5.08 0)
+					(stroke
+						(width 0.0254)
+						(type solid)
+						(color 128 0 0 1)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR"
+			(power global)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "GND"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "El símbolo de potencia crea una etiqueta global con el nombre 'GND'"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "power-flag"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "GND_BAR_0_0"
+				(polyline
+					(pts
+						(xy -1.27 -2.54) (xy 1.27 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin power_in line
+					(at 0 0 0)
+					(length 0)
+					(hide yes)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE"
+			(power global)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "VCC5V-EXT"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "El símbolo de potencia crea una etiqueta global con el nombre 'VCC5V-EXT'"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "power-flag"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "VCC5V-EXT_CIRCLE_0_0"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 -1.905)
+					(radius 0.635)
+					(stroke
+						(width 0.127)
+						(type solid)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin power_in line
+					(at 0 0 0)
+					(length 0)
+					(hide yes)
+					(name "VCC5V-EXT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Misc:root_0_PCB LABEL 7x7_Misc.SCHLIB"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "LABEL 7x7mm"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "*PCB{space}LABEL{space}7x7*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "root_0_PCB LABEL 7x7_Misc.SCHLIB_1_0"
+				(rectangle
+					(start 2.54 -7.62)
+					(end -5.08 0)
+					(stroke
+						(width 0.0254)
+						(type solid)
+						(color 128 0 0 1)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(text "Name:"
+		(exclude_from_sim no)
+		(at 377.19 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "0a091410-4246-4129-a8a5-cd2ddb4b37cd")
+	)
+	(text "No."
+		(exclude_from_sim no)
+		(at 312.42 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "1d583a49-8c51-4db9-8bb8-4dc0736386fc")
+	)
+	(text "File:"
+		(exclude_from_sim no)
+		(at 238.76 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "22b3142d-5a6a-4fd1-b920-8d71e72a532a")
+	)
+	(text "${PCBA}"
+		(exclude_from_sim no)
+		(at 276.86 275.6662 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "26751be2-0511-4197-bd90-b37c8deafcb0")
+	)
+	(text ""
+		(exclude_from_sim no)
+		(at 311.15 256.3622 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "272e1273-e634-4e3a-833e-5ac73ae1f3eb")
+	)
+	(text "IAS1"
+		(exclude_from_sim no)
+		(at 290.83 161.1122 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.508)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "32ef0a35-a171-4c38-b853-1b9c29186b58")
+	)
+	(text "${FILENAME}"
+		(exclude_from_sim no)
+		(at 245.11 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "3b27f9c2-6f69-4c49-8537-7840246bb60a")
+	)
+	(text "${##}"
+		(exclude_from_sim no)
+		(at 287.02 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "40c39ec9-7b6c-436f-91f0-8bed5a6e8d3e")
+	)
+	(text "${ADDRESS1}"
+		(exclude_from_sim no)
+		(at 297.18 265.2522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "53316b49-3d55-42aa-8b38-0a10dc4e922d")
+	)
+	(text "Strict Hierarchical Design (Power Ports local)"
+		(exclude_from_sim no)
+		(at 387.35 258.9022 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.508)
+				(bold yes)
+			)
+			(justify right bottom)
+		)
+		(uuid "55fab55e-5cb8-4e72-8642-f920e82d0177")
+	)
+	(text "Changes"
+		(exclude_from_sim no)
+		(at 320.04 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "5ae24bf4-e877-4cbf-a2b0-adfc59330b12")
+	)
+	(text "PCBA:"
+		(exclude_from_sim no)
+		(at 267.97 275.6662 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "64971334-3347-4b6f-9233-760a4573a242")
+	)
+	(text "2"
+		(exclude_from_sim no)
+		(at 313.69 280.4922 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "6b038654-300e-46a4-9c13-aa0f5479a3d2")
+	)
+	(text "Camera Adapter 1, 2"
+		(exclude_from_sim no)
+		(at 224.79 117.9322 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.508)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "6f9ee4fe-e42f-4a3b-90eb-80d51ebd8da4")
+	)
+	(text "${TITLE}"
+		(exclude_from_sim no)
+		(at 246.38 270.3322 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "75c4ce23-79db-4533-82e4-a1abf54a1ff3")
+	)
+	(text "${#}"
+		(exclude_from_sim no)
+		(at 276.86 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "8a64213e-c296-41f3-a51d-534deba9849e")
+	)
+	(text "${AUTHOR}"
+		(exclude_from_sim no)
+		(at 248.92 280.4922 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "8d9a8bfd-b470-48e1-b59d-d8a0f64db91e")
+	)
+	(text "Checked by:"
+		(exclude_from_sim no)
+		(at 267.97 280.4922 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "9172906e-4a56-4fa2-898e-7220f6683dc2")
+	)
+	(text "IAS0"
+		(exclude_from_sim no)
+		(at 290.83 135.7122 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.508)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "9629bdcd-1e02-42b5-98d5-09c85a2c3fa0")
+	)
+	(text "Date:"
+		(exclude_from_sim no)
+		(at 363.22 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "98781692-44d1-4909-9fcc-b8b92d1b3fc7")
+	)
+	(text "of"
+		(exclude_from_sim no)
+		(at 281.94 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "ad50c4d4-ee8d-428c-a952-e7589b45dfb3")
+	)
+	(text "${COMPANY}"
+		(exclude_from_sim no)
+		(at 238.76 265.2522 0)
+		(effects
+			(font
+				(size 1.778 1.778)
+				(thickness 0.3556)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "b5cbfbc9-ea5f-496e-b130-d17ffb48c157")
+	)
+	(text "PCB:"
+		(exclude_from_sim no)
+		(at 238.76 275.4122 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "c26adb87-071b-418f-a4d2-de554a2552dd")
+	)
+	(text "Date:"
+		(exclude_from_sim no)
+		(at 238.76 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "c6777e5d-5d43-4fd9-b557-31b3aa5b8f3c")
+	)
+	(text "Author:"
+		(exclude_from_sim no)
+		(at 238.76 280.4922 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "cc206d1a-ebaa-41db-a94d-240e7cbdd677")
+	)
+	(text "${CURRENT_DATE}"
+		(exclude_from_sim no)
+		(at 246.38 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "cd831b86-14a4-4729-8fcd-cbf7e06494d4")
+	)
+	(text "Title:"
+		(exclude_from_sim no)
+		(at 238.76 270.3322 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "d3d05a00-64f0-45a3-aa3c-11f3c853ef80")
+	)
+	(text "Page:"
+		(exclude_from_sim no)
+		(at 267.97 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "d7405210-f0c4-4c35-9b35-00202f41e427")
+	)
+	(text "3"
+		(exclude_from_sim no)
+		(at 313.69 275.4122 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "d9e4d107-2b0f-4f7b-922c-51f4382263c6")
+	)
+	(text "Rev.:"
+		(exclude_from_sim no)
+		(at 350.52 290.6522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "e6e03bb6-4636-4789-93af-6ad5a088181d")
+	)
+	(text "Confidential"
+		(exclude_from_sim no)
+		(at 323.85 270.7132 0)
+		(effects
+			(font
+				(size 1.778 1.778)
+				(thickness 0.3556)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "e7f5372f-75e5-4d76-a8fa-e18b4b8d84f6")
+	)
+	(text "1"
+		(exclude_from_sim no)
+		(at 313.69 285.5722 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "eca1f7a8-41ff-4c20-8dc0-ca0421705409")
+	)
+	(text "${ADDRESS2}"
+		(exclude_from_sim no)
+		(at 322.58 265.2522 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "f02c34f2-c83e-48f6-9b67-267a3939cff0")
+	)
+	(text "${CHECKEDBY}"
+		(exclude_from_sim no)
+		(at 284.48 280.4922 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "f0849def-fe74-43a3-a173-86ad61683279")
+	)
+	(text ""
+		(exclude_from_sim no)
+		(at 285.75 208.1022 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "f865aa91-e269-4aeb-a652-e753e839e652")
+	)
+	(text "${PCB}"
+		(exclude_from_sim no)
+		(at 246.38 275.4122 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left bottom)
+		)
+		(uuid "f8841fd2-4667-45d8-9007-51097c524164")
+	)
+	(polyline
+		(pts
+			(xy 373.38 291.9222) (xy 373.38 271.6022)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "0b919340-80f0-4869-8954-87c2154f7390")
+	)
+	(polyline
+		(pts
+			(xy 311.15 291.9222) (xy 311.15 286.8422)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "1d5550cd-7675-4430-baa8-eed3bb10869d")
+	)
+	(polyline
+		(pts
+			(xy 311.15 286.8422) (xy 236.22 286.8422)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "3595cd01-9e40-41a6-94fb-6835ce670763")
+	)
+	(polyline
+		(pts
+			(xy 311.15 286.8422) (xy 311.15 271.6022)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "56aa882c-75d9-4b9d-a297-55ef88af9db9")
+	)
+	(polyline
+		(pts
+			(xy 359.41 281.7622) (xy 311.15 281.7622)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "57abbf58-5172-4d1a-9e18-3cbe0855d598")
+	)
+	(polyline
+		(pts
+			(xy 236.22 260.1722) (xy 236.22 291.9222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 0 0 0 1)
+		)
+		(uuid "67008242-0866-419a-ba38-3cc258e0bfd7")
+	)
+	(polyline
+		(pts
+			(xy 359.41 281.7622) (xy 388.62 281.7622)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "6af676b1-55e6-4abd-935f-4a43bb5e40dc")
+	)
+	(polyline
+		(pts
+			(xy 311.15 266.5222) (xy 347.98 266.5222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "75cb6925-eb52-4ba0-96d6-8337c3b9ad7d")
+	)
+	(polyline
+		(pts
+			(xy 347.98 260.1722) (xy 236.22 260.1722)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 0 0 0 1)
+		)
+		(uuid "792cd8c8-8ac7-4d5c-b1e8-86c99ba92ffd")
+	)
+	(polyline
+		(pts
+			(xy 347.98 260.1722) (xy 388.62 260.1722)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "8e854f32-f15c-48bb-8de4-795a90651d63")
+	)
+	(polyline
+		(pts
+			(xy 311.15 276.6822) (xy 236.22 276.6822)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "8f203cd9-477b-463a-bdeb-b972718a5b93")
+	)
+	(polyline
+		(pts
+			(xy 359.41 276.6822) (xy 388.62 276.6822)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "a3349efc-e745-4f48-853d-8097a37a658a")
+	)
+	(polyline
+		(pts
+			(xy 359.41 286.8422) (xy 388.62 286.8422)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "ae7700bd-7e55-4870-b6c5-f4dd02932853")
+	)
+	(polyline
+		(pts
+			(xy 347.98 291.9222) (xy 347.98 260.1722)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "aebebccd-b07b-4b66-b4e2-7e9681f6d4ed")
+	)
+	(polyline
+		(pts
+			(xy 312.42 271.6022) (xy 236.22 271.6022)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "b2e4627d-e421-4c71-9a83-e90727f76081")
+	)
+	(polyline
+		(pts
+			(xy 359.41 291.9222) (xy 236.22 291.9222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "b72ffff9-1a74-453b-8aa8-eafda23a15cd")
+	)
+	(polyline
+		(pts
+			(xy 317.5 291.9222) (xy 317.5 266.5222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "c1f55dff-2c86-44eb-b84e-844f1614a37b")
+	)
+	(polyline
+		(pts
+			(xy 359.41 286.8422) (xy 311.15 286.8422)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "c9db194e-72d2-411c-86c8-c008bc425155")
+	)
+	(polyline
+		(pts
+			(xy 311.15 276.6822) (xy 359.41 276.6822)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "d1092f9c-7475-4e47-9f6f-8c6f9e323288")
+	)
+	(polyline
+		(pts
+			(xy 312.42 266.5222) (xy 236.22 266.5222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "d9c3686e-77b2-410f-bbd9-4f9f702bf8d9")
+	)
+	(polyline
+		(pts
+			(xy 388.62 260.1722) (xy 388.62 291.9222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "da30315d-014f-4152-8956-bd43e95f33b3")
+	)
+	(polyline
+		(pts
+			(xy 266.7 271.6022) (xy 266.7 286.8422)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "dd6fc3ab-1355-4ca5-8e95-29afe9e0943c")
+	)
+	(polyline
+		(pts
+			(xy 359.41 271.6022) (xy 388.62 271.6022)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "de180ccf-fc54-4940-8964-5552644d20f6")
+	)
+	(polyline
+		(pts
+			(xy 359.41 271.6022) (xy 359.41 291.9222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "de23c072-0709-4e53-871f-f760d04bfb5f")
+	)
+	(polyline
+		(pts
+			(xy 311.15 281.7622) (xy 236.22 281.7622)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "e6d3e66a-fe37-40c9-8229-92ac71257cd5")
+	)
+	(polyline
+		(pts
+			(xy 311.15 271.6022) (xy 359.41 271.6022)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "eb46f303-0fbc-4fd4-9498-d97c41368596")
+	)
+	(polyline
+		(pts
+			(xy 388.62 291.9222) (xy 359.41 291.9222)
+		)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 8 13 2 1)
+		)
+		(uuid "fce723d1-bcf1-4c1b-a8b7-a082a0e05b17")
+	)
+	(image
+		(at 367.387 265.8872)
+		(scale 1.56248)
+		(uuid "389eb907-ef6f-4d27-ae6f-a778a46a685c")
+		(data "Qk02kAAAAAAAADYAAAAoAAAA/wAAADAAAAABABgAAAAAAAAAAAAjLgAAIy4AAAAAAAAAAAAAoKjz"
+			"n6fzoKjzoKjzoKjzoKjzoKjzoKjzoKjzoKjzoKjzoKjzoKjzoKnzrrf12N36/////////////v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////////t73XmJ3Bn6Xloqr9oKjz"
+			"oKjzoKjzoKjzoKjzoKjzoKjzoKjzoKjzoKfzo6z0v8b39fj+/////////////v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////6OnpdXZ2hoeH6+zs/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////9fb2iYmKeHh52tvb////2traeXl6lJWV/////////v//////wsPDeXp6qKmp"
+			"/////v///v//////r6+went7u7u7/////v///v///v///v///v//////////kpOTS0tMIyMkFBQV"
+			"GRkaMzM0Z2dntbW2/////////v///v///v///v///v//////////o6SkTU1OJCQlHR0eMTEybW1u"
+			"4+Pk////////////goODjI2N/////v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v//////3d7efn5/gIGBw8TE/////v///v///v///v///v///v///v///v//"
+			"/v//////fn5/gICB6+zs/////v///v///////f7+oKGhYWFiNzc4IiIjHh4fKiorT09Qk5SU////"
+			"/////v///v//////2traeXl6lpeX/////v///v///v///v///v//////////zs/Pb29wODg5ICAh"
+			"Hx8gNjY3bW1uy8zM/////////v///v///v///v//////t7m4enp7tLW1/////v///v///v///v//"
+			"/v///v///v//////jY6OfX5+6OjoAAAAgY3wEyTjHy/kHy/kHy/kHy/kHy/kHy/kHy/kHy/kHy/k"
+			"Hy/kHy/kHi/kHS3kFyjjGSvjgo7w/////////v///v///v///v///v///v///v///v///v///v//"
+			"/v//////rrTUCRRzDBZ0ERt3EBpuGCWrIDLwHy/kHy/kHy/kHy/kHy/kHy/kHy/kHy/kHy/kHi/k"
+			"GyzkESPiNEXnoqz0/////////v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v//////BAQFBQUGAAAA7e3u////"
+			"/v///v///v///v///v///v///v///v///v///v///v///////f3+AAAABgYHAAAA////////s7Oz"
+			"AAAAAAAAj4+Q/////v//////hISFAAAAAAAAwsPD/////v//////X15gAAAAAAAA5ufn/////v//"
+			"/v///v//////k5SUAAAABwcICQkKBgYHBAQFBAQFBQUGBwcIAgIDAwME6uvs/////v///v///v//"
+			"////9fX2ERESAwMEDQ0OBwcIAgIDAAABAAAAAAAAY2Nj////MDAxAAAAHBwd/////v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v//////////AAAACAgJCgoLAAAA"
+			"8/T0/////v///v///v///v///v///v///v///v//////AAAABAMFFRUW/////v//////goKDAAAA"
+			"BgYHBgUHBAMFAgIDAgIDAwMEBwcIBwcIAAAAs7S0/////v//////tLSzAAAAAAAAlZWW/////v//"
+			"/v///v//////+vv7KywsAAAACAgJBAQFAQECAQECBAQFCQgKAAAAJygo+Pn5/////v///v///v//"
+			"////cHFxAAAAAAAA2dra/////v///v///v///v///v///v//////HBwdAwMEFhYXAAAA////ESPi"
+			"KzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKjrlHi7kHS/k3eP7////"
+			"/v///v///v///v///v///v///v///v///v//////gIm9Aw51HyiFISqGISqGISqGHyh6JjO3LD3u"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmJzjlGyzjHzHkt8D3/////////v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////goKDCQkKDAwNUVFR/////v///v///v///v///v///v///v///v///v///v//"
+			"/v//////aWpqCQkKCwsMaGhp////////uLi3BAQFCQkKgYKC/////v//////i4uMCAgJBAQFr6+w"
+			"/////v//////ZmZnDAwNAQAC0tPT/////v///v//////c3N0AAAAFBQVAAAAQEFBlZWWtLW1sLCx"
+			"ioqLOTo6AAAAAAAAVFRU/////v///v//////////BgYHEBARDQ0ODw4PiYqKvb6+uru7hIWFExQU"
+			"AAAASEhJDAwNEhITJyco/////v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////rq6vAwMEFhYXFRUWCQkKenp7/////v///v///v///v///v///v///v///v//"
+			"////CgoLExMUDg4P/////v//////AAAABQUGAAAAT09PlJWVuLm5wMHBp6eoVFRVAAAAFRUWAAAA"
+			"1NXV////////s7OzBAQFCAgJiYiK/////v///v//////8fLxAAAADg4PBwcIGxsck5OUxMTFxMXF"
+			"k5OUGxscBwcIDw8QAAAA7/Dw/////v///v//////d3h4CgoLAgIDwsHD/////v///v///v///v//"
+			"/v///v//////JycoEhITFBQVAAAA////anjtIjPkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKDjlDiDi0dj6/////v///v///v///v///v///v///v//////rrTY"
+			"BRB+IiyNIiyNIiyNIiyNIiyNIiyNICqAKTnZLDzoLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmKTnlFCXiVGTr/////////v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////9vf3AAAAFhYXAAAA////////"
+			"/v///v///v///v///v///v///v///v///v///v//////BAQFFRUWAAAA3N3d////////uLi3BAQF"
+			"CQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC1NbV/////v//////"
+			"wcLCAAAAFRUWAwME19jY////////////////////////9PX1SUlKioqL/////v///v//////VVZX"
+			"CgoLDg4PMTEy////////////////////////fX5+AAAAFhYXEhITJyco/////v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////PD0+Dw8QEBARGBgZExMUCwsM"
+			"/////v///v///v///v///v///v///v///v//////CgoLExMUEBAR/////v//////c3R0gYGC////"
+			"////////////////////////vL29AAABDw8QPz9A////////sbGxBAQFCAgJi4uM/////v//////"
+			"////EA8RERESAgIDbW1t////////////////////////a2tsAgIDERESDw8Q/////////v//////"
+			"d3h4CgoLAgIDxMTF/////v///v///v///v///v///v//////JycoEhITFxcYAAAA////7fL9ECLi"
+			"KzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKjrlESPi8/f+"
+			"/////v///v///v///v///v//////////CBWGISyTIy2TIy2TIy2TIy2TIy2TIy2TIiyRKTSZJTbt"
+			"KzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmITHkJjjl9/r+/////v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////Ojo7EBARBQQGp6io/////v///v///v///v///v///v///v///v///v//////"
+			"v7/AAQECEhITHx8g/////v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy////"
+			"/v//////ZmZnDAwNAQEC1NbV/////v//////FRUWExMUAAAA09TU/////v///v///v///v///v//"
+			"/v///////////////v///v//////+fr6AAAAFRUWAgID/////////v///v///v///v///v//////"
+			"qqqrBQUGEhITJyco/////v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////+vv7AAAAERESOjo7jI2NCgoLAAABwMHB/////v///v///v///v///v///v///v//////"
+			"CgoLExMUEBAR/////v///v///////////////v///v///v///v///v///v//////ISEiERESAwME"
+			"////////sbGxBAQFCAgJi4uM/////v//////hoeHBQUGDQ0OS0tM/////v///v///v///v///v//"
+			"/v//////SEhJDg4PBAQFiYmK/////v//////d3h4CgoLAgIDxMTF/////v///v///v///v///v//"
+			"/v//////JycoEhITFxcYAAAA/v//////VmTrJDXlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmJjblNEXn/////v///v///v///v///v//////anW8GCOTJC+Z"
+			"JC+ZJC+ZJC+ZJC+ZJC+ZJC+ZISyYMz6ZiJX5ITLkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmJjblGCrj7fH9/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////rq+vAwMEDw8QPT0+/////v//"
+			"/v///v///v///v///v///v///v///v//////VVVWDQ0OBwcIlJSU/////v//////uLi3BAQFCQkK"
+			"g4SE/////v//////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC1NbV////////zc7PAAAA"
+			"Dw8QRERF/////v///v///v///v///v///v///v///v///v///v///v///v//////lJSVBwcICgoL"
+			"eXl6/////v///v///v///v///v///v///v//////AAAAEhITJyco/////v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//////iImJCAgJBwYInZ6e7e/vAAAADg4PTUxO"
+			"/////v///v///v///v///v///v///v//////CgoLExMUEBAR/////v///v///v///v///v///v//"
+			"/v///v///v///v///v//////IiIjEhITAAAA////////sbGxBAQFCAgJi4uM/////v//////CgoL"
+			"FBQVAAAA/////////v///v///v///v///v///v///////f7+AAAAFBQVCwsM/////v//////d3h4"
+			"CgoLAgIDxMTF/////v///v///v///v///v///v//////JycoEhITFxcYAAAA/v//////2t/7EyTj"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmGCnjprD1"
+			"/////v///v///v//////9fn8CBWRJC+eJDCeJDCeJDCeJDCeJDCeJDCeJDCeHiqbQEur////ESPi"
+			"KzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKDjlGCvj+Pv+////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//////////AQECFRUWAAAA/////////v///v///v///v///v///v///v//////////AAAA"
+			"FRUWAAAA/////////v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//"
+			"////ZmZnDAwNAQEC1NbV////////fH19CQkKBQUGra6u/////v///v///v///v///v///v///v//"
+			"/v///v///v///v///v//////U1JTDQ0OAQEC1NXV/////v///v///v///v///v///v///v//////"
+			"AAAAEhITJyco/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"////FxcYExMUAAAA////////Hx8gEhITAAAA/////////v///v///v///v///v///v//////CgoL"
+			"ExMUEBAR/////v///v///v///v///v///v///v///v//////////////qaqqAgIDEhITICAh////"
+			"////sbGxBAQFCAgJi4uM////////1tfXAAAADw8QQ0RE/////v///v///v///v///v///v///v//"
+			"/v//////QUFCDw8QAAAA2trb////////d3h4CgoLAgIDxMTF/////v///v///v///v///v///v//"
+			"////JCQlEhITFxcYAAAA/v///v//////QVHoJjblLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmKTnlITPk/////v///v///v//////YGq9GyefJDCjJDCjJDCj"
+			"JDCjJDCjJDCjJDCjJDCjFiOdiZPP////a3ntIjPkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmJjblJTfl/////////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////aGhpCwsMBwcIkZKS////////"
+			"////////////////////////////qqqrBAQFDg4PTExN/////v///v//////uLi3BAQFCQkKg4SE"
+			"/////v//////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC1NbV////////S0tMDg4PAAAA"
+			"9fX2/////////////////////////////////////////////////v//////KCgpEhITAAAA////"
+			"/////v///v///v///v///v///v///v//////AAAAEhITJyco/////v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v//////09TUAAAADw8QQkND////////jY2OCAgJBwcIlJSU"
+			"/////v///v///v///v///v///v//////CgoLExMUEBAR/////v///v///v///v///v//////////"
+			"////////vr+/QEFBAAAAFhYXAAAAmZma////////sbGxBAQFCAgJi4uM////////nJ2dBgYHCAgJ"
+			"i42M/////v///v///v///v///v///v///v///v//////iYqLCAgJBgYHn6Cg////////d3h4CgoL"
+			"AgIDxMTF/////v///v///v///v///v///v//////ICAhExMUFxcYAAAA/v///v//////xMv4Fifj"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmGivjrLX1"
+			"/////v//////7fH5CBabJTGnJTGnJTGnJTGnJTGnJTGnJTGnJTGnJTCmDBqd////////5+v8ECLi"
+			"KzvmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmITLkT17q////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//////3NzdAAAAExMUJSUmqqurnZ6enZ6enZ6enZ6enZ6enZ6enZ6eqampMzM0ERESAQEC"
+			"v8DA/////v///v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////"
+			"ZmZnDAwNAQEC1NbV////////MDAxERESCAcJoqOjn5+gnZ6enZ6enZ6enZ6enZ6enZ6enZ6enZ6e"
+			"nZ6emZmZysvL////////EBARExMUBQUG/////v///v///v///v///v///v///v///v//////AAAA"
+			"EhITJyco/////v///v///v///v///v///v///v///v///v///v///v///v///v///v//////YmJj"
+			"DAwNAwMFrq+v////////+/v8AAAAEhITHx8g/////v///v///v///v///v///v//////CgoLExMU"
+			"EBAR/////v///v///v//////////4eLigYKCOzw8AAAAAwIEDw8QDw8QAAAAaGhp/////v//////"
+			"sbGxBAQFCAgJi4uM////////fX5+CQkKBAQFsbGy/////v///v///v///v///v///v///v///v//"
+			"////r6+wBQUGCQkKgIGB////////d3h4CgoLAgIDxMTF/////v///v///v///v///v///v//////"
+			"ICAhExMUFxcYAAAA/v///v///v//////L0DmKDjlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmKDjlKz3l/////v//////V2O/HSqnJTKrJTKrJTKrJTKrJTKr"
+			"JTKrJTKrJTKrGCWlgIrP/////v//////TFzqJTXlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmFifjpa/0/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////Hx8gEhITExMUBgYHBgYHBgYH"
+			"BgYHBgYHBgYHBgYHBgYHBgYHERESFBQVCQkK/////v///v///v//////uLi3BAQFCQkKg4SE////"
+			"/v//////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC1NbV////////KSkqEhITFxcYBwcI"
+			"BgYHBgYHBgYHBgYHBgYHBgYHBgYHBgYHBgYHBgYHBQUGAAAA////////CAgJExMUEhIT/////v//"
+			"/v///v///v///v///v///v///v//////AAAAEhITJyco/////v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////////AAAAFBQVAAAA/////////v//////OTk6EBARAAAA3N3d"
+			"/////v///v///v///v///v//////CgoLExMUEBAR/////v///v//////6uvrLS0uAAAACQkKCwsM"
+			"CQkKAwMEAAAAPDw9ysrL/////v///v//////sbGxBAQFCAgJi4uM////////dXZ2CgoLBAQFurq7"
+			"/////v///v///v///v///v///v///v///v//////urq6BAQFCgoLd3d3////////d3h4CgoLAgID"
+			"xMTF/////v///v///v///v///v///v//////ICAhExMUFxcYAAAA/v///v///v//////r7j2Girj"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmFyjjvcX3"
+			"////5+z4ChejJzOuJzOuJzOuJzOuJzOuJzOuJzOuJzOuJTKuER+m/////////v//////ztX5FSbj"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKjrlEyXj////"
+			"/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//////lJSVBwcIFhYXFRUWAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBQVFhYXCgoLeHh5////"
+			"/v///v///v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////ZmZn"
+			"DAwNAQEC1NbV////////NDQ1EBARFhYXAwMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAR"
+			"FhYXAAAA////////EA8RExMUBAQF/////v///v///v///v///v///v///v///v//////AAAAEhIT"
+			"Jyco/////v///v///v///v///v///v///v///v///v///v///v///v///v//////rKysBAQFDQ0O"
+			"Wlpb/////v///v//////p6eoBQQGCwsMZ2ho/////v///v///v///v///v//////CgoLExMUEBAR"
+			"/////v//////29zcAAAADw8QDw8QAAAAIiIjd3d4vL29/////////////v///v///v//////sbGx"
+			"BAQFCAgJi4uM////////gICBCQkKBQUGrq6v/////v///v///v///v///v///v///v///v//////"
+			"rK2tBQUGCQkKgoKD////////d3h4CgoLAgIDxMTF/////v///v///v///v///v///v//////ICAh"
+			"ExMUFxcYAAAA/v///v///v///v//////ITPlKTnlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmJzflOkvn////T1zBHyyvJjOxJjOxJjOxJjOxJjOxJjOxJjOx"
+			"JjOxGCWsi5XX/////v///v///v//////NkjnJzflLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmITLkaHbt/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////////AAAAFRUWCwsM////////////"
+			"////////////////GBgZFBQVAAAA7O3t/////v///v///v//////uLi3BAQFCQkKg4SE/////v//"
+			"////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC1NbV////////WlpbDQ0OAgID5+jo////"
+			"////////////////////////////////SEhJDw8QAAAA////////KyssERESAAAA/////////v//"
+			"/v///v///v///v///v///v//////AAAAEhITJyco/////v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v//////OTk6EBARAAABxsfH/////v///v//////////AAAAFBQVAQEC////"
+			"/////v///v///v///v//////CgoLExMUEBAR/////v//////ERESEhITCwsMNzc45+jo////////"
+			"/////////v///v///v///v///v//////sbGxBAQFCAgJi4uM////////pqenBQUGCgoLfn5/////"
+			"/v///v///v///v///v///v///v///v//////fn9/CgoLBQUGp6eo////////d3h4CgoLAgIDxMTF"
+			"/////v///v///v///v///v///v//////ICAhExMUFxcYAAAA/v///v///v///v//////mqXzHC3k"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmGivlprHt"
+			"EyGrJzS0JzS0JzS0JzS0JzS0JzS0JzS0JzS0JTOzFSSu/////////v///v///v//////t7/3GCnj"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvlDyHi8/f+"
+			"/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//////TU1ODg4PAgIDuru7////////////////////z9DQAAAAERESLi4v/////v///v//"
+			"/v///v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwN"
+			"AQEC1NbV////////np+fBQUGCQkKiYqL////////////////////////////////////JSUmDw8Q"
+			"Gxsc////////XV1dDAwNAgIDx8fI/////v///v///v///v///v///v///v//////AAAAEhITJyco"
+			"/////v///v///v///v///v///v///v///v///v///v///v///v//////9/j4AAAAFBQVCgoL////"
+			"/v///v///v///v//////VFRVDQ0OAwMEr7Cw/////v///v///v///v//////CgoLExMUEBAR////"
+			"////6+zsAAAAEhITKCgp/////////v///v///v///v///v///v///v///v///v//////sbGxBAQF"
+			"CAgJi4uM////////8PHxAAAAEhITHh4f/////v///v///v///v///v///v///v///v//////ISEi"
+			"EhITAAAA7vDw////////d3l4CgoLAgIDyMjJ/////v///v///v///v///v///v//////IiIjExMU"
+			"FRUWAAAA/v///v///v///v//////////GCrjKjrlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDznHi7WJzSwKDW2KDW2KDW2KDW2KDW2KDW2KDW2KDW2FyWw"
+			"maLe/////v///v///v///v///v//////JTflKTnlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmITLkdIHu/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////wMHBAAABDg4PTU1O/////v///v//"
+			"/v//////YWJiDAwNBQUGo6Ok/////v///v///v///v//////uLi3BAQFCQkKg4SE/////v//////"
+			"i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC1NbV////////////AAAAExMUDAwN////////"
+			"/v///v///v///v///v//////////AAAADAwNWlpb////////ra2tAwMEDQ0OUlJT/////v///v//"
+			"/v///v///v///v//////////AAAAEhITJyco/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////hIWFCAgKCgoLcnNz/////v///v///v///v//////wMHBAQECEBAROzs8////"
+			"/v///v///v///v//////CgoLExMUEBAR////////1dbWAAABDAwNcHBx/////v///v///v///v//"
+			"/v///v///v///v///v///v//////sbGxBAQFCAgJi4uM/////v//////Li4vEBARAAAAvr6/////"
+			"/v///v///v///v///v///v//////xcbGAAAAERESKyor/////v//////b3BwCwsMBgYHpqen////"
+			"/v///v///v///v///v///v//////CAgJFBQVHh4fAAAA/v///v///v///v///v//////hpLwHzDk"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzsKDW6"
+			"JzS3KDS4KDS4KDS4KDS4KDS4KDS4JTK3HCu0/////////v///v///v///v///v//////n6nzHC3k"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvlEiTj////"
+			"/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//////CwsMExMUAAAA/////////v//////////AQECFBQVAAAA/////////v///v///v//"
+			"/v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////ZmZnDAwNAQEC"
+			"1NbV/////v//////dXV2BQUGCgoLU1NT/////////v///v///v///v//////eHl5CgkLAAAAw8TE"
+			"////////////AQECFRUWAAAAzM3N/////////v///v//////////////GxobEhITEhITJyco////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////FBQVExMUAAAA3t/f/////v//"
+			"/v///v///v///v//////BwcIFBQVAAAA9/j4/////v///v///v//////CgoLExMUEBAR////////"
+			"/f7+AAAAERESLzAw/////////v///v///v///////////////////v///v//////sbGxBAQFCAgJ"
+			"i4uM/////v//////z8/QAAAAFBQVBgYH/P39/////////v///v///v//////////CQkKFBQVAAAA"
+			"yMjI/////v//////bG5tCwsMFhYXAAAAtre3/////////v///v///v//////3N3eAAAAERESSEhJ"
+			"AAAA/v///v///v///v///v//////////ESTiKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzoKjrYJzS1KDW6KDW6KDW6KDW6KDW6KDW6FSOzp6/k////"
+			"/v///v///v///v///v///v//////////GSvjKjrlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmHzDkhpLw/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////eXp6CgoLBQUGoqKj/////v//////"
+			"s7S0AwMEDQ0OW1tc/////v///v///v///v///v//////uLi3BAQFCQkKg4SE/////v//////i4uM"
+			"CAgJBAQFsbGy/////v//////ZWVmCwsMAQEC1NbV/////v//////////GhobDAwNBQUGQkJD/P39"
+			"////////////////jI2NAAAADQ0OLCwt/////v///v//////oaKiAAAAFRUWAAAApKSl////////"
+			"////////oaKiAAABAgIDFhYXEhITJyco/////v///v///v///v///v///v///v///v///v///v//"
+			"/v//////zs/PAAAAEhITHBwd/////v///v///v///v///v///v//////bm5vCwsMCQkKg4OE////"
+			"/v///v///v//////CQkKEhITEBAR/////v//////Ojo7DAwOBgYHaGhp////////////////////"
+			"tbW2MDExiYmK/////v//////srKzBAQFCAgJi4uM/////v///v//////bm5vAAAAEhITBQUFq6ur"
+			"////////////////sbKyBwcIEhITAQECYWFi/////v///v//////bW5uCwsMFRUWDg4PAAAAWVla"
+			"8vPz////////////////ISEiEhITBQUGlpaXAAAA/v///v///v///v///v///v//////cX7uIjLk"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzrJzW5"
+			"Jza5KDa6KDa6KDa6KDa6JDK5JDO5/////v///v///v///v///v///v///v///v//////iJTxHzDk"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKjrlFynj////"
+			"/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////7u/vAAAAEBARNjY3/////v//////SEhIDg4PAAAAzs/P/////v///v///v///v///v//"
+			"////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////iImKAQECAAAB1NXV"
+			"/////v///v//////////ICAhAwMEDAwNAAAANjY3XFxdU1NUDw8QBQUGCgoLCAgJ/////////v//"
+			"/v///v//////X19gAAAAFBQVBQUGBAQFNDQ0MDAxAQECAAAAAAAA3t/fAwMEEhITJyco/////v//"
+			"/v///v///v///v///v///v///v///v///v///v//////XV1eDAwNCAgJiYqK/////v///v///v//"
+			"/v///v///v//////29zcAAAAExMUEhIT/////v///v///v//////JycoCwsMDw8Q/////v//////"
+			"+/z8AwMECwsMCgoLAAAALCwtNzc4GhoaAAAABAQFAQEDNzg4/////v//////2draAAAABgYIioqL"
+			"/////v///v///v//////a2tsAAAADw8QBAQFAgIDMTEyMzM0BAQFAwMEDw8QAAAAXV1e/////v//"
+			"/v///v//////bW5uCwsMAAAA////KSgqAAAAAAAAHBwdPz9AMTEyAAAAERESDg4PCQkK////AAAA"
+			"/v///v///v///v///v///v//////8/f9DyHiKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzoKjnUJzW3KDa7KDa7KDa7KDa7EyK0tb3p/////v///v//"
+			"/v///v///v///v///v///v//////////EiTiKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmHS7kmKLz/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////MTEyEBARAAAA+Pn5////////AAAA"
+			"ExMUFRQV/////v///v///v///v///v///v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJ"
+			"BAQFsbGy/////v//////////Ly8wAAAAz9DQ/////v///v///v//////////iYmKBAQFAAAAAQEC"
+			"AAABAAABAgIDAAAAUFBR/////////v///v///v///v///v//////nJydAwIEAAABBgYHAwMEAAAB"
+			"AAAAQUFC+vv7////AAAAEhITJyco/////v///v///v///v///v///v///v///v///v///v//////"
+			"////AAAAFRUWAAAA9vf3/////v///v///v///v///v///v///v//////GhobExMUAAAAy8zM////"
+			"/v///v//////zs7PDAwNAAAA/////v///v//////////TU1OAAAAAwMEAwIEAgIDAwMEAgIDAAAA"
+			"IyMj3+Dh/////v///v//////Y2NkAAAAgICB/////v///v///v///v//////ysvLKSkpAAAABAQF"
+			"AwIEAgIDBAQFAAAAISEiv7+//////v///v///v///v//////XF5dAAAAdHR1////////jo6PAQEC"
+			"AAAAAQECBAQFBgYHAAAAJCQl+fr6////AAAA/v///v///v///v///v///v///v//////XGrsJDTl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzqJzW5"
+			"JzW7KDa8KDa8IzG6Lj2+/////v///v///v///v///v///v///v///v///v///v//////cX7uIjLk"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKTnlHzHk////"
+			"/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////paWmBAQFCAgJi4uM////m5ucBgYHCAgJhoeH/////v///v///v///v///v///v//////"
+			"uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v///v///////////////////v//"
+			"/v///v///v///v//////////////ycrKk5OTf3+AhoaHqqur+/z8/////////v///v///v///v//"
+			"/v///v///v//////////w8TEkpOThoeHoaKi7vDv////////////AAAAEhITJyco/////v///v//"
+			"/v///v///v///v///v///v///v///v//////pqenBAQFEBARNDQ1/////v///v///v///v///v//"
+			"/v///v///v//////iIiJCAgJDQ0OWFhY/////v///v///v///////////////v///v///v///v//"
+			"////////////srOzj5CQiIiJmpucwcLC/////////////v///v///v///v///////////////v//"
+			"/v///v///v///v///v//////////7u/vqKmpi4yMiouLpqen6Onp/////////v///v///v///v//"
+			"/v///////////////////v///v//////////vb6+ioqLfn5/kpKS09TU/////////v//AAAA/v//"
+			"/v///v///v///v///v///v//////3+X7EiPiKzvmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzoKjnRJzW5KDa8KDa8EB+0xcvu/////v///v///v///v//"
+			"/v///v///v///v///v///v//////8vb+ECHiKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmGivjqbP1/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//////////AAAAERESHh4f////Li4uERESAAAA"
+			"+vv7/////v///v///v///v///v///v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQF"
+			"sbGy/////v///v///////////////v///v///v///v///v///v///v///v///v//////////////"
+			"/////////////v///v///v///v///v///v///v///v///v///v//////////////////////////"
+			"/v///v//////AAAAEhITJyco/////v///v///v///v///v///v///v///v///v///v//////MzQ0"
+			"EBARBQUGoKGi/////v///v///v///v///v///v///v///v//////9vf3AAAAFhYXAAAA////////"
+			"/v///v///////////////v///v///v///v///v///v///////////////////////////////v//"
+			"/v///v///v///v///v///////////v///v///v///v///v///v///v///v///v//////////////"
+			"/////////////v///v///v///v///v///v///v///v///////////v///v///v///v//////////"
+			"/////////////////v///v///v//AAAA/v///v///v///v///v///v///v///v//////R1fpJjbl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzoJzW3"
+			"JzW7IjC6OkjC/////v///v///v///v///v///v///v///v///v///v///v///v//////WmnrJDTl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKDjlKTvl////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////XV5fDAwNAAABz9DQAAAADw8QPj4//////v///v///v///v///v///v///v//////uLi3"
+			"BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy/////v//////////kZKSyMnJ/////v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////AAAAEhITJyco/////v///v///v//"
+			"/v///v///v///v///v///v//////8fPzAAAAFhYXAAAA/////////v///v///v///v///v///v//"
+			"/v///v///v//////NDQ1EBARBQUGn5+f/////v//////8fLyhIWF9PX1/////v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v//////srO0np+f/////v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v//"
+			"/v///v///v///v///v///v//////ytH5FSbjLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzpKTjNJzW5Dh2z09nz/////v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////2+H7EiTiLDvmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmGCnjusL3/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//////0NHRAAAAFRUWFBQVFRUWAwMEsrKz////"
+			"/v///v///v///v///v///v///v//////uLi3BAQFCQkKg4SE/////v//////i4uMCAgJBAQFsbGy"
+			"/////v//////dnZ3AAAAAAAA7/Dw/////v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////AAAAEhITJyco/////v///v///v///v///v///v///v///v///v//////f3+ACQkKDg4P"
+			"TU1N/////v///v///v///v///v///v///v///v///v///v//////oaKiBQQGERESKyss/////v//"
+			"////FRUWAAAAHR0e/////v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//////y8vLAAAAAAAAnp6f/////v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v//////NEXnJzfl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmIC60"
+			"SFbH/////v///v///v///v///v///v///v///v///v///v///v///v///v///v//////QlLoJjbl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmJzflN0jn////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////ExMUExMUFRUWFRUWAQEC/////////v///v///v///v///v///v///v//////t7e3BAQF"
+			"CQkKg4SE/////v//////i4qLCAgJBAQFsbGy/////v//////X19gDAwNAAAAzs/P/////v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//////AAAAEhITJyco/////v///v///v///v//"
+			"/v///v///v///v///v//////Dw8RFBQVAAAAwsPD/////v///v///v///v///v///v///v///v//"
+			"/v///v//////////AAAAFRUWAAAA6Onp////////AgIDExMUCAgK/////v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////qqqqBAQFCAgJg4OE/////v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v//"
+			"/v///v///v///v///v///v//////tr72GSrjLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzpEiLB4+j2/////v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////ydH6GivkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmFSbjzNP5/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//////mpqbAAAAAQECAAAAeHl5/////v///v//"
+			"/v///v///v///v///v///v//////uLm5AwMECQkKg4SE/////v//////iImKCAgJBAQFsbGy////"
+			"/v//////ioqLAAAAAAAA+vv7/////v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"////AAAAEhITJyco/////v///v///v///v///v///v///v///v//////ubm6AAAAAAAARUVG////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//////oqKiAAAAAAAAXl9f////////"
+			"KCgpAAAAMDAw/////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////3NzdAAAAAAAAsrKy/////v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v//////JTflKTnl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKTnmLT7l////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////6O30FyfcLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmJTblR1fp////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//////4OHh0NHR19jY/////v///v///v///v///v///v///v///v///v//////3t/fAAAACQkK"
+			"g4SE/////v//////paWlAAABBAQFsbGy/////v///v//////vb6+7O3t/////v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v//////ERESDg4PJyYo/////v///v///v///v///v//"
+			"/v///v///v//////4OHhzs/P2tra/////v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////7e7uz9DQ0NHR////////////sbKy/////////v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//////3d7ey8zM/////v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v//"
+			"/v///v///v///v///v///v//////oav0HCzkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmGCnjwcn4/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v//////Ym7NIC/GLDzpLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvmEiPi3uT7/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///////////////v///v///v///v///v//"
+			"/v///v///v///v///v///v//////SkpLAAAAdnd3/////v//////////HR0eAAAAqKip/////v//"
+			"/v///v///////////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////"
+			"q6usAAAAEBAR/////v///v///v///v///v///v///v///v///v///////////////v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///////////////v///v//////"
+			"/////////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///////////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v//////////GizjKjrl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmJjblP0/o////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///////P7/DBuzJzS2LDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmJDTlWWjr////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////////+Pn5"
+			"/////v///v//////////+vv7+/z8/////v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v//////////8/T0/////v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v//"
+			"/v///v///v///v///v///v//////i5fxHi/kLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmEyTi1t36/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//////f4nYHCq4JzW5KTjNLDzpLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvlECLi7/P9/////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///////////v///v///v///v///v///////////v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/////////v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v//////////EyXjKzvl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmJDXlU2Lq////"
+			"/v///v///v///v///v///v///v///v///v///v///v//////////EiK1JjS7JzW7JzW4LDzpLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmIjPkanjt////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////d4TvITHkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvlECLi6+/9/////v///v///v///v///v///v///v///v///v//"
+			"/v//////mqPhGCe3KDa8KDa8JzW5KjnSLDzoLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvlECPi/P///////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v///v//////+Pv+ECLiKzvl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmIzPkZ3Xt////"
+			"/v///v///v///v///v///v///v///v///v///v//////IC+5JTO6KDa7KDa7JzW6JzW5LDzrLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmIDHkfInw////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////YnDsIzPkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvlECLi/P///////v///v///v///v///v///v///v///v//////"
+			"tbzpFCO0KDa6KDa6KDa6KDa6JzW2KjnWLDzoLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvlFCbj/////////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v//AAAA/v///v///v///v///v///v///v///v///v///v///v///v///v//////5er8ESLiKzvl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmIDHkfInw////"
+			"/v///v///v///v///v///v///v///v//////M0K+IzG4KDW6KDW6KDW6KDW6JzW5KDW7LDzrLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmHi/kjpny////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////TV3qJTXlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKzvlFCfj/////////v///v///v///v///v///v//////ztXxEB6x"
+			"KDS5KDS5KDS5KDS5KDS5KDS5JzS0KzraLDznLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKjrlGizj/////////v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"AAAA/v///v///v///v///v///v///v///v///v///v///v///v///v///v//////z9b5FSbjLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmHi7kkZzy////"
+			"/v///v///v///v///v///v//////S1jEIS60KDW2KDW2KDW2KDW2KDW2KDW2JzS1KDW9KTnqLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmHCzkoKr0////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////MkPmJzjlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKjrlHS7k/////////v///v///v///v//////5uv4DBqrJzW1JzW1"
+			"JzW1JzW1JzW1JzW1JzW1JzS1HSusQFDoKDnmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKTnlIzXl/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////tb72FyjjLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmGyzjp7D0////"
+			"/v///v///v///v//////X2zIHiuvJjSyJjSyJjSyJjSyJjSyJjSyJjSyHiywYGvG0Nf+GCnjLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmGSrjsbr2////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////L0DmKDjlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKDjlKTrl/////v///v///v//////9/r9ChmmJjOwJzOwJzOwJzOw"
+			"JzOwJzOwJzOwJzOwDRqm3OHz////KDrlKDjlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmKDjlL0Hm/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////0Nb6ECLiKzvl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmGCnjvMT3////"
+			"/v///v//////bXjJHCioJjOsJjOsJjOsJjOsJjOsJjOsJjOsIC2qPku3////////pa/1GyzjLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmFifjwsr4////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////YnDsIDHkLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmJzflOkvo/////v///////v//CheeJTGpJjKpJjKpJjKpJjKpJjKp"
+			"JjKpJjKpEBygwsnp////////////HC7kKjrlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmJjblPk/o/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////////IDLkKDjl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmFCXj09n6////"
+			"////fYfLGSWgJTGlJTGlJTGlJTGlJTGlJTGlJTGlIS2jJzWn/////v///v//////j5ryHi/kLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmEyXj1dv6////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v//////5uv8DyHiKjrlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmJTXlUGDq////////FCGaIy6gJTChJTChJTChJTChJTChJTChJTCh"
+			"Ex+Zpq7b/////v///v//////////EyXjKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmJTXlT1/q/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////x8/4DiDi"
+			"KjrlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvlESLi7PD/1Nns"
+			"DhqRIy+bIy+bIy+bIy+bIy+bIy+bIy+bIS2aFCKV/////////v///v///v//////h5PxHC3kLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvlECLi5+v8////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v//////xs34DyHiKDjlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmJTXlXWzws7jSFCCPIy6WIy6WIy6WIy6WIy6WIy6WIy6WEh2Nlp7P"
+			"/////v///v///v///v//////////KjvlJjblLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmIzPkYW/s/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////4uj8"
+			"IDHkHzDkKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvmITLqS1m3HSeK"
+			"IiyQIiyQIiyQIiyQIiyQIiyQHymOGSWM/////////v///v///v///v///v//////9Pj+FSfjJzfl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvlDyLi9vr+////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v//////////a3ntDyHiIzPkKzvlLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDznJzfhICl+ISuJISuKISuKISuKISuKICqKAAt40tjq/////v//"
+			"/v///v///v///v///v///v//////7fH9HS/kITHkKzvmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmITLkc4Du/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v//AAAA/v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//////"
+			"////6e38YnHsESPiGyzjIjLkJzflKjrlKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLD3rKTfLHiZz"
+			"ICmBICmDHyiCFyF9AAlvqrHT/////v///v///v///v///v///v///v///v///v//////////X23s"
+			"DyHiITHkKDjlKzvlLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmLDzmKzvlEiTi////////"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v//AAAA/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v//////////////usL3f4vwVGPrN0jnKzvlKzvl"
+			"LDzmLDzmLDzmLDzmLDzmLDzmLDzmLD3tKTjSICqIHSZ4JTCBY2um5+rz/////v///v///v///v//"
+			"/v///v///v///v///v///v///v//////////7PH9iZTxS1vqLD3mKzvlLDzmLDzmLDzmLDzmLDzm"
+			"LDzmLDzmLDzmLDzmLDzmLDzmHzDkeobv/////v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v///v//"
+			"/v///v///v///v///v///v///v///v///v///v///v///v//AAAA"
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB TEXT FIELD BOT_AVT_KHK_Lib.IntLib")
+		(at 219.71 277.9522 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "029dba00-5a4b-49d5-85ef-2f31f12c080c")
+		(property "Reference" "T2"
+			(at 214.376 276.4282 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "PCB Text BOT"
+			(at 214.376 288.3662 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB TEXTFIELD BOT 2"
+			(at 219.71 277.9522 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 219.71 277.9522 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "PCB Textfield BOT"
+			(at 219.71 277.9522 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "T2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib")
+		(at 163.83 281.7622 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0326685e-fb27-4b77-9b12-5ba7e85b2ca2")
+		(property "Reference" "MRK4"
+			(at 161.036 287.0962 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "Marker Single Layer"
+			(at 162.56 285.5722 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB_Marker_Pad_top"
+			(at 163.83 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 163.83 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Position Marker for PCBs"
+			(at 163.83 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "MRK4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib")
+		(at 163.83 272.8722 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1dfd3075-6ce5-4a41-8aed-a4643b7919fb")
+		(property "Reference" "MRK1"
+			(at 161.036 278.2062 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "Marker Single Layer"
+			(at 162.56 276.6822 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB_Marker_Pad_top"
+			(at 163.83 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 163.83 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Position Marker for PCBs"
+			(at 163.83 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "MRK1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB TEXT FIELD TOP_AVT_KHK_Lib.IntLib")
+		(at 199.39 277.9522 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "20226476-7b70-4a01-9800-c7555c056562")
+		(property "Reference" "T1"
+			(at 194.056 276.4282 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "PCB Text TOP"
+			(at 194.056 288.3662 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB TEXTFIELD TOP 2"
+			(at 199.39 277.9522 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 199.39 277.9522 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "PCB Textfield TOP"
+			(at 199.39 277.9522 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "T1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB_AVT_KHK_Lib.IntLib")
+		(at 132.08 279.2222 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "2eeac286-e5ae-49f4-8f3b-56b1813f03a4")
+		(property "Reference" "PCB1"
+			(at 132.08 276.6822 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "CSI2-KRIA-KV260_Rev01"
+			(at 132.08 286.8422 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 279.2222 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 132.08 279.2222 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "PCB ML06"
+			(at 132.08 279.2222 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KHK PART NUMBER" ""
+			(at 123.952 437.7182 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "MANUFACTURER" "several"
+			(at 123.952 437.7182 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "MANUFACTURER PART NUMBER" ""
+			(at 123.952 437.7182 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "PCB1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR")
+		(at 241.3 136.9822 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "32a3632f-481c-465b-9c21-3963da42f5b1")
+		(property "Reference" "#PWR084"
+			(at 241.3 136.9822 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 237.49 136.9822 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 241.3 136.9822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 241.3 136.9822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 241.3 136.9822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin ""
+			(uuid "a1590dfb-0f9f-44e2-9d53-b4b5a22aa71a")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "#PWR084")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib")
+		(at 171.45 272.8722 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "419f9e65-8e42-4bc7-92f3-2a93904092fc")
+		(property "Reference" "MRK2"
+			(at 168.656 278.2062 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "Marker Single Layer"
+			(at 170.18 276.6822 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB_Marker_Pad_top"
+			(at 171.45 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 171.45 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Position Marker for PCBs"
+			(at 171.45 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "MRK2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Misc:root_0_PCB LABEL 7x7_Misc.SCHLIB")
+		(at 115.57 279.2222 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "69ab81fa-ef77-4fe2-9b8d-d0b4ee20a301")
+		(property "Reference" "LA1"
+			(at 115.57 276.6822 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "LABEL 7x7mm"
+			(at 115.57 286.8422 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB LABEL 7x7"
+			(at 115.57 279.2222 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 115.57 279.2222 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "LABEL 7x7mm"
+			(at 115.57 279.2222 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KHK PART NUMBER" ""
+			(at 107.442 437.7182 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "MANUFACTURER" "several"
+			(at 107.442 437.7182 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "MANUFACTURER PART NUMBER" "several"
+			(at 107.442 437.7182 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "LA1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib")
+		(at 179.07 272.8722 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6eb9a40b-f49b-499e-901a-d91fbd2b035e")
+		(property "Reference" "MRK3"
+			(at 176.276 278.2062 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "Marker Single Layer"
+			(at 177.8 276.6822 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB_Marker_Pad_top"
+			(at 179.07 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 179.07 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Position Marker for PCBs"
+			(at 179.07 272.8722 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "MRK3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib")
+		(at 171.45 281.7622 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "74d95de6-4951-45f3-8b7f-5e6ffd4df01d")
+		(property "Reference" "MRK5"
+			(at 168.656 287.0962 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "Marker Single Layer"
+			(at 170.18 285.5722 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB_Marker_Pad_top"
+			(at 171.45 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 171.45 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Position Marker for PCBs"
+			(at 171.45 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "MRK5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "AVT_KHK_Lib:root_0_PCB Marker Pad Single Layer_AVT_KHK_Lib.IntLib")
+		(at 179.07 281.7622 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "857c158f-069e-4b0a-beae-fd9254405b6b")
+		(property "Reference" "MRK6"
+			(at 176.276 287.0962 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Value" "Marker Single Layer"
+			(at 177.8 285.5722 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right bottom)
+			)
+		)
+		(property "Footprint" "PCB_Marker_Pad_top"
+			(at 179.07 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 179.07 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Position Marker for PCBs"
+			(at 179.07 281.7622 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "MRK6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE")
+		(at 241.3 131.9022 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "903cff33-1fee-4ff6-bf8c-40c33e6b02bb")
+		(property "Reference" "#PWR083"
+			(at 241.3 131.9022 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "VCC5V-EXT"
+			(at 237.49 131.9022 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 241.3 131.9022 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 241.3 131.9022 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 241.3 131.9022 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin ""
+			(uuid "f5c7d623-a13e-4f82-bc1f-554a107eb6b9")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "#PWR083")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR")
+		(at 241.3 162.3822 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c7a1af10-1cc6-4873-9b31-c7a41fd832b5")
+		(property "Reference" "#PWR086"
+			(at 241.3 162.3822 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 237.49 162.3822 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 241.3 162.3822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 241.3 162.3822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 241.3 162.3822 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin ""
+			(uuid "b367f268-7677-4b5a-b5dd-b0f8d56a52a6")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "#PWR086")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE")
+		(at 241.3 157.3022 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e688d88c-3365-4f17-bce0-82a161374979")
+		(property "Reference" "#PWR085"
+			(at 241.3 157.3022 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "VCC5V-EXT"
+			(at 237.49 157.3022 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 241.3 157.3022 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 241.3 157.3022 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 241.3 157.3022 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin ""
+			(uuid "4958d856-f739-4ad9-8450-ca9a16519cd8")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(reference "#PWR085")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet
+		(at 241.3 128.0922)
+		(size 38.1 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0)
+			(type solid)
+			(color 128 0 0 1)
+		)
+		(fill
+			(color 128 255 128 1)
+		)
+		(uuid "03df7440-7352-41ed-ab0f-89d6bada491f")
+		(property "Sheetname" "IAS0"
+			(at 241.3 125.5522 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
+			(at 241.3 128.0922 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(pin "VCC5V-EXT" passive
+			(at 241.3 131.9022 180)
+			(uuid "b7c684de-2bb0-434d-9e1c-5ecaa0a035a7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "GND" passive
+			(at 241.3 136.9822 180)
+			(uuid "fed09483-f9f5-4502-911f-179054a5efb7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXC_P" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000001")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXC_N" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000002")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXD0_P" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000003")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXD0_N" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000004")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXD1_P" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000005")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXD1_N" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000006")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXD2_P" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000007")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "B7-CSI2-TXD2_N" passive
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000008")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "I2C_SCL_3V3" bidirectional
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-000000000009")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "I2C_SDA_3V3" bidirectional
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-00000000000a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "EXT-GPIO2" bidirectional
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-00000000000b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PWDN_3V3" input
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-00000000000c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "CLK_KRIA_P" input
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-00000000000d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "CLK_KRIA_N" input
+			(at 241.3 140.7922 180)
+			(uuid "00000001-0000-4000-8000-00000000000e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 241.3 153.4922)
+		(size 38.1 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0)
+			(type solid)
+			(color 128 0 0 1)
+		)
+		(fill
+			(color 128 255 128 1)
+		)
+		(uuid "fc4f8828-fd1c-408c-aca8-cb0001102819")
+		(property "Sheetname" "IAS1"
+			(at 241.3 150.9522 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
+			(at 241.3 153.4922 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(pin "VCC5V-EXT" passive
+			(at 241.3 157.3022 180)
+			(uuid "a5cd83f8-2ffc-4809-91cc-ce4cc0c8230b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "GND" passive
+			(at 241.3 162.3822 180)
+			(uuid "8af9ef01-c158-4f1c-aaf1-9887fa81e9ed")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "2")
+		)
+	)
+	(embedded_fonts no)
+)

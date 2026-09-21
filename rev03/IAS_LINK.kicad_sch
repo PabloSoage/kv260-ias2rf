@@ -1,0 +1,168 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "750c4746-afa9-5817-b1bc-c23424167635")
+	(paper "A3")
+	(title_block
+		(title "IAS_LINK - Hirose IAS1, AC coupling, link terminations")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "LINK_RX_D0_P"
+		(shape input)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8c34ec0f-d127-5793-a61b-242c53a1e985")
+	)
+	(hierarchical_label "LINK_RX_D0_N"
+		(shape input)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "984788fe-5d47-5035-bdcc-05e5ae26583e")
+	)
+	(hierarchical_label "LINK_RX_D1_P"
+		(shape input)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6705c12c-6cc3-51e3-9fd8-620a921dd231")
+	)
+	(hierarchical_label "LINK_RX_D1_N"
+		(shape input)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6b7e4e05-7e06-5d40-9d5c-0a5b2b75e622")
+	)
+	(hierarchical_label "LINK_RX_CLK_P"
+		(shape input)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8fc2902f-c0e7-56d7-be9c-a1cf418525cb")
+	)
+	(hierarchical_label "LINK_RX_CLK_N"
+		(shape input)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c6f5831a-e503-56e1-8eb1-a25e17dc31e4")
+	)
+	(hierarchical_label "LINK_TX_D0_P"
+		(shape output)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "45bff793-148e-5c68-bf29-b13c5d5b8518")
+	)
+	(hierarchical_label "LINK_TX_D0_N"
+		(shape output)
+		(at 25.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1763114a-3439-559f-8396-5072dec45868")
+	)
+	(hierarchical_label "LINK_TX_CLK_P"
+		(shape output)
+		(at 25.4 66.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "00249b2d-0ba4-57b5-b0d4-97dadf8095fb")
+	)
+	(hierarchical_label "LINK_TX_CLK_N"
+		(shape output)
+		(at 25.4 71.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1601b9e1-c485-5789-a2c3-b4880a9cdefe")
+	)
+	(hierarchical_label "HK_SCL"
+		(shape bidirectional)
+		(at 25.4 76.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3b8be3ca-5d48-5829-af80-82f757569065")
+	)
+	(hierarchical_label "HK_SDA"
+		(shape bidirectional)
+		(at 25.4 81.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a4ae1c57-c6ba-5fe7-9434-dfe61a3499ff")
+	)
+	(hierarchical_label "FPGA_PROG_B"
+		(shape output)
+		(at 25.4 86.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6fe76ffb-859b-58af-b574-7ceff9eaac3f")
+	)
+	(hierarchical_label "FPGA_IRQ"
+		(shape input)
+		(at 25.4 91.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "bf147450-8f32-5563-a30c-3d56e94465b8")
+	)
+)

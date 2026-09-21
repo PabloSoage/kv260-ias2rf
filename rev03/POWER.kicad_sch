@@ -1,0 +1,14 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "ff907464-7c32-5063-b5be-91e05d87db03")
+	(paper "A3")
+	(title_block
+		(title "POWER - 12 V input, protection, buck/LDO tree (rails are global)")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+)

@@ -817,6 +817,30 @@
     [
       "fc4f8828-fd1c-408c-aca8-cb0001102819",
       "IAS1"
+    ],
+    [
+      "507b9e7f-0337-5c4e-b621-478c31de2af5",
+      "IAS_LINK"
+    ],
+    [
+      "bc106418-3615-506a-a32b-ff6e1a94f8d2",
+      "CONTROL"
+    ],
+    [
+      "51a8ece2-9cfa-5b8f-9159-3fd5d03d8124",
+      "CONVERTERS"
+    ],
+    [
+      "86907de8-dbaa-540c-95d7-38c6f0e48980",
+      "CLOCK"
+    ],
+    [
+      "388f8fcb-a039-5966-b84c-c0dd05bb2489",
+      "ROUTING"
+    ],
+    [
+      "178e9fd4-026b-514b-ade0-1bd1f53cb813",
+      "POWER"
     ]
   ],
   "text_variables": {

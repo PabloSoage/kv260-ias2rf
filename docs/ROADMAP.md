@@ -95,7 +95,54 @@ the power `[E]` marks replaced by datasheet values.
 
 ---
 
-## Phase 2 — Schematic
+## Phase 2 — Schematic ⬅ **STARTED**
+
+### Done: the hierarchy skeleton
+
+`_work/rev03_build_hierarchy.py` created six sheets under `rev03/` and wired their interfaces into
+the root, **108 interface signals** in total:
+
+| Sheet | Signals | Contents |
+|---|---|---|
+| `IAS_LINK` | 14 | Hirose IAS1, AC coupling, link terminations |
+| `CONTROL` | 40 | Front-end FPGA, Pmod, AERIS-10 control IDC |
+| `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers |
+| `CLOCK` | 8 | Reference selector, TCXO, ADCLK944 fan-out |
+| `ROUTING` | 9 | 4× SPDT channel routing, IF and clock SMAs |
+| `POWER` | 0 | 12 V input, protection, buck/LDO tree — rails are global symbols |
+
+**Why this is not what §8 of the audit warns against.** That warning is about generating
+*circuits* by script: untyped symbols wired with auto-generated labels, which cannot be reviewed
+by eye and which ERC cannot check because the pins carry no electrical type. This skeleton contains
+**no symbols and no wires** — only sheets and the hierarchical labels that define what crosses
+between them. There is nothing to mis-type, and ERC verifies exactly the property that matters:
+that every sheet pin matches a hierarchical label by name and direction. All six sheets came out
+with 0 orphan, 0 missing and 0 wrong-direction pins. The circuit gets drawn in the GUI.
+
+Power rails are deliberately **not** hierarchical labels. They travel as global power symbols, the
+way the inherited design already does, which keeps sheet interfaces to signals.
+
+### Done: hierarchy made consistent
+
+`_work/sync_sheet_pins.py` did from the command line what *Synchronize Hierarchical Labels* does in
+the GUI, and closed the last 36 structural errors:
+
+- **2 orphan pins removed** — `CLK_KRIA_P` / `CLK_KRIA_N` on the IAS0 block, sheet pins for a label
+  that does not exist. Remains of the Rev01 idea of sending a 125 MHz LVPECL clock back into a MIPI
+  pin on the SOM, which Rev03 dropped.
+- **34 missing pins added** — the shared sheet exposes 25 hierarchical labels; IAS0 declared only
+  16 of them and IAS1 only 2.
+- **9 pin directions corrected** on IAS0.
+
+**Result: `hier_label_mismatch` 36 → 0.**
+
+### Still to do
+
+Draw the circuits, in the GUI, sheet by sheet against the master document.
+
+---
+
+## Phase 2 — Schematic: requirements
 
 Start from `CSI2-KRIA-KV260_Rev01-2.kicad_sch` (the purge, which is valid work). The two
 script-generated sheets have already been **removed** from the project and moved to
