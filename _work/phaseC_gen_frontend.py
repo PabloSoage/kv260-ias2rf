@@ -267,7 +267,7 @@ header = """(kicad_sch
 	(uuid "abcdef12-3456-7890-abcd-ef1234567890")
 	(paper "A2")
 	(title_block
-		(title "FRONTEND - KV260-IAS2RF SDR + Radar")
+		(title "FRONTEND - SDR + Radar")
 		(rev "01")
 		(company "open hardware")
 	)

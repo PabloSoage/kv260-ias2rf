@@ -1,0 +1,21 @@
+# Historial local del editor (extension Local History de VS Code).
+# Estaban commiteados como gitlinks sin .gitmodules: un submodulo roto que
+# impide clonar el repo correctamente.
+.history/
+
+# Autoguardado de KiCad. Son 28 MB de zips que no aportan nada: los
+# snapshots que importan estan en _backup_original/.
+*-backups/
+
+# Estado local por usuario de KiCad (posiciones de ventana, zoom, capas
+# visibles). No es contenido del proyecto.
+*.kicad_prl
+
+# Salidas de simulacion y trabajo temporal
+*.net
+fp-info-cache
+~*
+*.bak
+*.stackdump
+__pycache__/
+*.pyc

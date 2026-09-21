@@ -1,201 +1,208 @@
-# Plan de trabajo
+# Work plan
 
-*14 de agosto de 2026 · Arquitectura Rev02*
+*21 September 2026 · Rev03 architecture*
 
-Cada fase tiene un **criterio de salida verificable**. Una fase no está terminada porque se hayan
-tocado ficheros, sino porque se cumple su criterio. El Rev01 se declaró completo sin criterios
-de salida, y de ahí vino todo.
-
----
-
-## Fase 0 — Cerrar los bloqueantes ✅ COMPLETADA
-
-| Bloqueante | Resultado |
-|---|---|
-| **B-01** — Interfaz con la Kria | ⛔ **En contra.** IAS0 termina en el ISP AP1302; no existe cabecera RPi de 40 pines; los GTH no son accesibles. Presupuesto real: **8 pares + ~14 señales sueltas** |
-| **B-02** — Modo 1-lane del AD9253 | ⛔ **En contra.** Limitado a **62.5 MSPS** |
-| **B-03** — Conmutadores de RF | ✅ **A favor.** M3SWA2-34DR+ con driver interno, control positivo 3.3 V |
-| **B-04** — IF de AERIS-10 | ✅ **A favor.** 120 MHz; los filtros `BPF2` son placeholders sin especificar |
-| **B-05** — Variante Extended | ⚠️ **Parcial.** No publicada. Se dimensiona para 8 chips |
-
-Evidencia y fuentes en [RIESGOS.md](RIESGOS.md). Consecuencia: la arquitectura Rev02 no era
-realizable y se ha sustituido por la **Rev03, con FPGA de front-end**.
-
-Queda pendiente, no bloqueante para decidir pero sí para cerrar el esquemático:
-
-| Tarea | Fuente |
-|---|---|
-| `VCCO` exacta del banco HPA tal como la configura la KV260 | Esquemático de la carrier card |
-| Confirmar la variante Extended de AERIS (B-05) | Autor del proyecto |
-| Medir la envolvente mecánica sobre la KV260 | La placa física |
+Every phase has a **verifiable exit criterion**. A phase is not finished because files were
+touched; it is finished when its criterion is met. Rev01 was declared complete with no exit
+criteria, and that is where all of it came from.
 
 ---
 
-## Fase 0.5 — Decisión de arquitectura ⬅ **AQUÍ ESTAMOS**
+## Phase 0 — Close the blockers ✅ COMPLETE
 
-**Una sola pregunta, y de ella depende todo lo demás:** ¿se acepta poner una FPGA de front-end
-en la placa adaptadora?
+| Blocker | Outcome |
+|---|---|
+| **B-01** — Interface to the Kria | ⛔ **Against.** IAS0 ends at the AP1302 ISP; there is no 40-pin RPi header; the GTHs are not reachable. Real budget: **8 pairs + ~14 loose signals** |
+| **B-02** — AD9253 1-lane mode | ⛔ **Against.** Capped at **62.5 MSPS** |
+| **B-03** — RF switches | ✅ **In favour.** M3SWA2-34DR+ has an internal driver, positive 3.3 V control |
+| **B-04** — AERIS-10 IF | ✅ **In favour.** 120 MHz; the `BPF2` filters are unspecified placeholders |
+| **B-05** — Extended variant | ⚠️ **Partial.** Not published. Sized for 8 chips |
 
-| | Con FPGA de front-end | Sin FPGA |
+Evidence and sources in [BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md). Consequence: the Rev02
+architecture was not realisable and has been replaced by **Rev03, with a front-end FPGA**.
+
+Still outstanding — not blocking the decision, but blocking schematic sign-off:
+
+| Task | Source |
+|---|---|
+| Exact `VCCO` of the HPA bank as the KV260 sets it | Carrier card schematic |
+| Confirm the AERIS Extended variant (B-05) | The project's author |
+| Measure the mechanical envelope on the KV260 | The physical board |
+
+---
+
+## Phase 0.5 — Architecture decision ⬅ **WE ARE HERE**
+
+**One question, and everything else depends on it:** is a front-end FPGA accepted on the adapter
+board?
+
+| | With front-end FPGA | Without |
 |---|---|---|
-| Resolución de radar | **0.75 m** | 3.0 – 6.0 m |
-| Canales de RX | 2 a 400 MSPS + 2 de SDR | 2 a 62.5 MSPS |
-| Transmisión | 14 bits, bus local | 8 bits repartidos entre 2 conectores |
-| Control de los ADAR1000 | Trivial, con estrobo síncrono | Sin resolver para 8 chips |
-| Firmware de AERIS | **Corre casi sin portar** | Hay que reescribirlo |
-| Conectores usados | J8 + Pmod | J8 + J9 (FFC) + Pmod |
-| Complejidad de la placa | **Placa FPGA**: arranque, secuencia, JTAG | Placa pasiva |
-| Segundo flujo de herramientas | Sí (Vivado para la FPGA de front-end) | No |
+| Radar resolution | **0.75 m** | 3.0 – 6.0 m |
+| RX channels | 2 at 400 MSPS + 2 for SDR | 2 at 62.5 MSPS |
+| Direction finding | **4 coherent channels** | 2, with ambiguity |
+| Transmission | 14 bits, local bus | 8 bits split across 2 connectors |
+| ADAR1000 control | Trivial, with a synchronous strobe | Unsolved for 8 chips |
+| AERIS firmware | **Runs almost unported** | Has to be rewritten |
+| Connectors used | J8 + Pmod | J8 + J9 (FFC) + Pmod |
+| Board complexity | **An FPGA board**: boot, sequencing, JTAG | Passive board |
+| Second toolchain | Yes (Vivado for the front-end FPGA) | No |
 
-**Criterio de salida:** decisión tomada y registrada. Sin ella, cualquier esquemático es trabajo
-tirado.
+**Exit criterion:** decision taken and recorded. Without it, any schematic is wasted work.
+
+> **Note:** the DSP core for the "with FPGA" branch already exists and is measured on silicon —
+> [scanner64](https://github.com/PabloSoage/scanner64). That removes a large part of the risk from
+> this decision: the hard question (can the PL sustain a converter stream in real time?) has been
+> answered with hardware.
 
 ---
 
-## Fase 1 — Especificación congelada
+## Phase 1 — Frozen specification
 
-| Tarea | Entregable |
+| Task | Deliverable |
 |---|---|
-| Fijar frecuencia de muestreo y modo de lanes del ADC | Actualizar §4.1 del documento maestro |
-| Fijar ancho de bus, tasa y componente del DAC | Actualizar §5.1 |
-| Congelar el mapa pin a pin de IAS0, IAS1 y la cabecera RPi | Tabla de asignación completa, con pines físicos |
-| Congelar el conector de control hacia AERIS-10 | Pinout del IDC 2×20, con niveles y direcciones |
-| Presupuesto de corriente por raíl con datos de datasheet | Sustituir las estimaciones `[E]` de §10.1 |
-| Definir el stackup de 6 capas con impedancias calculadas | Ficha de stackup para el fabricante |
+| Fix the ADC sample rate and lane mode | Update §4.1 of the master document |
+| Fix the DAC bus width, rate and part | Update §5.1 |
+| Freeze the pin-by-pin map of IAS1, J9 and the Pmod | Complete assignment table, with physical pins |
+| Freeze the control connector to AERIS-10 | IDC 2×20 pinout, with levels and directions |
+| Per-rail current budget from datasheet figures | Replace the `[E]` estimates in §10.1 |
+| Define the 6-layer stackup with computed impedances | Stackup sheet for the fabricator |
 
-**Criterio de salida:** el documento maestro sin ninguna marca `[?]` en las secciones 4, 5, 6
-y 10, y con las `[E]` de alimentación sustituidas por valores de datasheet.
+**Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
+the power `[E]` marks replaced by datasheet values.
 
 ---
 
-## Fase 2 — Esquemático
+## Phase 2 — Schematic
 
-Se parte de `CSI2-KRIA-KV260_Rev01-2.kicad_sch` (la purga, que es trabajo válido) y se
-**descartan** `FRONTEND.kicad_sch` y `PHASED_ARRAY.kicad_sch`.
+Start from `CSI2-KRIA-KV260_Rev01-2.kicad_sch` (the purge, which is valid work). The two
+script-generated sheets have already been **removed** from the project and moved to
+`_deprecated/`.
 
-> **Captura manual en la GUI de KiCad, no generación por script.** Ver la nota metodológica de
-> [AUDITORIA_Rev01.md](AUDITORIA_Rev01.md#7-nota-metodológica). Los scripts sirven para purgar y
-> para extraer datos; no para dibujar circuitos que nadie va a poder revisar.
+> **Manual capture in the KiCad GUI, not script generation.** See the
+> [method note](AUDIT_Rev01.md#8-method-note). Scripts are for purging and extracting data, not for
+> drawing circuits nobody will be able to review.
 
-| Hoja | Contenido |
+| Sheet | Contents |
 |---|---|
-| Raíz | Jerarquía y conectores Hirose |
-| `IAS_RX` | Hirose IAS0, ADC, acondicionamiento de entrada, terminaciones |
-| `IAS_TX` | Hirose IAS1, traductores de nivel, DAC, filtro de reconstrucción |
-| `CLOCK` | Selector de referencia, TCXO, ADCLK944 con acoplo y polarización |
-| `ROUTING` | 4 conmutadores SPDT, SMA de IF, SMA de reloj |
-| `CONTROL` | Cabecera RPi, decodificador 3→8, traductores a 1.8 V, IDC hacia AERIS y placa B |
-| `POWER` | Árbol completo con protección de polaridad y separación analógico/digital |
+| Root | Hierarchy and the Hirose connectors |
+| `IAS_LINK` | Hirose IAS1, the serial link to the Kria, terminations |
+| `CONVERTERS` | ADC, DAC, input conditioning, reconstruction filter |
+| `CLOCK` | Reference selector, TCXO, ADCLK944 with coupling and bias |
+| `ROUTING` | 4 SPDT switches, IF SMAs, clock SMAs |
+| `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
+| `POWER` | Full tree with reverse-polarity protection and analogue/digital separation |
 
-**Requisitos de calidad, no negociables:**
+**Non-negotiable quality requirements:**
 
-- Símbolos con **tipos eléctricos correctos** en todos los pines. Si un símbolo de EasyEDA viene
-  con todo marcado `Unspecified`, se corrige antes de usarlo: si no, el ERC no comprueba nada.
-- Conexiones con **wires**, no solo con etiquetas. Las etiquetas son válidas para buses y raíles;
-  la topología de RF y de alimentación tiene que verse.
-- Un `no_connect` explícito en cada pin deliberadamente sin usar.
+- Symbols with **correct electrical types** on every pin. If an EasyEDA symbol arrives with
+  everything marked `Unspecified`, fix it before using it: otherwise ERC checks nothing.
+- Connections with **wires**, not labels alone. Labels are fine for buses and rails; RF and power
+  topology has to be visible.
+- An explicit `no_connect` on every deliberately unused pin.
 
-**Criterio de salida:**
+**Prerequisite — multi-channel annotation.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is instantiated
+twice (IAS0 and IAS1), so its 19 references are duplicated across the project and
+`kicad-cli sch export netlist` currently fails with *"the schematic has annotation errors"*. Fix it
+in the GUI: `Tools → Annotate Schematic`, scope **"Use sheet number (X/Y)"**. **Without this there
+is no netlist, and without a netlist phase 3 cannot start.**
 
-1. ERC con **cero errores** y warnings justificados uno a uno en un fichero de excepciones.
-2. Revisión visual hoja por hoja contra el documento maestro.
-3. Cada componente del BOM con su parte real, encapsulado y disponibilidad comprobada.
+**Exit criteria:**
+
+1. ERC with **zero errors** and warnings justified one by one in an exclusions file.
+2. `kicad-cli sch export netlist` succeeds.
+3. Visual review sheet by sheet against the master document.
+4. Every BOM item with a real part number, package and checked availability.
 
 ---
 
-## Fase 3 — Layout
+## Phase 3 — Layout
 
-| Tarea | Nota |
+| Task | Note |
 |---|---|
-| Ampliar el contorno de placa | Manteniendo fijas las posiciones de los dos Hirose |
-| Definir el stackup de 6 capas en KiCad | Con dieléctricos y espesores reales del fabricante |
-| Placement | Conversores y reloj lo más cerca posible de los Hirose |
-| Rutado de los pares de los IAS | 100 Ω diferenciales, apareados en longitud, plano de referencia continuo |
-| Rutado del bus del DAC | Terminación serie en origen, retorno próximo |
-| Planos de alimentación | Separación real entre analógico y digital, ferritas en los puntos de unión |
-| Rutado de las líneas de IF | 50 Ω hasta los SMA |
+| Extend the board outline | Keeping the two Hirose positions fixed |
+| Define the 6-layer stackup in KiCad | With the fabricator's real dielectrics and thicknesses |
+| Placement | Converters and clock as close to the Hirose as possible |
+| Route the IAS pairs | 100 Ω differential, length-matched, continuous reference plane |
+| Route the DAC bus | Series termination at source, close return path |
+| Power planes | Real separation between analogue and digital, ferrites at the junctions |
+| Route the IF lines | 50 Ω to the SMAs |
 
-**Criterio de salida:**
+**Exit criteria:**
 
-1. DRC con cero errores **con las reglas correctas activadas** (no heredando las del import).
-2. Cero pads sin conectar — y esta vez con pads de verdad.
-3. Impedancias verificadas con la calculadora del stackup del fabricante.
-4. Revisión de fabricabilidad con el fabricante elegido antes de pedir.
+1. DRC with zero errors **and the correct rules enabled** (not inherited from the import).
+2. Zero unconnected pads — and this time with actual pads.
+3. Impedances verified with the fabricator's stackup calculator.
+4. Manufacturability review with the chosen fabricator before ordering.
 
 ---
 
-## Fase 4 — Prototipo y puesta en marcha
+## Phase 4 — Prototype and bring-up
 
-Orden deliberado: cada paso valida el anterior y no depende del siguiente.
+Deliberate order: each step validates the previous one and does not depend on the next.
 
-| Paso | Qué se valida | Cómo |
+| Step | What it validates | How |
 |---|---|---|
-| 1 | Alimentación | Tensiones y rizado en todos los raíles, sin conversores montados |
-| 2 | Reloj | Salidas del ADCLK944 con osciloscopio: niveles, jitter, terminaciones |
-| 3 | **Enlace IAS0 → PL** | Inyectar una senoide conocida en la entrada del ADC y recuperarla en el PL. **Es la validación crítica de todo el proyecto** (cierra B-01 en la práctica) |
-| 4 | **Enlace PL → IAS1** | Generar una senoide desde el PL y verla en la salida del DAC |
-| 5 | Diafonía del bus del DAC | Barrido de frecuencia de muestreo hasta encontrar el límite real (cierra R-01) |
-| 6 | Conmutadores y encaminado | Los 3 modos de operación de §7.2 |
-| 7 | Integración con AERIS-10 | Reloj común, IF en ambos sentidos, control de haz |
+| 1 | Power | Voltages and ripple on every rail, with no converters fitted |
+| 2 | Clock | ADCLK944 outputs on the scope: levels, jitter, terminations |
+| 3 | **IAS1 link to the PL** | Inject a known sine at the ADC input and recover it in the PL. **This is the critical validation of the whole project** (it closes B-01 in practice) |
+| 4 | **PL to DAC link** | Generate a sine from the PL and see it at the DAC output |
+| 5 | DAC bus crosstalk | Sweep the sample rate until the real limit appears |
+| 6 | Switches and routing | The 3 operating modes |
+| 7 | Integration with AERIS-10 | Common clock, IF both ways, beam control |
 
-**Criterio de salida:** lazo cerrado DAC → conmutador → conmutador → ADC funcionando, con la
-señal generada por el PL recuperada por el PL.
+**Exit criterion:** a closed loop DAC → switch → switch → ADC working, with the signal generated by
+the PL recovered by the PL.
 
 ---
 
-## Fase 5 — Gateware
+## Phase 5 — Gateware
 
-Se puede solapar con las fases 2 y 3.
+Can overlap phases 2 and 3.
 
-| Tarea | Nota |
+| Task | Note |
 |---|---|
-| Receptor serie LVDS del ADC | `ISERDESE3` + alineación de trama |
-| Generador del bus del DAC | |
-| Maestro SPI y control de haz | |
-| Portar el procesado de radar de AERIS-10 | Adaptar reloj (400 → 80/125 MHz), bits (8 → 14), host (USB → AXI/DMA) |
-| Cadena SDR | DDC, decimación, demodulación |
-| Aplicación de host | |
+| ADC serial LVDS receiver | `ISERDESE3` + frame alignment |
+| DAC bus generator | |
+| SPI master and beam control | |
+| Port the AERIS-10 radar processing | Adapt clock (400 → 80/125 MHz), bits (8 → 14), host (USB → AXI/DMA) |
+| SDR chain | DDC, decimation, demodulation. **Reuse [scanner64](https://github.com/PabloSoage/scanner64)** |
+| Host application | |
 
-**Criterio de salida:** captura de ADC y generación de DAC funcionando sobre hardware real, con
-las regresiones del firmware de AERIS pasando en el nuevo dominio de reloj.
-
----
-
-## Fases posteriores
-
-- **Placa B — front-end SDR.** Independiente. Puede empezar en cuanto la Fase 1 congele la
-  interfaz de IF.
-- **Integración con AERIS-10X.** Depende de que el autor publique la variante extendida (B-05).
+**Exit criterion:** ADC capture and DAC generation working on real hardware, with the AERIS firmware
+regressions passing in the new clock domain.
 
 ---
 
-## Estado actual
+## Later phases
 
-**Fase 0 completada. Bloqueado en la Fase 0.5**, a la espera de la decisión sobre la FPGA de
-front-end.
+- **SDR front-end board.** Independent. Can start as soon as phase 1 freezes the IF interface.
+- **Integration with AERIS-10X.** Depends on the author publishing the Extended variant (B-05).
 
-### Trabajo hecho sobre los ficheros KiCad
+---
 
-| Acción | Estado |
+## Current state
+
+**Phase 0 complete. Blocked at phase 0.5**, awaiting the front-end FPGA decision.
+
+### Work done on the KiCad files
+
+| Action | State |
 |---|---|
-| Eliminados los **34 footprints vacíos** que el Rev01 había insertado en el `.kicad_pcb` | ✅ Hecho. Copia previa en `_backup_original/CSI2-KRIA-KV260_Rev01_preRev02cleanup.kicad_pcb` |
-| Verificada la integridad del fichero tras la edición | ✅ Paréntesis balanceados; **488 pads intactos**, ninguno era de los footprints borrados |
-| Conservados los 5 footprints sin pads que **sí** son originales del import (`LA1`, `T1`, `T2`, `J5_IAS0`, `J5_IAS1`) | ✅ |
+| Removed the **34 empty footprints** Rev01 had inserted in the `.kicad_pcb` | ✅ Done. Prior copy in `_backup_original/CSI2-KRIA-KV260_Rev01_preRev02cleanup.kicad_pcb` |
+| Verified file integrity after the edit | ✅ Balanced parentheses; **488 pads untouched**, none belonged to the deleted footprints |
+| Kept the 5 pad-less footprints that **are** original to the import (`LA1`, `T1`, `T2`, `J5_IAS0`, `J5_IAS1`) | ✅ |
+| **Removed the two dead sheets from the project** (`FRONTEND`, `PHASED_ARRAY`) | ✅ Done by `_work/rev03_drop_dead_sheets.py`. Moved to `_deprecated/` |
+| **ERC measured before and after** with `kicad-cli 10.0.1` | ✅ **1130 → 427 violations.** All the serious electrical categories at zero |
+| Repository cleaned for publication | ✅ Broken `.history` gitlinks, autosave zips and `.kicad_prl` untracked. 67 MB → 25 MB |
 
-**Lo que deliberadamente no se ha hecho, y por qué:**
+**What has deliberately not been done, and why:**
 
-- **No se ha dibujado esquemático nuevo.** La arquitectura cambió al cerrar B-01 y la decisión de
-  la Fase 0.5 está abierta. Dibujar ahora sería trabajo tirado.
-- **No se ha hecho placement ni rutado.** Por lo mismo, y porque hacerlo escribiendo
-  S-expressions a mano produciría exactamente el tipo de artefacto irrevisable que causó los
-  problemas del Rev01 (ver la [nota metodológica](AUDITORIA_Rev01.md#7-nota-metodológica)).
-- **No se ha ampliado el contorno de placa** ni definido el stackup de 6 capas: ambos dependen de
-  la decisión de arquitectura y de la envolvente mecánica, aún sin medir.
-- **No se han inventado pinouts.** Los símbolos de las piezas nuevas (XC7A50T, AD9484, AD9708) se
-  crearán a partir de sus datasheets, con tipos eléctricos correctos, no por copia de librerías
-  de terceros sin tipar.
-
-`FRONTEND.kicad_sch` y `PHASED_ARRAY.kicad_sch` siguen registrados en el proyecto pero
-**implementan una arquitectura muerta**. Conviene sacarlos del `.kicad_pro` y del esquemático
-raíz al empezar la Fase 2; no se ha hecho ahora para no dejar el proyecto en un estado que no
-puedas abrir y comprobar.
+- **No new schematic drawn.** The architecture changed when B-01 closed and the phase 0.5 decision
+  is open. Drawing now would be wasted work.
+- **No placement or routing.** Same reason, and because doing it by hand-writing S-expressions
+  would produce exactly the kind of unreviewable artefact that caused the Rev01 problems.
+- **The board outline has not been extended** and the 6-layer stackup is not defined: both depend on
+  the architecture decision and on the mechanical envelope, which is still unmeasured.
+- **No pinouts invented.** Symbols for the new parts will be built from their datasheets, with
+  correct electrical types, not copied from untyped third-party libraries.

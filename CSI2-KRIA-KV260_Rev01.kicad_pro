@@ -817,14 +817,6 @@
     [
       "fc4f8828-fd1c-408c-aca8-cb0001102819",
       "IAS1"
-    ],
-    [
-      "d8f1a234-5678-4abc-9012-3456789abcde",
-      "FRONTEND"
-    ],
-    [
-      "e9a2b345-6789-5bcd-0123-4567890bcdef",
-      "PHASED_ARRAY"
     ]
   ],
   "text_variables": {
@@ -833,7 +825,7 @@
     "ADDRESS3": "Germany",
     "AUTHOR": "CWA",
     "CHECKEDBY": "IHA",
-    "PAGESETUP": "Record=PageOptions¦CenterHorizontal=True¦CenterVertical=True¦PrintScale=0.73¦XCorrection=1.00¦YCorrection=1.00¦PrintKind=2¦BorderSize=5000000¦LeftOffset=0¦BottomOffset=0¦Orientation=2¦PaperLength=1000¦PaperWidth=1000¦Scale=100¦PaperSource=7¦PrintQuality=-4¦MediaType=1¦DitherType=10¦PrintScaleMode=1¦PaperKind=A3",
+    "PAGESETUP": "Record=PageOptions\u00a6CenterHorizontal=True\u00a6CenterVertical=True\u00a6PrintScale=0.73\u00a6XCorrection=1.00\u00a6YCorrection=1.00\u00a6PrintKind=2\u00a6BorderSize=5000000\u00a6LeftOffset=0\u00a6BottomOffset=0\u00a6Orientation=2\u00a6PaperLength=1000\u00a6PaperWidth=1000\u00a6Scale=100\u00a6PaperSource=7\u00a6PrintQuality=-4\u00a6MediaType=1\u00a6DitherType=10\u00a6PrintScaleMode=1\u00a6PaperKind=A3",
     "PCB": "",
     "PCBA": "",
     "SHEETTOTAL": "4"
