@@ -58,6 +58,74 @@ WANTED = {
     "ADF4382ABCCZ":    ("ADF4382A",       "11-21 GHz synthesiser (AERIS-10, reference only)"),
 }
 
+# ---------------------------------------------------------------------------
+# Pin tables taken from the MANUFACTURER DATASHEET.
+# These override anything derived from the Eagle library.
+#
+# Both datasheets were read locally from the AERIS-10 repository at
+#   <PLFM_RADAR>/7_Components Datasheets and Application notes/
+# because analog.com would not serve its PDFs from this machine.
+#
+# (pad, name, kicad_type)
+# ---------------------------------------------------------------------------
+
+DATASHEET_PINS = {
+    # M3SWA2-34DR+.pdf, "FUNCTIONAL DIAGRAM" and "DC ELECTRICAL SPECIFICATIONS".
+    # 16-lead QFN, 3x3 mm.
+    #
+    # NOTE THE SUPPLIES. This part needs BOTH VDD = +3.3 V and VEE = -3.3 V.
+    # Its control logic is positive (VCTRL low 0..+0.8 V, high +2..+3.6 V),
+    # which is what made an earlier reading of a search snippet conclude that
+    # no negative rail was needed. The datasheet is explicit: "VDD = +3.3 V,
+    # VEE = -3.3 V". Positive control, bipolar supply.
+    #   IDD 1.6 mA typ, 2.9 mA max;  IEE 0 mA typ, 1.8 mA max.
+    "M3SWA2-34DR": [
+        ("1",  "NC",    "no_connect"),
+        ("2",  "GND",   "power_in"),
+        ("3",  "RF1",   "passive"),
+        ("4",  "GND",   "power_in"),
+        ("5",  "VEE",   "power_in"),
+        ("6",  "VCTRL", "input"),
+        ("7",  "GND",   "power_in"),
+        ("8",  "VDD",   "power_in"),
+        ("9",  "GND",   "power_in"),
+        ("10", "RF2",   "passive"),
+        ("11", "GND",   "power_in"),
+        ("12", "NC",    "no_connect"),
+        ("13", "NC",    "no_connect"),
+        ("14", "GND",   "power_in"),
+        ("15", "RFC",   "passive"),
+        ("16", "GND",   "power_in"),
+    ],
+
+    # LTC5552f.pdf, "PIN CONFIGURATION" and "PIN FUNCTIONS".
+    # 12-lead 3x2 mm QFN (UDB), exposed pad is pin 13 and is GND.
+    # VCC is a regulated 3.3 V, 132 mA typical when enabled.
+    "LTC5552": [
+        ("1",  "GND", "power_in"),
+        ("2",  "IF+", "passive"),
+        ("3",  "IF-", "passive"),
+        ("4",  "GND", "power_in"),
+        ("5",  "RF",  "passive"),
+        ("6",  "GND", "power_in"),
+        ("7",  "EN",  "input"),
+        ("8",  "GND", "power_in"),
+        ("9",  "VCC", "power_in"),
+        ("10", "GND", "power_in"),
+        ("11", "LO",  "input"),
+        ("12", "GND", "power_in"),
+        ("13", "GND_EP", "power_in"),
+    ],
+}
+
+DATASHEET_NOTE = {
+    "M3SWA2-34DR": "Pin table from the Mini-Circuits M3SWA2-34DR+ datasheet. "
+                   "Needs BOTH VDD +3.3 V and VEE -3.3 V; control logic is positive.",
+    "LTC5552": "Pin table from the Analog Devices LTC5552 datasheet (LTC5552f). "
+               "VCC 3.3 V, 132 mA typical enabled. Exposed pad (pin 13) is GND.",
+}
+
+
 DIR_MAP = {
     "in": "input", "out": "output", "io": "bidirectional",
     "oc": "open_collector", "pwr": "power_in", "sup": "power_out",
@@ -206,11 +274,14 @@ def main():
 
     print()
     missing = [k for k in WANTED if k not in all_pins]
+    import collections
     for ds, pins in sorted(all_pins.items()):
         name, desc = WANTED[ds]
-        import collections
+        tag = "datasheet" if name in DATASHEET_PINS else "eagle    "
+        if name in DATASHEET_PINS:
+            pins = DATASHEET_PINS[name]
         types = collections.Counter(t for _, _, t in pins)
-        print(f"  {name:18s} {len(pins):3d} pins   "
+        print(f"  [{tag}] {name:18s} {len(pins):3d} pins   "
               + "  ".join(f"{t}:{c}" for t, c in types.most_common()))
     if missing:
         print(f"\n  NOT FOUND in the Eagle sources: {missing}")
@@ -230,7 +301,12 @@ def main():
     ]
     for ds, pins in sorted(all_pins.items()):
         name, desc = WANTED[ds]
-        body.append(emit_symbol(name, desc, pins, note))
+        if name in DATASHEET_PINS:
+            pins = DATASHEET_PINS[name]
+            src = DATASHEET_NOTE[name]
+        else:
+            src = note
+        body.append(emit_symbol(name, desc, pins, src))
     body.append(')')
 
     with open(OUT_LIB, "w", encoding="utf-8", newline=NL) as fh:

@@ -26,8 +26,14 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
         │     └── LDO → +3V3_A  240 mA   DAC AVDD, AD8352 drivers, references
         ├── buck → +2V5      600 mA   pre-regulator, analogue only
         │     └── LDO → +1V8_A  600 mA   AD9484 AVDD, AD9253 AVDD
-        └── buck → +1V0      700 mA   FPGA VCCINT
+        ├── buck → +1V0      700 mA   FPGA VCCINT
+        └── (from +3V3_D) charge pump → −3V3   8 mA   RF switch VEE
 ```
+
+**The −3.3 V rail is there because B-03 was wrong the first time.** The M3SWA2-34DR+ needs
+VDD +3.3 V *and* VEE −3.3 V; what is positive is its control logic, not its supply. See
+[BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md) B-03. The draw is 1.8 mA maximum per switch, so a
+small charge pump covers all four with room to spare.
 
 ### 1.2 What the budget caught
 
@@ -68,15 +74,16 @@ With 30 % margin:
 | `+3V3_A` | 3.3 | 240 mA | LDO | +3V6 | 0.07 W | ≥ 0.31 A |
 | `+1V8_D` | 1.8 | 230 mA | LDO | +3V3_D | 0.34 W | ≥ 0.30 A |
 | `+1V2` | 1.2 | 100 mA | LDO | +3V3_D | 0.21 W | ≥ 0.13 A |
+| `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 667 mA at 12 V = 8.0 W.** With margin, 0.87 A and 10.4 W. The jack, the PTC and the
+**Input: 661 mA at 12 V = 7.9 W.** With margin, 0.86 A and 10.3 W. The jack, the PTC and the
 reverse-polarity MOSFET want ≥ 1.0 A, and 2 A costs nothing extra.
 
 For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter is comfortable on
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 `[E]` Confidence: 0 verified, 19 estimated
+### 1.4 `[E]` Confidence: 2 verified, 18 estimated
 
 **No load figure in this budget comes from a datasheet.** analog.com refused to serve its PDFs
 throughout (repeated 60 s timeouts; the mirrors return 403 and 410), so every converter figure is
@@ -95,7 +102,7 @@ Every entry in `_work/power_budget.py` names the table to check:
 | AD9484 DRVDD, 130 mA | Same table. Digital power is set by the LVDS driver bias, so it barely varies with sample rate |
 | AD9253 AVDD, 200 mA | Table 2. The quad at 125 MSPS is about 1.1 W total; two channels at half rate is well under a quarter |
 | ADCLK944, 150 mA | Table 1, and specifically **whether the quoted ICC already includes output termination current** — LVPECL budgets are routinely wrong by exactly that amount |
-| M3SWA2-34DR+, 40 mA for 4 | The 3.3–3.6 V supply is `[V]`; the current per part is not |
+| ~~M3SWA2-34DR+~~ | ✅ **Now verified from the datasheet.** IDD 2.9 mA max and IEE 1.8 mA max per part, so 11.6 mA on `+3V3_D` and 7.2 mA on `−3V3` for four |
 | AD9708 / AD9767 / AD8352 | Table 1 of each |
 
 Replacing any of them is one line; the totals, the regulator choices and the dissipation all

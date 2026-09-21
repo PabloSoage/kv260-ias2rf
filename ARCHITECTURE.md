@@ -394,9 +394,12 @@ timing requirement:
 
 ### 7.4 Routing switches
 
-`[V]` **B-03 closed in favour:** the `M3SWA2-34DR+` is an absorptive GaAs SPDT with an **internal
-driver**, DC–30 GHz, supply 3.3–3.6 V. Positive logic control: **no negative rail needed**. The
-charge-pump inverter comes out of the power tree.
+`[V]` **B-03, corrected:** the `M3SWA2-34DR+` is an absorptive GaAs SPDT with an internal driver,
+DC–30 GHz — but its datasheet requires **VDD +3.3 V *and* VEE −3.3 V**. The control logic is
+positive (`VCTRL` 0 to +3.6 V), which is not the same as a single-rail supply, and an earlier
+reading conflated the two. **The charge-pump inverter stays in the power tree.** The draw is
+negligible: 1.8 mA maximum per switch, 7.2 mA for four. See
+[docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) B-03.
 
 Four SPDTs on the adapter let each converter channel be reassigned between the SDR chain and the
 radar chain, enabling mixed mode, SDR I/Q, and **radar I/Q** (needed to tell the sign of the Doppler

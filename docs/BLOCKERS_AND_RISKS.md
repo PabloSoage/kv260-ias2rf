@@ -10,7 +10,7 @@ interface to the Kria. This document holds the evidence; the consequences are in
 |---|---|---|
 | **B-01** | Can the IAS pins be outputs? Which bank do they reach? | ⛔ **Closes against.** IAS0 does not reach the FPGA at all |
 | **B-02** | Does the AD9253 do 125 MSPS in 1-lane mode? | ⛔ **Closes against.** 1-lane is capped at 62.5 MSPS |
-| **B-03** | Do the RF switches need negative control? | ✅ **Closes in favour.** Positive control, 3.3 V |
+| **B-03** | Do the RF switches need a negative rail? | ⛔ **Reopened, closes against.** The M3SWA2-34DR+ needs VDD +3.3 V **and VEE −3.3 V**. Control logic is positive; the supply is bipolar |
 | **B-04** | What is AERIS-10's IF? | ✅ **Closes in favour.** 120 MHz, filters unspecified |
 | **B-05** | How is the Extended variant built? | ⚠️ **Partial.** Not published; 8 ADAR1000s per the project owner |
 
@@ -127,17 +127,51 @@ of the one-lane limit.
 
 ---
 
-## B-03 — RF switches ✅ CLOSES IN FAVOUR
+## B-03 — RF switches ⛔ REOPENED AND CLOSED AGAINST (21 September 2026)
 
-The **M3SWA2-34DR+** (the one AERIS-10 uses, 17 of them) is an absorptive GaAs MMIC SPDT switch
-**with an internal driver**, DC – 30 GHz, supply **3.3 – 3.6 V**, in a 3×3 mm QFN, handling
-+27 dBm.
+### The correction
 
-The internal driver takes positive logic control: **no negative rail is needed.** The charge-pump
-inverter comes out of the power tree.
+**This blocker was closed wrongly the first time, and the error is worth setting out.**
 
-The `-5V0_ADAR12` / `-5V0_ADAR34` rails AERIS has are for the **ADAR1000s**, not for the switches,
-and they live on its own board. They do not affect the adapter.
+It was closed "in favour" on the strength of a web search snippet reporting *"supply voltage
+requirement is 3.3V ~ 3.6V"*, from which it followed that the part ran off a single positive rail
+and no charge-pump inverter was needed. The inverter was struck from the power tree on that basis.
+
+Reading the actual datasheet says otherwise. **M3SWA2-34DR+.pdf, DC ELECTRICAL SPECIFICATIONS:**
+
+| Parameter | Min | Typ | Max |
+|---|---|---|---|
+| Positive Supply Voltage, **VDD** | +3.3 | | +3.6 V |
+| **Negative Supply Voltage, VEE** | **−3.6** | | **−3.3 V** |
+| Positive Supply Current, IDD | | 1.6 | 2.9 mA |
+| Negative Supply Current, IEE | | 0 | 1.8 mA |
+| Control Voltage Low | 0 | | +0.8 V |
+| Control Voltage High | +2 | | +3.6 V |
+
+And the functional diagram shows pin 5 as **VEE** and pin 8 as VDD.
+
+**The part needs a bipolar supply.** What is positive is the *control logic* — `VCTRL` swings 0 to
++3.6 V — and that is the distinction the snippet blurred and the earlier reading missed:
+**positive control, bipolar supply**. They are not the same claim.
+
+### What this changes
+
+- A **−3.3 V rail is required** after all. The charge-pump inverter goes back into the power tree
+  (LM2663 or similar; AERIS carries one for the same reason).
+- The current is tiny — 1.8 mA maximum per switch, so 7.2 mA for four — which is why a small
+  charge pump is enough and no real dissipation is involved.
+- `docs/POWER_AND_STACKUP.md` now carries the rail.
+
+### Why it survived the first pass
+
+Nothing about the wrong answer looked wrong: the part genuinely is 3.3 V, it genuinely has an
+internal driver, and it genuinely takes positive control. The snippet was accurate as far as it
+went. It simply did not mention the second supply, and a summary that omits something reads
+identically to one that covers everything. **The lesson is the one already in the working rules:
+a search result is not a datasheet.**
+
+The `-5V0_ADAR12` / `-5V0_ADAR34` rails AERIS carries are for the **ADAR1000s**, on its own board,
+and remain irrelevant here — that part of the original note was right.
 
 ---
 

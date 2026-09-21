@@ -55,9 +55,13 @@ LOADS = [
     ("+3V3_D", "TCXO", 3.3, 20, "E", "typical for a 100 MHz TCXO"),
 
     # ---- RF routing and glue -------------------------------------------
-    ("+3V3_D", "M3SWA2-34DR+ SPDT, x4", 3.3, 40, "E",
-     "Mini-Circuits datasheet: 3.3-3.6 V supply, internal driver [V for the "
-     "voltage]. CHECK the supply current per part"),
+    ("+3V3_D", "M3SWA2-34DR+ SPDT, x4, VDD", 3.3, 12, "V",
+     "Mini-Circuits M3SWA2-34DR+ datasheet, DC ELECTRICAL SPECIFICATIONS: "
+     "IDD 1.6 mA typ, 2.9 mA max per part. 4 x 2.9 = 11.6 mA"),
+    ("-3V3", "M3SWA2-34DR+ SPDT, x4, VEE", -3.3, 8, "V",
+     "Same table: VEE -3.3 V required, IEE 1.8 mA max per part. 4 x 1.8 = 7.2 mA. "
+     "This rail was wrongly deleted when B-03 was first closed; see "
+     "docs/BLOCKERS_AND_RISKS.md B-03"),
     ("+3V3_D", "Level translators to 1.8 V", 3.3, 50, "E", "SN74AVC-class, switching"),
     ("+3V3_D", "Housekeeping: temp sensor, EEPROM, LEDs", 3.3, 30, "E", ""),
 ]
@@ -79,10 +83,14 @@ TREE = {
     "+1V8_D": ("+3V3_D", "ldo",  None),
     "+1V2":   ("+3V3_D", "ldo",  None),
     "+1V0":   ("+5V0",   "buck", 0.88),
+    # Charge-pump inverter. Reinstated after B-03 was reopened: the RF switches
+    # need VEE = -3.3 V. A few milliamps, so a small pump is plenty.
+    "-3V3":   ("+3V3_D", "pump", 0.80),
 }
 
 VOLTS = {"+12V": 12.0, "+5V0": 5.0, "+3V6": 3.6, "+3V3_D": 3.3, "+3V3_A": 3.3,
-         "+2V5": 2.5, "+1V8_A": 1.8, "+1V8_D": 1.8, "+1V2": 1.2, "+1V0": 1.0}
+         "+2V5": 2.5, "+1V8_A": 1.8, "+1V8_D": 1.8, "+1V2": 1.2, "+1V0": 1.0,
+         "-3V3": -3.3}
 
 MARGIN = 1.30          # design margin on every rail
 
@@ -106,7 +114,7 @@ def main():
         print()
 
     # Propagate loads up the tree, innermost first.
-    order = ["+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A", "+3V6",
+    order = ["-3V3", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A", "+3V6",
              "+3V3_D", "+5V0", "+12V"]
     load = {r: direct.get(r, 0) for r in VOLTS}
     diss = {}
@@ -120,6 +128,11 @@ def main():
         if kind == "ldo":
             i_in = i_out                       # LDO passes its output current
             diss[rail] = (v_in - v_out) * i_out / 1000.0
+        elif kind == "pump":
+            p_out = abs(v_out) * i_out / 1000.0
+            p_in = p_out / eff
+            i_in = p_in / v_in * 1000.0
+            diss[rail] = p_in - p_out
         else:
             p_out = v_out * i_out / 1000.0
             p_in = p_out / eff
