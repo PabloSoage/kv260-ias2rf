@@ -68,6 +68,7 @@ project.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Master document **for this board**. Rev03 architecture |
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers, closed, with evidence and sources, plus the open risks |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the KiCad files actually contain, with evidence |
+| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, measured mechanical envelope, and the one blocking unknown |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |
 

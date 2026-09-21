@@ -204,15 +204,36 @@ LVDS pairs, which is what they are for.
 
 ---
 
-### R-04 — Mechanical envelope not measured
+### R-04 — Mechanical envelope: measured, but not registered
 
-The current outline is 119 × 44.5 mm. How far the board can grow without fouling the heatsink, the
-front connectors or the enclosure has to be measured on the physical board. The Hirose positions
-are fixed.
+**Measured** `[V]` from the official 3D model (XTP679) by `_work/kv260_envelope.py`:
+
+| | Value |
+|---|---|
+| KV260 bounding box | **140.00 × 123.10 × 35.84 mm** |
+| Anything above 40 mm | **nothing** |
+| Fansink (>30 mm) | a block of roughly **50 × 56 mm** |
+| Rear I/O (>20 mm) | extends to the high-Y edge |
+
+An adapter at Hirose stacking height **cannot pass over the fansink**; it can extend over the low
+regions.
+
+**What is still open:** the registration between the adapter's frame and the model's.
+`_work/kv260_locate_ias.py` tried to find the two mating IAS connectors by their signature — two
+bodies 50.040 mm apart on one axis, each about 11.6 × 2.9 mm — across several Z bands at 0.5 mm
+resolution. **No such pair exists in the STL**: the connectors are not resolvable as distinct
+bodies at that fidelity.
+
+So the envelope is known but the growth direction is not. Closing it needs either **XTP681** (the
+Allegro layout, with exact connector placements) or five minutes with a ruler on the assembled
+board. Until then the ~120 × 90 mm target stays an estimate.
+
+The Hirose positions on the adapter are fixed and measured `[V]`: 50.040 mm apart on X, 2.8 mm from
+the board edge.
 
 Added since: if **J9 (RPi camera, 15-pin FFC)** is used alongside J8, the adapter needs an FFC
 cable reaching that connector, which sits elsewhere on the carrier. That is a real mechanical
-complication.
+complication. The Rev03 allocation avoids J9 for exactly this reason.
 
 ---
 

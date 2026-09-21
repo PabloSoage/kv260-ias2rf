@@ -78,6 +78,17 @@ The comparison that led here:
 | Per-rail current budget from datasheet figures | Replace the `[E]` estimates in §10.1 |
 | Define the 6-layer stackup with computed impedances | Stackup sheet for the fabricator |
 
+**Status (21 September 2026):** partly done — see [INTERFACE_SPEC.md](INTERFACE_SPEC.md).
+
+| Item | State |
+|---|---|
+| Pin map of J8 and the Pmod | ✅ frozen |
+| Mechanical envelope | ✅ measured from the official 3D model |
+| Growth direction within that envelope | ❌ needs XTP681, or a ruler on the assembled board |
+| `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
+| Per-rail current budget | ⬜ pending datasheets |
+| 6-layer stackup | ⬜ pending fabricator |
+
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
 the power `[E]` marks replaced by datasheet values.
 
