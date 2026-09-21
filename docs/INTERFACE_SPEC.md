@@ -17,8 +17,8 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | Pmod J2 allocation | ✅ Frozen below |
 | KV260 mechanical envelope | ✅ `[V]` measured from the official 3D model (§5) |
 | Where the adapter sits within that envelope | ❌ `[?]` **not registered** — see §5.3 |
-| `VCCO` of the HPA bank | ❌ `[?]` **blocking** — see §6 |
-| Serial link electrical standard | ❌ depends on `VCCO` |
+| `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
+| Serial link electrical standard | ✅ `LVDS_12` with AC coupling — see §6.1 |
 | Per-rail current budget | ⬜ pending datasheet figures |
 | 6-layer stackup and impedances | ⬜ pending fabricator |
 
@@ -63,15 +63,35 @@ The architecture calls for 3 pairs receive and 2 pairs transmit ([ARCHITECTURE.m
 | `LINK_TX_D0±` | `TXD2` | 26 / 27 | Kria → FPGA | ≤1 Gbps |
 | `LINK_TX_CLK±` | `TXD3` | 10 / 11 | Kria → FPGA | source-synchronous |
 
-**Why the clock goes on `TXC`.** In the original design that pair is the MIPI **clock lane**, so on
-the SOM side it is the one most likely to land on a clock-capable pin (MRCC/SRCC). A source-
-synchronous receiver needs its clock on a pin that can drive a BUFG/MMCM directly; anything else
-costs a routing detour and jitter.
+**Why the clock goes on `TXC` — now confirmed** `[V]`. The reasoning was that the pair had been the
+MIPI clock lane, so it was the one most likely to land on a clock-capable SOM pin. The carrier card
+schematic (XTP682, `038-05058-03-A1.pdf`, sheet 13) settles it: **that pair is `HPA05_CC`, and the
+`_CC` suffix is AMD's own marking for clock capable.** A source-synchronous receiver needs its clock
+on a pin that can drive a BUFG/MMCM directly; this one can.
 
-`[?]` **To confirm** against the KV260 carrier card schematic: that the SOM pin behind `TXC` really
-is clock-capable. If it is not, `LINK_RX_CLK` moves to whichever pair is, and the rest shuffle.
+### 3.1 SOM-side mapping — verified against the carrier schematic
 
-### 3.1 Note on pair polarity
+Every one of the five pairs was cross-checked against XTP682 sheet 13, where the IAS1 connector is
+designator `J8`, a `BM20B_0.8_-34DS-0.4V`. **All five match, polarity included** `[V]`:
+
+| Adapter net (from `.kicad_pcb`) | Pins | Carrier net (XTP682) | SOM bank pin |
+|---|---|---|---|
+| `B7-CSI2-TXD0_P` / `_N` | 4 / 5 | `HPA06_P` / `HPA06_N` | HPA06 |
+| **`B7-CSI2-TXC_P` / `_N`** | **7 / 8** | **`HPA05_CC_P` / `HPA05_CC_N`** | **HPA05, clock capable** |
+| `B7-CSI2-TXD3_P` / `_N` | 10 / 11 | `HPA09_P` / `HPA09_N` | HPA09 |
+| `B7-CSI2-TXD2_N` / `_P` | 26 / 27 | `HPA08_N` / `HPA08_P` | HPA08 |
+| `B7-CSI2-TXD1_N` / `_P` | 29 / 30 | `HPA07_N` / `HPA07_P` | HPA07 |
+
+The `_N`-before-`_P` ordering on pins 26/27 and 29/30 that §3.2 notes is **not** an adapter quirk:
+the carrier is wired the same way. Both sides agree, so the pairs mate correctly — but the
+constraints file still has to know.
+
+**And B-01 is now confirmed from the primary source.** Sheet 13 is titled *"IMAGE CO-PROCESSOR FOR
+IAS 0 CONNECTOR"* and shows the AP1302's sensor-side pins (`S0_CLK_DP`, `S0_D0_DP` …) wired to the
+IAS0 connector, with its host-side pins (`H_CLK_DP`, `H_D0_DP` …) wired to `HPA00_CC`, `HPA01`,
+`HPA02`, `HPA03`, `HPA04`. IAS0 reaches the SOM **only through the ISP**. IAS1 is direct.
+
+### 3.2 Note on pair polarity
 
 Three of the pairs are listed `_P` / `_N` and two `_N` / `_P` (pins 26/27 and 29/30) `[V]`. That is
 how the original design routed them. Polarity inversion is harmless on a self-synchronising serial
@@ -163,27 +183,42 @@ remains an estimate.
 
 ---
 
-## 6. `[?]` The blocking unknown: `VCCO` of the HPA bank
+## 6. `VCCO` of the HPA bank — 1.2 V, on strong evidence
 
-Everything electrical about the link depends on one number that is not in this repository: the
-`VCCO` the KV260 applies to the SOM bank behind J8.
+Everything electrical about the link depends on the `VCCO` the KV260 applies to the SOM bank behind
+J8. XTP682 does not print a net called `VCCO_HPA`, so this is **not a direct citation**. But the
+evidence points one way and it is worth setting out, because the design decision hangs on it.
 
-| If `VCCO` is | Then |
+**What is verified** `[V]` in XTP682:
+
+1. The carrier has a dedicated **`PL_1V2` regulator**, enabled by `VCCOEN_PL_M2C` — the signal the
+   SOM asserts when it wants the carrier to bring up the PL's `VCCO` rails.
+2. `PL_1V2` is routed to the SOM connector (sheet 6).
+3. On sheet 13 the AP1302's MIPI I/O supplies, **`HMIPI_VDD` and `SMIPI_VDD`, are tied to
+   `PL_1V2`**.
+4. That AP1302 host interface is what drives `HPA00_CC`, `HPA01` … `HPA04` into the SOM.
+
+For a device whose MIPI I/O runs from a 1.2 V rail to signal into the SOM's HPA bank, that bank has
+to be at 1.2 V as well. **`VCCO_HPA` = 1.2 V** `[E, strongly supported]`.
+
+### 6.1 What that means for the design
+
+| Consequence | |
 |---|---|
-| 1.2 V (likely, MIPI D-PHY convention) | The link runs `LVDS_12`. The ADC's ANSI LVDS output, at 1.2 V common mode, has no headroom into a 1.2 V bank → **AC coupling and re-biasing are required**, and that has to be on the board from the start |
-| 1.8 V | `LVDS` outright, DC-coupled, simplest case |
+| The link runs **`LVDS_12`** | Not plain `LVDS`, which wants 1.8 V |
+| The ADC's ANSI LVDS output sits at 1.2 V common mode | Into a 1.2 V bank there is no headroom → **AC coupling and re-biasing are required** |
+| The Pmod is on a 3.3 V HD bank | So the single-ended control signals **do** need level translation |
 
-It also decides whether level translation is needed on the single-ended signals, since the Pmod is
-on a 3.3 V HD bank while J8 is on an HP bank.
+**This is the case the mitigation was designed for, so it stops being a contingency and becomes the
+baseline:** series AC-coupling capacitors on all five pairs, with 0 Ω links as the alternative
+stuffing option. Ten footprints. If a later measurement shows 1.8 V, they get stuffed with 0 Ω and
+nothing is lost.
 
-**How to close it:** download **XTP682** (Kria KV260 Starter Kit Carrier Card Schematic, PDF) from
-the AMD product page and look up the bank the `B7-CSI2-*` nets land on. It is the single most
-valuable document still missing.
+### 6.2 `[?]` How to turn this from strong evidence into a fact
 
-**Design mitigation in the meantime:** lay out AC-coupling capacitor footprints in series on all
-five pairs, with 0 Ω links as the alternative. If `VCCO` turns out to be 1.8 V they get stuffed with
-0 Ω and nothing is lost; if it is 1.2 V the board already has what it needs. The cost is ten
-footprints.
+Either read `VCCO_HPA` directly in the **K26 SOM datasheet (DS987)** pin table, or measure the rail
+on an assembled board. Neither is urgent: the design that follows from 1.2 V also survives 1.8 V,
+because the AC coupling is stuffable.
 
 ---
 
@@ -192,11 +227,13 @@ footprints.
 | Criterion | State |
 |---|---|
 | Pin map of J8 and the Pmod frozen | ✅ §3, §4 |
+| SOM-side mapping verified | ✅ §3.2, against XTP682 |
+| Clock pair on a clock-capable pin | ✅ §3.2, `HPA05_CC` |
 | Mechanical envelope measured | ✅ §5.1, §5.2 |
-| Growth direction established | ❌ §5.3 |
-| `VCCO` of the HPA bank known | ❌ §6 |
+| `VCCO` and the link's I/O standard | ✅ §6, 1.2 V / `LVDS_12` with AC coupling |
 | ADC/DAC operating points fixed | ✅ [ARCHITECTURE.md](../ARCHITECTURE.md) §5 |
+| Growth direction within the envelope | ❌ §5.3 — needs XTP681, or a ruler |
 | Per-rail current budget from datasheets | ⬜ pending |
 | 6-layer stackup with computed impedances | ⬜ pending fabricator |
 
-Two of these need something from outside this repository. Everything else is ready.
+Only one item still needs something from outside the repository, and a ruler settles it.

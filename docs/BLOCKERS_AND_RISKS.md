@@ -35,6 +35,24 @@ Later the same guide names them explicitly as *"IAS camera sensor **ISP** interf
 Independently corroborated: *"the first IAS MIPI connector is connected to an external ISP AP1302
 from ONSemi, while the second is connected directly to the SOM pins"*.
 
+### Confirmed from the primary source (21 September 2026)
+
+The carrier card schematic itself — **XTP682**, `KV260_v2/038-05058-03-A1.pdf`, sheet 13 — settles
+it beyond inference `[V]`:
+
+- The sheet is titled **"IMAGE CO-PROCESSOR FOR IAS 0 CONNECTOR"**. The AP1302's sensor-side pins
+  (`S0_CLK_DP`, `S0_D0_DP`, `S0_D1_DP` …) go to the IAS0 connector; its host-side pins (`H_CLK_DP`,
+  `H_D0_DP` …) go to `HPA00_CC`, `HPA01`, `HPA02`, `HPA03`, `HPA04`. **IAS0 reaches the SOM only
+  through the ISP.**
+- The IAS1 connector (designator `J8`, a `BM20B_0.8_-34DS-0.4V`) wires straight to `HPA05_CC`,
+  `HPA06`, `HPA07`, `HPA08`, `HPA09`. **No buffer, no ISP.**
+
+A bonus from the same sheet: the pair that the adapter calls `TXC` lands on **`HPA05_CC`** — AMD's
+own marking for a clock-capable pin. The choice of that pair for the link clock, made on the
+inference that a former MIPI clock lane would be clock capable, is confirmed. All five pairs were
+cross-checked pin by pin and match including polarity; see
+[INTERFACE_SPEC.md](INTERFACE_SPEC.md) §3.1.
+
 ### The three consequences
 
 **1. IAS0 (J7) does not reach the programmable logic.** Its four MIPI lanes run into an AP1302 ISP
