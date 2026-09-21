@@ -136,6 +136,20 @@ the GUI, and closed the last 36 structural errors:
 
 **Result: `hier_label_mismatch` 36 → 0.**
 
+### Done: symbol libraries with correct pin types
+
+See [SYMBOLS.md](SYMBOLS.md). The hardest symbol in the design turned out to be free:
+**`XC7A50T-FTG256` ships in KiCad's own `FPGA_Xilinx_Artix7`** — 256 pins, 4 units, correctly
+typed, exactly the package AERIS-10 uses. `AD9708AR` and `ADF4351` are likewise in the official
+libraries.
+
+Seven more were generated into `symbols/kv260-ias2rf.kicad_sym` by `_work/make_symbols.py`. Their
+pin tables come from the **AERIS-10 Eagle library**, not from the datasheets — analog.com was
+unreachable, and inventing pinouts is the one thing the working rules forbid outright. Four came
+through with real electrical types and help ERC today; three (`M3SWA2-34DR`, `AD9523BCPZ`,
+`LTC5552`) arrived almost entirely `passive` because the source never typed them, and must be
+retyped before they are worth anything.
+
 ### Still to do
 
 Draw the circuits, in the GUI, sheet by sheet against the master document.
