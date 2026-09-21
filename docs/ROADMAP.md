@@ -87,7 +87,7 @@ The comparison that led here:
 | Growth direction within that envelope | ❌ needs XTP681, or a ruler on the assembled board |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ❌ `[E]` — analog.com would not serve its datasheets |
+| Per-rail load figures | ⚠️ **7 of 21 verified from datasheets**; the rest remain `[E]` |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -143,12 +143,19 @@ See [SYMBOLS.md](SYMBOLS.md). The hardest symbol in the design turned out to be 
 typed, exactly the package AERIS-10 uses. `AD9708AR` and `ADF4351` are likewise in the official
 libraries.
 
-Seven more were generated into `symbols/kv260-ias2rf.kicad_sym` by `_work/make_symbols.py`. Their
-pin tables come from the **AERIS-10 Eagle library**, not from the datasheets — analog.com was
-unreachable, and inventing pinouts is the one thing the working rules forbid outright. Four came
-through with real electrical types and help ERC today; three (`M3SWA2-34DR`, `AD9523BCPZ`,
-`LTC5552`) arrived almost entirely `passive` because the source never typed them, and must be
-retyped before they are worth anything.
+Seven more were generated into `symbols/kv260-ias2rf.kicad_sym` by `_work/make_symbols.py`.
+**Four are built from manufacturer datasheets** — `AD9484BCPZ-500`, `AD8352ACPZ`, `M3SWA2-34DR`,
+`LTC5552` — read locally out of the AERIS-10 repository's component folder, since analog.com was
+unreachable throughout. The remaining three come from the AERIS Eagle library; two of those
+(`ADAR1000ACCZN`, `ADF4382A`) carry usable types, and `AD9523BCPZ` does not.
+
+The `AD9484BCPZ-500` symbol was built both ways and the two agree exactly — 57 pins, same pads, the
+only differences being Eagle's uniquifying name suffixes. That is mutual confirmation of both
+sources.
+
+**Retyping the M3SWA2 uncovered a design error:** blocker B-03 had been closed wrongly and the
+charge-pump inverter struck from the power tree. The part needs VEE −3.3 V. See
+[BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md) B-03.
 
 ### Still to do
 

@@ -31,20 +31,29 @@ LOADS = [
     ("+3V3_D", "QSPI config flash", 3.3, 20, "E", "read current during boot only"),
 
     # ---- converters ---------------------------------------------------
-    ("+1V8_A", "AD9484 AVDD, 400 MSPS", 1.8, 400, "E",
-     "AD9484 datasheet Rev. A, Table 2 SUPPLY CURRENTS. CHECK IAVDD at 400 MSPS"),
-    ("+1V8_D", "AD9484 DRVDD, LVDS drivers", 1.8, 130, "E",
-     "AD9484 Table 2. Digital power is set by the LVDS driver bias, so it is "
-     "nearly independent of sample rate"),
+    ("+1V8_A", "AD9484 AVDD", 1.8, 300, "V",
+     "AD9484 datasheet, POWER SUPPLY table: IAVDD 283 mA typ, 300 mA max. "
+     "Quoted at the rated 500 MSPS, so 400 MSPS is a little lower - using the "
+     "500 MSPS figure is the conservative choice. Cross-check: "
+     "(283+89) mA x 1.8 V = 670 mW, which is the stated SDR-mode dissipation"),
+    ("+1V8_D", "AD9484 DRVDD, LVDS drivers", 1.8, 100, "V",
+     "AD9484 datasheet, POWER SUPPLY table: IDRVDD 89 mA typ, 100 mA max in "
+     "SDR mode. Set by the LVDS driver bias, so nearly independent of rate"),
     ("+1V8_A", "AD9253 AVDD, 2 of 4 channels at 62.5 MSPS", 1.8, 200, "E",
      "AD9253 datasheet Table 2. Quad at 125 MSPS is about 1.1 W total; two "
      "channels at half rate is well under a quarter of that"),
     ("+3V3_D", "AD9253 DRVDD", 3.3, 60, "E", "AD9253 Table 2"),
-    ("+3V3_A", "AD9708 AVDD, radar DAC", 3.3, 40, "E", "AD9708 Table 1"),
+    ("+3V3_A", "AD9708 AVDD, radar DAC", 3.3, 25, "V",
+     "AD9708 datasheet: Analog Supply Current IAVDD 25 mA"),
     ("+3V3_A", "AD9767 AVDD, dual SDR DAC", 3.3, 100, "E", "AD9767 Table 1"),
-    ("+3V3_D", "AD9708 + AD9767 DVDD", 3.3, 60, "E", "datasheet Table 1, both parts"),
-    ("+3V3_A", "AD8352 differential drivers, x2", 3.3, 100, "E",
-     "AD8352 Table 1. About 50 mA each with the recommended bias"),
+    ("+3V3_D", "AD9708 DVDD", 3.3, 3, "V",
+     "AD9708 datasheet: Digital Supply Current IDVDD 3 mA"),
+    ("+3V3_D", "AD9767 DVDD", 3.3, 40, "E",
+     "AD9767 datasheet Table 1 - no local copy, analog.com unreachable"),
+    ("+3V3_A", "AD8352 differential drivers, x2", 3.3, 80, "V",
+     "AD8352 datasheet, POWER INTERFACE: quiescent current 39 mA max per "
+     "device, 2 x 39 = 78 mA. NOTE the datasheet table extracts with shifted "
+     "columns, so confirm visually. Supply range is 3-5.5 V, so 3V3_A is fine"),
 
     # ---- clock ---------------------------------------------------------
     ("+3V3_D", "ADCLK944 LVPECL fanout", 3.3, 150, "E",

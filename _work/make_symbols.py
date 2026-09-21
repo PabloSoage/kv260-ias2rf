@@ -70,6 +70,49 @@ WANTED = {
 # ---------------------------------------------------------------------------
 
 DATASHEET_PINS = {
+
+    # ad8352.pdf Rev. C, Table 4 "Pin Function Descriptions".
+    # 16-lead LFCSP; the exposed pad must be connected to ground.
+    # Supply 3 to 5.5 V; quiescent current 39 mA max.
+    "AD8352ACPZ": [
+        ("1",  "RDP", "passive"),      ("2",  "RGP", "passive"),
+        ("3",  "RGN", "passive"),      ("4",  "RDN", "passive"),
+        ("5",  "VIN", "input"),
+        ("6",  "GND", "power_in"),     ("7",  "GND", "power_in"),
+        ("8",  "VCC", "power_in"),     ("9",  "GND", "power_in"),
+        ("10", "VON", "output"),       ("11", "VOP", "output"),
+        ("12", "GND", "power_in"),     ("13", "VCC", "power_in"),
+        ("14", "VCM", "bidirectional"),("15", "ENB", "input"),
+        ("16", "VIP", "input"),
+        ("17", "GND_EP", "power_in"),
+    ],
+
+    # AD9484.pdf Rev. A, Table 7 "Pin Function Descriptions".
+    # 56-lead LFCSP; pin 0 is the exposed paddle and is AGND.
+    #   AVDD 1.8 V, IAVDD 283 mA typ / 300 mA max
+    #   DRVDD 1.8 V, IDRVDD 89 mA typ / 100 mA max
+    #   SDR-mode dissipation 670 mW typ / 720 mW max
+    "AD9484BCPZ-500": (
+        [("0", "AGND_EP", "power_in")]
+        + [(str(n), "AVDD", "power_in")
+           for n in (30, 32, 33, 34, 37, 38, 39, 41, 42, 43, 46)]
+        + [(str(n), "DRVDD", "power_in") for n in (7, 24, 47)]
+        + [(str(n), "DRGND", "power_in") for n in (8, 23, 48)]
+        + [("35", "VIN+", "input"), ("36", "VIN-", "input"),
+           ("40", "CML", "output"),
+           ("44", "CLK+", "input"), ("45", "CLK-", "input"),
+           ("31", "VREF", "bidirectional")]
+        + [(str(n), "DNC", "no_connect")
+           for n in (1, 2, 28, 51, 52, 53, 54, 55, 56)]
+        + [("25", "SDIO", "bidirectional"), ("26", "SCLK/DFS", "input"),
+           ("27", "CSB", "input"), ("29", "PWDN", "input"),
+           ("49", "DCO-", "output"), ("50", "DCO+", "output")]
+        + [(str(3 + 2 * i + off), f"D{i}{sign}", "output")
+           for i in range(2) for off, sign in ((0, "-"), (1, "+"))]
+        + [(str(9 + 2 * (i - 2) + off), f"D{i}{sign}", "output")
+           for i in range(2, 8) for off, sign in ((0, "-"), (1, "+"))]
+        + [("21", "OR-", "output"), ("22", "OR+", "output")]
+    ),
     # M3SWA2-34DR+.pdf, "FUNCTIONAL DIAGRAM" and "DC ELECTRICAL SPECIFICATIONS".
     # 16-lead QFN, 3x3 mm.
     #
@@ -119,6 +162,10 @@ DATASHEET_PINS = {
 }
 
 DATASHEET_NOTE = {
+    "AD8352ACPZ": "Pin table from the AD8352 datasheet Rev. C, Table 4. "
+                  "Supply 3-5.5 V, quiescent current 39 mA max. EP is GND.",
+    "AD9484BCPZ-500": "Pin table from the AD9484 datasheet Rev. A, Table 7. "
+                      "AVDD/DRVDD 1.8 V; IAVDD 300 mA max, IDRVDD 100 mA max.",
     "M3SWA2-34DR": "Pin table from the Mini-Circuits M3SWA2-34DR+ datasheet. "
                    "Needs BOTH VDD +3.3 V and VEE -3.3 V; control logic is positive.",
     "LTC5552": "Pin table from the Analog Devices LTC5552 datasheet (LTC5552f). "

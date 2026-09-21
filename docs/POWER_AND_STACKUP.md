@@ -7,7 +7,7 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **every load figure still `[E]`** — see §1.4 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **7 of 21 loads verified from datasheets** — see §1.4 |
 | Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
 
 ---
@@ -17,15 +17,15 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ### 1.1 The tree
 
 ```
-12 V in  (667 mA, 8.0 W)
-  └── buck → +5V0        1440 mA
-        ├── buck → +3V3_D   1020 mA   digital: FPGA VCCO, converter DVDD, clock, switches
-        │     ├── LDO → +1V8_D  230 mA   FPGA VCCAUX, AD9484 DRVDD
+12 V in  (605 mA, 7.3 W)
+  └── buck → +5V0        1308 mA
+        ├── buck → +3V3_D    955 mA   digital: FPGA VCCO, converter DVDD, clock, switches
+        │     ├── LDO → +1V8_D  200 mA   FPGA VCCAUX, AD9484 DRVDD
         │     └── LDO → +1V2    100 mA   FPGA VCCO, IAS-facing bank
-        ├── buck → +3V6      240 mA   pre-regulator, analogue only
-        │     └── LDO → +3V3_A  240 mA   DAC AVDD, AD8352 drivers, references
-        ├── buck → +2V5      600 mA   pre-regulator, analogue only
-        │     └── LDO → +1V8_A  600 mA   AD9484 AVDD, AD9253 AVDD
+        ├── buck → +3V6      205 mA   pre-regulator, analogue only
+        │     └── LDO → +3V3_A  205 mA   DAC AVDD, AD8352 drivers, references
+        ├── buck → +2V5      500 mA   pre-regulator, analogue only
+        │     └── LDO → +1V8_A  500 mA   AD9484 AVDD, AD9253 AVDD
         ├── buck → +1V0      700 mA   FPGA VCCINT
         └── (from +3V3_D) charge pump → −3V3   8 mA   RF switch VEE
 ```
@@ -65,29 +65,44 @@ With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1440 mA | buck | +12V | 0.80 W | ≥ 1.87 A |
-| `+3V3_D` | 3.3 | 1020 mA | buck | +5V0 | 0.37 W | ≥ 1.33 A |
+| `+5V0` | 5.0 | 1308 mA | buck | +12V | 0.73 W | ≥ 1.70 A |
+| `+3V3_D` | 3.3 | 955 mA | buck | +5V0 | 0.35 W | ≥ 1.24 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
-| `+2V5` | 2.5 | 600 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
-| `+1V8_A` | 1.8 | 600 mA | LDO | +2V5 | 0.42 W | ≥ 0.78 A — **thermal pad required** |
-| `+3V6` | 3.6 | 240 mA | buck | +5V0 | 0.10 W | ≥ 0.31 A |
-| `+3V3_A` | 3.3 | 240 mA | LDO | +3V6 | 0.07 W | ≥ 0.31 A |
-| `+1V8_D` | 1.8 | 230 mA | LDO | +3V3_D | 0.34 W | ≥ 0.30 A |
+| `+2V5` | 2.5 | 500 mA | buck | +5V0 | 0.17 W | ≥ 0.65 A |
+| `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
+| `+3V6` | 3.6 | 205 mA | buck | +5V0 | 0.08 W | ≥ 0.27 A |
+| `+3V3_A` | 3.3 | 205 mA | LDO | +3V6 | 0.06 W | ≥ 0.27 A |
+| `+1V8_D` | 1.8 | 200 mA | LDO | +3V3_D | 0.30 W | ≥ 0.26 A |
 | `+1V2` | 1.2 | 100 mA | LDO | +3V3_D | 0.21 W | ≥ 0.13 A |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 661 mA at 12 V = 7.9 W.** With margin, 0.86 A and 10.3 W. The jack, the PTC and the
+**Input: 605 mA at 12 V = 7.3 W.** With margin, 0.79 A and 9.4 W. The jack, the PTC and the
 reverse-polarity MOSFET want ≥ 1.0 A, and 2 A costs nothing extra.
 
 For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter is comfortable on
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 `[E]` Confidence: 2 verified, 18 estimated
+### 1.4 Confidence: 7 verified, 14 estimated
 
-**No load figure in this budget comes from a datasheet.** analog.com refused to serve its PDFs
-throughout (repeated 60 s timeouts; the mirrors return 403 and 410), so every converter figure is
-engineering judgement from the device class.
+**Seven of the twenty-one load figures now come from manufacturer datasheets.** analog.com refused
+to serve its PDFs throughout (repeated 60 s timeouts; the mirrors return 403 and 410), but the
+AERIS-10 repository turned out to carry a component folder with several of them locally. The rest
+remain engineering judgement from the device class.
+
+| Load | Figure | Source |
+|---|---|---|
+| AD9484 AVDD | **300 mA** max | `AD9484.pdf` Rev. A, POWER SUPPLY table. IAVDD 283 typ / 300 max, at the rated 500 MSPS — using it at 400 MSPS is conservative |
+| AD9484 DRVDD | **100 mA** max | Same table. IDRVDD 89 typ / 100 max, SDR mode |
+| AD9708 AVDD | **25 mA** | `AD9708.pdf`, Analog Supply Current |
+| AD9708 DVDD | **3 mA** | Same, Digital Supply Current |
+| AD8352 ×2 | **80 mA** | `ad8352.pdf` Rev. C, quiescent current 39 mA max each |
+| M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |
+| M3SWA2 ×4, VEE | **8 mA** | Same, IEE 1.8 mA max each |
+
+The AD9484 figures cross-check against themselves: (283 + 89) mA × 1.8 V = 670 mW, which is exactly
+the SDR-mode dissipation the datasheet states. That the arithmetic closes is what gives confidence
+the column-shifted PDF extraction was read correctly.
 
 This budget is good enough to **choose the topology and size the regulators** — and it already
 earned its keep by catching the two overheating LDOs, which is a structural finding that does not
@@ -98,8 +113,8 @@ Every entry in `_work/power_budget.py` names the table to check:
 | Load | What to check |
 |---|---|
 | XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists |
-| AD9484 AVDD, 400 mA | Datasheet Rev. A, Table 2 SUPPLY CURRENTS, at 400 MSPS |
-| AD9484 DRVDD, 130 mA | Same table. Digital power is set by the LVDS driver bias, so it barely varies with sample rate |
+| ~~AD9484 AVDD / DRVDD~~ | ✅ **Verified** — see the table above |
+| ~~AD9708, AD8352~~ | ✅ **Verified** — see the table above |
 | AD9253 AVDD, 200 mA | Table 2. The quad at 125 MSPS is about 1.1 W total; two channels at half rate is well under a quarter |
 | ADCLK944, 150 mA | Table 1, and specifically **whether the quoted ICC already includes output termination current** — LVPECL budgets are routinely wrong by exactly that amount |
 | ~~M3SWA2-34DR+~~ | ✅ **Now verified from the datasheet.** IDD 2.9 mA max and IEE 1.8 mA max per part, so 11.6 mA on `+3V3_D` and 7.2 mA on `−3V3` for four |
