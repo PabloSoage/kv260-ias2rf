@@ -86,8 +86,9 @@ The comparison that led here:
 | Mechanical envelope | ✅ measured from the official 3D model |
 | Growth direction within that envelope | ❌ needs XTP681, or a ruler on the assembled board |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
-| Per-rail current budget | ⬜ pending datasheets |
-| 6-layer stackup | ⬜ pending fabricator |
+| Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
+| Per-rail load figures | ❌ `[E]` — analog.com would not serve its datasheets |
+| 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
 the power `[E]` marks replaced by datasheet values.
