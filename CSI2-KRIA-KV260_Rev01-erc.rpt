@@ -1,4 +1,4 @@
-ERC report (2026-09-21T16:41:30, Encoding UTF8)
+ERC report (2026-09-21T16:54:29, Encoding UTF8)
 Report includes: Errors, Warnings, Exclusions
 
 ***** Sheet /
@@ -10,16 +10,10 @@ Report includes: Errors, Warnings, Exclusions
     @(241.30 mm, 140.792 mm): Hierarchical Sheet Pin 'CLK_KRIA_N'
 [label_dangling]: Label not connected
     ; error
-    @(31.75 mm, 46.812 mm): Hierarchical Label 'I2C_SDA_3V3'
-[label_dangling]: Label not connected
-    ; error
     @(86.36 mm, 53.162 mm): Hierarchical Label 'I2C_SCL_3V3'
 [label_dangling]: Label not connected
     ; error
-    @(68.58 mm, 102.692 mm): Hierarchical Label 'PWDN_3V3'
-[label_dangling]: Label not connected
-    ; error
-    @(46.99 mm, 126.822 mm): Hierarchical Label 'EXT-GPIO0-I2C-SCL'
+    @(86.36 mm, 55.702 mm): Hierarchical Label 'I2C_SDA_3V3'
 [label_dangling]: Label not connected
     ; error
     @(46.99 mm, 129.362 mm): Hierarchical Label 'EXT-GPIO1-I2C-SDA'
@@ -31,10 +25,13 @@ Report includes: Errors, Warnings, Exclusions
     @(46.99 mm, 142.062 mm): Hierarchical Label 'B7-CSI2-TXD3_N'
 [label_dangling]: Label not connected
     ; error
-    @(46.99 mm, 167.462 mm): Hierarchical Label 'B7-CSI2-TXD1_P'
+    @(46.99 mm, 164.922 mm): Hierarchical Label 'B7-CSI2-TXD1_N'
 [label_dangling]: Label not connected
     ; error
     @(46.99 mm, 172.542 mm): Hierarchical Label 'B7-CSI2-TXD0_N'
+[label_dangling]: Label not connected
+    ; error
+    @(100.33 mm, 197.942 mm): Hierarchical Label 'EXT-GPIO0-I2C-SCL'
 [label_dangling]: Label not connected
     ; error
     @(208.28 mm, 197.942 mm): Hierarchical Label 'EXT-GPIO3'
@@ -61,7 +58,7 @@ Report includes: Errors, Warnings, Exclusions
     @(284.48 mm, 157.302 mm): Hierarchical Label 'I2C_SCL'
 [label_dangling]: Label not connected
     ; error
-    @(345.44 mm, 136.982 mm): Hierarchical Label 'B7-CSI2-TXD1_N'
+    @(345.44 mm, 134.442 mm): Hierarchical Label 'B7-CSI2-TXD1_P'
 [label_dangling]: Label not connected
     ; error
     @(345.44 mm, 142.062 mm): Hierarchical Label 'B7-CSI2-TXD2_P'
@@ -71,6 +68,9 @@ Report includes: Errors, Warnings, Exclusions
 [label_dangling]: Label not connected
     ; error
     @(345.44 mm, 144.602 mm): Hierarchical Label 'B7-CSI2-TXD2_N'
+[label_dangling]: Label not connected
+    ; error
+    @(292.10 mm, 236.042 mm): Hierarchical Label 'PWDN_3V3'
 [label_dangling]: Label not connected
     ; error
     @(292.10 mm, 238.582 mm): Hierarchical Label 'GPIO3_3V3'
@@ -160,55 +160,55 @@ Report includes: Errors, Warnings, Exclusions
     @(219.71 mm, 277.952 mm): Symbol T2 [root_0_PCB TEXT FIELD BOT_AVT_KHK_...]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 41.732 mm): Symbol #PWR02 Hidden pin  [VCC3V3, Power input, Line]
+    @(27.94 mm, 41.732 mm): Symbol #PWR01_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 41.732 mm): Symbol #PWR02 [VCC3V3_CIRCLE]
+    @(27.94 mm, 41.732 mm): Symbol #PWR01_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 56.972 mm): Symbol #PWR04 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 56.972 mm): Symbol #PWR03_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 56.972 mm): Symbol #PWR04 [GND_BAR]
+    @(27.94 mm, 56.972 mm): Symbol #PWR03_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(62.23 mm, 41.732 mm): Symbol #PWR025 Hidden pin  [VCC3V3, Power input, Line]
+    @(62.23 mm, 41.732 mm): Symbol #PWR026_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(62.23 mm, 41.732 mm): Symbol #PWR025 [VCC3V3_CIRCLE]
+    @(62.23 mm, 41.732 mm): Symbol #PWR026_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(62.23 mm, 56.972 mm): Symbol #PWR028 Hidden pin  [GND, Power input, Line]
+    @(62.23 mm, 56.972 mm): Symbol #PWR027_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(62.23 mm, 56.972 mm): Symbol #PWR028 [GND_BAR]
+    @(62.23 mm, 56.972 mm): Symbol #PWR027_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(43.18 mm, 82.372 mm): Horizontal Wire, length 1.27 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(43.18 mm, 82.372 mm): Symbol #PWR022 Hidden pin  [VCC5V-CAM, Power input, Line]
+    @(43.18 mm, 82.372 mm): Symbol #PWR021_IAS1 Hidden pin  [VCC5V-CAM, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(43.18 mm, 82.372 mm): Symbol #PWR022 [VCC5V-CAM_CIRCLE]
+    @(43.18 mm, 82.372 mm): Symbol #PWR021_IAS1 [VCC5V-CAM_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(44.45 mm, 82.372 mm): Symbol C3 Pin 1 [1, Passive, Line]
+    @(44.45 mm, 82.372 mm): Symbol C3_IAS1 Pin 1 [1, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(44.45 mm, 82.372 mm): Horizontal Wire, length 27.94 mm
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(44.45 mm, 82.372 mm): Symbol C3 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
+    @(44.45 mm, 82.372 mm): Symbol C3_IAS1 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(44.45 mm, 82.372 mm): Symbol C3 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
+    @(44.45 mm, 82.372 mm): Symbol C3_IAS1 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(73.66 mm, 63.322 mm): Symbol #PWR030 Hidden pin  [VCC3V3, Power input, Line]
+    @(73.66 mm, 63.322 mm): Symbol #PWR029_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(73.66 mm, 63.322 mm): Symbol #PWR030 [VCC3V3_CIRCLE]
+    @(73.66 mm, 63.322 mm): Symbol #PWR029_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(101.60 mm, 30.302 mm): Horizontal Wire, length 12.70 mm
@@ -217,10 +217,10 @@ Report includes: Errors, Warnings, Exclusions
     @(101.60 mm, 37.922 mm): Vertical Wire, length 7.62 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(101.60 mm, 37.922 mm): Symbol #PWR037 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(101.60 mm, 37.922 mm): Symbol #PWR038_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(101.60 mm, 37.922 mm): Symbol #PWR037 [VCC5V-EXT_CIRCLE]
+    @(101.60 mm, 37.922 mm): Symbol #PWR038_IAS1 [VCC5V-EXT_CIRCLE]
 [unconnected_wire_endpoint]: Extremo de línea sin conectar
     ; warning
     @(44.45 mm, 82.372 mm): Horizontal Wire, length 27.94 mm
@@ -229,70 +229,70 @@ Report includes: Errors, Warnings, Exclusions
     @(44.45 mm, 102.692 mm): Vertical Wire, length 12.70 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(44.45 mm, 102.692 mm): Symbol #PWR023 Hidden pin  [GND, Power input, Line]
+    @(44.45 mm, 102.692 mm): Symbol #PWR024_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(44.45 mm, 102.692 mm): Symbol #PWR023 [GND_BAR]
+    @(44.45 mm, 102.692 mm): Symbol #PWR024_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(99.06 mm, 63.322 mm): Symbol TP1 Pin 1 [1, Passive, Line]
+    @(99.06 mm, 63.322 mm): Symbol TP1_IAS1 Pin 1 [1, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(99.06 mm, 67.132 mm): Symbol TP1 [IAS1_1_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(99.06 mm, 67.132 mm): Symbol TP1_IAS1 [IAS1_1_TP_16_10_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(99.06 mm, 67.132 mm): Symbol TP1 [IAS1_1_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(99.06 mm, 67.132 mm): Symbol TP1_IAS1 [IAS1_1_TP_16_10_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 124.282 mm): Symbol #PWR05 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(27.94 mm, 124.282 mm): Symbol #PWR06_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 124.282 mm): Symbol #PWR05 [VCC-EXT-IN_CIRCLE]
+    @(27.94 mm, 124.282 mm): Symbol #PWR06_IAS1 [VCC-EXT-IN_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(127.00 mm, 30.302 mm): Symbol R1 Pin 1 [1, Passive, Line]
+    @(127.00 mm, 30.302 mm): Symbol R1_IAS1 Pin 1 [1, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(127.00 mm, 30.302 mm): Horizontal Wire, length 12.70 mm
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(127.00 mm, 30.302 mm): Symbol R1 [IAS1_2_R 0R0 1% 0603_AVT_KHK_Lib.I...]
+    @(127.00 mm, 30.302 mm): Symbol R1_IAS1 [IAS1_2_R 0R0 1% 0603_AVT_KHK_Lib.I...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(127.00 mm, 30.302 mm): Symbol R1 [IAS1_2_R 0R0 1% 0603_AVT_KHK_Lib.I...]
+    @(127.00 mm, 30.302 mm): Symbol R1_IAS1 [IAS1_2_R 0R0 1% 0603_AVT_KHK_Lib.I...]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(85.09 mm, 102.692 mm): Symbol #PWR032 Hidden pin  [GND, Power input, Line]
+    @(85.09 mm, 102.692 mm): Symbol #PWR031_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(85.09 mm, 102.692 mm): Symbol #PWR032 [GND_BAR]
+    @(85.09 mm, 102.692 mm): Symbol #PWR031_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 131.902 mm): Symbol #PWR08 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(27.94 mm, 131.902 mm): Symbol #PWR07_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 131.902 mm): Symbol #PWR08 [VCC-EXT-IN_CIRCLE]
+    @(27.94 mm, 131.902 mm): Symbol #PWR07_IAS1 [VCC-EXT-IN_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(97.79 mm, 102.692 mm): Symbol #PWR036 Hidden pin  [GND, Power input, Line]
+    @(97.79 mm, 102.692 mm): Symbol #PWR035_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(97.79 mm, 102.692 mm): Symbol #PWR036 [GND_BAR]
+    @(97.79 mm, 102.692 mm): Symbol #PWR035_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 139.522 mm): Symbol #PWR010 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(27.94 mm, 139.522 mm): Symbol #PWR09_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 139.522 mm): Symbol #PWR010 [VCC-EXT-IN_CIRCLE]
+    @(27.94 mm, 139.522 mm): Symbol #PWR09_IAS1 [VCC-EXT-IN_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(139.70 mm, 30.302 mm): Vertical Wire, length 7.62 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(139.70 mm, 37.922 mm): Symbol #PWR046 Hidden pin  [VCC5V-CAM, Power input, Line]
+    @(139.70 mm, 37.922 mm): Symbol #PWR045_IAS1 Hidden pin  [VCC5V-CAM, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(139.70 mm, 37.922 mm): Symbol #PWR046 [VCC5V-CAM_CIRCLE]
+    @(139.70 mm, 37.922 mm): Symbol #PWR045_IAS1 [VCC5V-CAM_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(139.70 mm, 40.462 mm): Vertical Wire, length 2.54 mm
@@ -301,34 +301,34 @@ Report includes: Errors, Warnings, Exclusions
     @(139.70 mm, 40.462 mm): Vertical Wire, length 2.54 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 147.142 mm): Symbol #PWR012 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 147.142 mm): Symbol #PWR011_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 147.142 mm): Symbol #PWR012 [GND_BAR]
+    @(27.94 mm, 147.142 mm): Symbol #PWR011_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(139.70 mm, 60.782 mm): Symbol #PWR047 Hidden pin  [GND, Power input, Line]
+    @(139.70 mm, 60.782 mm): Symbol #PWR048_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(139.70 mm, 60.782 mm): Symbol #PWR047 [GND_BAR]
+    @(139.70 mm, 60.782 mm): Symbol #PWR048_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(146.05 mm, 45.542 mm): Symbol #PWR050 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(146.05 mm, 45.542 mm): Symbol #PWR049_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(146.05 mm, 45.542 mm): Symbol #PWR050 [VCC5V-EXT_CIRCLE]
+    @(146.05 mm, 45.542 mm): Symbol #PWR049_IAS1 [VCC5V-EXT_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 154.762 mm): Symbol #PWR014 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 154.762 mm): Symbol #PWR013_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 154.762 mm): Symbol #PWR014 [GND_BAR]
+    @(27.94 mm, 154.762 mm): Symbol #PWR013_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(146.05 mm, 60.782 mm): Symbol #PWR052 Hidden pin  [GND, Power input, Line]
+    @(146.05 mm, 60.782 mm): Symbol #PWR051_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(146.05 mm, 60.782 mm): Symbol #PWR052 [GND_BAR]
+    @(146.05 mm, 60.782 mm): Symbol #PWR051_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(135.89 mm, 89.992 mm): Vertical Wire, length 12.70 mm
@@ -337,67 +337,67 @@ Report includes: Errors, Warnings, Exclusions
     @(140.97 mm, 82.372 mm): Horizontal Wire, length 17.78 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(140.97 mm, 82.372 mm): Symbol C4 Pin 1 [1, Passive, Line]
+    @(140.97 mm, 82.372 mm): Symbol C4_IAS1 Pin 1 [1, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(140.97 mm, 82.372 mm): Symbol C4 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
+    @(140.97 mm, 82.372 mm): Symbol C4_IAS1 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(140.97 mm, 82.372 mm): Symbol C4 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
+    @(140.97 mm, 82.372 mm): Symbol C4_IAS1 [IAS1_0_mirrored_C 10U 16V X5R 0805...]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 162.382 mm): Symbol #PWR015 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 162.382 mm): Symbol #PWR016_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 162.382 mm): Symbol #PWR015 [GND_BAR]
+    @(27.94 mm, 162.382 mm): Symbol #PWR016_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(140.97 mm, 89.992 mm): Horizontal Wire, length 5.08 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(135.89 mm, 102.692 mm): Symbol #PWR043 Hidden pin  [GND, Power input, Line]
+    @(135.89 mm, 102.692 mm): Symbol #PWR044_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(135.89 mm, 102.692 mm): Symbol #PWR043 [GND_BAR]
+    @(135.89 mm, 102.692 mm): Symbol #PWR044_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 170.002 mm): Symbol #PWR018 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 170.002 mm): Symbol #PWR017_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 170.002 mm): Symbol #PWR018 [GND_BAR]
+    @(27.94 mm, 170.002 mm): Symbol #PWR017_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(161.29 mm, 60.782 mm): Symbol #PWR060 Hidden pin  [GND, Power input, Line]
+    @(161.29 mm, 60.782 mm): Symbol #PWR059_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(161.29 mm, 60.782 mm): Symbol #PWR060 [GND_BAR]
+    @(161.29 mm, 60.782 mm): Symbol #PWR059_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(158.75 mm, 82.372 mm): Symbol #PWR054 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(158.75 mm, 82.372 mm): Symbol #PWR053_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(158.75 mm, 82.372 mm): Symbol #PWR054 [VCC-EXT-IN_CIRCLE]
+    @(158.75 mm, 82.372 mm): Symbol #PWR053_IAS1 [VCC-EXT-IN_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(27.94 mm, 177.622 mm): Symbol #PWR020 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 177.622 mm): Symbol #PWR019_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(27.94 mm, 177.622 mm): Symbol #PWR020 [GND_BAR]
+    @(27.94 mm, 177.622 mm): Symbol #PWR019_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(173.99 mm, 50.622 mm): Symbol #PWR062 Hidden pin  [VCC3V3, Power input, Line]
+    @(173.99 mm, 50.622 mm): Symbol #PWR061_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(173.99 mm, 50.622 mm): Symbol #PWR062 [VCC3V3_CIRCLE]
+    @(173.99 mm, 50.622 mm): Symbol #PWR061_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(193.04 mm, 41.732 mm): Horizontal Wire, length 1.27 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(193.04 mm, 41.732 mm): Symbol #PWR069 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(193.04 mm, 41.732 mm): Symbol #PWR070_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(193.04 mm, 41.732 mm): Symbol #PWR069 [VCC-EXT-IN_CIRCLE]
+    @(193.04 mm, 41.732 mm): Symbol #PWR070_IAS1 [VCC-EXT-IN_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(194.31 mm, 41.732 mm): Horizontal Wire, length 7.62 mm
@@ -406,127 +406,127 @@ Report includes: Errors, Warnings, Exclusions
     @(194.31 mm, 44.272 mm): Vertical Wire, length 2.54 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(194.31 mm, 44.272 mm): Symbol C11 Pin 1 [1, Passive, Line]
+    @(194.31 mm, 44.272 mm): Symbol C11_IAS1 Pin 1 [1, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(194.31 mm, 44.272 mm): Symbol C11 [IAS1_0_C 4U7 10V X5R 0603_Passive....]
+    @(194.31 mm, 44.272 mm): Symbol C11_IAS1 [IAS1_0_C 4U7 10V X5R 0603_Passive....]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(194.31 mm, 44.272 mm): Symbol C11 [IAS1_0_C 4U7 10V X5R 0603_Passive....]
+    @(194.31 mm, 44.272 mm): Symbol C11_IAS1 [IAS1_0_C 4U7 10V X5R 0603_Passive....]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(194.31 mm, 56.972 mm): Symbol #PWR071 Hidden pin  [GND, Power input, Line]
+    @(194.31 mm, 56.972 mm): Symbol #PWR072_IAS1 Hidden pin  [GND, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(194.31 mm, 56.972 mm): Vertical Wire, length 5.08 mm
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(194.31 mm, 56.972 mm): Symbol #PWR071 [GND_BAR]
+    @(194.31 mm, 56.972 mm): Symbol #PWR072_IAS1 [GND_BAR]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(201.93 mm, 37.922 mm): Symbol TP3 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(201.93 mm, 37.922 mm): Symbol TP3_IAS1 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(201.93 mm, 37.922 mm): Symbol TP3 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(201.93 mm, 37.922 mm): Symbol TP3_IAS1 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(201.93 mm, 41.732 mm): Symbol TP3 Pin 1 [1, Passive, Line]
+    @(201.93 mm, 41.732 mm): Symbol TP3_IAS1 Pin 1 [1, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(207.01 mm, 56.972 mm): Symbol #PWR073 Hidden pin  [GND, Power input, Line]
+    @(207.01 mm, 56.972 mm): Symbol #PWR074_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(207.01 mm, 56.972 mm): Symbol #PWR073 [GND_BAR]
+    @(207.01 mm, 56.972 mm): Symbol #PWR074_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(87.63 mm, 218.262 mm): Symbol #PWR034 Hidden pin  [VCC1V8, Power input, Line]
+    @(87.63 mm, 218.262 mm): Symbol #PWR033_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(87.63 mm, 218.262 mm): Symbol #PWR034 [VCC1V8_CIRCLE]
+    @(87.63 mm, 218.262 mm): Symbol #PWR033_IAS1 [VCC1V8_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(237.49 mm, 56.972 mm): Symbol #PWR079 Hidden pin  [GND, Power input, Line]
+    @(237.49 mm, 56.972 mm): Symbol #PWR080_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(237.49 mm, 56.972 mm): Symbol #PWR079 [GND_BAR]
+    @(237.49 mm, 56.972 mm): Symbol #PWR080_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(243.84 mm, 56.972 mm): Symbol #PWR088 Hidden pin  [GND, Power input, Line]
+    @(243.84 mm, 56.972 mm): Symbol #PWR087_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(243.84 mm, 56.972 mm): Symbol #PWR088 [GND_BAR]
+    @(243.84 mm, 56.972 mm): Symbol #PWR087_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(114.30 mm, 225.882 mm): Symbol #PWR040 Hidden pin  [GND, Power input, Line]
+    @(114.30 mm, 225.882 mm): Symbol #PWR039_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(114.30 mm, 225.882 mm): Symbol #PWR040 [GND_BAR]
+    @(114.30 mm, 225.882 mm): Symbol #PWR039_IAS1 [GND_BAR]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(259.08 mm, 37.922 mm): Symbol TP2 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(259.08 mm, 37.922 mm): Symbol TP2_IAS1 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(259.08 mm, 37.922 mm): Symbol TP2 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(259.08 mm, 37.922 mm): Symbol TP2_IAS1 [IAS1_3_TP_16_10_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(259.08 mm, 41.732 mm): Symbol TP2 Pin 1 [1, Passive, Line]
+    @(259.08 mm, 41.732 mm): Symbol TP2_IAS1 Pin 1 [1, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(262.89 mm, 41.732 mm): Symbol #PWR090 Hidden pin  [VCC3V3, Power input, Line]
+    @(262.89 mm, 41.732 mm): Symbol #PWR089_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(262.89 mm, 41.732 mm): Symbol #PWR090 [VCC3V3_CIRCLE]
+    @(262.89 mm, 41.732 mm): Symbol #PWR089_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(123.19 mm, 238.582 mm): Symbol #PWR041 Hidden pin  [GND, Power input, Line]
+    @(123.19 mm, 238.582 mm): Symbol #PWR042_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(123.19 mm, 238.582 mm): Symbol #PWR041 [GND_BAR]
+    @(123.19 mm, 238.582 mm): Symbol #PWR042_IAS1 [GND_BAR]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(88.90 mm, 258.902 mm): Symbol C50 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
+    @(88.90 mm, 258.902 mm): Symbol C50_IAS1 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(88.90 mm, 258.902 mm): Symbol C50 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
+    @(88.90 mm, 258.902 mm): Symbol C50_IAS1 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(158.75 mm, 225.882 mm): Symbol #PWR056 Hidden pin  [GND, Power input, Line]
+    @(158.75 mm, 225.882 mm): Symbol #PWR055_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(158.75 mm, 225.882 mm): Symbol #PWR056 [GND_BAR]
+    @(158.75 mm, 225.882 mm): Symbol #PWR055_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(96.52 mm, 258.902 mm): Symbol C50 Pin 2 [2, Passive, Line]
+    @(96.52 mm, 258.902 mm): Symbol C50_IAS1 Pin 2 [2, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(100.33 mm, 258.902 mm): Symbol C51 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
+    @(100.33 mm, 258.902 mm): Symbol C51_IAS1 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(100.33 mm, 258.902 mm): Symbol C51 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
+    @(100.33 mm, 258.902 mm): Symbol C51_IAS1 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(107.95 mm, 258.902 mm): Symbol C51 Pin 2 [2, Passive, Line]
+    @(107.95 mm, 258.902 mm): Symbol C51_IAS1 Pin 2 [2, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(111.76 mm, 258.902 mm): Symbol C52 Pin 1 [1, Passive, Line]
+    @(111.76 mm, 258.902 mm): Symbol C52_IAS1 Pin 1 [1, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(111.76 mm, 258.902 mm): Symbol C52 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
+    @(111.76 mm, 258.902 mm): Symbol C52_IAS1 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(111.76 mm, 258.902 mm): Symbol C52 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
+    @(111.76 mm, 258.902 mm): Symbol C52_IAS1 [IAS1_1_C 4U7 10V X5R 0603_Passive....]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(184.15 mm, 218.262 mm): Symbol #PWR067 Hidden pin  [VCC3V3, Power input, Line]
+    @(184.15 mm, 218.262 mm): Symbol #PWR068_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(184.15 mm, 218.262 mm): Symbol #PWR067 [VCC3V3_CIRCLE]
+    @(184.15 mm, 218.262 mm): Symbol #PWR068_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(293.37 mm, 46.812 mm): Symbol #PWR098 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(293.37 mm, 46.812 mm): Symbol #PWR097_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(293.37 mm, 46.812 mm): Symbol #PWR098 [VCC5V-EXT_CIRCLE]
+    @(293.37 mm, 46.812 mm): Symbol #PWR097_IAS1 [VCC5V-EXT_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(290.83 mm, 64.592 mm): Vertical Wire, length 10.16 mm
@@ -535,91 +535,91 @@ Report includes: Errors, Warnings, Exclusions
     @(290.83 mm, 64.592 mm): Vertical Wire, length 10.16 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(293.37 mm, 56.972 mm): Symbol #PWR0100 Hidden pin  [GND, Power input, Line]
+    @(293.37 mm, 56.972 mm): Symbol #PWR099_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(293.37 mm, 56.972 mm): Symbol #PWR0100 [GND_BAR]
+    @(293.37 mm, 56.972 mm): Symbol #PWR099_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(290.83 mm, 74.752 mm): Symbol #PWR096 Hidden pin  [C-GND, Power input, Line]
+    @(290.83 mm, 74.752 mm): Symbol #PWR095_IAS1 Hidden pin  [C-GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(290.83 mm, 74.752 mm): Symbol #PWR096 [C-GND_POWER_GROUND]
+    @(290.83 mm, 74.752 mm): Symbol #PWR095_IAS1 [C-GND_POWER_GROUND]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(158.75 mm, 269.062 mm): Symbol X1 Pin 1 [1, Passive, Line]
+    @(158.75 mm, 269.062 mm): Symbol X1_IAS1 Pin 1 [1, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(158.75 mm, 269.062 mm): Symbol #PWR058 Hidden pin  [C-GND, Power input, Line]
+    @(158.75 mm, 269.062 mm): Symbol #PWR057_IAS1 Hidden pin  [C-GND, Power input, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(158.75 mm, 269.062 mm): Symbol X1 [IAS1_0_PCB HOLE 3.4-6-DK_AVT_KHK_L...]
+    @(158.75 mm, 269.062 mm): Symbol X1_IAS1 [IAS1_0_PCB HOLE 3.4-6-DK_AVT_KHK_L...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(158.75 mm, 269.062 mm): Symbol X1 [IAS1_0_PCB HOLE 3.4-6-DK_AVT_KHK_L...]
+    @(158.75 mm, 269.062 mm): Symbol X1_IAS1 [IAS1_0_PCB HOLE 3.4-6-DK_AVT_KHK_L...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(158.75 mm, 269.062 mm): Symbol #PWR058 [C-GND_POWER_GROUND]
+    @(158.75 mm, 269.062 mm): Symbol #PWR057_IAS1 [C-GND_POWER_GROUND]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(223.52 mm, 218.262 mm): Symbol #PWR075 Hidden pin  [VCC1V8, Power input, Line]
+    @(223.52 mm, 218.262 mm): Symbol #PWR076_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(223.52 mm, 218.262 mm): Symbol C8 Pin 1 [1, Passive, Line]
+    @(223.52 mm, 218.262 mm): Symbol C8_IAS1 Pin 1 [1, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(223.52 mm, 218.262 mm): Symbol C8 [IAS1_0_C 100N 10% 16V X7R 402_Pass...]
+    @(223.52 mm, 218.262 mm): Symbol C8_IAS1 [IAS1_0_C 100N 10% 16V X7R 402_Pass...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(223.52 mm, 218.262 mm): Symbol C8 [IAS1_0_C 100N 10% 16V X7R 402_Pass...]
+    @(223.52 mm, 218.262 mm): Symbol C8_IAS1 [IAS1_0_C 100N 10% 16V X7R 402_Pass...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(223.52 mm, 218.262 mm): Symbol #PWR075 [VCC1V8_CIRCLE]
+    @(223.52 mm, 218.262 mm): Symbol #PWR076_IAS1 [VCC1V8_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(177.80 mm, 261.442 mm): Symbol #PWR063 Hidden pin  [GND, Power input, Line]
+    @(177.80 mm, 261.442 mm): Symbol #PWR064_IAS1 Hidden pin  [GND, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(177.80 mm, 261.442 mm): Horizontal Wire, length 12.70 mm
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(177.80 mm, 261.442 mm): Symbol #PWR063 [GND_BAR]
+    @(177.80 mm, 261.442 mm): Symbol #PWR064_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(223.52 mm, 225.882 mm): Symbol #PWR078 Hidden pin  [GND, Power input, Line]
+    @(223.52 mm, 225.882 mm): Symbol #PWR077_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(223.52 mm, 225.882 mm): Symbol #PWR078 [GND_BAR]
+    @(223.52 mm, 225.882 mm): Symbol #PWR077_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(190.50 mm, 261.442 mm): Vertical Wire, length 2.54 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(190.50 mm, 263.982 mm): Symbol C10 Pin 1 [1, Passive, Line]
+    @(190.50 mm, 263.982 mm): Symbol C10_IAS1 Pin 1 [1, Passive, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(190.50 mm, 263.982 mm): Symbol C10 [IAS1_0_C X 0603_AVT_KHK_Lib.IntLib]
+    @(190.50 mm, 263.982 mm): Symbol C10_IAS1 [IAS1_0_C X 0603_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(190.50 mm, 263.982 mm): Symbol C10 [IAS1_0_C X 0603_AVT_KHK_Lib.IntLib]
+    @(190.50 mm, 263.982 mm): Symbol C10_IAS1 [IAS1_0_C X 0603_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(177.80 mm, 274.142 mm): Horizontal Wire, length 12.70 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(177.80 mm, 274.142 mm): Symbol R24 Pin 1 [1, Passive, Line]
+    @(177.80 mm, 274.142 mm): Symbol R24_IAS1 Pin 1 [1, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(177.80 mm, 274.142 mm): Symbol #PWR066 Hidden pin  [C-GND, Power input, Line]
+    @(177.80 mm, 274.142 mm): Symbol #PWR065_IAS1 Hidden pin  [C-GND, Power input, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(177.80 mm, 274.142 mm): Symbol R24 [IAS1_1_R 0R0 1% 0603_Passive.SCHLIB]
+    @(177.80 mm, 274.142 mm): Symbol R24_IAS1 [IAS1_1_R 0R0 1% 0603_Passive.SCHLIB]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(177.80 mm, 274.142 mm): Symbol R24 [IAS1_1_R 0R0 1% 0603_Passive.SCHLIB]
+    @(177.80 mm, 274.142 mm): Symbol R24_IAS1 [IAS1_1_R 0R0 1% 0603_Passive.SCHLIB]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(177.80 mm, 274.142 mm): Symbol #PWR066 [C-GND_POWER_GROUND]
+    @(177.80 mm, 274.142 mm): Symbol #PWR065_IAS1 [C-GND_POWER_GROUND]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(308.61 mm, 126.822 mm): Vertical Wire, length 2.54 mm
@@ -634,22 +634,22 @@ Report includes: Errors, Warnings, Exclusions
     @(308.61 mm, 129.362 mm): Horizontal Wire, length 2.54 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(331.47 mm, 46.812 mm): Symbol #PWR0114 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(331.47 mm, 46.812 mm): Symbol #PWR0113_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(331.47 mm, 46.812 mm): Symbol #PWR0114 [VCC5V-EXT_CIRCLE]
+    @(331.47 mm, 46.812 mm): Symbol #PWR0113_IAS1 [VCC5V-EXT_CIRCLE]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(311.15 mm, 124.282 mm): Symbol J8 [IAS1_0_CON BM20B(0.8)-34DP_AVT_KHK...]
+    @(311.15 mm, 124.282 mm): Symbol J8_IAS1 [IAS1_0_CON BM20B(0.8)-34DP_AVT_KHK...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(311.15 mm, 124.282 mm): Symbol J8 [IAS1_0_CON BM20B(0.8)-34DP_AVT_KHK...]
+    @(311.15 mm, 124.282 mm): Symbol J8_IAS1 [IAS1_0_CON BM20B(0.8)-34DP_AVT_KHK...]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(331.47 mm, 49.352 mm): Symbol #PWR0116 Hidden pin  [GND, Power input, Line]
+    @(331.47 mm, 49.352 mm): Symbol #PWR0115_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(331.47 mm, 49.352 mm): Symbol #PWR0116 [GND_BAR]
+    @(331.47 mm, 49.352 mm): Symbol #PWR0115_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(311.15 mm, 126.822 mm): Horizontal Wire, length 2.54 mm
@@ -667,16 +667,16 @@ Report includes: Errors, Warnings, Exclusions
     @(308.61 mm, 144.602 mm): Vertical Wire, length 7.62 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(237.49 mm, 246.202 mm): Symbol #PWR081 Hidden pin  [GND, Power input, Line]
+    @(237.49 mm, 246.202 mm): Symbol #PWR082_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(237.49 mm, 246.202 mm): Symbol #PWR081 [GND_BAR]
+    @(237.49 mm, 246.202 mm): Symbol #PWR082_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(307.34 mm, 154.762 mm): Symbol #PWR0101 Hidden pin  [VCC1V8, Power input, Line]
+    @(307.34 mm, 154.762 mm): Symbol #PWR0102_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(307.34 mm, 154.762 mm): Symbol #PWR0101 [VCC1V8_CIRCLE]
+    @(307.34 mm, 154.762 mm): Symbol #PWR0102_IAS1 [VCC1V8_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(308.61 mm, 152.222 mm): Horizontal Wire, length 2.54 mm
@@ -694,43 +694,43 @@ Report includes: Errors, Warnings, Exclusions
     @(308.61 mm, 162.382 mm): Vertical Wire, length 6.35 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(307.34 mm, 164.922 mm): Symbol #PWR0103 Hidden pin  [VCC2V75, Power input, Line]
+    @(307.34 mm, 164.922 mm): Symbol #PWR0104_IAS1 Hidden pin  [VCC2V75, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(307.34 mm, 164.922 mm): Symbol #PWR0103 [VCC2V75_CIRCLE]
+    @(307.34 mm, 164.922 mm): Symbol #PWR0104_IAS1 [VCC2V75_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(311.15 mm, 159.842 mm): Symbol J8 Pin 15 [15, Passive, Line]
+    @(311.15 mm, 159.842 mm): Symbol J8_IAS1 Pin 15 [15, Passive, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(308.61 mm, 168.732 mm): Symbol #PWR0106 Hidden pin  [GND, Power input, Line]
+    @(308.61 mm, 168.732 mm): Symbol #PWR0105_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(308.61 mm, 168.732 mm): Symbol #PWR0106 [GND_BAR]
+    @(308.61 mm, 168.732 mm): Symbol #PWR0105_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(311.15 mm, 164.922 mm): Horizontal Wire, length 3.81 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(279.40 mm, 218.262 mm): Symbol #PWR092 Hidden pin  [VCC3V3, Power input, Line]
+    @(279.40 mm, 218.262 mm): Symbol #PWR091_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(279.40 mm, 218.262 mm): Symbol C9 [IAS1_0_mirrored_C 100N 10% 16V X7R...]
+    @(279.40 mm, 218.262 mm): Symbol C9_IAS1 [IAS1_0_mirrored_C 100N 10% 16V X7R...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'Passive'
     ; warning
-    @(279.40 mm, 218.262 mm): Symbol C9 [IAS1_0_mirrored_C 100N 10% 16V X7R...]
+    @(279.40 mm, 218.262 mm): Symbol C9_IAS1 [IAS1_0_mirrored_C 100N 10% 16V X7R...]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(279.40 mm, 218.262 mm): Symbol #PWR092 [VCC3V3_CIRCLE]
+    @(279.40 mm, 218.262 mm): Symbol #PWR091_IAS1 [VCC3V3_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(279.40 mm, 225.882 mm): Symbol #PWR094 Hidden pin  [GND, Power input, Line]
+    @(279.40 mm, 225.882 mm): Symbol #PWR093_IAS1 Hidden pin  [GND, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(279.40 mm, 225.882 mm): Symbol C9 Pin 2 [2, Passive, Line]
+    @(279.40 mm, 225.882 mm): Symbol C9_IAS1 Pin 2 [2, Passive, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(279.40 mm, 225.882 mm): Symbol #PWR094 [GND_BAR]
+    @(279.40 mm, 225.882 mm): Symbol #PWR093_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(339.09 mm, 126.822 mm): Horizontal Wire, length 2.54 mm
@@ -757,168 +757,159 @@ Report includes: Errors, Warnings, Exclusions
     @(339.09 mm, 147.142 mm): Horizontal Wire, length 2.54 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(325.12 mm, 180.162 mm): Symbol #PWR0107 Hidden pin  [VCC1V2, Power input, Line]
+    @(325.12 mm, 180.162 mm): Symbol #PWR0108_IAS1 Hidden pin  [VCC1V2, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(325.12 mm, 180.162 mm): Symbol TP4 Pin 1 [1, Passive, Line]
+    @(325.12 mm, 180.162 mm): Symbol TP4_IAS1 Pin 1 [1, Passive, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(325.12 mm, 180.162 mm): Symbol #PWR0107 [VCC1V2_CIRCLE]
+    @(325.12 mm, 180.162 mm): Symbol #PWR0108_IAS1 [VCC1V2_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(340.36 mm, 149.682 mm): Horizontal Wire, length 3.81 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(340.36 mm, 149.682 mm): Symbol #PWR0124 Hidden pin  [VCC1V2, Power input, Line]
+    @(340.36 mm, 149.682 mm): Symbol #PWR0123_IAS1 Hidden pin  [VCC1V2, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(340.36 mm, 149.682 mm): Symbol #PWR0124 [VCC1V2_CIRCLE]
+    @(340.36 mm, 149.682 mm): Symbol #PWR0123_IAS1 [VCC1V2_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(369.57 mm, 44.272 mm): Symbol #PWR0130 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(369.57 mm, 44.272 mm): Symbol #PWR0129_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(369.57 mm, 44.272 mm): Symbol #PWR0130 [VCC5V-EXT_CIRCLE]
+    @(369.57 mm, 44.272 mm): Symbol #PWR0129_IAS1 [VCC5V-EXT_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(369.57 mm, 48.082 mm): Symbol #PWR0131 Hidden pin  [GND, Power input, Line]
+    @(369.57 mm, 48.082 mm): Symbol #PWR0132_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(369.57 mm, 48.082 mm): Symbol #PWR0131 [GND_BAR]
+    @(369.57 mm, 48.082 mm): Symbol #PWR0132_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(325.12 mm, 182.702 mm): Symbol #PWR0109 Hidden pin  [VCC1V8, Power input, Line]
+    @(325.12 mm, 182.702 mm): Symbol #PWR0110_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(325.12 mm, 182.702 mm): Symbol TP5 Pin 1 [1, Passive, Line]
+    @(325.12 mm, 182.702 mm): Symbol TP5_IAS1 Pin 1 [1, Passive, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(325.12 mm, 182.702 mm): Symbol #PWR0109 [VCC1V8_CIRCLE]
+    @(325.12 mm, 182.702 mm): Symbol #PWR0110_IAS1 [VCC1V8_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(336.55 mm, 162.382 mm): Horizontal Wire, length 2.54 mm
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(325.12 mm, 185.242 mm): Symbol #PWR0112 Hidden pin  [VCC2V75, Power input, Line]
+    @(325.12 mm, 185.242 mm): Symbol #PWR0111_IAS1 Hidden pin  [VCC2V75, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(325.12 mm, 185.242 mm): Symbol TP6 Pin 1 [1, Passive, Line]
+    @(325.12 mm, 185.242 mm): Symbol TP6_IAS1 Pin 1 [1, Passive, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(325.12 mm, 185.242 mm): Symbol #PWR0112 [VCC2V75_CIRCLE]
+    @(325.12 mm, 185.242 mm): Symbol #PWR0111_IAS1 [VCC2V75_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(336.55 mm, 164.922 mm): Horizontal Wire, length 3.81 mm
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(328.93 mm, 180.162 mm): Symbol TP4 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(328.93 mm, 180.162 mm): Symbol TP4_IAS1 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(328.93 mm, 180.162 mm): Symbol TP4 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(328.93 mm, 180.162 mm): Symbol TP4_IAS1 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(369.57 mm, 64.592 mm): Symbol #PWR0134 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(369.57 mm, 64.592 mm): Symbol #PWR0133_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(369.57 mm, 64.592 mm): Symbol #PWR0134 [VCC5V-EXT_CIRCLE]
+    @(369.57 mm, 64.592 mm): Symbol #PWR0133_IAS1 [VCC5V-EXT_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(339.09 mm, 162.382 mm): Vertical Wire, length 15.24 mm
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(328.93 mm, 182.702 mm): Symbol TP5 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(328.93 mm, 182.702 mm): Symbol TP5_IAS1 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(328.93 mm, 182.702 mm): Symbol TP5 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(328.93 mm, 182.702 mm): Symbol TP5_IAS1 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(369.57 mm, 76.022 mm): Symbol #PWR0135 Hidden pin  [GND, Power input, Line]
+    @(369.57 mm, 76.022 mm): Symbol #PWR0136_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(369.57 mm, 76.022 mm): Symbol #PWR0135 [GND_BAR]
+    @(369.57 mm, 76.022 mm): Symbol #PWR0136_IAS1 [GND_BAR]
 [footprint_link_issues]: La configuración actual no incluye la biblioteca de huellas ''
     ; warning
-    @(328.93 mm, 185.242 mm): Symbol TP6 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(328.93 mm, 185.242 mm): Symbol TP6_IAS1 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'AVT_KHK_Lib'
     ; warning
-    @(328.93 mm, 185.242 mm): Symbol TP6 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
+    @(328.93 mm, 185.242 mm): Symbol TP6_IAS1 [IAS1_2_TP_16_10_AVT_KHK_Lib.IntLib]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(340.36 mm, 164.922 mm): Symbol #PWR0126 Hidden pin  [VCC2V75, Power input, Line]
+    @(340.36 mm, 164.922 mm): Symbol #PWR0125_IAS1 Hidden pin  [VCC2V75, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(340.36 mm, 164.922 mm): Symbol #PWR0126 [VCC2V75_CIRCLE]
+    @(340.36 mm, 164.922 mm): Symbol #PWR0125_IAS1 [VCC2V75_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(339.09 mm, 168.732 mm): Symbol #PWR0122 Hidden pin  [GND, Power input, Line]
+    @(339.09 mm, 168.732 mm): Symbol #PWR0121_IAS1 Hidden pin  [GND, Power input, Line]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
     @(339.09 mm, 168.732 mm): Vertical Wire, length 6.35 mm
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(339.09 mm, 168.732 mm): Symbol #PWR0122 [GND_BAR]
+    @(339.09 mm, 168.732 mm): Symbol #PWR0121_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(337.82 mm, 196.672 mm): Symbol #PWR0119 Hidden pin  [VCC1V8, Power input, Line]
+    @(337.82 mm, 196.672 mm): Symbol #PWR0120_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(337.82 mm, 196.672 mm): Symbol #PWR0119 [VCC1V8_CIRCLE]
+    @(337.82 mm, 196.672 mm): Symbol #PWR0120_IAS1 [VCC1V8_CIRCLE]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(334.01 mm, 227.152 mm): Symbol #PWR0118 Hidden pin  [GND, Power input, Line]
+    @(334.01 mm, 227.152 mm): Symbol #PWR0117_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(334.01 mm, 227.152 mm): Symbol #PWR0118 [GND_BAR]
+    @(334.01 mm, 227.152 mm): Symbol #PWR0117_IAS1 [GND_BAR]
 [endpoint_off_grid]: Symbol pin or wire end off connection grid
     ; warning
-    @(346.71 mm, 227.152 mm): Symbol #PWR0127 Hidden pin  [GND, Power input, Line]
+    @(346.71 mm, 227.152 mm): Symbol #PWR0128_IAS1 Hidden pin  [GND, Power input, Line]
 [lib_symbol_issues]: La configuración actual no incluye la biblioteca de símbolos 'CSI2-KRIA-KV260_Rev01-altium-import'
     ; warning
-    @(346.71 mm, 227.152 mm): Symbol #PWR0127 [GND_BAR]
+    @(346.71 mm, 227.152 mm): Symbol #PWR0128_IAS1 [GND_BAR]
 
 ***** Sheet /IAS0/
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 41.732 mm): Symbol #PWR02 Hidden pin  [VCC3V3, Power input, Line]
+    @(27.94 mm, 41.732 mm): Symbol #PWR01_IAS1 Hidden pin  [VCC3V3, Power input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(27.94 mm, 56.972 mm): Symbol #PWR03_IAS1 Hidden pin  [GND, Power input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(62.23 mm, 41.732 mm): Symbol #PWR026_IAS1 Hidden pin  [VCC3V3, Power input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(62.23 mm, 56.972 mm): Symbol #PWR027_IAS1 Hidden pin  [GND, Power input, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(73.66 mm, 63.322 mm): Symbol #PWR029_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [power_pin_not_driven]: Input Power pin not driven by any Output Power pins
     ; error
-    @(27.94 mm, 41.732 mm): Symbol #PWR02 Hidden pin  [VCC3V3, Power input, Line]
+    @(101.60 mm, 37.922 mm): Symbol #PWR038_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 56.972 mm): Symbol #PWR04 Hidden pin  [GND, Power input, Line]
+    @(99.06 mm, 63.322 mm): Symbol TP1_IAS1 Pin 1 [1, Passive, Line]
+[pin_not_connected]: Pin not connected
+    ; error
+    @(27.94 mm, 124.282 mm): Symbol #PWR06_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [power_pin_not_driven]: Input Power pin not driven by any Output Power pins
     ; error
-    @(27.94 mm, 56.972 mm): Symbol #PWR04 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 124.282 mm): Symbol #PWR06_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(62.23 mm, 41.732 mm): Symbol #PWR025 Hidden pin  [VCC3V3, Power input, Line]
+    @(85.09 mm, 102.692 mm): Symbol #PWR031_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(62.23 mm, 56.972 mm): Symbol #PWR028 Hidden pin  [GND, Power input, Line]
-[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
-    ; error
-    @(43.18 mm, 82.372 mm): Symbol #PWR022 Hidden pin  [VCC5V-CAM, Power input, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(73.66 mm, 63.322 mm): Symbol #PWR030 Hidden pin  [VCC3V3, Power input, Line]
-[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
-    ; error
-    @(101.60 mm, 37.922 mm): Symbol #PWR037 Hidden pin  [VCC5V-EXT, Power input, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(99.06 mm, 63.322 mm): Symbol TP1 Pin 1 [1, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(27.94 mm, 124.282 mm): Symbol #PWR05 Hidden pin  [VCC-EXT-IN, Power input, Line]
-[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
-    ; error
-    @(27.94 mm, 124.282 mm): Symbol #PWR05 Hidden pin  [VCC-EXT-IN, Power input, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(85.09 mm, 102.692 mm): Symbol #PWR032 Hidden pin  [GND, Power input, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(27.94 mm, 131.902 mm): Symbol #PWR08 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(27.94 mm, 131.902 mm): Symbol #PWR07_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica EXT-GPIO0-I2C-SCL no está conectada a la hoja pricipal
     ; error
     @(46.99 mm, 126.822 mm): Hierarchical Label 'EXT-GPIO0-I2C-SCL'
@@ -927,10 +918,10 @@ Report includes: Errors, Warnings, Exclusions
     @(46.99 mm, 129.362 mm): Hierarchical Label 'EXT-GPIO1-I2C-SDA'
 [pin_not_connected]: Pin not connected
     ; error
-    @(97.79 mm, 102.692 mm): Symbol #PWR036 Hidden pin  [GND, Power input, Line]
+    @(97.79 mm, 102.692 mm): Symbol #PWR035_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 139.522 mm): Symbol #PWR010 Hidden pin  [VCC-EXT-IN, Power input, Line]
+    @(27.94 mm, 139.522 mm): Symbol #PWR09_IAS1 Hidden pin  [VCC-EXT-IN, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica EXT-GPIO3 no está conectada a la hoja pricipal
     ; error
     @(46.99 mm, 136.982 mm): Hierarchical Label 'EXT-GPIO3'
@@ -939,49 +930,46 @@ Report includes: Errors, Warnings, Exclusions
     @(46.99 mm, 142.062 mm): Hierarchical Label 'B7-CSI2-TXD3_N'
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 147.142 mm): Symbol #PWR012 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 147.142 mm): Symbol #PWR011_IAS1 Hidden pin  [GND, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica B7-CSI2-TXD3_P no está conectada a la hoja pricipal
     ; error
     @(46.99 mm, 144.602 mm): Hierarchical Label 'B7-CSI2-TXD3_P'
 [pin_not_connected]: Pin not connected
     ; error
-    @(139.70 mm, 60.782 mm): Symbol #PWR047 Hidden pin  [GND, Power input, Line]
+    @(139.70 mm, 60.782 mm): Symbol #PWR048_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(146.05 mm, 45.542 mm): Symbol #PWR050 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(146.05 mm, 45.542 mm): Symbol #PWR049_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 154.762 mm): Symbol #PWR014 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 154.762 mm): Symbol #PWR013_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(146.05 mm, 60.782 mm): Symbol #PWR052 Hidden pin  [GND, Power input, Line]
+    @(146.05 mm, 60.782 mm): Symbol #PWR051_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 162.382 mm): Symbol #PWR015 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 162.382 mm): Symbol #PWR016_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 170.002 mm): Symbol #PWR018 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 170.002 mm): Symbol #PWR017_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(161.29 mm, 60.782 mm): Symbol #PWR060 Hidden pin  [GND, Power input, Line]
+    @(161.29 mm, 60.782 mm): Symbol #PWR059_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(27.94 mm, 177.622 mm): Symbol #PWR020 Hidden pin  [GND, Power input, Line]
+    @(27.94 mm, 177.622 mm): Symbol #PWR019_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(173.99 mm, 50.622 mm): Symbol #PWR062 Hidden pin  [VCC3V3, Power input, Line]
+    @(173.99 mm, 50.622 mm): Symbol #PWR061_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(207.01 mm, 56.972 mm): Symbol #PWR073 Hidden pin  [GND, Power input, Line]
+    @(207.01 mm, 56.972 mm): Symbol #PWR074_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(87.63 mm, 218.262 mm): Symbol #PWR034 Hidden pin  [VCC1V8, Power input, Line]
-[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
-    ; error
-    @(87.63 mm, 218.262 mm): Symbol #PWR034 Hidden pin  [VCC1V8, Power input, Line]
+    @(87.63 mm, 218.262 mm): Symbol #PWR033_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(237.49 mm, 56.972 mm): Symbol #PWR079 Hidden pin  [GND, Power input, Line]
+    @(237.49 mm, 56.972 mm): Symbol #PWR080_IAS1 Hidden pin  [GND, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica I2C_SCL no está conectada a la hoja pricipal
     ; error
     @(76.20 mm, 233.502 mm): Hierarchical Label 'I2C_SCL'
@@ -990,25 +978,25 @@ Report includes: Errors, Warnings, Exclusions
     @(76.20 mm, 236.042 mm): Hierarchical Label 'I2C_SDA'
 [pin_not_connected]: Pin not connected
     ; error
-    @(243.84 mm, 56.972 mm): Symbol #PWR088 Hidden pin  [GND, Power input, Line]
+    @(243.84 mm, 56.972 mm): Symbol #PWR087_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(114.30 mm, 225.882 mm): Symbol #PWR040 Hidden pin  [GND, Power input, Line]
+    @(114.30 mm, 225.882 mm): Symbol #PWR039_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(259.08 mm, 41.732 mm): Symbol TP2 Pin 1 [1, Passive, Line]
+    @(259.08 mm, 41.732 mm): Symbol TP2_IAS1 Pin 1 [1, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(262.89 mm, 41.732 mm): Symbol #PWR090 Hidden pin  [VCC3V3, Power input, Line]
+    @(262.89 mm, 41.732 mm): Symbol #PWR089_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(123.19 mm, 238.582 mm): Symbol #PWR041 Hidden pin  [GND, Power input, Line]
+    @(123.19 mm, 238.582 mm): Symbol #PWR042_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(158.75 mm, 225.882 mm): Symbol #PWR056 Hidden pin  [GND, Power input, Line]
+    @(158.75 mm, 225.882 mm): Symbol #PWR055_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(184.15 mm, 218.262 mm): Symbol #PWR067 Hidden pin  [VCC3V3, Power input, Line]
+    @(184.15 mm, 218.262 mm): Symbol #PWR068_IAS1 Hidden pin  [VCC3V3, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica GPIO2_3V3 no está conectada a la hoja pricipal
     ; error
     @(208.28 mm, 195.402 mm): Hierarchical Label 'GPIO2_3V3'
@@ -1017,13 +1005,10 @@ Report includes: Errors, Warnings, Exclusions
     @(208.28 mm, 200.482 mm): Hierarchical Label 'GPIO3_3V3'
 [pin_not_connected]: Pin not connected
     ; error
-    @(293.37 mm, 46.812 mm): Symbol #PWR098 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(293.37 mm, 46.812 mm): Symbol #PWR097_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(293.37 mm, 56.972 mm): Symbol #PWR0100 Hidden pin  [GND, Power input, Line]
-[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
-    ; error
-    @(158.75 mm, 269.062 mm): Symbol #PWR058 Hidden pin  [C-GND, Power input, Line]
+    @(293.37 mm, 56.972 mm): Symbol #PWR099_IAS1 Hidden pin  [GND, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica GPIO2 no está conectada a la hoja pricipal
     ; error
     @(215.90 mm, 233.502 mm): Hierarchical Label 'GPIO2'
@@ -1032,76 +1017,76 @@ Report includes: Errors, Warnings, Exclusions
     @(215.90 mm, 236.042 mm): Hierarchical Label 'PWDN'
 [pin_not_connected]: Pin not connected
     ; error
-    @(331.47 mm, 46.812 mm): Symbol #PWR0114 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(331.47 mm, 46.812 mm): Symbol #PWR0113_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(331.47 mm, 49.352 mm): Symbol #PWR0116 Hidden pin  [GND, Power input, Line]
+    @(331.47 mm, 49.352 mm): Symbol #PWR0115_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 131.902 mm): Symbol J8 Pin 4 [4, Passive, Line]
+    @(311.15 mm, 131.902 mm): Symbol J8_IAS1 Pin 4 [4, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 134.442 mm): Symbol J8 Pin 5 [5, Passive, Line]
+    @(311.15 mm, 134.442 mm): Symbol J8_IAS1 Pin 5 [5, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 139.522 mm): Symbol J8 Pin 7 [7, Passive, Line]
+    @(311.15 mm, 139.522 mm): Symbol J8_IAS1 Pin 7 [7, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 142.062 mm): Symbol J8 Pin 8 [8, Passive, Line]
+    @(311.15 mm, 142.062 mm): Symbol J8_IAS1 Pin 8 [8, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(237.49 mm, 246.202 mm): Symbol #PWR081 Hidden pin  [GND, Power input, Line]
+    @(237.49 mm, 246.202 mm): Symbol #PWR082_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 147.142 mm): Symbol J8 Pin 10 [10, Passive, Line]
+    @(311.15 mm, 147.142 mm): Symbol J8_IAS1 Pin 10 [10, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 149.682 mm): Symbol J8 Pin 11 [11, Passive, Line]
+    @(311.15 mm, 149.682 mm): Symbol J8_IAS1 Pin 11 [11, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(311.15 mm, 157.302 mm): Symbol J8 Pin 14 [14, Passive, Line]
+    @(311.15 mm, 157.302 mm): Symbol J8_IAS1 Pin 14 [14, Passive, Line]
 [power_pin_not_driven]: Input Power pin not driven by any Output Power pins
     ; error
-    @(307.34 mm, 164.922 mm): Symbol #PWR0103 Hidden pin  [VCC2V75, Power input, Line]
+    @(307.34 mm, 164.922 mm): Symbol #PWR0104_IAS1 Hidden pin  [VCC2V75, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 129.362 mm): Symbol J8 Pin 32 [32, Passive, Line]
+    @(336.55 mm, 129.362 mm): Symbol J8_IAS1 Pin 32 [32, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 134.442 mm): Symbol J8 Pin 30 [30, Passive, Line]
+    @(336.55 mm, 134.442 mm): Symbol J8_IAS1 Pin 30 [30, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 136.982 mm): Symbol J8 Pin 29 [29, Passive, Line]
+    @(336.55 mm, 136.982 mm): Symbol J8_IAS1 Pin 29 [29, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 142.062 mm): Symbol J8 Pin 27 [27, Passive, Line]
+    @(336.55 mm, 142.062 mm): Symbol J8_IAS1 Pin 27 [27, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 144.602 mm): Symbol J8 Pin 26 [26, Passive, Line]
+    @(336.55 mm, 144.602 mm): Symbol J8_IAS1 Pin 26 [26, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 154.762 mm): Symbol J8 Pin 22 [22, Passive, Line]
+    @(336.55 mm, 154.762 mm): Symbol J8_IAS1 Pin 22 [22, Passive, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(336.55 mm, 157.302 mm): Symbol J8 Pin 21 [21, Passive, Line]
+    @(336.55 mm, 157.302 mm): Symbol J8_IAS1 Pin 21 [21, Passive, Line]
 [power_pin_not_driven]: Input Power pin not driven by any Output Power pins
     ; error
-    @(325.12 mm, 180.162 mm): Symbol #PWR0107 Hidden pin  [VCC1V2, Power input, Line]
+    @(325.12 mm, 180.162 mm): Symbol #PWR0108_IAS1 Hidden pin  [VCC1V2, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(369.57 mm, 64.592 mm): Symbol #PWR0134 Hidden pin  [VCC5V-EXT, Power input, Line]
+    @(369.57 mm, 64.592 mm): Symbol #PWR0133_IAS1 Hidden pin  [VCC5V-EXT, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(369.57 mm, 76.022 mm): Symbol #PWR0135 Hidden pin  [GND, Power input, Line]
+    @(369.57 mm, 76.022 mm): Symbol #PWR0136_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(337.82 mm, 196.672 mm): Symbol #PWR0119 Hidden pin  [VCC1V8, Power input, Line]
+    @(337.82 mm, 196.672 mm): Symbol #PWR0120_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(334.01 mm, 227.152 mm): Symbol #PWR0118 Hidden pin  [GND, Power input, Line]
+    @(334.01 mm, 227.152 mm): Symbol #PWR0117_IAS1 Hidden pin  [GND, Power input, Line]
 [pin_not_connected]: Pin not connected
     ; error
-    @(346.71 mm, 227.152 mm): Symbol #PWR0127 Hidden pin  [GND, Power input, Line]
+    @(346.71 mm, 227.152 mm): Symbol #PWR0128_IAS1 Hidden pin  [GND, Power input, Line]
 [no_connect_dangling]: Unconnected "no connection" flag
     ; warning
     @(101.60 mm, 60.782 mm): No Connect
@@ -1137,15 +1122,21 @@ Report includes: Errors, Warnings, Exclusions
     @(267.97 mm, 241.122 mm): No Connect
 
 ***** Sheet /IAS1/
-[hier_label_mismatch]: La etiqueta jerárquica I2C_SCL_3V3 no está conectada a la hoja pricipal
+[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
     ; error
-    @(86.36 mm, 53.162 mm): Hierarchical Label 'I2C_SCL_3V3'
+    @(27.94 mm, 41.732 mm): Symbol #PWR01_IAS1 Hidden pin  [VCC3V3, Power input, Line]
+[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
+    ; error
+    @(27.94 mm, 56.972 mm): Symbol #PWR03_IAS1 Hidden pin  [GND, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica I2C_SDA_3V3 no está conectada a la hoja pricipal
     ; error
-    @(86.36 mm, 55.702 mm): Hierarchical Label 'I2C_SDA_3V3'
-[pin_not_connected]: Pin not connected
+    @(67.31 mm, 46.812 mm): Hierarchical Label 'I2C_SDA_3V3'
+[hier_label_mismatch]: La etiqueta jerárquica I2C_SCL_3V3 no está conectada a la hoja pricipal
     ; error
-    @(99.06 mm, 63.322 mm): Symbol TP1 Pin 1 [1, Passive, Line]
+    @(67.31 mm, 51.892 mm): Hierarchical Label 'I2C_SCL_3V3'
+[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
+    ; error
+    @(43.18 mm, 82.372 mm): Symbol #PWR021_IAS1 Hidden pin  [VCC5V-CAM, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica PWDN_3V3 no está conectada a la hoja pricipal
     ; error
     @(68.58 mm, 102.692 mm): Hierarchical Label 'PWDN_3V3'
@@ -1191,69 +1182,30 @@ Report includes: Errors, Warnings, Exclusions
 [hier_label_mismatch]: La etiqueta jerárquica B7-CSI2-TXD0_P no está conectada a la hoja pricipal
     ; error
     @(46.99 mm, 175.082 mm): Hierarchical Label 'B7-CSI2-TXD0_P'
+[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
+    ; error
+    @(87.63 mm, 218.262 mm): Symbol #PWR033_IAS1 Hidden pin  [VCC1V8, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica I2C_SCL no está conectada a la hoja pricipal
     ; error
     @(76.20 mm, 233.502 mm): Hierarchical Label 'I2C_SCL'
 [hier_label_mismatch]: La etiqueta jerárquica I2C_SDA no está conectada a la hoja pricipal
     ; error
     @(76.20 mm, 236.042 mm): Hierarchical Label 'I2C_SDA'
-[pin_not_connected]: Pin not connected
-    ; error
-    @(259.08 mm, 41.732 mm): Symbol TP2 Pin 1 [1, Passive, Line]
 [hier_label_mismatch]: La etiqueta jerárquica GPIO2_3V3 no está conectada a la hoja pricipal
     ; error
     @(208.28 mm, 195.402 mm): Hierarchical Label 'GPIO2_3V3'
 [hier_label_mismatch]: La etiqueta jerárquica GPIO3_3V3 no está conectada a la hoja pricipal
     ; error
     @(208.28 mm, 200.482 mm): Hierarchical Label 'GPIO3_3V3'
+[power_pin_not_driven]: Input Power pin not driven by any Output Power pins
+    ; error
+    @(158.75 mm, 269.062 mm): Symbol #PWR057_IAS1 Hidden pin  [C-GND, Power input, Line]
 [hier_label_mismatch]: La etiqueta jerárquica GPIO2 no está conectada a la hoja pricipal
     ; error
     @(215.90 mm, 233.502 mm): Hierarchical Label 'GPIO2'
 [hier_label_mismatch]: La etiqueta jerárquica PWDN no está conectada a la hoja pricipal
     ; error
     @(215.90 mm, 236.042 mm): Hierarchical Label 'PWDN'
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 131.902 mm): Symbol J8 Pin 4 [4, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 134.442 mm): Symbol J8 Pin 5 [5, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 139.522 mm): Symbol J8 Pin 7 [7, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 142.062 mm): Symbol J8 Pin 8 [8, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 147.142 mm): Symbol J8 Pin 10 [10, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 149.682 mm): Symbol J8 Pin 11 [11, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(311.15 mm, 157.302 mm): Symbol J8 Pin 14 [14, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 129.362 mm): Symbol J8 Pin 32 [32, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 134.442 mm): Symbol J8 Pin 30 [30, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 136.982 mm): Symbol J8 Pin 29 [29, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 142.062 mm): Symbol J8 Pin 27 [27, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 144.602 mm): Symbol J8 Pin 26 [26, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 154.762 mm): Symbol J8 Pin 22 [22, Passive, Line]
-[pin_not_connected]: Pin not connected
-    ; error
-    @(336.55 mm, 157.302 mm): Symbol J8 Pin 21 [21, Passive, Line]
 [no_connect_dangling]: Unconnected "no connection" flag
     ; warning
     @(101.60 mm, 60.782 mm): No Connect
@@ -1288,7 +1240,7 @@ Report includes: Errors, Warnings, Exclusions
     ; warning
     @(267.97 mm, 241.122 mm): No Connect
 
- ** ERC messages: 427  Errors 139  Warnings 288
+ ** ERC messages: 411  Errors 123  Warnings 288
 
  ** Ignored checks:
     - Global label only appears once in the schematic

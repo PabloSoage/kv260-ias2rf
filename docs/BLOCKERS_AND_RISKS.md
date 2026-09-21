@@ -260,9 +260,13 @@ it would run in its native 400 MSPS domain.
 
 ### R-09 — Adding an FPGA to the adapter is a step change in complexity
 
-It stops being an adapter board and becomes an FPGA board: configuration, boot memory, multi-rail
-sequenced power, JTAG, and a second toolchain. It is the most important project decision still
-open.
+**Accepted, knowingly, on 21 September 2026.** The board stops being an adapter and becomes an FPGA
+board: configuration, boot memory, multi-rail sequenced power, JTAG, and a second toolchain.
+
+This is no longer an open decision, but it remains a live risk and the schedule should reflect it.
+What reduces it: the part chosen is the one AERIS-10 already uses, so its firmware ports with little
+work, and the DSP core has been built and measured on silicon
+([scanner64](https://github.com/PabloSoage/scanner64)).
 
 ---
 

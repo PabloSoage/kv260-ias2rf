@@ -204,14 +204,52 @@ Blocks absent without which the system cannot work:
 footprints removed. What remains is pre-existing Altium noise: 502 clearance, 199 track width,
 199 silkscreen overlap, 199 drill out of range, 145 library footprint issues.
 
-**The netlist cannot be exported** `[V]`. `kicad-cli sch export netlist` fails with *"the schematic
-has annotation errors"*. The cause is structural: `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is a
-multi-channel sheet instantiated **twice** (IAS0 and IAS1), so its 19 references appear twice in the
-project. It is fixed in the GUI with `Tools → Annotate Schematic`, scope *"Use sheet number (X/Y)"*.
+**The netlist could not be exported, and there were two causes** `[V]`. `kicad-cli sch export
+netlist` failed with *"the schematic has annotation errors"*. This matters more than it looks:
+while it failed, **`Update PCB from Schematic` could not run**, so no schematic change could ever
+reach the layout.
 
-This matters more than it looks: **until it is fixed, `Update PCB from Schematic` cannot run**, so
-no schematic change can reach the layout. It is a prerequisite for phase 3 of the roadmap, and the
-earlier documentation mentioned the annotation step without noting that it blocks the netlist.
+**Cause 1 — duplicate instance references.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is a multi-channel
+sheet instantiated **twice** (IAS0 and IAS1). Every symbol carries two
+`(path … (reference …))` entries, and both held the *same* reference. This one was expected: the
+earlier documentation mentioned the annotation step, though without noting that it blocks the
+netlist.
+
+**Cause 2 — the root schematic's UUID did not match its own instance paths.** This one was not
+expected, and it is the more interesting failure. The root schematic declared:
+
+```
+(uuid "e5fa38a9-3b17-4a79-842c-71067d69144e")
+```
+
+while every instance path in the project, including those inside that same file, pointed at:
+
+```
+(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366" (reference "T2") …)
+```
+
+The instance tree therefore referenced a root sheet that does not exist, and KiCad could not
+resolve a single annotation — which is why fixing cause 1 alone changed nothing.
+
+**How the right value was chosen, rather than guessed:** counting occurrences across the project.
+The declared UUID appeared **once** (its own declaration). The one used by the paths appeared
+**188 times** — 170 in the shared sheet, 16 in the root schematic and 2 in the `.kicad_pro`. The
+declaration was the outlier, so it was rewritten to match.
+
+The likely origin is the Altium import or the earlier script manipulation; either way it had been
+silently breaking annotation for the whole life of the project.
+
+**Both fixed** by `_work/fix_multichannel_annotation.py`, with a dry-run mode, parenthesis checking
+and a cross-check that every new reference exists in the PCB. Measured result:
+
+| | Before | After |
+|---|---|---|
+| `sch export netlist` | fails | **48 components, 61 nets** |
+| `sch export bom` | fails | **48 rows** |
+| ERC | 427 | **411** (`pin_not_connected` 71 → 55) |
+
+The netlist's 19 `_IAS0` + 19 `_IAS1` + 10 root components are exactly the schematic's contents,
+and all 38 suffixed references already existed in the PCB — so schematic and layout agree.
 
 ---
 

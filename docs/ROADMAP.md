@@ -31,10 +31,20 @@ Still outstanding — not blocking the decision, but blocking schematic sign-off
 
 ---
 
-## Phase 0.5 — Architecture decision ⬅ **WE ARE HERE**
+## Phase 0.5 — Architecture decision ✅ DECIDED (21 September 2026)
 
-**One question, and everything else depends on it:** is a front-end FPGA accepted on the adapter
-board?
+**The front-end FPGA is accepted.** The reason is the one in phase 0: the KV260 does not expose
+enough pins for a converter to connect directly.
+
+**The radar is AERIS-10**, for surveillance at range, understood as a project rather than
+something that will be operated (see the licensing position in
+[BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md) R-06).
+
+**Obstacle detection leaves this board.** It will be a commercial automotive radar connected over
+USB — cheaper, licence-free at 76–77 GHz, and purpose-built. It is therefore **not** a subsystem of
+this adapter, and nothing in the schematic has to account for it.
+
+The comparison that led here:
 
 | | With front-end FPGA | Without |
 |---|---|---|
@@ -101,11 +111,11 @@ script-generated sheets have already been **removed** from the project and moved
   topology has to be visible.
 - An explicit `no_connect` on every deliberately unused pin.
 
-**Prerequisite — multi-channel annotation.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is instantiated
-twice (IAS0 and IAS1), so its 19 references are duplicated across the project and
-`kicad-cli sch export netlist` currently fails with *"the schematic has annotation errors"*. Fix it
-in the GUI: `Tools → Annotate Schematic`, scope **"Use sheet number (X/Y)"**. **Without this there
-is no netlist, and without a netlist phase 3 cannot start.**
+**Prerequisite — multi-channel annotation.** ✅ **Done** (21 September 2026). It had two causes:
+duplicate instance references on the shared sheet, and a root schematic whose declared UUID did not
+match its own instance paths. Both fixed by `_work/fix_multichannel_annotation.py`. The netlist now
+exports with 48 components and 61 nets, so `Update PCB from Schematic` is unblocked and phase 3 can
+start once the schematic is done.
 
 **Exit criteria:**
 

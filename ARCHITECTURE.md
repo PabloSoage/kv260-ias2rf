@@ -4,6 +4,7 @@
 **SDR chain (HF / VHF / UHF) plus a 10.5 GHz radar chain on AERIS-10**
 
 *Revision 03 · 21 September 2026 · All five Rev02 blockers are closed*
+*Architecture **approved** 21 September 2026: front-end FPGA accepted, radar is AERIS-10*
 
 ---
 
@@ -137,7 +138,21 @@ there is ample room to add the link to the Kria.
 Cheaper alternatives: Spartan-7 XC7S25/S50 (same Vivado flow, no transceivers, which are not needed
 here). The cost would be having to port the firmware.
 
-### 2.3 The cost, stated plainly
+### 2.3 Status: approved
+
+**The front-end FPGA was accepted on 21 September 2026**, for the reason in §1: the KV260 does not
+expose enough pins for a converter to connect directly.
+
+Two scope decisions came with it:
+
+- **The radar is AERIS-10**, for surveillance at range. It is understood as a project rather than
+  something that will be operated on air; the licensing position is in
+  [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) R-06.
+- **Obstacle detection leaves this board.** It will be a commercial automotive radar over USB —
+  cheaper, licence-free at 76–77 GHz and purpose-built. Nothing in this schematic has to account
+  for it.
+
+### 2.4 The cost, stated plainly
 
 This stops being an adapter board and becomes **an FPGA board**: QSPI boot memory, sequenced
 multi-rail power (VCCINT, VCCAUX, VCCO ×3), JTAG, dense decoupling, and a second toolchain. It is

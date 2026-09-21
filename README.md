@@ -143,20 +143,33 @@ kicad-cli sch erc --severity-all -o erc.rpt CSI2-KRIA-KV260_Rev01.kicad_sch
 were removed). They are pre-existing violations of the original Altium design: 502 clearance,
 199 track width, 199 silkscreen overlap, 199 drill out of range, 145 library footprint issues.
 
-### Known blocker for any PCB update
+### The netlist now exports — a blocker that is closed
 
-**The netlist cannot be exported yet.** `kicad-cli sch export netlist` fails with *"the schematic
-has annotation errors"*.
+`kicad-cli sch export netlist` used to fail with *"the schematic has annotation errors"*, which
+meant `Update PCB from Schematic` could never run and no schematic change could reach the layout.
 
-The cause is structural and expected: `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is a multi-channel sheet
-instantiated **twice** (as IAS0 and as IAS1), so its 19 component references appear twice across
-the project. KiCad needs multi-channel annotation before it can build a netlist.
+There were **two independent causes**, both now fixed by `_work/fix_multichannel_annotation.py`:
 
-The fix is in the GUI, not in a file: `Tools → Annotate Schematic`, scope **"Use sheet number
-(X/Y)"**. KiCad then assigns suffixes — `C3` becomes `C3_IAS0` / `C3_IAS1`, and so on.
+1. **Duplicate instance references.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is instantiated twice (as
+   IAS0 and as IAS1), and both instance paths carried the *same* reference. Rewritten as
+   `<ref>_IAS0` / `<ref>_IAS1` — which is the convention the PCB already used, so schematic and
+   layout now agree on all 38 references.
+2. **The root schematic's UUID did not match its own instance paths.** The file declared
+   `(uuid "e5fa38a9-…")` while every instance path in the project pointed at `/56c49378-…`. The
+   instance tree referenced a root that did not exist, so KiCad could not resolve a single
+   annotation. The declared UUID appeared **once** in the whole project; the one used by the paths
+   appeared **188 times**, so the declaration was the outlier and was rewritten.
 
-**Until this is done, `Update PCB from Schematic` cannot run.** It is a prerequisite for phase 3
-of the [roadmap](docs/ROADMAP.md).
+Result, measured:
+
+| | Before | After |
+|---|---|---|
+| `sch export netlist` | fails | **48 components, 61 nets** |
+| `sch export bom` | fails | **48 rows** |
+| ERC violations | 427 | **411** |
+
+The 19 `_IAS0` + 19 `_IAS1` + 10 root-sheet components in the netlist are exactly what the
+schematic contains.
 
 ---
 
