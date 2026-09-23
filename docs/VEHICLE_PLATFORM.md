@@ -233,18 +233,20 @@ A vehicle is a hostile electrical environment and this affects **every** board i
 | Temperature: −10 to +70 °C in the cabin, worse in the engine bay | Industrial grade on the critical parts |
 | Dust and water | Suitable IP enclosure; the KV260's fansink needs filtered air |
 
-**Power budget `[E]`, to be refined:**
+**Power budget, to be refined** (`[V]` where measured):
 
 | Consumer | Power |
 |---|---|
-| KV260 | 36 W (12 V / 3 A) |
+| KV260 | **~10 W** `[E]`. 36 W is only the brick's rating. **Measured** `[V]` by [scanner64](https://github.com/PabloSoage/scanner64) with the carrier's INA260: **3.24 W idle, 4.30 W** with the PL processing 64 channels at 100 MSPS. That INA260 sits on a 5 V rail, so it excludes the 12 V input stage, the fan and USB peripherals, hence the margin |
+| This adapter board | **7.3 W** `[V/E]` at 12 V, 9.5 W with 30 % margin — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
 | LiDAR | 10 – 20 W |
 | SDR (RX) | 10 – 15 W |
 | AERIS Extended radar | **Very high**: 16 GaN amplifiers of 10 W. Pulsed, but the peak drives the sizing |
-| **Total without radar** | **~60 – 70 W** |
+| **Total without radar** | **~40 – 55 W** |
 
-Sixty or seventy watts continuous with the engine off is about 6 A at 12 V: a 100 Ah LiFePO4 gives
-many hours. **With the Extended radar the order of magnitude changes entirely** and the sums have to
+Forty to fifty-five watts continuous with the engine off is about 4–5 A at 12 V: a 100 Ah LiFePO4
+gives around a day. (The first version of this table used the KV260 brick's 36 W rating; the
+measured draw is a small fraction of that.) **With the Extended radar the order of magnitude changes entirely** and the sums have to
 be done properly before buying anything.
 
 **Noise from the secondary alternator and the DC/DC converters will be your worst enemy on HF.** It

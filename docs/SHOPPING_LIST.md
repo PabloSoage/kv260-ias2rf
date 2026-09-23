@@ -112,7 +112,8 @@ Organised by **stage** (the reasoning behind the order is in
 | ☐ | ADC **AD9253BCPZ-125** | 14 b, 2 of 4 channels at 62.5 MSPS, 1-lane | €40 |
 | ☐ | Clock fan-out **ADCLK944BCPZ-R2** + TCXO | With AC coupling and a bias network | €30 |
 | ☐ | Differential drivers **AD8352ACPZ** ×2 | The ones AERIS uses | €30 |
-| ☐ | Switches **M3SWA2-34DR+** ×4 | Positive 3.3 V control, confirmed | €80 |
+| ☐ | Switches **M3SWA2-34DR+** ×4 | Positive 3.3 V control, but they **also need VEE −3.3 V** (B-03) | €80 |
+| ☐ | −3.3 V charge-pump inverter (LM2663 or similar) | VEE for the switches, 8 mA | €3 |
 | ☐ | Power: bucks, LDOs, reverse-polarity protection | See §9 of the master document | €40 |
 | ☐ | Connectors: Hirose BM20B(0.8)-34DP ×2, SMA, Pmod | | €60 |
 | ☐ | FFC/Pmod cable to the KV260 | | €20 |
