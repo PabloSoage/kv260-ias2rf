@@ -68,9 +68,9 @@ project.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Master document **for this board**. Rev03 architecture |
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers, closed, with evidence and sources, plus the open risks |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the KiCad files actually contain, with evidence |
-| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, measured mechanical envelope, and the one blocking unknown |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget and the 6-layer stackup with computed trace widths |
-| [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** Where each symbol comes from and how far to trust its pin types |
+| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, the mechanical envelope, and the adapter registered on the KV260 model — where the board can grow |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (12 of 21 loads from datasheets) and the 6-layer stackup with computed trace widths |
+| [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** 10 symbols, 8 from datasheets, each cross-checked against a second source |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |
 
@@ -147,6 +147,19 @@ Reproduce it with:
 ```bash
 kicad-cli sch erc --severity-all -o erc.rpt CSI2-KRIA-KV260_Rev01.kicad_sch
 ```
+
+### Measured mechanical fit
+
+The adapter is registered on AMD's official 3D model of the KV260 (the STEP, XTP679). The IAS
+connectors are found in it by part name, and the fit is confirmed three independent ways. The
+decisive one: **the adapter's two M3 holes land on the carrier's corner holes within 5 µm.**
+
+![Clearance under the adapter](docs/img/kv260_clearance.svg)
+
+Red is a carrier part that would rise through the adapter, which sits only 0.8 mm above the
+carrier. **The board can grow outward, off the side of the KV260, and in no other direction.**
+Detail, and one tight spot (the J18 jumper), in [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md)
+§5.3. Reproduced by `_work/kv260_register_adapter.py`.
 
 ### Measured PCB state
 

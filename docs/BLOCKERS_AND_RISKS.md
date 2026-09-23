@@ -1,6 +1,6 @@
 # Blockers and risks
 
-*Updated: 21 September 2026 · **All five blockers are closed***
+*Updated: 23 September 2026 · **All five blockers are closed** · R-04 (mechanical registration) closed*
 
 Two of them closed **against** what the architecture assumed. The result forces a rethink of the
 interface to the Kria. This document holds the evidence; the consequences are in
@@ -256,7 +256,7 @@ LVDS pairs, which is what they are for.
 
 ---
 
-### R-04 — Mechanical envelope: measured, but not registered
+### R-04 — Mechanical envelope: measured and registered ✅
 
 **Measured** `[V]` from the official 3D model (XTP679) by `_work/kv260_envelope.py`:
 
@@ -267,21 +267,22 @@ LVDS pairs, which is what they are for.
 | Fansink (>30 mm) | a block of roughly **50 × 56 mm** |
 | Rear I/O (>20 mm) | extends to the high-Y edge |
 
-An adapter at Hirose stacking height **cannot pass over the fansink**; it can extend over the low
-regions.
+**Registered** `[V]` on 23 September 2026, from the STEP rather than the STL:
+`_work/kv260_step_locate.py` finds the IAS connectors by part name, and
+`_work/kv260_register_adapter.py` maps the adapter onto the carrier. Three independent checks pass.
+Pin 1 falls on the marked end, the original outline clears the carrier (with one exception, below),
+and **the adapter's two M3 holes land on the KV260's corner holes within 5 µm**. Full account in
+[INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3.
 
-**What is still open:** the registration between the adapter's frame and the model's.
-`_work/kv260_locate_ias.py` tried to find the two mating IAS connectors by their signature — two
-bodies 50.040 mm apart on one axis, each about 11.6 × 2.9 mm — across several Z bands at 0.5 mm
-resolution. **No such pair exists in the STL**: the connectors are not resolvable as distinct
-bodies at that fidelity.
+**The answer: grow outward, off the carrier's side edge.** In that direction there is nothing in the
+model for as far as it was scanned. Every other direction meets carrier parts within 1.5–8.5 mm,
+because the adapter sits only **0.8 mm** above the carrier. So the ~120 × 90 mm target fits with the
+extra width all outward, and the outer edge needs its own **~7.9 mm standoff** down to the plane of
+the KV260's rubber feet.
 
-So the envelope is known but the growth direction is not. Closing it needs either **XTP681** (the
-Allegro layout, with exact connector placements) or five minutes with a ruler on the assembled
-board. Until then the ~120 × 90 mm target stays an estimate.
-
-The Hirose positions on the adapter are fixed and measured `[V]`: 50.040 mm apart on X, 2.8 mm from
-the board edge.
+**One residual item: J18**, the fitted IAS0 autofocus jumper. The original notch clears it by
+−1.0 mm in the model (an overlap). Rev03 keeps 1.5 mm clear of it; the adapter doesn't use the
+pin it feeds.
 
 Added since: if **J9 (RPi camera, 15-pin FFC)** is used alongside J8, the adapter needs an FFC
 cable reaching that connector, which sits elsewhere on the carrier. That is a real mechanical

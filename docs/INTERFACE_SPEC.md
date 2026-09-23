@@ -5,6 +5,8 @@
 The pin-by-pin freeze for everything crossing between the Kria KV260 and the adapter board. What
 is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 
+*Updated 23 September 2026: §5.3 registration closed from the STEP model.*
+
 ---
 
 ## 1. What is settled and what is not
@@ -16,11 +18,11 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | Single-ended allocation on J8 | ✅ Frozen below |
 | Pmod J2 allocation | ✅ Frozen below |
 | KV260 mechanical envelope | ✅ `[V]` measured from the official 3D model (§5) |
-| Where the adapter sits within that envelope | ❌ `[?]` **not registered** — see §5.3 |
+| Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks — §5.3 |
 | `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
 | Serial link electrical standard | ✅ `LVDS_12` with AC coupling — see §6.1 |
-| Per-rail current budget | ⬜ pending datasheet figures |
-| 6-layer stackup and impedances | ⬜ pending fabricator |
+| Per-rail current budget | ⚠️ 12 of 21 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| 6-layer stackup and impedances | ✅ computed; fabricator to confirm |
 
 ---
 
@@ -159,32 +161,89 @@ band above 20 mm that extends to high Y is the rear I/O (USB, Ethernet, video).
 **The useful conclusion:** an adapter sitting at Hirose stacking height, a handful of millimetres
 above the carrier PCB, **cannot pass over the fansink**. It can extend freely over the low regions.
 
-### 5.3 `[?]` What could not be established
+### 5.3 Registration and growth direction — measured `[V]`
 
-**The registration between the adapter's coordinate system and the model's.** The plan was to find
-the two mating IAS connectors in the model by their signature — two bodies 50.040 mm apart on one
-axis, each about 11.6 × 2.9 mm — and use them to align the two frames.
+**Closed without touching the hardware.** Neither the STL nor the `.brd` could do it, but the
+**STEP** the STL was made from can. It is a Creo assembly with every part named and every placement
+stored as a transform, so the IAS connectors can be found by name instead of by shape.
 
-It did not work. `_work/kv260_locate_ias.py` searched several Z bands at 0.5 mm resolution,
-segmented the geometry into connected components and tested every pair. **No axis-aligned pair of
-connector-sized bodies at 50.040 mm was found.** The IAS connectors are not resolvable as distinct
-bodies in this STL at the fidelity available — they are presumably merged into a larger assembly
-body, or simplified out.
+**Why the STL search failed.** `_work/kv260_locate_ias.py` looked for bodies of about
+11.6 × 2.9 mm. The STEP shows the carrier's IAS connector is **9.38 × 2.40 × 0.80 mm**. At 0.8 mm
+tall it is nearly flush with the board, so it was never going to show up as a separate body.
 
-So the envelope is known, but **which way the board may grow is not**. Two ways to close it, the
-second faster than the first:
+#### How it was done — three sources, three independent checks
 
-1. **XTP681**, the carrier card PCB layout — but **not by parsing it**. The `.brd` is binary
-   Allegro and an attempt to recover the connector coordinates from it failed; see
-   [`_work/brd_probe_NEGATIVE.md`](../_work/brd_probe_NEGATIVE.md) for what was tried and why it
-   is not worth retrying. It has to be opened in the viewer, which needs the board passed as a
-   command-line argument — from its shortcut the viewer starts in APD+ mode and will not offer
-   `.brd` at all.
-2. **A ruler.** Mount the existing adapter and measure the clearance from its edges to the fansink
-   and to the rear connectors. Five minutes, and it settles it.
+| Source | What it gives |
+|---|---|
+| **STEP** (`_work/kv260_step_locate.py`) | Two instances of `CONN_928X90X80_38P` at X 21.647, Y 11.986 and Y 62.024: **50.038 mm apart**. The adapter's pair is 50.040 mm apart, and that match is what identifies the part |
+| **XTP681 plot** (`default.pdf`) | It has no text layer, but its silkscreen **renders**. **J7 (IAS0) is the +Y connector, J8 (IAS1) the −Y one**, and the pin-1 marks are at the −Y end |
+| **Our `.kicad_pcb`** | `J8_IAS0` and `J8_IAS1` on the bottom face, with their pad 1 |
 
-Until then the growth direction stays `[E]` and the ~120 × 90 mm figure in the architecture document
-remains an estimate.
+`_work/kv260_register_adapter.py` builds the rigid transform (adapter → carrier: **rotation
+−90.00°**, residual **2 µm** at the second connector) and then checks it three ways. None of the
+three was used to build it:
+
+| Check | Result |
+|---|---|
+| 1. The adapter's pad 1 lands on the carrier connector's pin-1 end | ✅ 3.20 mm towards −Y, where the silkscreen draws the mark |
+| 2. The original Allied Vision outline is a product that fits, so nothing may rise through it | ✅ 11,948 of 11,958 cells clear. The other 10 are **J18**, below |
+| 3. The adapter's two M3 holes land on the carrier's corner holes | ✅ **both within 5 µm**. Holes have nothing to do with the connectors |
+
+Check 3 also answers a mechanical question: the original board is not cantilevered off two 0.8 mm
+connectors. It **screws down through the KV260's own corner holes**, the same ones the rubber feet
+sit under.
+
+**The original board, seen from the carrier:** 119.00 × 44.50 mm (the designer's own dimensions in
+`Dwgs.User` agree). It lies along the carrier's side edge, **flush with the front and rear edges**
+(Y −10.00 and 109.00), and overhangs the side by 10 mm. It is U-shaped, with one tongue reaching each
+IAS connector.
+
+#### Which way it can grow
+
+![Clearance map under the adapter](img/kv260_clearance.svg)
+
+The map is drawn in the KiCad frame of `CSI2-KRIA-KV260_Rev01.kicad_pcb`, so it reads the way the
+board is edited. Red means something on the carrier rises through the adapter's PCB. The adapter
+sits at **0.8 mm** above the carrier (the Hirose mated height), so any part taller than that
+collides, and nothing can be fitted on the adapter's underside.
+
+| Direction on the carrier | In KiCad | Clear |
+|---|---|---|
+| **Outward, off the carrier's side edge** | **down (+Y)** | **25+ mm along the full 119 mm — nothing at all in the model** |
+| Past the front edge | right (+X) | 25+ mm for the part already off the carrier; 2–8.5 mm over it |
+| Past the rear edge | left (−X) | 25+ mm for the part off the carrier; 8.5–16.5 mm for the IAS0 tongue |
+| Inward, towards the SOM | up (−Y) | **1.5–5 mm** almost everywhere. The carrier is crowded |
+
+**The answer: grow outward, off the side of the KV260.** Every other direction runs into the carrier
+within a few millimetres. The Rev03 target of ~120 × 90 mm fits: that is the same 119 mm length,
+with the width growing from 44.5 to ~90 mm, all of it outward. The overhang past the carrier edge
+goes from 10 mm to about 55 mm.
+
+**That overhang needs a support at its outer edge**, because two corner screws are not enough for a
+board carrying an FPGA and SMA connectors. The model gives the height exactly: the rubber feet reach
+**Z −7.085**, so from the adapter's underside (Z +0.8) to the surface the KV260 stands on is
+**7.9 mm**. An 8 mm M3 standoff under the outer edge lands on the same plane.
+
+#### A constraint the original design only just meets: J18
+
+**J18** is the IAS0 autofocus jumper (`VDD_AF2V8` → `VDD_AF2V8_J7`, XTP682 p. 13): a 2-pin header,
+**fitted**, with a 2.4 mm body and pins to 7.5 mm. Its IAS1 twin, J19, is `DNP`. Allied Vision
+cut a notch for it, but in the official model the notch edge (KiCad X 144.901) **overlaps the
+header body by 1.0 mm**, 20 % of its footprint.
+
+The model can't tell whether that's real or a generic header drawn slightly too large. It doesn't
+matter for Rev03: **keep the board edge at least 1.5 mm clear of KiCad X 143.9–149.0, Y 84.0–86.5**
+(the header body in the Rev01 frame). J18 can stay where it is either way. It feeds J7 **pin 34**
+only, and the adapter leaves pin 34 of both connectors unconnected: no net on the pads in the
+`.kicad_pcb` or in the exported netlist, and §4.1 lists it as free.
+
+#### Reproducing it
+
+```
+py _work/kv260_register_adapter.py KV260V2-Starter-Kit.stp KV260V2-Starter-Kit.stl --svg docs/img/kv260_clearance.svg
+```
+
+Both model files are the official XTP679 download (not redistributed here). It runs in about 20 s.
 
 ---
 
@@ -237,8 +296,9 @@ because the AC coupling is stuffable.
 | Mechanical envelope measured | ✅ §5.1, §5.2 |
 | `VCCO` and the link's I/O standard | ✅ §6, 1.2 V / `LVDS_12` with AC coupling |
 | ADC/DAC operating points fixed | ✅ [ARCHITECTURE.md](../ARCHITECTURE.md) §5 |
-| Growth direction within the envelope | ❌ §5.3 — needs XTP681, or a ruler |
-| Per-rail current budget from datasheets | ⬜ pending |
-| 6-layer stackup with computed impedances | ⬜ pending fabricator |
+| Growth direction within the envelope | ✅ §5.3 — registered on the STEP; grow outward, off the carrier's side |
+| Per-rail current budget from datasheets | ⚠️ 12 of 21 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| 6-layer stackup with computed impedances | ✅ computed; ⬜ fabricator's field solver to confirm |
 
-Only one item still needs something from outside the repository, and a ruler settles it.
+Nothing in this list needs the hardware any more. What remains is the fabricator's impedance
+confirmation and the nine power figures still estimated.

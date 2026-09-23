@@ -56,3 +56,15 @@ location. Four numbers (J7 X/Y, J8 X/Y) plus the outline extents are enough.
 
 `extracta.exe`, the Allegro command-line database dump, is **not** included in
 the free viewer, so there is no headless route.
+
+## Postscript — 23 September 2026: closed by another route
+
+The question this probe tried to answer is closed, **from the STEP model rather than the `.brd`**:
+`_work/kv260_step_locate.py` finds the IAS connectors by part name (J7 at Y 62.024, J8 at Y 11.986),
+and `_work/kv260_register_adapter.py` registers the adapter with three independent checks. See
+`docs/INTERFACE_SPEC.md` §5.3.
+
+For the record, the rejected `.brd` candidate above (J7 86.609, J8 36.566 mm) has the same
+ordering as the STEP result, and the same separation to within 5 µm. That is **not** new evidence
+that it was right: the separation is what it was selected on, and the ordering is a coin toss. The
+advice stands. There is no reason to go back to the `.brd`.

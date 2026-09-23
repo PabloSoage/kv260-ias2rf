@@ -14,7 +14,7 @@ criteria, and that is where all of it came from.
 |---|---|
 | **B-01** — Interface to the Kria | ⛔ **Against.** IAS0 ends at the AP1302 ISP; there is no 40-pin RPi header; the GTHs are not reachable. Real budget: **8 pairs + ~14 loose signals** |
 | **B-02** — AD9253 1-lane mode | ⛔ **Against.** Capped at **62.5 MSPS** |
-| **B-03** — RF switches | ✅ **In favour.** M3SWA2-34DR+ has an internal driver, positive 3.3 V control |
+| **B-03** — RF switches | ⛔ **Against, after a first wrong closure.** The M3SWA2-34DR+ has positive control logic but needs VDD +3.3 V **and VEE −3.3 V** |
 | **B-04** — AERIS-10 IF | ✅ **In favour.** 120 MHz; the `BPF2` filters are unspecified placeholders |
 | **B-05** — Extended variant | ⚠️ **Partial.** Not published. Sized for 8 chips |
 
@@ -25,9 +25,9 @@ Still outstanding — not blocking the decision, but blocking schematic sign-off
 
 | Task | Source |
 |---|---|
-| Exact `VCCO` of the HPA bank as the KV260 sets it | Carrier card schematic |
+| ~~Exact `VCCO` of the HPA bank as the KV260 sets it~~ | ✅ 1.2 V, from XTP682 — [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §6 |
 | Confirm the AERIS Extended variant (B-05) | The project's author |
-| Measure the mechanical envelope on the KV260 | The physical board |
+| ~~Measure the mechanical envelope on the KV260~~ | ✅ from the official 3D model, no hardware needed — [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5 |
 
 ---
 
@@ -84,10 +84,10 @@ The comparison that led here:
 |---|---|
 | Pin map of J8 and the Pmod | ✅ frozen |
 | Mechanical envelope | ✅ measured from the official 3D model |
-| Growth direction within that envelope | ❌ needs XTP681, or a ruler on the assembled board |
+| Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ⚠️ **7 of 21 verified from datasheets**; the rest remain `[E]` |
+| Per-rail load figures | ⚠️ **12 of 21 verified from datasheets**; the rest need Vivado or parts not yet chosen |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -143,15 +143,17 @@ See [SYMBOLS.md](SYMBOLS.md). The hardest symbol in the design turned out to be 
 typed, exactly the package AERIS-10 uses. `AD9708AR` and `ADF4351` are likewise in the official
 libraries.
 
-Seven more were generated into `symbols/kv260-ias2rf.kicad_sym` by `_work/make_symbols.py`.
-**Four are built from manufacturer datasheets** — `AD9484BCPZ-500`, `AD8352ACPZ`, `M3SWA2-34DR`,
-`LTC5552` — read locally out of the AERIS-10 repository's component folder, since analog.com was
-unreachable throughout. The remaining three come from the AERIS Eagle library; two of those
-(`ADAR1000ACCZN`, `ADF4382A`) carry usable types, and `AD9523BCPZ` does not.
+Ten more are generated into `symbols/kv260-ias2rf.kicad_sym` by `_work/make_symbols.py`.
+**Eight are built from manufacturer datasheets**: four from the AERIS-10 component folder, and four
+(`AD9523`, `AD9253`, `AD9767`, `ADCLK944`) from the Internet Archive's copies of analog.com, fetched
+by `_work/fetch_datasheets.py`. Only `ADAR1000ACCZN` and `ADF4382A`, both AERIS-10 reference parts,
+remain on the Eagle library.
 
-The `AD9484BCPZ-500` symbol was built both ways and the two agree exactly — 57 pins, same pads, the
-only differences being Eagle's uniquifying name suffixes. That is mutual confirmation of both
-sources.
+Each datasheet table is cross-checked against an independent second source by
+`_work/crosscheck_pinouts.py`. The result: no conflicts, and ten disagreements, every one of them an
+error in the second source. The same work found three real errors: exposed pads numbered 0 instead
+of N+1, the M3SWA2's missing paddle, and an erratum in the LTC5552 datasheet. See
+[SYMBOLS.md](SYMBOLS.md) §5.
 
 **Retyping the M3SWA2 uncovered a design error:** blocker B-03 had been closed wrongly and the
 charge-pump inverter struck from the power tree. The part needs VEE −3.3 V. See
