@@ -9,12 +9,23 @@ carries a real type.
 
 WHERE THE DATA COMES FROM, AND HOW FAR TO TRUST IT
 --------------------------------------------------
-analog.com would not serve its datasheets from this machine (repeated 60 s
-timeouts; mirrors return 403 and 410), so the pin tables could not be taken
-from the primary source. They are taken instead from the **Eagle library of the
-AERIS-10 project**, whose boards were fabricated and measured. That is good
-evidence - a wrong pinout there would have shown up as a dead board - but it is
-**second-hand**, and each symbol says so in its description.
+Eight of the ten symbols are transcribed from the MANUFACTURER DATASHEET
+(DATASHEET_PINS below). analog.com will not serve its PDFs to this machine, so
+they came from two other places:
+
+  * the AERIS-10 repository, which ships several datasheets locally
+    (<PLFM_RADAR>/7_Components Datasheets and Application notes/);
+  * the Internet Archive's copies of analog.com's own URLs, fetched by
+    _work/fetch_datasheets.py - byte-identical to what analog.com served on the
+    snapshot date, and the script records which snapshot.
+
+Pin tables were read from the RENDERED page, not from extracted text: text
+extraction drops overbars (so REFA and REFA-bar become the same name) and
+shuffles table columns.
+
+The remaining two (ADAR1000ACCZN, ADF4382A) come from the **Eagle library of
+the AERIS-10 project**, whose boards were fabricated and measured. Good
+evidence, but second-hand, and each such symbol says so in its properties.
 
 Eagle records a direction per pin, which is exactly the information KiCad needs:
 
@@ -62,9 +73,11 @@ WANTED = {
 # Pin tables taken from the MANUFACTURER DATASHEET.
 # These override anything derived from the Eagle library.
 #
-# Both datasheets were read locally from the AERIS-10 repository at
-#   <PLFM_RADAR>/7_Components Datasheets and Application notes/
-# because analog.com would not serve its PDFs from this machine.
+# Sources: the AERIS-10 datasheet folder (AD8352, AD9484, M3SWA2, LTC5552) and
+# _work/fetch_datasheets.py (AD9523, AD9253, AD9767, ADCLK944).
+#
+# EXPOSED PADS are numbered N+1 throughout, to match KiCad's stock footprints,
+# whatever the datasheet calls them - see the AD9484 entry.
 #
 # (pad, name, kicad_type)
 # ---------------------------------------------------------------------------
@@ -92,8 +105,14 @@ DATASHEET_PINS = {
     #   AVDD 1.8 V, IAVDD 283 mA typ / 300 mA max
     #   DRVDD 1.8 V, IDRVDD 89 mA typ / 100 mA max
     #   SDR-mode dissipation 670 mW typ / 720 mW max
+    #
+    # EXPOSED PAD NUMBERING. The datasheet calls the paddle "pin 0"; KiCad's
+    # stock LFCSP/QFN footprints number it N+1 (QFN-56-1EP_8x8mm... has pads
+    # 1..57). A symbol pin must match a footprint pad, or Update PCB leaves the
+    # paddle - here the ADC's only analogue ground - unconnected. So the symbol
+    # follows the footprint: pad 57. The first build of this symbol used "0".
     "AD9484BCPZ-500": (
-        [("0", "AGND_EP", "power_in")]
+        [("57", "AGND_EP", "power_in")]
         + [(str(n), "AVDD", "power_in")
            for n in (30, 32, 33, 34, 37, 38, 39, 41, 42, 43, 46)]
         + [(str(n), "DRVDD", "power_in") for n in (7, 24, 47)]
@@ -122,28 +141,44 @@ DATASHEET_PINS = {
     # no negative rail was needed. The datasheet is explicit: "VDD = +3.3 V,
     # VEE = -3.3 V". Positive control, bipolar supply.
     #   IDD 1.6 mA typ, 2.9 mA max;  IEE 0 mA typ, 1.8 mA max.
+    #
+    # PADDLE. "GND 2, 4, 7, 9, 11, 14, 16 & Paddle - connects to ground";
+    # case style DQ3005, "exposed paddle". The first build of this symbol had
+    # 16 pins and no paddle, so on the PCB a 30 GHz switch would have had its
+    # main ground floating. Caught by _work/crosscheck_pinouts.py: the AERIS
+    # Eagle part has pad 17, ours did not. Eagle was right.
+    # Port names follow the PAD DESCRIPTION table ("RF OUT 1", "RF OUT 2").
+    # NC pins: "Not used internally. Connected to ground on test board." -
+    # passive, so grounding them as the test board does is not an ERC error.
     "M3SWA2-34DR": [
-        ("1",  "NC",    "no_connect"),
-        ("2",  "GND",   "power_in"),
-        ("3",  "RF1",   "passive"),
-        ("4",  "GND",   "power_in"),
-        ("5",  "VEE",   "power_in"),
-        ("6",  "VCTRL", "input"),
-        ("7",  "GND",   "power_in"),
-        ("8",  "VDD",   "power_in"),
-        ("9",  "GND",   "power_in"),
-        ("10", "RF2",   "passive"),
-        ("11", "GND",   "power_in"),
-        ("12", "NC",    "no_connect"),
-        ("13", "NC",    "no_connect"),
-        ("14", "GND",   "power_in"),
-        ("15", "RFC",   "passive"),
-        ("16", "GND",   "power_in"),
+        ("1",  "NC",     "passive"),
+        ("2",  "GND",    "power_in"),
+        ("3",  "RFOUT1", "passive"),
+        ("4",  "GND",    "power_in"),
+        ("5",  "VEE",    "power_in"),
+        ("6",  "VCTRL",  "input"),
+        ("7",  "GND",    "power_in"),
+        ("8",  "VDD",    "power_in"),
+        ("9",  "GND",    "power_in"),
+        ("10", "RFOUT2", "passive"),
+        ("11", "GND",    "power_in"),
+        ("12", "NC",     "passive"),
+        ("13", "NC",     "passive"),
+        ("14", "GND",    "power_in"),
+        ("15", "RFC",    "passive"),
+        ("16", "GND",    "power_in"),
+        ("17", "GND_EP", "power_in"),
     ],
 
     # LTC5552f.pdf, "PIN CONFIGURATION" and "PIN FUNCTIONS".
     # 12-lead 3x2 mm QFN (UDB), exposed pad is pin 13 and is GND.
     # VCC is a regulated 3.3 V, 132 mA typical when enabled.
+    #
+    # DATASHEET ERRATUM. PIN FUNCTIONS says "GND (Pins 1, 3, 4, 6, 8, 10, 12,
+    # Exposed Pad Pin 13)" AND "IF+, IF- (Pins 2, 3)" - pin 3 claimed twice.
+    # The PIN CONFIGURATION drawing shows pin 3 as IF-, and a differential IF
+    # needs it. Two statements of three say IF-; the GND list is the error.
+    # Grounding pin 3 would short one side of the IF port.
     "LTC5552": [
         ("1",  "GND", "power_in"),
         ("2",  "IF+", "passive"),
@@ -159,15 +194,178 @@ DATASHEET_PINS = {
         ("12", "GND", "power_in"),
         ("13", "GND_EP", "power_in"),
     ],
+
+    # AD9523.pdf Rev. D, Figure 2 and Table 19 "Pin Function Descriptions".
+    # 72-lead LFCSP, 10x10 mm; exposed paddle is GND (pad 73, see AD9484 note).
+    #
+    # Complements carry an overbar in the datasheet, which text extraction
+    # loses; they were read from the rendered page. Every OUTn pair has the
+    # complement on the LOWER pin number (Table 19: "25 OUT13-bar
+    # Complementary..., 26 OUT13 Square Wave..."). In Figure 2 the overbar of
+    # the lower row sits right under the row above and reads like an underline
+    # of the wrong pin - the table is the authority, not the drawing.
+    #
+    # Type column: P -> power_in, P/O -> power_out (internal LDO decoupling
+    # pins), I -> input, O -> output, I/O -> bidirectional, GND -> power_in.
+    # Pin 69 is NC, typed "P" by the datasheet, "not connected internally";
+    # Note 1 prefers it grounded, so it is passive rather than no_connect -
+    # a no_connect pin wired to GND would be an ERC error for doing the
+    # recommended thing.
+    "AD9523BCPZ": (
+        [("1",  "LDO_PLL1",    "power_out"),
+         ("2",  "VDD3_PLL1",   "power_in"),
+         ("3",  "REFA",        "input"),  ("4",  "~{REFA}",   "input"),
+         ("5",  "REFB",        "input"),  ("6",  "~{REFB}",   "input"),
+         ("7",  "LF1_EXT_CAP", "output"),
+         ("8",  "OSC_CTRL",    "output"),
+         ("9",  "OSC_IN",      "input"),  ("10", "~{OSC_IN}", "input"),
+         ("11", "LF2_EXT_CAP", "output"),
+         ("12", "LDO_PLL2",    "power_out"),
+         ("13", "VDD3_PLL2",   "power_in"),
+         ("14", "LDO_VCO",     "power_out"),
+         ("15", "~{PD}",       "input"),
+         ("16", "REF_SEL",     "input"),
+         ("17", "~{SYNC}",     "input"),
+         ("18", "VDD3_REF",    "power_in"),
+         ("19", "~{RESET}",    "input"),
+         ("20", "~{CS}",       "input"),
+         ("21", "SCLK/SCL",    "input"),
+         ("22", "SDIO/SDA",    "bidirectional"),
+         ("23", "SDO",         "output"),
+         ("24", "REF_TEST",    "input"),
+         ("55", "STATUS1/SP1", "bidirectional"),
+         ("56", "STATUS0/SP0", "bidirectional"),
+         ("57", "EEPROM_SEL",  "input"),
+         ("69", "NC",          "passive"),
+         ("70", "ZD_IN",       "input"),  ("71", "~{ZD_IN}", "input"),
+         ("72", "PLL1_OUT",    "output"),
+         ("73", "GND_EP",      "power_in")]
+        # (complement pin, true pin) for OUT0..OUT13
+        + [(str(pc), f"~{{OUT{n}}}", "output") for n, (pc, pt) in enumerate(
+              [(67, 68), (64, 65), (61, 62), (58, 59), (52, 53), (49, 50),
+               (46, 47), (43, 44), (40, 41), (37, 38), (34, 35), (31, 32),
+               (28, 29), (25, 26)])]
+        + [(str(pt), f"OUT{n}", "output") for n, (pc, pt) in enumerate(
+              [(67, 68), (64, 65), (61, 62), (58, 59), (52, 53), (49, 50),
+               (46, 47), (43, 44), (40, 41), (37, 38), (34, 35), (31, 32),
+               (28, 29), (25, 26)])]
+        + [(str(p), n, "power_in") for p, n in (
+              (27, "VDD3_OUT[12:13]"), (33, "VDD3_OUT[10:11]"),
+              (39, "VDD3_OUT[8:9]"),   (45, "VDD3_OUT[6:7]"),
+              (51, "VDD3_OUT[4:5]"),   (60, "VDD3_OUT[2:3]"),
+              (66, "VDD3_OUT[0:1]"),
+              (30, "VDD1.8_OUT[12:13]"), (36, "VDD1.8_OUT[10:11]"),
+              (42, "VDD1.8_OUT[8:9]"),   (48, "VDD1.8_OUT[6:7]"),
+              (54, "VDD1.8_OUT[4:5]"),   (63, "VDD1.8_OUT[0:3]"))]
+    ),
+
+    # AD9253.pdf Rev. D, Figure 9 and Table 8 "Pin Function Descriptions".
+    # 48-lead LFCSP 7x7 mm (CP-48-13); pin 0 = AGND exposed pad -> pad 49.
+    # This datasheet has no Type column; types follow the descriptions.
+    #
+    # NOTE THE SUPPLY. DRVDD is 1.8 V (Table 1: 1.7 / 1.8 / 1.9 V), absolute
+    # maximum 2.0 V. The first power budget put it on +3V3_D, which would have
+    # destroyed the part at power-up. It is on +1V8_D now.
+    #   -125 grade: IAVDD 183 typ / 200 max, IDRVDD 71 typ / 100 max (ANSI-644)
+    "AD9253BCPZ-125": (
+        [("49", "AGND_EP", "power_in")]
+        + [(str(n), "AVDD", "power_in") for n in (3, 4, 7, 34, 39, 45, 46)]
+        + [(str(n), "DRVDD", "power_in") for n in (8, 29)]
+        + [("1",  "VIN+D", "input"), ("2",  "VIN-D", "input"),
+           ("36", "VIN+A", "input"), ("35", "VIN-A", "input"),
+           ("37", "VIN+B", "input"), ("38", "VIN-B", "input"),
+           ("48", "VIN+C", "input"), ("47", "VIN-C", "input"),
+           ("5",  "CLK-",  "input"), ("6",  "CLK+",  "input")]
+        + [(p, n, "output") for p, n in (
+              ("9", "D1-D"), ("10", "D1+D"), ("11", "D0-D"), ("12", "D0+D"),
+              ("13", "D1-C"), ("14", "D1+C"), ("15", "D0-C"), ("16", "D0+C"),
+              ("17", "DCO-"), ("18", "DCO+"), ("19", "FCO-"), ("20", "FCO+"),
+              ("21", "D1-B"), ("22", "D1+B"), ("23", "D0-B"), ("24", "D0+B"),
+              ("25", "D1-A"), ("26", "D1+A"), ("27", "D0-A"), ("28", "D0+A"))]
+        + [("30", "SCLK/DTP", "input"),
+           ("31", "SDIO/OLM", "bidirectional"),
+           ("32", "CSB",      "input"),
+           ("33", "PDWN",     "input"),
+           ("40", "RBIAS",    "passive"),      # 10 k 1 % to ground
+           ("41", "SENSE",    "input"),
+           ("42", "VREF",     "bidirectional"),  # "Voltage Reference Input and Output"
+           ("43", "VCM",      "output"),
+           ("44", "SYNC",     "input")]
+    ),
+
+    # AD9763_9765_9767.pdf Rev. G, Figure 5 and Table 6 (AD9767 column).
+    # 48-lead LQFP, no exposed pad. Pin 1 is DB13P1, the MSB of port 1.
+    #   AVDD 3-5.5 V: IAVDD 71 typ / 75 max.  DVDD 2.7-5.5 V: IDVDD 15 mA
+    #   at 100 MSPS (Table 1, footnote 5; no maximum given).
+    "AD9767ASTZ": (
+        [(str(1 + i),  f"DB{13 - i}P1", "input") for i in range(14)]
+        + [(str(23 + i), f"DB{13 - i}P2", "input") for i in range(14)]
+        + [("15", "DCOM1", "power_in"), ("16", "DVDD1", "power_in"),
+           ("17", "WRT1/IQWRT",   "input"),
+           ("18", "CLK1/IQCLK",   "input"),
+           ("19", "CLK2/IQRESET", "input"),
+           ("20", "WRT2/IQSEL",   "input"),
+           ("21", "DCOM2", "power_in"), ("22", "DVDD2", "power_in"),
+           ("37", "SLEEP",    "input"),
+           ("38", "ACOM",     "power_in"),
+           ("39", "IOUTA2",   "output"), ("40", "IOUTB2", "output"),
+           ("41", "FSADJ2",   "passive"),      # full-scale set resistor
+           ("42", "GAINCTRL", "input"),
+           ("43", "REFIO",    "bidirectional"),
+           ("44", "FSADJ1",   "passive"),
+           ("45", "IOUTB1",   "output"), ("46", "IOUTA1", "output"),
+           ("47", "AVDD",     "power_in"),
+           ("48", "MODE",     "input")]
+    ),
+
+    # ADCLK944.pdf Rev. 0, Figure 2 and Table 6 "Pin Function Descriptions".
+    # 16-lead LFCSP 3x3 mm; EPAD must be connected to VEE -> pad 17.
+    # Single supply here, so VEE is ground.
+    #   Table 3: IVCC 138 typ / 165 max at 3.3 V, with outputs loaded 50 ohm to
+    #   VCC-2 V - so the figure INCLUDES the current delivered to the loads.
+    "ADCLK944BCPZ": [
+        ("1",  "CLK",    "input"),
+        ("2",  "VT",     "passive"),     # centre tap of the 100 ohm input termination
+        ("3",  "VREF",   "output"),      # bias for AC-coupled inputs
+        ("4",  "~{CLK}", "input"),
+        ("5",  "VEE",    "power_in"),
+        ("6",  "~{Q3}",  "output"), ("7",  "Q3", "output"),
+        ("8",  "VCC",    "power_in"),
+        ("9",  "~{Q2}",  "output"), ("10", "Q2", "output"),
+        ("11", "~{Q1}",  "output"), ("12", "Q1", "output"),
+        ("13", "VCC",    "power_in"),
+        ("14", "~{Q0}",  "output"), ("15", "Q0", "output"),
+        ("16", "VEE",    "power_in"),
+        ("17", "VEE_EP", "power_in"),
+    ],
+}
+
+# Parts that exist ONLY as datasheet tables - there is no Eagle deviceset to
+# start from. name -> one-line description.
+DATASHEET_ONLY = {
+    "AD9253BCPZ-125": "Quad 14-bit 125 MSPS ADC, serial LVDS - SDR receive (2 of 4 channels used)",
+    "AD9767ASTZ":     "Dual 14-bit 125 MSPS current-output DAC, parallel CMOS - SDR transmit",
+    "ADCLK944BCPZ":   "1:4 LVPECL clock fan-out, 7 GHz",
 }
 
 DATASHEET_NOTE = {
     "AD8352ACPZ": "Pin table from the AD8352 datasheet Rev. C, Table 4. "
                   "Supply 3-5.5 V, quiescent current 39 mA max. EP is GND.",
     "AD9484BCPZ-500": "Pin table from the AD9484 datasheet Rev. A, Table 7. "
-                      "AVDD/DRVDD 1.8 V; IAVDD 300 mA max, IDRVDD 100 mA max.",
-    "M3SWA2-34DR": "Pin table from the Mini-Circuits M3SWA2-34DR+ datasheet. "
-                   "Needs BOTH VDD +3.3 V and VEE -3.3 V; control logic is positive.",
+                      "AVDD/DRVDD 1.8 V; IAVDD 300 mA max, IDRVDD 100 mA max. "
+                      "Exposed pad (datasheet pin 0) is pad 57 to match KiCad footprints.",
+    "AD9523BCPZ": "Pin table from the AD9523 datasheet Rev. D, Table 19. "
+                  "Complements read from the rendered page. Exposed pad is GND, pad 73.",
+    "AD9253BCPZ-125": "Pin table from the AD9253 datasheet Rev. D, Table 8. "
+                      "AVDD AND DRVDD are both 1.8 V (DRVDD abs max 2.0 V). "
+                      "Exposed pad (datasheet pin 0) is AGND, pad 49.",
+    "AD9767ASTZ": "Pin table from the AD9763/AD9765/AD9767 datasheet Rev. G, Table 6. "
+                  "AVDD 3-5.5 V, 75 mA max; DVDD 2.7-5.5 V. No exposed pad.",
+    "ADCLK944BCPZ": "Pin table from the ADCLK944 datasheet Rev. 0, Table 6. "
+                    "IVCC 165 mA max at 3.3 V, outputs loaded. EPAD to VEE, pad 17.",
+    "M3SWA2-34DR": "Pin table from the Mini-Circuits M3SWA2-34DR+ datasheet, PAD DESCRIPTION. "
+                   "Needs BOTH VDD +3.3 V and VEE -3.3 V; control logic is positive. "
+                   "Exposed paddle is GND, pad 17.",
     "LTC5552": "Pin table from the Analog Devices LTC5552 datasheet (LTC5552f). "
                "VCC 3.3 V, 132 mA typical enabled. Exposed pad (pin 13) is GND.",
 }
@@ -227,7 +425,8 @@ def emit_symbol(libname, desc, pins, source_note):
     """A KiCad symbol: power on top/bottom, inputs left, outputs right."""
     def bucket(t, name):
         if t in ("power_in", "power_out"):
-            return "gnd" if re.search(r"(?i)^(gnd|vee|vss|agnd|dgnd|epad|ep)$", name) else "pwr"
+            return "gnd" if re.search(
+                r"(?i)^(a|d|dr)?gnd(_ep)?$|^(vee|vss|epad|ep|vee_ep|[ad]com\d?)$", name) else "pwr"
         if t in ("input",):
             return "left"
         if t in ("output",):
@@ -321,17 +520,43 @@ def main():
 
     print()
     missing = [k for k in WANTED if k not in all_pins]
-    import collections
+
+    # (symbol name, description, pins, provenance note) for every symbol.
+    symbols = []
     for ds, pins in sorted(all_pins.items()):
         name, desc = WANTED[ds]
-        tag = "datasheet" if name in DATASHEET_PINS else "eagle    "
         if name in DATASHEET_PINS:
-            pins = DATASHEET_PINS[name]
+            symbols.append((name, desc, DATASHEET_PINS[name], DATASHEET_NOTE[name]))
+        else:
+            symbols.append((name, desc, pins, None))
+    for name, desc in sorted(DATASHEET_ONLY.items()):
+        symbols.append((name, desc, DATASHEET_PINS[name], DATASHEET_NOTE[name]))
+
+    import collections
+    bad = 0
+    for name, desc, pins, src in symbols:
+        tag = "datasheet" if src else "eagle    "
         types = collections.Counter(t for _, _, t in pins)
         print(f"  [{tag}] {name:18s} {len(pins):3d} pins   "
               + "  ".join(f"{t}:{c}" for t, c in types.most_common()))
+        # A pad listed twice is a transcription error, never a feature.
+        pads = collections.Counter(p for p, _, _ in pins)
+        dup = sorted((p for p, c in pads.items() if c > 1), key=sort_key)
+        if dup:
+            print(f"        DUPLICATE PADS: {dup}")
+            bad += 1
+        # Numeric pads must run 1..N with no gap (the exposed pad is N).
+        # Datasheet symbols only: Eagle's LGA/BGA parts use letter-number pads.
+        nums = sorted(int(p) for p in pads if p.isdigit())
+        if src and nums and nums != list(range(1, len(nums) + 1)):
+            gaps = sorted(set(range(1, max(nums) + 1)) - set(nums))
+            print(f"        PAD SEQUENCE BROKEN: first={nums[0]} gaps={gaps}")
+            bad += 1
     if missing:
         print(f"\n  NOT FOUND in the Eagle sources: {missing}")
+    if bad:
+        print(f"\nABORTED: {bad} symbol(s) failed the pad checks")
+        return 1
 
     if DRY:
         print("\n--dry-run: nothing written.")
@@ -346,19 +571,13 @@ def main():
         f'{TAB}(version 20241209)',
         f'{TAB}(generator "kv260-ias2rf/_work/make_symbols.py")',
     ]
-    for ds, pins in sorted(all_pins.items()):
-        name, desc = WANTED[ds]
-        if name in DATASHEET_PINS:
-            pins = DATASHEET_PINS[name]
-            src = DATASHEET_NOTE[name]
-        else:
-            src = note
-        body.append(emit_symbol(name, desc, pins, src))
+    for name, desc, pins, src in symbols:
+        body.append(emit_symbol(name, desc, pins, src or note))
     body.append(')')
 
     with open(OUT_LIB, "w", encoding="utf-8", newline=NL) as fh:
         fh.write(NL.join(body) + NL)
-    print(f"\nwrote {os.path.relpath(OUT_LIB, ROOT)}  ({len(all_pins)} symbols)")
+    print(f"\nwrote {os.path.relpath(OUT_LIB, ROOT)}  ({len(symbols)} symbols)")
     print("Verify with:  kicad-cli sym upgrade / sym export svg")
     return 0
 

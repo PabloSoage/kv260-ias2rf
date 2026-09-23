@@ -1,13 +1,13 @@
 # Power budget and stackup — phase 1
 
-*21 September 2026 · Rev03 architecture, approved*
+*21 September 2026 · Rev03 architecture, approved · updated 23 September 2026*
 
 The two remaining phase 1 items that do not depend on AMD. Both are produced by scripts in
 `_work/`, so re-running them after any change is one command.
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **7 of 21 loads verified from datasheets** — see §1.4 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **12 of 21 loads verified from datasheets** — see §1.4 |
 | Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
 
 ---
@@ -17,13 +17,13 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ### 1.1 The tree
 
 ```
-12 V in  (605 mA, 7.3 W)
-  └── buck → +5V0        1308 mA
-        ├── buck → +3V3_D    955 mA   digital: FPGA VCCO, converter DVDD, clock, switches
-        │     ├── LDO → +1V8_D  200 mA   FPGA VCCAUX, AD9484 DRVDD
+12 V in  (608 mA, 7.3 W)
+  └── buck → +5V0        1312 mA
+        ├── buck → +3V3_D    989 mA   digital: FPGA VCCO, DAC DVDD, clock, switches
+        │     ├── LDO → +1V8_D  300 mA   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
         │     └── LDO → +1V2    100 mA   FPGA VCCO, IAS-facing bank
-        ├── buck → +3V6      205 mA   pre-regulator, analogue only
-        │     └── LDO → +3V3_A  205 mA   DAC AVDD, AD8352 drivers, references
+        ├── buck → +3V6      180 mA   pre-regulator, analogue only
+        │     └── LDO → +3V3_A  180 mA   DAC AVDD, AD8352 drivers, references
         ├── buck → +2V5      500 mA   pre-regulator, analogue only
         │     └── LDO → +1V8_A  500 mA   AD9484 AVDD, AD9253 AVDD
         ├── buck → +1V0      700 mA   FPGA VCCINT
@@ -59,66 +59,89 @@ where the analogue rails need it, but only has to drop a few hundred millivolts:
 
 Cost: two extra bucks. A multi-rail PMIC would consolidate them if board area gets tight.
 
+**A second catch, on 23 September: the AD9253's DRVDD was on the wrong rail.** The budget had it on
+`+3V3_D`. The datasheet (Rev. D, Table 1) gives DRVDD **1.7–1.9 V**, with an **absolute maximum of
+2.0 V**, so the first power-up would have destroyed the ADC. It's now on `+1V8_D`. That rail rises
+to 300 mA and its LDO to 0.45 W, which needs a part with a thermal pad but no change of topology.
+
+This one doesn't come from the arithmetic. It came from reading the datasheet's supply table
+instead of assuming that "the digital drivers go on the digital 3.3 V". The AD9484 next to it runs
+DRVDD at 1.8 V as well.
+
 ### 1.3 Regulator sizing
 
 With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1308 mA | buck | +12V | 0.73 W | ≥ 1.70 A |
-| `+3V3_D` | 3.3 | 955 mA | buck | +5V0 | 0.35 W | ≥ 1.24 A |
+| `+5V0` | 5.0 | 1312 mA | buck | +12V | 0.73 W | ≥ 1.71 A |
+| `+3V3_D` | 3.3 | 989 mA | buck | +5V0 | 0.36 W | ≥ 1.29 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
 | `+2V5` | 2.5 | 500 mA | buck | +5V0 | 0.17 W | ≥ 0.65 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
-| `+3V6` | 3.6 | 205 mA | buck | +5V0 | 0.08 W | ≥ 0.27 A |
-| `+3V3_A` | 3.3 | 205 mA | LDO | +3V6 | 0.06 W | ≥ 0.27 A |
-| `+1V8_D` | 1.8 | 200 mA | LDO | +3V3_D | 0.30 W | ≥ 0.26 A |
+| `+3V6` | 3.6 | 180 mA | buck | +5V0 | 0.07 W | ≥ 0.23 A |
+| `+3V3_A` | 3.3 | 180 mA | LDO | +3V6 | 0.05 W | ≥ 0.23 A |
+| `+1V8_D` | 1.8 | 300 mA | LDO | +3V3_D | **0.45 W** | ≥ 0.39 A — thermal pad |
 | `+1V2` | 1.2 | 100 mA | LDO | +3V3_D | 0.21 W | ≥ 0.13 A |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 605 mA at 12 V = 7.3 W.** With margin, 0.79 A and 9.4 W. The jack, the PTC and the
+**Input: 608 mA at 12 V = 7.3 W.** With margin, 0.79 A and 9.5 W. The jack, the PTC and the
 reverse-polarity MOSFET want ≥ 1.0 A, and 2 A costs nothing extra.
 
 For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter is comfortable on
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 Confidence: 7 verified, 14 estimated
+### 1.4 Confidence: 12 verified, 9 estimated
 
-**Seven of the twenty-one load figures now come from manufacturer datasheets.** analog.com refused
-to serve its PDFs throughout (repeated 60 s timeouts; the mirrors return 403 and 410), but the
-AERIS-10 repository turned out to carry a component folder with several of them locally. The rest
-remain engineering judgement from the device class.
+**Twelve of the twenty-one load figures now come from manufacturer datasheets.** analog.com refuses
+to serve its PDFs to this machine (repeated 60 s timeouts; the mirrors return 403 and 410). They
+came from two other places: the AERIS-10 repository's component folder, and the **Internet
+Archive's copies of analog.com's own URLs**, fetched by `_work/fetch_datasheets.py`. That script
+records the snapshot, size and SHA-256 of each file.
 
 | Load | Figure | Source |
 |---|---|---|
 | AD9484 AVDD | **300 mA** max | `AD9484.pdf` Rev. A, POWER SUPPLY table. IAVDD 283 typ / 300 max, at the rated 500 MSPS — using it at 400 MSPS is conservative |
 | AD9484 DRVDD | **100 mA** max | Same table. IDRVDD 89 typ / 100 max, SDR mode |
+| AD9253 AVDD | **200 mA** max | `AD9253.pdf` Rev. D, Table 1, -125 grade: IAVDD 183 typ / 200 max. That is **four** channels at 125 MSPS; we use two, at 62.5 MSPS, so it is an upper bound |
+| AD9253 DRVDD | **100 mA** max, **on 1.8 V** | Same table: IDRVDD 71 typ / 100 max, ANSI-644. See §1.2 for the rail |
 | AD9708 AVDD | **25 mA** | `AD9708.pdf`, Analog Supply Current |
 | AD9708 DVDD | **3 mA** | Same, Digital Supply Current |
+| AD9767 AVDD | **75 mA** max | `AD9763_9765_9767.pdf` Rev. G, Table 1: IAVDD 71 typ / 75 max, both DACs at 20 mA full scale |
+| AD9767 DVDD | **19 mA** | Same table: 15 mA at 100 MSPS, scaled to 125 MSPS. Measured at 5 V, so an over-estimate at 3.3 V |
 | AD8352 ×2 | **80 mA** | `ad8352.pdf` Rev. C, quiescent current 39 mA max each |
+| ADCLK944 | **165 mA** max | `ADCLK944.pdf` Rev. 0, Table 3: IVCC 138 typ / 165 max, **with the outputs loaded** — so it includes the current delivered to the terminations |
 | M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |
 | M3SWA2 ×4, VEE | **8 mA** | Same, IEE 1.8 mA max each |
 
-The AD9484 figures cross-check against themselves: (283 + 89) mA × 1.8 V = 670 mW, which is exactly
-the SDR-mode dissipation the datasheet states. That the arithmetic closes is what gives confidence
-the column-shifted PDF extraction was read correctly.
+Three of these cross-check against the datasheet's own dissipation figure. That's what gives
+confidence the tables were read correctly, since text extraction shuffles their columns:
 
-This budget is good enough to **choose the topology and size the regulators** — and it already
-earned its keep by catching the two overheating LDOs, which is a structural finding that does not
-depend on the exact milliamps. It is **not a thermal sign-off**.
+| Part | Currents × voltage | Datasheet dissipation |
+|---|---|---|
+| AD9484 | (283 + 89) mA × 1.8 V = 670 mW | 670 mW, SDR mode ✓ |
+| AD9253 | (183 + 71) mA × 1.8 V = 457 mW | 457 mW, four channels, ANSI-644 ✓ |
+| AD9767 | (75 + 15) mA × 5 V = 450 mW | 450 mW ✓ |
 
-Every entry in `_work/power_budget.py` names the table to check:
+**The ADCLK944 question is answered.** The budget had asked whether the quoted supply current
+included the LVPECL termination current, because LVPECL budgets are routinely wrong by exactly that
+amount. It does: the table is measured with the outputs loaded 50 Ω to VCC − 2 V. What it doesn't
+include is the through-current of Thevenin bias dividers on AC-coupled inputs. That stays a
+separate estimated line, since it depends on resistor values not yet chosen.
+
+This budget is good enough to **choose the topology and size the regulators** — and it has now
+caught three structural errors: two overheating LDOs and an ADC supply above its absolute maximum.
+It is **not a thermal sign-off**.
+
+The nine that remain estimates:
 
 | Load | What to check |
 |---|---|
-| XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists |
-| ~~AD9484 AVDD / DRVDD~~ | ✅ **Verified** — see the table above |
-| ~~AD9708, AD8352~~ | ✅ **Verified** — see the table above |
-| AD9253 AVDD, 200 mA | Table 2. The quad at 125 MSPS is about 1.1 W total; two channels at half rate is well under a quarter |
-| ADCLK944, 150 mA | Table 1, and specifically **whether the quoted ICC already includes output termination current** — LVPECL budgets are routinely wrong by exactly that amount |
-| ~~M3SWA2-34DR+~~ | ✅ **Now verified from the datasheet.** IDD 2.9 mA max and IEE 1.8 mA max per part, so 11.6 mA on `+3V3_D` and 7.2 mA on `−3V3` for four |
-| AD9708 / AD9767 / AD8352 | Table 1 of each |
+| XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists — a datasheet cannot give this, it depends on the design |
+| XC7A50T VCCAUX, VCCO ×2 | Same: Vivado's power report, not a datasheet |
+| QSPI flash, TCXO, level translators, housekeeping | Parts not chosen yet. Each is a line in the budget |
+| LVPECL bias networks | Resistor values, above |
 
 Replacing any of them is one line; the totals, the regulator choices and the dissipation all
 recompute.
@@ -220,9 +243,10 @@ part of an impedance-controlled quote.
 | `VCCO` and the link I/O standard | ✅ 1.2 V, `LVDS_12` with AC coupling |
 | Mechanical envelope | ✅ measured |
 | Power tree topology and regulator sizing | ✅ §1.1–1.3 |
-| Per-rail load figures | ❌ `[E]` — §1.4, needs datasheets |
+| Per-rail load figures | ⚠️ 12 of 21 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
 | Stackup and trace widths | ✅ §2.1–2.3, pending fabricator confirmation |
-| Growth direction within the envelope | ❌ needs XTP681 opened in a viewer, or a ruler |
+| Growth direction within the envelope | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3 — outward, off the carrier's side |
 
-Two items left, and neither blocks starting the schematic: the load figures refine a budget whose
-**structure** is already settled, and the growth direction affects the outline, not the circuit.
+One item left, and it doesn't block the schematic: the remaining load figures refine a budget
+whose **structure** is already settled, and most of them can only come from Vivado once the FPGA
+design exists.

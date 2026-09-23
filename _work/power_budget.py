@@ -39,28 +39,43 @@ LOADS = [
     ("+1V8_D", "AD9484 DRVDD, LVDS drivers", 1.8, 100, "V",
      "AD9484 datasheet, POWER SUPPLY table: IDRVDD 89 mA typ, 100 mA max in "
      "SDR mode. Set by the LVDS driver bias, so nearly independent of rate"),
-    ("+1V8_A", "AD9253 AVDD, 2 of 4 channels at 62.5 MSPS", 1.8, 200, "E",
-     "AD9253 datasheet Table 2. Quad at 125 MSPS is about 1.1 W total; two "
-     "channels at half rate is well under a quarter of that"),
-    ("+3V3_D", "AD9253 DRVDD", 3.3, 60, "E", "AD9253 Table 2"),
+    ("+1V8_A", "AD9253 AVDD", 1.8, 200, "V",
+     "AD9253 datasheet Rev. D, Table 1, -125 grade: IAVDD 183 mA typ, 200 mA "
+     "max - all FOUR channels at 125 MSPS. We use two channels at 62.5 MSPS "
+     "and can power the other two down over SPI, so this is an upper bound. "
+     "Cross-check: (183+71) mA x 1.8 V = 457 mW, the stated four-channel "
+     "sine-wave figure"),
+    # DRVDD IS 1.8 V. The first version of this budget had it on +3V3_D;
+    # absolute maximum is 2.0 V, so that would have destroyed the ADC.
+    ("+1V8_D", "AD9253 DRVDD, LVDS drivers", 1.8, 100, "V",
+     "AD9253 datasheet Rev. D, Table 1: DRVDD 1.7-1.9 V; IDRVDD 71 mA typ, "
+     "100 mA max, ANSI-644 mode. Abs. max DRVDD 2.0 V"),
     ("+3V3_A", "AD9708 AVDD, radar DAC", 3.3, 25, "V",
      "AD9708 datasheet: Analog Supply Current IAVDD 25 mA"),
-    ("+3V3_A", "AD9767 AVDD, dual SDR DAC", 3.3, 100, "E", "AD9767 Table 1"),
+    ("+3V3_A", "AD9767 AVDD, dual SDR DAC", 3.3, 75, "V",
+     "AD9763/65/67 datasheet Rev. G, Table 1: IAVDD 71 mA typ, 75 mA max, "
+     "whole chip at IOUTFS = 20 mA per DAC. Cross-check: (75+15) mA x 5 V = "
+     "450 mW, the stated dissipation"),
     ("+3V3_D", "AD9708 DVDD", 3.3, 3, "V",
      "AD9708 datasheet: Digital Supply Current IDVDD 3 mA"),
-    ("+3V3_D", "AD9767 DVDD", 3.3, 40, "E",
-     "AD9767 datasheet Table 1 - no local copy, analog.com unreachable"),
+    ("+3V3_D", "AD9767 DVDD", 3.3, 19, "V",
+     "Same table: IDVDD 15 mA at 100 MSPS (no maximum given). Digital "
+     "current scales with clock, so 15 x 125/100 = 19 mA at the part's full "
+     "125 MSPS. Measured at DVDD = 5 V, so at 3.3 V this over-estimates"),
     ("+3V3_A", "AD8352 differential drivers, x2", 3.3, 80, "V",
      "AD8352 datasheet, POWER INTERFACE: quiescent current 39 mA max per "
      "device, 2 x 39 = 78 mA. NOTE the datasheet table extracts with shifted "
      "columns, so confirm visually. Supply range is 3-5.5 V, so 3V3_A is fine"),
 
     # ---- clock ---------------------------------------------------------
-    ("+3V3_D", "ADCLK944 LVPECL fanout", 3.3, 150, "E",
-     "ADCLK944 datasheet Table 1. LVPECL draws constant current; CHECK whether "
-     "the quoted ICC already includes output termination"),
-    ("+3V3_D", "LVPECL output termination, 4 outputs", 3.3, 60, "E",
-     "about 15 mA per terminated output pair into the bias network"),
+    ("+3V3_D", "ADCLK944 LVPECL fanout", 3.3, 165, "V",
+     "ADCLK944 datasheet Rev. 0, Table 3: IVCC 138 mA typ, 165 mA max at "
+     "3.3 V +/-10 %, measured with the outputs loaded 50 ohm to VCC-2 V - so "
+     "it INCLUDES the current the outputs deliver to their terminations"),
+    ("+3V3_D", "LVPECL bias networks, 2 AC-coupled outputs", 3.3, 60, "E",
+     "The ADCLK944 figure covers output current, not the through-current of "
+     "Thevenin bias dividers on the AC-coupled ADC and DAC clock inputs. "
+     "Depends on resistor values not yet chosen"),
     ("+3V3_D", "TCXO", 3.3, 20, "E", "typical for a 100 MHz TCXO"),
 
     # ---- RF routing and glue -------------------------------------------
