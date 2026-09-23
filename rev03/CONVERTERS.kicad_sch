@@ -308,28 +308,6 @@
 		)
 		(uuid "a3dff546-3bfd-5126-9b49-05585f804aec")
 	)
-	(hierarchical_label "CLK_DAC_P"
-		(shape input)
-		(at 25.4 162.5600 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "719439d6-03c8-509c-8d4c-53ec807afffd")
-	)
-	(hierarchical_label "CLK_DAC_N"
-		(shape input)
-		(at 25.4 167.6400 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "0bf6fdd9-811e-5bc6-ba24-ddde0a6a9890")
-	)
 	(hierarchical_label "IF_RX_A_P"
 		(shape bidirectional)
 		(at 25.4 172.7200 0)
@@ -417,5 +395,27 @@
 			(justify left)
 		)
 		(uuid "487506d7-0c64-5bac-9297-14bce1eb16c7")
+	)
+	(hierarchical_label "DACS_IQCLK"
+		(shape input)
+		(at 25.4 213.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a77b1f3d-686a-5323-8553-45223153813e")
+	)
+	(hierarchical_label "DACS_IQRESET"
+		(shape input)
+		(at 25.4 218.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b4524fb1-a5db-5e68-9c1f-50acc5906082")
 	)
 )

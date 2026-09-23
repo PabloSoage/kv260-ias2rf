@@ -451,4 +451,59 @@
 		)
 		(uuid "eef1c9cb-c8c9-5a08-bc49-5fcab33a85ee")
 	)
+	(hierarchical_label "DACS_IQCLK"
+		(shape output)
+		(at 25.4 228.6000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3e4824ac-deaf-5580-ac3e-4fa91e9f8f01")
+	)
+	(hierarchical_label "DACS_IQRESET"
+		(shape output)
+		(at 25.4 233.6800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "944c542e-0e00-54bc-972a-ab9bcb02492c")
+	)
+	(hierarchical_label "CLK_SEL"
+		(shape output)
+		(at 25.4 238.7600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "48f22961-0de1-5864-8b64-40ad91b71050")
+	)
+	(hierarchical_label "XO_SCL"
+		(shape output)
+		(at 25.4 243.8400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0b85c310-af6f-5d24-9a85-15dc7f8c05fa")
+	)
+	(hierarchical_label "XO_SDA"
+		(shape bidirectional)
+		(at 25.4 248.9200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7ae43f2a-ee2d-579d-a5af-63bcb8b648af")
+	)
 )

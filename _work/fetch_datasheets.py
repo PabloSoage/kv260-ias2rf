@@ -28,6 +28,7 @@ Usage:  py _work/fetch_datasheets.py
 """
 
 import hashlib
+import http.cookiejar
 import os
 import sys
 import time
@@ -39,17 +40,31 @@ OUT = os.path.join(ROOT, "_work", "datasheets")
 CHUNK = 1_000_000
 UA = {"User-Agent": "Mozilla/5.0"}
 
+# The Wayback Machine sometimes answers 302 to the very same URL while setting
+# a cookie; without a cookie jar urllib sees an infinite redirect loop.
+OPENER = urllib.request.build_opener(
+    urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+
 WAYBACK = "https://web.archive.org/web/{ts}id_/{url}"
 ADI = "https://www.analog.com/media/en/technical-documentation/data-sheets/"
 
-# local name, snapshot timestamp, original URL, revision as printed on the PDF
+# local name, snapshot timestamp(s), original URL, revision as printed on the PDF.
+# Several timestamps = alternates, tried in order. Some snapshots are stuck in a
+# redirect loop on the Archive's side (ADCLK948.pdf of 2024 redirects to the
+# adclk948.pdf capture, which redirects straight back); an older capture of
+# the same URL is then used, and the output says which one.
 SHEETS = [
-    ("AD9523.pdf",   "20240716170710", ADI + "AD9523.pdf", "Rev. D"),
+    ("AD9523.pdf",   ("20240716170710", "20220119021345"), ADI + "AD9523.pdf", "Rev. D"),
     ("AD9253.pdf",   "20250701080623", ADI + "ad9253.pdf", "Rev. D"),
     ("AD9767.pdf",   "20160402045243",
      "http://www.analog.com/media/en/technical-documentation/data-sheets/AD9763_9765_9767.pdf",
      "Rev. G"),
     ("ADCLK944.pdf", "20250113092642", ADI + "ADCLK944.pdf", "Rev. 0"),
+    # Clock sheet, 23 September: 2-input LVPECL fan-out and the programmable XO.
+    ("ADCLK948.pdf", "20220119015656", ADI + "ADCLK948.pdf", "Rev. ?"),
+    ("Si549.pdf",    "20240712105249",
+     "https://www.skyworksinc.com/-/media/SkyWorks/SL/documents/public/data-sheets/si549-datasheet.pdf",
+     "Rev. ?"),
 ]
 
 
@@ -63,7 +78,7 @@ def fetch(url):
         # snapshots; both are transient, so retry.
         for attempt in range(5):
             try:
-                with urllib.request.urlopen(req, timeout=120) as r:
+                with OPENER.open(req, timeout=120) as r:
                     part = r.read()
                     status = r.status
                 break
@@ -87,13 +102,20 @@ def fetch(url):
 def main():
     os.makedirs(OUT, exist_ok=True)
     bad = 0
-    for name, ts, url, rev in SHEETS:
+    for name, stamps, url, rev in SHEETS:
         path = os.path.join(OUT, name)
-        src = WAYBACK.format(ts=ts, url=url)
-        try:
-            blob = fetch(src)
-        except Exception as e:                      # noqa: BLE001
-            print(f"  FAIL {name:14s} {e}")
+        if isinstance(stamps, str):
+            stamps = (stamps,)
+        blob, err = None, None
+        for ts in stamps:
+            src = WAYBACK.format(ts=ts, url=url)
+            try:
+                blob = fetch(src)
+                break
+            except Exception as e:                  # noqa: BLE001
+                err = e
+        if blob is None:
+            print(f"  FAIL {name:14s} {err}")
             bad += 1
             continue
         complete = blob.startswith(b"%PDF") and b"%%EOF" in blob[-1024:]

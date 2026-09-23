@@ -288,16 +288,19 @@ This removes at the root the Rev02 compromise, which forced 8-bit transmission f
 
 ### 5.3 Clock
 
-Unchanged from Rev02, and still correct:
+**Revised on 23 September 2026, when the sheet was drawn.** The Rev02 plan (TCXO, selector,
+ADCLK944 feeding ADC, DAC and FPGA) did not survive contact with the datasheets: a fan-out copies
+one frequency to every output, the DACs take CMOS clocks, and a TCXO cannot reach 400 MHz. Full
+account in [docs/CLOCK_SPEC.md](docs/CLOCK_SPEC.md). What is drawn:
 
 ```
-  +-- SMA CLK_REF_IN <-- AERIS-10, AD9523 output          (radar mode)
-  +-- On-board TCXO                                       (standalone SDR mode)
-  +--> Selector --> ADCLK944 (LVPECL 1:4 fan-out)
-                      +-[AC coupling + bias]--> ADC CLK
-                      +-[AC coupling + bias]--> DAC CLK
-                      +------------------------> front-end FPGA
-                      +------------------------> 100 Ohm terminated
+  J401 SMA CLK_REF_IN <-- AERIS-10, AD9523 output, 400 MHz   (radar mode)   -> CLK0
+  Y401 Si549 programmable XO, 400 or 500 MHz via I2C         (SDR mode, default) -> CLK1
+  U401 ADCLK948: selects CLK0/CLK1, 8 LVPECL outputs, AC-coupled with 200 ohm + 100 pF
+        Q0 --> AD9484   (400/500 MSPS)
+        Q1 --> AD9253   (divides by 8 internally: 50 / 62.5 MSPS)
+        Q2 --> front-end FPGA (generates the DACs' CMOS clocks with their data)
+        Q3 --> J402 SMA CLK_OUT
 ```
 
 **The master clock is AERIS's AD9523 whenever the radar is in use** `[V]`: it already phase-aligns
@@ -437,7 +440,7 @@ In outline:
 12 V DC jack
   +-- TVS SMBJ15A · PTC · P-MOSFET ideal diode        <- reverse polarity, was missing
   +-- buck 12 V -> +5V0                               1.3 A
-        +-- buck -> +3V3_D   logic, DAC DVDD, ADCLK944, switches, FPGA VCCO
+        +-- buck -> +3V3_D   logic, DAC DVDD, clock (ADCLK948, Si549), switches, FPGA VCCO
         |     +-- LDO -> +1V8_D   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
         |     +-- LDO -> +1V2     FPGA VCCO, IAS-facing bank
         |     +-- charge pump -> -3V3   RF switch VEE (B-03)
@@ -479,8 +482,8 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U_DAC1` | Radar DAC | AD9708AR | X | AERIS's part `[V]` |
 | `U_DAC2` | SDR DAC | AD9767ASTZ | X | Dual 14 b, 3.3 V |
 | `U_AMP1..2` | Differential input drivers | AD8352ACPZ | X | Used by AERIS `[V]` |
-| `U_CLK1` | LVPECL 1:4 fan-out | ADCLK944BCPZ-R2 | C | With AC coupling and bias |
-| `Y_CLK1` | TCXO, standalone mode | ±0.5 ppm | P | |
+| `U401` | Reference select + LVPECL 1:8 fan-out | ADCLK948BCPZ | C | Drawn: rev03/CLOCK. Replaces the ADCLK944 + separate selector |
+| `Y401` | Programmable master XO, 400/500 MHz | Si549, LVPECL, 3.3 V, 5×7 mm, pinout C | C | Replaces the TCXO; GPS-disciplined through its ±950 ppm DCO |
 | `U_SW1..4` | Routing SPDTs | M3SWA2-34DR+ | X | Positive 3.3 V control, but **bipolar supply: VDD +3.3 V and VEE −3.3 V** (B-03). Exposed paddle to GND |
 | `U_PWR*` | Bucks, LDOs and sequencer | — | P | Includes FPGA power |
 | `U_INV1` | −3.3 V charge-pump inverter | LM2663 or equivalent | X | **Reinstated.** VEE for the four RF switches, 8 mA. It had been dropped when B-03 was closed wrongly |

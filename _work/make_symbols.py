@@ -9,7 +9,7 @@ carries a real type.
 
 WHERE THE DATA COMES FROM, AND HOW FAR TO TRUST IT
 --------------------------------------------------
-Eight of the ten symbols are transcribed from the MANUFACTURER DATASHEET
+Ten of the twelve symbols are transcribed from the MANUFACTURER DATASHEET
 (DATASHEET_PINS below). analog.com will not serve its PDFs to this machine, so
 they came from two other places:
 
@@ -74,7 +74,7 @@ WANTED = {
 # These override anything derived from the Eagle library.
 #
 # Sources: the AERIS-10 datasheet folder (AD8352, AD9484, M3SWA2, LTC5552) and
-# _work/fetch_datasheets.py (AD9523, AD9253, AD9767, ADCLK944).
+# _work/fetch_datasheets.py (AD9523, AD9253, AD9767, ADCLK944, ADCLK948, Si549).
 #
 # EXPOSED PADS are numbered N+1 throughout, to match KiCad's stock footprints,
 # whatever the datasheet calls them - see the AD9484 entry.
@@ -340,12 +340,68 @@ DATASHEET_PINS = {
     ],
 }
 
+DATASHEET_PINS.update({
+
+    # ADCLK948.pdf Rev. B, Figure 2 and Table 7 "Pin Function Descriptions".
+    # 32-lead LFCSP 5x5 mm (CP-32-21), exposed pad 2.70 mm square -> pad 33.
+    # EPAD "must be soldered to the VEE power plane"; single 3.3 V supply
+    # here, so VEE is ground.
+    #   Table 4: IVCC 288 typ / 330 max mA, IVEE 96 / 120 mA, VCC-VEE 3.3 V.
+    # Complements on the LOWER pin of each output pair (Table 7: "11, 12
+    # Q7-bar, Q7"). IN_SEL (Table 3): logic 1 >= VCC-0.4 V, logic 0 <= 1 V,
+    # 0.6 mA flows out of the pin at logic 0 - there is an internal pull-up.
+    # VREFx is a bias output ((VCC+1)/2, 235 ohm) for AC-coupled inputs.
+    "ADCLK948BCPZ": (
+        [("1", "CLK0", "input"), ("2", "~{CLK0}", "input"),
+         ("3", "VREF0", "output"), ("4", "VT0", "passive"),
+         ("5", "CLK1", "input"), ("6", "~{CLK1}", "input"),
+         ("7", "VT1", "passive"), ("8", "VREF1", "output"),
+         ("9", "NC", "no_connect"),
+         ("32", "IN_SEL", "input"),
+         ("33", "VEE_EP", "power_in")]
+        + [(str(p), "VCC", "power_in") for p in (10, 15, 16, 25, 26, 31)]
+        # (complement pad, true pad) for Q0..Q7
+        + [(str(c), f"~{{Q{n}}}", "output") for n, (c, t) in enumerate(
+              [(29, 30), (27, 28), (23, 24), (21, 22), (19, 20), (17, 18), (13, 14), (11, 12)])]
+        + [(str(t), f"Q{n}", "output") for n, (c, t) in enumerate(
+              [(29, 30), (27, 28), (23, 24), (21, 22), (19, 20), (17, 18), (13, 14), (11, 12)])]
+    ),
+
+    # Si549 datasheet Revision H (Skyworks), "Pin Assignments" and Ordering
+    # Guide. 8-pin, 5x7 mm package option A. Pins 1 and 2 depend on the
+    # ordering "pinout option"; this symbol is PINOUT CODE C - the one the
+    # datasheet names for replacing an Si570 ("If replacing Si570A-K, use
+    # Code C"): pin 1 NC, pin 2 OE active high. That makes it pin- and
+    # footprint-compatible with the Si570, whose KiCad stock symbol serves as
+    # the second source in crosscheck_pinouts.py.
+    #   IDD LVPECL 107 typ / 153 max mA. I2C pull-ups to VDD (datasheet §I2C).
+    "Si549_PinoutC": [
+        ("1", "NC",   "no_connect"),
+        ("2", "OE",   "input"),
+        ("3", "GND",  "power_in"),
+        ("4", "CLK+", "output"),
+        ("5", "CLK-", "output"),
+        ("6", "VDD",  "power_in"),
+        ("7", "SDA",  "bidirectional"),
+        ("8", "SCL",  "input"),
+    ],
+})
+
+_CLOCK_NOTES = {
+    "ADCLK948BCPZ": "Pin table from the ADCLK948 datasheet Rev. B, Table 7. "
+                    "IVCC 330 mA max. EPAD to VEE (ground here), pad 33.",
+    "Si549_PinoutC": "Pin table from the Si549 datasheet Revision H, pinout code C "
+                     "(Si570-compatible: pin 1 NC, pin 2 OE active high). IDD 153 mA max LVPECL.",
+}
+
 # Parts that exist ONLY as datasheet tables - there is no Eagle deviceset to
 # start from. name -> one-line description.
 DATASHEET_ONLY = {
+    "ADCLK948BCPZ":   "2-input, 8-output LVPECL clock fan-out, 4.8 GHz - reference selector and distribution",
+    "Si549_PinoutC":  "I2C programmable ultra-low-jitter XO, 0.2-1500 MHz, LVPECL - local master clock",
     "AD9253BCPZ-125": "Quad 14-bit 125 MSPS ADC, serial LVDS - SDR receive (2 of 4 channels used)",
     "AD9767ASTZ":     "Dual 14-bit 125 MSPS current-output DAC, parallel CMOS - SDR transmit",
-    "ADCLK944BCPZ":   "1:4 LVPECL clock fan-out, 7 GHz",
+    "ADCLK944BCPZ":   "1:4 LVPECL clock fan-out, 7 GHz - first clock plan, superseded by the ADCLK948",
 }
 
 DATASHEET_NOTE = {
@@ -369,6 +425,7 @@ DATASHEET_NOTE = {
     "LTC5552": "Pin table from the Analog Devices LTC5552 datasheet (LTC5552f). "
                "VCC 3.3 V, 132 mA typical enabled. Exposed pad (pin 13) is GND.",
 }
+DATASHEET_NOTE.update(_CLOCK_NOTES)
 
 
 DIR_MAP = {
@@ -421,6 +478,32 @@ def sort_key(pad):
     return (0, int(m.group(1)), "") if m else (1, 0, pad)
 
 
+# Hand-arranged pin layouts, for symbols that have to read well on a sheet.
+# Pads listed per side, top to bottom (left/right) or left to right
+# (pwr/gnd); None leaves a gap between groups. Every pad must appear once.
+SYMBOL_LAYOUT = {
+    # Each input grouped with its own termination pins, so the AC-coupling
+    # network draws as a straight line; outputs in order Q0..Q7, true pin
+    # above its complement.
+    "ADCLK948BCPZ": {
+        "half_w": 12.7,
+        "left": ["1", "2", "4", "3", None, None, None, None,
+                 "5", "6", "7", "8", None, None, None, None, "32"],
+        "right": ["30", "29", "28", "27", "24", "23", "22", "21",
+                  "20", "19", "18", "17", "14", "13", "12", "11"],
+        "pwr": ["10", "15", "16", "25", "26", "31"],
+        "gnd": ["33", "9"],
+    },
+    "Si549_PinoutC": {
+        "half_w": 7.62,
+        "left": ["2", None, "7", "8"],
+        "right": ["4", "5"],
+        "pwr": ["6"],
+        "gnd": ["3", "1"],
+    },
+}
+
+
 def emit_symbol(libname, desc, pins, source_note):
     """A KiCad symbol: power on top/bottom, inputs left, outputs right."""
     def bucket(t, name):
@@ -439,11 +522,20 @@ def emit_symbol(libname, desc, pins, source_note):
     for pad, name, t in sorted(pins, key=lambda p: sort_key(p[0])):
         groups[bucket(t, name)].append((pad, name, t))
 
+    lay = SYMBOL_LAYOUT.get(libname)
+    if lay:
+        bypad = {p[0]: p for p in pins}
+        listed = [x for k in ("left", "right", "pwr", "gnd") for x in lay.get(k, []) if x]
+        assert sorted(listed) == sorted(bypad),             f"{libname}: layout and pin table disagree: {set(bypad) ^ set(listed)}"
+        groups = {k: [bypad[x] if x else None for x in lay.get(k, [])]
+                  for k in ("left", "right", "pwr", "gnd")}
+        groups["nc"] = []
+
     n_side = max(len(groups["left"]), len(groups["right"]), 1)
     n_tb = max(len(groups["pwr"]), len(groups["gnd"]) + len(groups["nc"]), 1)
     half_h = max(n_side, 4) * 2.54 / 2 + 2.54
     half_w = max(n_tb, 4) * 2.54 / 2 + 2.54
-    half_w = max(half_w, 25.4)
+    half_w = lay["half_w"] if lay else max(half_w, 25.4)
 
     L = []
     L.append(f'{TAB}(symbol "{libname}"')
@@ -480,19 +572,28 @@ def emit_symbol(libname, desc, pins, source_note):
         L.append(f'{TAB}{TAB}{TAB}{TAB}(number "{pad}" (effects (font (size 1.27 1.27))))')
         L.append(f'{TAB}{TAB}{TAB})')
 
+    # None entries are gaps: they take a position but place no pin.
     y = (len(groups["left"]) - 1) * 2.54 / 2
-    for pad, name, t in groups["left"]:
-        add(pad, name, t, -half_w - 2.54, y, 0); y -= 2.54
+    for e in groups["left"]:
+        if e:
+            add(*e, -half_w - 2.54, y, 0)
+        y -= 2.54
     y = (len(groups["right"]) - 1) * 2.54 / 2
-    for pad, name, t in groups["right"]:
-        add(pad, name, t, half_w + 2.54, y, 180); y -= 2.54
+    for e in groups["right"]:
+        if e:
+            add(*e, half_w + 2.54, y, 180)
+        y -= 2.54
     x = -(len(groups["pwr"]) - 1) * 2.54 / 2
-    for pad, name, t in groups["pwr"]:
-        add(pad, name, t, x, half_h + 2.54, 270); x += 2.54
+    for e in groups["pwr"]:
+        if e:
+            add(*e, x, half_h + 2.54, 270)
+        x += 2.54
     bottom = groups["gnd"] + groups["nc"]
     x = -(len(bottom) - 1) * 2.54 / 2
-    for pad, name, t in bottom:
-        add(pad, name, t, x, -half_h - 2.54, 90); x += 2.54
+    for e in bottom:
+        if e:
+            add(*e, x, -half_h - 2.54, 90)
+        x += 2.54
 
     L.append(f'{TAB}{TAB})')
     L.append(f'{TAB})')

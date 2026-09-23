@@ -69,8 +69,9 @@ project.
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers, closed, with evidence and sources, plus the open risks |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the KiCad files actually contain, with evidence |
 | [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, the mechanical envelope, and the adapter registered on the KV260 model — where the board can grow |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (12 of 21 loads from datasheets) and the 6-layer stackup with computed trace widths |
-| [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** 10 symbols, 8 from datasheets, each cross-checked against a second source |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (13 of 21 loads from datasheets) and the 6-layer stackup with computed trace widths |
+| [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** 12 symbols, 10 from datasheets, cross-checked against a second source where one exists |
+| [docs/CLOCK_SPEC.md](docs/CLOCK_SPEC.md) | **Phase 2.** The first drawn sheet: the clock plan, every value's source, and how to review it |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |
 
@@ -138,6 +139,7 @@ Two further passes since, both measured:
 | Dead sheets removed | 427 | `pin_to_pin` 63 → 0 |
 | Multi-channel annotation fixed | **411** | netlist exports: 48 components, 61 nets |
 | Rev03 hierarchy skeleton added | 496 | **`hier_label_mismatch` 36 → 0**; +121 `label_dangling`, which is the 108 new interface labels awaiting their circuits |
+| CLOCK sheet drawn | 500 | On the sheet: 2 "power input not driven" (`+3V3_D`, `GND`, until POWER exists) and 6 `isolated_pin_label` (outputs, until their receivers exist). Wiring verified by `_work/check_sheet.py clock`: PASS |
 
 What remains is pre-existing noise from the Altium import (off-grid endpoints, library symbols
 the CLI cannot resolve) plus leftovers of the purge. The serious electrical categories are gone.

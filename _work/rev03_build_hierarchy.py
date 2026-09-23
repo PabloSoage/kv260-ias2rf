@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 """
+DO NOT RE-RUN. This script built the Rev03 hierarchy once (commit eae6713).
+Running it again would add a second set of sheet blocks to the root and
+overwrite the drawn sheets (rev03/CLOCK.kicad_sch since 23 September).
+Its tables are kept in step with the design as the record of intent;
+interface changes are applied by small scripts such as
+_work/rev03_clock_interface.py, followed by _work/sync_sheet_pins.py.
+
 Build the Rev03 sheet hierarchy: sheets and their interfaces, nothing else.
 
 WHY THIS IS NOT THE THING THE AUDIT WARNED ABOUT
@@ -66,6 +73,7 @@ CONV_DIGITAL = [                       # front-end FPGA <-> converters
     ("ADCS_FCO_P", "input"), ("ADCS_FCO_N", "input"),
     ("DACR_D[7..0]", "output"), ("DACR_CLK", "output"),
     ("DACS_D[13..0]", "output"), ("DACS_IQWRT", "output"), ("DACS_IQSEL", "output"),
+    ("DACS_IQCLK", "output"), ("DACS_IQRESET", "output"),      # added 23 Sep
     ("CONV_SPI_SCLK", "output"), ("CONV_SPI_SDIO", "bidirectional"),
     ("CONV_SPI_CSB_R", "output"), ("CONV_SPI_CSB_S", "output"),
 ]
@@ -73,7 +81,7 @@ CONV_DIGITAL = [                       # front-end FPGA <-> converters
 CLOCKS = [                             # CLOCK -> consumers
     "CLK_ADCR_P", "CLK_ADCR_N",
     "CLK_ADCS_P", "CLK_ADCS_N",
-    "CLK_DAC_P", "CLK_DAC_N",
+    # CLK_DAC_P/N removed 23 Sep: the DACs take CMOS clocks from the FPGA
     "CLK_FPGA_P", "CLK_FPGA_N",
 ]
 
@@ -111,7 +119,8 @@ SHEETS = {
              ("FPGA_PROG_B", "input"), ("FPGA_IRQ", "output")] +
             [(n, flip(d)) for n, d in CONV_DIGITAL] +
             [("CLK_FPGA_P", "input"), ("CLK_FPGA_N", "input")] +
-            [("SW_CTRL[3..0]", "output")],
+            [("SW_CTRL[3..0]", "output")] +
+            [("CLK_SEL", "output"), ("XO_SCL", "output"), ("XO_SDA", "bidirectional")],
     },
     "CONVERTERS": {
         "file": "rev03/CONVERTERS.kicad_sch",
@@ -124,9 +133,10 @@ SHEETS = {
     },
     "CLOCK": {
         "file": "rev03/CLOCK.kicad_sch",
-        "desc": "Reference selector, TCXO, ADCLK944 fan-out",
+        "desc": "Si549 master XO, ADCLK948 reference select and fan-out",
         "at": (30.0, 140.0),
-        "labels": [(n, "output") for n in CLOCKS],
+        "labels": [(n, "output") for n in CLOCKS] +
+            [("CLK_SEL", "input"), ("XO_SCL", "input"), ("XO_SDA", "bidirectional")],
     },
     "ROUTING": {
         "file": "rev03/ROUTING.kicad_sch",

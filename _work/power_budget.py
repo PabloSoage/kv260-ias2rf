@@ -68,15 +68,20 @@ LOADS = [
      "columns, so confirm visually. Supply range is 3-5.5 V, so 3V3_A is fine"),
 
     # ---- clock ---------------------------------------------------------
-    ("+3V3_D", "ADCLK944 LVPECL fanout", 3.3, 165, "V",
-     "ADCLK944 datasheet Rev. 0, Table 3: IVCC 138 mA typ, 165 mA max at "
-     "3.3 V +/-10 %, measured with the outputs loaded 50 ohm to VCC-2 V - so "
-     "it INCLUDES the current the outputs deliver to their terminations"),
-    ("+3V3_D", "LVPECL bias networks, 2 AC-coupled outputs", 3.3, 60, "E",
-     "The ADCLK944 figure covers output current, not the through-current of "
-     "Thevenin bias dividers on the AC-coupled ADC and DAC clock inputs. "
-     "Depends on resistor values not yet chosen"),
-    ("+3V3_D", "TCXO", 3.3, 20, "E", "typical for a 100 MHz TCXO"),
+    # Clock, as drawn on rev03/CLOCK.kicad_sch (docs/CLOCK_SPEC.md). The
+    # ADCLK944 of the first plan became an ADCLK948 (2 selectable inputs),
+    # and the TCXO a Si549 programmable XO: a TCXO cannot give 400-500 MHz.
+    # Both sit on +3V3_CLK, a ferrite-filtered branch of +3V3_D.
+    ("+3V3_D", "ADCLK948 LVPECL fan-out (via +3V3_CLK)", 3.3, 330, "V",
+     "ADCLK948 datasheet Rev. B, Table 4: IVCC 288 typ / 330 max mA at 3.3 V "
+     "+/-10 %, outputs loaded - so it covers the current into the 200 ohm "
+     "pull-downs. Only 4 of 8 outputs are used; the open ones draw nothing, "
+     "so this is an upper bound"),
+    ("+3V3_D", "Si549 programmable XO, LVPECL (via +3V3_CLK)", 3.3, 153, "V",
+     "Si549 datasheet Revision H: IDD LVPECL 107 typ / 153 max mA"),
+    ("+3V3_D", "Si549 LVPECL pull-downs, 2 x 130 ohm", 3.3, 30, "E",
+     "About 15 mA per leg into Rp at a ~2 V output level. Whether the "
+     "datasheet's IDD already includes it is not stated, so counted apart"),
 
     # ---- RF routing and glue -------------------------------------------
     ("+3V3_D", "M3SWA2-34DR+ SPDT, x4, VDD", 3.3, 12, "V",

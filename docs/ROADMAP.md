@@ -87,7 +87,7 @@ The comparison that led here:
 | Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ⚠️ **12 of 21 verified from datasheets**; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ **13 of 21 verified from datasheets**; the rest need Vivado or parts not yet chosen |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -107,7 +107,7 @@ the root, **108 interface signals** in total:
 | `IAS_LINK` | 14 | Hirose IAS1, AC coupling, link terminations |
 | `CONTROL` | 40 | Front-end FPGA, Pmod, AERIS-10 control IDC |
 | `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers |
-| `CLOCK` | 8 | Reference selector, TCXO, ADCLK944 fan-out |
+| `CLOCK` | 9 | **Drawn** (23 Sep) — Si549 XO, ADCLK948 select + fan-out. [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | 9 | 4× SPDT channel routing, IF and clock SMAs |
 | `POWER` | 0 | 12 V input, protection, buck/LDO tree — rails are global symbols |
 
@@ -145,7 +145,7 @@ libraries.
 
 Ten more are generated into `symbols/kv260-ias2rf.kicad_sym` by `_work/make_symbols.py`.
 **Eight are built from manufacturer datasheets**: four from the AERIS-10 component folder, and four
-(`AD9523`, `AD9253`, `AD9767`, `ADCLK944`) from the Internet Archive's copies of analog.com, fetched
+(`AD9523`, `AD9253`, `AD9767`, `ADCLK944`; later `ADCLK948` and `Si549`) from the Internet Archive's copies of analog.com, fetched
 by `_work/fetch_datasheets.py`. Only `ADAR1000ACCZN` and `ADF4382A`, both AERIS-10 reference parts,
 remain on the Eagle library.
 
@@ -180,7 +180,7 @@ script-generated sheets have already been **removed** from the project and moved
 | Root | Hierarchy and the Hirose connectors |
 | `IAS_LINK` | Hirose IAS1, the serial link to the Kria, terminations |
 | `CONVERTERS` | ADC, DAC, input conditioning, reconstruction filter |
-| `CLOCK` | Reference selector, TCXO, ADCLK944 with coupling and bias |
+| `CLOCK` | ✅ Drawn and verified: `check_sheet.py clock` PASS. Awaiting your review — [CLOCK_SPEC.md](CLOCK_SPEC.md) §5 |
 | `ROUTING` | 4 SPDT switches, IF SMAs, clock SMAs |
 | `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
 | `POWER` | Full tree with reverse-polarity protection and analogue/digital separation |
@@ -236,7 +236,7 @@ Deliberate order: each step validates the previous one and does not depend on th
 | Step | What it validates | How |
 |---|---|---|
 | 1 | Power | Voltages and ripple on every rail, with no converters fitted |
-| 2 | Clock | ADCLK944 outputs on the scope: levels, jitter, terminations |
+| 2 | Clock | ADCLK948 outputs on the scope via J402: levels, jitter, terminations; Si549 at 400 and 500 MHz |
 | 3 | **IAS1 link to the PL** | Inject a known sine at the ADC input and recover it in the PL. **This is the critical validation of the whole project** (it closes B-01 in practice) |
 | 4 | **PL to DAC link** | Generate a sine from the PL and see it at the DAC output |
 | 5 | DAC bus crosstalk | Sweep the sample rate until the real limit appears |

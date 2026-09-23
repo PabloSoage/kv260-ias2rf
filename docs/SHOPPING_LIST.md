@@ -110,7 +110,7 @@ Organised by **stage** (the reasoning behind the order is in
 |---|---|---|---|
 | ◆ | **Board design and fabrication** | 6 layers, short run with assembly | €400 – 800 |
 | ☐ | ADC **AD9253BCPZ-125** | 14 b, 2 of 4 channels at 62.5 MSPS, 1-lane | €40 |
-| ☐ | Clock fan-out **ADCLK944BCPZ-R2** + TCXO | With AC coupling and a bias network | €30 |
+| ☐ | Clock: **ADCLK948BCPZ** (select + 1:8 fan-out) + **Si549** programmable XO | Si549 ordered configured: LVPECL, 3.3 V, 5×7 mm, pinout C. See docs/CLOCK_SPEC.md | €50 – 70 |
 | ☐ | Differential drivers **AD8352ACPZ** ×2 | The ones AERIS uses | €30 |
 | ☐ | Switches **M3SWA2-34DR+** ×4 | Positive 3.3 V control, but they **also need VEE −3.3 V** (B-03) | €80 |
 | ☐ | −3.3 V charge-pump inverter (LM2663 or similar) | VEE for the switches, 8 mA | €3 |
@@ -127,7 +127,7 @@ Organised by **stage** (the reasoning behind the order is in
 
 **Bring-up checklist** (in this order — each step validates the previous one)
 - [ ] Rail voltages and ripple on every rail, with no converters fitted
-- [ ] ADCLK944 outputs on the scope: levels, jitter, termination
+- [ ] Clock on the scope via the CLK_OUT SMA: levels, jitter, termination; Si549 at 400 and 500 MHz
 - [ ] **A known sine into the ADC input, recovered in the PL** ← the critical test
 - [ ] The 3 switching modes
 

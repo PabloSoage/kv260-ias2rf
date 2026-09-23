@@ -7,7 +7,7 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **12 of 21 loads verified from datasheets** — see §1.4 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **13 of 21 loads verified from datasheets** — see §1.4 |
 | Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
 
 ---
@@ -17,9 +17,9 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ### 1.1 The tree
 
 ```
-12 V in  (608 mA, 7.3 W)
-  └── buck → +5V0        1312 mA
-        ├── buck → +3V3_D    989 mA   digital: FPGA VCCO, DAC DVDD, clock, switches
+12 V in  (699 mA, 8.4 W)
+  └── buck → +5V0        1509 mA
+        ├── buck → +3V3_D   1257 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches
         │     ├── LDO → +1V8_D  300 mA   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
         │     └── LDO → +1V2    100 mA   FPGA VCCO, IAS-facing bank
         ├── buck → +3V6      180 mA   pre-regulator, analogue only
@@ -74,8 +74,8 @@ With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1312 mA | buck | +12V | 0.73 W | ≥ 1.71 A |
-| `+3V3_D` | 3.3 | 989 mA | buck | +5V0 | 0.36 W | ≥ 1.29 A |
+| `+5V0` | 5.0 | 1509 mA | buck | +12V | 0.84 W | ≥ 1.96 A |
+| `+3V3_D` | 3.3 | 1257 mA | buck | +5V0 | 0.46 W | ≥ 1.63 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
 | `+2V5` | 2.5 | 500 mA | buck | +5V0 | 0.17 W | ≥ 0.65 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
@@ -85,16 +85,18 @@ With 30 % margin:
 | `+1V2` | 1.2 | 100 mA | LDO | +3V3_D | 0.21 W | ≥ 0.13 A |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 608 mA at 12 V = 7.3 W.** With margin, 0.79 A and 9.5 W. The jack, the PTC and the
+**Input: 699 mA at 12 V = 8.4 W.** With margin, 0.91 A and 10.9 W. The rise since the first
+budget is the clock, as drawn: the ADCLK948 (330 mA max) and the Si549 (153 mA) replaced an
+ADCLK944 (165 mA) and a TCXO (20 mA), see [CLOCK_SPEC.md](CLOCK_SPEC.md). The jack, the PTC and the
 reverse-polarity MOSFET want ≥ 1.0 A, and 2 A costs nothing extra.
 
 For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter is comfortable on
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 Confidence: 12 verified, 9 estimated
+### 1.4 Confidence: 13 verified, 8 estimated
 
-**Twelve of the twenty-one load figures now come from manufacturer datasheets.** analog.com refuses
+**Thirteen of the twenty-one load figures now come from manufacturer datasheets.** analog.com refuses
 to serve its PDFs to this machine (repeated 60 s timeouts; the mirrors return 403 and 410). They
 came from two other places: the AERIS-10 repository's component folder, and the **Internet
 Archive's copies of analog.com's own URLs**, fetched by `_work/fetch_datasheets.py`. That script
@@ -111,7 +113,8 @@ records the snapshot, size and SHA-256 of each file.
 | AD9767 AVDD | **75 mA** max | `AD9763_9765_9767.pdf` Rev. G, Table 1: IAVDD 71 typ / 75 max, both DACs at 20 mA full scale |
 | AD9767 DVDD | **19 mA** | Same table: 15 mA at 100 MSPS, scaled to 125 MSPS. Measured at 5 V, so an over-estimate at 3.3 V |
 | AD8352 ×2 | **80 mA** | `ad8352.pdf` Rev. C, quiescent current 39 mA max each |
-| ADCLK944 | **165 mA** max | `ADCLK944.pdf` Rev. 0, Table 3: IVCC 138 typ / 165 max, **with the outputs loaded** — so it includes the current delivered to the terminations |
+| ADCLK948 | **330 mA** max | `ADCLK948.pdf` Rev. B, Table 4: IVCC 288 typ / 330 max, **with the outputs loaded** — so it includes the current into the 200 Ω pull-downs. Half the outputs are unused and open, so it is an upper bound |
+| Si549 | **153 mA** max | `Si549.pdf` Revision H: IDD LVPECL 107 typ / 153 max |
 | M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |
 | M3SWA2 ×4, VEE | **8 mA** | Same, IEE 1.8 mA max each |
 
@@ -124,11 +127,11 @@ confidence the tables were read correctly, since text extraction shuffles their 
 | AD9253 | (183 + 71) mA × 1.8 V = 457 mW | 457 mW, four channels, ANSI-644 ✓ |
 | AD9767 | (75 + 15) mA × 5 V = 450 mW | 450 mW ✓ |
 
-**The ADCLK944 question is answered.** The budget had asked whether the quoted supply current
-included the LVPECL termination current, because LVPECL budgets are routinely wrong by exactly that
-amount. It does: the table is measured with the outputs loaded 50 Ω to VCC − 2 V. What it doesn't
-include is the through-current of Thevenin bias dividers on AC-coupled inputs. That stays a
-separate estimated line, since it depends on resistor values not yet chosen.
+**The LVPECL question is answered.** The budget had asked whether the fan-out's quoted supply
+current included its termination current, because LVPECL budgets are routinely wrong by exactly
+that amount. It does, for the ADCLK944 first considered and for the ADCLK948 drawn: both tables
+are measured with the outputs loaded. What stays a separate estimated line is the Si549's two
+130 Ω pull-downs, whose inclusion in its IDD the datasheet doesn't state.
 
 This budget is good enough to **choose the topology and size the regulators** — and it has now
 caught three structural errors: two overheating LDOs and an ADC supply above its absolute maximum.
@@ -140,7 +143,8 @@ The nine that remain estimates:
 |---|---|
 | XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists — a datasheet cannot give this, it depends on the design |
 | XC7A50T VCCAUX, VCCO ×2 | Same: Vivado's power report, not a datasheet |
-| QSPI flash, TCXO, level translators, housekeeping | Parts not chosen yet. Each is a line in the budget |
+| QSPI flash, level translators, housekeeping | Parts not chosen yet. Each is a line in the budget |
+| Si549 LVPECL pull-downs | Whether its IDD figure already includes them is not stated |
 | LVPECL bias networks | Resistor values, above |
 
 Replacing any of them is one line; the totals, the regulator choices and the dissipation all
@@ -243,7 +247,7 @@ part of an impedance-controlled quote.
 | `VCCO` and the link I/O standard | ✅ 1.2 V, `LVDS_12` with AC coupling |
 | Mechanical envelope | ✅ measured |
 | Power tree topology and regulator sizing | ✅ §1.1–1.3 |
-| Per-rail load figures | ⚠️ 12 of 21 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ 13 of 21 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
 | Stackup and trace widths | ✅ §2.1–2.3, pending fabricator confirmation |
 | Growth direction within the envelope | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3 — outward, off the carrier's side |
 

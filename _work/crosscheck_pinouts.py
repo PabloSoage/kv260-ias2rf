@@ -5,13 +5,16 @@ Cross-check every datasheet-transcribed pin table against a second source.
 A pin table typed by hand from a datasheet can be wrong in exactly the ways
 that are invisible later: two pins swapped, a complement on the wrong side of
 a pair, a supply pin read as a signal. The defence is a second, independent
-source. Two exist:
+source. Three exist:
 
   * the AERIS-10 Eagle libraries (fabricated, measured boards);
   * _work/pinouts.txt, pin names scraped from EasyEDA/LCSC symbols during
-    the Rev01 work - names only, no types.
+    the Rev01 work - names only, no types;
+  * KiCad's own stock symbol libraries, where a pin-compatible part exists
+    (the Si549 in pinout code C is a drop-in for the Si570, which KiCad
+    ships).
 
-Neither is authoritative - that is the datasheet - but an INDEPENDENT source
+None is authoritative - that is the datasheet - but an INDEPENDENT source
 that agrees pin for pin is strong evidence the transcription is right, and
 any disagreement is worth a second look at the datasheet page.
 
@@ -47,7 +50,17 @@ SECOND_SOURCE = {
     "AD9253BCPZ-125": ("easyeda", "AD9253BCPZ-125"),
     "AD9767ASTZ":     ("easyeda", "AD9767ASTZ"),
     "ADCLK944BCPZ":   ("easyeda", "ADCLK944BCPZ-R2"),
+    "Si549_PinoutC":  ("kicad",   "Oscillator:Si570"),
 }
+
+# Datasheet symbols for which no independent source exists. Listed so the
+# gap is visible in the output instead of silently skipped.
+NO_SECOND_SOURCE = {
+    "ADCLK948BCPZ": "not in Eagle, EasyEDA or KiCad's libraries. Checked only "
+                    "against itself: Figure 2 and Table 7 of the datasheet agree",
+}
+
+KICAD_SYMBOLS = "E:/Program Files/KiCad/10.0/share/kicad/symbols"
 
 EP_WORDS = re.compile(r"(?i)^(ep|epad|pad|exp|gnd_ep|agnd_ep|vee_ep|thermal.*|.*_ep)$")
 
@@ -106,6 +119,9 @@ ADJUDICATED = {
     ("AD9253BCPZ-125", "47"): "EasyEDA typo 'VNI' for VIN (datasheet Table 8)",
     ("AD9253BCPZ-125", "48"): "EasyEDA typo 'VNI' for VIN (datasheet Table 8)",
     ("AD9253BCPZ-125", "40"): "EasyEDA typo 'RBAIS' for RBIAS (datasheet Table 8)",
+    ("Si549_PinoutC", "6"):
+        "Naming only: KiCad's Si570 calls the supply 'Vcc', the Si549 "
+        "datasheet 'VDD'. Same pin, same function",
 }
 
 
@@ -122,6 +138,17 @@ def load_easyeda():
         if cur and m and m.group(1) != "Pin":
             parts[cur][m.group(1)] = m.group(2)
     return parts
+
+
+def load_kicad(ref):
+    """{pad: name} of a stock KiCad symbol, 'Library:Symbol'."""
+    lib, name = ref.split(":")
+    text = open(os.path.join(KICAD_SYMBOLS, lib + ".kicad_sym"), encoding="utf-8").read()
+    i = text.find(f'(symbol "{name}"')
+    j = text.find('\n\t(symbol "', i + 10)
+    body = text[i:j if j > 0 else len(text)]
+    return {num: nm for nm, num in re.findall(
+        r'\(pin \w+ \w+.*?\(name "([^"]*)".*?\(number "([^"]*)"', body, re.S)}
 
 
 def load_eagle():
@@ -164,7 +191,10 @@ def main():
     print("-" * 64)
     for sym, (kind, key) in SECOND_SOURCE.items():
         ours = {p: n for p, n, _ in ms.DATASHEET_PINS[sym]}
-        src = (eagle if kind == "eagle" else easy).get(key)
+        if kind == "kicad":
+            src = load_kicad(key)
+        else:
+            src = (eagle if kind == "eagle" else easy).get(key)
         if src is None:
             print(f"{sym:16s} {kind:9s}  -- second source has no '{key}'")
             continue
@@ -198,6 +228,8 @@ def main():
         if bar:
             print(f"      overbar present on one side only: {len(bar)} pins "
                   f"(e.g. pad {bar[0][0]}: {bar[0][1]!r} vs {bar[0][2]!r})")
+    for sym, why in NO_SECOND_SOURCE.items():
+        print(f"{sym:16s} {'-':9s} {len(ms.DATASHEET_PINS[sym]):5d} {'-':>6s}  NO SECOND SOURCE: {why}")
     print()
     print("No conflicts." if not total_conf else f"{total_conf} conflict(s) to resolve.")
     return 1 if total_conf else 0

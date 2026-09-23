@@ -4127,7 +4127,7 @@
 	)
 	(sheet
 		(at 110.0 40.0)
-		(size 62.0 111.60)
+		(size 62.0 121.92)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -4563,10 +4563,60 @@
 				(justify right)
 		)
 		)
+		(pin "CLK_SEL" output
+			(at 110.0 146.6800 180)
+			(uuid "86f858f9-a3c6-5f01-adb0-49983b992734")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_IQCLK" output
+			(at 110.0 149.2200 180)
+			(uuid "1ff4ffe0-4cdb-5c3e-9d8f-465cf4b5fda9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_IQRESET" output
+			(at 110.0 151.7600 180)
+			(uuid "f7777066-c418-5208-8842-714297f3208e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "XO_SCL" output
+			(at 110.0 154.3000 180)
+			(uuid "1f8b815d-ae8e-5c59-9b9a-6852d83a6e29")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "XO_SDA" bidirectional
+			(at 110.0 156.8400 180)
+			(uuid "fc1aa7f4-9e15-5c96-8bab-3b69a35e501e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 	)
 	(sheet
 		(at 110.0 140.0)
-		(size 62.0 103.98)
+		(size 62.0 106.68)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -4872,26 +4922,6 @@
 				(justify right)
 		)
 		)
-		(pin "CLK_DAC_P" input
-			(at 110.0 213.6600 180)
-			(uuid "f36d8936-b554-51c7-ad35-17138c962f80")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
-		(pin "CLK_DAC_N" input
-			(at 110.0 216.2000 180)
-			(uuid "6914c505-1794-550c-a364-7ed22d5d577c")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
 		(pin "IF_RX_A_P" bidirectional
 			(at 110.0 218.7400 180)
 			(uuid "4eafab05-6013-5072-9345-1b15c8774ece")
@@ -4972,10 +5002,30 @@
 				(justify right)
 		)
 		)
+		(pin "DACS_IQCLK" input
+			(at 110.0 239.0600 180)
+			(uuid "50b86487-9a6b-5633-a22d-80278d1aa666")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_IQRESET" input
+			(at 110.0 241.6000 180)
+			(uuid "8f8061c5-ea91-57b1-98c9-f2e05d5eeb9c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 	)
 	(sheet
 		(at 30.0 140.0)
-		(size 62.0 30.32)
+		(size 62.0 35.56)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -5051,26 +5101,6 @@
 				(justify right)
 		)
 		)
-		(pin "CLK_DAC_P" output
-			(at 30.0 155.2400 180)
-			(uuid "7acd8256-1d9e-53e4-b022-ddcfe99b3055")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
-		(pin "CLK_DAC_N" output
-			(at 30.0 157.7800 180)
-			(uuid "ca2e9f91-29f0-5bd6-b6c9-373cd3d13c77")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
 		(pin "CLK_FPGA_P" output
 			(at 30.0 160.3200 180)
 			(uuid "6094e80d-87af-5067-b140-06a8bd454e59")
@@ -5090,6 +5120,36 @@
 			)
 				(justify right)
 		)
+		)
+		(pin "CLK_SEL" input
+			(at 30.0 165.4000 180)
+			(uuid "17641a94-5690-5400-a1f9-8103e03d009a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "XO_SCL" input
+			(at 30.0 167.9400 180)
+			(uuid "1494bc7d-4219-56f7-82b5-55f829a8ef94")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "XO_SDA" bidirectional
+			(at 30.0 170.4800 180)
+			(uuid "7a398a15-8459-5ed6-a0a9-f219ddfdee8a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
 		)
 	)
 	(sheet

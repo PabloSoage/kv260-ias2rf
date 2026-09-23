@@ -119,11 +119,18 @@ def main():
 
         new = blk
 
-        # Remove orphan pins.
+        # Remove orphan pins. The block is found by matching parentheses, not
+        # by indentation: the pins written by rev03_build_hierarchy.py close
+        # their (effects ...) on a line indented like the pin's own close, and
+        # an indentation-based match cut them short, leaving one stray paren
+        # per pin (caught by the balance check below, 23 September).
         for o in orphans:
-            pat = re.compile(r'\n\t\t\(pin "' + re.escape(o) + r'" \w+\n(?:.*\n)*?\t\t\)')
-            new, n = pat.subn("", new, count=1)
-            total_del += n
+            k = new.find('\n\t\t(pin "' + o + '" ')
+            if k < 0:
+                continue
+            pin_end = scan(new, k + 1)      # not `e`: that is the block's end
+            new = new[:k] + new[pin_end:]
+            total_del += 1
 
         # Correct any pin whose direction disagrees with its label.
         for w in wrong:
