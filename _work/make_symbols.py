@@ -550,6 +550,17 @@ SYMBOL_LAYOUT = {
         "pwr": ["3", "4", "7", "34", "39", "45", "46", None, "8", "29"],
         "gnd": ["49", None, "48", "47", "1", "2"],
     },
+    # RFC and the control in on the left, the two throws out on the right
+    # 15.24 mm apart; VDD alone on top and VEE apart at the bottom-left, so
+    # each supply's filter network (datasheet Figure 2) stacks clear of the
+    # ground bus that takes the GND and NC pads.
+    "M3SWA2-34DR": {
+        "half_w": 19.05,
+        "left": [None, "15", None, None, None, "6"],
+        "right": ["3", None, None, None, None, None, "10"],
+        "pwr": ["8"],
+        "gnd": ["5", None, None, "2", "4", "7", "9", "11", "14", "16", "17", "1", "12", "13"],
+    },
     # Interleaved mode: port 1 data and the four IQ controls on the left, then
     # every pin tied low (MODE, GAINCTRL, SLEEP and the unused port 2) in one
     # contiguous block that a single bus grounds. Each DAC's outputs 15.24 mm

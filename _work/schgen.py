@@ -246,7 +246,8 @@ class Sheet:
         vertical = p.rot in (0, 180)
         # Field placement: beside a vertical part, above/below a horizontal one.
         if power:
-            ref_at, val_at, rj = (x, y + 3.81), (x, y + (3.81 if "GND" in p.sym.lib_id else -3.81)), None
+            below = "GND" in p.sym.lib_id or p.value.startswith("-")   # symbols that point down
+            ref_at, val_at, rj = (x, y + 3.81), (x, y + (3.81 if below else -3.81)), None
         elif p.sym.lib_id.startswith("Connector:"):
             ref_at, val_at, rj = (x, y - 6.35), (x, y - 3.81), None
         elif len(p.sym.pins) <= 2:

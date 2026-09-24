@@ -4127,7 +4127,7 @@
 	)
 	(sheet
 		(at 110.0 40.0)
-		(size 62.0 218.44)
+		(size 62.0 228.60)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -4506,16 +4506,6 @@
 		(pin "CLK_FPGA_N" input
 			(at 110.0 141.6000 180)
 			(uuid "c3271e86-ce75-52a6-ac88-3611398967eb")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
-		(pin "SW_CTRL[3..0]" output
-			(at 110.0 144.1400 180)
-			(uuid "52eff366-b7eb-5b35-8629-d7d818a9f119")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4953,6 +4943,46 @@
 				(justify right)
 			)
 		)
+		(pin "SW_CTRL0" output
+			(at 110.0 255.9000 180)
+			(uuid "77f56d2c-1bfe-567c-85be-2acafbdd8761")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL1" output
+			(at 110.0 258.4400 180)
+			(uuid "edf9b4b8-9a33-5153-b1c6-dce04cd543c5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL2" output
+			(at 110.0 260.9800 180)
+			(uuid "f91ea0fd-5a3d-5a1d-803b-48bb2363947e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL3" output
+			(at 110.0 263.5200 180)
+			(uuid "00c95660-cc28-5bef-bc16-54d48f8cc2e4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 	)
 	(sheet
 		(at 30.0 140.0)
@@ -5085,7 +5115,7 @@
 	)
 	(sheet
 		(at 190.0 140.0)
-		(size 62.0 45.72)
+		(size 62.0 55.88)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -5120,16 +5150,6 @@
 				)
 				(justify left top)
 			)
-		)
-		(pin "SW_CTRL[3..0]" input
-			(at 190.0 165.4000 180)
-			(uuid "7ee129d6-b879-59d3-8d41-3ad5d774323e")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
 		)
 		(pin "IF_RX_A" output
 			(at 190.0 167.9400 180)
@@ -5184,6 +5204,46 @@
 		(pin "IF_TX_C" input
 			(at 190.0 180.6400 180)
 			(uuid "9692f541-9a41-5f1c-85b8-4a825ce8a116")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL0" input
+			(at 190.0 183.1800 180)
+			(uuid "7e1fdcdf-dd8c-5d76-8f03-8e8f309b2288")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL1" input
+			(at 190.0 185.7200 180)
+			(uuid "077254b9-f2ee-5e1f-a6a4-2546cf844b6f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL2" input
+			(at 190.0 188.2600 180)
+			(uuid "1745263e-3fa0-5998-891e-28529bac1efd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SW_CTRL3" input
+			(at 190.0 190.8000 180)
+			(uuid "8d10d3a3-ccb4-5c2b-b95b-1a1086c6cd45")
 			(effects
 				(font
 					(size 1.27 1.27)

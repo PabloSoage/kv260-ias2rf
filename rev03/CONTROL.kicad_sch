@@ -836,7 +836,7 @@
 		)
 		(uuid "693a6dde-b4f8-5579-8880-5e310f5187da")
 	)
-	(hierarchical_label "SW_CTRL[3..0]"
+	(hierarchical_label "SW_CTRL0"
 		(shape output)
 		(at 105.4 167.6400 0)
 		(effects
@@ -845,11 +845,44 @@
 			)
 			(justify left)
 		)
-		(uuid "eef1c9cb-c8c9-5a08-bc49-5fcab33a85ee")
+		(uuid "3f097673-32a9-5e1a-9479-7c13d61cda7a")
+	)
+	(hierarchical_label "SW_CTRL1"
+		(shape output)
+		(at 105.4 172.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4a3e5037-3652-5623-a16c-667464517f32")
+	)
+	(hierarchical_label "SW_CTRL2"
+		(shape output)
+		(at 105.4 177.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "839d0c0b-1f5e-52fb-9bdf-9434df010f92")
+	)
+	(hierarchical_label "SW_CTRL3"
+		(shape output)
+		(at 105.4 182.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "2d9ddaaa-d30e-50e7-bc80-562fcd7a5e24")
 	)
 	(hierarchical_label "CLK_SEL"
 		(shape output)
-		(at 105.4 172.7200 0)
+		(at 105.4 187.9600 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -860,7 +893,7 @@
 	)
 	(hierarchical_label "XO_SCL"
 		(shape output)
-		(at 105.4 177.8000 0)
+		(at 105.4 193.0400 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -871,7 +904,7 @@
 	)
 	(hierarchical_label "XO_SDA"
 		(shape bidirectional)
-		(at 105.4 182.8800 0)
+		(at 105.4 198.1200 0)
 		(effects
 			(font
 				(size 1.27 1.27)

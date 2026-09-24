@@ -131,7 +131,7 @@ SHEETS = {
              ("FPGA_PROG_B", "input"), ("FPGA_IRQ", "output")] +
             [(n, flip(d)) for n, d in CONV_DIGITAL] +
             [("CLK_FPGA_P", "input"), ("CLK_FPGA_N", "input")] +
-            [("SW_CTRL[3..0]", "output")] +
+            [(f"SW_CTRL{i}", "output") for i in range(4)] +
             [("CLK_SEL", "output"), ("XO_SCL", "output"), ("XO_SDA", "bidirectional")],
     },
     # CONVERTERS was split in four on 24 Sep (_work/rev03_split_converters.py):
@@ -186,7 +186,7 @@ SHEETS = {
         "at": (190.0, 140.0),
         "labels":
             [(n, "output") for n in IF_RX] + [(n, "input") for n in IF_TX] +
-            [("SW_CTRL[3..0]", "input")],
+            [(f"SW_CTRL{i}", "input") for i in range(4)],
     },
     "POWER": {
         "file": "rev03/POWER.kicad_sch",

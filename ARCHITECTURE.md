@@ -487,7 +487,7 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U602`, `U603` | SDR ADC drivers, 12 dB | AD8352ACPZ | C | One per AD9253 channel. Drawn: rev03/ADC_SDR |
 | `U401` | Reference select + LVPECL 1:8 fan-out | ADCLK948BCPZ | C | Drawn: rev03/CLOCK. Replaces the ADCLK944 + separate selector |
 | `Y401` | Programmable master XO, 400/500 MHz | Si549, LVPECL, 3.3 V, 5×7 mm, pinout C | C | Replaces the TCXO; GPS-disciplined through its ±950 ppm DCO |
-| `U_SW1..4` | Routing SPDTs | M3SWA2-34DR+ | X | Positive 3.3 V control, but **bipolar supply: VDD +3.3 V and VEE −3.3 V** (B-03). Exposed paddle to GND |
+| `U901..U904` | Routing SPDTs | M3SWA2-34DR+ | C | Positive 3.3 V control, but **bipolar supply: VDD +3.3 V and VEE −3.3 V** (B-03). Drawn: rev03/ROUTING, with the datasheet's Figure 2 network each. Footprint from Mini-Circuits PL-768 |
 | `U_PWR*` | Bucks, LDOs and sequencer | — | P | Includes FPGA power |
 | `U_INV1` | −3.3 V charge-pump inverter | LM2663 or equivalent | X | **Reinstated.** VEE for the four RF switches, 8 mA. It had been dropped when B-03 was closed wrongly |
 | `Q_REV1` | Reverse-polarity protection | P-MOSFET + Zener | P | |
@@ -497,7 +497,7 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `H1..2` | M3 screws through the KV260's corner holes | M3 + standoff | C | `[V]` The original board's holes land on the carrier's within 5 µm (docs/INTERFACE_SPEC.md §5.3) |
 | `H3..` | Outer-edge supports | M3 standoff, ~8 mm | P | The widened board overhangs the carrier; 7.9 mm from its underside to the plane of the KV260's feet |
 | `J_PMOD1` | Cable to the KV260's Pmod J2 | 2×6, 2.54 mm | P | |
-| `J_IF*` | IF and clock SMAs | Edge-mount | P | |
+| `J911..J952` | IF SMAs, 10 | Edge-mount | C | Drawn: rev03/ROUTING, each DC-blocked. `J401`/`J402` are the clock SMAs |
 | `J_EXT1` | IDC 2×20 to AERIS | — | P | Up to 8 ADAR1000s |
 | ~~`U_MIX1`~~ | ~~ADL5801~~ | | **D** | Does not reach 10.5 GHz; AERIS does the mixing |
 | ~~`U_PWR3`~~ | ~~ADP151~~ | | **D** | 200 mA is not enough |

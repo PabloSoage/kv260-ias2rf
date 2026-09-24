@@ -76,6 +76,7 @@ project.
 | [docs/ADC_SDR_SPEC.md](docs/ADC_SDR_SPEC.md) | **Phase 2.** The SDR ADC, two channels, and the second SDR input `IF_RX_C` |
 | [docs/DAC_RADAR_SPEC.md](docs/DAC_RADAR_SPEC.md) | **Phase 2.** The radar DAC, its reconstruction filter and balun, and a reference error found in AERIS-10 |
 | [docs/DAC_SDR_SPEC.md](docs/DAC_SDR_SPEC.md) | **Phase 2.** The dual SDR DAC in interleaved mode, two output chains |
+| [docs/ROUTING_SPEC.md](docs/ROUTING_SPEC.md) | **Phase 2.** The four RF switches, the switching plan, ten SMAs |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |
 

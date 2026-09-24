@@ -199,7 +199,7 @@ script-generated sheets have already been **removed** from the project and moved
 | `DAC_RADAR` | ✅ Drawn and verified: `check_sheet.py dac_radar` PASS. Awaiting review — [DAC_RADAR_SPEC.md](DAC_RADAR_SPEC.md) |
 | `DAC_SDR` | ✅ Drawn and verified: `check_sheet.py dac_sdr` PASS. Awaiting review — [DAC_SDR_SPEC.md](DAC_SDR_SPEC.md) |
 | `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep) — [CLOCK_SPEC.md](CLOCK_SPEC.md) |
-| `ROUTING` | 4 SPDT switches, IF SMAs, clock SMAs |
+| `ROUTING` | ✅ Drawn and verified: `check_sheet.py routing` PASS. Awaiting review — [ROUTING_SPEC.md](ROUTING_SPEC.md) |
 | `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
 | `POWER` | Full tree with reverse-polarity protection and analogue/digital separation |
 
