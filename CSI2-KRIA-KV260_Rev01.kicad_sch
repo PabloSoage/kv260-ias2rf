@@ -4127,7 +4127,7 @@
 	)
 	(sheet
 		(at 110.0 40.0)
-		(size 62.0 162.56)
+		(size 62.0 218.44)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -4423,29 +4423,9 @@
 				(justify right)
 		)
 		)
-		(pin "DACR_D[7..0]" input
-			(at 110.0 116.2000 180)
-			(uuid "4e383baf-c579-5289-a502-36d5c9b0b331")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
 		(pin "DACR_CLK" input
 			(at 110.0 118.7400 180)
 			(uuid "28d70be4-2427-5e18-bcad-03e2cf4f98f6")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
-		(pin "DACS_D[13..0]" input
-			(at 110.0 121.2800 180)
-			(uuid "960bca21-5981-5bb1-9899-c6a488135f18")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4746,6 +4726,226 @@
 		(pin "ADCR_D7_P" output
 			(at 110.0 197.4800 180)
 			(uuid "81fce6e8-7434-54de-a97a-1eeeba448ba2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D0" input
+			(at 110.0 200.0200 180)
+			(uuid "4d6b7f4e-5465-5cf6-8a50-2b3f1dc4cbde")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D1" input
+			(at 110.0 202.5600 180)
+			(uuid "fdac5efc-63ac-5ae9-9fe6-b1dd2fe5ca09")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D2" input
+			(at 110.0 205.1000 180)
+			(uuid "1d2514cc-0d71-5f1d-b5ff-97e4cd426c2d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D3" input
+			(at 110.0 207.6400 180)
+			(uuid "221253a9-acda-57af-b6a8-a67100ceae52")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D4" input
+			(at 110.0 210.1800 180)
+			(uuid "386058ae-7370-5ed0-b6fb-35c187b1c4f7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D5" input
+			(at 110.0 212.7200 180)
+			(uuid "68f2a8d2-b8ac-5ac8-8bcc-2ffb673ecff3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D6" input
+			(at 110.0 215.2600 180)
+			(uuid "61305235-8b8f-50c2-b215-ccc1944036ce")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D7" input
+			(at 110.0 217.8000 180)
+			(uuid "cf0d728d-8b4e-51f0-bbce-8254b088c2ec")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D0" input
+			(at 110.0 220.3400 180)
+			(uuid "5be4b4e3-f4e9-51e1-93ad-d1d05a97e4a5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D1" input
+			(at 110.0 222.8800 180)
+			(uuid "0412ccdc-a4f4-5863-a432-0c00187c3b96")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D10" input
+			(at 110.0 225.4200 180)
+			(uuid "9758df55-2455-510a-82ba-e78252ee9a46")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D11" input
+			(at 110.0 227.9600 180)
+			(uuid "0eed4002-fa10-5324-bcd4-e4aa11841969")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D12" input
+			(at 110.0 230.5000 180)
+			(uuid "e4cefccd-ee9e-51ee-b15d-1ef8311c8d18")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D13" input
+			(at 110.0 233.0400 180)
+			(uuid "96de2865-2d9d-5a7a-90fb-0a9ed5c7b11f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D2" input
+			(at 110.0 235.5800 180)
+			(uuid "1369c6c2-d4f5-58ba-bc9c-8e56c8d0956c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D3" input
+			(at 110.0 238.1200 180)
+			(uuid "ccc6ed2f-5c9b-5e16-bb47-3e81a2a2bcfb")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D4" input
+			(at 110.0 240.6600 180)
+			(uuid "99bf8245-6cc4-5687-b595-8316d43c74e9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D5" input
+			(at 110.0 243.2000 180)
+			(uuid "d7717b60-6950-54b0-8fc2-1704b2ebb966")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D6" input
+			(at 110.0 245.7400 180)
+			(uuid "6d68f61a-e2fa-5e94-a802-646cb7983b75")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D7" input
+			(at 110.0 248.2800 180)
+			(uuid "d1986766-83e4-5702-94c2-da42d9f4d5a1")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D8" input
+			(at 110.0 250.8200 180)
+			(uuid "812fe172-3f5e-51a0-935e-c8852f1e601d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D9" input
+			(at 110.0 253.3600 180)
+			(uuid "5909cc99-421a-5249-a671-e5284e09cb4a")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5521,7 +5721,7 @@
 	)
 	(sheet
 		(at 520.0 40.0)
-		(size 62.0 20.00)
+		(size 62.0 35.56)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -5557,16 +5757,6 @@
 				(justify left top)
 			)
 		)
-		(pin "DACR_D[7..0]" input
-			(at 520.0 45.0800 180)
-			(uuid "59324a25-fe4a-5362-98f7-0a7df0ffca07")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
-		)
 		(pin "DACR_CLK" input
 			(at 520.0 47.6200 180)
 			(uuid "4c477e41-af0f-56a7-a16f-22273c371089")
@@ -5587,10 +5777,90 @@
 				(justify right)
 		)
 		)
+		(pin "DACR_D0" input
+			(at 520.0 52.7000 180)
+			(uuid "6e5b13fb-904c-5228-8747-c787f0f30932")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D1" input
+			(at 520.0 55.2400 180)
+			(uuid "c4d6ae58-4d84-59f1-b833-d11f2d6e82a5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D2" input
+			(at 520.0 57.7800 180)
+			(uuid "e47a48d0-82d1-5f2c-8bea-2665b8f7cd83")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D3" input
+			(at 520.0 60.3200 180)
+			(uuid "5a458c48-07ed-5019-871f-599bdf8c1ccc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D4" input
+			(at 520.0 62.8600 180)
+			(uuid "673b6ab1-e07c-53f8-8167-40f4d2c6bc00")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D5" input
+			(at 520.0 65.4000 180)
+			(uuid "b18a4998-0431-5469-af17-ae6ca52561a0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D6" input
+			(at 520.0 67.9400 180)
+			(uuid "256a2603-ccd5-57ec-8e13-198b846aee65")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACR_D7" input
+			(at 520.0 70.4800 180)
+			(uuid "24b06af5-4677-575d-aa4a-bd82dc5dd1e1")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 	)
 	(sheet
 		(at 520.0 80.0)
-		(size 62.0 25.40)
+		(size 62.0 60.96)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -5625,16 +5895,6 @@
 				)
 				(justify left top)
 			)
-		)
-		(pin "DACS_D[13..0]" input
-			(at 520.0 85.0800 180)
-			(uuid "9bdbcace-0821-55a8-846d-7fdb77601933")
-			(effects
-				(font
-					(size 1.27 1.27)
-			)
-				(justify right)
-		)
 		)
 		(pin "DACS_IQWRT" input
 			(at 520.0 87.6200 180)
@@ -5689,6 +5949,146 @@
 		(pin "IF_TX_C" output
 			(at 520.0 100.3200 180)
 			(uuid "f3bbb6e9-aa43-5be7-8f22-745b605c6a9c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D0" input
+			(at 520.0 102.8600 180)
+			(uuid "db00cb53-298e-5454-90d3-10935f4eb634")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D1" input
+			(at 520.0 105.4000 180)
+			(uuid "c6d561e2-364d-551e-84ad-841f4e50365d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D10" input
+			(at 520.0 107.9400 180)
+			(uuid "6f8613fa-a068-5a76-8d58-d203bc002ab6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D11" input
+			(at 520.0 110.4800 180)
+			(uuid "e4c53152-b16d-5b69-adfd-ed28568ad781")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D12" input
+			(at 520.0 113.0200 180)
+			(uuid "d4f0f9dc-743a-524d-a7e2-422587c4f5fe")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D13" input
+			(at 520.0 115.5600 180)
+			(uuid "08917d31-d662-54db-a448-a1d24bc3568f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D2" input
+			(at 520.0 118.1000 180)
+			(uuid "b88da997-9043-54b4-bcdb-743c97589035")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D3" input
+			(at 520.0 120.6400 180)
+			(uuid "56248115-2c61-589a-a1bd-149edcb7df6b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D4" input
+			(at 520.0 123.1800 180)
+			(uuid "3bc0bc3c-f6af-557b-8a9f-a4e11325aad2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D5" input
+			(at 520.0 125.7200 180)
+			(uuid "471f5b3f-121f-58fe-bb1d-c87badbfac7f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D6" input
+			(at 520.0 128.2600 180)
+			(uuid "91fb21d8-8786-5b65-9916-89368bfcbf4e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D7" input
+			(at 520.0 130.8000 180)
+			(uuid "a48babda-f614-514e-826a-bb5be25af095")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D8" input
+			(at 520.0 133.3400 180)
+			(uuid "6d5a32e5-5b3a-5c42-b850-455d0742efd2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DACS_D9" input
+			(at 520.0 135.8800 180)
+			(uuid "52224ea1-3db6-57f4-8a8b-fa18af0701bb")
 			(effects
 				(font
 					(size 1.27 1.27)

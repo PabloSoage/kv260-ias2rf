@@ -11,7 +11,7 @@
 	)
 	(lib_symbols
 	)
-	(hierarchical_label "DACS_D[13..0]"
+	(hierarchical_label "DACS_D0"
 		(shape input)
 		(at 25.4 25.4000 0)
 		(effects
@@ -20,11 +20,154 @@
 			)
 			(justify left)
 		)
-		(uuid "c7757724-3948-5a1b-8c90-6f3682a17de4")
+		(uuid "c27f3e0f-09ab-5b9f-ad3c-319fe6cdc07e")
+	)
+	(hierarchical_label "DACS_D1"
+		(shape input)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e30a2724-a8e8-5516-8b58-fda50f8bfdb8")
+	)
+	(hierarchical_label "DACS_D2"
+		(shape input)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e9f2cb81-660d-53d3-a01a-be9b603ae504")
+	)
+	(hierarchical_label "DACS_D3"
+		(shape input)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7184f874-aac5-5490-92d8-2a0cacc5a37b")
+	)
+	(hierarchical_label "DACS_D4"
+		(shape input)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "100a228d-0380-5b02-bb3f-f544d9f3d8b3")
+	)
+	(hierarchical_label "DACS_D5"
+		(shape input)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "dc3554b3-f293-5cde-bb26-9fc94580cb4b")
+	)
+	(hierarchical_label "DACS_D6"
+		(shape input)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ef1cff6a-d1ef-5fe0-9b7e-0dad5d86e07e")
+	)
+	(hierarchical_label "DACS_D7"
+		(shape input)
+		(at 25.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ebf52019-ec0b-51cb-8017-6729213d17d3")
+	)
+	(hierarchical_label "DACS_D8"
+		(shape input)
+		(at 25.4 66.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ac1c975a-bbca-558e-b27e-51c329ef21dd")
+	)
+	(hierarchical_label "DACS_D9"
+		(shape input)
+		(at 25.4 71.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4c98bb20-64f4-5849-994f-4c52cc2cc6cb")
+	)
+	(hierarchical_label "DACS_D10"
+		(shape input)
+		(at 25.4 76.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0c8b2e78-75a6-5c18-8f61-fa26ee824dd1")
+	)
+	(hierarchical_label "DACS_D11"
+		(shape input)
+		(at 25.4 81.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5d97bdd7-9dfc-5c37-8e0c-cbeb6e159585")
+	)
+	(hierarchical_label "DACS_D12"
+		(shape input)
+		(at 25.4 86.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "67fcb381-f70d-5775-a024-aaafc2d7d76c")
+	)
+	(hierarchical_label "DACS_D13"
+		(shape input)
+		(at 25.4 91.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7a1b7749-81b4-5b69-8ef6-5028ddc5e426")
 	)
 	(hierarchical_label "DACS_IQWRT"
 		(shape input)
-		(at 25.4 30.4800 0)
+		(at 25.4 96.5200 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -35,7 +178,7 @@
 	)
 	(hierarchical_label "DACS_IQSEL"
 		(shape input)
-		(at 25.4 35.5600 0)
+		(at 25.4 101.6000 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -46,7 +189,7 @@
 	)
 	(hierarchical_label "DACS_IQCLK"
 		(shape input)
-		(at 25.4 40.6400 0)
+		(at 25.4 106.6800 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -57,7 +200,7 @@
 	)
 	(hierarchical_label "DACS_IQRESET"
 		(shape input)
-		(at 25.4 45.7200 0)
+		(at 25.4 111.7600 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -68,7 +211,7 @@
 	)
 	(hierarchical_label "IF_TX_A"
 		(shape output)
-		(at 25.4 50.8000 0)
+		(at 25.4 116.8400 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -79,7 +222,7 @@
 	)
 	(hierarchical_label "IF_TX_C"
 		(shape output)
-		(at 25.4 55.8800 0)
+		(at 25.4 121.9200 0)
 		(effects
 			(font
 				(size 1.27 1.27)

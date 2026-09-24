@@ -51,6 +51,7 @@ SECOND_SOURCE = {
     "AD9767ASTZ":     ("easyeda", "AD9767ASTZ"),
     "ADCLK944BCPZ":   ("easyeda", "ADCLK944BCPZ-R2"),
     "Si549_PinoutC":  ("kicad",   "Oscillator:Si570"),
+    "AD9708AR":       ("kicad",   "Video:AD9708AR"),
 }
 
 # Datasheet symbols for which no independent source exists. Listed so the
@@ -119,6 +120,27 @@ ADJUDICATED = {
     ("AD9253BCPZ-125", "47"): "EasyEDA typo 'VNI' for VIN (datasheet Table 8)",
     ("AD9253BCPZ-125", "48"): "EasyEDA typo 'VNI' for VIN (datasheet Table 8)",
     ("AD9253BCPZ-125", "40"): "EasyEDA typo 'RBAIS' for RBIAS (datasheet Table 8)",
+    ("AD9708AR", "9"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("AD9708AR", "10"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("AD9708AR", "11"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("AD9708AR", "12"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("AD9708AR", "13"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("AD9708AR", "14"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("AD9708AR", "25"):
+        "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
+        "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
     ("Si549_PinoutC", "6"):
         "Naming only: KiCad's Si570 calls the supply 'Vcc', the Si549 "
         "datasheet 'VDD'. Same pin, same function",
@@ -201,6 +223,10 @@ def main():
         m, conf, bar, only_a, only_b, ep_ok, ne_a, ne_b = compare(ours, src)
         settled = [c for c in conf if (sym, c[0]) in ADJUDICATED]
         conf = [c for c in conf if (sym, c[0]) not in ADJUDICATED]
+        # a pad only one side has can be adjudicated too (e.g. NC pins a
+        # second source leaves out)
+        settled += [(p, ours[p], None) for p in only_a if (sym, p) in ADJUDICATED]
+        only_a = [p for p in only_a if (sym, p) not in ADJUDICATED]
         ep_settled = not ep_ok and (sym, "EP") in ADJUDICATED
         open_ep = not ep_ok and not ep_settled
         if conf or only_a or only_b or open_ep:

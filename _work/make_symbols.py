@@ -9,7 +9,7 @@ carries a real type.
 
 WHERE THE DATA COMES FROM, AND HOW FAR TO TRUST IT
 --------------------------------------------------
-Ten of the twelve symbols are transcribed from the MANUFACTURER DATASHEET
+Eleven of the thirteen symbols are transcribed from the MANUFACTURER DATASHEET
 (DATASHEET_PINS below). analog.com will not serve its PDFs to this machine, so
 they came from two other places:
 
@@ -39,7 +39,6 @@ Those are maintained and verified, and duplicating them would only create a
 second version to drift:
 
     XC7A50T-FTG256   FPGA_Xilinx_Artix7    front-end FPGA, 256 pins, 4 units
-    AD9708AR         Video                 radar DAC
     ADF4351          RF                    SDR synthesiser (board B)
 
 Usage:  py _work/make_symbols.py [--dry-run]
@@ -375,6 +374,22 @@ DATASHEET_PINS.update({
     # footprint-compatible with the Si570, whose KiCad stock symbol serves as
     # the second source in crosscheck_pinouts.py.
     #   IDD LVPECL 107 typ / 153 max mA. I2C pull-ups to VDD (datasheet §I2C).
+    # AD9708 datasheet Rev. B, Pin Configuration and Pin Function
+    # Descriptions (AERIS-10 component folder). Rebuilt here although KiCad's
+    # Video library has it: the stock symbol omits the NC pins and its layout
+    # forces crossings around the reference pins (docs/DAC_RADAR_SPEC.md).
+    "AD9708AR": [
+        ("1", "DB7", "input"), ("2", "DB6", "input"), ("3", "DB5", "input"),
+        ("4", "DB4", "input"), ("5", "DB3", "input"), ("6", "DB2", "input"),
+        ("7", "DB1", "input"), ("8", "DB0", "input"),
+        ("9", "NC", "no_connect"), ("10", "NC", "no_connect"), ("11", "NC", "no_connect"),
+        ("12", "NC", "no_connect"), ("13", "NC", "no_connect"), ("14", "NC", "no_connect"),
+        ("15", "SLEEP", "input"), ("16", "REFLO", "passive"), ("17", "REFIO", "bidirectional"),
+        ("18", "FS_ADJ", "passive"), ("19", "COMP1", "passive"), ("20", "ACOM", "power_in"),
+        ("21", "IOUTB", "output"), ("22", "IOUTA", "output"), ("23", "COMP2", "passive"),
+        ("24", "AVDD", "power_in"), ("25", "NC", "no_connect"), ("26", "DCOM", "power_in"),
+        ("27", "DVDD", "power_in"), ("28", "CLOCK", "input"),
+    ],
     "Si549_PinoutC": [
         ("1", "NC",   "no_connect"),
         ("2", "OE",   "input"),
@@ -390,6 +405,8 @@ DATASHEET_PINS.update({
 _CLOCK_NOTES = {
     "ADCLK948BCPZ": "Pin table from the ADCLK948 datasheet Rev. B, Table 7. "
                     "IVCC 330 mA max. EPAD to VEE (ground here), pad 33.",
+    "AD9708AR": "Pin table from the AD9708 datasheet Rev. B, Pin Function Descriptions. "
+                "AVDD/DVDD 2.7-5.5 V; IAVDD 30 mA max, IDVDD 6 mA max.",
     "Si549_PinoutC": "Pin table from the Si549 datasheet Revision H, pinout code C "
                      "(Si570-compatible: pin 1 NC, pin 2 OE active high). IDD 153 mA max LVPECL.",
 }
@@ -399,6 +416,7 @@ _CLOCK_NOTES = {
 DATASHEET_ONLY = {
     "ADCLK948BCPZ":   "2-input, 8-output LVPECL clock fan-out, 4.8 GHz - reference selector and distribution",
     "Si549_PinoutC":  "I2C programmable ultra-low-jitter XO, 0.2-1500 MHz, LVPECL - local master clock",
+    "AD9708AR":       "8-bit 125 MSPS current-output DAC, parallel CMOS - radar chirp",
     "AD9253BCPZ-125": "Quad 14-bit 125 MSPS ADC, serial LVDS - SDR receive (2 of 4 channels used)",
     "AD9767ASTZ":     "Dual 14-bit 125 MSPS current-output DAC, parallel CMOS - SDR transmit",
     "ADCLK944BCPZ":   "1:4 LVPECL clock fan-out, 7 GHz - first clock plan, superseded by the ADCLK948",
@@ -532,6 +550,19 @@ SYMBOL_LAYOUT = {
         "pwr": ["3", "4", "7", "34", "39", "45", "46", None, "8", "29"],
         "gnd": ["49", None, "48", "47", "1", "2"],
     },
+    # Data and clock in on the left; outputs on the right, 15.24 mm apart so
+    # the filter's shunt parts hang between the legs; COMP1 on top beside
+    # AVDD (its capacitor goes to AVDD); the reference, full-scale and
+    # grounds along the bottom, spaced for the parts hanging off them.
+    "AD9708AR": {
+        "half_w": 22.86,
+        "left": ["1", "2", "3", "4", "5", "6", "7", "8", None, "28", None, "15", None,
+                 "9", "10", "11", "12", "13", "14", "25", None, None, None],
+        "right": [None, None, None, None, None, "22", None, None, None, None, None, "21"],
+        "pwr": ["27", None, None, None, "24", None, None, "19"],
+        "gnd": ["17", None, None, None, "18", None, None, None, None, None, "23", None,
+                None, None, "16", "20", "26"],
+    },
     # Analogue, clock and control in on the left; data out on the right in
     # bit order, true pin above complement; supplies on top, AVDD then DRVDD.
     # The gaps on the left leave room for the parts hanging off CML, VREF
@@ -651,7 +682,6 @@ def main():
     print()
     print("Already covered by KiCad's official libraries, not rebuilt:")
     print("    XC7A50T-FTG256   FPGA_Xilinx_Artix7")
-    print("    AD9708AR         Video")
     print("    ADF4351          RF")
     print()
 

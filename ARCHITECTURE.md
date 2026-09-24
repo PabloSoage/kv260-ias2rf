@@ -479,7 +479,8 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U_CFG1` | Configuration flash | QSPI 32 Mb | P | |
 | `U501` | Radar ADC | AD9484BCPZ-500 | C | 8 b / 400 MSPS, AERIS's part `[V]`. Drawn: rev03/ADC_RADAR. Custom footprint (5.10 mm exposed pad) |
 | `U601` | SDR ADC | AD9253BCPZ-125 | C | 14 b, channels A and B, 62.5 MSPS in 1-lane. **AVDD and DRVDD both 1.8 V** (DRVDD abs. max 2.0 V). Drawn: rev03/ADC_SDR |
-| `U_DAC1` | Radar DAC | AD9708AR | X | AERIS's part `[V]` |
+| `U701` | Radar DAC | AD9708AR | C | AERIS's part `[V]`. Drawn: rev03/DAC_RADAR. Internal 1.2 V reference, unlike AERIS (see DAC_RADAR_SPEC §1) |
+| `T701` | DAC output balun, 2:1 Z | — | P | Part not chosen (ADT2-1T class) |
 | `U_DAC2` | SDR DAC | AD9767ASTZ | X | Dual 14 b, 3.3 V |
 | `U502`, `U503` | Radar ADC drivers, 15 + 10 dB | AD8352ACPZ | C | Drawn: rev03/ADC_RADAR. Two in cascade, as AERIS `[V]`; at 5 V, the only supply the datasheet characterises |
 | `U602`, `U603` | SDR ADC drivers, 12 dB | AD8352ACPZ | C | One per AD9253 channel. Drawn: rev03/ADC_SDR |

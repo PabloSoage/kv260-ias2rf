@@ -49,10 +49,13 @@ def relabel(name):
     spec = H.SHEETS[name]
     path = os.path.join(ROOT, spec["file"])
     text = open(path, encoding="utf-8").read()
-    if re.search(r'\n\t\((symbol|wire)\b', text):
-        raise SystemExit(f"ABORTED: {spec['file']} has been drawn; edit it in KiCad")
     want = dict(spec["labels"])
     have = dict(re.findall(r'\(hierarchical_label "([^"]+)"\s*\(shape (\w+)\)', text))
+    if re.search(r'\n\t\((symbol|wire)\b', text):
+        if want == have:
+            print(f"  {name:10s} drawn; labels current ({len(want)})")
+            return
+        raise SystemExit(f"ABORTED: {spec['file']} has been drawn; edit it in KiCad")
     if want == have:
         print(f"  {name:10s} labels already current ({len(want)})")
         return

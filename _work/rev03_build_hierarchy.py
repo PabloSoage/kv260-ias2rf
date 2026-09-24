@@ -75,8 +75,10 @@ CONV_DIGITAL = [                       # front-end FPGA <-> converters
     ("ADCS_D1_P", "input"), ("ADCS_D1_N", "input"),
     ("ADCS_DCO_P", "input"), ("ADCS_DCO_N", "input"),
     ("ADCS_FCO_P", "input"), ("ADCS_FCO_N", "input"),
-    ("DACR_D[7..0]", "output"), ("DACR_CLK", "output"),
-    ("DACS_D[13..0]", "output"), ("DACS_IQWRT", "output"), ("DACS_IQSEL", "output"),
+    # DAC buses split into one label per line on 24 Sep, as ADCR's were.
+    *[(f"DACR_D{i}", "output") for i in range(8)], ("DACR_CLK", "output"),
+    *[(f"DACS_D{i}", "output") for i in range(14)],
+    ("DACS_IQWRT", "output"), ("DACS_IQSEL", "output"),
     ("DACS_IQCLK", "output"), ("DACS_IQRESET", "output"),      # added 23 Sep
     ("CONV_SPI_SCLK", "output"), ("CONV_SPI_SDIO", "bidirectional"),
     ("CONV_SPI_CSB_R", "output"), ("CONV_SPI_CSB_S", "output"),

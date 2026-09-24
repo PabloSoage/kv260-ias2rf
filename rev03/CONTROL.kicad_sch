@@ -473,7 +473,7 @@
 		)
 		(uuid "8b06af7f-2c3d-52c8-9976-6adef080f572")
 	)
-	(hierarchical_label "DACR_D[7..0]"
+	(hierarchical_label "DACR_D0"
 		(shape input)
 		(at 25.4 238.7600 0)
 		(effects
@@ -482,9 +482,9 @@
 			)
 			(justify left)
 		)
-		(uuid "3ba38d69-3651-5c65-914e-593c6236aac4")
+		(uuid "5f222df1-7598-5324-bd19-0c6322cc35a1")
 	)
-	(hierarchical_label "DACR_CLK"
+	(hierarchical_label "DACR_D1"
 		(shape input)
 		(at 25.4 243.8400 0)
 		(effects
@@ -493,9 +493,9 @@
 			)
 			(justify left)
 		)
-		(uuid "5f031f74-1218-5328-9c8c-eccb65c8d819")
+		(uuid "d34ce410-f146-5062-88fb-e4706cd2e039")
 	)
-	(hierarchical_label "DACS_D[13..0]"
+	(hierarchical_label "DACR_D2"
 		(shape input)
 		(at 25.4 248.9200 0)
 		(effects
@@ -504,11 +504,231 @@
 			)
 			(justify left)
 		)
-		(uuid "3d1d2138-4d26-5b2d-a0de-6084e25dca97")
+		(uuid "c74448b7-e3cb-5102-9684-898c8f47b40d")
+	)
+	(hierarchical_label "DACR_D3"
+		(shape input)
+		(at 25.4 254.0000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e1211f02-3483-5fa0-ad01-8aa2a990f352")
+	)
+	(hierarchical_label "DACR_D4"
+		(shape input)
+		(at 25.4 259.0800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "368a3a08-6e7a-5f7b-ae05-2989fe7bc57a")
+	)
+	(hierarchical_label "DACR_D5"
+		(shape input)
+		(at 105.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3fa8d39f-f01e-5f4d-8349-b9c7814fd2a5")
+	)
+	(hierarchical_label "DACR_D6"
+		(shape input)
+		(at 105.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c1cc6ae7-1802-5e2a-ad23-40af55ad0524")
+	)
+	(hierarchical_label "DACR_D7"
+		(shape input)
+		(at 105.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5f42a1ca-ae3b-5045-b063-4683858fcc4d")
+	)
+	(hierarchical_label "DACR_CLK"
+		(shape input)
+		(at 105.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5f031f74-1218-5328-9c8c-eccb65c8d819")
+	)
+	(hierarchical_label "DACS_D0"
+		(shape input)
+		(at 105.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9899c5a3-5516-5f21-8060-6f2d7743c6fa")
+	)
+	(hierarchical_label "DACS_D1"
+		(shape input)
+		(at 105.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "586af17b-6ea3-5177-99ea-fdc8dae205d6")
+	)
+	(hierarchical_label "DACS_D2"
+		(shape input)
+		(at 105.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "bcb99661-31e9-5092-9161-0c1b8196f770")
+	)
+	(hierarchical_label "DACS_D3"
+		(shape input)
+		(at 105.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3a1608d8-60c4-5dfa-af5e-0b2cd6246bc5")
+	)
+	(hierarchical_label "DACS_D4"
+		(shape input)
+		(at 105.4 66.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fd208542-6103-526d-9c43-84ed0dc14615")
+	)
+	(hierarchical_label "DACS_D5"
+		(shape input)
+		(at 105.4 71.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f24400b0-ba55-5ee1-8f64-e7da031e1e5b")
+	)
+	(hierarchical_label "DACS_D6"
+		(shape input)
+		(at 105.4 76.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9a75cb1e-2edb-5562-9d57-3b86c86bd964")
+	)
+	(hierarchical_label "DACS_D7"
+		(shape input)
+		(at 105.4 81.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fff9593b-2653-5791-9247-38fc96ea4bfa")
+	)
+	(hierarchical_label "DACS_D8"
+		(shape input)
+		(at 105.4 86.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b86b2fd7-2e1f-5d96-87af-650d3e03053b")
+	)
+	(hierarchical_label "DACS_D9"
+		(shape input)
+		(at 105.4 91.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "cf2b6c64-5136-5a0b-b46d-53daab46de46")
+	)
+	(hierarchical_label "DACS_D10"
+		(shape input)
+		(at 105.4 96.5200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3ad3e3eb-f7eb-57a3-a6c4-70ea31dff269")
+	)
+	(hierarchical_label "DACS_D11"
+		(shape input)
+		(at 105.4 101.6000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a24eeba8-f8e4-5331-99ad-cd4b5dffce76")
+	)
+	(hierarchical_label "DACS_D12"
+		(shape input)
+		(at 105.4 106.6800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3e543c5c-1fbc-52e4-8637-7d5f61ddbb5b")
+	)
+	(hierarchical_label "DACS_D13"
+		(shape input)
+		(at 105.4 111.7600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fcf0fcbf-4cf8-54f9-ad2e-e4e94999628e")
 	)
 	(hierarchical_label "DACS_IQWRT"
 		(shape input)
-		(at 25.4 254.0000 0)
+		(at 105.4 116.8400 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -519,7 +739,7 @@
 	)
 	(hierarchical_label "DACS_IQSEL"
 		(shape input)
-		(at 25.4 259.0800 0)
+		(at 105.4 121.9200 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -530,7 +750,7 @@
 	)
 	(hierarchical_label "DACS_IQCLK"
 		(shape input)
-		(at 105.4 25.4000 0)
+		(at 105.4 127.0000 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -541,7 +761,7 @@
 	)
 	(hierarchical_label "DACS_IQRESET"
 		(shape input)
-		(at 105.4 30.4800 0)
+		(at 105.4 132.0800 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -552,7 +772,7 @@
 	)
 	(hierarchical_label "CONV_SPI_SCLK"
 		(shape input)
-		(at 105.4 35.5600 0)
+		(at 105.4 137.1600 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -563,7 +783,7 @@
 	)
 	(hierarchical_label "CONV_SPI_SDIO"
 		(shape bidirectional)
-		(at 105.4 40.6400 0)
+		(at 105.4 142.2400 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -574,7 +794,7 @@
 	)
 	(hierarchical_label "CONV_SPI_CSB_R"
 		(shape input)
-		(at 105.4 45.7200 0)
+		(at 105.4 147.3200 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -585,7 +805,7 @@
 	)
 	(hierarchical_label "CONV_SPI_CSB_S"
 		(shape input)
-		(at 105.4 50.8000 0)
+		(at 105.4 152.4000 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -596,7 +816,7 @@
 	)
 	(hierarchical_label "CLK_FPGA_P"
 		(shape input)
-		(at 105.4 55.8800 0)
+		(at 105.4 157.4800 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -607,7 +827,7 @@
 	)
 	(hierarchical_label "CLK_FPGA_N"
 		(shape input)
-		(at 105.4 60.9600 0)
+		(at 105.4 162.5600 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -618,7 +838,7 @@
 	)
 	(hierarchical_label "SW_CTRL[3..0]"
 		(shape output)
-		(at 105.4 66.0400 0)
+		(at 105.4 167.6400 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -629,7 +849,7 @@
 	)
 	(hierarchical_label "CLK_SEL"
 		(shape output)
-		(at 105.4 71.1200 0)
+		(at 105.4 172.7200 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -640,7 +860,7 @@
 	)
 	(hierarchical_label "XO_SCL"
 		(shape output)
-		(at 105.4 76.2000 0)
+		(at 105.4 177.8000 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -651,7 +871,7 @@
 	)
 	(hierarchical_label "XO_SDA"
 		(shape bidirectional)
-		(at 105.4 81.2800 0)
+		(at 105.4 182.8800 0)
 		(effects
 			(font
 				(size 1.27 1.27)
