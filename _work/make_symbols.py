@@ -390,6 +390,33 @@ DATASHEET_PINS.update({
         ("24", "AVDD", "power_in"), ("25", "NC", "no_connect"), ("26", "DCOM", "power_in"),
         ("27", "DVDD", "power_in"), ("28", "CLOCK", "input"),
     ],
+    # Power (25 Sep). TI datasheets: LMR33630 SNVSAN3F (ti.com, fetched by
+    # _work/fetch_datasheets.py), TPS562201 SLVSD91D, TPS7A8300 SBVS197F,
+    # LM2663 SNVS002E (AERIS-10 component folder). KiCad's own LMR33630
+    # symbol extends another and is not used.
+    "LMR33630ADDA": [
+        ("1", "PGND", "power_in"), ("2", "VIN", "power_in"), ("3", "EN", "input"),
+        ("4", "PG", "open_collector"), ("5", "FB", "input"), ("6", "VCC", "power_out"),
+        ("7", "BOOT", "passive"), ("8", "SW", "output"), ("9", "AGND_EP", "power_in"),
+    ],
+    "TPS562201": [
+        ("1", "GND", "power_in"), ("2", "SW", "output"), ("3", "VIN", "power_in"),
+        ("4", "VFB", "input"), ("5", "EN", "input"), ("6", "VBST", "passive"),
+    ],
+    "TPS7A8300RGR": [
+        ("1", "OUT", "power_out"), ("2", "SNS", "input"), ("3", "FB", "input"),
+        ("4", "PG", "open_collector"), ("5", "50mV", "passive"), ("6", "100mV", "passive"),
+        ("7", "200mV", "passive"), ("8", "GND", "power_in"), ("9", "400mV", "passive"),
+        ("10", "800mV", "passive"), ("11", "1.6V", "passive"), ("12", "BIAS", "power_in"),
+        ("13", "NR/SS", "passive"), ("14", "EN", "input"), ("15", "IN", "power_in"),
+        ("16", "IN", "power_in"), ("17", "IN", "power_in"), ("18", "GND", "power_in"),
+        ("19", "OUT", "power_out"), ("20", "OUT", "power_out"), ("21", "GND_EP", "power_in"),
+    ],
+    "LM2663M": [
+        ("1", "SD", "input"), ("2", "CAP+", "passive"), ("3", "GND", "power_in"),
+        ("4", "CAP-", "passive"), ("5", "OUT", "power_out"), ("6", "LV", "input"),
+        ("7", "OSC", "passive"), ("8", "V+", "power_in"),
+    ],
     "Si549_PinoutC": [
         ("1", "NC",   "no_connect"),
         ("2", "OE",   "input"),
@@ -405,6 +432,12 @@ DATASHEET_PINS.update({
 _CLOCK_NOTES = {
     "ADCLK948BCPZ": "Pin table from the ADCLK948 datasheet Rev. B, Table 7. "
                     "IVCC 330 mA max. EPAD to VEE (ground here), pad 33.",
+    "LMR33630ADDA": "Pin table from the LMR33630 datasheet SNVSAN3F, Pin Functions (HSOIC). "
+                    "Thermal pad is AGND, pad 9.",
+    "TPS562201": "Pin table from the TPS562201 datasheet SLVSD91D, Table 4-1 (SOT-23-6 DDC).",
+    "TPS7A8300RGR": "Pin table from the TPS7A8300 datasheet SBVS197F, Pin Functions (RGR). "
+                    "Program pins typed passive: each is tied to GND or left open. Pad 21 = GND.",
+    "LM2663M": "Pin table from the LM2662/LM2663 datasheet SNVS002E, Pin Functions (LM2663: pin 1 SD).",
     "AD9708AR": "Pin table from the AD9708 datasheet Rev. B, Pin Function Descriptions. "
                 "AVDD/DVDD 2.7-5.5 V; IAVDD 30 mA max, IDVDD 6 mA max.",
     "Si549_PinoutC": "Pin table from the Si549 datasheet Revision H, pinout code C "
@@ -417,6 +450,10 @@ DATASHEET_ONLY = {
     "ADCLK948BCPZ":   "2-input, 8-output LVPECL clock fan-out, 4.8 GHz - reference selector and distribution",
     "Si549_PinoutC":  "I2C programmable ultra-low-jitter XO, 0.2-1500 MHz, LVPECL - local master clock",
     "AD9708AR":       "8-bit 125 MSPS current-output DAC, parallel CMOS - radar chirp",
+    "LMR33630ADDA":   "3.8-36 V in, 3 A synchronous buck, 400 kHz - 12 V to +5V0",
+    "TPS562201":      "4.5-17 V in, 2 A synchronous buck, SOT-23-6 - +3V3_D, +2V5, +1V0",
+    "TPS7A8300RGR":   "2 A low-noise LDO, ANY-OUT - +1V8_A, +1V8_D, +3V3_A",
+    "LM2663M":        "Switched-capacitor voltage inverter, 200 mA - -3V3",
     "AD9253BCPZ-125": "Quad 14-bit 125 MSPS ADC, serial LVDS - SDR receive (2 of 4 channels used)",
     "AD9767ASTZ":     "Dual 14-bit 125 MSPS current-output DAC, parallel CMOS - SDR transmit",
     "ADCLK944BCPZ":   "1:4 LVPECL clock fan-out, 7 GHz - first clock plan, superseded by the ADCLK948",
@@ -550,6 +587,18 @@ SYMBOL_LAYOUT = {
         "pwr": ["3", "4", "7", "34", "39", "45", "46", None, "8", "29"],
         "gnd": ["49", None, "48", "47", "1", "2"],
     },
+    # Regulators: input and enable on the left, switch node with its boot
+    # capacitor pin one part-length above it, feedback below, on the right.
+    "LMR33630ADDA": {"half_w": 10.16, "left": ["2", None, "3", None, "6", None, "4"],
+                     "right": ["7", None, None, "8", None, None, "5"], "gnd": ["1", "9"]},
+    "TPS562201": {"half_w": 7.62, "left": ["3", None, "5"],
+                  "right": ["6", None, None, "2", None, None, "4"], "gnd": ["1"]},
+    "TPS7A8300RGR": {"half_w": 12.7,
+                     "left": ["15", "16", "17", None, "14", None, "13", None, "12"],
+                     "right": ["1", "19", "20", None, "2", None, "3", None, "4"],
+                     "gnd": ["5", "6", "7", "9", "10", "11", None, "8", "18", "21"]},
+    "LM2663M": {"half_w": 7.62, "left": ["8", None, "1", "6", "7"],
+                "right": ["2", None, None, "4", None, "5"], "gnd": ["3"]},
     # RFC and the control in on the left, the two throws out on the right
     # 15.24 mm apart; VDD alone on top and VEE apart at the bottom-left, so
     # each supply's filter network (datasheet Figure 2) stacks clear of the

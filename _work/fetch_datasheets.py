@@ -68,6 +68,18 @@ SHEETS = [
 ]
 
 
+# ti.com serves its PDFs to this machine directly (checked 25 Sep 2026), so
+# TI parts need no archive: (file, URL).
+DIRECT = [
+    ("LMR33630.pdf", "https://www.ti.com/lit/ds/symlink/lmr33630.pdf"),
+]
+
+
+def fetch_direct(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    return urllib.request.urlopen(req, timeout=120).read()
+
+
 def fetch(url):
     """Download `url` in Range chunks; return the bytes."""
     data = b""
@@ -125,6 +137,20 @@ def main():
         print(f"  {tag} {name:14s} {len(blob):>9,} B  {rev:7s} "
               f"sha256 {hashlib.sha256(blob).hexdigest()[:16]}")
         print(f"       {src}")
+        bad += 0 if complete else 1
+    for name, url in DIRECT:
+        try:
+            blob = fetch_direct(url)
+        except Exception as e:                      # noqa: BLE001
+            print(f"  FAIL {name:14s} {e}")
+            bad += 1
+            continue
+        complete = blob.startswith(b"%PDF") and b"%%EOF" in blob[-1024:]
+        with open(os.path.join(OUT, name), "wb") as fh:
+            fh.write(blob)
+        print(f"  {'ok  ' if complete else 'TRUNCATED'} {name:14s} {len(blob):>9,} B  direct   "
+              f"sha256 {hashlib.sha256(blob).hexdigest()[:16]}")
+        print(f"       {url}")
         bad += 0 if complete else 1
     print()
     print("All complete." if not bad else f"{bad} file(s) missing or truncated.")
