@@ -7,7 +7,7 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **13 of 22 loads verified from datasheets** — see §1.4 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **14 of 22 loads verified from datasheets** — see §1.4 |
 | Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
 
 ---
@@ -89,17 +89,17 @@ With 30 % margin:
 budget is the clock, as drawn: the ADCLK948 (330 mA max) and the Si549 (153 mA) replaced an
 ADCLK944 (165 mA) and a TCXO (20 mA), see [CLOCK_SPEC.md](CLOCK_SPEC.md). Then, when the radar
 ADC sheet was drawn, the AD8352 drivers moved from `+3V3_A` to 5 V, the only supply their
-datasheet characterises (Table 1) and the one AERIS-10 uses; there are four of them now, two
-drawn and two assumed for the SDR ADC ([ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md)). The jack, the PTC and the
+datasheet characterises (Table 1) and the one AERIS-10 uses; there are four of them, two per ADC
+([ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md), [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md)). The jack, the PTC and the
 reverse-polarity MOSFET want ≥ 1.0 A, and 2 A costs nothing extra.
 
 For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter is comfortable on
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 Confidence: 13 verified, 9 estimated
+### 1.4 Confidence: 14 verified, 8 estimated
 
-**Thirteen of the twenty-two load figures now come from manufacturer datasheets.** analog.com refuses
+**Fourteen of the twenty-two load figures now come from manufacturer datasheets.** analog.com refuses
 to serve its PDFs to this machine (repeated 60 s timeouts; the mirrors return 403 and 410). They
 came from two other places: the AERIS-10 repository's component folder, and the **Internet
 Archive's copies of analog.com's own URLs**, fetched by `_work/fetch_datasheets.py`. That script
@@ -115,7 +115,7 @@ records the snapshot, size and SHA-256 of each file.
 | AD9708 DVDD | **3 mA** | Same, Digital Supply Current |
 | AD9767 AVDD | **75 mA** max | `AD9763_9765_9767.pdf` Rev. G, Table 1: IAVDD 71 typ / 75 max, both DACs at 20 mA full scale |
 | AD9767 DVDD | **19 mA** | Same table: 15 mA at 100 MSPS, scaled to 125 MSPS. Measured at 5 V, so an over-estimate at 3.3 V |
-| AD8352 ×2, radar | **78 mA** at 5 V | `ad8352.pdf` Rev. C, Table 1: quiescent current 37 typ / 39 max each. Drawn on `rev03/ADC_RADAR` |
+| AD8352 ×4 | **2 × 78 mA** at 5 V | `ad8352.pdf` Rev. C, Table 1: quiescent current 37 typ / 39 max each. Two on `rev03/ADC_RADAR`, two on `rev03/ADC_SDR` |
 | ADCLK948 | **330 mA** max | `ADCLK948.pdf` Rev. B, Table 4: IVCC 288 typ / 330 max, **with the outputs loaded** — so it includes the current into the 200 Ω pull-downs. Half the outputs are unused and open, so it is an upper bound |
 | Si549 | **153 mA** max | `Si549.pdf` Revision H: IDD LVPECL 107 typ / 153 max |
 | M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |
@@ -140,7 +140,7 @@ This budget is good enough to **choose the topology and size the regulators** �
 caught three structural errors: two overheating LDOs and an ADC supply above its absolute maximum.
 It is **not a thermal sign-off**.
 
-The nine that remain estimates:
+The eight that remain estimates:
 
 | Load | What to check |
 |---|---|
@@ -148,7 +148,6 @@ The nine that remain estimates:
 | XC7A50T VCCAUX, VCCO ×2 | Same: Vivado's power report, not a datasheet |
 | QSPI flash, level translators, housekeeping | Parts not chosen yet. Each is a line in the budget |
 | Si549 LVPECL pull-downs | Whether its IDD figure already includes them is not stated |
-| AD8352 ×2 for the SDR ADC | The per-device figure is verified; that the SDR chain uses two of them is an assumption until `ADC_SDR` is drawn |
 
 Replacing any of them is one line; the totals, the regulator choices and the dissipation all
 recompute.
@@ -250,7 +249,7 @@ part of an impedance-controlled quote.
 | `VCCO` and the link I/O standard | ✅ 1.2 V, `LVDS_12` with AC coupling |
 | Mechanical envelope | ✅ measured |
 | Power tree topology and regulator sizing | ✅ §1.1–1.3 |
-| Per-rail load figures | ⚠️ 13 of 22 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ 14 of 22 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
 | Stackup and trace widths | ✅ §2.1–2.3, pending fabricator confirmation |
 | Growth direction within the envelope | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3 — outward, off the carrier's side |
 

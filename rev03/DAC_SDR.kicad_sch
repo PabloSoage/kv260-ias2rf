@@ -77,4 +77,15 @@
 		)
 		(uuid "fdb6f33b-12fa-54e1-90c8-32c62a1364b8")
 	)
+	(hierarchical_label "IF_TX_C"
+		(shape output)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6bb94da0-097b-5bed-af68-14c43a9e943c")
+	)
 )

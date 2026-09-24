@@ -515,6 +515,23 @@ SYMBOL_LAYOUT = {
         "pwr": ["8", "13", "15"],
         "gnd": ["6", "7", "9", "12", "17"],
     },
+    # Channel A's input at the top of the left side and channel B's at the
+    # bottom, so each driver chain comes straight in; between them the
+    # reference, bias, clock and SPI pins, spaced for the parts hanging off
+    # them. Unused channels C and D on the bottom edge (tied to VCM).
+    # Right: the one-lane outputs used (A on D0+-B, B on D1+-B, Table 8),
+    # DCO, FCO, then the unused lanes.
+    "AD9253BCPZ-125": {
+        "half_w": 20.32,
+        "left": ["36", "35", None, None, "43", None, None, None, None,
+                 "42", None, None, None, None, "41", None, None, "40", None, None, None, None,
+                 "6", "5", None, None, None, "31", "30", "32", "33", None, "44",
+                 None, None, "37", "38"],
+        "right": ["24", "23", "22", "21", None, "18", "17", "20", "19", None,
+                  "28", "27", "26", "25", "16", "15", "14", "13", "12", "11", "10", "9"],
+        "pwr": ["3", "4", "7", "34", "39", "45", "46", None, "8", "29"],
+        "gnd": ["49", None, "48", "47", "1", "2"],
+    },
     # Analogue, clock and control in on the left; data out on the right in
     # bit order, true pin above complement; supplies on top, AVDD then DRVDD.
     # The gaps on the left leave room for the parts hanging off CML, VREF

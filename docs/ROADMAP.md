@@ -87,7 +87,7 @@ The comparison that led here:
 | Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ⚠️ **13 of 22 verified from datasheets**; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ **14 of 22 verified from datasheets**; the rest need Vivado or parts not yet chosen |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -195,7 +195,7 @@ script-generated sheets have already been **removed** from the project and moved
 | Root | Hierarchy and the Hirose connectors |
 | `IAS_LINK` | Hirose IAS1, the serial link to the Kria, terminations |
 | `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review** — [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
-| `ADC_SDR` | AD9253, its drivers and input conditioning |
+| `ADC_SDR` | ✅ Drawn and verified: `check_sheet.py adc_sdr` PASS. Awaiting review — [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md) |
 | `DAC_RADAR` | AD9708, reconstruction filter, balun |
 | `DAC_SDR` | AD9767, reconstruction filter, balun |
 | `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep) — [CLOCK_SPEC.md](CLOCK_SPEC.md) |

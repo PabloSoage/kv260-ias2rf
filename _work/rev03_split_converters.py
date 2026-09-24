@@ -41,7 +41,7 @@ from sync_sheet_pins import scan                      # noqa: E402
 ROOT = H.ROOT
 DRY = "--dry-run" in sys.argv
 NEW = ["ADC_RADAR", "ADC_SDR", "DAC_RADAR", "DAC_SDR"]
-RELABEL = ["CONTROL", "ROUTING"]
+RELABEL = ["CONTROL", "ROUTING", "ADC_SDR", "DAC_RADAR", "DAC_SDR"]   # while labels-only
 
 
 def relabel(name):

@@ -4885,7 +4885,7 @@
 	)
 	(sheet
 		(at 190.0 140.0)
-		(size 62.0 40.64)
+		(size 62.0 45.72)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -4964,6 +4964,26 @@
 		(pin "IF_TX_B" input
 			(at 190.0 175.5600 180)
 			(uuid "281345af-4841-5285-918a-f620ac627dd3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "IF_RX_C" output
+			(at 190.0 178.1000 180)
+			(uuid "dc25723a-8d99-543c-bb60-db8609dad21b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "IF_TX_C" input
+			(at 190.0 180.6400 180)
+			(uuid "9692f541-9a41-5f1c-85b8-4a825ce8a116")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5312,7 +5332,7 @@
 	)
 	(sheet
 		(at 440.0 130.0)
-		(size 62.0 45.56)
+		(size 62.0 45.72)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -5488,6 +5508,16 @@
 				(justify right)
 		)
 		)
+		(pin "IF_RX_C" input
+			(at 440.0 170.6400 180)
+			(uuid "199b6751-625f-5c38-ad0d-3423aff8abcc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
 	)
 	(sheet
 		(at 520.0 40.0)
@@ -5560,7 +5590,7 @@
 	)
 	(sheet
 		(at 520.0 80.0)
-		(size 62.0 25.24)
+		(size 62.0 25.40)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -5655,6 +5685,16 @@
 			)
 				(justify right)
 		)
+		)
+		(pin "IF_TX_C" output
+			(at 520.0 100.3200 180)
+			(uuid "f3bbb6e9-aa43-5be7-8f22-745b605c6a9c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
 		)
 	)
 )

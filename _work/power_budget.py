@@ -69,9 +69,8 @@ LOADS = [
      "AD8352 datasheet Rev. C, Table 1, POWER INTERFACE: quiescent current "
      "37 typ / 39 max mA per device at ENB 3 V. 2 x 39 = 78 mA. Drawn on "
      "rev03/ADC_RADAR"),
-    ("+5V0", "AD8352 SDR drivers, x2", 5.0, 78, "E",
-     "Assumes the SDR ADC takes one AD8352 per channel like the radar chain; "
-     "confirm when ADC_SDR is drawn"),
+    ("+5V0", "AD8352 SDR drivers, x2 (via +5V_IFS)", 5.0, 78, "V",
+     "Same figure, one AD8352 per AD9253 channel. Drawn on rev03/ADC_SDR"),
 
     # ---- clock ---------------------------------------------------------
     # Clock, as drawn on rev03/CLOCK.kicad_sch (docs/CLOCK_SPEC.md). The

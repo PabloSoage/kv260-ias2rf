@@ -92,10 +92,14 @@ CLOCKS = [                             # CLOCK -> consumers
 # 24 Sep: single-ended 50 ohm, not differential pairs. The routing switches
 # (M3SWA2, SPDT) and the SMAs are single-ended; the AD8352 drivers take a
 # single-ended input (AD8352 datasheet Figure 26), and the DACs get a balun.
-IF_RX = ["IF_RX_A",                    # SDR receive into the 14-bit ADC
-         "IF_RX_B"]                    # radar IF into the 8-bit ADC
-IF_TX = ["IF_TX_A",                    # SDR transmit out of the DAC
-         "IF_TX_B"]                    # radar chirp out of the DAC
+# IF_RX_C / IF_TX_C added the same day: the SDR converters are dual (AD9253
+# channels A and B, AD9767 DACs 1 and 2), and the second channel needs a way out.
+IF_RX = ["IF_RX_A",                    # SDR receive, AD9253 channel A
+         "IF_RX_B",                    # radar IF into the 8-bit ADC
+         "IF_RX_C"]                    # SDR receive, AD9253 channel B
+IF_TX = ["IF_TX_A",                    # SDR transmit, AD9767 DAC 1
+         "IF_TX_B",                    # radar chirp out of the DAC
+         "IF_TX_C"]                    # SDR transmit, AD9767 DAC 2
 IF_ANALOG = IF_RX + IF_TX
 
 
@@ -149,7 +153,7 @@ SHEETS = {
             [(n, "output") for n, _ in CONV_DIGITAL if n.startswith("ADCS_")] +
             [("CLK_ADCS_P", "input"), ("CLK_ADCS_N", "input"),
              ("CONV_SPI_SCLK", "input"), ("CONV_SPI_SDIO", "bidirectional"),
-             ("CONV_SPI_CSB_S", "input"), ("IF_RX_A", "input")],
+             ("CONV_SPI_CSB_S", "input"), ("IF_RX_A", "input"), ("IF_RX_C", "input")],
     },
     "DAC_RADAR": {
         "file": "rev03/DAC_RADAR.kicad_sch",
@@ -165,7 +169,7 @@ SHEETS = {
         "at": (520.0, 80.0),
         "labels":
             [(n, "input") for n, _ in CONV_DIGITAL if n.startswith("DACS_")] +
-            [("IF_TX_A", "output")],
+            [("IF_TX_A", "output"), ("IF_TX_C", "output")],
     },
     "CLOCK": {
         "file": "rev03/CLOCK.kicad_sch",

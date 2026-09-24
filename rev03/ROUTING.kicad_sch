@@ -33,9 +33,20 @@
 		)
 		(uuid "927337f7-b636-5df3-85ee-997a48cdcea0")
 	)
+	(hierarchical_label "IF_RX_C"
+		(shape output)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d9acf61d-2e6b-52eb-af45-efffe4f7db30")
+	)
 	(hierarchical_label "IF_TX_A"
 		(shape input)
-		(at 25.4 35.5600 0)
+		(at 25.4 40.6400 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -46,7 +57,7 @@
 	)
 	(hierarchical_label "IF_TX_B"
 		(shape input)
-		(at 25.4 40.6400 0)
+		(at 25.4 45.7200 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -55,9 +66,20 @@
 		)
 		(uuid "533c2d31-1afb-5bfd-8166-7eff98aea12e")
 	)
+	(hierarchical_label "IF_TX_C"
+		(shape input)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5eac6555-3a2b-533c-bc77-63f19deb4dd2")
+	)
 	(hierarchical_label "SW_CTRL[3..0]"
 		(shape input)
-		(at 25.4 45.7200 0)
+		(at 25.4 55.8800 0)
 		(effects
 			(font
 				(size 1.27 1.27)
