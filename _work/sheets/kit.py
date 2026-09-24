@@ -218,3 +218,39 @@ class Kit:
         n, w, j = self.s.write()
         print(f"wrote {os.path.relpath(self.path, ROOT)}: {n} symbols, {w} wire segments, "
               f"{j} junctions")
+
+
+def dac_output(k, P, N, r, label):
+    """DAC current outputs P, N (pin positions, 15.24 mm apart) -> 49.9 ohm
+    loads -> AERIS-10's 5-pole differential LC filter -> 2:1 balun -> label.
+    The same network as DAC_RADAR (drawn there by its own code). r: dict of
+    refs rp, rn (loads), cp, cn (22 p shunts), c1, c3, c5 (across), l1p, l1n,
+    l2p, l2n (series), t (balun)."""
+    s = k.s
+    xo = P[0]
+    for ref, dx, leg in ((r["rp"], 5.08, P), (r["rn"], 5.08, N),
+                         (r["cp"], 15.24, P), (r["cn"], 15.24, N)):
+        c = k.vpart(ref, xo + dx, leg[1])
+        k.gnd(c.pin(2))
+
+    def across(ref, x):
+        c = k.vpart(ref, x, P[1])
+        s.wire(c.pin(2), (x, N[1]))
+
+    across(r["c1"], xo + 25.4)
+    l1p, l1n = k.hpart(r["l1p"], xo + 38.1, P[1]), k.hpart(r["l1n"], xo + 38.1, N[1])
+    across(r["c3"], xo + 50.8)
+    l2p, l2n = k.hpart(r["l2p"], xo + 63.5, P[1]), k.hpart(r["l2n"], xo + 63.5, N[1])
+    across(r["c5"], xo + 76.2)
+    s.wire(P, l1p.pin(1))
+    s.wire(N, l1n.pin(1))
+    s.wire(l1p.pin(2), l2p.pin(1))
+    s.wire(l1n.pin(2), l2n.pin(1))
+    T = k.part(r["t"], (xo + 99.06, P[1] + 5.08))
+    aa, ab, sa, sb = T.pin(1), T.pin(2), T.pin(3), T.pin(4)
+    assert aa[1] == P[1]
+    s.wire(l2p.pin(2), aa)
+    s.wire(l2n.pin(2), (aa[0] - 2.54, N[1]), (aa[0] - 2.54, ab[1]), ab)
+    s.wire(sb, (sb[0] + 5.08, sb[1]))
+    s.hlabel(label, "output", (sb[0] + 5.08, sb[1]))
+    k.gnd(sa)

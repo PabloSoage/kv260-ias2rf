@@ -550,6 +550,20 @@ SYMBOL_LAYOUT = {
         "pwr": ["3", "4", "7", "34", "39", "45", "46", None, "8", "29"],
         "gnd": ["49", None, "48", "47", "1", "2"],
     },
+    # Interleaved mode: port 1 data and the four IQ controls on the left, then
+    # every pin tied low (MODE, GAINCTRL, SLEEP and the unused port 2) in one
+    # contiguous block that a single bus grounds. Each DAC's outputs 15.24 mm
+    # apart on the right; reference and full-scale networks along the bottom.
+    "AD9767ASTZ": {
+        "half_w": 30.48,
+        "left": [str(p) for p in range(1, 15)] + [None, "17", "18", "19", "20", None, None,
+                                                   "48", "42", "37"]
+                + [str(p) for p in range(23, 37)] + [None, None],
+        "right": ["46"] + [None] * 5 + ["45"] + [None] * 6 + ["39"] + [None] * 5 + ["40"],
+        "pwr": ["16", "22", None, None, None, "47"],
+        "gnd": ["43", None, None, None, "44"] + [None] * 7 + ["41"] + [None] * 7
+               + ["38", "15", "21"],
+    },
     # Data and clock in on the left; outputs on the right, 15.24 mm apart so
     # the filter's shunt parts hang between the legs; COMP1 on top beside
     # AVDD (its capacitor goes to AVDD); the reference, full-scale and

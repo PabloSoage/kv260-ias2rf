@@ -481,7 +481,8 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U601` | SDR ADC | AD9253BCPZ-125 | C | 14 b, channels A and B, 62.5 MSPS in 1-lane. **AVDD and DRVDD both 1.8 V** (DRVDD abs. max 2.0 V). Drawn: rev03/ADC_SDR |
 | `U701` | Radar DAC | AD9708AR | C | AERIS's part `[V]`. Drawn: rev03/DAC_RADAR. Internal 1.2 V reference, unlike AERIS (see DAC_RADAR_SPEC §1) |
 | `T701` | DAC output balun, 2:1 Z | — | P | Part not chosen (ADT2-1T class) |
-| `U_DAC2` | SDR DAC | AD9767ASTZ | X | Dual 14 b, 3.3 V |
+| `U801` | SDR DAC | AD9767ASTZ | C | Dual 14 b, 3.3 V, interleaved mode, 10 mA full scale. Drawn: rev03/DAC_SDR |
+| `T801`, `T802` | SDR DAC output baluns, 2:1 Z | — | P | As T701 |
 | `U502`, `U503` | Radar ADC drivers, 15 + 10 dB | AD8352ACPZ | C | Drawn: rev03/ADC_RADAR. Two in cascade, as AERIS `[V]`; at 5 V, the only supply the datasheet characterises |
 | `U602`, `U603` | SDR ADC drivers, 12 dB | AD8352ACPZ | C | One per AD9253 channel. Drawn: rev03/ADC_SDR |
 | `U401` | Reference select + LVPECL 1:8 fan-out | ADCLK948BCPZ | C | Drawn: rev03/CLOCK. Replaces the ADCLK944 + separate selector |

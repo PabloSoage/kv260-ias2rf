@@ -197,7 +197,7 @@ script-generated sheets have already been **removed** from the project and moved
 | `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review** — [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
 | `ADC_SDR` | ✅ Drawn and verified: `check_sheet.py adc_sdr` PASS. Awaiting review — [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md) |
 | `DAC_RADAR` | ✅ Drawn and verified: `check_sheet.py dac_radar` PASS. Awaiting review — [DAC_RADAR_SPEC.md](DAC_RADAR_SPEC.md) |
-| `DAC_SDR` | AD9767, reconstruction filter, balun |
+| `DAC_SDR` | ✅ Drawn and verified: `check_sheet.py dac_sdr` PASS. Awaiting review — [DAC_SDR_SPEC.md](DAC_SDR_SPEC.md) |
 | `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep) — [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | 4 SPDT switches, IF SMAs, clock SMAs |
 | `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
