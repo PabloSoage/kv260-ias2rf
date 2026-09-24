@@ -87,7 +87,7 @@ The comparison that led here:
 | Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ⚠️ **13 of 21 verified from datasheets**; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ **13 of 22 verified from datasheets**; the rest need Vivado or parts not yet chosen |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -106,8 +106,8 @@ the root, **108 interface signals** in total:
 |---|---|---|
 | `IAS_LINK` | 14 | Hirose IAS1, AC coupling, link terminations |
 | `CONTROL` | 40 | Front-end FPGA, Pmod, AERIS-10 control IDC |
-| `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers |
-| `CLOCK` | 9 | **Drawn** (23 Sep) — Si549 XO, ADCLK948 select + fan-out. [CLOCK_SPEC.md](CLOCK_SPEC.md) |
+| `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers — **split in four on 24 Sep**, below |
+| `CLOCK` | 9 | **Drawn** (23 Sep), **reviewed and accepted** (24 Sep) — Si549 XO, ADCLK948 select + fan-out. [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | 9 | 4× SPDT channel routing, IF and clock SMAs |
 | `POWER` | 0 | 12 V input, protection, buck/LDO tree — rails are global symbols |
 
@@ -159,9 +159,22 @@ of N+1, the M3SWA2's missing paddle, and an erratum in the LTC5552 datasheet. Se
 charge-pump inverter struck from the power tree. The part needs VEE −3.3 V. See
 [BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md) B-03.
 
-### Still to do
+### Done: CONVERTERS split in four (24 Sep)
 
-Draw the circuits, in the GUI, sheet by sheet against the master document.
+One converter sheet would have held about 200 parts, too many to review in one sitting.
+`_work/rev03_split_converters.py` replaced it with `ADC_RADAR`, `ADC_SDR`, `DAC_RADAR` and
+`DAC_SDR`, each the size of CLOCK, and made two interface changes on the way
+([ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §1): the radar ADC's data bus became one label per line,
+and the four IF signals became single-ended, matching the SPDT switches and SMAs that carry them.
+`hier_label_mismatch` stays at 0.
+
+### How the sheets are drawn
+
+Generated, and checked, one sheet at a time: a connection list written by hand from the
+datasheets (`_work/sheets/<sheet>_spec.py`), a drawing made from coordinates
+(`_work/sheets/<sheet>.py`), and `_work/check_sheet.py`, which compares KiCad's own netlist of the
+drawing against the list, pin by pin. Then a human review against the datasheets. Once a sheet is
+accepted, its `.kicad_sch` is the source and is edited in KiCad.
 
 ---
 
@@ -171,16 +184,21 @@ Start from `CSI2-KRIA-KV260_Rev01-2.kicad_sch` (the purge, which is valid work).
 script-generated sheets have already been **removed** from the project and moved to
 `_deprecated/`.
 
-> **Manual capture in the KiCad GUI, not script generation.** See the
-> [method note](AUDIT_Rev01.md#8-method-note). Scripts are for purging and extracting data, not for
-> drawing circuits nobody will be able to review.
+> **No unreviewable generated circuits.** See the [method note](AUDIT_Rev01.md#8-method-note).
+> What the note rules out is Rev01's kind: untyped symbols joined by auto-generated labels. The
+> sheets now drawn by script use typed symbols and real wires, are verified against a separate
+> connection list, and are reviewed by a person before they are accepted (§ *How the sheets are
+> drawn*, above).
 
 | Sheet | Contents |
 |---|---|
 | Root | Hierarchy and the Hirose connectors |
 | `IAS_LINK` | Hirose IAS1, the serial link to the Kria, terminations |
-| `CONVERTERS` | ADC, DAC, input conditioning, reconstruction filter |
-| `CLOCK` | ✅ Drawn and verified: `check_sheet.py clock` PASS. Awaiting your review — [CLOCK_SPEC.md](CLOCK_SPEC.md) §5 |
+| `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review** — [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
+| `ADC_SDR` | AD9253, its drivers and input conditioning |
+| `DAC_RADAR` | AD9708, reconstruction filter, balun |
+| `DAC_SDR` | AD9767, reconstruction filter, balun |
+| `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep) — [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | 4 SPDT switches, IF SMAs, clock SMAs |
 | `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
 | `POWER` | Full tree with reverse-polarity protection and analogue/digital separation |

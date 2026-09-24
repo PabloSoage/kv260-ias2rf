@@ -11,8 +11,8 @@
 	)
 	(lib_symbols
 	)
-	(hierarchical_label "IF_RX_A_P"
-		(shape bidirectional)
+	(hierarchical_label "IF_RX_A"
+		(shape output)
 		(at 25.4 25.4000 0)
 		(effects
 			(font
@@ -20,10 +20,10 @@
 			)
 			(justify left)
 		)
-		(uuid "e656431d-af17-5ac3-a6a3-2b6b67902d2a")
+		(uuid "a8312570-0ed0-54d6-876f-37bce508f7f2")
 	)
-	(hierarchical_label "IF_RX_A_N"
-		(shape bidirectional)
+	(hierarchical_label "IF_RX_B"
+		(shape output)
 		(at 25.4 30.4800 0)
 		(effects
 			(font
@@ -31,10 +31,10 @@
 			)
 			(justify left)
 		)
-		(uuid "e5fd65fc-b01a-5c16-912a-b32e2d8736eb")
+		(uuid "927337f7-b636-5df3-85ee-997a48cdcea0")
 	)
-	(hierarchical_label "IF_RX_B_P"
-		(shape bidirectional)
+	(hierarchical_label "IF_TX_A"
+		(shape input)
 		(at 25.4 35.5600 0)
 		(effects
 			(font
@@ -42,10 +42,10 @@
 			)
 			(justify left)
 		)
-		(uuid "1008bad6-edc9-5d08-b12e-ce53d1d65051")
+		(uuid "87cea6ab-a241-5435-9b2d-345d270c975f")
 	)
-	(hierarchical_label "IF_RX_B_N"
-		(shape bidirectional)
+	(hierarchical_label "IF_TX_B"
+		(shape input)
 		(at 25.4 40.6400 0)
 		(effects
 			(font
@@ -53,55 +53,11 @@
 			)
 			(justify left)
 		)
-		(uuid "9c92422e-95cd-5dfa-84c5-a631c96a120a")
-	)
-	(hierarchical_label "IF_TX_A_P"
-		(shape bidirectional)
-		(at 25.4 45.7200 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "b7e72636-6f28-55aa-b78f-89540ef1c98a")
-	)
-	(hierarchical_label "IF_TX_A_N"
-		(shape bidirectional)
-		(at 25.4 50.8000 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "7153726c-11dd-542e-bfa3-5530d328b549")
-	)
-	(hierarchical_label "IF_TX_B_P"
-		(shape bidirectional)
-		(at 25.4 55.8800 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "ed6c4b4e-a301-5449-9a9f-66db5dabc19a")
-	)
-	(hierarchical_label "IF_TX_B_N"
-		(shape bidirectional)
-		(at 25.4 60.9600 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "65cc0e5b-d435-521b-922a-f635974c46d3")
+		(uuid "533c2d31-1afb-5bfd-8166-7eff98aea12e")
 	)
 	(hierarchical_label "SW_CTRL[3..0]"
 		(shape input)
-		(at 25.4 66.0400 0)
+		(at 25.4 45.7200 0)
 		(effects
 			(font
 				(size 1.27 1.27)

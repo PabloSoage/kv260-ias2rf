@@ -827,10 +827,6 @@
       "CONTROL"
     ],
     [
-      "51a8ece2-9cfa-5b8f-9159-3fd5d03d8124",
-      "CONVERTERS"
-    ],
-    [
       "86907de8-dbaa-540c-95d7-38c6f0e48980",
       "CLOCK"
     ],
@@ -841,6 +837,22 @@
     [
       "178e9fd4-026b-514b-ade0-1bd1f53cb813",
       "POWER"
+    ],
+    [
+      "098c3043-9761-501a-810e-811ea671fbd3",
+      "ADC_RADAR"
+    ],
+    [
+      "b557715d-d7df-5c36-ab36-4e0e85ff00a4",
+      "ADC_SDR"
+    ],
+    [
+      "abb2f662-6c46-5063-a48c-75af2e9d6b41",
+      "DAC_RADAR"
+    ],
+    [
+      "0ca50663-c0dc-5a7e-b2b3-0505ce09ba16",
+      "DAC_SDR"
     ]
   ],
   "text_variables": {

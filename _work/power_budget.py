@@ -62,10 +62,16 @@ LOADS = [
      "Same table: IDVDD 15 mA at 100 MSPS (no maximum given). Digital "
      "current scales with clock, so 15 x 125/100 = 19 mA at the part's full "
      "125 MSPS. Measured at DVDD = 5 V, so at 3.3 V this over-estimates"),
-    ("+3V3_A", "AD8352 differential drivers, x2", 3.3, 80, "V",
-     "AD8352 datasheet, POWER INTERFACE: quiescent current 39 mA max per "
-     "device, 2 x 39 = 78 mA. NOTE the datasheet table extracts with shifted "
-     "columns, so confirm visually. Supply range is 3-5.5 V, so 3V3_A is fine"),
+    # The AD8352s moved from +3V3_A to +5V0 when ADC_RADAR was drawn (24 Sep):
+    # the datasheet characterises the part at 5 V only (Table 1), AERIS-10
+    # runs its two at 5 V, and 3 V is merely inside the allowed range.
+    ("+5V0", "AD8352 radar drivers, x2 (via +5V_IFR)", 5.0, 78, "V",
+     "AD8352 datasheet Rev. C, Table 1, POWER INTERFACE: quiescent current "
+     "37 typ / 39 max mA per device at ENB 3 V. 2 x 39 = 78 mA. Drawn on "
+     "rev03/ADC_RADAR"),
+    ("+5V0", "AD8352 SDR drivers, x2", 5.0, 78, "E",
+     "Assumes the SDR ADC takes one AD8352 per channel like the radar chain; "
+     "confirm when ADC_SDR is drawn"),
 
     # ---- clock ---------------------------------------------------------
     # Clock, as drawn on rev03/CLOCK.kicad_sch (docs/CLOCK_SPEC.md). The

@@ -81,8 +81,8 @@ for k in range(4):
 
 # Interface to the rest of the design: hierarchical labels.
 HIER = {
-    "CLK_ADCR_P": "output", "CLK_ADCR_N": "output",   # -> AD9484, CONVERTERS
-    "CLK_ADCS_P": "output", "CLK_ADCS_N": "output",   # -> AD9253, CONVERTERS
+    "CLK_ADCR_P": "output", "CLK_ADCR_N": "output",   # -> AD9484, ADC_RADAR
+    "CLK_ADCS_P": "output", "CLK_ADCS_N": "output",   # -> AD9253, ADC_SDR
     "CLK_FPGA_P": "output", "CLK_FPGA_N": "output",   # -> XC7A50T, CONTROL
     "CLK_SEL": "input",                               # FPGA, open-drain
     "XO_SCL": "input", "XO_SDA": "bidirectional",     # FPGA I2C master, 3.3 V

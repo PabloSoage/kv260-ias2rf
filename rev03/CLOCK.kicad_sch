@@ -2701,7 +2701,7 @@
 		)
 		(uuid "5ab2249c-5234-543e-9b5c-90d4913ea6fe")
 	)
-	(text "Q0: to the AD9484 (CONVERTERS)"
+	(text "Q0: to the AD9484 (ADC_RADAR)"
 		(exclude_from_sim no)
 		(at 256.54 54.61 0)
 		(effects
@@ -2710,9 +2710,9 @@
 			)
 			(justify left)
 		)
-		(uuid "4496ca98-e355-5971-a459-9c12a1fa402f")
+		(uuid "a584c942-9d5e-55ec-8450-8de1c6eeefce")
 	)
-	(text "Q1: to the AD9253 (CONVERTERS)"
+	(text "Q1: to the AD9253 (ADC_SDR)"
 		(exclude_from_sim no)
 		(at 256.54 85.09 0)
 		(effects
@@ -2721,7 +2721,7 @@
 			)
 			(justify left)
 		)
-		(uuid "00f978f7-07a5-5ac5-ab92-439f0eec46b6")
+		(uuid "440427c9-d1ce-5260-b93a-4fba4437046c")
 	)
 	(text "Q2: to the XC7A50T (CONTROL)"
 		(exclude_from_sim no)

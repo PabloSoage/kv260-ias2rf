@@ -21,7 +21,7 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks — §5.3 |
 | `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
 | Serial link electrical standard | ✅ `LVDS_12` with AC coupling — see §6.1 |
-| Per-rail current budget | ⚠️ 13 of 21 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| Per-rail current budget | ⚠️ 13 of 22 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup and impedances | ✅ computed; fabricator to confirm |
 
 ---
@@ -297,7 +297,7 @@ because the AC coupling is stuffable.
 | `VCCO` and the link's I/O standard | ✅ §6, 1.2 V / `LVDS_12` with AC coupling |
 | ADC/DAC operating points fixed | ✅ [ARCHITECTURE.md](../ARCHITECTURE.md) §5 |
 | Growth direction within the envelope | ✅ §5.3 — registered on the STEP; grow outward, off the carrier's side |
-| Per-rail current budget from datasheets | ⚠️ 13 of 21 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| Per-rail current budget from datasheets | ⚠️ 13 of 22 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup with computed impedances | ✅ computed; ⬜ fabricator's field solver to confirm |
 
 Nothing in this list needs the hardware any more. What remains is the fabricator's impedance

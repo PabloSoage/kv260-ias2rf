@@ -18,7 +18,7 @@ Checks:
      or as a no-connect - so the specification cannot silently forget one;
   5. no part is on the sheet that the specification does not list.
 
-Usage:  py _work/check_sheet.py clock
+Usage:  py _work/check_sheet.py clock | adc_radar
 """
 
 import importlib
@@ -60,6 +60,7 @@ def netlist():
 def main():
     name = sys.argv[1] if len(sys.argv) > 1 else "clock"
     spec = importlib.import_module(f"{name}_spec")
+    power_nets = POWER_NETS | set(getattr(spec, "POWER", ()))
     refs = set(spec.PARTS)
     nets, comps = netlist()
     by_pin = {}
@@ -93,7 +94,7 @@ def main():
             err(f"{nname}: connected but not specified: {sorted(extra)}")
         if nname in spec.HIER and not got_name.endswith("/" + nname):
             err(f"{nname}: carries the name '{got_name}', not the hierarchical label")
-        if nname in POWER_NETS and got_name != nname:
+        if nname in power_nets and got_name != nname:
             err(f"{nname}: power net is named '{got_name}'")
         if not (missing or extra):
             print(f"  ok    {nname:12s} {len(want):2d} pins   ({got_name})")

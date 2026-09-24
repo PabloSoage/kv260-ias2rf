@@ -444,7 +444,7 @@ In outline:
         |     +-- LDO -> +1V8_D   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
         |     +-- LDO -> +1V2     FPGA VCCO, IAS-facing bank
         |     +-- charge pump -> -3V3   RF switch VEE (B-03)
-        +-- buck -> +3V6 -> LDO -> +3V3_A   DAC AVDD, AD8352 drivers   (analogue)
+        +-- buck -> +3V6 -> LDO -> +3V3_A   DAC AVDD                   (analogue)
         +-- buck -> +2V5 -> LDO -> +1V8_A   ADC AVDD                   (analogue)
         +-- buck -> +1V0     FPGA VCCINT, sequenced
 ```
@@ -477,11 +477,12 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 |---|---|---|---|---|
 | `U_FPGA1` | Front-end FPGA | XC7A50T-2FTG256I | X | Same as AERIS `[V]`: its firmware runs unported |
 | `U_CFG1` | Configuration flash | QSPI 32 Mb | P | |
-| `U_ADC1` | Radar ADC | AD9484BCPZ-500 | X | 8 b / 400 MSPS, AERIS's part `[V]` |
+| `U501` | Radar ADC | AD9484BCPZ-500 | C | 8 b / 400 MSPS, AERIS's part `[V]`. Drawn: rev03/ADC_RADAR. Custom footprint (5.10 mm exposed pad) |
 | `U_ADC2` | SDR ADC | AD9253BCPZ-125 | X | 14 b, 2 of 4 channels, ≤62.5 MSPS in 1-lane. **AVDD and DRVDD both 1.8 V** (DRVDD abs. max 2.0 V) |
 | `U_DAC1` | Radar DAC | AD9708AR | X | AERIS's part `[V]` |
 | `U_DAC2` | SDR DAC | AD9767ASTZ | X | Dual 14 b, 3.3 V |
-| `U_AMP1..2` | Differential input drivers | AD8352ACPZ | X | Used by AERIS `[V]` |
+| `U502`, `U503` | Radar ADC drivers, 15 + 10 dB | AD8352ACPZ | C | Drawn: rev03/ADC_RADAR. Two in cascade, as AERIS `[V]`; at 5 V, the only supply the datasheet characterises |
+| `U_AMP3..4` | SDR ADC drivers | AD8352ACPZ | X | Assumed one per AD9253 channel; decided when ADC_SDR is drawn |
 | `U401` | Reference select + LVPECL 1:8 fan-out | ADCLK948BCPZ | C | Drawn: rev03/CLOCK. Replaces the ADCLK944 + separate selector |
 | `Y401` | Programmable master XO, 400/500 MHz | Si549, LVPECL, 3.3 V, 5×7 mm, pinout C | C | Replaces the TCXO; GPS-disciplined through its ±950 ppm DCO |
 | `U_SW1..4` | Routing SPDTs | M3SWA2-34DR+ | X | Positive 3.3 V control, but **bipolar supply: VDD +3.3 V and VEE −3.3 V** (B-03). Exposed paddle to GND |

@@ -501,6 +501,35 @@ SYMBOL_LAYOUT = {
         "pwr": ["6"],
         "gnd": ["3", "1"],
     },
+    # Ordered so the external network draws without a single crossing:
+    # VIP, RGN, RGP, RDP, RDN, VIN, each pair that takes a part exactly one
+    # resistor length (7.62 mm) apart. RN (single-ended input, AD8352
+    # Figure 26) runs VIP -> RGN, RG runs RGN -> RGP, RD and CD run
+    # RDP -> RDN. VOP is level with VIP and VON with VIN. ENB sits on top
+    # beside VCC, which is what it is tied to.
+    "AD8352ACPZ": {
+        "half_w": 10.16,
+        "left": ["16", None, None, "3", None, None, "2", "1", None, None, "4",
+                 None, None, "5", None, "14", None, None],
+        "right": ["11"] + [None] * 12 + ["10"] + [None] * 4,
+        "pwr": ["8", "13", "15"],
+        "gnd": ["6", "7", "9", "12", "17"],
+    },
+    # Analogue, clock and control in on the left; data out on the right in
+    # bit order, true pin above complement; supplies on top, AVDD then DRVDD.
+    # The gaps on the left leave room for the parts hanging off CML, VREF
+    # and the clock termination, so nothing crosses the wires below them.
+    "AD9484BCPZ-500": {
+        "half_w": 25.4,
+        "left": ["35", "36", None, None, "40", "31", None, None, None, None, "44", "45",
+                 None, None, "25", "26", "27", "29"],
+        "right": ["4", "3", "6", "5", "10", "9", "12", "11", "14", "13", "16", "15",
+                  "18", "17", "20", "19", None, "22", "21", None, "50", "49"],
+        "pwr": ["30", "32", "33", "34", "37", "38", "39", "41", "42", "43", "46",
+                None, "7", "24", "47"],
+        "gnd": ["57", "8", "23", "48", None,
+                "1", "2", "28", "51", "52", "53", "54", "55", "56"],
+    },
 }
 
 

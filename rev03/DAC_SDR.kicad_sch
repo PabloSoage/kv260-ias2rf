@@ -1,0 +1,80 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "3e389bd3-70b4-5f70-afe1-06407d5f607e")
+	(paper "A3")
+	(title_block
+		(title "DAC_SDR - AD9767 dual SDR DAC, output balun")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "DACS_D[13..0]"
+		(shape input)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c7757724-3948-5a1b-8c90-6f3682a17de4")
+	)
+	(hierarchical_label "DACS_IQWRT"
+		(shape input)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "495c9be2-fd19-5438-9ba5-027ec5e21770")
+	)
+	(hierarchical_label "DACS_IQSEL"
+		(shape input)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "620db488-68ba-5d30-a8af-c6b99431ee04")
+	)
+	(hierarchical_label "DACS_IQCLK"
+		(shape input)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "72149522-19b0-5088-86cb-efaa5a86a472")
+	)
+	(hierarchical_label "DACS_IQRESET"
+		(shape input)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b66535dd-e203-5e88-8fad-f53fde59ebba")
+	)
+	(hierarchical_label "IF_TX_A"
+		(shape output)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fdb6f33b-12fa-54e1-90c8-32c62a1364b8")
+	)
+)

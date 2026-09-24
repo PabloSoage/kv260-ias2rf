@@ -1,0 +1,168 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "72e70e76-72f0-5542-99c0-1653388b34e1")
+	(paper "A3")
+	(title_block
+		(title "ADC_SDR - AD9253 SDR ADC and its drivers")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "ADCS_D0_P"
+		(shape output)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6a4346aa-88ff-571f-b7f2-ffe816d77189")
+	)
+	(hierarchical_label "ADCS_D0_N"
+		(shape output)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "eaa8dedb-ee8b-53fd-b085-38875c26bb63")
+	)
+	(hierarchical_label "ADCS_D1_P"
+		(shape output)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a45729a9-f598-5eef-acc4-861682729794")
+	)
+	(hierarchical_label "ADCS_D1_N"
+		(shape output)
+		(at 25.4 40.6400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "07be0646-0881-57a6-98cd-7713beae3a11")
+	)
+	(hierarchical_label "ADCS_DCO_P"
+		(shape output)
+		(at 25.4 45.7200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e97658db-66bd-5b5c-8816-88ee136cde45")
+	)
+	(hierarchical_label "ADCS_DCO_N"
+		(shape output)
+		(at 25.4 50.8000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "57a6d56c-7050-5826-b4e3-37dab10a5011")
+	)
+	(hierarchical_label "ADCS_FCO_P"
+		(shape output)
+		(at 25.4 55.8800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "035d3f43-b7d4-5e4e-9c0b-88fefadf4f1c")
+	)
+	(hierarchical_label "ADCS_FCO_N"
+		(shape output)
+		(at 25.4 60.9600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9d86309f-93ff-5bb1-8976-9fa7f325b719")
+	)
+	(hierarchical_label "CLK_ADCS_P"
+		(shape input)
+		(at 25.4 66.0400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4bb2ba4c-a954-5ddf-82d6-0f6f8ed809e9")
+	)
+	(hierarchical_label "CLK_ADCS_N"
+		(shape input)
+		(at 25.4 71.1200 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1cb3a937-6afe-5896-8db1-00e59ee5b513")
+	)
+	(hierarchical_label "CONV_SPI_SCLK"
+		(shape input)
+		(at 25.4 76.2000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "07f6c43e-caf7-5f03-bc33-dfad3b0438dd")
+	)
+	(hierarchical_label "CONV_SPI_SDIO"
+		(shape bidirectional)
+		(at 25.4 81.2800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "30e62563-c6ea-5f91-a5d1-04cfeb1c1091")
+	)
+	(hierarchical_label "CONV_SPI_CSB_S"
+		(shape input)
+		(at 25.4 86.3600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "05746473-c319-5fe2-9c68-2428f70bc16d")
+	)
+	(hierarchical_label "IF_RX_A"
+		(shape input)
+		(at 25.4 91.4400 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "58188956-c65c-5f61-a81c-2f09c12553d9")
+	)
+)

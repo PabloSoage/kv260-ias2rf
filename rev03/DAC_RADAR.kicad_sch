@@ -1,0 +1,47 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "70e2d8b2-caf5-5de4-bb4a-34ecc2a57bbf")
+	(paper "A3")
+	(title_block
+		(title "DAC_RADAR - AD9708 radar chirp DAC, output balun")
+		(rev "03")
+		(company "KV260-IAS2RF")
+	)
+	(lib_symbols
+	)
+	(hierarchical_label "DACR_D[7..0]"
+		(shape input)
+		(at 25.4 25.4000 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "12be24c4-c9e2-5ccf-99ff-83d801390e19")
+	)
+	(hierarchical_label "DACR_CLK"
+		(shape input)
+		(at 25.4 30.4800 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3580ceef-dc5a-526d-88c8-631058ee6a85")
+	)
+	(hierarchical_label "IF_TX_B"
+		(shape output)
+		(at 25.4 35.5600 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "069268c5-eebf-514f-910d-aeeae4ccf62c")
+	)
+)

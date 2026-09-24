@@ -238,7 +238,7 @@ A vehicle is a hostile electrical environment and this affects **every** board i
 | Consumer | Power |
 |---|---|
 | KV260 | **~10 W** `[E]`. 36 W is only the brick's rating. **Measured** `[V]` by [scanner64](https://github.com/PabloSoage/scanner64) with the carrier's INA260: **3.24 W idle, 4.30 W** with the PL processing 64 channels at 100 MSPS. That INA260 sits on a 5 V rail, so it excludes the 12 V input stage, the fan and USB peripherals, hence the margin |
-| This adapter board | **8.4 W** `[V/E]` at 12 V, 10.9 W with 30 % margin — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
+| This adapter board | **8.9 W** `[V/E]` at 12 V, 11.6 W with 30 % margin — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
 | LiDAR | 10 – 20 W |
 | SDR (RX) | 10 – 15 W |
 | AERIS Extended radar | **Very high**: 16 GaN amplifiers of 10 W. Pulsed, but the peak drives the sizing |

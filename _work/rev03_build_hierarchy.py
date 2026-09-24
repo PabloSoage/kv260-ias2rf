@@ -63,8 +63,12 @@ LINK_FROM_KRIA = [                     # Kria -> FPGA
     "LINK_TX_CLK_P", "LINK_TX_CLK_N",
 ]
 
+# 24 Sep: the ADCR data bus became one label per line (ADCR_D0_P ...), like
+# ADCS_*: a drawn sheet then carries no bus, and every pair is checked by name.
+ADCR_BITS = [(f"ADCR_D{i}_{pn}", "input") for i in range(8) for pn in "PN"]
+
 CONV_DIGITAL = [                       # front-end FPGA <-> converters
-    ("ADCR_D_P[7..0]", "input"), ("ADCR_D_N[7..0]", "input"),
+    *ADCR_BITS,
     ("ADCR_DCO_P", "input"), ("ADCR_DCO_N", "input"),
     ("ADCR_OR_P", "input"), ("ADCR_OR_N", "input"),
     ("ADCS_D0_P", "input"), ("ADCS_D0_N", "input"),
@@ -85,12 +89,14 @@ CLOCKS = [                             # CLOCK -> consumers
     "CLK_FPGA_P", "CLK_FPGA_N",
 ]
 
-IF_ANALOG = [                          # CONVERTERS <-> ROUTING
-    "IF_RX_A_P", "IF_RX_A_N",          # SDR receive into the 14-bit ADC
-    "IF_RX_B_P", "IF_RX_B_N",          # radar IF into the 8-bit ADC
-    "IF_TX_A_P", "IF_TX_A_N",          # SDR transmit out of the DAC
-    "IF_TX_B_P", "IF_TX_B_N",          # radar chirp out of the DAC
-]
+# 24 Sep: single-ended 50 ohm, not differential pairs. The routing switches
+# (M3SWA2, SPDT) and the SMAs are single-ended; the AD8352 drivers take a
+# single-ended input (AD8352 datasheet Figure 26), and the DACs get a balun.
+IF_RX = ["IF_RX_A",                    # SDR receive into the 14-bit ADC
+         "IF_RX_B"]                    # radar IF into the 8-bit ADC
+IF_TX = ["IF_TX_A",                    # SDR transmit out of the DAC
+         "IF_TX_B"]                    # radar chirp out of the DAC
+IF_ANALOG = IF_RX + IF_TX
 
 
 def flip(d):
@@ -122,14 +128,44 @@ SHEETS = {
             [("SW_CTRL[3..0]", "output")] +
             [("CLK_SEL", "output"), ("XO_SCL", "output"), ("XO_SDA", "bidirectional")],
     },
-    "CONVERTERS": {
-        "file": "rev03/CONVERTERS.kicad_sch",
-        "desc": "AD9484, AD9253, AD9708, AD9767, AD8352 drivers",
-        "at": (110.0, 140.0),
+    # CONVERTERS was split in four on 24 Sep (_work/rev03_split_converters.py):
+    # one sheet held ~200 parts, too many to review in one sitting.
+    "ADC_RADAR": {
+        "file": "rev03/ADC_RADAR.kicad_sch",
+        "desc": "AD9484 radar ADC, two AD8352 drivers",
+        "at": (440.0, 40.0),
         "labels":
-            [(n, d) for n, d in CONV_DIGITAL] +
-            [(n, "input") for n in CLOCKS if not n.startswith("CLK_FPGA")] +
-            [(n, "bidirectional") for n in IF_ANALOG],
+            [(n, "output") for n, _ in ADCR_BITS] +
+            [(f"ADCR_{s}_{pn}", "output") for s in ("DCO", "OR") for pn in "PN"] +
+            [("CLK_ADCR_P", "input"), ("CLK_ADCR_N", "input"),
+             ("CONV_SPI_SCLK", "input"), ("CONV_SPI_SDIO", "bidirectional"),
+             ("CONV_SPI_CSB_R", "input"), ("IF_RX_B", "input")],
+    },
+    "ADC_SDR": {
+        "file": "rev03/ADC_SDR.kicad_sch",
+        "desc": "AD9253 SDR ADC and its drivers",
+        "at": (440.0, 130.0),
+        "labels":
+            [(n, "output") for n, _ in CONV_DIGITAL if n.startswith("ADCS_")] +
+            [("CLK_ADCS_P", "input"), ("CLK_ADCS_N", "input"),
+             ("CONV_SPI_SCLK", "input"), ("CONV_SPI_SDIO", "bidirectional"),
+             ("CONV_SPI_CSB_S", "input"), ("IF_RX_A", "input")],
+    },
+    "DAC_RADAR": {
+        "file": "rev03/DAC_RADAR.kicad_sch",
+        "desc": "AD9708 radar chirp DAC, output balun",
+        "at": (520.0, 40.0),
+        "labels":
+            [(n, "input") for n, _ in CONV_DIGITAL if n.startswith("DACR_")] +
+            [("IF_TX_B", "output")],
+    },
+    "DAC_SDR": {
+        "file": "rev03/DAC_SDR.kicad_sch",
+        "desc": "AD9767 dual SDR DAC, output balun",
+        "at": (520.0, 80.0),
+        "labels":
+            [(n, "input") for n, _ in CONV_DIGITAL if n.startswith("DACS_")] +
+            [("IF_TX_A", "output")],
     },
     "CLOCK": {
         "file": "rev03/CLOCK.kicad_sch",
@@ -143,7 +179,7 @@ SHEETS = {
         "desc": "4x SPDT channel routing, IF and clock SMAs",
         "at": (190.0, 140.0),
         "labels":
-            [(n, "bidirectional") for n in IF_ANALOG] +
+            [(n, "output") for n in IF_RX] + [(n, "input") for n in IF_TX] +
             [("SW_CTRL[3..0]", "input")],
     },
     "POWER": {

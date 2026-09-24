@@ -61,10 +61,10 @@ SHEETS = [
      "Rev. G"),
     ("ADCLK944.pdf", "20250113092642", ADI + "ADCLK944.pdf", "Rev. 0"),
     # Clock sheet, 23 September: 2-input LVPECL fan-out and the programmable XO.
-    ("ADCLK948.pdf", "20220119015656", ADI + "ADCLK948.pdf", "Rev. ?"),
+    ("ADCLK948.pdf", "20220119015656", ADI + "ADCLK948.pdf", "Rev. B"),
     ("Si549.pdf",    "20240712105249",
      "https://www.skyworksinc.com/-/media/SkyWorks/SL/documents/public/data-sheets/si549-datasheet.pdf",
-     "Rev. ?"),
+     "Revision H"),
 ]
 
 

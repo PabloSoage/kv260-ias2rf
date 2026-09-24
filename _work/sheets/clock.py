@@ -37,7 +37,8 @@ BLOCK_UUID = "86907de8-dbaa-540c-95d7-38c6f0e48980"          # CLOCK block in th
 
 s = schgen.Sheet(SHEET, FILE_UUID,
                  "CLOCK - master XO, reference select, fan-out",
-                 "CSI2-KRIA-KV260_Rev01", f"/{ROOT_UUID}/{BLOCK_UUID}")
+                 "CSI2-KRIA-KV260_Rev01", f"/{ROOT_UUID}/{BLOCK_UUID}",
+                 generator="_work/sheets/clock.py")
 s.lib("kv260-ias2rf", os.path.join(ROOT, "symbols", "kv260-ias2rf.kicad_sym"))
 
 
@@ -152,8 +153,8 @@ s.text("CLK_SEL: FPGA open-drain. High/open = CLK1 (Si549), low = CLK0 (SMA).", 
 # Fan-out: eight pins 2.54 mm apart spread to four blocks 30.48 mm apart.
 # Lines that rise turn top-first, lines that fall turn bottom-first, so no
 # two lines cross (worked through in docs/CLOCK_SPEC.md §4).
-BLOCKS = [("Q0", 30, 29, "CLK_ADCR", "to the AD9484 (CONVERTERS)"),
-          ("Q1", 28, 27, "CLK_ADCS", "to the AD9253 (CONVERTERS)"),
+BLOCKS = [("Q0", 30, 29, "CLK_ADCR", "to the AD9484 (ADC_RADAR)"),
+          ("Q1", 28, 27, "CLK_ADCS", "to the AD9253 (ADC_SDR)"),
           ("Q2", 24, 23, "CLK_FPGA", "to the XC7A50T (CONTROL)"),
           ("Q3", 22, 21, None, "CLK_OUT SMA")]
 pins, targets = [], []
