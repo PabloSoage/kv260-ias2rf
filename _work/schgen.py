@@ -138,11 +138,15 @@ class Sheet:
         self.parts.append(p)
         return p
 
-    def power(self, lib_id, value, at, rot=0):
+    def power(self, lib_id, value, at, rot=0, hide_value=False):
+        """A power symbol. hide_value: for a ground turned sideways beside a
+        connector pin, where its name would land on the next row."""
         self.pwr_count += 1
         n = self.ref_base + self.pwr_count
-        return self.place(lib_id, f"#PWR{n:03d}" if "PWR_FLAG" not in lib_id else f"#FLG{n:03d}",
-                          value, at, rot)
+        p = self.place(lib_id, f"#PWR{n:03d}" if "PWR_FLAG" not in lib_id else f"#FLG{n:03d}",
+                       value, at, rot)
+        p.hide_value = hide_value
+        return p
 
     # ---- connections --------------------------------------------------
     def wire(self, *pts):
@@ -265,7 +269,8 @@ class Sheet:
         # KiCad adds the symbol's rotation to a field's stored angle; storing
         # 90 on a part rotated 90/270 displays the text horizontal.
         fang = 90 if p.rot in (90, 270) else 0
-        props = [("Reference", p.ref, ref_at, power), ("Value", p.value, val_at, power and "PWR_FLAG" in p.sym.lib_id),
+        hide_val = power and ("PWR_FLAG" in p.sym.lib_id or getattr(p, "hide_value", False))
+        props = [("Reference", p.ref, ref_at, power), ("Value", p.value, val_at, hide_val),
                  ("Footprint", p.footprint, (x, y), True), ("Datasheet", "", (x, y), True),
                  ("Description", "", (x, y), True)]
         props += [(k, v, (x, y), True) for k, v in p.fields.items()]

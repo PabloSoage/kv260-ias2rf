@@ -193,7 +193,7 @@ script-generated sheets have already been **removed** from the project and moved
 | Sheet | Contents |
 |---|---|
 | Root | Hierarchy and the Hirose connectors |
-| `IAS_LINK` | Hirose IAS1, the serial link to the Kria, terminations |
+| `IAS_LINK` | ✅ Drawn and verified: `check_sheet.py ias_link` PASS. Awaiting review — [IAS_LINK_SPEC.md](IAS_LINK_SPEC.md) |
 | `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review** — [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
 | `ADC_SDR` | ✅ Drawn and verified: `check_sheet.py adc_sdr` PASS. Awaiting review — [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md) |
 | `DAC_RADAR` | ✅ Drawn and verified: `check_sheet.py dac_radar` PASS. Awaiting review — [DAC_RADAR_SPEC.md](DAC_RADAR_SPEC.md) |

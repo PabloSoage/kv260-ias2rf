@@ -442,7 +442,7 @@ In outline:
   +-- buck 12 V -> +5V0                               1.3 A
         +-- buck -> +3V3_D   logic, DAC DVDD, clock (ADCLK948, Si549), switches, FPGA VCCO
         |     +-- LDO -> +1V8_D   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
-        |     +-- LDO -> +1V2     FPGA VCCO, IAS-facing bank
+        |     +-- LDO -> +1V2     link terminations (the FPGA's link bank must be 2.5 V: IAS_LINK_SPEC §3)
         |     +-- charge pump -> -3V3   RF switch VEE (B-03)
         +-- buck -> +3V6 -> LDO -> +3V3_A   DAC AVDD                   (analogue)
         +-- buck -> +2V5 -> LDO -> +1V8_A   ADC AVDD                   (analogue)
