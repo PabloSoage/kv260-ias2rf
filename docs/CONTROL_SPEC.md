@@ -33,7 +33,7 @@ clock-capable pin** (the symbol's ball names show it). So:
 | 14 | 3.3 V | AD9484 on **AERIS-10's own balls**, CLK_FPGA on AERIS's `FPGA_ADC_CLOCK` balls, AD9253, the two link pairs the FPGA receives, flash | The flash pins live in bank 14. LVDS_25 **inputs** are allowed in a 3.3 V bank with `DIFF_TERM` off (UG471 Table 1-44 note 1, DS181 Table 11 note 1), so each pair gets an external 100 Ω, as AERIS does |
 | 15 | 3.3 V | AD9708 on **AERIS's own balls**, `DACR_CLK` on AERIS's `FPGA_DAC_CLOCK`, AD9767, Pmod, `SW_CTRL0-3`, `CLK_SEL`, XO I²C | The DACs, switches and XO are 3.3 V parts |
 | 34 | 2.5 V | Only the three link pairs the FPGA **drives** | LVDS_25 outputs need VCCO = 2.5 V (UG471). The other 14 balls stay unused |
-| 35 | 1.8 V | 8 × ADAR1000 control + SPI (35 lines), converter SPI, `HK_SCL/SDA`, `FPGA_IRQ` | AERIS drives the ADAR1000s at 1.8 V; the ADCs' SPI is 1.8 V; the carrier's lines are 1.8 V |
+| 35 | 1.8 V | 8 × ADAR1000 control + SPI (35 lines), converter SPI, `HK_SCL/SDA`, `FPGA_IRQ` | AERIS drives the ADAR1000s at 1.8 V; the ADCs' SPI is 1.8 V; the carrier's lines are taken as 1.8 V `[E]`: J8 carries `VCC1V8`, but the carrier schematic (XTP682) is not on disk to confirm the level of `I2C_SCL/SDA`, `PWDN` and `GPIO2` |
 
 The pin table is in `control_spec.py`. On import it **proves itself against the symbol's own ball
 names**:
