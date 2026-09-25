@@ -106,7 +106,7 @@ architecture** documented here.
 
 | File | Actual state |
 |---|---|
-| `CSI2-KRIA-KV260_Rev01-2.kicad_sch` | Original schematic with the camera electronics purged. **Usable as a base.** |
+| `rev03/*.kicad_sch` | The Rev03 schematic, nine sheets under the root. The Rev01 IAS0/IAS1 sheet is in `_deprecated/` since 25 Sep |
 | `CSI2-KRIA-KV260_Rev01.kicad_pcb` | Original layout, intact and valid. Cleared of the 34 empty footprints a previous pass had inserted. |
 | `PCB/`, `Documents/` | Original Altium sources and fabrication outputs, untouched. |
 | `_deprecated/` | The two script-generated sheets, removed from the project. See the README in that folder. |
