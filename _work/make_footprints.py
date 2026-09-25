@@ -171,6 +171,10 @@ def hirose():
     # texts (pin-number marks, reference, value) read upright: angle 0
     blk = re.sub(r'(\((?:fp_text user|property) "[^"]*"\s*\(at [\d.\-]+ [\d.\-]+) [\d.\-]+\)', r"\1 0)", blk)
     blk = re.sub(r'"B\.(Cu|Mask|Paste|SilkS|Fab|CrtYd|Adhes)"', r'"F.\1"', blk)
+    # no silkscreen: its pin-number texts are 0.5 mm (below the 0.8 mm
+    # minimum) and its outline runs over its own pads. Placed on the bottom,
+    # mated to the carrier, it cannot be read anyway (build_board.py agrees)
+    blk = blk.replace('(layer "F.SilkS")', '(layer "F.Fab")')
     blk = blk.replace(" mirror)", ")").replace("(justify mirror)", "")
     blk = re.sub(r'\(net "[^"]*"\)\n\t*', "", blk)
     blk = re.sub(r'"Reference" "J8_IAS1"', '"Reference" "REF**"', blk)
