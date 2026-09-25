@@ -208,6 +208,7 @@ routing is planned.
 | L4 filled on a copy (`kicad-cli pcb drc --refill-zones`) | All islands fill. The only new reports are the islands' `isolated_copper`, expected until their vias are placed |
 | J101/J102 against the original board | Position, face, rotation and all 38 pads identical. Nets as INTERFACE_SPEC §3–§4 (pin 4/5 `LINK_RX_D0`, 7/8 `LINK_RX_CLK`, 14 `HK_SCL`, 21 `FPGA_PROG_B`, 22 `HK_SDA`, 15 `FPGA_IRQ`: moved from 32 after the check against the carrier, INTERFACE_SPEC §4.3) |
 | Footprints | All 472 exist. Four are new, in `footprints/kv260-ias2rf.pretty` (`_work/make_footprints.py`): ADCLK948 and AD9484 LFCSPs with their datasheets' exposed pads, the M3SWA2's DQ3005 from its Mini-Circuits case drawing, and the Hirose BM20B |
+| TPS7A8300 (U1005–U1007) against TI's RGR0020A drawings (SBVS197, pp. 44–45) | KiCad's `QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm` fits: 3.5 mm body, pin 1 top-left and the same pin order. Its exposed pad is 2.0 mm against TI's 2.05 mm land, still 0.25 mm clear of the pins. TI's example puts four 0.2 mm vias in the pad: add them when routing, for the +1V8_D LDO's 0.49 W |
 
 Parts chosen for this step, each checked against its datasheet (all fetched by
 `_work/fetch_datasheets.py`):
