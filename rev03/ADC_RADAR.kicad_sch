@@ -10049,7 +10049,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:LFCSP-56-1EP_8x8mm_P0.5mm_EP5.1x5.1mm"
 			(at 278.13 130.81 0)
 			(hide yes)
 			(effects

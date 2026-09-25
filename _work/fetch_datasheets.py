@@ -89,6 +89,16 @@ SHEETS = [
 DIRECT = [
     ("LMR33630.pdf", "https://www.ti.com/lit/ds/symlink/lmr33630.pdf"),
     ("SN74LVC1G07.pdf", "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf"),
+    # Layout (25 Sep): Mini-Circuits serves directly too - the balun and the
+    # land patterns (PL-xxx) its datasheets point to.
+    ("ADT2-1T.pdf", "https://www.minicircuits.com/pdfs/ADT2-1T+.pdf"),
+    ("PL-052.pdf", "https://www.minicircuits.com/pcb/98-pl052.pdf"),
+    ("PL-768.pdf", "https://www.minicircuits.com/pcb/98-pl768.pdf"),
+    ("DQ3005.pdf", "https://www.minicircuits.com/case_style/DQ3005.pdf"),   # M3SWA2 package
+    ("CD542.pdf", "https://www.minicircuits.com/case_style/CD542.pdf"),     # ADT2-1T package
+    # the power inductors and the reverse-polarity MOSFET, chosen at layout
+    ("SRP7028A.pdf", "https://www.bourns.com/docs/Product-Datasheets/SRP7028A.pdf"),
+    ("DMP3013SFV.pdf", "https://www.diodes.com/assets/Datasheets/DMP3013SFV.pdf"),
 ]
 
 

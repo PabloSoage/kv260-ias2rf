@@ -422,6 +422,13 @@ DATASHEET_PINS.update({
     # CONTROL (25 Sep): the FPGA's configuration flash. Micron datasheet
     # mt25q_qlhs_L_128_ABA Rev. K, Figure 6 (8-pin SOP2, package code SE),
     # HOLD# option (part number digit 1). Fetched by _work/fetch_datasheets.py.
+    # Layout (25 Sep): the DAC output balun. Mini-Circuits ADT2-1T+ datasheet
+    # (Rev. F), Pin Connections: primary dot 3, primary 1, secondary dot 6,
+    # secondary 4, secondary centre tap 5, not used 2. Case CD542.
+    "ADT2-1T": [
+        ("1", "PRI", "passive"), ("2", "NC", "no_connect"), ("3", "PRI_DOT", "passive"),
+        ("4", "SEC", "passive"), ("5", "SEC_CT", "passive"), ("6", "SEC_DOT", "passive"),
+    ],
     "MT25QL128ABA1ESE": [
         ("1", "~{S}", "input"), ("2", "DQ1", "bidirectional"), ("3", "~{W}/DQ2", "bidirectional"),
         ("4", "VSS", "power_in"), ("5", "DQ0", "bidirectional"), ("6", "C", "input"),
@@ -448,6 +455,8 @@ _CLOCK_NOTES = {
     "TPS7A8300RGR": "Pin table from the TPS7A8300 datasheet SBVS197F, Pin Functions (RGR). "
                     "Program pins typed passive: each is tied to GND or left open. Pad 21 = GND.",
     "LM2663M": "Pin table from the LM2662/LM2663 datasheet SNVS002E, Pin Functions (LM2663: pin 1 SD).",
+    "ADT2-1T": "Pin Connections from the Mini-Circuits ADT2-1T+ datasheet Rev. F. 50 ohm, impedance "
+               "ratio 2 (secondary/primary), 0.4-450 MHz, case CD542, land pattern PL-052.",
     "MT25QL128ABA1ESE": "Pin table from the Micron MT25QL128ABA datasheet Rev. K, Figure 6 "
                         "(SO8W, 208 mil; HOLD# variant). 2.7-3.6 V. In Vivado's configuration "
                         "memory list (UG908) as mt25ql128.",
@@ -462,6 +471,7 @@ _CLOCK_NOTES = {
 DATASHEET_ONLY = {
     "ADCLK948BCPZ":   "2-input, 8-output LVPECL clock fan-out, 4.8 GHz - reference selector and distribution",
     "Si549_PinoutC":  "I2C programmable ultra-low-jitter XO, 0.2-1500 MHz, LVPECL - local master clock",
+    "ADT2-1T":          "RF transformer 1:2 impedance, 0.4-450 MHz - DAC output balun (100 ohm side to the DAC)",
     "MT25QL128ABA1ESE": "128 Mb 3 V quad SPI NOR flash, SO8W - FPGA configuration",
     "AD9708AR":       "8-bit 125 MSPS current-output DAC, parallel CMOS - radar chirp",
     "LMR33630ADDA":   "3.8-36 V in, 3 A synchronous buck, 400 kHz - 12 V to +5V0",
@@ -611,6 +621,10 @@ SYMBOL_LAYOUT = {
                      "left": ["15", "16", "17", None, "14", None, "13", None, "12"],
                      "right": ["1", "19", "20", None, "2", None, "3", None, "4"],
                      "gnd": ["5", "6", "7", "9", "10", "11", None, "8", "18", "21"]},
+    # secondary (100 ohm, to the DAC) on the left, dot at the top and the
+    # other end 15.24 mm below, the spacing of the DAC output legs
+    "ADT2-1T": {"half_w": 10.16, "left": ["6", None, None, "5", None, None, "4"],
+                "right": ["3", None, None, None, None, None, "1"], "gnd": ["2"]},
     "MT25QL128ABA1ESE": {"half_w": 10.16, "left": ["1", "6", "5", "2", "3", "7", None],
                          "pwr": ["8"], "gnd": ["4"]},
     "LM2663M": {"half_w": 7.62, "left": ["8", None, "1", "6", "7"],

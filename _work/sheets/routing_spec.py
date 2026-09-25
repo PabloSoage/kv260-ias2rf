@@ -22,7 +22,7 @@ at 0 V DC" (Electrical Specifications, note 3).
 from kit import R, C
 
 SMA_FP = "Connector_Coaxial:SMA_Samtec_SMA-J-P-H-ST-EM1_EdgeMount"
-SW_FP = ""        # QFN 3x3 mm, 16 leads + paddle: Mini-Circuits case DG1677; layout PL-768
+SW_FP = "kv260-ias2rf:MiniCircuits_DQ3005"   # case DQ3005 (datasheet p.12), 3x3 mm QFN-16; layout PL-768
 
 SWITCHES = [  # n, converter label, shape, RF1 name, RF2 name
     (1, "IF_RX_A", "output", "SDR_RX_A", "AERIS_IF_A"),

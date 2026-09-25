@@ -3732,7 +3732,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:MiniCircuits_DQ3005"
 			(at 83.82 78.74 0)
 			(hide yes)
 			(effects
@@ -5768,7 +5768,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:MiniCircuits_DQ3005"
 			(at 223.52 78.74 0)
 			(hide yes)
 			(effects
@@ -7804,7 +7804,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:MiniCircuits_DQ3005"
 			(at 83.82 201.93 0)
 			(hide yes)
 			(effects
@@ -9840,7 +9840,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:MiniCircuits_DQ3005"
 			(at 223.52 201.93 0)
 			(hide yes)
 			(effects

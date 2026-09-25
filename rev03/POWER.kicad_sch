@@ -602,12 +602,8 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:Q_PMOS"
-			(pin_numbers
-				(hide yes)
-			)
+		(symbol "Transistor_FET:DMP3013SFV"
 			(pin_names
-				(offset 0)
 				(hide yes)
 			)
 			(exclude_from_sim no)
@@ -616,7 +612,7 @@
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "Q"
-				(at 5.08 1.27 0)
+				(at 5.08 1.905 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -626,8 +622,8 @@
 					(justify left)
 				)
 			)
-			(property "Value" "Q_PMOS"
-				(at 5.08 -1.27 0)
+			(property "Value" "DMP3013SFV"
+				(at 5.08 0 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -637,8 +633,21 @@
 					(justify left)
 				)
 			)
-			(property "Footprint" ""
-				(at 5.08 2.54 0)
+			(property "Footprint" "Package_SON:Diodes_PowerDI3333-8"
+				(at 5.08 -1.905 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(justify left)
+				)
+			)
+			(property "Datasheet" "https://www.diodes.com/assets/Datasheets/DMP3013SFV.pdf"
+				(at 5.08 -3.81 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -646,9 +655,10 @@
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Datasheet" ""
+			(property "Description" "-12A Id, -30V Vds, P-Channel Power MOSFET, 9.5mOhm Ron, 33.7nC Qg (typ), PowerDI3333-8"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -659,7 +669,7 @@
 					)
 				)
 			)
-			(property "Description" "P-MOSFET transistor"
+			(property "ki_keywords" "P-Channel MOSFET"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -670,7 +680,7 @@
 					)
 				)
 			)
-			(property "ki_keywords" "PMOS P-MOS"
+			(property "ki_fp_filters" "Diodes*PowerDI3333*"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -681,7 +691,7 @@
 					)
 				)
 			)
-			(symbol "Q_PMOS_0_1"
+			(symbol "DMP3013SFV_0_1"
 				(polyline
 					(pts
 						(xy 0.254 1.905) (xy 0.254 -1.905)
@@ -825,7 +835,7 @@
 				)
 				(polyline
 					(pts
-						(xy 2.921 -0.381) (xy 3.683 -0.381)
+						(xy 2.794 -0.508) (xy 2.921 -0.381) (xy 3.683 -0.381) (xy 3.81 -0.254)
 					)
 					(stroke
 						(width 0)
@@ -848,43 +858,7 @@
 					)
 				)
 			)
-			(symbol "Q_PMOS_1_1"
-				(pin passive line
-					(at 2.54 5.08 270)
-					(length 2.54)
-					(name "D"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "D"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "G"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "G"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
+			(symbol "DMP3013SFV_1_1"
 				(pin passive line
 					(at 2.54 -5.08 90)
 					(length 2.54)
@@ -895,7 +869,81 @@
 							)
 						)
 					)
-					(number "S"
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(hide yes)
+					(name "S"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(hide yes)
+					(name "S"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "G"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "D"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -6080,7 +6128,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:Q_PMOS")
+		(lib_id "Transistor_FET:DMP3013SFV")
 		(at 81.28 78.74 90)
 		(unit 1)
 		(body_style 1)
@@ -6099,7 +6147,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "P-MOS 30V 5A"
+		(property "Value" "DMP3013SFV"
 			(at 76.2 90.17 90)
 			(effects
 				(font
@@ -6108,7 +6156,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_SON:Diodes_PowerDI3333-8"
 			(at 81.28 78.74 90)
 			(hide yes)
 			(effects
@@ -6135,14 +6183,20 @@
 				)
 			)
 		)
-		(pin "D"
-			(uuid "f8dff3f8-8eee-5fe3-83bc-12e2534d156f")
+		(pin "1"
+			(uuid "94bb0fa1-db08-5b40-aae2-5c6316cd9f0d")
 		)
-		(pin "G"
-			(uuid "e04c99c7-2103-5991-bd7e-3a9da4737ddd")
+		(pin "2"
+			(uuid "6deea0bb-6fed-580c-9958-49e459e7f7dc")
 		)
-		(pin "S"
-			(uuid "ab1d1185-bb97-5f3e-9cda-a012d17ef273")
+		(pin "3"
+			(uuid "acffcf25-24a9-5ff3-b7f3-fdb8760fd1ac")
+		)
+		(pin "4"
+			(uuid "1844d0dc-7174-58b5-9e2c-214793a9e7a3")
+		)
+		(pin "5"
+			(uuid "7abe7ee8-ccff-53a2-a014-c43b596b07cf")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
@@ -7432,7 +7486,7 @@
 				)
 			)
 		)
-		(property "Value" "8.2u 5.1A"
+		(property "Value" "SRP7028A-8R2M"
 			(at 231.14 87.63 90)
 			(effects
 				(font
@@ -7440,7 +7494,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm"
 			(at 231.14 83.82 90)
 			(hide yes)
 			(effects
@@ -9032,7 +9086,7 @@
 				)
 			)
 		)
-		(property "Value" "3.3u 3.5A"
+		(property "Value" "SRP7028A-3R3M"
 			(at 113.03 173.99 90)
 			(effects
 				(font
@@ -9040,7 +9094,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm"
 			(at 113.03 170.18 90)
 			(hide yes)
 			(effects
@@ -10356,7 +10410,7 @@
 				)
 			)
 		)
-		(property "Value" "3.3u 3.5A"
+		(property "Value" "SRP7028A-3R3M"
 			(at 273.05 173.99 90)
 			(effects
 				(font
@@ -10364,7 +10418,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm"
 			(at 273.05 170.18 90)
 			(hide yes)
 			(effects
@@ -11680,7 +11734,7 @@
 				)
 			)
 		)
-		(property "Value" "2.2u 3.5A"
+		(property "Value" "SRP7028A-2R2M"
 			(at 433.07 173.99 90)
 			(effects
 				(font
@@ -11688,7 +11742,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm"
 			(at 433.07 170.18 90)
 			(hide yes)
 			(effects

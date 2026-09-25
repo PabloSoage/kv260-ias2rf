@@ -30,9 +30,10 @@ PARTS = {
               "PJ-102AH (ARCHITECTURE BOM, C). Pin 1 centre = +12 V, pin 2 sleeve = GND"),
     "F1001": ("Device:Polyfuse", "PTC 1.5A hold", "Fuse:Fuse_1812_4532Metric",
               "Judgement: input 0.96 A with margin (POWER_AND_STACKUP §1.3); 1.5 A hold. Part to choose"),
-    "Q1001": ("Device:Q_PMOS", "P-MOS 30V 5A", "",
-              "Reverse-polarity protection (ARCHITECTURE BOM Q_REV1, P). Vds >= 30 V, Id >= 3 A, "
-              "Rds(on) <= 50 mohm at Vgs -10 V. Part to choose; footprint follows it"),
+    "Q1001": ("Transistor_FET:DMP3013SFV", "DMP3013SFV", "Package_SON:Diodes_PowerDI3333-8",
+              "Reverse-polarity protection. Needed Vds >= 30 V, Id >= 3 A, Rds(on) <= 50 mohm. "
+              "DMP3013SFV datasheet DS40141 Rev. 5: -30 V, -12 A, 9.5 mohm at -10 V, VGSS +-25 V. "
+              "Pins 1-3 S, 4 G, 5 D (pad)"),
     "R1001": R("100k", "Gate pull-down: turns Q1001 on when the input is the right way round"),
     "D1002": ("Device:D_Zener", "15V", "Diode_SMD:D_SOD-123",
               "Gate-source clamp: keeps Vgs inside +-20 V when the TVS clamps near 24 V"),
@@ -48,9 +49,9 @@ PARTS = {
     "C1003": C("220n 25V", "Table 9-2: CHF 220 nF", "Capacitor_SMD:C_0603_1608Metric"),
     "C1004": C("1u", "Table 9-2 / Pin Functions: CVCC 1 uF"),
     "C1005": C("100n", "Table 9-2 / Pin Functions: CBOOT 100 nF, BOOT to SW"),
-    "L1001": ("Device:L", "8.2u 5.1A", "",
+    "L1001": ("Device:L", "SRP7028A-8R2M", "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm",
               "Table 9-2: L 8 uH (8.2 uH nearest standard). Isat >= the high-side limit ISC, "
-              "5.05 A max (Electrical Characteristics). Part and footprint to choose"),
+              "5.05 A max. Bourns SRP7028A-8R2M: Isat 7.5 A, Irms 4 A, DCR 68 mohm max"),
     "R1002": R("100k", "Table 9-2: RFBT 100 kohm"),
     "R1003": R("24.9k", "Table 9-2: RFBB 24.9 kohm (VOUT = 1 V x (1 + 100/24.9) = 5.02 V)"),
 }
@@ -71,9 +72,9 @@ for u, rail, r1, l, b in BUCKS:
         f"C{b + 1}": C("100n", "p.14: optional 0.1 uF at pin 3 for high frequency"),
         f"R{b}": R("10k", "Figure 7-1: R3 10 kohm pulls EN up to VIN"),
         f"C{b + 2}": C("100n", "p.14: 0.1 uF from VBST to SW"),
-        f"L{b}": ("Device:L", f"{l} 3.5A", "",
-                  f"Table 7-2: L1 {l}. Peak current rating >= 3.5 A (the datasheet's worked "
-                  "example). Part and footprint to choose"),
+        f"L{b}": ("Device:L", f"SRP7028A-{l[0]}R{l[2]}M", "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm",
+                  f"Table 7-2: L1 {l}. Peak current >= 3.5 A (the datasheet's worked example). "
+                  "Bourns SRP7028A: 3R3M Isat 12 A / Irms 6 A; 2R2M Isat 14 A / Irms 8 A"),
         f"R{b + 1}": R(r1, f"Table 7-2: R1 for {rail[1:].replace('V', '.').rstrip('_AD.')} V"),
         f"R{b + 2}": R("10k", "Table 7-2: R2 10 kohm"),
         f"C{b + 3}": C("22u 10V", "Figure 7-1: C8 22 uF (20-68 uF, Table 7-2)", C0805),
@@ -122,14 +123,14 @@ NETS["GND"] += ["J1001.2", "R1001.2", "D1001.1", "C1001.2",
                [f"C{1006 + i}.2" for i in range(4)]
 NETS.update({
     "VIN_RAW": ["J1001.1", "F1001.1"],
-    "VIN_FUSED": ["F1001.2", "Q1001.D"],
-    "GATE": ["Q1001.G", "R1001.1", "D1002.2"],
+    "VIN_FUSED": ["F1001.2", "Q1001.5"],
+    "GATE": ["Q1001.4", "R1001.1", "D1002.2"],
     "LMR_VCC": ["U1001.6", "C1004.1"],
     "LMR_BOOT": ["U1001.7", "C1005.1"],
     "LMR_SW": ["U1001.8", "C1005.2", "L1001.1"],
     "LMR_FB": ["U1001.5", "R1002.2", "R1003.1"],
 })
-NETS["+12V"] += ["Q1001.S", "D1002.1", "D1001.2", "C1001.1", "U1001.2", "U1001.3",
+NETS["+12V"] += ["Q1001.1", "Q1001.2", "Q1001.3", "D1002.1", "D1001.2", "C1001.1", "U1001.2", "U1001.3",
                  "C1002.1", "C1003.1"]
 NETS["+5V0"] += ["L1001.2", "R1002.1"] + [f"C{1006 + i}.1" for i in range(4)]
 for u, rail, r1, l, b in BUCKS:

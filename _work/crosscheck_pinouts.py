@@ -67,6 +67,8 @@ NO_SECOND_SOURCE = {
                     "datasheet's pin drawing and Pin Functions table, which agree",
     "LM2663M": "KiCad has only the LM2665 (SOT-23-6), a different part. Checked only "
                "against the datasheet's pin drawing and Pin Functions table",
+    "ADT2-1T": "not in Eagle, EasyEDA or KiCad's symbol libraries. Checked against the "
+               "datasheet's Pin Connections table and outline drawing, which agree",
     "ADCLK948BCPZ": "not in Eagle, EasyEDA or KiCad's libraries. Checked only "
                     "against itself: Figure 2 and Table 7 of the datasheet agree",
 }

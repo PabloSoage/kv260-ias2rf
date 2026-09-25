@@ -17,7 +17,8 @@ sends them their data.
 
 # ref -> (lib_id, value, footprint, source of the value)
 PARTS = {
-    "U401": ("kv260-ias2rf:ADCLK948BCPZ", "ADCLK948BCPZ", "",
+    "U401": ("kv260-ias2rf:ADCLK948BCPZ", "ADCLK948BCPZ",
+             "kv260-ias2rf:LFCSP-32-1EP_5x5mm_P0.5mm_EP2.7x2.7mm",
              "2 selectable inputs, 8 LVPECL outputs. Footprint: CP-32-21 has a 2.70 mm "
              "exposed pad; KiCad's stock LFCSP-32 5x5 all have >= 3.1 mm. Custom footprint "
              "needed at layout"),

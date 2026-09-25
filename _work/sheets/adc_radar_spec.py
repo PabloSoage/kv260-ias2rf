@@ -35,7 +35,8 @@ def C(value, why, fp=C0402):
 
 # ref -> (lib_id, value, footprint, source of the value)
 PARTS = {
-    "U501": ("kv260-ias2rf:AD9484BCPZ-500", "AD9484BCPZ-500", "",
+    "U501": ("kv260-ias2rf:AD9484BCPZ-500", "AD9484BCPZ-500",
+             "kv260-ias2rf:LFCSP-56-1EP_8x8mm_P0.5mm_EP5.1x5.1mm",
              "Radar ADC, AERIS-10's part. Footprint: CP-56-5 has a 5.10 mm exposed pad "
              "(datasheet Figure 40); KiCad's 8x8 mm 56-pin parts have 6.6 or 5.1x4.96 mm. "
              "Custom footprint needed at layout"),

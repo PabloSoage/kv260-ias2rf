@@ -2777,7 +2777,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "AVT_KHK_Lib:J-BM20B(0.8)-34DP"
+		(property "Footprint" "kv260-ias2rf:J-BM20B(0.8)-34DP"
 			(at 66.04 110.49 0)
 			(hide yes)
 			(effects
@@ -3692,7 +3692,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "AVT_KHK_Lib:J-BM20B(0.8)-34DP"
+		(property "Footprint" "kv260-ias2rf:J-BM20B(0.8)-34DP"
 			(at 66.04 205.74 0)
 			(hide yes)
 			(effects

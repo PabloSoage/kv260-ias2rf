@@ -950,373 +950,85 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:Transformer_1P_1S"
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
+		(symbol "kv260-ias2rf:ADT2-1T"
+			(pin_names (offset 0.508))
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "T"
-				(at 0 6.35 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
+			(property "Reference" "U"
+				(at 0 0 0)
+				(effects (font (size 1.27 1.27)) (hide no))
 			)
-			(property "Value" "Transformer_1P_1S"
-				(at 0 -7.62 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
+			(property "Value" "ADT2-1T"
+				(at 0 0 0)
+				(effects (font (size 1.27 1.27)) (hide no))
 			)
 			(property "Footprint" ""
 				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
+				(effects (font (size 1.27 1.27)) (hide yes))
 			)
 			(property "Datasheet" ""
 				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
+				(effects (font (size 1.27 1.27)) (hide yes))
 			)
-			(property "Description" "Transformer, single primary, single secondary"
+			(property "Description" "RF transformer 1:2 impedance, 0.4-450 MHz - DAC output balun (100 ohm side to the DAC)"
 				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
+				(effects (font (size 1.27 1.27)) (hide yes))
 			)
-			(property "ki_keywords" "transformer coil magnet"
+			(property "ki_keywords" "kv260-ias2rf"
 				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
+				(effects (font (size 1.27 1.27)) (hide yes))
+			)
+			(property "SymbolSource" "Pin Connections from the Mini-Circuits ADT2-1T+ datasheet Rev. F. 50 ohm, impedance ratio 2 (secondary/primary), 0.4-450 MHz, case CD542, land pattern PL-052."
+				(at 0 0 0)
+				(effects (font (size 1.27 1.27)) (hide yes))
+			)
+			(symbol "ADT2-1T_0_1"
+				(rectangle
+					(start -10.16 11.43)
+					(end 10.16 -11.43)
+					(stroke (width 0.254) (type default))
+					(fill (type background))
 				)
 			)
-			(symbol "Transformer_1P_1S_0_1"
-				(arc
-					(start -1.27 3.81)
-					(mid -1.656 2.9336)
-					(end -2.54 2.5654)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
+			(symbol "ADT2-1T_1_1"
+				(pin passive line
+					(at -12.70 7.62 0)
+					(length 2.54)
+					(name "SEC_DOT" (effects (font (size 1.27 1.27))))
+					(number "6" (effects (font (size 1.27 1.27))))
 				)
-				(arc
-					(start -1.27 1.27)
-					(mid -1.656 0.3936)
-					(end -2.54 0.0254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
+				(pin passive line
+					(at -12.70 0.00 0)
+					(length 2.54)
+					(name "SEC_CT" (effects (font (size 1.27 1.27))))
+					(number "5" (effects (font (size 1.27 1.27))))
 				)
-				(arc
-					(start -1.27 -1.27)
-					(mid -1.656 -2.1464)
-					(end -2.54 -2.5146)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
+				(pin passive line
+					(at -12.70 -7.62 0)
+					(length 2.54)
+					(name "SEC" (effects (font (size 1.27 1.27))))
+					(number "4" (effects (font (size 1.27 1.27))))
 				)
-				(arc
-					(start -1.27 -3.81)
-					(mid -1.656 -4.6864)
-					(end -2.54 -5.0546)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
+				(pin passive line
+					(at 12.70 7.62 180)
+					(length 2.54)
+					(name "PRI_DOT" (effects (font (size 1.27 1.27))))
+					(number "3" (effects (font (size 1.27 1.27))))
 				)
-				(arc
-					(start -2.54 5.08)
-					(mid -1.642 4.708)
-					(end -1.27 3.81)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
+				(pin passive line
+					(at 12.70 -7.62 180)
+					(length 2.54)
+					(name "PRI" (effects (font (size 1.27 1.27))))
+					(number "1" (effects (font (size 1.27 1.27))))
 				)
-				(arc
-					(start -2.54 2.54)
-					(mid -1.642 2.168)
-					(end -1.27 1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start -2.54 0)
-					(mid -1.642 -0.372)
-					(end -1.27 -1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start -2.54 -2.54)
-					(mid -1.642 -2.912)
-					(end -1.27 -3.81)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -0.635 5.08) (xy -0.635 -5.08)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.635 -5.08) (xy 0.635 5.08)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 1.2954 3.81)
-					(mid 1.6457 4.7117)
-					(end 2.54 5.08)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 1.2954 1.27)
-					(mid 1.6457 2.1717)
-					(end 2.54 2.54)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 1.2954 -1.27)
-					(mid 1.6457 -0.3683)
-					(end 2.54 0)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 2.54 2.5654)
-					(mid 1.6599 2.9299)
-					(end 1.2954 3.81)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 2.54 0.0254)
-					(mid 1.6599 0.3899)
-					(end 1.2954 1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 2.54 -2.5146)
-					(mid 1.6599 -2.1501)
-					(end 1.2954 -1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 1.3208 -3.81)
-					(mid 1.6711 -2.9085)
-					(end 2.5654 -2.54)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start 2.5654 -5.0546)
-					(mid 1.6851 -4.6902)
-					(end 1.3208 -3.81)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
+				(pin no_connect line
+					(at 0.00 -13.97 90)
+					(length 2.54)
+					(name "NC" (effects (font (size 1.27 1.27))))
+					(number "2" (effects (font (size 1.27 1.27))))
 				)
 			)
-			(symbol "Transformer_1P_1S_1_1"
-				(pin passive line
-					(at -10.16 5.08 0)
-					(length 7.62)
-					(name "AA"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -10.16 -5.08 0)
-					(length 7.62)
-					(name "AB"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 10.16 -5.08 180)
-					(length 7.62)
-					(name "SA"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 10.16 5.08 180)
-					(length 7.62)
-					(name "SB"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
 		)
 	)
 	(junction
@@ -1424,6 +1136,14 @@
 	(no_connect
 		(at 101.6 147.32)
 		(uuid "4f0b1d71-086d-5dda-8fd6-51eceef566d8")
+	)
+	(no_connect
+		(at 238.76 133.35)
+		(uuid "6680dcac-9665-5e5a-8511-ba743dce5214")
+	)
+	(no_connect
+		(at 251.46 147.32)
+		(uuid "d7bbb2dd-1a38-5901-9154-0b17162506f9")
 	)
 	(wire
 		(pts
@@ -1807,13 +1527,13 @@
 	)
 	(wire
 		(pts
-			(xy 228.6 125.73) (xy 241.3 125.73)
+			(xy 228.6 125.73) (xy 238.76 125.73)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "778ed0da-5d96-5c9a-8ea0-81639b98b9e2")
+		(uuid "ca084eed-a70e-5106-a3a8-bbf5865862d0")
 	)
 	(wire
 		(pts
@@ -1827,43 +1547,33 @@
 	)
 	(wire
 		(pts
-			(xy 228.6 140.97) (xy 238.76 140.97)
+			(xy 228.6 140.97) (xy 236.22 140.97)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "01214def-2196-52a5-9c6b-5b8d11ba6364")
+		(uuid "d22c61a8-cb7b-5cc8-ac65-9db14190e6a6")
 	)
 	(wire
 		(pts
-			(xy 238.76 140.97) (xy 238.76 135.89)
+			(xy 236.22 140.97) (xy 238.76 140.97)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "55969f71-8754-56ba-9df8-5983d25979e7")
+		(uuid "dc2e54eb-6fd0-5f55-a94d-32bc423733db")
 	)
 	(wire
 		(pts
-			(xy 238.76 135.89) (xy 241.3 135.89)
+			(xy 264.16 125.73) (xy 269.24 125.73)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d216e0d0-2a6e-5cd5-b499-969a9b9688fb")
-	)
-	(wire
-		(pts
-			(xy 261.62 125.73) (xy 266.7 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ba576952-83fd-5640-9d2d-a31f74967de0")
+		(uuid "865845d1-3e6b-5c5e-b97b-fc67191b2a47")
 	)
 	(hierarchical_label "DACR_D0"
 		(shape input)
@@ -1966,14 +1676,14 @@
 	)
 	(hierarchical_label "IF_TX_B"
 		(shape output)
-		(at 266.7 125.73 0)
+		(at 269.24 125.73 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid "54f3663e-e812-5d05-a552-c7e543f424fb")
+		(uuid "da5cd96e-5d8d-59c4-8d52-09eb289e2172")
 	)
 	(text "+3V3_A is the analogue LDO; no extra filter (AD9708 Figure 22 is for a shared supply)."
 		(exclude_from_sim no)
@@ -4542,8 +4252,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:Transformer_1P_1S")
-		(at 251.46 130.81 0)
+		(lib_id "kv260-ias2rf:ADT2-1T")
+		(at 251.46 133.35 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4553,7 +4263,7 @@
 		(dnp no)
 		(uuid "52c593ad-112e-5c76-b6f4-ef55d7304c4d")
 		(property "Reference" "T701"
-			(at 241.3 121.92 0)
+			(at 265.43 130.81 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4561,8 +4271,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "balun 2:1 Z, 100R:50R"
-			(at 241.3 142.24 0)
+		(property "Value" "ADT2-1T+"
+			(at 265.43 133.35 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4570,8 +4280,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
-			(at 251.46 130.81 0)
+		(property "Footprint" "RF_Mini-Circuits:Mini-Circuits_CD542_LandPatternPL-052"
+			(at 251.46 133.35 0)
 			(hide yes)
 			(effects
 				(font
@@ -4580,7 +4290,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 251.46 130.81 0)
+			(at 251.46 133.35 0)
 			(hide yes)
 			(effects
 				(font
@@ -4589,7 +4299,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 251.46 130.81 0)
+			(at 251.46 133.35 0)
 			(hide yes)
 			(effects
 				(font
@@ -4597,17 +4307,23 @@
 				)
 			)
 		)
+		(pin "6"
+			(uuid "37ebe27f-be0e-57b2-b6da-79a446d009cf")
+		)
+		(pin "5"
+			(uuid "174e5bf7-da7e-5b49-aece-3a40bd7efa2f")
+		)
+		(pin "4"
+			(uuid "bacdf060-c94b-5a2f-8f7d-ad2660322fb8")
+		)
+		(pin "3"
+			(uuid "c409713e-1f91-5aff-8dd4-9d767e7d1fe7")
+		)
 		(pin "1"
 			(uuid "65ed9634-73ff-5014-9a04-4324e0061b0d")
 		)
 		(pin "2"
 			(uuid "f2fc8885-dfd6-5e45-a574-acfdd4ef26f0")
-		)
-		(pin "3"
-			(uuid "c409713e-1f91-5aff-8dd4-9d767e7d1fe7")
-		)
-		(pin "4"
-			(uuid "bacdf060-c94b-5a2f-8f7d-ad2660322fb8")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
@@ -4620,7 +4336,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 261.62 135.89 0)
+		(at 264.16 140.97 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4630,7 +4346,7 @@
 		(dnp no)
 		(uuid "2290095d-a9ef-5125-9f5c-74ddf841ee49")
 		(property "Reference" "#PWR717"
-			(at 261.62 139.7 0)
+			(at 264.16 144.78 0)
 			(hide yes)
 			(effects
 				(font
@@ -4639,7 +4355,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 261.62 139.7 0)
+			(at 264.16 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4647,7 +4363,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 261.62 135.89 0)
+			(at 264.16 140.97 0)
 			(hide yes)
 			(effects
 				(font
@@ -4656,7 +4372,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 261.62 135.89 0)
+			(at 264.16 140.97 0)
 			(hide yes)
 			(effects
 				(font
@@ -4665,7 +4381,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 261.62 135.89 0)
+			(at 264.16 140.97 0)
 			(hide yes)
 			(effects
 				(font

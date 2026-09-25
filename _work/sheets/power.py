@@ -39,7 +39,7 @@ flag(J.pin(2))                     # the board's ground enters here
 f = k.hpart("F1001", 58.42, Y0)
 s.wire(J.pin(1), f.pin(1))
 Q = k.part("Q1001", (81.28, Y0 + 2.54), rot=90)
-qd, qs, qg = Q.pin("D"), Q.pin("S"), Q.pin("G")
+qd, qs, qg = Q.pin(5), Q.pin(1), Q.pin(4)          # D, S, G
 assert qd[1] == Y0 and qs[1] == Y0
 s.wire(f.pin(2), qd)
 rg = hang("R1001", qg[0], qg[1])

@@ -45,9 +45,9 @@ PARTS = {
     "L703": ("Device:L", "107.3n", "Inductor_SMD:L_0603_1608Metric", "AERIS L26"),
     "L704": ("Device:L", "107.3n", "Inductor_SMD:L_0603_1608Metric", "AERIS L27"),
     "C711": C("33p", "AERIS C59 (32.8 pF), at the far end of the filter. C0G"),
-    "T701": ("Device:Transformer_1P_1S", "balun 2:1 Z, 100R:50R", "",
-             "Judgement, part not chosen: 100 ohm differential (two 50 ohm loads) to 50 ohm "
-             "single-ended, passband covering the chirp. Footprint with the part"),
+    "T701": ("kv260-ias2rf:ADT2-1T", "ADT2-1T+", "RF_Mini-Circuits:Mini-Circuits_CD542_LandPatternPL-052",
+             "100 ohm differential (two 50 ohm loads) to 50 ohm single-ended. Mini-Circuits ADT2-1T+: "
+             "impedance ratio 2, 0.4-450 MHz. 100 ohm secondary to the DAC; centre tap unused"),
 }
 
 DATA = {f"DACR_D{i}": pin for i, pin in zip(range(8), (8, 7, 6, 5, 4, 3, 2, 1))}
@@ -58,7 +58,7 @@ NETS = {
     "+3V3_A": ["U701.24", "C701.1", "C702.1", "C703.1"],
     "+3V3_D": ["U701.27", "C704.1"],
     "GND": ["C702.2", "C703.2", "C704.2", "C705.2", "R701.2", "C706.2", "U701.15",
-            "U701.16", "U701.20", "U701.26", "R702.2", "R703.2", "C707.2", "C708.2", "T701.3"],
+            "U701.16", "U701.20", "U701.26", "R702.2", "R703.2", "C707.2", "C708.2", "T701.1"],
     "COMP1": ["U701.19", "C701.2"],
     "REFIO": ["U701.17", "C705.1"],
     "FS_ADJ": ["U701.18", "R701.1"],
@@ -69,8 +69,8 @@ NETS = {
     "IOUTB": ["U701.21", "R703.1", "C708.1", "C709.2", "L702.1"],
     "F1_P": ["L701.2", "C710.1", "L703.1"],
     "F1_N": ["L702.2", "C710.2", "L704.1"],
-    "F2_P": ["L703.2", "C711.1", "T701.1"],
-    "F2_N": ["L704.2", "C711.2", "T701.2"],
-    "IF_TX_B": ["T701.4"],
+    "F2_P": ["L703.2", "C711.1", "T701.6"],
+    "F2_N": ["L704.2", "C711.2", "T701.4"],
+    "IF_TX_B": ["T701.3"],
 }
-NO_CONNECT = [f"U701.{p}" for p in (9, 10, 11, 12, 13, 14, 25)]
+NO_CONNECT = [f"U701.{p}" for p in (9, 10, 11, 12, 13, 14, 25)] + ["T701.2", "T701.5"]

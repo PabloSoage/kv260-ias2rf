@@ -21,7 +21,7 @@ in AMD's UltraScale+ SelectIO guide).
 from kit import R, C
 
 HIROSE = ("Connector_Generic:Conn_02x17_Odd_Even", "BM20B(0.8)-34DP",
-          "AVT_KHK_Lib:J-BM20B(0.8)-34DP")
+          "kv260-ias2rf:J-BM20B(0.8)-34DP")   # _work/make_footprints.py
 
 PARTS = {
     "J101": (*HIROSE, "IAS1 (J8 on the KV260): the link. Footprint as the original layout"),

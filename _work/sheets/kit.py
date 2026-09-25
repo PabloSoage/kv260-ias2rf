@@ -246,11 +246,14 @@ def dac_output(k, P, N, r, label):
     s.wire(N, l1n.pin(1))
     s.wire(l1p.pin(2), l2p.pin(1))
     s.wire(l1n.pin(2), l2n.pin(1))
-    T = k.part(r["t"], (xo + 99.06, P[1] + 5.08))
-    aa, ab, sa, sb = T.pin(1), T.pin(2), T.pin(3), T.pin(4)
+    T = k.part(r["t"], (xo + 99.06, P[1] + k.s._sym(k.P[r["t"]][0]).pins["6"][1]),
+               text_at=(xo + 113.03, P[1] + 5.08))
+    aa, ab, sa, sb = T.pin(6), T.pin(4), T.pin(1), T.pin(3)   # ADT2-1T+: secondary 6/4, primary 3/1
     assert aa[1] == P[1]
     s.wire(l2p.pin(2), aa)
     s.wire(l2n.pin(2), (aa[0] - 2.54, N[1]), (aa[0] - 2.54, ab[1]), ab)
     s.wire(sb, (sb[0] + 5.08, sb[1]))
     s.hlabel(label, "output", (sb[0] + 5.08, sb[1]))
     k.gnd(sa)
+    s.no_connect(T.pin(5))                                   # centre tap unused
+    s.no_connect(T.pin(2))

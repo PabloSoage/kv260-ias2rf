@@ -3487,6 +3487,86 @@
 			)
 		)
 	)
+	(symbol "ADT2-1T"
+		(pin_names (offset 0.508))
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "U"
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide no))
+		)
+		(property "Value" "ADT2-1T"
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide no))
+		)
+		(property "Footprint" ""
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide yes))
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide yes))
+		)
+		(property "Description" "RF transformer 1:2 impedance, 0.4-450 MHz - DAC output balun (100 ohm side to the DAC)"
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide yes))
+		)
+		(property "ki_keywords" "kv260-ias2rf"
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide yes))
+		)
+		(property "SymbolSource" "Pin Connections from the Mini-Circuits ADT2-1T+ datasheet Rev. F. 50 ohm, impedance ratio 2 (secondary/primary), 0.4-450 MHz, case CD542, land pattern PL-052."
+			(at 0 0 0)
+			(effects (font (size 1.27 1.27)) (hide yes))
+		)
+		(symbol "ADT2-1T_0_1"
+			(rectangle
+				(start -10.16 11.43)
+				(end 10.16 -11.43)
+				(stroke (width 0.254) (type default))
+				(fill (type background))
+			)
+		)
+		(symbol "ADT2-1T_1_1"
+			(pin passive line
+				(at -12.70 7.62 0)
+				(length 2.54)
+				(name "SEC_DOT" (effects (font (size 1.27 1.27))))
+				(number "6" (effects (font (size 1.27 1.27))))
+			)
+			(pin passive line
+				(at -12.70 0.00 0)
+				(length 2.54)
+				(name "SEC_CT" (effects (font (size 1.27 1.27))))
+				(number "5" (effects (font (size 1.27 1.27))))
+			)
+			(pin passive line
+				(at -12.70 -7.62 0)
+				(length 2.54)
+				(name "SEC" (effects (font (size 1.27 1.27))))
+				(number "4" (effects (font (size 1.27 1.27))))
+			)
+			(pin passive line
+				(at 12.70 7.62 180)
+				(length 2.54)
+				(name "PRI_DOT" (effects (font (size 1.27 1.27))))
+				(number "3" (effects (font (size 1.27 1.27))))
+			)
+			(pin passive line
+				(at 12.70 -7.62 180)
+				(length 2.54)
+				(name "PRI" (effects (font (size 1.27 1.27))))
+				(number "1" (effects (font (size 1.27 1.27))))
+			)
+			(pin no_connect line
+				(at 0.00 -13.97 90)
+				(length 2.54)
+				(name "NC" (effects (font (size 1.27 1.27))))
+				(number "2" (effects (font (size 1.27 1.27))))
+			)
+		)
+	)
 	(symbol "LM2663M"
 		(pin_names (offset 0.508))
 		(exclude_from_sim no)

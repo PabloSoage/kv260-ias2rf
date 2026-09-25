@@ -54,8 +54,8 @@ for dac, pa, pb, label, b in CHAINS:
         r["l2p"]: ("Device:L", "107.3n", L0603, "AERIS L26"),
         r["l2n"]: ("Device:L", "107.3n", L0603, "AERIS L27"),
         r["c5"]: C("33p", "AERIS C59 (32.8 pF). C0G"),
-        r["t"]: ("Device:Transformer_1P_1S", "balun 2:1 Z, 100R:50R", "",
-                 "As T701 on DAC_RADAR: part not chosen"),
+        r["t"]: ("kv260-ias2rf:ADT2-1T", "ADT2-1T+",
+                 "RF_Mini-Circuits:Mini-Circuits_CD542_LandPatternPL-052", "As T701 on DAC_RADAR"),
     })
 
 DATA = {f"DACS_D{i}": 14 - i for i in range(14)}     # DB13P1 = pin 1 ... DB0P1 = pin 14
@@ -79,14 +79,14 @@ NETS = {
     **{k: [f"U801.{p}"] for k, p in {**DATA, **CTRL}.items()},
 }
 for dac, pa, pb, label, r in CHAIN_REFS:
-    NETS["GND"] += [f"{r['rp']}.2", f"{r['rn']}.2", f"{r['cp']}.2", f"{r['cn']}.2", f"{r['t']}.3"]
+    NETS["GND"] += [f"{r['rp']}.2", f"{r['rn']}.2", f"{r['cp']}.2", f"{r['cn']}.2", f"{r['t']}.1"]
     NETS.update({
         f"IOUTA{dac}": [f"U801.{pa}", f"{r['rp']}.1", f"{r['cp']}.1", f"{r['c1']}.1", f"{r['l1p']}.1"],
         f"IOUTB{dac}": [f"U801.{pb}", f"{r['rn']}.1", f"{r['cn']}.1", f"{r['c1']}.2", f"{r['l1n']}.1"],
         f"F{dac}1_P": [f"{r['l1p']}.2", f"{r['c3']}.1", f"{r['l2p']}.1"],
         f"F{dac}1_N": [f"{r['l1n']}.2", f"{r['c3']}.2", f"{r['l2n']}.1"],
-        f"F{dac}2_P": [f"{r['l2p']}.2", f"{r['c5']}.1", f"{r['t']}.1"],
-        f"F{dac}2_N": [f"{r['l2n']}.2", f"{r['c5']}.2", f"{r['t']}.2"],
-        label: [f"{r['t']}.4"],
+        f"F{dac}2_P": [f"{r['l2p']}.2", f"{r['c5']}.1", f"{r['t']}.6"],
+        f"F{dac}2_N": [f"{r['l2n']}.2", f"{r['c5']}.2", f"{r['t']}.4"],
+        label: [f"{r['t']}.3"],
     })
-NO_CONNECT = []
+NO_CONNECT = [f"{r['t']}.{p}" for *_, r in CHAIN_REFS for p in (2, 5)]
