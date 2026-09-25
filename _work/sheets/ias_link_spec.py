@@ -35,12 +35,21 @@ PAIRS = {
     "LINK_TX_D0": (27, 26, False),     # N before P
     "LINK_TX_CLK": (10, 11, False),
 }
+# What the carrier puts on each single-ended pin (XTP682 sheets 8 and 13, read
+# 25 Sep 2026): 14/22 IAS1_I2C_SCK/SDA through the TCA9546A, 2.21 k to PL_1V8;
+# 21 IAS1_RESET_B from the SLG7XL46528 (SOM pin HDA04), 10 k to PL_1V8;
+# 15 HPA13_FLASH, an INPUT to the SOM through an SN74AVC4T245 (A side at
+# 1.8 V, 2DIR high); 20 HPA13_TRIGGER, an output of the SOM through the same
+# part (1DIR low); 32 IAS1_EXTCLK, the Si5332's 48 MHz OUT2b, always on.
+# So the interrupt goes on 15: pin 32 is a clock the carrier drives.
 SINGLE = {"HK_SCL": (14, "bidirectional"), "HK_SDA": (22, "bidirectional"),
-          "FPGA_PROG_B": (21, "output"), "FPGA_IRQ": (32, "input")}
+          "FPGA_PROG_B": (21, "output"), "FPGA_IRQ": (15, "input")}
 GND_PINS = (2, 3, 6, 9, 12, 16, 19, 25, 28, 31, 33)
-# Carrier rails (13: VCC1V8, 17/18: VCC2V75, 23/24: VCC1V2) and free pins:
-# the adapter takes no power from the connector (ARCHITECTURE §9.1).
-NC_PINS = (1, 13, 15, 17, 18, 20, 23, 24, 34)
+# Carrier rails (13: PL_1V8, 17/18: IAS_2V75, 23/24: PL_1V2): the adapter takes
+# no power from the connector (ARCHITECTURE §9.1). 1: test point on the
+# carrier. 20: HPA13_TRIGGER, unused. 32: the carrier's clock, not taken.
+# 34: VDD_AF2V8 through the carrier's unfitted jumper J19.
+NC_PINS = (1, 13, 17, 18, 20, 23, 24, 32, 34)
 
 cap = 101
 REFS = {}

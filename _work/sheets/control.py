@@ -331,7 +331,8 @@ s.text("MT25QL128: FCS_B 2.4k, W and HOLD 4.7k (UG470 Figure 2-14); CCLK 22R ser
 
 # ---- HK I2C pull-ups
 standing([("R1131", "HK_SCL"), ("R1132", "HK_SDA")], 490.22, 347.98, "+1V8_D", pitch=15.24)
-s.text("HK I2C pull-ups at 1.8 V (DNP if the carrier has its own)", (477.52, 337.82))
+s.text("HK I2C pull-ups at 1.8 V (the carrier adds 2.21k); FPGA_IRQ pull-down", (477.52, 337.82))
+hanging([("R1133", "FPGA_IRQ")], 530.86, 350.52)
 
 # ---- unit 4, power
 U4 = k.part("U1101", (579.12, 406.4), unit=4, text_at=(566.42, 444.5))

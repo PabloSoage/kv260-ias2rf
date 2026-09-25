@@ -1692,10 +1692,6 @@
 		(uuid "2f83234a-6639-51f8-89b7-156db28034d5")
 	)
 	(no_connect
-		(at 60.96 107.95)
-		(uuid "c2362dd0-3ce1-53d1-97eb-fe6fbe585b29")
-	)
-	(no_connect
 		(at 60.96 110.49)
 		(uuid "7f3fad7a-b6f4-513f-893c-a530bd818002")
 	)
@@ -1714,6 +1710,10 @@
 	(no_connect
 		(at 73.66 118.11)
 		(uuid "a70bd291-61c9-57e4-895a-8c960ca225db")
+	)
+	(no_connect
+		(at 73.66 128.27)
+		(uuid "d7c4d9d2-6145-53fc-8f47-d3554ada95fe")
 	)
 	(no_connect
 		(at 73.66 130.81)
@@ -1883,6 +1883,16 @@
 	)
 	(wire
 		(pts
+			(xy 60.96 107.95) (xy 55.88 107.95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b28d1c0a-29ac-56f3-be1f-00b7604d0a7f")
+	)
+	(wire
+		(pts
 			(xy 60.96 115.57) (xy 55.88 115.57)
 		)
 		(stroke
@@ -1940,16 +1950,6 @@
 			(type default)
 		)
 		(uuid "b8edb701-fba2-5198-915f-7c50fadb966b")
-	)
-	(wire
-		(pts
-			(xy 73.66 128.27) (xy 78.74 128.27)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "824eec30-918e-5f82-b818-5209f51365b9")
 	)
 	(wire
 		(pts
@@ -2322,6 +2322,17 @@
 		)
 		(uuid "b9de91ad-4494-5abb-853d-d53f89b62dcf")
 	)
+	(hierarchical_label "FPGA_IRQ"
+		(shape input)
+		(at 55.88 107.95 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "28fee8eb-3121-5ff6-a831-0d11a0797496")
+	)
 	(hierarchical_label "FPGA_PROG_B"
 		(shape output)
 		(at 55.88 115.57 180)
@@ -2383,17 +2394,6 @@
 			(justify left)
 		)
 		(uuid "03657f10-eefb-5b8d-8dc3-18bf537a4c49")
-	)
-	(hierarchical_label "FPGA_IRQ"
-		(shape input)
-		(at 78.74 128.27 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "eb3876c7-e64d-5319-b53b-bd56cb0cffb9")
 	)
 	(hierarchical_label "LINK_RX_D0_P"
 		(shape input)

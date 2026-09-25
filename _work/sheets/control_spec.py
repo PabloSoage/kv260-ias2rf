@@ -27,6 +27,7 @@ Decoupling: UG483 Table 2-2, row FTG256 / XC7A50T.
 XADC: on-chip reference, UG480 Figure 1-2 (right).
 """
 
+import os
 import re
 
 from kit import R, C, C0805
@@ -163,8 +164,12 @@ PARTS.update({
     "R1128": R("4.7k", "HOLD#/DQ3 pull-up, Figure 2-14 (and MT25QL datasheet Figure 6 note 1)"),
     "R1129": R("10k", "Holds FPGA_PROG_B high while the Kria is not driving it"),
     "R1130": R("330", "DONE LED, about 4 mA"),
-    "R1131": R("4.7k", "HK_SCL pull-up at 1.8 V (DNP if the carrier has its own)"),
-    "R1132": R("4.7k", "HK_SDA pull-up at 1.8 V (DNP if the carrier has its own)"),
+    "R1131": R("4.7k", "HK_SCL pull-up at 1.8 V. The carrier already has 2.21k to PL_1V8 "
+                       "(XTP682 sheet 8); fitted, the bus sees 1.5k, 1.2 mA at 1.8 V"),
+    "R1132": R("4.7k", "HK_SDA pull-up, same"),
+    "R1133": R("47k", "FPGA_IRQ pull-down: with PUDC_B high the pin floats until the FPGA is "
+                      "configured, and the carrier's SN74AVC4T245 input must not float. "
+                      "Reads as no interrupt (active high)"),
     "C1180": C("100n", "U1102 flash decoupling"),
     "C1181": C("100n", "U1103 decoupling"),
     # XADC, UG480 Figure 1-2 (right): on-chip reference
@@ -340,6 +345,8 @@ add("+3V3_D", "R1130.1")
 add("HK_SCL", "R1131.2")
 add("HK_SDA", "R1132.2")
 add("+1V8_D", "R1131.1", "R1132.1")
+add("FPGA_IRQ", "R1133.1")
+add("GND", "R1133.2")
 # XADC
 add("+1V8_D", "FB1101.1")
 add("XADC_VCC", "FB1101.2", "C1175.1", "C1176.1")
@@ -388,6 +395,16 @@ def check_pins():
     power pins from the symbol. Raises on the first violation."""
     sym = _fpga_symbol()
     name = {b: v[3] for b, v in sym.pins.items()}
+    # The symbol itself, ball by ball, against Xilinx's package file for the
+    # exact device (fetched by _work/fetch_datasheets.py; skipped if absent).
+    pkg = os.path.join(os.path.dirname(__file__), "..", "datasheets", "xc7a50tftg256pkg.txt")
+    if os.path.exists(pkg):
+        with open(pkg) as fh:
+            xil = {f[0]: f[1] for f in (ln.split() for ln in fh)
+                   if len(f) >= 8 and re.match(r"^[A-T]\d+$", f[0])}
+        assert xil == name, "symbol differs from xc7a50tftg256pkg.txt: " + str(
+            sorted((b, name.get(b), xil.get(b)) for b in set(xil) | set(name)
+                   if name.get(b) != xil.get(b))[:10])
     seen = set()
     for bank, table in BANKS.items():
         for ball in list(table) + BANK_NC[bank]:

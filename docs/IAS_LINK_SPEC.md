@@ -33,7 +33,7 @@ and 23/24 are left unconnected: the adapter takes no power from the connector (A
 |---|---|---|
 | **Termination and bias for the FPGA-bound pairs at `+1V2`** | An AC-coupled LVDS input needs its common mode restored. The XC7A50T has only HR banks, and those have no internal bias for AC-coupled inputs, so it's external. 1.2 V is the LVDS common mode, and the rail already exists | A resistor divider from another rail |
 | **No parts for the Kria-bound pairs beyond the capacitors** | Their receiver is inside the SOM, in an HP bank, which has internal termination and bias (`DIFF_TERM_ADV`, `DQS_BIAS`). **To confirm** in AMD's UltraScale+ SelectIO guide (UG571), which isn't in the repository | Footprints for an external bias network, fitted only if needed |
-| **The single-ended signals pass straight through** | `HK_SCL`/`HK_SDA`, `FPGA_PROG_B` and `FPGA_IRQ` are at the carrier's levels. Translating them belongs next to the FPGA, on CONTROL | — |
+| **The single-ended signals pass straight through** | `HK_SCL`/`HK_SDA` (14/22), `FPGA_PROG_B` (21) and `FPGA_IRQ` (15) are at the carrier's levels, **1.8 V, verified** in XTP682 (INTERFACE_SPEC §4.3). Translating them belongs next to the FPGA, on CONTROL. Pin 32, first given to FPGA_IRQ, is the carrier's 48 MHz camera clock and is left unconnected | — |
 
 ---
 

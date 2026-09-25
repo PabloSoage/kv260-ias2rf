@@ -81,6 +81,14 @@ SHEETS = [
     ("MT25QL128.pdf", "20210507044858",
      "https://www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/"
      "serial-nor/mt25q/die-rev-a/mt25q_qlhs_l_128_aba_0.pdf", "Rev. ?"),
+    # Layout (25 Sep): the package guide (DXP/DXN, pin types) and Xilinx's own
+    # machine-readable ball list for the exact device, to check the symbol by.
+    ("UG475.pdf", ("20221223103143", "20220315023512"),
+     "https://www.xilinx.com/content/dam/xilinx/support/documents/user_guides/"
+     "ug475_7Series_Pkg_Pinout.pdf", "Pkg pinout"),
+    ("xc7a50tftg256pkg.txt", ("20230208072858", "20221223103953"),
+     "https://www.xilinx.com/content/dam/xilinx/support/packagefiles/a7packages/"
+     "xc7a50tftg256pkg.txt", "pkg file"),
 ]
 
 
@@ -160,7 +168,10 @@ def main():
             print(f"  FAIL {name:14s} {err}")
             bad += 1
             continue
-        complete = blob.startswith(b"%PDF") and b"%%EOF" in blob[-1024:]
+        if name.endswith(".pdf"):
+            complete = blob.startswith(b"%PDF") and b"%%EOF" in blob[-1024:]
+        else:                                       # Xilinx package file
+            complete = b"Total Number of Pins" in blob[-512:]
         with open(path, "wb") as fh:
             fh.write(blob)
         tag = "ok  " if complete else "TRUNCATED"

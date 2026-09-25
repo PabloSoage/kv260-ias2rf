@@ -35334,7 +35334,7 @@
 			(at 2.4 -0.75 90)
 			(size 0.6 0.23)
 			(layers "B.Cu" "B.Mask" "B.Paste")
-			(net "unconnected-(J101-Pin_15-Pad15)")
+			(net "/FPGA_IRQ")
 			(roundrect_rratio 0.25)
 			(solder_mask_margin 0.05)
 			(solder_paste_margin -0.025)
@@ -35504,7 +35504,7 @@
 			(at -2.4 0.75 90)
 			(size 0.6 0.23)
 			(layers "B.Cu" "B.Mask" "B.Paste")
-			(net "/FPGA_IRQ")
+			(net "unconnected-(J101-Pin_32-Pad32)")
 			(roundrect_rratio 0.25)
 			(solder_mask_margin 0.05)
 			(solder_paste_margin -0.025)
@@ -53829,6 +53829,123 @@
 			(roundrect_rratio 0.25)
 		)
 		(path "/bc106418-3615-506a-a32b-ff6e1a94f8d2/4cbf6e5a-75d5-5c68-bf2d-491685a142a5")
+		(sheetname "/CONTROL/")
+		(sheetfile "rev03/CONTROL.kicad_sch")
+		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "2e423db5-ae2d-5895-b015-d6a6340f8424")
+		(at 173.25 151.4)
+		(descr "Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
+		(tags "resistor")
+		(property "Reference" "R1133"
+			(at 0 -1.17 0)
+			(layer "F.SilkS")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "47k"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 0 0 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net "/FPGA_IRQ")
+			(roundrect_rratio 0.25)
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net "GND")
+			(roundrect_rratio 0.25)
+		)
+		(path "/bc106418-3615-506a-a32b-ff6e1a94f8d2/92cb5644-bf55-5a5a-87e4-d1dfd8c30eae")
 		(sheetname "/CONTROL/")
 		(sheetfile "rev03/CONTROL.kicad_sch")
 		(embedded_fonts no)

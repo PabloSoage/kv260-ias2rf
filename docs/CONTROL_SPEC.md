@@ -18,7 +18,8 @@ it stays on it. The circuits sit nearby as small wired blocks.
 
 The Xilinx documents behind every value are now on disk, fetched through the Internet Archive by
 `_work/fetch_datasheets.py`: UG470 (configuration), UG471 (SelectIO), UG480 (XADC), UG483 (PCB
-design), DS181 (Artix-7 data sheet), DS593 (JTAG cable), UG908 (Vivado programming) and the Micron
+design), DS181 (Artix-7 data sheet), DS593 (JTAG cable), UG908 (Vivado programming), UG475 (packages
+and pinout), Xilinx's ball list for the exact device (`xc7a50tftg256pkg.txt`) and the Micron
 MT25QL128 datasheet.
 
 ---
@@ -33,7 +34,7 @@ clock-capable pin** (the symbol's ball names show it). So:
 | 14 | 3.3 V | AD9484 on **AERIS-10's own balls**, CLK_FPGA on AERIS's `FPGA_ADC_CLOCK` balls, AD9253, the two link pairs the FPGA receives, flash | The flash pins live in bank 14. LVDS_25 **inputs** are allowed in a 3.3 V bank with `DIFF_TERM` off (UG471 Table 1-44 note 1, DS181 Table 11 note 1), so each pair gets an external 100 Ω, as AERIS does |
 | 15 | 3.3 V | AD9708 on **AERIS's own balls**, `DACR_CLK` on AERIS's `FPGA_DAC_CLOCK`, AD9767, Pmod, `SW_CTRL0-3`, `CLK_SEL`, XO I²C | The DACs, switches and XO are 3.3 V parts |
 | 34 | 2.5 V | Only the three link pairs the FPGA **drives** | LVDS_25 outputs need VCCO = 2.5 V (UG471). The other 14 balls stay unused |
-| 35 | 1.8 V | 8 × ADAR1000 control + SPI (35 lines), converter SPI, `HK_SCL/SDA`, `FPGA_IRQ` | AERIS drives the ADAR1000s at 1.8 V; the ADCs' SPI is 1.8 V; the carrier's lines are taken as 1.8 V `[E]`: J8 carries `VCC1V8`, but the carrier schematic (XTP682) is not on disk to confirm the level of `I2C_SCL/SDA`, `PWDN` and `GPIO2` |
+| 35 | 1.8 V | 8 × ADAR1000 control + SPI (35 lines), converter SPI, `HK_SCL/SDA`, `FPGA_IRQ` | AERIS drives the ADAR1000s at 1.8 V; the ADCs' SPI is 1.8 V; the carrier's lines are **1.8 V `[V]`**: I2C, reset and the interrupt input all sit on `PL_1V8` on the carrier (XTP682, INTERFACE_SPEC §4.3) |
 
 The pin table is in `control_spec.py`. On import it **proves itself against the symbol's own ball
 names**:
@@ -58,12 +59,13 @@ names**:
 | **Flash MT25QL128ABA1ESE** (128 Mb, SO8W) | In Vivado's configuration-memory list (UG908, `mt25ql128`). The Winbond W25Q128 that KiCad ships is not. AERIS uses a 1 Gb BGA; 128 Mb holds a 50T bitstream (about 17 Mb) several times over | AERIS's MT25QL01G |
 | **XADC on its on-chip reference:** VP, VN, VREFP, VREFN to GNDADC; VCCADC and GNDADC through ferrites (UG480 Figure 1-2, right) | UG480 Table 1-1: *"This pin should always be connected to GNDADC if an external reference is not supplied."* **AERIS ties VREFP to +1V0: that is wrong**, confirmed now that UG480 is on disk | An external 1.25 V reference |
 | **VCCBATT to GND** | DS181: *"If battery is not used, connect VCCBATT to either ground or VCCAUX"*; UG470 Figure 2-14 grounds it | — |
-| **DXP/DXN to GND** | As AERIS. **Not verified**: the package guide UG475 is not on disk | Left open |
+| **DXP/DXN to GND** | UG475 Table 1-12: *"When not used, tie to GND."* The XADC's own sensor reads the die temperature | An external thermal-diode monitor |
 | **JTAG on the Xilinx 2 × 7, 2 mm header** | DS593 Figure 14: 2 VREF, 4 TMS, 6 TCK, 8 TDO, 10 TDI; 3–11 GND, 13 PGND; 1, 12, 14 unused. Direct to the FPGA, as UG470 Figure 2-14 | Digilent 1 × 6 |
 | **The AERIS ribbon: an IDC 2 × 20.** Pins 1–32 carry CS, TX_LOAD, RX_LOAD and TR for each of the 8 ADAR1000s. Pins 33/35/37 carry the SPI (SCLK, SDIO, SDO), each next to a ground. 34, 36 and 38–40 are grounds | ARCHITECTURE §7.2, sized for 8 chips. **Only five grounds for 35 lines**: acceptable for static control lines and a few-MHz SPI, with `SLEW = SLOW` in the constraints | A 2 × 25 with a ground beside every signal |
 | **No pull resistors on the ADAR lines here** | AERIS keeps them next to the chips (4.7 kΩ on LOAD, 22.1 kΩ on TR and SPI, 22.1 kΩ up on CS). **The AERIS end of this cable does not exist yet**: its Main Board has no such connector, because its own U42 drives these nets | Duplicate them here |
 | **Pmod pinout** | Pmod pins 1–4 CS, MOSI, MISO, SCLK (INTERFACE_SPEC §4.2); 7 BEAM_STROBE, 8 PPS_SYNC, 9–10 spare. GND 5/11. The KV260's 3.3 V (6/12) is left open: the adapter takes no power from the Pmod. On an odd/even header Pmod pin *k* is pad 2*k*−1 and pin *k*+6 is pad 2*k* | — |
-| **HK I²C pull-ups 4.7 kΩ to 1.8 V**, fitted | The carrier's own pull-ups are not known. Remove them if it has its own | — |
+| **HK I²C pull-ups 4.7 kΩ to 1.8 V**, fitted | The carrier already has 2.21 kΩ to `PL_1V8` (XTP682 sheet 8). With both, the bus sees 1.5 kΩ: 1.2 mA at 1.8 V, inside I²C's 3 mA. Kept so the bus idles high on the bench without a carrier | Not fitted |
+| **FPGA_IRQ on J8 pin 15, active high, 47 kΩ pull-down (R1133)** | Pin 15 is the only single-ended pin that goes **into** the SOM, through the carrier's SN74AVC4T245 at 1.8 V. The pin first allocated, 32, is the carrier's 48 MHz camera clock (INTERFACE_SPEC §4.3). With PUDC_B high the FPGA's pin floats until configured; the pull-down holds the translator's input at "no interrupt" | Pin 32, which would fight the carrier's clock |
 | **HK devices (temperature sensor, ID EEPROM) not drawn** | Deferred: they sit on the HK bus, which reaches the FPGA, and can be added without touching anything else | — |
 
 ---
@@ -76,7 +78,9 @@ names**:
 | RN1101–RN1107 | 4 × 22 Ω arrays, 27 lines, 1 spare | AERIS R23–R30 on the AD9708 |
 | R1115–R1118, C1101 | 24.9 Ω × 4, 100 nF at the bias | §2 |
 | R1119–R1128 | see §2 | UG470 Table 2-4, Figure 2-14; CCLK 22 Ω as AERIS (Figure 2-14 note 4: termination may be needed) |
-| R1129 | 10 kΩ to +1V8_D | Holds FPGA_PROG_B high while the Kria is not driving it |
+| R1129 | 10 kΩ to +1V8_D | Holds FPGA_PROG_B high while the Kria is not driving it (the carrier also has 10 kΩ, R208) |
+| R1131, R1132 | 4.7 kΩ to +1V8_D | HK I²C pull-ups, §2 |
+| R1133 | 47 kΩ to GND | FPGA_IRQ pull-down, §2. Stiff enough for a CMOS input: even 10 µA of leakage would leave it under 0.5 V |
 | Q1101, D1101, R1130 | 2N7002, green LED, 330 Ω | DONE lamp, about 4 mA |
 | Decoupling C1110–C1171 | FTG256/XC7A50T row of **UG483 Table 2-2**; types from Table 2-5 | VCCINT 330 µF + 3 × 4.7 µF + 5 × 0.47 µF; VCCBRAM 100 µF + 0.47 µF; VCCAUX 47 µF + 2 × 4.7 µF + 3 × 0.47 µF; VCCO_0 47 µF; per other bank 2 × 4.7 µF + 4 × 0.47 µF, and one 47 µF per group of banks at one voltage |
 | FB1101, FB1102, C1175, C1176 | ferrites, 100 nF, 470 nF | UG480 Figure 1-2 |
@@ -107,7 +111,8 @@ current and tri-stated I/Os during the ramp. PUDC_B high keeps the I/Os floating
 | Check | Result |
 |---|---|
 | `control_spec.py` self-check: every ball against the symbol (bank, pair, clock capability, all 256 covered) | passes on import |
-| `_work/check_sheet.py control`: 182 nets exact, 48 no-connects alone, every pin of the 100 parts accounted for | **PASS** |
+| The KiCad symbol against **Xilinx's own ball list** (`xc7a50tftg256pkg.txt`), all 256 balls by name | **identical**. Now part of the self-check, which fails if they ever differ (mutation-tested) |
+| `_work/check_sheet.py control`: 182 nets exact, 48 no-connects alone, every pin of the 101 parts accounted for | **PASS** |
 | KiCad ERC | 7 warnings on this sheet, all `pin_to_pin`. KiCad's symbol types CFGBVS, VP, VN, VREFP, VREFN, DXP and DXN as bidirectional, and here they are tied to power nets on purpose (§2). Design total: 660 (was 672) |
 | Pin tables | New project symbol MT25QL128ABA1ESE from the Micron datasheet Figure 6, cross-checked against KiCad's MT25QU (same family): agrees apart from pin 7's name (HOLD# vs RESET# variant) and the W-PDFN's exposed pad. SN74LVC1G07 pinout checked against TI's Pin Functions table (DBV) |
 

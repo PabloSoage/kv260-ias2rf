@@ -7,7 +7,7 @@ The Rev03 board exists. It has:
 - the outline and the 6-layer stackup;
 - design rules and net classes;
 - the two ground planes;
-- **every one of the 471 parts with its nets**, linked to its symbol;
+- **every one of the 472 parts with its nets**, linked to its symbol;
 - the holes and fiducials;
 - a first placement.
 
@@ -124,8 +124,8 @@ planned.
 |---|---|
 | `kicad-cli pcb drc --schematic-parity` | **0 parity problems**: every symbol has its footprint, every pad its net. **No shorts, clearance or courtyard violations** |
 | | **499 unconnected**: the unrouted board. **~430 silkscreen warnings**: reference designators on top of each other and of pads, to tidy as parts are moved; the Hirose footprints' 0.5 mm pin-number text is below the default minimum height |
-| J101/J102 against the original board | Position, face, rotation and all 38 pads identical. Nets as INTERFACE_SPEC §3–§4 (pin 4/5 `LINK_RX_D0`, 7/8 `LINK_RX_CLK`, 14 `HK_SCL`, 21 `FPGA_PROG_B`, 22 `HK_SDA`, 32 `FPGA_IRQ`) |
-| Footprints | All 471 exist. Four are new, in `footprints/kv260-ias2rf.pretty` (`_work/make_footprints.py`): ADCLK948 and AD9484 LFCSPs with their datasheets' exposed pads, the M3SWA2's DQ3005 from its Mini-Circuits case drawing, and the Hirose BM20B |
+| J101/J102 against the original board | Position, face, rotation and all 38 pads identical. Nets as INTERFACE_SPEC §3–§4 (pin 4/5 `LINK_RX_D0`, 7/8 `LINK_RX_CLK`, 14 `HK_SCL`, 21 `FPGA_PROG_B`, 22 `HK_SDA`, 15 `FPGA_IRQ`: moved from 32 after the check against the carrier, INTERFACE_SPEC §4.3) |
+| Footprints | All 472 exist. Four are new, in `footprints/kv260-ias2rf.pretty` (`_work/make_footprints.py`): ADCLK948 and AD9484 LFCSPs with their datasheets' exposed pads, the M3SWA2's DQ3005 from its Mini-Circuits case drawing, and the Hirose BM20B |
 
 Parts chosen for this step, each checked against its datasheet (all fetched by
 `_work/fetch_datasheets.py`):
