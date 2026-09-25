@@ -54,10 +54,13 @@ support.
 | **LM2663 gives about −3.25 V** | ROUT 3.5 Ω typ × 8 mA pulls it about 30 mV below −3.3 V in magnitude. The M3SWA2 quotes VEE −3.3 V typical, −3.6 V minimum, and no maximum | A regulated negative rail |
 | **Bidirectional TVS** (SMBJ15CA) | KiCad's TVS symbol is bidirectional. The BOM had SMBJ15A. On a DC input either works: reverse polarity is blocked by Q1001 | Unidirectional SMBJ15A with a diode symbol |
 
-**Still to choose (value on the sheet, footprint empty):** the four power inductors (8.2 µH ≥ 5.1 A;
-3.3 / 3.3 / 2.2 µH ≥ 3.5 A) and the P-MOSFET (Vds ≥ 30 V, Id ≥ 3 A, Rds(on) ≤ 50 mΩ). KiCad's
-generic MOSFET symbol numbers its pins D/G/S, so the MOSFET's footprint waits for the part. The
-TPS7A8300's stock footprint has a 2 × 2 mm pad; check it against the RGR drawing at layout.
+**Chosen at layout (25 Sep; [LAYOUT.md](LAYOUT.md) §5), each against its datasheet:**
+- **Inductors:** Bourns SRP7028A. The 8R2M has Isat 7.5 A, above the LMR33630's 5.05 A current
+  limit. The 3R3M and 2R2M have Isat 12 A and 14 A, above the 3.5 A needed.
+- **P-MOSFET:** Diodes DMP3013SFV (−30 V, −12 A, 9.5 mΩ, VGSS ±25 V), with numbered pins that
+  match its PowerDI3333-8 footprint.
+
+The TPS7A8300's stock footprint has a 2 × 2 mm pad; check it against the RGR drawing.
 
 ---
 

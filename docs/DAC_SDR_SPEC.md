@@ -27,7 +27,7 @@ Datasheet: AD9763/AD9765/AD9767 Rev. G, `_work/datasheets/AD9767.pdf`.
 | **The same filter as the radar DAC** | Cut-off around 50 MHz, the right place for a DAC clocked up to 125 MSPS; one design for both. The SDR's own band plan may want its own later | A filter for the SDR transmit band |
 | **SLEEP tied low** | It has an active pull-down (p.25); FPGA control not needed | An FPGA line |
 
-**Still open, as on DAC_RADAR: the baluns T801 and T802 have no part yet.**
+**T801 and T802 are ADT2-1T+**, wired as T701 on [DAC_RADAR](DAC_RADAR_SPEC.md).
 
 ---
 

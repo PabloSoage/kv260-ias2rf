@@ -24,7 +24,7 @@
 			)
 		)
 	)
-	(property "Datasheet" "https://www.minicircuits.com/case_style/DQ3005.pdf"
+	(property "Datasheet" ""
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
@@ -35,7 +35,7 @@
 			)
 		)
 	)
-	(property "Description" "Mini-Circuits DQ3005, 3x3 mm, 16 leads, P0.5, EP1.54 (M3SWA2-34DR+)"
+	(property "Description" ""
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)

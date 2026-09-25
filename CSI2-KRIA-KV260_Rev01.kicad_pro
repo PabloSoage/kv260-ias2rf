@@ -124,11 +124,11 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
+        "min_clearance": 0.1,
         "min_connection": 0.0,
-        "min_copper_edge_clearance": 0.5,
+        "min_copper_edge_clearance": 0.3,
         "min_groove_width": 0.0,
-        "min_hole_clearance": 0.25,
+        "min_hole_clearance": 0.2,
         "min_hole_to_hole": 0.25,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
@@ -136,10 +136,10 @@
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
-        "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.2,
+        "min_through_hole_diameter": 0.2,
+        "min_track_width": 0.1,
         "min_via_annular_width": 0.1,
-        "min_via_diameter": 0.5,
+        "min_via_diameter": 0.45,
         "solder_mask_to_copper_clearance": 0.0,
         "use_height_for_length_calcs": true
       },
@@ -479,75 +479,75 @@
     "classes": [
       {
         "bus_width": 12,
-        "clearance": 0.2,
-        "diff_pair_gap": 0.25,
+        "clearance": 0.15,
+        "diff_pair_gap": 0.15,
         "diff_pair_via_gap": 0.25,
-        "diff_pair_width": 0.2,
+        "diff_pair_width": 0.136,
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": -1,
+        "priority": 2147483647,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.2,
+        "track_width": 0.15,
         "tuning_profile": "",
-        "via_diameter": 0.6,
-        "via_drill": 0.3,
+        "via_diameter": 0.45,
+        "via_drill": 0.2,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.15,
+        "diff_pair_gap": 0.15,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.136,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "LVDS100",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.136,
+        "tuning_profile": "",
+        "via_diameter": 0.45,
+        "via_drill": 0.2,
         "wire_width": 6
       },
       {
         "bus_width": 12,
         "clearance": 0.2,
-        "diff_pair_gap": 0.25,
+        "diff_pair_gap": 0.15,
         "diff_pair_via_gap": 0.25,
-        "diff_pair_width": 0.2,
+        "diff_pair_width": 0.136,
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
-        "name": "100 Ohm",
+        "name": "RF50",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": -1,
+        "priority": 1,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.2,
+        "track_width": 0.174,
         "tuning_profile": "",
-        "via_diameter": 0.6,
-        "via_drill": 0.3,
-        "wire_width": 6
-      },
-      {
-        "bus_width": 12,
-        "clearance": 0.25,
-        "diff_pair_gap": 0.25,
-        "diff_pair_via_gap": 0.25,
-        "diff_pair_width": 0.2,
-        "line_style": 0,
-        "microvia_diameter": 0.3,
-        "microvia_drill": 0.1,
-        "name": "50 Ohm",
-        "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": -1,
-        "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.5,
-        "tuning_profile": "",
-        "via_diameter": 0.6,
-        "via_drill": 0.3,
+        "via_diameter": 0.45,
+        "via_drill": 0.2,
         "wire_width": 6
       },
       {
         "bus_width": 12,
         "clearance": 0.2,
-        "diff_pair_gap": 0.25,
+        "diff_pair_gap": 0.15,
         "diff_pair_via_gap": 0.25,
-        "diff_pair_width": 0.2,
+        "diff_pair_width": 0.136,
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
-        "name": "All Nets",
+        "name": "Power",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": -1,
+        "priority": 2,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.2,
+        "track_width": 0.4,
         "tuning_profile": "",
         "via_diameter": 0.6,
         "via_drill": 0.3,
@@ -558,115 +558,103 @@
       "version": 5
     },
     "net_colors": null,
-    "netclass_assignments": null,
+    "netclass_assignments": {},
     "netclass_patterns": [
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXC_IAS1_N"
+        "netclass": "LVDS100",
+        "pattern": "*LINK_*_P"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXC_IAS1_P"
+        "netclass": "LVDS100",
+        "pattern": "*LINK_*_N"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD0_IAS1_N"
+        "netclass": "LVDS100",
+        "pattern": "*ADCR_D*_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD0_IAS1_P"
+        "netclass": "LVDS100",
+        "pattern": "*ADCR_DCO_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD1_IAS1_N"
+        "netclass": "LVDS100",
+        "pattern": "*ADCR_OR_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD1_IAS1_P"
+        "netclass": "LVDS100",
+        "pattern": "*ADCS_*_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD2_IAS1_N"
+        "netclass": "LVDS100",
+        "pattern": "*CLK_ADC*_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD2_IAS1_P"
+        "netclass": "LVDS100",
+        "pattern": "*CLK_FPGA_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD3_IAS1_N"
+        "netclass": "LVDS100",
+        "pattern": "*FPGA_CLK_[PN]"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD3_IAS1_P"
+        "netclass": "RF50",
+        "pattern": "*IF_RX_*"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXC_IAS0_N"
+        "netclass": "RF50",
+        "pattern": "*IF_TX_*"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXC_IAS0_P"
+        "netclass": "RF50",
+        "pattern": "*/RF*"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD0_IAS0_N"
+        "netclass": "RF50",
+        "pattern": "*SMA*"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD0_IAS0_P"
+        "netclass": "Power",
+        "pattern": "+12V"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD1_IAS0_N"
+        "netclass": "Power",
+        "pattern": "+5V0"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD1_IAS0_P"
+        "netclass": "Power",
+        "pattern": "+3V3_D"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD2_IAS0_N"
+        "netclass": "Power",
+        "pattern": "+3V3_A"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD2_IAS0_P"
+        "netclass": "Power",
+        "pattern": "+2V5"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD3_IAS0_N"
+        "netclass": "Power",
+        "pattern": "+1V8_D"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "B7-CSI2-TXD3_IAS0_P"
+        "netclass": "Power",
+        "pattern": "+1V8_A"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "*CLK_ADC_*"
+        "netclass": "Power",
+        "pattern": "+1V0"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "*CLK_DAC_*"
+        "netclass": "Power",
+        "pattern": "-3V3"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "*CLK_KRIA_*"
+        "netclass": "Power",
+        "pattern": "*VIN*"
       },
       {
-        "netclass": "100 Ohm",
-        "pattern": "*B7-CSI2-*"
-      },
-      {
-        "netclass": "50 Ohm",
-        "pattern": "ANT_*"
-      },
-      {
-        "netclass": "50 Ohm",
-        "pattern": "MIX_*"
-      },
-      {
-        "netclass": "50 Ohm",
-        "pattern": "RF_SW*"
+        "netclass": "Power",
+        "pattern": "*_SW"
       }
     ]
   },

@@ -456,7 +456,7 @@ _CLOCK_NOTES = {
                     "Program pins typed passive: each is tied to GND or left open. Pad 21 = GND.",
     "LM2663M": "Pin table from the LM2662/LM2663 datasheet SNVS002E, Pin Functions (LM2663: pin 1 SD).",
     "ADT2-1T": "Pin Connections from the Mini-Circuits ADT2-1T+ datasheet Rev. F. 50 ohm, impedance "
-               "ratio 2 (secondary/primary), 0.4-450 MHz, case CD542, land pattern PL-052.",
+               "ratio 2 (secondary/primary), 0.4-450 MHz, case CD542. KiCad's PL-052 footprint grounds pin 4 as well, which a balun must not: plain CD542 pads used.",
     "MT25QL128ABA1ESE": "Pin table from the Micron MT25QL128ABA datasheet Rev. K, Figure 6 "
                         "(SO8W, 208 mil; HOLD# variant). 2.7-3.6 V. In Vivado's configuration "
                         "memory list (UG908) as mt25ql128.",

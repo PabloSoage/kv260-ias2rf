@@ -55,7 +55,7 @@ for dac, pa, pb, label, b in CHAINS:
         r["l2n"]: ("Device:L", "107.3n", L0603, "AERIS L27"),
         r["c5"]: C("33p", "AERIS C59 (32.8 pF). C0G"),
         r["t"]: ("kv260-ias2rf:ADT2-1T", "ADT2-1T+",
-                 "RF_Mini-Circuits:Mini-Circuits_CD542_LandPatternPL-052", "As T701 on DAC_RADAR"),
+                 "RF_Mini-Circuits:Mini-Circuits_CD542_H2.84mm", "As T701 on DAC_RADAR"),
     })
 
 DATA = {f"DACS_D{i}": 14 - i for i in range(14)}     # DB13P1 = pin 1 ... DB0P1 = pin 14

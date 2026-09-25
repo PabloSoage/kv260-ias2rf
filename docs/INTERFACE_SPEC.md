@@ -215,9 +215,9 @@ collides, and nothing can be fitted on the adapter's underside.
 | Inward, towards the SOM | up (−Y) | **1.5–5 mm** almost everywhere. The carrier is crowded |
 
 **The answer: grow outward, off the side of the KV260.** Every other direction runs into the carrier
-within a few millimetres. The Rev03 target of ~120 × 90 mm fits: that is the same 119 mm length,
-with the width growing from 44.5 to ~90 mm, all of it outward. The overhang past the carrier edge
-goes from 10 mm to about 55 mm.
+within a few millimetres. The same 119 mm length, growing outward. *At layout (25 Sep) the board
+became 119 × 120 mm, not the ~90 estimated here: the parts' courtyards need it
+([LAYOUT.md](LAYOUT.md) §1). The overhang past the carrier edge is 85 mm, with three supports.*
 
 **That overhang needs a support at its outer edge**, because two corner screws are not enough for a
 board carrying an FPGA and SMA connectors. The model gives the height exactly: the rubber feet reach

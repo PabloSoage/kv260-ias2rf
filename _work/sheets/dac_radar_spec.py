@@ -45,7 +45,7 @@ PARTS = {
     "L703": ("Device:L", "107.3n", "Inductor_SMD:L_0603_1608Metric", "AERIS L26"),
     "L704": ("Device:L", "107.3n", "Inductor_SMD:L_0603_1608Metric", "AERIS L27"),
     "C711": C("33p", "AERIS C59 (32.8 pF), at the far end of the filter. C0G"),
-    "T701": ("kv260-ias2rf:ADT2-1T", "ADT2-1T+", "RF_Mini-Circuits:Mini-Circuits_CD542_LandPatternPL-052",
+    "T701": ("kv260-ias2rf:ADT2-1T", "ADT2-1T+", "RF_Mini-Circuits:Mini-Circuits_CD542_H2.84mm",
              "100 ohm differential (two 50 ohm loads) to 50 ohm single-ended. Mini-Circuits ADT2-1T+: "
              "impedance ratio 2, 0.4-450 MHz. 100 ohm secondary to the DAC; centre tap unused"),
 }

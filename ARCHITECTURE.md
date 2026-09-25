@@ -478,12 +478,12 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U1101` | Front-end FPGA | XC7A50T-2FTG256I | C | Same as AERIS `[V]`. Drawn: rev03/CONTROL. Banks 14/15 at 3.3 V, 34 at 2.5 V, 35 at 1.8 V (CONTROL_SPEC §1) |
 | `U1102` | Configuration flash | MT25QL128ABA1ESE, 128 Mb, SO8W | C | In Vivado's flash list (UG908). Master SPI x4, UG470 Figure 2-14 |
 | `U1103` | PROG_B level buffer | 74LVC1G07 | C | 1.8 V in, open-drain to PROGRAM_B |
-| `U501` | Radar ADC | AD9484BCPZ-500 | C | 8 b / 400 MSPS, AERIS's part `[V]`. Drawn: rev03/ADC_RADAR. Custom footprint (5.10 mm exposed pad) |
+| `U501` | Radar ADC | AD9484BCPZ-500 | C | 8 b / 400 MSPS, AERIS's part `[V]`. Drawn: rev03/ADC_RADAR. Footprint with its 5.10 mm exposed pad in `footprints/kv260-ias2rf.pretty` |
 | `U601` | SDR ADC | AD9253BCPZ-125 | C | 14 b, channels A and B, 62.5 MSPS in 1-lane. **AVDD and DRVDD both 1.8 V** (DRVDD abs. max 2.0 V). Drawn: rev03/ADC_SDR |
 | `U701` | Radar DAC | AD9708AR | C | AERIS's part `[V]`. Drawn: rev03/DAC_RADAR. Internal 1.2 V reference, unlike AERIS (see DAC_RADAR_SPEC §1) |
-| `T701` | DAC output balun, 2:1 Z | — | P | Part not chosen (ADT2-1T class) |
+| `T701` | DAC output balun, 2:1 Z | Mini-Circuits ADT2-1T+ | C | 100 Ω secondary to the DAC. Footprint: plain CD542 pads (LAYOUT §5) |
 | `U801` | SDR DAC | AD9767ASTZ | C | Dual 14 b, 3.3 V, interleaved mode, 10 mA full scale. Drawn: rev03/DAC_SDR |
-| `T801`, `T802` | SDR DAC output baluns, 2:1 Z | — | P | As T701 |
+| `T801`, `T802` | SDR DAC output baluns, 2:1 Z | ADT2-1T+ | C | As T701 |
 | `U502`, `U503` | Radar ADC drivers, 15 + 10 dB | AD8352ACPZ | C | Drawn: rev03/ADC_RADAR. Two in cascade, as AERIS `[V]`; at 5 V, the only supply the datasheet characterises |
 | `U602`, `U603` | SDR ADC drivers, 12 dB | AD8352ACPZ | C | One per AD9253 channel. Drawn: rev03/ADC_SDR |
 | `U401` | Reference select + LVPECL 1:8 fan-out | ADCLK948BCPZ | C | Drawn: rev03/CLOCK. Replaces the ADCLK944 + separate selector |
@@ -492,14 +492,14 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U1001` | 12 V → +5V0 buck, 3 A | LMR33630ADDA | C | Drawn: rev03/POWER |
 | `U1002..U1004` | +3V3_D, +2V5, +1V0 bucks | TPS562201 | C | Drawn: rev03/POWER |
 | `U1005..U1007` | +1V8_A, +1V8_D, +3V3_A LDOs | TPS7A8300RGR | C | Drawn: rev03/POWER |
-| `L1001`, `L1010..L1030` | Power inductors | — | P | Values on the sheet; parts to choose |
+| `L1001`, `L1010..L1030` | Power inductors | Bourns SRP7028A-8R2M, -3R3M ×2, -2R2M | C | Isat 7.5–14 A |
 | `U1008` | −3.3 V charge-pump inverter | LM2663M | C | Drawn: rev03/POWER. **Reinstated.** VEE for the four RF switches, 8 mA. It had been dropped when B-03 was closed wrongly |
-| `Q1001` | Reverse-polarity protection | P-MOSFET + 15 V zener | P | Drawn: rev03/POWER; part to choose |
+| `Q1001` | Reverse-polarity protection | DMP3013SFV + 15 V zener | C | −30 V, 9.5 mΩ, VGSS ±25 V |
 | `D1001` | TVS | SMBJ15CA | C | Bidirectional, as KiCad's TVS symbol |
 | `J1001` | DC jack | PJ-102AH | C | Drawn: rev03/POWER |
 | `J8` ×2 | Hirose BM20B(0.8)-34DP | — | C | IAS1 functional; IAS0 mechanical and power only |
 | `H1..2` | M3 screws through the KV260's corner holes | M3 + standoff | C | `[V]` The original board's holes land on the carrier's within 5 µm (docs/INTERFACE_SPEC.md §5.3) |
-| `H3..` | Outer-edge supports | M3 standoff, ~8 mm | P | The widened board overhangs the carrier; 7.9 mm from its underside to the plane of the KV260's feet |
+| `H3..H5` | Outer-edge supports | M3 standoff, 8 mm | C | Placed (LAYOUT §2). The board, 119 × 120 mm, overhangs the carrier by 85 mm; 7.9 mm from its underside to the plane of the KV260's feet |
 | `J1102` | Cable to the KV260's Pmod J2 | 2×6, 2.54 mm | C | Drawn: rev03/CONTROL. The Pmod's 3.3 V is not used |
 | `J1101` | JTAG | Xilinx 2×7, 2 mm (Molex 87832-1420) | C | DS593 Figure 14 |
 | `J911..J952` | IF SMAs, 10 | Edge-mount | C | Drawn: rev03/ROUTING, each DC-blocked. `J401`/`J402` are the clock SMAs |

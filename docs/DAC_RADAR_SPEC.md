@@ -24,9 +24,11 @@ DACR_D0..7, DACR_CLK ──► U701 AD9708 ──► 50 Ω loads ──► LC fi
 | **Series resistors on the data lines sit on CONTROL**, not here | A series resistor terminates the line at its *source* (the FPGA). AERIS uses 22 Ω (R23–R30); the datasheet suggests 20–100 Ω (p.9) | — |
 | **SLEEP tied low** | It has an internal pull-down (pin 15); AERIS drives it from the FPGA | One more FPGA line |
 
-**Still open: T701's part.** It needs a 2:1 impedance ratio (100 Ω differential to 50 Ω), with a
-passband covering the chirp. Its value on the sheet says so, and its footprint is empty until the
-part is chosen. Mini-Circuits' ADT2-1T is the obvious candidate, **not verified here**.
+**T701 is a Mini-Circuits ADT2-1T+** (chosen at layout, 25 Sep; [LAYOUT.md](LAYOUT.md) §5). Its
+datasheet gives an impedance ratio of 2 (secondary/primary), 50 Ω, 0.4–450 MHz. The 100 Ω
+secondary (pins 6 and 4) takes the filter's differential output, the primary (3 to the line, 1 to
+ground) drives the 50 Ω single-ended line. The centre tap (5) is unused. The symbol is new, from
+the datasheet's Pin Connections table.
 
 ---
 
@@ -69,7 +71,7 @@ About 20 minutes, with `AD9708.pdf` from the AERIS-10 component folder.
    on purpose.
 2. **U701's pins against the Pin Function Descriptions** (p.4).
 3. **The filter against AERIS's schematic**, part by part, with the script above.
-4. **T701**: pick the part.
+4. **T701**: the ADT2-1T+ pin mapping above, against its datasheet.
 
 ```
 py _work/check_sheet.py dac_radar

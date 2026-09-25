@@ -38,7 +38,7 @@ import schgen                                        # noqa: E402
 
 STOCK = "E:/Program Files/KiCad/10.0/share/kicad/footprints/"
 OUT = os.path.join(ROOT, "footprints", "kv260-ias2rf.pretty")
-BOARD = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+BOARD = os.path.join(ROOT, "_deprecated", "CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb")   # the original
 T = "\t"
 
 
@@ -125,8 +125,8 @@ def dq3005():
     props = []
     for k, v, y, lay, hide in (("Reference", "REF**", -2.6, "F.SilkS", False),
                                ("Value", name, 2.6, "F.Fab", False),
-                               ("Datasheet", "https://www.minicircuits.com/case_style/DQ3005.pdf", 0, "F.Fab", True),
-                               ("Description", "Mini-Circuits DQ3005, 3x3 mm, 16 leads, P0.5, EP1.54 (M3SWA2-34DR+)", 0, "F.Fab", True)):
+                               ("Datasheet", "", 0, "F.Fab", True),
+                               ("Description", "", 0, "F.Fab", True)):
         props.append(f'{T}(property "{k}" "{v}"\n{T}{T}(at 0 {f(y)} 0)\n{T}{T}(layer "{lay}")\n'
                      + (f"{T}{T}(hide yes)\n" if hide else "")
                      + f'{T}{T}(effects\n{T}{T}{T}(font\n{T}{T}{T}{T}(size 0.8 0.8)\n{T}{T}{T}{T}(thickness 0.12)\n{T}{T}{T})\n{T}{T})\n{T})')

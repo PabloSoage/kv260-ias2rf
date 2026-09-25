@@ -3516,7 +3516,7 @@
 			(at 0 0 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
-		(property "SymbolSource" "Pin Connections from the Mini-Circuits ADT2-1T+ datasheet Rev. F. 50 ohm, impedance ratio 2 (secondary/primary), 0.4-450 MHz, case CD542, land pattern PL-052."
+		(property "SymbolSource" "Pin Connections from the Mini-Circuits ADT2-1T+ datasheet Rev. F. 50 ohm, impedance ratio 2 (secondary/primary), 0.4-450 MHz, case CD542. KiCad's PL-052 footprint grounds pin 4 as well, which a balun must not: plain CD542 pads used."
 			(at 0 0 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)

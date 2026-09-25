@@ -238,6 +238,16 @@ start once the schematic is done.
 | Power planes | Real separation between analogue and digital, ferrites at the junctions |
 | Route the IF lines | 50 Ω to the SMAs |
 
+**Status (25 September 2026)** — [LAYOUT.md](LAYOUT.md):
+
+| Task | State |
+|---|---|
+| Extend the board outline | ✅ 119 × 120 mm; Hirose positions and the two corner holes kept exactly |
+| 6-layer stackup in KiCad | ✅ as POWER_AND_STACKUP §2.1; fabricator's numbers still to come |
+| Net classes and rules | ✅ LVDS100, RF50, Power; standard 6-layer process |
+| Placement | ⚠️ first pass by script, every part in its sheet's region; to refine by hand |
+| Routing | ❌ next, in KiCad |
+
 **Exit criteria:**
 
 1. DRC with zero errors **and the correct rules enabled** (not inherited from the import).
