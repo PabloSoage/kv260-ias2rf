@@ -7,7 +7,7 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **15 of 23 loads verified from datasheets** — see §1.4 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **16 of 25 loads verified from datasheets** — see §1.4 |
 | Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
 
 ---
@@ -19,15 +19,15 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ```
 As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September:
 
-12 V in  (743 mA, 8.9 W)
-  └── LMR33630 buck → +5V0   1605 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
-        ├── TPS562201 → +3V3_D   1157 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches
-        │     ├── TPS7A8300 → +1V8_D  300 mA   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
+12 V in  (755 mA, 9.1 W)
+  └── LMR33630 buck → +5V0   1630 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
+        ├── TPS562201 → +3V3_D   1191 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches
+        │     ├── TPS7A8300 → +1V8_D  330 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD
         │     └── LM2663 → −3V3        8 mA   RF switch VEE
         ├── TPS7A8300 → +3V3_A    100 mA   DAC AVDD (no pre-regulator needed any more)
-        ├── TPS562201 → +2V5      601 mA   FPGA LVDS banks, and:
+        ├── TPS562201 → +2V5      601 mA   FPGA bank 34 (link outputs), and:
         │     ├── TPS7A8300 → +1V8_A  500 mA   AD9484 AVDD, AD9253 AVDD
-        │     └── divider → +1V2        1 mA   link termination bias only
+        │     └── divider → +1V2        1 mA   termination bias only (2 link pairs, CLK_FPGA)
         └── TPS562201 → +1V0      700 mA   FPGA VCCINT
 ```
 
@@ -75,17 +75,17 @@ With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1605 mA | buck | +12V | 0.89 W | ≥ 2.09 A |
-| `+3V3_D` | 3.3 | 1157 mA | buck | +5V0 | 0.42 W | ≥ 1.50 A |
+| `+5V0` | 5.0 | 1630 mA | buck | +12V | 0.91 W | ≥ 2.12 A |
+| `+3V3_D` | 3.3 | 1191 mA | buck | +5V0 | 0.44 W | ≥ 1.55 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
 | `+2V5` | 2.5 | 601 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
 | `+3V3_A` | 3.3 | 100 mA | LDO | +5V0 | 0.17 W | ≥ 0.13 A |
-| `+1V8_D` | 1.8 | 300 mA | LDO | +3V3_D | **0.45 W** | ≥ 0.39 A — thermal pad |
+| `+1V8_D` | 1.8 | 330 mA | LDO | +3V3_D | **0.49 W** | ≥ 0.43 A — thermal pad |
 | `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | — |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 743 mA at 12 V = 8.9 W.** With margin, 0.97 A and 11.6 W. The rise since the first
+**Input: 755 mA at 12 V = 9.1 W.** With margin, 0.98 A and 11.8 W. The rise since the first
 budget is the clock, as drawn: the ADCLK948 (330 mA max) and the Si549 (153 mA) replaced an
 ADCLK944 (165 mA) and a TCXO (20 mA), see [CLOCK_SPEC.md](CLOCK_SPEC.md). Then, when the radar
 ADC sheet was drawn, the AD8352 drivers moved from `+3V3_A` to 5 V, the only supply their
@@ -97,9 +97,9 @@ For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 Confidence: 15 verified, 8 estimated
+### 1.4 Confidence: 16 verified, 9 estimated
 
-**Fifteen of the twenty-three load figures now come from manufacturer datasheets.** analog.com refuses
+**Sixteen of the twenty-five load figures now come from manufacturer datasheets.** analog.com refuses
 to serve its PDFs to this machine (repeated 60 s timeouts; the mirrors return 403 and 410). They
 came from two other places: the AERIS-10 repository's component folder, and the **Internet
 Archive's copies of analog.com's own URLs**, fetched by `_work/fetch_datasheets.py`. That script
@@ -249,7 +249,7 @@ part of an impedance-controlled quote.
 | `VCCO` and the link I/O standard | ✅ 1.2 V, `LVDS_12` with AC coupling |
 | Mechanical envelope | ✅ measured |
 | Power tree topology and regulator sizing | ✅ §1.1–1.3 |
-| Per-rail load figures | ⚠️ 15 of 23 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ 16 of 25 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
 | Stackup and trace widths | ✅ §2.1–2.3, pending fabricator confirmation |
 | Growth direction within the envelope | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3 — outward, off the carrier's side |
 

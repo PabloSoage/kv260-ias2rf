@@ -24,7 +24,7 @@ Output goes to _work/datasheets/, which is git-ignored - the PDFs are
 Analog Devices' copyright and are not redistributed here. This script and the
 hashes it prints are the record.
 
-Usage:  py _work/fetch_datasheets.py
+Usage:  py _work/fetch_datasheets.py [file.pdf ...]   (default: all)
 """
 
 import hashlib
@@ -47,6 +47,7 @@ OPENER = urllib.request.build_opener(
 
 WAYBACK = "https://web.archive.org/web/{ts}id_/{url}"
 ADI = "https://www.analog.com/media/en/technical-documentation/data-sheets/"
+XLNX = "https://www.xilinx.com/support/documentation/"
 
 # local name, snapshot timestamp(s), original URL, revision as printed on the PDF.
 # Several timestamps = alternates, tried in order. Some snapshots are stuck in a
@@ -65,6 +66,21 @@ SHEETS = [
     ("Si549.pdf",    "20240712105249",
      "https://www.skyworksinc.com/-/media/SkyWorks/SL/documents/public/data-sheets/si549-datasheet.pdf",
      "Revision H"),
+    # CONTROL sheet, 25 September: the XC7A50T's own documents. docs.amd.com
+    # serves only a JavaScript portal to scripts, but the Archive holds the
+    # old xilinx.com PDF URLs.
+    ("UG483.pdf", "20220302131111", XLNX + "user_guides/ug483_7Series_PCB.pdf", "PCB design"),
+    ("UG470.pdf", "20220315025443", XLNX + "user_guides/ug470_7Series_Config.pdf", "Config"),
+    ("UG471.pdf", "20220315025334", XLNX + "user_guides/ug471_7Series_SelectIO.pdf", "SelectIO"),
+    ("UG480.pdf", "20220324041335", XLNX + "user_guides/ug480_7Series_XADC.pdf", "XADC"),
+    ("DS181.pdf", "20220315025345", XLNX + "data_sheets/ds181_Artix_7_Data_Sheet.pdf", "Artix-7 DC"),
+    ("DS593.pdf", "20220303040011", XLNX + "data_sheets/ds593.pdf", "JTAG cable"),
+    # Vivado's list of configuration flashes it can program (Appendix C).
+    ("UG908.pdf", "20220302140110",
+     XLNX + "sw_manuals/xilinx2020_2/ug908-vivado-programming-debugging.pdf", "2020.2"),
+    ("MT25QL128.pdf", "20210507044858",
+     "https://www.micron.com/-/media/client/global/documents/products/data-sheet/nor-flash/"
+     "serial-nor/mt25q/die-rev-a/mt25q_qlhs_l_128_aba_0.pdf", "Rev. ?"),
 ]
 
 
@@ -72,6 +88,7 @@ SHEETS = [
 # TI parts need no archive: (file, URL).
 DIRECT = [
     ("LMR33630.pdf", "https://www.ti.com/lit/ds/symlink/lmr33630.pdf"),
+    ("SN74LVC1G07.pdf", "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf"),
 ]
 
 
@@ -114,7 +131,10 @@ def fetch(url):
 def main():
     os.makedirs(OUT, exist_ok=True)
     bad = 0
+    only = set(sys.argv[1:])
     for name, stamps, url, rev in SHEETS:
+        if only and name not in only:
+            continue
         path = os.path.join(OUT, name)
         if isinstance(stamps, str):
             stamps = (stamps,)
@@ -139,6 +159,8 @@ def main():
         print(f"       {src}")
         bad += 0 if complete else 1
     for name, url in DIRECT:
+        if only and name not in only:
+            continue
         try:
             blob = fetch_direct(url)
         except Exception as e:                      # noqa: BLE001

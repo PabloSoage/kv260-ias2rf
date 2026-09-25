@@ -21,7 +21,7 @@ for the tree as drawn.
        ─ U1008 LM2663         ─► −3V3       8 mA   RF switches' VEE
 ```
 
-Input: **743 mA at 12 V, 8.9 W**; 0.97 A and 11.6 W with the 30 % margin.
+Input: **755 mA at 12 V, 9.1 W**; 0.98 A and 11.8 W with the 30 % margin (with CONTROL drawn).
 
 ---
 
@@ -49,7 +49,7 @@ support.
 | **No pre-regulator for +3V3_A** | Since the AD8352s moved to 5 V, +3V3_A carries 100 mA. Its LDO straight off +5V0 dissipates 0.17 W | — |
 | **+2V5 feeds both the FPGA's LVDS banks and the +1V8_A LDO** | The FPGA's link bank must be at 2.5 V (IAS_LINK_SPEC §3); the rail already existed. The analogue 1.8 V gets there through a low-noise LDO | A separate 2.5 V LDO for the FPGA |
 | **+1V2 is a resistor divider** | Its only load is the bias of two AC-coupled terminations, with no DC current. The planned "+1V2 LDO for the IAS bank" was based on the wrong bank voltage | An LDO |
-| **No power sequencing** | Every regulator comes up as soon as its input does. Xilinx recommends an order for the 7 series (VCCINT, then VCCAUX, then VCCO) to minimise inrush current. **To confirm in DS181** (not in the repository) that ignoring it does no harm | An EN chain, or an RC delay on each EN |
+| **No power sequencing** | Every regulator comes up as soon as its input does. Xilinx recommends an order for the 7 series (VCCINT, then VCCAUX, then VCCO) to minimise inrush current. **Checked in DS181 since** ([CONTROL_SPEC.md](CONTROL_SPEC.md) §4): the order is a recommendation; the one hard limit, VCCO − VCCAUX > 2.625 V for at most 300 ms per cycle, is met because +1V8_D is an LDO fed from +3V3_D | An EN chain, or an RC delay on each EN |
 | **Switching frequencies 400 and 580 kHz** | The datasheets' own designs. Their harmonics fall in the HF band the SDR receives. The layout has to keep the switchers away from the SDR front-end inputs, and the ADCs have ferrite-filtered rails | 2.1 MHz LMR33630 version: fewer harmonics in HF, a little less efficient |
 | **LM2663 gives about −3.25 V** | ROUT 3.5 Ω typ × 8 mA pulls it about 30 mV below −3.3 V in magnitude. The M3SWA2 quotes VEE −3.3 V typical, −3.6 V minimum, and no maximum | A regulated negative rail |
 | **Bidirectional TVS** (SMBJ15CA) | KiCad's TVS symbol is bidirectional. The BOM had SMBJ15A. On a DC input either works: reverse polarity is blocked by Q1001 | Unidirectional SMBJ15A with a diode symbol |

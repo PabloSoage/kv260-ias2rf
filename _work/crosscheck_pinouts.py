@@ -55,6 +55,9 @@ SECOND_SOURCE = {
     # Power (25 Sep): pin-compatible family members in KiCad's own library
     "TPS562201":      ("kicad",   "Regulator_Switching:TPS562200"),
     "LMR33630ADDA":   ("kicad",   "Regulator_Switching:LMR33640ADDA"),
+    # CONTROL (25 Sep): the 1.8 V member of the same family, W-PDFN package,
+    # same eight-pin assignment
+    "MT25QL128ABA1ESE": ("kicad", "Memory_Flash:MT25QUxxxxxx1xW7"),
 }
 
 # Datasheet symbols for which no independent source exists. Listed so the
@@ -156,6 +159,13 @@ ADJUDICATED = {
         "not match it by name. Same pad 9 on both",
     ("LMR33630ADDA", "EP"):
         "See pad 9: one exposed pad on each side, named differently",
+    ("MT25QL128ABA1ESE", "7"):
+        "Pin 7 is DQ3/HOLD# or DQ3/RESET# by part number (datasheet Figure 6); KiCad's "
+        "symbol is drawn for a RESET# variant. The HOLD# part is the one Figure 2-14 of "
+        "UG470 draws. Same pad either way",
+    ("MT25QL128ABA1ESE", "EP"):
+        "KiCad's symbol is for the W-PDFN package, which has an exposed pad; the SO8W "
+        "chosen here has none",
     ("Si549_PinoutC", "6"):
         "Naming only: KiCad's Si570 calls the supply 'Vcc', the Si549 "
         "datasheet 'VDD'. Same pin, same function",

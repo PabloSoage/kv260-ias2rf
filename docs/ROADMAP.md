@@ -87,7 +87,7 @@ The comparison that led here:
 | Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ⚠️ **15 of 23 verified from datasheets**; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ **16 of 25 verified from datasheets**; the rest need Vivado or parts not yet chosen |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -105,7 +105,7 @@ the root, **108 interface signals** in total:
 | Sheet | Signals | Contents |
 |---|---|---|
 | `IAS_LINK` | 14 | Hirose IAS1, AC coupling, link terminations |
-| `CONTROL` | 40 | Front-end FPGA, Pmod, AERIS-10 control IDC |
+| `CONTROL` | 40 | **Drawn** (25 Sep) — XC7A50T, flash, JTAG, Pmod, AERIS ribbon. [CONTROL_SPEC.md](CONTROL_SPEC.md) |
 | `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers — **split in four on 24 Sep**, below |
 | `CLOCK` | 9 | **Drawn** (23 Sep), **reviewed and accepted** (24 Sep) — Si549 XO, ADCLK948 select + fan-out. [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | 9 | 4× SPDT channel routing, IF and clock SMAs |

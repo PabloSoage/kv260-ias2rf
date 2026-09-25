@@ -69,7 +69,7 @@ project.
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers, closed, with evidence and sources, plus the open risks |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the KiCad files actually contain, with evidence |
 | [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, the mechanical envelope, and the adapter registered on the KV260 model — where the board can grow |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (15 of 23 loads from datasheets) and the 6-layer stackup with computed trace widths |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (16 of 25 loads from datasheets) and the 6-layer stackup with computed trace widths |
 | [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** 17 symbols, 15 from datasheets, cross-checked against a second source where one exists |
 | [docs/CLOCK_SPEC.md](docs/CLOCK_SPEC.md) | **Phase 2.** The first drawn sheet, reviewed and accepted: the clock plan, every value's source |
 | [docs/ADC_RADAR_SPEC.md](docs/ADC_RADAR_SPEC.md) | **Phase 2.** The radar ADC and its two AD8352 drivers, the split of CONVERTERS in four, and how to review it |
@@ -79,6 +79,7 @@ project.
 | [docs/ROUTING_SPEC.md](docs/ROUTING_SPEC.md) | **Phase 2.** The four RF switches, the switching plan, ten SMAs |
 | [docs/IAS_LINK_SPEC.md](docs/IAS_LINK_SPEC.md) | **Phase 2.** The Hirose connectors, AC coupling and terminations of the link |
 | [docs/POWER_SPEC.md](docs/POWER_SPEC.md) | **Phase 2.** The power tree as drawn: the regulators and where every value comes from |
+| [docs/CONTROL_SPEC.md](docs/CONTROL_SPEC.md) | **Phase 2.** The front-end FPGA sheet: bank voltages, configuration, the Pmod and the AERIS ribbon |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |
 
@@ -148,6 +149,7 @@ Two further passes since, both measured:
 | Rev03 hierarchy skeleton added | 496 | **`hier_label_mismatch` 36 → 0**; +121 `label_dangling`, which is the 108 new interface labels awaiting their circuits |
 | CLOCK sheet drawn | 500 | On the sheet: 2 "power input not driven" (`+3V3_D`, `GND`, until POWER exists) and 6 `isolated_pin_label` (outputs, until their receivers exist). Wiring verified by `_work/check_sheet.py clock`: PASS |
 | CONVERTERS split, ADC_RADAR drawn | 672 | +144 `pin_not_connected` on root sheet pins that KiCad had not reported before, though they were just as unwired (why is not established; the root is wired last). On ADC_RADAR: 3 rails and 2 SPI inputs undriven until POWER and CONTROL exist. `check_sheet.py adc_radar`: PASS. [ADC_RADAR_SPEC.md](docs/ADC_RADAR_SPEC.md) §4 |
+| All Rev03 sheets drawn (to CONTROL) | 660 | Every Rev03 rail driven. On CONTROL: 7 `pin_to_pin` warnings, config and XADC pins KiCad types bidirectional, tied to power on purpose. Most of the rest: the 109 unwired root sheet pins, and the old Rev01 IAS0/IAS1 sheets. [CONTROL_SPEC.md](docs/CONTROL_SPEC.md) §5 |
 
 What remains is pre-existing noise from the Altium import (off-grid endpoints, library symbols
 the CLI cannot resolve) plus leftovers of the purge. The serious electrical categories are gone.

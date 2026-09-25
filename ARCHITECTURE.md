@@ -475,8 +475,9 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 
 | Ref | Function | Part | State | Note |
 |---|---|---|---|---|
-| `U_FPGA1` | Front-end FPGA | XC7A50T-2FTG256I | X | Same as AERIS `[V]`: its firmware runs unported |
-| `U_CFG1` | Configuration flash | QSPI 32 Mb | P | |
+| `U1101` | Front-end FPGA | XC7A50T-2FTG256I | C | Same as AERIS `[V]`. Drawn: rev03/CONTROL. Banks 14/15 at 3.3 V, 34 at 2.5 V, 35 at 1.8 V (CONTROL_SPEC §1) |
+| `U1102` | Configuration flash | MT25QL128ABA1ESE, 128 Mb, SO8W | C | In Vivado's flash list (UG908). Master SPI x4, UG470 Figure 2-14 |
+| `U1103` | PROG_B level buffer | 74LVC1G07 | C | 1.8 V in, open-drain to PROGRAM_B |
 | `U501` | Radar ADC | AD9484BCPZ-500 | C | 8 b / 400 MSPS, AERIS's part `[V]`. Drawn: rev03/ADC_RADAR. Custom footprint (5.10 mm exposed pad) |
 | `U601` | SDR ADC | AD9253BCPZ-125 | C | 14 b, channels A and B, 62.5 MSPS in 1-lane. **AVDD and DRVDD both 1.8 V** (DRVDD abs. max 2.0 V). Drawn: rev03/ADC_SDR |
 | `U701` | Radar DAC | AD9708AR | C | AERIS's part `[V]`. Drawn: rev03/DAC_RADAR. Internal 1.2 V reference, unlike AERIS (see DAC_RADAR_SPEC §1) |
@@ -499,9 +500,10 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `J8` ×2 | Hirose BM20B(0.8)-34DP | — | C | IAS1 functional; IAS0 mechanical and power only |
 | `H1..2` | M3 screws through the KV260's corner holes | M3 + standoff | C | `[V]` The original board's holes land on the carrier's within 5 µm (docs/INTERFACE_SPEC.md §5.3) |
 | `H3..` | Outer-edge supports | M3 standoff, ~8 mm | P | The widened board overhangs the carrier; 7.9 mm from its underside to the plane of the KV260's feet |
-| `J_PMOD1` | Cable to the KV260's Pmod J2 | 2×6, 2.54 mm | P | |
+| `J1102` | Cable to the KV260's Pmod J2 | 2×6, 2.54 mm | C | Drawn: rev03/CONTROL. The Pmod's 3.3 V is not used |
+| `J1101` | JTAG | Xilinx 2×7, 2 mm (Molex 87832-1420) | C | DS593 Figure 14 |
 | `J911..J952` | IF SMAs, 10 | Edge-mount | C | Drawn: rev03/ROUTING, each DC-blocked. `J401`/`J402` are the clock SMAs |
-| `J_EXT1` | IDC 2×20 to AERIS | — | P | Up to 8 ADAR1000s |
+| `J1103` | IDC 2×20 to AERIS | — | X | 8 × ADAR1000 at 1.8 V; pinout in CONTROL_SPEC §2. **The AERIS end does not exist yet** |
 | ~~`U_MIX1`~~ | ~~ADL5801~~ | | **D** | Does not reach 10.5 GHz; AERIS does the mixing |
 | ~~`U_PWR3`~~ | ~~ADP151~~ | | **D** | 200 mA is not enough |
 | ~~`U_DEC1`~~ | ~~74HC138~~ | | **D** | The FPGA does the fan-out |

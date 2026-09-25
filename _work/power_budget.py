@@ -27,13 +27,20 @@ LOADS = [
     ("+1V8_D", "XC7A50T VCCAUX", 1.8, 100, "E", "DS181, typical for this device size"),
     # The link bank moved from +1V2 to +2V5 on 25 Sep: the FPGA drives LVDS_25
     # on three link pairs, which needs a 2.5 V bank (docs/IAS_LINK_SPEC.md §3).
-    ("+2V5", "XC7A50T VCCO, LVDS banks (link, ADC capture)", 2.5, 100, "E",
-     "5 link pairs and 14 ADC pairs plus bank overhead; Vivado to confirm"),
-    ("+1V2", "Link termination bias, 2 pairs, divider", 1.2, 1, "V",
-     "rev03/POWER: 1.10k/1.02k from +2V5. The pairs are AC-coupled, so the "
-     "terminations draw no DC; 1 mA is the divider's own current"),
+    # 25 Sep, CONTROL drawn: bank 34 at 2.5 V holds only the three link
+    # output pairs; the ADC and link INPUT pairs sit in the 3.3 V bank 14
+    # (LVDS_25 inputs are allowed there, UG471). Bank 35 at 1.8 V drives the
+    # ADAR1000 ribbon and the converter SPI.
+    ("+2V5", "XC7A50T VCCO_34, three LVDS_25 output pairs", 2.5, 100, "E",
+     "LVDS_25 drivers into 100 ohm plus bank overhead; Vivado to confirm"),
+    ("+1V8_D", "XC7A50T VCCO_35, ADAR ribbon (35 lines), SPI, HK", 1.8, 30, "E",
+     "static control lines, SPI a few MHz; Vivado to confirm"),
+    ("+1V2", "Termination bias: 2 link pairs + CLK_FPGA, divider", 1.2, 1, "V",
+     "rev03/POWER: 1.10k/1.02k from +2V5. All three pairs are AC-coupled, so "
+     "the terminations draw no DC; 1 mA is the divider's own current"),
     ("+3V3_D", "XC7A50T VCCO, converter and Pmod banks", 3.3, 200, "E", "DS181"),
-    ("+3V3_D", "QSPI config flash", 3.3, 20, "E", "read current during boot only"),
+    ("+3V3_D", "QSPI config flash MT25QL128", 3.3, 20, "E", "read current during boot only"),
+    ("+3V3_D", "DONE LED", 3.3, 4, "V", "rev03/CONTROL: (3.3 - 2.0) V / 330 ohm"),
 
     # ---- converters ---------------------------------------------------
     ("+1V8_A", "AD9484 AVDD", 1.8, 300, "V",

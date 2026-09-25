@@ -419,6 +419,14 @@ DATASHEET_PINS.update({
         ("4", "CAP-", "passive"), ("5", "OUT", "power_out"), ("6", "LV", "input"),
         ("7", "OSC", "passive"), ("8", "V+", "power_in"),
     ],
+    # CONTROL (25 Sep): the FPGA's configuration flash. Micron datasheet
+    # mt25q_qlhs_L_128_ABA Rev. K, Figure 6 (8-pin SOP2, package code SE),
+    # HOLD# option (part number digit 1). Fetched by _work/fetch_datasheets.py.
+    "MT25QL128ABA1ESE": [
+        ("1", "~{S}", "input"), ("2", "DQ1", "bidirectional"), ("3", "~{W}/DQ2", "bidirectional"),
+        ("4", "VSS", "power_in"), ("5", "DQ0", "bidirectional"), ("6", "C", "input"),
+        ("7", "~{HOLD}/DQ3", "bidirectional"), ("8", "VCC", "power_in"),
+    ],
     "Si549_PinoutC": [
         ("1", "NC",   "no_connect"),
         ("2", "OE",   "input"),
@@ -440,6 +448,9 @@ _CLOCK_NOTES = {
     "TPS7A8300RGR": "Pin table from the TPS7A8300 datasheet SBVS197F, Pin Functions (RGR). "
                     "Program pins typed passive: each is tied to GND or left open. Pad 21 = GND.",
     "LM2663M": "Pin table from the LM2662/LM2663 datasheet SNVS002E, Pin Functions (LM2663: pin 1 SD).",
+    "MT25QL128ABA1ESE": "Pin table from the Micron MT25QL128ABA datasheet Rev. K, Figure 6 "
+                        "(SO8W, 208 mil; HOLD# variant). 2.7-3.6 V. In Vivado's configuration "
+                        "memory list (UG908) as mt25ql128.",
     "AD9708AR": "Pin table from the AD9708 datasheet Rev. B, Pin Function Descriptions. "
                 "AVDD/DVDD 2.7-5.5 V; IAVDD 30 mA max, IDVDD 6 mA max.",
     "Si549_PinoutC": "Pin table from the Si549 datasheet Revision H, pinout code C "
@@ -451,6 +462,7 @@ _CLOCK_NOTES = {
 DATASHEET_ONLY = {
     "ADCLK948BCPZ":   "2-input, 8-output LVPECL clock fan-out, 4.8 GHz - reference selector and distribution",
     "Si549_PinoutC":  "I2C programmable ultra-low-jitter XO, 0.2-1500 MHz, LVPECL - local master clock",
+    "MT25QL128ABA1ESE": "128 Mb 3 V quad SPI NOR flash, SO8W - FPGA configuration",
     "AD9708AR":       "8-bit 125 MSPS current-output DAC, parallel CMOS - radar chirp",
     "LMR33630ADDA":   "3.8-36 V in, 3 A synchronous buck, 400 kHz - 12 V to +5V0",
     "TPS562201":      "4.5-17 V in, 2 A synchronous buck, SOT-23-6 - +3V3_D, +2V5, +1V0",
@@ -599,6 +611,8 @@ SYMBOL_LAYOUT = {
                      "left": ["15", "16", "17", None, "14", None, "13", None, "12"],
                      "right": ["1", "19", "20", None, "2", None, "3", None, "4"],
                      "gnd": ["5", "6", "7", "9", "10", "11", None, "8", "18", "21"]},
+    "MT25QL128ABA1ESE": {"half_w": 10.16, "left": ["1", "6", "5", "2", "3", "7", None],
+                         "pwr": ["8"], "gnd": ["4"]},
     "LM2663M": {"half_w": 7.62, "left": ["8", None, "1", "6", "7"],
                 "right": ["2", None, None, "4", None, "5"], "gnd": ["3"]},
     # RFC and the control in on the left, the two throws out on the right

@@ -16,7 +16,7 @@ import pymupdf
 
 KICAD_CLI = "E:/Program Files/KiCad/10.0/bin/kicad-cli.exe"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PAPER = {"A3": (420, 297), "A2": (594, 420), "A4": (297, 210)}
+PAPER = {"A3": (420, 297), "A2": (594, 420), "A4": (297, 210), "A1": (841, 594)}
 
 name, out = sys.argv[1], sys.argv[2]
 tmp = tempfile.mkdtemp()

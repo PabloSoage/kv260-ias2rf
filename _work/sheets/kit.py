@@ -58,10 +58,10 @@ class Kit:
         self.P = parts
 
     # ---- placing
-    def part(self, ref, at, rot=0, text_at=None, mirror=False):
+    def part(self, ref, at, rot=0, text_at=None, mirror=False, unit=1):
         lib_id, value, fp, _ = self.P[ref]
         return self.s.place(lib_id, ref, value, at, rot, footprint=fp, text_at=text_at,
-                            mirror=mirror)
+                            mirror=mirror, unit=unit)
 
     def gnd(self, at):
         self.s.power("power:GND", "GND", at)
