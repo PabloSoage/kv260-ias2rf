@@ -192,7 +192,7 @@ script-generated sheets have already been **removed** from the project and moved
 
 | Sheet | Contents |
 |---|---|
-| Root | Hierarchy and the Hirose connectors |
+| Root | Hierarchy, every sheet pin labelled by net (**wired 25 Sep**, `_work/check_root.py`) |
 | `IAS_LINK` | ✅ Drawn and verified: `check_sheet.py ias_link` PASS. Awaiting review — [IAS_LINK_SPEC.md](IAS_LINK_SPEC.md) |
 | `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review** — [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
 | `ADC_SDR` | ✅ Drawn and verified: `check_sheet.py adc_sdr` PASS. Awaiting review — [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md) |

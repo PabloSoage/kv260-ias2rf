@@ -150,6 +150,7 @@ Two further passes since, both measured:
 | CLOCK sheet drawn | 500 | On the sheet: 2 "power input not driven" (`+3V3_D`, `GND`, until POWER exists) and 6 `isolated_pin_label` (outputs, until their receivers exist). Wiring verified by `_work/check_sheet.py clock`: PASS |
 | CONVERTERS split, ADC_RADAR drawn | 672 | +144 `pin_not_connected` on root sheet pins that KiCad had not reported before, though they were just as unwired (why is not established; the root is wired last). On ADC_RADAR: 3 rails and 2 SPI inputs undriven until POWER and CONTROL exist. `check_sheet.py adc_radar`: PASS. [ADC_RADAR_SPEC.md](docs/ADC_RADAR_SPEC.md) §4 |
 | All Rev03 sheets drawn (to CONTROL) | 660 | Every Rev03 rail driven. On CONTROL: 7 `pin_to_pin` warnings, config and XADC pins KiCad types bidirectional, tied to power on purpose. Most of the rest: the 109 unwired root sheet pins, and the old Rev01 IAS0/IAS1 sheets. [CONTROL_SPEC.md](docs/CONTROL_SPEC.md) §5 |
+| **Root wired**, Rev01 IAS0/IAS1 and Altium relics removed | **9, no errors** | 7 are CONTROL's explained `pin_to_pin` warnings; 2 are J101/J102's Hirose footprint, whose library (`AVT_KHK_Lib`) is not registered - to be extracted from the original board at layout. `_work/check_root.py`: all 92 interface nets exact, every sheet PASS |
 
 What remains is pre-existing noise from the Altium import (off-grid endpoints, library symbols
 the CLI cannot resolve) plus leftovers of the purge. The serious electrical categories are gone.
