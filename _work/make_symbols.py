@@ -9,7 +9,7 @@ carries a real type.
 
 WHERE THE DATA COMES FROM, AND HOW FAR TO TRUST IT
 --------------------------------------------------
-Eleven of the thirteen symbols are transcribed from the MANUFACTURER DATASHEET
+Fifteen of the seventeen symbols are transcribed from the MANUFACTURER DATASHEET
 (DATASHEET_PINS below). analog.com will not serve its PDFs to this machine, so
 they came from two other places:
 
@@ -410,7 +410,9 @@ DATASHEET_PINS.update({
         ("10", "800mV", "passive"), ("11", "1.6V", "passive"), ("12", "BIAS", "power_in"),
         ("13", "NR/SS", "passive"), ("14", "EN", "input"), ("15", "IN", "power_in"),
         ("16", "IN", "power_in"), ("17", "IN", "power_in"), ("18", "GND", "power_in"),
-        ("19", "OUT", "power_out"), ("20", "OUT", "power_out"), ("21", "GND_EP", "power_in"),
+        # one OUT drives the rail; the other two are the same node, typed
+        # passive so ERC does not see three drivers in conflict
+        ("19", "OUT", "passive"), ("20", "OUT", "passive"), ("21", "GND_EP", "power_in"),
     ],
     "LM2663M": [
         ("1", "SD", "input"), ("2", "CAP+", "passive"), ("3", "GND", "power_in"),
@@ -591,7 +593,7 @@ SYMBOL_LAYOUT = {
     # capacitor pin one part-length above it, feedback below, on the right.
     "LMR33630ADDA": {"half_w": 10.16, "left": ["2", None, "3", None, "6", None, "4"],
                      "right": ["7", None, None, "8", None, None, "5"], "gnd": ["1", "9"]},
-    "TPS562201": {"half_w": 7.62, "left": ["3", None, "5"],
+    "TPS562201": {"half_w": 7.62, "left": ["3", None, None, "5"],
                   "right": ["6", None, None, "2", None, None, "4"], "gnd": ["1"]},
     "TPS7A8300RGR": {"half_w": 12.7,
                      "left": ["15", "16", "17", None, "14", None, "13", None, "12"],

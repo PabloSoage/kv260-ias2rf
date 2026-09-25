@@ -444,7 +444,7 @@ In outline:
         |     +-- LDO -> +1V8_D   FPGA VCCAUX, AD9484 DRVDD, AD9253 DRVDD
         |     +-- LDO -> +1V2     link terminations (the FPGA's link bank must be 2.5 V: IAS_LINK_SPEC §3)
         |     +-- charge pump -> -3V3   RF switch VEE (B-03)
-        +-- buck -> +3V6 -> LDO -> +3V3_A   DAC AVDD                   (analogue)
+        +-- LDO -> +3V3_A   DAC AVDD, straight off +5V0 (100 mA, 0.17 W)   (analogue)
         +-- buck -> +2V5 -> LDO -> +1V8_A   ADC AVDD                   (analogue)
         +-- buck -> +1V0     FPGA VCCINT, sequenced
 ```
@@ -488,11 +488,14 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `U401` | Reference select + LVPECL 1:8 fan-out | ADCLK948BCPZ | C | Drawn: rev03/CLOCK. Replaces the ADCLK944 + separate selector |
 | `Y401` | Programmable master XO, 400/500 MHz | Si549, LVPECL, 3.3 V, 5×7 mm, pinout C | C | Replaces the TCXO; GPS-disciplined through its ±950 ppm DCO |
 | `U901..U904` | Routing SPDTs | M3SWA2-34DR+ | C | Positive 3.3 V control, but **bipolar supply: VDD +3.3 V and VEE −3.3 V** (B-03). Drawn: rev03/ROUTING, with the datasheet's Figure 2 network each. Footprint from Mini-Circuits PL-768 |
-| `U_PWR*` | Bucks, LDOs and sequencer | — | P | Includes FPGA power |
-| `U_INV1` | −3.3 V charge-pump inverter | LM2663 or equivalent | X | **Reinstated.** VEE for the four RF switches, 8 mA. It had been dropped when B-03 was closed wrongly |
-| `Q_REV1` | Reverse-polarity protection | P-MOSFET + Zener | P | |
-| `D_TVS1` | TVS | SMBJ15A | C | |
-| `J_PWR1` | DC jack | PJ-102AH | C | |
+| `U1001` | 12 V → +5V0 buck, 3 A | LMR33630ADDA | C | Drawn: rev03/POWER |
+| `U1002..U1004` | +3V3_D, +2V5, +1V0 bucks | TPS562201 | C | Drawn: rev03/POWER |
+| `U1005..U1007` | +1V8_A, +1V8_D, +3V3_A LDOs | TPS7A8300RGR | C | Drawn: rev03/POWER |
+| `L1001`, `L1010..L1030` | Power inductors | — | P | Values on the sheet; parts to choose |
+| `U1008` | −3.3 V charge-pump inverter | LM2663M | C | Drawn: rev03/POWER. **Reinstated.** VEE for the four RF switches, 8 mA. It had been dropped when B-03 was closed wrongly |
+| `Q1001` | Reverse-polarity protection | P-MOSFET + 15 V zener | P | Drawn: rev03/POWER; part to choose |
+| `D1001` | TVS | SMBJ15CA | C | Bidirectional, as KiCad's TVS symbol |
+| `J1001` | DC jack | PJ-102AH | C | Drawn: rev03/POWER |
 | `J8` ×2 | Hirose BM20B(0.8)-34DP | — | C | IAS1 functional; IAS0 mechanical and power only |
 | `H1..2` | M3 screws through the KV260's corner holes | M3 + standoff | C | `[V]` The original board's holes land on the carrier's within 5 µm (docs/INTERFACE_SPEC.md §5.3) |
 | `H3..` | Outer-edge supports | M3 standoff, ~8 mm | P | The widened board overhangs the carrier; 7.9 mm from its underside to the plane of the KV260's feet |

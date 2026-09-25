@@ -87,7 +87,7 @@ The comparison that led here:
 | Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
-| Per-rail load figures | ⚠️ **14 of 22 verified from datasheets**; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ **15 of 23 verified from datasheets**; the rest need Vivado or parts not yet chosen |
 | 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
@@ -201,7 +201,7 @@ script-generated sheets have already been **removed** from the project and moved
 | `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep) — [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | ✅ Drawn and verified: `check_sheet.py routing` PASS. Awaiting review — [ROUTING_SPEC.md](ROUTING_SPEC.md) |
 | `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
-| `POWER` | Full tree with reverse-polarity protection and analogue/digital separation |
+| `POWER` | ✅ Drawn and verified: `check_sheet.py power` PASS. Awaiting review — [POWER_SPEC.md](POWER_SPEC.md) |
 
 **Non-negotiable quality requirements:**
 

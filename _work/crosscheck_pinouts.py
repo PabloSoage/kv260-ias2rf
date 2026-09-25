@@ -52,11 +52,18 @@ SECOND_SOURCE = {
     "ADCLK944BCPZ":   ("easyeda", "ADCLK944BCPZ-R2"),
     "Si549_PinoutC":  ("kicad",   "Oscillator:Si570"),
     "AD9708AR":       ("kicad",   "Video:AD9708AR"),
+    # Power (25 Sep): pin-compatible family members in KiCad's own library
+    "TPS562201":      ("kicad",   "Regulator_Switching:TPS562200"),
+    "LMR33630ADDA":   ("kicad",   "Regulator_Switching:LMR33640ADDA"),
 }
 
 # Datasheet symbols for which no independent source exists. Listed so the
 # gap is visible in the output instead of silently skipped.
 NO_SECOND_SOURCE = {
+    "TPS7A8300RGR": "not in Eagle, EasyEDA or KiCad's libraries. Checked only against its "
+                    "datasheet's pin drawing and Pin Functions table, which agree",
+    "LM2663M": "KiCad has only the LM2665 (SOT-23-6), a different part. Checked only "
+               "against the datasheet's pin drawing and Pin Functions table",
     "ADCLK948BCPZ": "not in Eagle, EasyEDA or KiCad's libraries. Checked only "
                     "against itself: Figure 2 and Table 7 of the datasheet agree",
 }
@@ -141,6 +148,14 @@ ADJUDICATED = {
     ("AD9708AR", "25"):
         "KiCad's Video:AD9708AR leaves out the NC pins; the datasheet lists "
         "9-14 and 25 as 'No Internal Connection'. Kept, typed no_connect",
+    ("LMR33630ADDA", "1"):
+        "Naming only: KiCad's LMR33640ADDA calls pad 1 'GND', the LMR33630 datasheet "
+        "'PGND' (power ground). Same pad",
+    ("LMR33630ADDA", "9"):
+        "The thermal pad: the datasheet names it AGND, KiCad 'GND', so the script does "
+        "not match it by name. Same pad 9 on both",
+    ("LMR33630ADDA", "EP"):
+        "See pad 9: one exposed pad on each side, named differently",
     ("Si549_PinoutC", "6"):
         "Naming only: KiCad's Si570 calls the supply 'Vcc', the Si549 "
         "datasheet 'VDD'. Same pin, same function",
@@ -227,6 +242,8 @@ def main():
         # second source leaves out)
         settled += [(p, ours[p], None) for p in only_a if (sym, p) in ADJUDICATED]
         only_a = [p for p in only_a if (sym, p) not in ADJUDICATED]
+        settled += [(p, None, src[p]) for p in only_b if (sym, p) in ADJUDICATED]
+        only_b = [p for p in only_b if (sym, p) not in ADJUDICATED]
         ep_settled = not ep_ok and (sym, "EP") in ADJUDICATED
         open_ep = not ep_ok and not ep_settled
         if conf or only_a or only_b or open_ep:

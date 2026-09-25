@@ -25,8 +25,13 @@ LOADS = [
      "AERIS-10's design on the same part reports 0.730 W total in Vivado "
      "[V]. VCCINT dominates; 700 mA at 1.0 V leaves room for our link SerDes"),
     ("+1V8_D", "XC7A50T VCCAUX", 1.8, 100, "E", "DS181, typical for this device size"),
-    ("+1V2", "XC7A50T VCCO, IAS-facing bank", 1.2, 100, "E",
-     "5 LVDS_12 pairs plus bank overhead"),
+    # The link bank moved from +1V2 to +2V5 on 25 Sep: the FPGA drives LVDS_25
+    # on three link pairs, which needs a 2.5 V bank (docs/IAS_LINK_SPEC.md §3).
+    ("+2V5", "XC7A50T VCCO, LVDS banks (link, ADC capture)", 2.5, 100, "E",
+     "5 link pairs and 14 ADC pairs plus bank overhead; Vivado to confirm"),
+    ("+1V2", "Link termination bias, 2 pairs, divider", 1.2, 1, "V",
+     "rev03/POWER: 1.10k/1.02k from +2V5. The pairs are AC-coupled, so the "
+     "terminations draw no DC; 1 mA is the divider's own current"),
     ("+3V3_D", "XC7A50T VCCO, converter and Pmod banks", 3.3, 200, "E", "DS181"),
     ("+3V3_D", "QSPI config flash", 3.3, 20, "E", "read current during boot only"),
 
@@ -107,15 +112,17 @@ LOADS = [
 # with its ADP151. Dropping a buck in front of each LDO keeps the LDO's noise
 # rejection where it matters while cutting the dissipation to something a
 # small package can actually shed.
+# As drawn on rev03/POWER (25 Sep). The +3V6 pre-regulator is gone: with the
+# AD8352s on 5 V, +3V3_A carries 100 mA and its LDO straight off +5V0
+# dissipates 0.17 W. +1V2 is a resistor divider (a "ldo" here: same sums).
 TREE = {
-    "+5V0":   ("+12V",   "buck", 0.90),
-    "+3V3_D": ("+5V0",   "buck", 0.90),
-    "+3V6":   ("+5V0",   "buck", 0.90),   # pre-regulator for the analogue 3V3
-    "+3V3_A": ("+3V6",   "ldo",  None),
-    "+2V5":   ("+5V0",   "buck", 0.88),   # pre-regulator for the analogue 1V8
-    "+1V8_A": ("+2V5",   "ldo",  None),
-    "+1V8_D": ("+3V3_D", "ldo",  None),
-    "+1V2":   ("+3V3_D", "ldo",  None),
+    "+5V0":   ("+12V",   "buck", 0.90),   # LMR33630
+    "+3V3_D": ("+5V0",   "buck", 0.90),   # TPS562201
+    "+3V3_A": ("+5V0",   "ldo",  None),   # TPS7A8300
+    "+2V5":   ("+5V0",   "buck", 0.88),   # TPS562201; FPGA LVDS banks + feeds +1V8_A
+    "+1V8_A": ("+2V5",   "ldo",  None),   # TPS7A8300
+    "+1V8_D": ("+3V3_D", "ldo",  None),   # TPS7A8300
+    "+1V2":   ("+2V5",   "ldo",  None),   # divider
     "+1V0":   ("+5V0",   "buck", 0.88),
     # Charge-pump inverter. Reinstated after B-03 was reopened: the RF switches
     # need VEE = -3.3 V. A few milliamps, so a small pump is plenty.
@@ -148,7 +155,7 @@ def main():
         print()
 
     # Propagate loads up the tree, innermost first.
-    order = ["-3V3", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A", "+3V6",
+    order = ["-3V3", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A",
              "+3V3_D", "+5V0", "+12V"]
     load = {r: direct.get(r, 0) for r in VOLTS}
     diss = {}
