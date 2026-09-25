@@ -20,3 +20,6 @@ fp-info-cache
 __pycache__/
 *.pyc
 _work/datasheets/
+
+# Salidas de fabricacion: se regeneran con _work/fab/make_fab.py
+/fab/

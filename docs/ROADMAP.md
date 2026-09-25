@@ -88,7 +88,7 @@ The comparison that led here:
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
 | Per-rail load figures | ⚠️ **16 of 25 verified from datasheets**; the rest need Vivado or parts not yet chosen |
-| 6-layer stackup and trace widths | ✅ §2, pending the fabricator's field solver |
+| 6-layer stackup and trace widths | ✅ §2; JLC06161H-2116A and field-solver widths in §2.6 |
 
 **Exit criterion:** the master document with no `[?]` marks left in sections 4, 5, 6 and 10, and
 the power `[E]` marks replaced by datasheet values.
@@ -238,14 +238,17 @@ start once the schematic is done.
 | Power planes | Real separation between analogue and digital, ferrites at the junctions |
 | Route the IF lines | 50 Ω to the SMAs |
 
-**Status (25 September 2026)** — [LAYOUT.md](LAYOUT.md):
+**Status (26 September 2026)** — [LAYOUT.md](LAYOUT.md), [FABRICATION.md](FABRICATION.md):
 
 | Task | State |
 |---|---|
 | Extend the board outline | ✅ 119 × 120 mm; Hirose positions and the two corner holes kept exactly |
-| 6-layer stackup in KiCad | ✅ as POWER_AND_STACKUP §2.1; fabricator's numbers still to come |
-| Net classes and rules | ✅ LVDS100, RF50, Power; standard 6-layer process |
-| Placement | ⚠️ first pass by script, every part in its sheet's region; to refine by hand |
+| 6-layer stackup in KiCad | ✅ JLCPCB JLC06161H-2116A, the fabricator's real dielectrics (POWER_AND_STACKUP §2.6) |
+| Trace widths | ✅ by field solver on that stack, solder mask included: 117 / 150 µm at 100 Ω, 183 µm at 50 Ω. To confirm in JLCPCB's calculator |
+| Net classes and rules | ✅ LVDS100, RF50, Power |
+| Placement | ✅ every passive at its pin; POWER laid out along the power flow; 2.5 mm escape ring round the BGA. To adjust by hand while routing |
+| Power planes | ✅ L4 split drawn (+3V3_D background, islands); vias to place |
+| Fabrication outputs | ✅ `_work/fab/make_fab.py`: Gerbers, drill, BOM, CPL; a DRAFT until routed |
 | Routing | ❌ next, in KiCad |
 
 **Exit criteria:**

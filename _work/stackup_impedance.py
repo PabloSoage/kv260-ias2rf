@@ -2,6 +2,10 @@
 """
 Trace widths for the proposed 6-layer stackup.
 
+Superseded for the board (26 Sep 2026) by _work/field_solver.py, which solves
+the fabricator's real stack (JLCPCB JLC06161H-2116A) with the solder mask.
+Kept as the reasoning that chose the stack's shape (POWER_AND_STACKUP §2.1-2.5).
+
 Solves for the geometry that hits the two impedances this board needs:
   100 ohm differential  — the five IAS pairs and the converter LVDS
    50 ohm single-ended  — the IF lines to the SMAs

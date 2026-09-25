@@ -96,6 +96,32 @@ ANCHOR.update({
     "J1101": (153.0, 126.5, 90),         # JTAG 2x7, 2 mm
     "U1101": (158.0, 150.0, 90),         # FPGA: bank 15 towards the DACs, 14 towards the ADCs
 })
+# POWER, laid out along the flow of the power (POWER_SPEC §1), not left to
+# the legaliser: 12 V comes in at the jack's pin 1 (103.2, 150) and goes up
+# through the PTC and the reverse-polarity MOSFET to the LMR33630, whose
+# inductor sits to its left; +5V0 then feeds three buck cells below the jack
+# (chip above, inductor below, output capacitors under it; +1V0 on the
+# right, nearest the FPGA) and a column of LDOs on the right edge of the
+# block (+3V3_A at the top, next to the DACs). The charge pump for -3V3 goes
+# at the bottom, towards the RF switches that use it. Orientations put each
+# chip's switch pin towards its inductor and its input pins towards its
+# supply (pad maps of HSOP-8, SOT-23-6, PowerDI3333, 1812).
+ANCHOR.update({
+    "F1001": (107.5, 149.5, 90),        # pad 1 at the jack's VIN, pad 2 up to Q1001
+    "Q1001": (107.5, 143.8, 270),       # drain down to the PTC, sources (+12V) up
+    "U1001": (104.0, 137.5, 180),       # VIN pins right, towards Q1001; SW left
+    "L1001": (95.5, 137.5, 180),        # SW pad right, at U1001's pin 8; +5V0 left
+    "U1002": (93.5, 162.0, 90),         # +3V3_D buck: SW and VIN down, to the inductor
+    "L1010": (93.5, 168.7, 270),        # SW pad up, +3V3_D down
+    "U1003": (102.5, 162.0, 90),        # +2V5
+    "L1020": (102.5, 168.7, 270),
+    "U1004": (111.5, 162.0, 90),        # +1V0, nearest the FPGA
+    "L1030": (111.5, 168.7, 270),
+    "U1007": (117.0, 134.5, 0),         # +3V3_A LDO, next to the DACs
+    "U1006": (117.0, 142.5, 0),         # +1V8_D LDO
+    "U1005": (117.0, 150.5, 0),         # +1V8_A LDO
+    "U1008": (97.0, 181.0, 0),          # -3V3 charge pump
+})
 # region of each sheet: (x0, y0, x1, y1)
 REGION = {
     "IAS_LINK":  (173.5, 83.0, 193.0, 101.0),
@@ -175,8 +201,9 @@ class Grid:
 
 
 # ---------------------------------------------------------------- schematic positions
-def schematic_positions():
-    """ref -> (x, y) on its own sheet, from the rev03 .kicad_sch files."""
+def schematic_positions(all_units=False):
+    """ref -> (x, y) on its own sheet, from the rev03 .kicad_sch files: the
+    first unit's; with all_units, ref -> [(x, y) of every unit]."""
     pos = {}
     for fn in os.listdir(os.path.join(ROOT, "rev03")):
         text = open(os.path.join(ROOT, "rev03", fn), encoding="utf-8").read()
@@ -186,7 +213,11 @@ def schematic_positions():
             if ref.startswith("#"):
                 continue
             at = re.search(r"\(at ([\d.\-]+) ([\d.\-]+)", b)
-            pos.setdefault(ref, (float(at.group(1)), float(at.group(2))))
+            xy = (float(at.group(1)), float(at.group(2)))
+            if all_units:
+                pos.setdefault(ref, []).append(xy)
+            else:
+                pos.setdefault(ref, xy)
     return pos
 
 
@@ -223,10 +254,79 @@ def pad_positions(text):
     return pos
 
 
+def schematic_pins():
+    """ref -> {pin number: (x, y)} on its sheet, every unit, from the rev03
+    files: each instance's position, rotation and mirror applied to the pin
+    positions of the symbol embedded in that file."""
+    out = {}
+    pin_re = re.compile(r'\(pin \w+ \w+\s*\(at ([-\d.]+) ([-\d.]+)[^)]*\).*?\(number "([^"]*)"', re.S)
+    for fn in os.listdir(os.path.join(ROOT, "rev03")):
+        text = open(os.path.join(ROOT, "rev03", fn), encoding="utf-8").read()
+        lib = {}                                   # (lib_id, unit) -> {number: (x, y)}
+        i = text.find("(lib_symbols")
+        if i >= 0:
+            libs = schgen._block(text, i)
+            for m in re.finditer(r'\n\t\t\(symbol "([^"]+)"', libs):
+                blk = schgen._block(libs, m.start() + 3)
+                name = m.group(1).split(":")[-1]
+                for sm in re.finditer(r'\(symbol "' + re.escape(name) + r'_(\d+)_\d+"', blk):
+                    u = int(sm.group(1))
+                    for pm in pin_re.finditer(schgen._block(blk, sm.start())):
+                        lib.setdefault((m.group(1), u), {})[pm.group(3)] = (float(pm.group(1)),
+                                                                            float(pm.group(2)))
+        for m in re.finditer(r"\n\t\(symbol\n", text):
+            b = schgen._block(text, m.start() + 2)
+            ref = re.search(r'\(property "Reference" "([^"]+)"', b).group(1)
+            if ref.startswith("#"):
+                continue
+            lib_id = re.search(r'\(lib_id "([^"]+)"', b).group(1)
+            at = re.search(r"\(at ([\d.\-]+) ([\d.\-]+)(?: ([\d.\-]+))?", b)
+            x, y, rot = float(at.group(1)), float(at.group(2)), float(at.group(3) or 0)
+            unit = int(re.search(r"\(unit (\d+)\)", b).group(1))
+            mirror = "(mirror y)" in b
+            pins = dict(lib.get((lib_id, 0), {}))
+            pins.update(lib.get((lib_id, unit), {}))
+            a = math.radians(rot)
+            for num, (px, py) in pins.items():
+                dx, dy = px, -py                   # library Y is up
+                if mirror:
+                    dx = -dx
+                out.setdefault(ref, {})[num] = (x + dx * math.cos(a) + dy * math.sin(a),
+                                                y - dx * math.sin(a) + dy * math.cos(a))
+    return out
+
+
+def spec_notes():
+    """ref -> the description its sheet's spec gives it (_work/sheets/*_spec.py,
+    PARTS: (lib, value, footprint, description)). The schematic symbols do
+    not carry it; it often says whose pin a capacitor is for."""
+    import importlib
+    sheets = os.path.join(os.path.dirname(HERE), "sheets")
+    sys.path.insert(0, sheets)
+    notes = {}
+    for fn in sorted(os.listdir(sheets)):
+        if fn.endswith("_spec.py"):
+            mod = importlib.import_module(fn[:-3])
+            for ref, v in getattr(mod, "PARTS", {}).items():
+                if isinstance(v, tuple) and len(v) > 3 and isinstance(v[3], str):
+                    notes[ref] = v[3]
+    return notes
+
+
+def ohms(v):
+    m = re.match(r"([\d.]+)\s*([kKmM]?)", v)
+    if not m:
+        return 0.0
+    return float(m.group(1)) * {"k": 1e3, "K": 1e3, "M": 1e6, "m": 1e6, "": 1.0}[m.group(2)]
+
+
 def attachments(comps, spos):
     """passive ref -> (owner ref, net, is_rail, order key)."""
+    spins = schematic_pins()
+    notes = spec_notes()
+    shared = {}
     out = {}
-    for c in comps.values():
+    for c in sorted(comps.values(), key=lambda c: c.ref):
         if not PASSIVE.match(c.ref):
             continue
         nets = [n for n in dict.fromkeys(c.pads.values()) if not is_gnd(n)]
@@ -247,10 +347,37 @@ def attachments(comps, spos):
             powl = [o for o in comps.values() if c.sheet == "POWER" and o.sheet == "POWER"
                     and o.ref.startswith("L") and o.ref != c.ref]
             for n in nets:
-                owners = [o for o in same + powl if o.ref.startswith(("U", "L")) and n in o.pads.values()]
+                owners = [o for o in same + powl if o.ref.startswith(("U", "L", "Y")) and n in o.pads.values()]
                 if owners and is_rail(n):
                     sx, sy = spos.get(c.ref, (0, 0))
-                    o = min(owners, key=lambda o: math.dist(spos.get(o.ref, (1e6, 1e6)), (sx, sy)))
+                    # nearest by the distance to the owner's own pin on this
+                    # rail, not to the symbol's centre: the FPGA's power unit
+                    # is 300 mm tall on its sheet
+
+                    def gap(o, n=n):
+                        pts = [xy for num, xy in spins.get(o.ref, {}).items()
+                               if o.pads.get(num) == n]
+                        if not pts:
+                            return math.dist(spos.get(o.ref, (1e6, 1e6)), (sx, sy))
+                        return min(math.dist(xy, (sx, sy)) for xy in pts)
+                    # drawn right at a chip's pin (under 15 mm on the sheet):
+                    # that chip. Drawn in a block of its own, away from every
+                    # pin (CONTROL's FPGA decoupling, per UG483): the chip
+                    # with the most pins on the rail
+                    # the spec names the chip: "ADCLK948 p.10: 1 uF bypass",
+                    # "... one 100 nF at the Si549's VDD"
+                    note = notes.get(c.ref, "")
+                    named = [o for o in owners if re.search(r"\b" + re.escape(o.ref) + r"\b", note)
+                             or re.search(r"\b" + re.escape(o.value.split()[0]) + r"\b", note)]
+                    o = min(owners, key=gap)
+                    if len(named) == 1:
+                        o = named[0]
+                    elif gap(o) > 15.0 and c.sheet != "POWER":
+                        # most pins on the rail; between equals (two identical
+                        # drivers on one rail), share the capacitors out
+                        o = min(owners, key=lambda o, n=n: (-sum(v == n for v in o.pads.values()),
+                                                           shared.get((o.ref, n), 0), o.ref))
+                        shared[(o.ref, n)] = shared.get((o.ref, n), 0) + 1
                     best = (o.ref, n, True)
                     break
         if best is None:
@@ -264,6 +391,9 @@ def attachments(comps, spos):
             key = (-1, 0.0)                         # a buck's inductor, at its SW pin, first
         elif c.sheet == "POWER" and best[2] and grounded:
             key = (0, val)
+        elif (c.sheet != "POWER" and c.ref.startswith("R") and not c.ref.startswith("RN")
+              and ohms(c.value) >= 1e3 and (grounded or any(is_rail(n) for n in nets))):
+            key = (3, 0.0)          # a pull-up or pull-down (>= 1 k to a rail): DC, last
         else:
             key = (0, val) if best[2] and grounded and val <= 1.1e-6 else \
                   (1, 0.0) if not best[2] else (2, val)
@@ -369,6 +499,25 @@ def place(comps):
         if ref in KEEPOUT:
             m = KEEPOUT[ref]
             grid.add((b[0] - m, b[1] - m, b[2] + m, b[3] + m))
+            # Its VCCINT bulk (330, 100 and 3 x 4.7 uF, +1V0) next,
+            # before anything else can take the ring's edge: from the +1V0
+            # ball nearest the edge outward. Those balls are in the middle
+            # of the BGA, so about 11 mm is the least this can be. UG483
+            # p.24: "Bulk capacitors can be placed almost anywhere on the
+            # PCB, but the best placement is as close as possible to the FPGA."
+            bulk = sorted([r for r, v in attach.items() if v[0] == ref and v[1] == "+1V0"
+                           and farads(comps[r].value) >= 4.7e-6],
+                          key=lambda r: (-farads(comps[r].value), r))
+            pp = pad_positions(info[ref][2])
+            balls = [rot_pt(*pp[p], a) for p, n in comps[ref].pads.items() if n == "+1V0" and p in pp]
+            for r in bulk:
+                bx, by = min(balls, key=lambda q: min(q[0] - (b[0] - x), (b[2] - x) - q[0],
+                                                      q[1] - (b[1] - y), (b[3] - y) - q[1]))
+                cyd, tht, _ = info[r]
+                spot = spiral(grid, cyd, tht, x + bx, y + by, rmax=20.0)
+                if spot:
+                    placed[r] = spot[:3]
+                    grid.add(spot[3])
     for name, (x, y) in HOLES.items():
         grid.add((x - 3.6, y - 3.6, x + 3.6, y + 3.6))
     for name, (x, y) in FIDUCIALS.items():
@@ -729,18 +878,21 @@ LAYERS = [(0, "F.Cu", "signal", "L1 SIG"), (4, "In1.Cu", "power", "L2 GND"),
           (25, "Edge.Cuts", "user", None), (27, "Margin", "user", None),
           (31, "F.CrtYd", "user", "F.Courtyard"), (29, "B.CrtYd", "user", "B.Courtyard"),
           (35, "F.Fab", "user", None), (33, "B.Fab", "user", None)]
-# POWER_AND_STACKUP.md §2.1
-STACK = [("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.100, 4.05),
-         ("In1.Cu", "copper", 0.0175), ("dielectric 2", "core", 0.200, 4.30),
-         ("In2.Cu", "copper", 0.0175), ("dielectric 3", "prepreg", 0.800, 4.30),
-         ("In3.Cu", "copper", 0.0175), ("dielectric 4", "core", 0.200, 4.30),
-         ("In4.Cu", "copper", 0.0175), ("dielectric 5", "prepreg", 0.100, 4.05),
+# JLCPCB JLC06161H-2116A (POWER_AND_STACKUP §2.6): the fabricator's own
+# stack with the shape of §2.1 - thin dielectric under L1 and L6, L3 close to
+# L2 and far from L4. Between L3 and L4 JLCPCB presses 2116 + a 0.70 mm core +
+# 2116; it is one layer here, 0.9328 mm, at the thickness-weighted Er.
+STACK = [("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.1164, 4.16),
+         ("In1.Cu", "copper", 0.0152), ("dielectric 2", "core", 0.130, 4.17),
+         ("In2.Cu", "copper", 0.0152), ("dielectric 3", "prepreg", 0.9328, 4.44),
+         ("In3.Cu", "copper", 0.0152), ("dielectric 4", "core", 0.130, 4.17),
+         ("In4.Cu", "copper", 0.0152), ("dielectric 5", "prepreg", 0.1164, 4.16),
          ("B.Cu", "copper", 0.035)]
 
 
 def header():
     L = ["(kicad_pcb", f"{T}(version 20260206)", f'{T}(generator "pcbnew")',
-         f'{T}(generator_version "10.0")', f"{T}(general", f"{T}{T}(thickness 1.56)",
+         f'{T}(generator_version "10.0")', f"{T}(general", f"{T}{T}(thickness 1.556)",
          f"{T}{T}(legacy_teardrops no)", f"{T})", f'{T}(paper "A3")',
          f"{T}(title_block", f'{T}{T}(title "KV260-IAS2RF Rev03")', f'{T}{T}(rev "03")',
          f'{T}{T}(company "KV260-IAS2RF")',
@@ -886,7 +1038,7 @@ def rules():
     ns = pro["net_settings"]
     base = dict(ns["classes"][0])
     base.update({"track_width": 0.15, "clearance": 0.15, "via_diameter": 0.45, "via_drill": 0.2,
-                 "diff_pair_width": 0.136, "diff_pair_gap": 0.15})
+                 "diff_pair_width": 0.117, "diff_pair_gap": 0.15})
 
     def cls(name, **kw):
         c = dict(base, name=name, priority=kw.pop("priority"))
@@ -894,11 +1046,12 @@ def rules():
         return c
     ns["classes"] = [
         dict(base, name="Default", priority=2147483647),
-        # POWER_AND_STACKUP §2.2: 100 ohm differential on L1, W 136 S 150 um
-        cls("LVDS100", priority=0, track_width=0.136, diff_pair_width=0.136, diff_pair_gap=0.15,
+        # 100 ohm differential on L1, W 117 S 150 um: _work/field_solver.py on
+        # JLC06161H-2116A with solder mask (POWER_AND_STACKUP §2.6)
+        cls("LVDS100", priority=0, track_width=0.117, diff_pair_width=0.117, diff_pair_gap=0.15,
             clearance=0.15),
-        # 50 ohm single-ended on L1, W 174 um
-        cls("RF50", priority=1, track_width=0.174, clearance=0.2),
+        # 50 ohm single-ended on L1, W 183 um (same source)
+        cls("RF50", priority=1, track_width=0.183, clearance=0.2),
         cls("Power", priority=2, track_width=0.4, clearance=0.2, via_diameter=0.6, via_drill=0.3),
     ]
     ns["netclass_patterns"] = (
