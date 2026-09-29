@@ -293,7 +293,7 @@ every stage leaves something usable even if you abandon the next one.
 
 | # | Stage | Custom hardware | What you get |
 |---|---|---|---|
-| **0** | **Commercial SDR over USB** (HackRF, KrakenSDR) | **None** | You listen and locate **now**. And you find out what you actually need |
+| **0** | **Commercial SDR over USB** (bladeRF 2.0 micro, RSPdx-R2, KrakenSDR) | **None** | You listen and locate **now**. And you find out what you actually need |
 | **1** | **LiDAR** over Ethernet + SLAM | **None** | Vision in fog and at night, 3D mapping |
 | **2** | **OBD/CAN** with a SocketCAN adapter | **None** | Telemetry + odometry for the SLAM |
 | **3** | **Amateur licence** + commercial transceiver | **None** | Legal, reliable communication in the middle of nowhere |
@@ -305,9 +305,11 @@ every stage leaves something usable even if you abandon the next one.
 
 ### Why stage 0 is the most important
 
-**Do not design a board to find out what you need.** A HackRF covers 1 MHz to 6 GHz — including the
-5.8 GHz of drones — and costs less than a prototype run. A KrakenSDR does 5-channel direction
-finding out of the box. Both go over USB to the KV260 and work today.
+**Do not design a board to find out what you need.** A bladeRF 2.0 micro covers 47 MHz to 6 GHz —
+including the 5.8 GHz of drones — in full duplex with two coherent channels, and an RSPdx-R2 covers
+1 kHz to 2 GHz with better sensitivity; together they cost less than a prototype run. A KrakenSDR
+does 5-channel direction finding out of the box. All three go over USB to the KV260 and work today.
+Choice and alternatives: [SHOPPING_LIST.md](SHOPPING_LIST.md#choosing-the-stage-0-sdrs).
 
 Drive with that for six months. You will discover that half your requirements were wrong and that
 there are three you had not anticipated. **Then** design the board, to solve what actually limits
