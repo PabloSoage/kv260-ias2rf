@@ -1,4 +1,4 @@
-# Layout — board, rules and first placement
+# Layout — board, rules, placement and first routing
 
 *25 September 2026 · `CSI2-KRIA-KV260_Rev01.kicad_pcb` · built by `_work/layout/build_board.py`
 from the schematic's netlist; placement refined and L4 drawn the same day*
@@ -12,7 +12,8 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is not routed.** Routing is the next step, done in KiCad (§6).
+**It is autorouted, not finished** (2 October 2026, §6): 99 connections are left for KiCad, and
+the RF lines and the LVDS pairs need a hand review.
 
 The original Allied Vision board is kept, untouched, as
 `_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
@@ -204,7 +205,7 @@ routing is planned.
 | Check | Result |
 |---|---|
 | `kicad-cli pcb drc --schematic-parity` | **0 parity problems**: every symbol has its footprint, every pad its net. **No shorts, clearance or courtyard violations** |
-| | **499 unconnected** listed: the unrouted board. That is a cap on KiCad's list, not the count: it stayed at 499 when seven parts were added, and the netlist needs about 1,390 connections. **Nothing else**: no silkscreen warnings either |
+| | Before routing, **499 unconnected** listed: a cap on KiCad's list, not the count (the netlist needs about 1,390 connections). No silkscreen warnings. After routing: §6.1 |
 | `_work/layout/check_placement.py`: each passive's distance to its pin, from the board file | Decoupling ≤ 1 µF: median **2.9 mm** (first pass: 10 mm). Parts on a signal pin: median 3.4 mm, 90 % within 7.0 mm. Bulk: median 8.6 mm, none over 14 mm. On POWER, everything within 5.9 mm of its pin. The FPGA's 0.47 µF sit further out (median 8.9 mm): VCCINT is in the middle of the BGA and nothing may enter the 2.5 mm escape ring. The script's pad positions are checked against the coordinates KiCad prints in its DRC report: 964 pads, 0 µm apart |
 | L4 filled on a copy (`kicad-cli pcb drc --refill-zones`) | All islands fill. The only new reports are the islands' `isolated_copper`, expected until their vias are placed |
 | J101/J102 against the original board | Position, face, rotation and all 38 pads identical. Nets as INTERFACE_SPEC §3–§4 (pin 4/5 `LINK_RX_D0`, 7/8 `LINK_RX_CLK`, 14 `HK_SCL`, 21 `FPGA_PROG_B`, 22 `HK_SDA`, 15 `FPGA_IRQ`: moved from 32 after the check against the carrier, INTERFACE_SPEC §4.3) |
@@ -223,18 +224,39 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 
 ---
 
-## 6. What comes next: routing, in this order
+## 6. Routing
 
-1. **Fill the planes** (L2, L5, L4), and drop vias from each island on L4 to its pads.
-2. **The link**: five pairs from J101 on the bottom face. Via to L1 once, then run on L1 over an
-   unbroken L2 to the AC-coupling capacitors and the FPGA. Keep the N-before-P pairs as they are
-   (INTERFACE_SPEC §3.2).
-3. **Clocks**: the ADCLK948 outputs to the AD9484, AD9253 and the FPGA's CLK_FPGA pad, as
-   100 Ω pairs.
-4. **ADC LVDS**: AD9484 (10 pairs) and AD9253 (4 pairs) into bank 14, terminations at the FPGA.
-5. **FPGA fan-out** with 0.2 mm vias, then the DAC buses through the 22 Ω arrays.
-6. **IF lines** as 50 Ω on L1, through the switches to the SMAs.
-7. **Power**, then the slow signals.
+### 6.1 The autorouted board (2 October 2026)
+
+The board was routed by **an external autorouter**, a
+Python + Rust router that reads and writes the `.kicad_pcb` text itself. The chain is
+`_work/layout/route_krt.sh`: BGA fan-out, then the LVDS pairs, then everything else. It ran on a
+copy, and only tracks and vias came back: every footprint and zone is byte-identical.
+
+| | Result |
+|---|---|
+| BGA fan-out | 146 of 147 nets out of U1101, **dog-bone only**: a 0.45/0.2 mm via between four balls, no via in any pad |
+| Tracks and vias | 9,310 segments, 1,322 vias, all through-hole 0.45/0.2 mm (0.6/0.3 not used) |
+| DRC (zones refilled, schematic parity) | **0 parity problems. 99 connections unrouted**: 68 signals, 18 LVDS legs, 13 power or ground. 33 clearance errors, all on RF50 (0.15–0.2 mm against 0.2). 113 dangling track and via ends. 2 hole-to-hole |
+
+**The Power class clearance is now 0.15 mm** (was 0.2): the rails are 12 V at most, where IPC-2221
+asks 0.1 mm, and 0.2 mm kept the router out from between fine-pitch pins. RF50 keeps 0.2 mm,
+because there it is part of the 50 Ω line.
+
+**An external autorouter was tried first and stopped at about 540 unrouted** after nine passes and six hours.
+The bridge for it stays in the repo (`dsn_export.py`, `ses_import.py`): one polygon per plane
+net and keepout strips at the edge are what made it route at all.
+
+### 6.2 What is left, by hand in KiCad
+
+1. **The 99 unrouted connections.** Most are short local links among dense passives (DAC arrays,
+   the ADC front ends, JTAG, the ADAR ribbon).
+2. **The LVDS pairs.** Only 5 of 26 were routed coupled end to end (the link pairs and CLK_FPGA);
+   the router judged the other 21 electrically short and routed their legs singly. Re-route the
+   ADC data pairs as pairs, on L1, over unbroken L2.
+3. **The RF lines** (33 clearance errors): 0.183 mm on L1, 0.2 mm from everything.
+4. **Clean up** the 113 dangling ends, and the 2 hole-to-hole pairs.
+5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs.
 
 Before anything is ordered: DRC with zero errors and zero unconnected items, the widths
 confirmed in JLCPCB's calculator, and the checks in [FABRICATION.md](FABRICATION.md).
@@ -246,5 +268,6 @@ py _work/layout/check_placement.py drc.rpt   # passives' distance to their pins
 py _work/fab/make_fab.py                     # Gerbers, drill, BOM, CPL into fab/ (docs/FABRICATION.md)
 ```
 
-**Once parts are moved or tracks laid by hand, do not run `build_board.py` again.** From then on the
+**The board is routed: do not run `build_board.py` again.** It would rebuild the board and drop
+every track. From then on the
 board file is the source, as the drawn sheets are once accepted.

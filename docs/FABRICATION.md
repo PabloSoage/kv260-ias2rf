@@ -9,9 +9,10 @@ always regenerated, never edited.
 py _work/fab/make_fab.py
 ```
 
-**Today the output is a DRAFT.** The board is placed, not routed: DRC reports 0 errors and lists 499
-unrouted connections (a cap on its list; the real number is about 1,390). So the script names the folder `DRAFT-…` and writes *DO NOT ORDER* in the
-notes. The draft is there to check the files, not to order from.
+**Today the output is a DRAFT.** The board is autorouted but not finished (LAYOUT §6): DRC reports
+99 unrouted connections, 33 RF clearance errors and the router's dangling ends. So the script names
+the folder `DRAFT-…` and writes *DO NOT ORDER* in the notes. The draft is there to check the files,
+not to order from.
 
 ---
 

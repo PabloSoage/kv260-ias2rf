@@ -1052,7 +1052,9 @@ def rules():
             clearance=0.15),
         # 50 ohm single-ended on L1, W 183 um (same source)
         cls("RF50", priority=1, track_width=0.183, clearance=0.2),
-        cls("Power", priority=2, track_width=0.4, clearance=0.2, via_diameter=0.6, via_drill=0.3),
+        # 0.15 mm, not 0.2 (2 Oct, at routing): 12 V at most, where IPC-2221 asks
+        # 0.1 mm; 0.2 only cost the autorouter its way between fine-pitch pins
+        cls("Power", priority=2, track_width=0.4, clearance=0.15, via_diameter=0.6, via_drill=0.3),
     ]
     ns["netclass_patterns"] = (
         [{"netclass": "LVDS100", "pattern": p} for p in
