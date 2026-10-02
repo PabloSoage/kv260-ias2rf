@@ -76,11 +76,26 @@ class LibSymbol:
         if not m:
             raise KeyError(lib_id)
         body = _block(text, text.index("(symbol", m.start()))
-        if "(extends" in body:
-            raise ValueError(f"{lib_id} extends another symbol; not supported")
+        ext = re.search(r'\(extends "([^"]+)"\)', body)
+        if ext:
+            # A derived symbol (KiCad's "extends") has only properties; its
+            # pins and graphics are the parent's. Flatten it the way KiCad
+            # embeds it in a schematic: the parent's body under this name,
+            # with this symbol's property values.
+            parent = ext.group(1)
+            flat = LibSymbol(f"{lib}:{parent}", path).body
+            flat = flat.replace(f'(symbol "{lib}:{parent}"', f'(symbol "{name}"', 1)
+            flat = flat.replace(f'(symbol "{parent}_', f'(symbol "{name}_')
+            for key, val in re.findall(r'\(property "([^"]+)" "((?:[^"\\]|\\.)*)"', body):
+                flat = re.sub(r'(\(property "' + re.escape(key) + r'" ")(?:[^"\\]|\\.)*"',
+                              lambda m, v=val: m.group(1) + v + '"', flat, count=1)
+            body = flat
         self.lib_id = lib_id
         self.body = body.replace(f'(symbol "{name}"', f'(symbol "{lib_id}"', 1)
         self.power = "(power" in body[:400]
+        # a solder jumper is not a part to buy: the library says so, and the
+        # footprint agrees (exclude_from_bom), which DRC checks
+        self.in_bom = "(in_bom no)" not in body[:600]
         self.pins = {}     # number -> (x, y, electrical type, name)
         self.unit = {}     # number -> unit (0 = common to every unit)
         for sm in re.finditer(r'\(symbol "' + re.escape(name) + r'_(\d+)_\d+"', body):
@@ -300,7 +315,7 @@ class Sheet:
         L = [f"{T}(symbol", f'{T}{T}(lib_id "{p.sym.lib_id}")',
              f"{T}{T}(at {fmt(x)} {fmt(y)} {p.rot})"] + ([f"{T}{T}(mirror y)"] if p.mirror else []) + [
              f"{T}{T}(unit {p.unit})", f"{T}{T}(body_style 1)",
-             f"{T}{T}(exclude_from_sim no)", f"{T}{T}(in_bom {'no' if power else 'yes'})",
+             f"{T}{T}(exclude_from_sim no)", f"{T}{T}(in_bom {'no' if power or not p.sym.in_bom else 'yes'})",
              f"{T}{T}(on_board {'no' if power else 'yes'})", f"{T}{T}(in_pos_files {'no' if power else 'yes'})",
              f"{T}{T}(dnp no)", f'{T}{T}(uuid "{sym_uuid}")']
         for k, v, at, hide in props:

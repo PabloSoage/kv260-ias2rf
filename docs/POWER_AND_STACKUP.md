@@ -1,13 +1,13 @@
 # Power budget and stackup — phase 1
 
-*21 September 2026 · Rev03 architecture, approved · updated 24 September 2026*
+*21 September 2026 · Rev03 architecture, approved · updated 2 October 2026*
 
 The two remaining phase 1 items that do not depend on AMD. Both are produced by scripts in
 `_work/`, so re-running them after any change is one command.
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **16 of 25 loads verified from datasheets** — see §1.4 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **18 of 24 loads verified from datasheets** — see §1.4. The 6 left are the FPGA's rails and one pull-down pair |
 | Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
 
 ---
@@ -17,12 +17,12 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ### 1.1 The tree
 
 ```
-As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September:
+As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September; loads as of 2 October:
 
-12 V in  (755 mA, 9.1 W)
-  └── LMR33630 buck → +5V0   1630 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
-        ├── TPS562201 → +3V3_D   1191 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches
-        │     ├── TPS7A8300 → +1V8_D  330 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD
+12 V in  (733 mA, 8.8 W)
+  └── LMR33630 buck → +5V0   1584 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
+        ├── TPS562201 → +3V3_D   1128 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches
+        │     ├── TPS7A8300 → +1V8_D  332 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD, housekeeping
         │     └── LM2663 → −3V3        8 mA   RF switch VEE
         ├── TPS7A8300 → +3V3_A    100 mA   DAC AVDD (no pre-regulator needed any more)
         ├── TPS562201 → +2V5      601 mA   FPGA bank 34 (link outputs), and:
@@ -75,17 +75,18 @@ With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1630 mA | buck | +12V | 0.91 W | ≥ 2.12 A |
-| `+3V3_D` | 3.3 | 1191 mA | buck | +5V0 | 0.44 W | ≥ 1.55 A |
+| `+5V0` | 5.0 | 1584 mA | buck | +12V | 0.88 W | ≥ 2.06 A |
+| `+3V3_D` | 3.3 | 1128 mA | buck | +5V0 | 0.41 W | ≥ 1.47 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
 | `+2V5` | 2.5 | 601 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
 | `+3V3_A` | 3.3 | 100 mA | LDO | +5V0 | 0.17 W | ≥ 0.13 A |
-| `+1V8_D` | 1.8 | 330 mA | LDO | +3V3_D | **0.49 W** | ≥ 0.43 A — thermal pad |
+| `+1V8_D` | 1.8 | 332 mA | LDO | +3V3_D | **0.50 W** | ≥ 0.43 A — thermal pad |
 | `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | — |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 755 mA at 12 V = 9.1 W.** With margin, 0.98 A and 11.8 W. The rise since the first
+**Input: 733 mA at 12 V = 8.8 W.** With margin, 0.95 A and 11.4 W. (2 October: 755 mA before
+the flash, translator and housekeeping estimates were replaced by their datasheets.) The rise since the first
 budget is the clock, as drawn: the ADCLK948 (330 mA max) and the Si549 (153 mA) replaced an
 ADCLK944 (165 mA) and a TCXO (20 mA), see [CLOCK_SPEC.md](CLOCK_SPEC.md). Then, when the radar
 ADC sheet was drawn, the AD8352 drivers moved from `+3V3_A` to 5 V, the only supply their
@@ -97,9 +98,9 @@ For context: the KV260 itself is a 12 V, 3 A supply. Adding ~1 A for the adapter
 the same brick, though the vehicle installation
 ([VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §4) should keep the two separate anyway.
 
-### 1.4 Confidence: 16 verified, 9 estimated
+### 1.4 Confidence: 18 verified, 6 estimated
 
-**Sixteen of the twenty-five load figures now come from manufacturer datasheets.** analog.com refuses
+**Eighteen of the twenty-four load figures now come from manufacturer datasheets.** analog.com refuses
 to serve its PDFs to this machine (repeated 60 s timeouts; the mirrors return 403 and 410). They
 came from two other places: the AERIS-10 repository's component folder, and the **Internet
 Archive's copies of analog.com's own URLs**, fetched by `_work/fetch_datasheets.py`. That script
@@ -120,6 +121,11 @@ records the snapshot, size and SHA-256 of each file.
 | Si549 | **153 mA** max | `Si549.pdf` Revision H: IDD LVPECL 107 typ / 153 max |
 | M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |
 | M3SWA2 ×4, VEE | **8 mA** | Same, IEE 1.8 mA max each |
+| MT25QL128 flash | **35 mA** max | `MT25QL128.pdf` Table 42: 22 mA max reading quad at 133 MHz, 35 mA max while programming (I<sub>CC4</sub>, I<sub>CC5</sub>). The larger is counted |
+| Housekeeping on `+1V8_D` | **2 mA** | TMP1075 85 µA max while converting (`TMP1075.pdf` §6.5); M24C02-F 0.8 mA max reading (`M24C02.pdf` DS9398 Table 14); 74LVC1G07 10 µA (its datasheet); 0.18 mA in each 10 kΩ pull-up held low. Sum 1.6 mA |
+
+The old "level translators, 50 mA" line is gone: the one translator drawn is the 74LVC1G07 on
+PROG_B. Bank 35 at 1.8 V talks to the ADAR1000s and to the carrier directly (CONTROL_SPEC §1).
 
 Three of these cross-check against the datasheet's own dissipation figure. That's what gives
 confidence the tables were read correctly, since text extraction shuffles their columns:
@@ -140,13 +146,12 @@ This budget is good enough to **choose the topology and size the regulators** �
 caught three structural errors: two overheating LDOs and an ADC supply above its absolute maximum.
 It is **not a thermal sign-off**.
 
-The eight that remain estimates:
+The six that remain estimates:
 
 | Load | What to check |
 |---|---|
 | XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists — a datasheet cannot give this, it depends on the design |
-| XC7A50T VCCAUX, VCCO ×2 | Same: Vivado's power report, not a datasheet |
-| QSPI flash, level translators, housekeeping | Parts not chosen yet. Each is a line in the budget |
+| XC7A50T VCCAUX, VCCO ×3 | Same: Vivado's power report, not a datasheet |
 | Si549 LVPECL pull-downs | Whether its IDD figure already includes them is not stated |
 
 Replacing any of them is one line; the totals, the regulator choices and the dissipation all

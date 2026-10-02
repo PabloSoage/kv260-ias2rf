@@ -330,9 +330,44 @@ s.text("MT25QL128: FCS_B 2.4k, W and HOLD 4.7k (UG470 Figure 2-14); CCLK 22R ser
        (xf - 43.18, yf + 35.56))
 
 # ---- HK I2C pull-ups
-standing([("R1131", "HK_SCL"), ("R1132", "HK_SDA")], 490.22, 347.98, "+1V8_D", pitch=15.24)
-s.text("HK I2C pull-ups at 1.8 V (the carrier adds 2.21k); FPGA_IRQ pull-down", (477.52, 337.82))
-hanging([("R1133", "FPGA_IRQ")], 530.86, 350.52)
+standing([("R1131", "HK_SCL"), ("R1132", "HK_SDA"), ("R1134", "HK_ALERT")], 490.22, 347.98,
+         "+1V8_D", pitch=15.24)
+s.text("HK I2C pull-ups at 1.8 V (the carrier adds 2.21k), HK_ALERT pull-up; FPGA_IRQ pull-down",
+       (477.52, 337.82))
+hanging([("R1133", "FPGA_IRQ")], 541.02, 350.52)
+
+
+# ---- housekeeping devices on the HK bus
+def hk_chip(ref, cap, at, right):
+    """An I2C chip: address pins to GND on the left, supply with its
+    capacitor above, bus pins named on the right. right: [(pin, net)]."""
+    U = k.part(ref, at, text_at=(at[0] - 7.62, at[1] + 12.7))
+    bus([U.pin(n) for n in ((7, 6, 5) if ref == "U1104" else (1, 2, 3))], -1, "GND")
+    v = U.pin(8)
+    top = (v[0], v[1] - 7.62)
+    k.rail("+1V8_D", top)
+    c = k.vpart(cap, at[0] + 12.7, top[1])
+    s.wire(v, top, c.pin(1))
+    k.gnd(c.pin(2))
+    k.gnd(U.pin(4))
+    for n, net in right:
+        stub(U.pin(n), net, 1)
+    return U
+
+
+hk_chip("U1104", "C1182", (492.76, 391.16), [(1, "HK_SDA"), (2, "HK_SCL"), (3, "HK_ALERT")])
+s.text("TMP1075 board temperature, I2C 0x48. ALERT to the FPGA (bank 35, H3)",
+       (474.98, 370.84))
+hk_chip("U1105", "C1183", (492.76, 431.8), [(5, "HK_SDA"), (6, "HK_SCL"), (7, "EE_WC")])
+s.text("M24C02 board ID EEPROM, I2C 0x50", (474.98, 411.48))
+r = k.vpart("R1135", 510.54, 447.04)
+k.rail("+1V8_D", r.pin(1))
+vstub(r.pin(2), "EE_WC", 1, -1)
+jp = k.part("JP1101", (r.pin(2)[0] + 15.24, r.pin(2)[1]),
+           text_at=(r.pin(2)[0] + 11.43, r.pin(2)[1] - 7.62))
+s.wire(r.pin(2), jp.pin(1))
+k.gnd(jp.pin(2))
+s.text("WC high: write-protected; close JP1101 to write", (474.98, 464.82))
 
 # ---- unit 4, power
 U4 = k.part("U1101", (579.12, 406.4), unit=4, text_at=(566.42, 444.5))

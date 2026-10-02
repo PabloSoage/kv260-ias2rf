@@ -9292,6 +9292,668 @@
 				)
 			)
 		)
+		(symbol "Sensor_Temperature:TMP1075D"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "U"
+				(at -6.35 6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TMP1075D"
+				(at 6.35 6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Package_SO:SO-8_3.9x4.9mm_P1.27mm"
+				(at 0 -6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "https://www.ti.com/lit/gpn/tmp1075"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "I2C-bus digital temperature sensor and thermal watchdog, SO-8"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "temperature sensor I2C single channel"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "SO*3.9x4.9mm*P1.27mm*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "TMP1075D_0_1"
+				(rectangle
+					(start -7.62 5.08)
+					(end 7.62 -5.08)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "TMP1075D_1_1"
+				(pin bidirectional line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin open_collector line
+					(at 10.16 -2.54 180)
+					(length 2.54)
+					(name "ALERT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -7.62 90)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 -2.54 0)
+					(length 2.54)
+					(name "A2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 0 0)
+					(length 2.54)
+					(name "A1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 2.54 0)
+					(length 2.54)
+					(name "A0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 7.62 270)
+					(length 2.54)
+					(name "V+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Memory_EEPROM:M24C02-FMN"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "U"
+				(at -6.35 6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "M24C02-FMN"
+				(at 7.62 6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+				(at 0 8.89 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "http://www.st.com/content/ccc/resource/technical/document/datasheet/b0/d8/50/40/5a/85/49/6f/DM00071904.pdf/files/DM00071904.pdf/jcr:content/translations/en.DM00071904.pdf"
+				(at 1.27 -12.7 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "2Kb (256x8) I2C Serial EEPROM, 1.6-5.5V, SOIC-8"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "Nonvolatile Non-Volatile Memory ROM ST"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "SOIC*3.9x4.9mm*P1.27mm*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "M24C02-FMN_0_1"
+				(rectangle
+					(start -7.62 5.08)
+					(end 7.62 -5.08)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "M24C02-FMN_1_1"
+				(pin input line
+					(at -10.16 2.54 0)
+					(length 2.54)
+					(name "E0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 0 0)
+					(length 2.54)
+					(name "E1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 -2.54 0)
+					(length 2.54)
+					(name "E2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -7.62 90)
+					(length 2.54)
+					(name "VSS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 10.16 -2.54 180)
+					(length 2.54)
+					(name "~{WC}"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 7.62 270)
+					(length 2.54)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Jumper:SolderJumper_2_Open"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "JP"
+				(at 0 2.032 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SolderJumper_2_Open"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 -7.62 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Solder Jumper, 2-pole, open"
+				(at 0 -5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "solder jumper SPST"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "SolderJumper*Open*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "SolderJumper_2_Open_0_1"
+				(polyline
+					(pts
+						(xy -0.254 1.016) (xy -0.254 -1.016)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -0.254 -1.016)
+					(mid -1.2656 0)
+					(end -0.254 1.016)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(arc
+					(start 0.254 1.016)
+					(mid 1.2656 0)
+					(end 0.254 -1.016)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.254 1.016) (xy 0.254 -1.016)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SolderJumper_2_Open_1_1"
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 3.81)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:+1V0"
 			(power global)
 			(pin_numbers
@@ -10274,16 +10936,64 @@
 		(uuid "4d0324c3-b126-5674-a2ea-7d8165a17be7")
 	)
 	(junction
+		(at 477.52 391.16)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f64a2907-c3d6-584e-94cb-4d145adc4148")
+	)
+	(junction
+		(at 477.52 393.7)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "cb7dcf32-ff2d-59c7-8a54-08c642e9aca3")
+	)
+	(junction
+		(at 477.52 431.8)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "037bdff1-eaaa-59c3-a7b0-74d93d2c63eb")
+	)
+	(junction
+		(at 477.52 434.34)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "08855dc4-e1e0-5792-ace5-d9b4c03a2843")
+	)
+	(junction
 		(at 480.06 480.06)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "c08d289d-bedc-5d79-baba-0ed81e8474bf")
 	)
 	(junction
+		(at 492.76 375.92)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2a877ced-c9b1-5944-9052-bbd9af221702")
+	)
+	(junction
+		(at 492.76 416.56)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "27610630-ee3a-5b33-badd-a9b27eba989b")
+	)
+	(junction
 		(at 492.76 480.06)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b47cef52-92fb-5ba9-ab6b-82b7bfaf597c")
+	)
+	(junction
+		(at 505.46 347.98)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "cc50ae21-8e62-53bb-8c3d-d4a6e4f6c2a3")
+	)
+	(junction
+		(at 510.54 454.66)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "75d41e98-ebe0-5ab0-8a36-abeb30bad448")
 	)
 	(junction
 		(at 523.24 86.36)
@@ -10746,10 +11456,6 @@
 	(no_connect
 		(at 513.08 160.02)
 		(uuid "766237a4-4391-5dcc-8058-cc2d2aa513c8")
-	)
-	(no_connect
-		(at 614.68 218.44)
-		(uuid "abe4eaa7-d9e1-59a1-a8f2-9cf64a45d91d")
 	)
 	(no_connect
 		(at 614.68 220.98)
@@ -13327,6 +14033,16 @@
 	)
 	(wire
 		(pts
+			(xy 614.68 218.44) (xy 619.76 218.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ee11740-6fe6-5a71-95cd-7ea9bc81021e")
+	)
+	(wire
+		(pts
 			(xy 523.24 91.44) (xy 523.24 86.36)
 		)
 		(stroke
@@ -14687,6 +15403,16 @@
 	)
 	(wire
 		(pts
+			(xy 520.7 355.6) (xy 520.7 358.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "43510c6e-0803-5939-b72f-f5e162ca3b9c")
+	)
+	(wire
+		(pts
 			(xy 490.22 347.98) (xy 505.46 347.98)
 		)
 		(stroke
@@ -14697,13 +15423,263 @@
 	)
 	(wire
 		(pts
-			(xy 530.86 350.52) (xy 530.86 347.98)
+			(xy 505.46 347.98) (xy 520.7 347.98)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "67af79b1-3dbe-57ca-9562-1dd448da9f73")
+		(uuid "85a9180a-5009-5a35-ac19-f5d5f4dfab91")
+	)
+	(wire
+		(pts
+			(xy 541.02 350.52) (xy 541.02 347.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ec3bfb76-3570-5e35-b2a3-b5012e9e0832")
+	)
+	(wire
+		(pts
+			(xy 482.6 388.62) (xy 477.52 388.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e2ec3c05-0894-5142-b6db-4884293540c2")
+	)
+	(wire
+		(pts
+			(xy 482.6 391.16) (xy 477.52 391.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "02a3a600-507b-5d61-aa22-2ad11b4c0bff")
+	)
+	(wire
+		(pts
+			(xy 482.6 393.7) (xy 477.52 393.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ecbcdf71-9461-5aca-b8d5-6a1509048543")
+	)
+	(wire
+		(pts
+			(xy 477.52 388.62) (xy 477.52 391.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "92b0f19d-32c6-5a04-b05e-fd931ed72ba8")
+	)
+	(wire
+		(pts
+			(xy 477.52 391.16) (xy 477.52 393.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7a4fb978-9b55-5245-8be1-ceca25a42d12")
+	)
+	(wire
+		(pts
+			(xy 477.52 393.7) (xy 477.52 396.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "83f525a6-9d7c-5b53-8cf5-361104a5d0c6")
+	)
+	(wire
+		(pts
+			(xy 492.76 383.54) (xy 492.76 375.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "735169ac-36df-5a91-a1c9-624d3eb0d98f")
+	)
+	(wire
+		(pts
+			(xy 492.76 375.92) (xy 505.46 375.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "81bb2a22-4dd2-5531-853c-48486752c27e")
+	)
+	(wire
+		(pts
+			(xy 502.92 388.62) (xy 508 388.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a516cf7b-29ce-5e21-8f84-bcf5b3088859")
+	)
+	(wire
+		(pts
+			(xy 502.92 391.16) (xy 508 391.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9d0ef9d1-d933-5c94-8917-404174fe1cb4")
+	)
+	(wire
+		(pts
+			(xy 502.92 393.7) (xy 508 393.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8f901691-6c45-505b-ae15-c2dc1fb6bdea")
+	)
+	(wire
+		(pts
+			(xy 482.6 429.26) (xy 477.52 429.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4e3c770a-6b99-53ab-99dd-ed5d3c0b91da")
+	)
+	(wire
+		(pts
+			(xy 482.6 431.8) (xy 477.52 431.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c98acad7-923b-5bba-a374-4a9bdf096d1e")
+	)
+	(wire
+		(pts
+			(xy 482.6 434.34) (xy 477.52 434.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "046424e9-c1ec-5d72-b34b-6e1f6ab45a36")
+	)
+	(wire
+		(pts
+			(xy 477.52 429.26) (xy 477.52 431.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "651d8544-3835-5aa3-a62c-f55fefbdde86")
+	)
+	(wire
+		(pts
+			(xy 477.52 431.8) (xy 477.52 434.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1b872e4f-c490-50bb-ac38-07c8ca7797c0")
+	)
+	(wire
+		(pts
+			(xy 477.52 434.34) (xy 477.52 436.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ecc9cfff-b0fe-5d5f-84a6-f83c59f11951")
+	)
+	(wire
+		(pts
+			(xy 492.76 424.18) (xy 492.76 416.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5904f3a1-74c7-5125-ab18-3aee9a61c690")
+	)
+	(wire
+		(pts
+			(xy 492.76 416.56) (xy 505.46 416.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "599e5dc3-ed83-54e4-a997-55ec15e3f122")
+	)
+	(wire
+		(pts
+			(xy 502.92 429.26) (xy 508 429.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d9839d34-152e-5a00-a5ee-547f9d44f899")
+	)
+	(wire
+		(pts
+			(xy 502.92 431.8) (xy 508 431.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1a632ceb-8d71-54e1-90a9-55dc860d1620")
+	)
+	(wire
+		(pts
+			(xy 502.92 434.34) (xy 508 434.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2676be7d-e094-5a49-b93f-5d897e68ac95")
+	)
+	(wire
+		(pts
+			(xy 510.54 454.66) (xy 510.54 457.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d7f5ee28-fd7f-5b36-aa8d-7cb842dc226b")
+	)
+	(wire
+		(pts
+			(xy 510.54 454.66) (xy 520.7 454.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1ac01316-a482-563b-ac3b-8ca4f1e8ae54")
 	)
 	(wire
 		(pts
@@ -18464,6 +19440,16 @@
 		)
 		(uuid "f1e8e4cf-f3b4-5a0d-b707-1dd8488c9425")
 	)
+	(label "HK_ALERT"
+		(at 619.76 218.44 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b4367378-c22b-5beb-a0ed-1f8c47f8c17e")
+	)
 	(label "ADAR1_CS"
 		(at 695.96 134.62 180)
 		(effects
@@ -19197,16 +20183,100 @@
 		)
 		(uuid "be40e94f-38e0-5a07-876b-eaf0c2c4c936")
 	)
-	(hierarchical_label "FPGA_IRQ"
-		(shape output)
-		(at 530.86 347.98 0)
+	(label "HK_ALERT"
+		(at 520.7 358.14 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left)
 		)
-		(uuid "ad708105-2ab1-50bf-931e-a7ab09ef4783")
+		(uuid "2a9f360c-2f59-561c-8207-fcc3d6d13a80")
+	)
+	(hierarchical_label "FPGA_IRQ"
+		(shape output)
+		(at 541.02 347.98 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5fd98d11-2ef0-5094-bcde-ba1732a5df90")
+	)
+	(hierarchical_label "HK_SDA"
+		(shape bidirectional)
+		(at 508 388.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b78e48ce-07ca-5c9d-9099-0f70eb7c1a78")
+	)
+	(hierarchical_label "HK_SCL"
+		(shape bidirectional)
+		(at 508 391.16 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "173ef078-8fa9-5fab-b0c2-ad0168bdb558")
+	)
+	(label "HK_ALERT"
+		(at 508 393.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "6488ce9e-4069-5d29-a0f8-0eee621797a6")
+	)
+	(hierarchical_label "HK_SDA"
+		(shape bidirectional)
+		(at 508 429.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b5e5ea8d-df05-52fe-8627-b6c8a982956e")
+	)
+	(hierarchical_label "HK_SCL"
+		(shape bidirectional)
+		(at 508 431.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d123ff7c-f9a7-5304-8ce1-8175d020945c")
+	)
+	(label "EE_WC"
+		(at 508 434.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "01a2d1b2-e288-56ce-8f6c-3508bb03ca1a")
+	)
+	(label "EE_WC"
+		(at 510.54 457.2 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "e635d831-cd4d-5987-b95c-6e794bfc5d58")
 	)
 	(label "XADC_GND"
 		(at 548.64 386.08 180)
@@ -19468,7 +20538,7 @@
 		)
 		(uuid "39148c32-06f6-5ed7-bcc1-bb4a2d893bed")
 	)
-	(text "HK I2C pull-ups at 1.8 V (the carrier adds 2.21k); FPGA_IRQ pull-down"
+	(text "HK I2C pull-ups at 1.8 V (the carrier adds 2.21k), HK_ALERT pull-up; FPGA_IRQ pull-down"
 		(exclude_from_sim no)
 		(at 477.52 337.82 0)
 		(effects
@@ -19478,6 +20548,39 @@
 			(justify left)
 		)
 		(uuid "45a1cff6-540b-520d-930c-5d5319171b8e")
+	)
+	(text "TMP1075 board temperature, I2C 0x48. ALERT to the FPGA (bank 35, H3)"
+		(exclude_from_sim no)
+		(at 474.98 370.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "77519391-56a6-5985-97c0-3484ae9de92a")
+	)
+	(text "M24C02 board ID EEPROM, I2C 0x50"
+		(exclude_from_sim no)
+		(at 474.98 411.48 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "38b28002-27de-5073-b3af-3d055a623c96")
+	)
+	(text "WC high: write-protected; close JP1101 to write"
+		(exclude_from_sim no)
+		(at 474.98 464.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "29befeaf-f9b5-5ce4-a057-42da9039e8bf")
 	)
 	(text "VCCBATT to GND: no bitstream encryption (DS181; UG470 Figure 2-14)"
 		(exclude_from_sim no)
@@ -26189,7 +27292,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7k"
+		(property "Value" "10k"
 			(at 492.76 353.06 0)
 			(effects
 				(font
@@ -26260,7 +27363,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "4.7k"
+		(property "Value" "10k"
 			(at 508 353.06 0)
 			(effects
 				(font
@@ -26306,6 +27409,77 @@
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
 					(reference "R1132")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 520.7 351.79 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c4b900f2-fc92-5f42-9307-9ce1d03f43a3")
+		(property "Reference" "R1134"
+			(at 523.24 350.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10k"
+			(at 523.24 353.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 520.7 351.79 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 520.7 351.79 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 520.7 351.79 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "19296367-d12a-5527-b9b8-b886e3d02e64")
+		)
+		(pin "2"
+			(uuid "6c154818-ea19-5995-8261-ae1f7797bfb8")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R1134")
 					(unit 1)
 				)
 			)
@@ -26380,7 +27554,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 530.86 354.33 0)
+		(at 541.02 354.33 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -26390,7 +27564,7 @@
 		(dnp no)
 		(uuid "92cb5644-bf55-5a5a-87e4-d1dfd8c30eae")
 		(property "Reference" "R1133"
-			(at 533.4 353.06 0)
+			(at 543.56 353.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26399,7 +27573,7 @@
 			)
 		)
 		(property "Value" "47k"
-			(at 533.4 355.6 0)
+			(at 543.56 355.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26408,7 +27582,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 530.86 354.33 0)
+			(at 541.02 354.33 0)
 			(hide yes)
 			(effects
 				(font
@@ -26417,7 +27591,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 530.86 354.33 0)
+			(at 541.02 354.33 0)
 			(hide yes)
 			(effects
 				(font
@@ -26426,7 +27600,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 530.86 354.33 0)
+			(at 541.02 354.33 0)
 			(hide yes)
 			(effects
 				(font
@@ -26451,7 +27625,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 530.86 358.14 0)
+		(at 541.02 358.14 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -26461,7 +27635,7 @@
 		(dnp no)
 		(uuid "5e0f406d-eb81-514c-98d5-f39b1909e36c")
 		(property "Reference" "#PWR1131"
-			(at 530.86 361.95 0)
+			(at 541.02 361.95 0)
 			(hide yes)
 			(effects
 				(font
@@ -26470,7 +27644,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 530.86 361.95 0)
+			(at 541.02 361.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -26478,7 +27652,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 530.86 358.14 0)
+			(at 541.02 358.14 0)
 			(hide yes)
 			(effects
 				(font
@@ -26487,7 +27661,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 530.86 358.14 0)
+			(at 541.02 358.14 0)
 			(hide yes)
 			(effects
 				(font
@@ -26496,7 +27670,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 530.86 358.14 0)
+			(at 541.02 358.14 0)
 			(hide yes)
 			(effects
 				(font
@@ -26511,6 +27685,1138 @@
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
 					(reference "#PWR1131")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Sensor_Temperature:TMP1075D")
+		(at 492.76 391.16 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6fa129b9-fe31-5fb7-9d16-fa2852fbacc0")
+		(property "Reference" "U1104"
+			(at 485.14 403.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TMP1075DR"
+			(at 485.14 406.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+			(at 492.76 391.16 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 492.76 391.16 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 492.76 391.16 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "838bae99-777f-5729-938c-6985f8480c8f")
+		)
+		(pin "2"
+			(uuid "881ff03b-75de-5aa4-811d-b5e899aa1ca1")
+		)
+		(pin "3"
+			(uuid "fe4a76aa-12cf-569c-83e7-b7b608aa61ec")
+		)
+		(pin "4"
+			(uuid "26351ba5-383b-559b-93b7-e983dc4df659")
+		)
+		(pin "5"
+			(uuid "a4e4b71d-e5d6-5a07-a458-b5a33494c017")
+		)
+		(pin "6"
+			(uuid "783ff40a-9da6-5a08-8d2c-89a90885fd71")
+		)
+		(pin "7"
+			(uuid "b0da93ba-8956-598b-a993-7953f1769455")
+		)
+		(pin "8"
+			(uuid "3d904c4d-fcff-563b-b4a1-a79b97884ede")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "U1104")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 477.52 396.24 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "a3cd0d46-b319-5879-82dc-a8d8214e99e0")
+		(property "Reference" "#PWR1132"
+			(at 477.52 400.05 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 477.52 400.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 477.52 396.24 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 477.52 396.24 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 477.52 396.24 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7399ced9-dbfa-52c6-ad25-b37a1b580bfc")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1132")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+1V8")
+		(at 492.76 375.92 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "00b0e893-97d2-5846-91d1-3690f37e6759")
+		(property "Reference" "#PWR1133"
+			(at 492.76 379.73 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+1V8_D"
+			(at 492.76 372.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 492.76 375.92 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 492.76 375.92 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 492.76 375.92 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6fa7cec1-e0b6-5a19-a602-b5e516c7429c")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1133")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 505.46 379.73 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "9c4a30d2-51d4-5689-bff4-3147dc622dae")
+		(property "Reference" "C1182"
+			(at 508 378.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100n"
+			(at 508 381 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 505.46 379.73 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 505.46 379.73 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 505.46 379.73 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "060222ac-5eec-5694-94db-ea0393956100")
+		)
+		(pin "2"
+			(uuid "6f0e5d11-7f79-54cc-a05a-39236bcde10a")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "C1182")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 505.46 383.54 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "baa53eae-738b-5f8a-814c-1827a27e3fb1")
+		(property "Reference" "#PWR1134"
+			(at 505.46 387.35 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 505.46 387.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 505.46 383.54 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 505.46 383.54 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 505.46 383.54 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "4e33d9e9-9c23-54dc-b0b3-07c084c9951d")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1134")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 492.76 398.78 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "5ba2dd6f-0b8b-5447-aab1-9ffa115bb4c8")
+		(property "Reference" "#PWR1135"
+			(at 492.76 402.59 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 492.76 402.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 492.76 398.78 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 492.76 398.78 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 492.76 398.78 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "51973957-650f-501e-bf8f-db9fbca919a7")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1135")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Memory_EEPROM:M24C02-FMN")
+		(at 492.76 431.8 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "42138493-c477-5276-824a-fbe7ef9ec6f0")
+		(property "Reference" "U1105"
+			(at 485.14 444.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "M24C02-FMN6TP"
+			(at 485.14 447.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+			(at 492.76 431.8 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 492.76 431.8 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 492.76 431.8 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "84d527f8-3bbf-5129-a3d9-2fcf1d017717")
+		)
+		(pin "2"
+			(uuid "72672fa4-24fe-5ddc-8f77-4c03a82711c1")
+		)
+		(pin "3"
+			(uuid "6a34bf4f-8e2e-5695-a6b9-4aff28f81a9c")
+		)
+		(pin "4"
+			(uuid "d5af5813-2670-5766-bf83-50d840c66ce4")
+		)
+		(pin "5"
+			(uuid "9596d8c9-fd71-5ccc-ba76-683be61cdecf")
+		)
+		(pin "6"
+			(uuid "8e9bccca-81cb-5144-bcc4-7ae5d9a2ed35")
+		)
+		(pin "7"
+			(uuid "88de5073-576e-5217-b25a-69f33b8fe251")
+		)
+		(pin "8"
+			(uuid "e1035e4a-1310-54c1-9011-8b16bb926f42")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "U1105")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 477.52 436.88 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "3668eafa-f5b4-50a1-8267-f7ef670c705a")
+		(property "Reference" "#PWR1136"
+			(at 477.52 440.69 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 477.52 440.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 477.52 436.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 477.52 436.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 477.52 436.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f8ce1c90-4b07-50a3-9480-ac2585ae1d3b")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1136")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+1V8")
+		(at 492.76 416.56 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "6a80a1ec-e713-55dc-a345-c7e4b798f309")
+		(property "Reference" "#PWR1137"
+			(at 492.76 420.37 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+1V8_D"
+			(at 492.76 412.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 492.76 416.56 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 492.76 416.56 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 492.76 416.56 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "88036b9f-b65f-50a2-b667-53aa7c6fd326")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1137")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 505.46 420.37 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "9354ae76-df50-5865-b58d-bda747fa5126")
+		(property "Reference" "C1183"
+			(at 508 419.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100n"
+			(at 508 421.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 505.46 420.37 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 505.46 420.37 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 505.46 420.37 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e76b6ecf-915a-54b1-a6b4-f89ee3b2b8a0")
+		)
+		(pin "2"
+			(uuid "2827a1d3-7c88-50eb-964e-be485d0f5c41")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "C1183")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 505.46 424.18 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "8505621c-35f9-56a0-830b-c1f7f7f307e3")
+		(property "Reference" "#PWR1138"
+			(at 505.46 427.99 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 505.46 427.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 505.46 424.18 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 505.46 424.18 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 505.46 424.18 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8117fa87-3856-5997-81e1-8435b13864ec")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1138")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 492.76 439.42 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "eb731db2-28d2-51d4-9cce-3be5ebc5dda1")
+		(property "Reference" "#PWR1139"
+			(at 492.76 443.23 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 492.76 443.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 492.76 439.42 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 492.76 439.42 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 492.76 439.42 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "63eb66aa-db94-5cea-a38e-55b32136bd1d")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1139")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 510.54 450.85 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "63fe86ba-05f2-528c-abbb-fc83ba12c0bf")
+		(property "Reference" "R1135"
+			(at 513.08 449.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10k"
+			(at 513.08 452.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 510.54 450.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 510.54 450.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 510.54 450.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "df1c6add-2d4e-5e1b-81b0-7c018a64961e")
+		)
+		(pin "2"
+			(uuid "633ac36e-f009-51bf-ada3-fe13ed9a81ba")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R1135")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+1V8")
+		(at 510.54 447.04 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "b0f0be63-962c-50bc-bf1c-6ac4fe16d83b")
+		(property "Reference" "#PWR1140"
+			(at 510.54 450.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+1V8_D"
+			(at 510.54 443.23 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 510.54 447.04 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 510.54 447.04 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 510.54 447.04 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "be8af518-74e7-51e9-8319-4a1db174c4a0")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1140")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Jumper:SolderJumper_2_Open")
+		(at 525.78 454.66 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "94a7b650-d3b7-5e96-9932-e97a28a17aee")
+		(property "Reference" "JP1101"
+			(at 521.97 447.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "WC"
+			(at 521.97 449.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm"
+			(at 525.78 454.66 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 525.78 454.66 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 525.78 454.66 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e9a1ef62-52a0-5164-a481-06f80cdae3f8")
+		)
+		(pin "2"
+			(uuid "e95a7906-985f-5fa0-b694-8ef0d3e4a450")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "JP1101")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 530.86 454.66 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "16e339f9-0910-581a-9807-a31392f56ba9")
+		(property "Reference" "#PWR1141"
+			(at 530.86 458.47 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 530.86 458.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 530.86 454.66 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 530.86 454.66 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 530.86 454.66 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f975cfc7-6710-5453-9117-f03fd65d9b07")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1141")
 					(unit 1)
 				)
 			)
@@ -26729,8 +29035,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "a3cd0d46-b319-5879-82dc-a8d8214e99e0")
-		(property "Reference" "#PWR1132"
+		(uuid "02c3c86f-6b93-5468-91b2-33471cdcf1a6")
+		(property "Reference" "#PWR1142"
 			(at 548.64 374.65 0)
 			(hide yes)
 			(effects
@@ -26775,12 +29081,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7399ced9-dbfa-52c6-ad25-b37a1b580bfc")
+			(uuid "0686fa24-6a60-5782-838e-e2feb2569bb2")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1132")
+					(reference "#PWR1142")
 					(unit 1)
 				)
 			)
@@ -26796,8 +29102,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "00b0e893-97d2-5846-91d1-3690f37e6759")
-		(property "Reference" "#PWR1133"
+		(uuid "1f6501a3-6be8-5a53-9c0f-dda44bd3fa02")
+		(property "Reference" "#PWR1143"
 			(at 539.75 388.62 90)
 			(hide yes)
 			(effects
@@ -26844,12 +29150,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "6fa7cec1-e0b6-5a19-a602-b5e516c7429c")
+			(uuid "e0638802-decb-5667-a454-102ee47bfec0")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1133")
+					(reference "#PWR1143")
 					(unit 1)
 				)
 			)
@@ -26865,8 +29171,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "baa53eae-738b-5f8a-814c-1827a27e3fb1")
-		(property "Reference" "#PWR1134"
+		(uuid "94941844-b7ad-5638-9838-ebd1f5d91a2e")
+		(property "Reference" "#PWR1144"
 			(at 534.67 391.16 270)
 			(hide yes)
 			(effects
@@ -26913,12 +29219,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "4e33d9e9-9c23-54dc-b0b3-07c084c9951d")
+			(uuid "afe0dd1e-3e17-5529-aa68-ad85fbeac0c6")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1134")
+					(reference "#PWR1144")
 					(unit 1)
 				)
 			)
@@ -26934,8 +29240,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "5ba2dd6f-0b8b-5447-aab1-9ffa115bb4c8")
-		(property "Reference" "#PWR1135"
+		(uuid "bbcee338-5a63-52c1-b800-1f6c65858c64")
+		(property "Reference" "#PWR1145"
 			(at 548.64 445.77 0)
 			(hide yes)
 			(effects
@@ -26980,12 +29286,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "51973957-650f-501e-bf8f-db9fbca919a7")
+			(uuid "cc29b4b3-36f9-5f91-bb6b-172057e27980")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1135")
+					(reference "#PWR1145")
 					(unit 1)
 				)
 			)
@@ -27001,8 +29307,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "3668eafa-f5b4-50a1-8267-f7ef670c705a")
-		(property "Reference" "#PWR1136"
+		(uuid "919f08d7-946a-5e8b-b202-c1c7afb56646")
+		(property "Reference" "#PWR1146"
 			(at 609.6 374.65 0)
 			(hide yes)
 			(effects
@@ -27047,12 +29353,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "f8ce1c90-4b07-50a3-9480-ac2585ae1d3b")
+			(uuid "04dd004e-edda-5d1e-8b6b-3d0b46c2a17c")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1136")
+					(reference "#PWR1146")
 					(unit 1)
 				)
 			)
@@ -27068,8 +29374,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "6a80a1ec-e713-55dc-a345-c7e4b798f309")
-		(property "Reference" "#PWR1137"
+		(uuid "5c97427f-9e6b-5453-b854-655ec094c37e")
+		(property "Reference" "#PWR1147"
 			(at 609.6 445.77 0)
 			(hide yes)
 			(effects
@@ -27114,12 +29420,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "88036b9f-b65f-50a2-b667-53aa7c6fd326")
+			(uuid "f8e16773-5447-58e0-a37a-9c338a9651d1")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1137")
+					(reference "#PWR1147")
 					(unit 1)
 				)
 			)
@@ -27135,8 +29441,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "8505621c-35f9-56a0-830b-c1f7f7f307e3")
-		(property "Reference" "#PWR1138"
+		(uuid "0d55668a-1300-59b1-ae72-77015036aaa8")
+		(property "Reference" "#PWR1148"
 			(at 632.46 364.49 0)
 			(hide yes)
 			(effects
@@ -27181,12 +29487,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8117fa87-3856-5997-81e1-8435b13864ec")
+			(uuid "47278075-af88-5440-a385-cc056075de5e")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1138")
+					(reference "#PWR1148")
 					(unit 1)
 				)
 			)
@@ -27271,8 +29577,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "ad984af6-c2aa-544b-8ae0-0a65236c5c5c")
-		(property "Reference" "#FLG1139"
+		(uuid "85018e2b-38ba-5255-9dcb-61f5ffca46ca")
+		(property "Reference" "#FLG1149"
 			(at 655.32 364.49 0)
 			(hide yes)
 			(effects
@@ -27318,12 +29624,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "73679f20-108f-5dc6-a487-dff95cf8061b")
+			(uuid "c23998d9-b30a-5f75-9edd-310cf6f3e8ab")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#FLG1139")
+					(reference "#FLG1149")
 					(unit 1)
 				)
 			)
@@ -27481,8 +29787,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "c5f2a6d9-5dc1-537c-8411-be728130b5ef")
-		(property "Reference" "#FLG1140"
+		(uuid "6913a7b5-c2f5-56c5-a3b9-efa9d2838c71")
+		(property "Reference" "#FLG1150"
 			(at 680.72 372.11 0)
 			(hide yes)
 			(effects
@@ -27528,12 +29834,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "93d2c95a-da6a-531a-ba51-c8b11bb5e56b")
+			(uuid "a26bb505-b4e4-5b0f-9499-b2d0e3b05d0b")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#FLG1140")
+					(reference "#FLG1150")
 					(unit 1)
 				)
 			)
@@ -27620,8 +29926,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "16e339f9-0910-581a-9807-a31392f56ba9")
-		(property "Reference" "#PWR1141"
+		(uuid "0b217045-f55a-555c-b307-8d13525ae3fc")
+		(property "Reference" "#PWR1151"
 			(at 662.94 379.73 0)
 			(hide yes)
 			(effects
@@ -27666,12 +29972,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "f975cfc7-6710-5453-9117-f03fd65d9b07")
+			(uuid "6856187b-2aea-585d-9c12-4b1241c80d4b")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1141")
+					(reference "#PWR1151")
 					(unit 1)
 				)
 			)
@@ -27687,8 +29993,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "02c3c86f-6b93-5468-91b2-33471cdcf1a6")
-		(property "Reference" "#PWR1142"
+		(uuid "829db6ab-e569-54cc-a2fa-8ad1f9a53e3f")
+		(property "Reference" "#PWR1152"
 			(at 30.48 483.87 0)
 			(hide yes)
 			(effects
@@ -27733,12 +30039,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "0686fa24-6a60-5782-838e-e2feb2569bb2")
+			(uuid "98ebaa51-2dc3-5988-b1d8-77060cb23484")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1142")
+					(reference "#PWR1152")
 					(unit 1)
 				)
 			)
@@ -27825,8 +30131,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "1f6501a3-6be8-5a53-9c0f-dda44bd3fa02")
-		(property "Reference" "#PWR1143"
+		(uuid "2ebb237f-0562-55e9-b6c4-384442946d91")
+		(property "Reference" "#PWR1153"
 			(at 38.1 491.49 0)
 			(hide yes)
 			(effects
@@ -27871,12 +30177,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "e0638802-decb-5667-a454-102ee47bfec0")
+			(uuid "81868350-3a64-5679-95a5-ea0617aebba0")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1143")
+					(reference "#PWR1153")
 					(unit 1)
 				)
 			)
@@ -27963,8 +30269,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "94941844-b7ad-5638-9838-ebd1f5d91a2e")
-		(property "Reference" "#PWR1144"
+		(uuid "1dd34dea-a3fe-581e-86ec-abdfbf700acc")
+		(property "Reference" "#PWR1154"
 			(at 50.8 491.49 0)
 			(hide yes)
 			(effects
@@ -28009,12 +30315,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "afe0dd1e-3e17-5529-aa68-ad85fbeac0c6")
+			(uuid "815e544d-5bc0-51c9-9191-094b604d406c")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1144")
+					(reference "#PWR1154")
 					(unit 1)
 				)
 			)
@@ -28101,8 +30407,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "bbcee338-5a63-52c1-b800-1f6c65858c64")
-		(property "Reference" "#PWR1145"
+		(uuid "bb7a8575-c0e6-51fb-a08c-382371b07e74")
+		(property "Reference" "#PWR1155"
 			(at 63.5 491.49 0)
 			(hide yes)
 			(effects
@@ -28147,12 +30453,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "cc29b4b3-36f9-5f91-bb6b-172057e27980")
+			(uuid "09d41962-fa9a-5d87-91ef-64da7e5ccd28")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1145")
+					(reference "#PWR1155")
 					(unit 1)
 				)
 			)
@@ -28239,8 +30545,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "919f08d7-946a-5e8b-b202-c1c7afb56646")
-		(property "Reference" "#PWR1146"
+		(uuid "03caf2b5-c89f-57b9-9dca-46fa62433800")
+		(property "Reference" "#PWR1156"
 			(at 76.2 491.49 0)
 			(hide yes)
 			(effects
@@ -28285,12 +30591,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "04dd004e-edda-5d1e-8b6b-3d0b46c2a17c")
+			(uuid "4ed5bf75-e454-585e-ab85-377e64ebcd6b")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1146")
+					(reference "#PWR1156")
 					(unit 1)
 				)
 			)
@@ -28377,8 +30683,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "5c97427f-9e6b-5453-b854-655ec094c37e")
-		(property "Reference" "#PWR1147"
+		(uuid "35b06d31-4c6f-58d1-8322-7a6d457582aa")
+		(property "Reference" "#PWR1157"
 			(at 88.9 491.49 0)
 			(hide yes)
 			(effects
@@ -28423,12 +30729,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "f8e16773-5447-58e0-a37a-9c338a9651d1")
+			(uuid "137286c0-7632-5ab5-b479-d70a2c5b19e4")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1147")
+					(reference "#PWR1157")
 					(unit 1)
 				)
 			)
@@ -28515,8 +30821,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "0d55668a-1300-59b1-ae72-77015036aaa8")
-		(property "Reference" "#PWR1148"
+		(uuid "2dbc1258-2531-50e4-8b28-45ed41d30ddf")
+		(property "Reference" "#PWR1158"
 			(at 101.6 491.49 0)
 			(hide yes)
 			(effects
@@ -28561,12 +30867,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "47278075-af88-5440-a385-cc056075de5e")
+			(uuid "d9e6bb08-e2d1-502b-991b-64a332639d73")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1148")
+					(reference "#PWR1158")
 					(unit 1)
 				)
 			)
@@ -28653,8 +30959,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "a1e84ba1-1585-59ac-8a23-2871fc4eb6fe")
-		(property "Reference" "#PWR1149"
+		(uuid "4014b0b1-6bda-5fcd-b4e2-8c4800172de2")
+		(property "Reference" "#PWR1159"
 			(at 114.3 491.49 0)
 			(hide yes)
 			(effects
@@ -28699,12 +31005,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "768f1cfa-e733-5a00-8881-6ecb082b8864")
+			(uuid "c77a89e4-fc15-5ae0-bf23-41414453bb26")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1149")
+					(reference "#PWR1159")
 					(unit 1)
 				)
 			)
@@ -28791,8 +31097,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "bcbe52dd-7020-57fa-91f3-898c8d8da842")
-		(property "Reference" "#PWR1150"
+		(uuid "4f9cf6b2-0536-5af6-aabf-1658b5f8847c")
+		(property "Reference" "#PWR1160"
 			(at 127 491.49 0)
 			(hide yes)
 			(effects
@@ -28837,12 +31143,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "0b1ca360-5aac-5aef-8a2a-02d72059c948")
+			(uuid "b84ebde3-bbb3-524f-ae77-060c9b2c08af")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1150")
+					(reference "#PWR1160")
 					(unit 1)
 				)
 			)
@@ -28929,8 +31235,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "0b217045-f55a-555c-b307-8d13525ae3fc")
-		(property "Reference" "#PWR1151"
+		(uuid "772eddd5-1efb-56e3-a814-3bac55d733e1")
+		(property "Reference" "#PWR1161"
 			(at 139.7 491.49 0)
 			(hide yes)
 			(effects
@@ -28975,12 +31281,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "6856187b-2aea-585d-9c12-4b1241c80d4b")
+			(uuid "30ccce2d-8b0c-55fc-890c-54809f8e48e8")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1151")
+					(reference "#PWR1161")
 					(unit 1)
 				)
 			)
@@ -28996,8 +31302,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "829db6ab-e569-54cc-a2fa-8ad1f9a53e3f")
-		(property "Reference" "#PWR1152"
+		(uuid "88417915-d259-51e5-b291-da2beea976c2")
+		(property "Reference" "#PWR1162"
 			(at 160.02 483.87 0)
 			(hide yes)
 			(effects
@@ -29042,12 +31348,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "98ebaa51-2dc3-5988-b1d8-77060cb23484")
+			(uuid "8bdf7971-5740-5847-8d95-706c479ef0ee")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1152")
+					(reference "#PWR1162")
 					(unit 1)
 				)
 			)
@@ -29134,8 +31440,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "2ebb237f-0562-55e9-b6c4-384442946d91")
-		(property "Reference" "#PWR1153"
+		(uuid "a5477484-88d9-5f7a-b304-1707e4885c39")
+		(property "Reference" "#PWR1163"
 			(at 167.64 491.49 0)
 			(hide yes)
 			(effects
@@ -29180,12 +31486,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "81868350-3a64-5679-95a5-ea0617aebba0")
+			(uuid "3bdf3f16-3103-54b0-ab57-4bdd1fb19ad2")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1153")
+					(reference "#PWR1163")
 					(unit 1)
 				)
 			)
@@ -29272,8 +31578,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "1dd34dea-a3fe-581e-86ec-abdfbf700acc")
-		(property "Reference" "#PWR1154"
+		(uuid "074f9c7a-50dc-5d02-ac72-aaf1a2dc80c3")
+		(property "Reference" "#PWR1164"
 			(at 180.34 491.49 0)
 			(hide yes)
 			(effects
@@ -29318,12 +31624,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "815e544d-5bc0-51c9-9191-094b604d406c")
+			(uuid "60a05398-27ec-5ccf-b775-9175ec4c076a")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1154")
+					(reference "#PWR1164")
 					(unit 1)
 				)
 			)
@@ -29339,8 +31645,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "bb7a8575-c0e6-51fb-a08c-382371b07e74")
-		(property "Reference" "#PWR1155"
+		(uuid "bafcd0af-125f-520f-aa8c-48254fb32dcc")
+		(property "Reference" "#PWR1165"
 			(at 215.9 483.87 0)
 			(hide yes)
 			(effects
@@ -29385,12 +31691,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "09d41962-fa9a-5d87-91ef-64da7e5ccd28")
+			(uuid "34906ce0-0a9c-59ef-a72c-67ae2b20cf31")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1155")
+					(reference "#PWR1165")
 					(unit 1)
 				)
 			)
@@ -29477,8 +31783,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "03caf2b5-c89f-57b9-9dca-46fa62433800")
-		(property "Reference" "#PWR1156"
+		(uuid "b7927eaf-6751-5400-aaca-7c267b1030bf")
+		(property "Reference" "#PWR1166"
 			(at 223.52 491.49 0)
 			(hide yes)
 			(effects
@@ -29523,12 +31829,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "4ed5bf75-e454-585e-ab85-377e64ebcd6b")
+			(uuid "1415cc78-2694-5d8d-9ec1-a378c02ef2b0")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1156")
+					(reference "#PWR1166")
 					(unit 1)
 				)
 			)
@@ -29615,8 +31921,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "35b06d31-4c6f-58d1-8322-7a6d457582aa")
-		(property "Reference" "#PWR1157"
+		(uuid "5e1126ac-b0ff-5db1-bfe3-6c0478f9ac32")
+		(property "Reference" "#PWR1167"
 			(at 236.22 491.49 0)
 			(hide yes)
 			(effects
@@ -29661,12 +31967,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "137286c0-7632-5ab5-b479-d70a2c5b19e4")
+			(uuid "ce0a89ed-282d-540f-a0b4-0588249b6546")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1157")
+					(reference "#PWR1167")
 					(unit 1)
 				)
 			)
@@ -29753,8 +32059,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "2dbc1258-2531-50e4-8b28-45ed41d30ddf")
-		(property "Reference" "#PWR1158"
+		(uuid "02375dad-b7b7-5d67-8e32-a6ddcb66ad27")
+		(property "Reference" "#PWR1168"
 			(at 248.92 491.49 0)
 			(hide yes)
 			(effects
@@ -29799,12 +32105,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "d9e6bb08-e2d1-502b-991b-64a332639d73")
+			(uuid "f2d17334-ea10-5484-9214-70e93a2de305")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1158")
+					(reference "#PWR1168")
 					(unit 1)
 				)
 			)
@@ -29891,8 +32197,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "4014b0b1-6bda-5fcd-b4e2-8c4800172de2")
-		(property "Reference" "#PWR1159"
+		(uuid "73938b7a-eb88-58f1-9349-9f152304deef")
+		(property "Reference" "#PWR1169"
 			(at 261.62 491.49 0)
 			(hide yes)
 			(effects
@@ -29937,12 +32243,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c77a89e4-fc15-5ae0-bf23-41414453bb26")
+			(uuid "d3efc0a5-be1f-5001-a7f2-6d8f0c6600b6")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1159")
+					(reference "#PWR1169")
 					(unit 1)
 				)
 			)
@@ -30029,8 +32335,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "4f9cf6b2-0536-5af6-aabf-1658b5f8847c")
-		(property "Reference" "#PWR1160"
+		(uuid "02e8cf3a-7fe3-563c-9861-6a5ba7cce105")
+		(property "Reference" "#PWR1170"
 			(at 274.32 491.49 0)
 			(hide yes)
 			(effects
@@ -30075,12 +32381,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b84ebde3-bbb3-524f-ae77-060c9b2c08af")
+			(uuid "2dfc9159-210a-581d-af38-73a30ade0c6a")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1160")
+					(reference "#PWR1170")
 					(unit 1)
 				)
 			)
@@ -30167,8 +32473,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "772eddd5-1efb-56e3-a814-3bac55d733e1")
-		(property "Reference" "#PWR1161"
+		(uuid "d5876585-1ae1-5536-988f-c4c5640bf1c0")
+		(property "Reference" "#PWR1171"
 			(at 287.02 491.49 0)
 			(hide yes)
 			(effects
@@ -30213,12 +32519,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "30ccce2d-8b0c-55fc-890c-54809f8e48e8")
+			(uuid "ae207fd2-e076-5dfb-96a4-46d1f4b7c233")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1161")
+					(reference "#PWR1171")
 					(unit 1)
 				)
 			)
@@ -30234,8 +32540,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "88417915-d259-51e5-b291-da2beea976c2")
-		(property "Reference" "#PWR1162"
+		(uuid "182cd455-395e-5920-9eb8-3b2e03f6edca")
+		(property "Reference" "#PWR1172"
 			(at 309.88 483.87 0)
 			(hide yes)
 			(effects
@@ -30280,12 +32586,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8bdf7971-5740-5847-8d95-706c479ef0ee")
+			(uuid "c839c2a2-af64-5a88-b0b1-8d4ff642968d")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1162")
+					(reference "#PWR1172")
 					(unit 1)
 				)
 			)
@@ -30372,8 +32678,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "a5477484-88d9-5f7a-b304-1707e4885c39")
-		(property "Reference" "#PWR1163"
+		(uuid "74be9cf6-8432-511a-ad9a-99e4fd591c35")
+		(property "Reference" "#PWR1173"
 			(at 317.5 491.49 0)
 			(hide yes)
 			(effects
@@ -30418,12 +32724,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "3bdf3f16-3103-54b0-ab57-4bdd1fb19ad2")
+			(uuid "6302b2e1-ef5c-5e19-990e-5fdaf4cb72a3")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1163")
+					(reference "#PWR1173")
 					(unit 1)
 				)
 			)
@@ -30439,8 +32745,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "074f9c7a-50dc-5d02-ac72-aaf1a2dc80c3")
-		(property "Reference" "#PWR1164"
+		(uuid "2efc0b6e-f84e-5ec2-ad45-bb2ea93aaf65")
+		(property "Reference" "#PWR1174"
 			(at 345.44 483.87 0)
 			(hide yes)
 			(effects
@@ -30485,12 +32791,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "60a05398-27ec-5ccf-b775-9175ec4c076a")
+			(uuid "5aaff79d-482c-5999-be85-9cd8789dc145")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1164")
+					(reference "#PWR1174")
 					(unit 1)
 				)
 			)
@@ -30577,8 +32883,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "bafcd0af-125f-520f-aa8c-48254fb32dcc")
-		(property "Reference" "#PWR1165"
+		(uuid "8f0b2be5-8694-5cc8-a7fa-c2603274bc3c")
+		(property "Reference" "#PWR1175"
 			(at 353.06 491.49 0)
 			(hide yes)
 			(effects
@@ -30623,12 +32929,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "34906ce0-0a9c-59ef-a72c-67ae2b20cf31")
+			(uuid "437d8154-c0cb-5ea7-8549-085c1d1cf3f0")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1165")
+					(reference "#PWR1175")
 					(unit 1)
 				)
 			)
@@ -30715,8 +33021,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "b7927eaf-6751-5400-aaca-7c267b1030bf")
-		(property "Reference" "#PWR1166"
+		(uuid "aa08de29-71dd-5402-9f6d-2539a4209584")
+		(property "Reference" "#PWR1176"
 			(at 365.76 491.49 0)
 			(hide yes)
 			(effects
@@ -30761,12 +33067,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "1415cc78-2694-5d8d-9ec1-a378c02ef2b0")
+			(uuid "27785cf3-fcd3-5f3a-a67b-5a4e8866b5c4")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1166")
+					(reference "#PWR1176")
 					(unit 1)
 				)
 			)
@@ -30853,8 +33159,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "5e1126ac-b0ff-5db1-bfe3-6c0478f9ac32")
-		(property "Reference" "#PWR1167"
+		(uuid "b0c354ee-16e4-51f9-84ea-66e7636387aa")
+		(property "Reference" "#PWR1177"
 			(at 378.46 491.49 0)
 			(hide yes)
 			(effects
@@ -30899,12 +33205,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ce0a89ed-282d-540f-a0b4-0588249b6546")
+			(uuid "9b8e9123-b975-5574-ba6f-be8258e4fde8")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1167")
+					(reference "#PWR1177")
 					(unit 1)
 				)
 			)
@@ -30991,8 +33297,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "02375dad-b7b7-5d67-8e32-a6ddcb66ad27")
-		(property "Reference" "#PWR1168"
+		(uuid "81d53dbc-c4a4-59e5-ab1a-19ef3f8fb1fd")
+		(property "Reference" "#PWR1178"
 			(at 391.16 491.49 0)
 			(hide yes)
 			(effects
@@ -31037,12 +33343,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "f2d17334-ea10-5484-9214-70e93a2de305")
+			(uuid "b2a46e63-d308-5048-9c8b-9851cb51ead9")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1168")
+					(reference "#PWR1178")
 					(unit 1)
 				)
 			)
@@ -31129,8 +33435,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "73938b7a-eb88-58f1-9349-9f152304deef")
-		(property "Reference" "#PWR1169"
+		(uuid "8524f7b9-6e97-5047-a9c2-dd0f78a0465b")
+		(property "Reference" "#PWR1179"
 			(at 403.86 491.49 0)
 			(hide yes)
 			(effects
@@ -31175,12 +33481,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "d3efc0a5-be1f-5001-a7f2-6d8f0c6600b6")
+			(uuid "e27430e4-7960-5c57-ad64-040fc8a7ee74")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1169")
+					(reference "#PWR1179")
 					(unit 1)
 				)
 			)
@@ -31267,8 +33573,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "02e8cf3a-7fe3-563c-9861-6a5ba7cce105")
-		(property "Reference" "#PWR1170"
+		(uuid "7758e9b2-0185-568b-a1a9-c3411395e642")
+		(property "Reference" "#PWR1180"
 			(at 416.56 491.49 0)
 			(hide yes)
 			(effects
@@ -31313,12 +33619,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "2dfc9159-210a-581d-af38-73a30ade0c6a")
+			(uuid "39851dc2-6acc-5c96-be43-e4b1a9502c0f")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1170")
+					(reference "#PWR1180")
 					(unit 1)
 				)
 			)
@@ -31405,8 +33711,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "d5876585-1ae1-5536-988f-c4c5640bf1c0")
-		(property "Reference" "#PWR1171"
+		(uuid "0c04013b-495f-51a6-bc51-f748c2ffd017")
+		(property "Reference" "#PWR1181"
 			(at 429.26 491.49 0)
 			(hide yes)
 			(effects
@@ -31451,12 +33757,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ae207fd2-e076-5dfb-96a4-46d1f4b7c233")
+			(uuid "acc4afc8-542c-56d0-9eb3-2c630b0356d0")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1171")
+					(reference "#PWR1181")
 					(unit 1)
 				)
 			)
@@ -31543,8 +33849,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "182cd455-395e-5920-9eb8-3b2e03f6edca")
-		(property "Reference" "#PWR1172"
+		(uuid "82e6ddf5-2da4-51d3-ab9e-b1725802aa3d")
+		(property "Reference" "#PWR1182"
 			(at 441.96 491.49 0)
 			(hide yes)
 			(effects
@@ -31589,12 +33895,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c839c2a2-af64-5a88-b0b1-8d4ff642968d")
+			(uuid "5d5110c9-6d49-50b3-8cfb-b18bdaf03408")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1172")
+					(reference "#PWR1182")
 					(unit 1)
 				)
 			)
@@ -31681,8 +33987,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "74be9cf6-8432-511a-ad9a-99e4fd591c35")
-		(property "Reference" "#PWR1173"
+		(uuid "c25b8e7e-ffc8-5996-9168-eb48bfd6ebf9")
+		(property "Reference" "#PWR1183"
 			(at 454.66 491.49 0)
 			(hide yes)
 			(effects
@@ -31727,12 +34033,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "6302b2e1-ef5c-5e19-990e-5fdaf4cb72a3")
+			(uuid "9880a422-b1a3-55c9-962f-a4167631243d")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1173")
+					(reference "#PWR1183")
 					(unit 1)
 				)
 			)
@@ -31819,8 +34125,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "2efc0b6e-f84e-5ec2-ad45-bb2ea93aaf65")
-		(property "Reference" "#PWR1174"
+		(uuid "d02c270a-94ea-559c-907a-884e69cf8353")
+		(property "Reference" "#PWR1184"
 			(at 467.36 491.49 0)
 			(hide yes)
 			(effects
@@ -31865,12 +34171,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5aaff79d-482c-5999-be85-9cd8789dc145")
+			(uuid "e6314e39-bea3-588f-8f78-38f870867526")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1174")
+					(reference "#PWR1184")
 					(unit 1)
 				)
 			)
@@ -31957,8 +34263,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "8f0b2be5-8694-5cc8-a7fa-c2603274bc3c")
-		(property "Reference" "#PWR1175"
+		(uuid "de0e1fe1-2e52-5830-b5ea-356797ce9037")
+		(property "Reference" "#PWR1185"
 			(at 480.06 491.49 0)
 			(hide yes)
 			(effects
@@ -32003,12 +34309,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "437d8154-c0cb-5ea7-8549-085c1d1cf3f0")
+			(uuid "381be5ed-89ef-5475-b4a7-acfe7baf847a")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1175")
+					(reference "#PWR1185")
 					(unit 1)
 				)
 			)
@@ -32095,8 +34401,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "aa08de29-71dd-5402-9f6d-2539a4209584")
-		(property "Reference" "#PWR1176"
+		(uuid "e8ad9ca1-e834-5553-842f-7243abd6c8ed")
+		(property "Reference" "#PWR1186"
 			(at 492.76 491.49 0)
 			(hide yes)
 			(effects
@@ -32141,12 +34447,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "27785cf3-fcd3-5f3a-a67b-5a4e8866b5c4")
+			(uuid "984dde4b-6355-50ea-9f03-87d9f792d469")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1176")
+					(reference "#PWR1186")
 					(unit 1)
 				)
 			)
@@ -32233,8 +34539,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "b0c354ee-16e4-51f9-84ea-66e7636387aa")
-		(property "Reference" "#PWR1177"
+		(uuid "60579f60-b427-5f59-9b37-df5db581e509")
+		(property "Reference" "#PWR1187"
 			(at 505.46 491.49 0)
 			(hide yes)
 			(effects
@@ -32279,12 +34585,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "9b8e9123-b975-5574-ba6f-be8258e4fde8")
+			(uuid "8cf1f24c-c5be-596c-becd-1535069d7e84")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1177")
+					(reference "#PWR1187")
 					(unit 1)
 				)
 			)
@@ -32300,8 +34606,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "81d53dbc-c4a4-59e5-ab1a-19ef3f8fb1fd")
-		(property "Reference" "#PWR1178"
+		(uuid "9a51a0f7-1759-5e14-bd59-0527b818b830")
+		(property "Reference" "#PWR1188"
 			(at 30.48 534.67 0)
 			(hide yes)
 			(effects
@@ -32346,12 +34652,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b2a46e63-d308-5048-9c8b-9851cb51ead9")
+			(uuid "7c5360a3-aaee-5a3e-9e1d-d6d633cd3cb4")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1178")
+					(reference "#PWR1188")
 					(unit 1)
 				)
 			)
@@ -32438,8 +34744,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "8524f7b9-6e97-5047-a9c2-dd0f78a0465b")
-		(property "Reference" "#PWR1179"
+		(uuid "99c40a5d-0dfc-5027-a8e9-fa5e5214c467")
+		(property "Reference" "#PWR1189"
 			(at 38.1 542.29 0)
 			(hide yes)
 			(effects
@@ -32484,12 +34790,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "e27430e4-7960-5c57-ad64-040fc8a7ee74")
+			(uuid "63929579-3d1b-504b-9d12-f5d5c33a87e6")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1179")
+					(reference "#PWR1189")
 					(unit 1)
 				)
 			)
@@ -32576,8 +34882,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "7758e9b2-0185-568b-a1a9-c3411395e642")
-		(property "Reference" "#PWR1180"
+		(uuid "8bc679f3-49de-5690-a8a7-a9ec933277b7")
+		(property "Reference" "#PWR1190"
 			(at 50.8 542.29 0)
 			(hide yes)
 			(effects
@@ -32622,12 +34928,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "39851dc2-6acc-5c96-be43-e4b1a9502c0f")
+			(uuid "0a03ca6b-dd21-55bc-9adc-5774773eceda")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1180")
+					(reference "#PWR1190")
 					(unit 1)
 				)
 			)
@@ -32714,8 +35020,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "0c04013b-495f-51a6-bc51-f748c2ffd017")
-		(property "Reference" "#PWR1181"
+		(uuid "e45863e1-6c38-55bd-9d7d-1e55323cec29")
+		(property "Reference" "#PWR1191"
 			(at 63.5 542.29 0)
 			(hide yes)
 			(effects
@@ -32760,12 +35066,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "acc4afc8-542c-56d0-9eb3-2c630b0356d0")
+			(uuid "80afb9af-996d-5839-a25a-6abedcc1c361")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1181")
+					(reference "#PWR1191")
 					(unit 1)
 				)
 			)
@@ -32852,8 +35158,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "82e6ddf5-2da4-51d3-ab9e-b1725802aa3d")
-		(property "Reference" "#PWR1182"
+		(uuid "985184f7-1c94-5c1b-94f1-c9a007d158ed")
+		(property "Reference" "#PWR1192"
 			(at 76.2 542.29 0)
 			(hide yes)
 			(effects
@@ -32898,12 +35204,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5d5110c9-6d49-50b3-8cfb-b18bdaf03408")
+			(uuid "c815080c-5d40-5f74-aa17-18ce7059bb3f")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1182")
+					(reference "#PWR1192")
 					(unit 1)
 				)
 			)
@@ -32990,8 +35296,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "c25b8e7e-ffc8-5996-9168-eb48bfd6ebf9")
-		(property "Reference" "#PWR1183"
+		(uuid "8ac373a8-3758-5fb3-9ad6-7740ea233807")
+		(property "Reference" "#PWR1193"
 			(at 88.9 542.29 0)
 			(hide yes)
 			(effects
@@ -33036,12 +35342,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "9880a422-b1a3-55c9-962f-a4167631243d")
+			(uuid "dbc8bad6-1295-50a6-b9a6-21faf236fced")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1183")
+					(reference "#PWR1193")
 					(unit 1)
 				)
 			)
@@ -33128,8 +35434,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "d02c270a-94ea-559c-907a-884e69cf8353")
-		(property "Reference" "#PWR1184"
+		(uuid "85a4a8ee-930d-5ff1-bbea-46706fa08b47")
+		(property "Reference" "#PWR1194"
 			(at 101.6 542.29 0)
 			(hide yes)
 			(effects
@@ -33174,12 +35480,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "e6314e39-bea3-588f-8f78-38f870867526")
+			(uuid "082ee498-7bc3-5cff-af0c-97acb9331c4f")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1184")
+					(reference "#PWR1194")
 					(unit 1)
 				)
 			)
@@ -33266,8 +35572,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "de0e1fe1-2e52-5830-b5ea-356797ce9037")
-		(property "Reference" "#PWR1185"
+		(uuid "b8440539-b2c4-5bf6-b21d-2dd82a7c82d4")
+		(property "Reference" "#PWR1195"
 			(at 114.3 542.29 0)
 			(hide yes)
 			(effects
@@ -33312,12 +35618,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "381be5ed-89ef-5475-b4a7-acfe7baf847a")
+			(uuid "b342d458-3cab-59e1-91cc-22ebff7798e9")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1185")
+					(reference "#PWR1195")
 					(unit 1)
 				)
 			)
@@ -33333,8 +35639,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "e8ad9ca1-e834-5553-842f-7243abd6c8ed")
-		(property "Reference" "#PWR1186"
+		(uuid "9daa4551-4c65-5fe5-af67-498ff72d6b56")
+		(property "Reference" "#PWR1196"
 			(at 147.32 534.67 0)
 			(hide yes)
 			(effects
@@ -33379,12 +35685,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "984dde4b-6355-50ea-9f03-87d9f792d469")
+			(uuid "317f1875-af4b-5c67-98c3-d0f2c8b860fc")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1186")
+					(reference "#PWR1196")
 					(unit 1)
 				)
 			)
@@ -33471,8 +35777,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "60579f60-b427-5f59-9b37-df5db581e509")
-		(property "Reference" "#PWR1187"
+		(uuid "6e112fea-3d30-5d99-bd97-18d8344bb87d")
+		(property "Reference" "#PWR1197"
 			(at 154.94 542.29 0)
 			(hide yes)
 			(effects
@@ -33517,12 +35823,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8cf1f24c-c5be-596c-becd-1535069d7e84")
+			(uuid "461d91ca-8a5e-5116-8bf1-f08df5ae00f7")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1187")
+					(reference "#PWR1197")
 					(unit 1)
 				)
 			)
@@ -33609,8 +35915,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "9a51a0f7-1759-5e14-bd59-0527b818b830")
-		(property "Reference" "#PWR1188"
+		(uuid "ea0613d6-9e03-5f2c-8fa1-39fdc6577cc9")
+		(property "Reference" "#PWR1198"
 			(at 167.64 542.29 0)
 			(hide yes)
 			(effects
@@ -33655,12 +35961,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7c5360a3-aaee-5a3e-9e1d-d6d633cd3cb4")
+			(uuid "d8fcf5b2-866a-56fe-b201-76625775bc96")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1188")
+					(reference "#PWR1198")
 					(unit 1)
 				)
 			)
@@ -33747,8 +36053,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "99c40a5d-0dfc-5027-a8e9-fa5e5214c467")
-		(property "Reference" "#PWR1189"
+		(uuid "7e585705-bea4-5bcd-a459-c2857a29adc7")
+		(property "Reference" "#PWR1199"
 			(at 180.34 542.29 0)
 			(hide yes)
 			(effects
@@ -33793,12 +36099,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "63929579-3d1b-504b-9d12-f5d5c33a87e6")
+			(uuid "6c060c84-a238-56ea-832a-ed99c7c18972")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1189")
+					(reference "#PWR1199")
 					(unit 1)
 				)
 			)
@@ -33885,8 +36191,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "8bc679f3-49de-5690-a8a7-a9ec933277b7")
-		(property "Reference" "#PWR1190"
+		(uuid "106ab2a7-572c-5bf9-aa34-322773fc85f9")
+		(property "Reference" "#PWR1200"
 			(at 193.04 542.29 0)
 			(hide yes)
 			(effects
@@ -33931,12 +36237,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "0a03ca6b-dd21-55bc-9adc-5774773eceda")
+			(uuid "ab76a89e-2ca1-58c0-8149-0b75108fac05")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1190")
+					(reference "#PWR1200")
 					(unit 1)
 				)
 			)
@@ -34023,8 +36329,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "e45863e1-6c38-55bd-9d7d-1e55323cec29")
-		(property "Reference" "#PWR1191"
+		(uuid "77d38c17-31d3-5809-a6c0-a3d90ffed5e3")
+		(property "Reference" "#PWR1201"
 			(at 205.74 542.29 0)
 			(hide yes)
 			(effects
@@ -34069,12 +36375,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "80afb9af-996d-5839-a25a-6abedcc1c361")
+			(uuid "4786a333-63a5-5bf4-a4b9-efd1702bfba4")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1191")
+					(reference "#PWR1201")
 					(unit 1)
 				)
 			)
@@ -34161,8 +36467,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "985184f7-1c94-5c1b-94f1-c9a007d158ed")
-		(property "Reference" "#PWR1192"
+		(uuid "2f078567-1bed-59e6-b51f-13dcf8ecf44f")
+		(property "Reference" "#PWR1202"
 			(at 218.44 542.29 0)
 			(hide yes)
 			(effects
@@ -34207,12 +36513,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c815080c-5d40-5f74-aa17-18ce7059bb3f")
+			(uuid "f7f46078-5208-5ecd-b8d2-7042d74b1e36")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1192")
+					(reference "#PWR1202")
 					(unit 1)
 				)
 			)
@@ -34299,8 +36605,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "8ac373a8-3758-5fb3-9ad6-7740ea233807")
-		(property "Reference" "#PWR1193"
+		(uuid "3896c8a2-3cd9-5f4a-a197-4506a04bf19b")
+		(property "Reference" "#PWR1203"
 			(at 231.14 542.29 0)
 			(hide yes)
 			(effects
@@ -34345,12 +36651,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "dbc8bad6-1295-50a6-b9a6-21faf236fced")
+			(uuid "7c352a62-aeea-591b-a17c-a3a89a3981c2")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1193")
+					(reference "#PWR1203")
 					(unit 1)
 				)
 			)

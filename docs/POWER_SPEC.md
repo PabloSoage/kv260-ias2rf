@@ -21,7 +21,7 @@ for the tree as drawn.
        ─ U1008 LM2663         ─► −3V3       8 mA   RF switches' VEE
 ```
 
-Input: **755 mA at 12 V, 9.1 W**; 0.98 A and 11.8 W with the 30 % margin (with CONTROL drawn).
+Input: **733 mA at 12 V, 8.8 W**; 0.95 A and 11.4 W with the 30 % margin (with CONTROL drawn and its small parts at their datasheet figures, 2 October).
 
 ---
 

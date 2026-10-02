@@ -9,8 +9,8 @@ always regenerated, never edited.
 py _work/fab/make_fab.py
 ```
 
-**Today the output is a DRAFT.** The board is placed, not routed: DRC reports 0 errors and 499
-unrouted connections. So the script names the folder `DRAFT-…` and writes *DO NOT ORDER* in the
+**Today the output is a DRAFT.** The board is placed, not routed: DRC reports 0 errors and lists 499
+unrouted connections (a cap on its list; the real number is about 1,390). So the script names the folder `DRAFT-…` and writes *DO NOT ORDER* in the
 notes. The draft is there to check the files, not to order from.
 
 ---
@@ -23,8 +23,8 @@ notes. The draft is there to check the files, not to order from.
 | **Gerbers** | L1–L6, paste, silkscreen, mask, outline. Protel extensions, soldermask subtracted from silkscreen, zones checked | JLCPCB's KiCad guide, point by point |
 | **Drill** | Excellon, mm, decimal, absolute origin, alternate mode for oval holes, plus a PDF drill map | Same guide |
 | **Zip** | Gerbers + drill in one zip, spaces in the layer names replaced by `_` | The zip is what is uploaded |
-| **BOM** | `Comment, Designator, Footprint, LCSC Part #, Quantity`, one line per value and footprint: 108 lines, 472 parts | JLCPCB's BOM columns |
-| **CPL** | `Designator, Mid X, Mid Y, Layer, Rotation`, from KiCad's position file: 472 placements (fiducials and holes left out) | JLCPCB's CPL columns |
+| **BOM** | `Comment, Designator, Footprint, LCSC Part #, Quantity`, one line per value and footprint: 110 lines, 478 parts | JLCPCB's BOM columns |
+| **CPL** | `Designator, Mid X, Mid Y, Layer, Rotation`, from KiCad's position file: 478 placements (fiducials, holes and the solder jumper JP1101 left out: they are copper only) | JLCPCB's CPL columns |
 | **ORDER.txt** | The order form's values, and the DRC result | So the order is entered the same way every time |
 
 ---
@@ -75,6 +75,6 @@ should agree within a few ohms; if it does not, its widths win (POWER_AND_STACKU
 
 | Check | Result |
 |---|---|
-| Script run on the placed board | 15 files in the zip (6 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 108 lines / 472 parts, CPL 472 placements, DRC 0 errors |
-| CPL against BOM | The same 472 references in both |
+| Script run on the placed board | 15 files in the zip (6 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 110 lines / 478 parts, CPL 478 placements, DRC 0 errors (2 October) |
+| CPL against BOM | The same 478 references in both |
 | Settings against JLCPCB's KiCad guide | Protel extensions, subtract soldermask, zone check; Excellon mm, decimal, absolute, alternate oval mode — all as the guide lists |

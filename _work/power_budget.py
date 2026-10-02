@@ -39,7 +39,9 @@ LOADS = [
      "rev03/POWER: 1.10k/1.02k from +2V5. All three pairs are AC-coupled, so "
      "the terminations draw no DC; 1 mA is the divider's own current"),
     ("+3V3_D", "XC7A50T VCCO, converter and Pmod banks", 3.3, 200, "E", "DS181"),
-    ("+3V3_D", "QSPI config flash MT25QL128", 3.3, 20, "E", "read current during boot only"),
+    ("+3V3_D", "QSPI config flash MT25QL128", 3.3, 35, "V",
+     "MT25QL128 Table 42: 22 mA max in quad read at 133 MHz (boot), 35 mA max "
+     "while programming (ICC4/ICC5); the larger is counted"),
     ("+3V3_D", "DONE LED", 3.3, 4, "V", "rev03/CONTROL: (3.3 - 2.0) V / 330 ohm"),
 
     # ---- converters ---------------------------------------------------
@@ -108,8 +110,14 @@ LOADS = [
      "Same table: VEE -3.3 V required, IEE 1.8 mA max per part. 4 x 1.8 = 7.2 mA. "
      "This rail was wrongly deleted when B-03 was first closed; see "
      "docs/BLOCKERS_AND_RISKS.md B-03"),
-    ("+3V3_D", "Level translators to 1.8 V", 3.3, 50, "E", "SN74AVC-class, switching"),
-    ("+3V3_D", "Housekeeping: temp sensor, EEPROM, LEDs", 3.3, 30, "E", ""),
+    # 2 Oct: the "level translators" and "housekeeping" estimates replaced by
+    # the parts drawn on CONTROL. The only translator is the 74LVC1G07 on
+    # PROG_B (ICC 10 uA max, its datasheet); bank 35 at 1.8 V talks to the
+    # ADAR1000s and the carrier directly.
+    ("+1V8_D", "Housekeeping: TMP1075, M24C02, 74LVC1G07, pull-ups", 1.8, 2, "V",
+     "TMP1075 85 uA max converting (its 6.5); M24C02-F 0.8 mA max reading "
+     "(DS9398 Table 14); 74LVC1G07 10 uA; HK_ALERT, WC and the two HK pull-ups "
+     "at 10k draw 0.18 mA each when low. Sum 1.6 mA, rounded up"),
 ]
 
 # rail -> (source rail, converter type, efficiency or dropout)

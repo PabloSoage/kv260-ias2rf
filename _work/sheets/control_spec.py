@@ -55,6 +55,22 @@ PARTS = {
     "J1102": ("Connector_Generic:Conn_02x06_Odd_Even", "Pmod",
               "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
               "Cable to the KV260's Pmod J2 (INTERFACE_SPEC §4.2)"),
+    # Housekeeping devices on the HK bus (1.8 V). The carrier's TCA9546A
+    # channel 1 reaches only J8 (XTP682 sheets 8 and 13), so these addresses
+    # are free: 0x48 sensor, 0x50 EEPROM.
+    # SOIC rather than VSSOP: the Power class's 0.2 mm clearance does not fit
+    # between 0.65 mm-pitch pads, and V+ sits next to A0 (GND).
+    "U1104": ("Sensor_Temperature:TMP1075D", "TMP1075DR", "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+              "Board temperature on the HK bus, I2C 0x48 (A2..A0 = GND, TMP1075 Table 7-2). "
+              "1.7-5.5 V, +-1 C max -40..110 C"),
+    # Chosen for its drive at 1.8 V: 0.2 V at 0.7 mA (ST DS9398 Table 14). The
+    # AT24CS02, which has a factory serial number, guarantees only 0.15 mA at
+    # 1.7 V (its Table 4-2), and this bus needs about 1 mA.
+    "U1105": ("Memory_EEPROM:M24C02-FMN", "M24C02-FMN6TP", "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+              "Board ID EEPROM, 2 kbit, I2C 0x50 (E2..E0 = GND, DS9398 Table 2). "
+              "-F grade: 1.7-5.5 V"),
+    "JP1101": ("Jumper:SolderJumper_2_Open", "WC", "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm",
+               "Close to write the ID EEPROM: pulls WC to GND (open: write-protected)"),
     "J1103": ("Connector_Generic:Conn_02x20_Odd_Even", "AERIS ADAR",
               "Connector_IDC:IDC-Header_2x20_P2.54mm_Vertical",
               "Ribbon to AERIS-10: 8 x ADAR1000 control (ARCHITECTURE §7.2)"),
@@ -119,11 +135,12 @@ _B35_BALLS = ["E6", "B7", "A7", "B6", "B5", "A5", "A4", "B4", "A3", "C7", "C6", 
 BANK35 = dict(zip(_B35_BALLS, ADAR + [
     "CONV_SPI_SCLK", "CONV_SPI_SDIO", "CONV_SPI_CSB_R", "CONV_SPI_CSB_S",
     "HK_SCL", "HK_SDA", "FPGA_IRQ"]))
+BANK35["H3"] = "HK_ALERT"          # the temperature sensor's alert, a free bank-35 ball
 BANK_NC = {
     14: ["K12", "M15", "L14", "M14", "K13", "L13", "M12", "R12", "T12", "P6"],
     15: ["D10", "B14", "B15", "A15", "C16", "B16", "C11", "C12"],
     34: ["L5", "N1", "P1", "P4", "P3", "M5", "N4", "R2", "R1", "R3", "T2", "T4", "T3", "P5"],
-    35: ["H3", "K1", "J1", "L3", "L2", "K3", "K2", "K5"],
+    35: ["K1", "J1", "L3", "L2", "K3", "K2", "K5"],
 }
 BANKS = {14: BANK14, 15: BANK15, 34: BANK34, 35: BANK35}
 # FPGA balls that must be clock capable (MRCC/SRCC), and the reason
@@ -164,12 +181,19 @@ PARTS.update({
     "R1128": R("4.7k", "HOLD#/DQ3 pull-up, Figure 2-14 (and MT25QL datasheet Figure 6 note 1)"),
     "R1129": R("10k", "Holds FPGA_PROG_B high while the Kria is not driving it"),
     "R1130": R("330", "DONE LED, about 4 mA"),
-    "R1131": R("4.7k", "HK_SCL pull-up at 1.8 V. The carrier already has 2.21k to PL_1V8 "
-                       "(XTP682 sheet 8); fitted, the bus sees 1.5k, 1.2 mA at 1.8 V"),
-    "R1132": R("4.7k", "HK_SDA pull-up, same"),
+    "R1131": R("10k", "HK_SCL pull-up at 1.8 V. The carrier already has 2.21k to PL_1V8 "
+                      "(XTP682 sheet 8); together 1.81k, 1.0 mA at 1.8 V, which the "
+                      "M24C02 sinks at 0.2 V for 0.7 mA (DS9398 Table 14). Alone on the "
+                      "bench, 10k is enough for 100 kHz"),
+    "R1132": R("10k", "HK_SDA pull-up, same"),
     "R1133": R("47k", "FPGA_IRQ pull-down: with PUDC_B high the pin floats until the FPGA is "
                       "configured, and the carrier's SN74AVC4T245 input must not float. "
                       "Reads as no interrupt (active high)"),
+    "R1134": R("10k", "HK_ALERT pull-up: the TMP1075's ALERT is open-drain (its Table 5-1)"),
+    "R1135": R("10k", "U1105 WC pull-up: write-protected unless JP1101 is closed "
+                      "(DS9398 §2.4: WC high disables writes; floating, it enables them)"),
+    "C1182": C("100n", "U1104 decoupling (TMP1075 §8.3: 0.01 uF typical, more for a noisy supply)"),
+    "C1183": C("100n", "U1105 decoupling"),
     "C1180": C("100n", "U1102 flash decoupling"),
     "C1181": C("100n", "U1103 decoupling"),
     # XADC, UG480 Figure 1-2 (right): on-chip reference
@@ -347,6 +371,15 @@ add("HK_SDA", "R1132.2")
 add("+1V8_D", "R1131.1", "R1132.1")
 add("FPGA_IRQ", "R1133.1")
 add("GND", "R1133.2")
+# housekeeping devices
+add("HK_SDA", "U1104.1", "U1105.5")
+add("HK_SCL", "U1104.2", "U1105.6")
+add("HK_ALERT", "U1104.3", "R1134.2")
+add("GND", "U1104.4", "U1104.5", "U1104.6", "U1104.7", "C1182.2")
+add("+1V8_D", "U1104.8", "R1134.1", "C1182.1")
+add("GND", "U1105.1", "U1105.2", "U1105.3", "U1105.4", "C1183.2", "JP1101.2")
+add("EE_WC", "U1105.7", "R1135.2", "JP1101.1")
+add("+1V8_D", "U1105.8", "R1135.1", "C1183.1")
 # XADC
 add("+1V8_D", "FB1101.1")
 add("XADC_VCC", "FB1101.2", "C1175.1", "C1176.1")

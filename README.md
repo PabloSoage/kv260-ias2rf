@@ -69,7 +69,7 @@ project.
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers, closed, with evidence and sources, plus the open risks |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the KiCad files actually contain, with evidence |
 | [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, the mechanical envelope, and the adapter registered on the KV260 model — where the board can grow |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (16 of 25 loads from datasheets) and the 6-layer stackup with computed trace widths |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (18 of 24 loads from datasheets) and the 6-layer stackup with computed trace widths |
 | [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** 17 symbols, 15 from datasheets, cross-checked against a second source where one exists |
 | [docs/CLOCK_SPEC.md](docs/CLOCK_SPEC.md) | **Phase 2.** The first drawn sheet, reviewed and accepted: the clock plan, every value's source |
 | [docs/ADC_RADAR_SPEC.md](docs/ADC_RADAR_SPEC.md) | **Phase 2.** The radar ADC and its two AD8352 drivers, the split of CONVERTERS in four, and how to review it |
@@ -80,7 +80,7 @@ project.
 | [docs/IAS_LINK_SPEC.md](docs/IAS_LINK_SPEC.md) | **Phase 2.** The Hirose connectors, AC coupling and terminations of the link |
 | [docs/POWER_SPEC.md](docs/POWER_SPEC.md) | **Phase 2.** The power tree as drawn: the regulators and where every value comes from |
 | [docs/CONTROL_SPEC.md](docs/CONTROL_SPEC.md) | **Phase 2.** The front-end FPGA sheet: bank voltages, configuration, the Pmod and the AERIS ribbon |
-| [docs/LAYOUT.md](docs/LAYOUT.md) | **Phase 3.** The board: 119 × 120 mm outline, JLCPCB stackup, rules, the split power layer, placement of all 472 parts with every passive at its pin, and the routing plan |
+| [docs/LAYOUT.md](docs/LAYOUT.md) | **Phase 3.** The board: 119 × 120 mm outline, JLCPCB stackup, rules, the split power layer, placement of all 479 parts with every passive at its pin, and the routing plan |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | **Phase 3.** Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |

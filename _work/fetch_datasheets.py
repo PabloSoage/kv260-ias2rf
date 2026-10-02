@@ -89,6 +89,9 @@ SHEETS = [
     ("xc7a50tftg256pkg.txt", ("20230208072858", "20221223103953"),
      "https://www.xilinx.com/content/dam/xilinx/support/packagefiles/a7packages/"
      "xc7a50tftg256pkg.txt", "pkg file"),
+    # Housekeeping (2 Oct): st.com does not answer scripts; the Archive does.
+    ("M24C02.pdf", ("20241116070424", "20240430160457"),
+     "https://www.st.com/resource/en/datasheet/m24c02-r.pdf", "DS9398 Rev 8"),
 ]
 
 
@@ -99,6 +102,11 @@ DIRECT = [
     ("SN74LVC1G07.pdf", "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf"),
     # the LDOs' exposed pad, checked at layout (26 Sep)
     ("TPS7A8300.pdf", "https://www.ti.com/lit/ds/symlink/tps7a8300.pdf"),
+    # housekeeping devices (2 Oct). The AT24CS02 was considered and rejected:
+    # its output low is specified for 0.15 mA at 1.7 V (CONTROL_SPEC §2).
+    ("TMP1075.pdf", "https://www.ti.com/lit/ds/symlink/tmp1075.pdf"),
+    ("AT24CS02.pdf", "https://ww1.microchip.com/downloads/aemDocuments/documents/MPD/"
+                     "ProductDocuments/DataSheets/20006330A.pdf"),
     # Layout (25 Sep): Mini-Circuits serves directly too - the balun and the
     # land patterns (PL-xxx) its datasheets point to.
     ("ADT2-1T.pdf", "https://www.minicircuits.com/pdfs/ADT2-1T+.pdf"),
@@ -163,6 +171,15 @@ def main():
             src = WAYBACK.format(ts=ts, url=url)
             try:
                 blob = fetch(src)
+                break
+            except Exception as e:                  # noqa: BLE001
+                err = e
+            # Some captures answer a Range request with a 302 to another
+            # capture, which answers with a 302 back (M24C02.pdf, 2 Oct 2026),
+            # yet serve the whole file to a plain GET. The completeness check
+            # below still applies.
+            try:
+                blob = fetch_direct(src)
                 break
             except Exception as e:                  # noqa: BLE001
                 err = e

@@ -21,7 +21,7 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks — §5.3 |
 | `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
 | Serial link electrical standard | ✅ `LVDS_12` with AC coupling — see §6.1 |
-| Per-rail current budget | ⚠️ 16 of 25 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| Per-rail current budget | ⚠️ 18 of 24 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup and impedances | ✅ computed; fabricator to confirm |
 
 ---
@@ -108,7 +108,7 @@ discovered on the bench.
 
 | Signal | Pin | Direction | Function |
 |---|---|---|---|
-| `HK_SCL` | 14 | Kria → adapter | Housekeeping I2C: temperature sensor, board ID EEPROM |
+| `HK_SCL` | 14 | Kria → adapter | Housekeeping I2C: temperature sensor TMP1075 at 0x48, board ID EEPROM M24C02 at 0x50 (CONTROL_SPEC §2) |
 | `HK_SDA` | 22 | bidirectional | Same bus |
 | `FPGA_PROG_B` | 21 | Kria → adapter | Front-end FPGA reset / reconfigure (was `PWDN`) |
 | `FPGA_IRQ` | **15** | adapter → Kria | Interrupt: link error, overflow, beam-update done. Active high, 47 kΩ pull-down on the adapter (R1133). **Moved from pin 32 on 25 Sep**: §4.3 |
@@ -325,7 +325,7 @@ because the AC coupling is stuffable.
 | `VCCO` and the link's I/O standard | ✅ §6, 1.2 V / `LVDS_12` with AC coupling |
 | ADC/DAC operating points fixed | ✅ [ARCHITECTURE.md](../ARCHITECTURE.md) §5 |
 | Growth direction within the envelope | ✅ §5.3 — registered on the STEP; grow outward, off the carrier's side |
-| Per-rail current budget from datasheets | ⚠️ 16 of 25 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| Per-rail current budget from datasheets | ⚠️ 18 of 24 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup with computed impedances | ✅ computed; ⬜ fabricator's field solver to confirm |
 
 Nothing in this list needs the hardware any more. What remains is the fabricator's impedance

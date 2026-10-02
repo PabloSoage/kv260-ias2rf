@@ -7,7 +7,8 @@ The Rev03 board exists. It has:
 - the outline and the 6-layer stackup;
 - design rules and net classes;
 - the two ground planes and the split power layer;
-- **every one of the 472 parts with its nets**, linked to its symbol;
+- **every one of the 479 parts with its nets**, linked to its symbol (472 until the housekeeping
+  devices were added on 2 October);
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
@@ -188,7 +189,7 @@ if the part is through-hole.
 - at 1.0 mm, or at the 0.8 mm minimum;
 - beside the part, or up to 3 mm away for chips, connectors and inductors.
 
-160 references fit. The other 320 are hidden on the silkscreen, but every one stays on F.Fab, the
+155 references fit. The other 332 are hidden on the silkscreen, but every one stays on F.Fab, the
 assembly drawing. Most of them are 0402 passives in dense groups. The Hirose connectors' silkscreen
 is moved to B.Fab: its 0.5 mm text is below the minimum, its outline runs over its own pads, and it
 sits mated to the carrier where nobody can read it.
@@ -203,12 +204,12 @@ routing is planned.
 | Check | Result |
 |---|---|
 | `kicad-cli pcb drc --schematic-parity` | **0 parity problems**: every symbol has its footprint, every pad its net. **No shorts, clearance or courtyard violations** |
-| | **499 unconnected**: the unrouted board. **Nothing else**: no silkscreen warnings either |
-| `_work/layout/check_placement.py`: each passive's distance to its pin, from the board file | Decoupling ≤ 1 µF: median **2.9 mm** (first pass: 10 mm). Parts on a signal pin: median 3.4 mm, 90 % within 7.0 mm. Bulk: median 8.6 mm, none over 14 mm. On POWER, everything within 5.9 mm of its pin. The FPGA's 0.47 µF sit further out (median 8.9 mm): VCCINT is in the middle of the BGA and nothing may enter the 2.5 mm escape ring. The script's pad positions are checked against the coordinates KiCad prints in its DRC report: 963 pads, 0 µm apart |
+| | **499 unconnected** listed: the unrouted board. That is a cap on KiCad's list, not the count: it stayed at 499 when seven parts were added, and the netlist needs about 1,390 connections. **Nothing else**: no silkscreen warnings either |
+| `_work/layout/check_placement.py`: each passive's distance to its pin, from the board file | Decoupling ≤ 1 µF: median **2.9 mm** (first pass: 10 mm). Parts on a signal pin: median 3.4 mm, 90 % within 7.0 mm. Bulk: median 8.6 mm, none over 14 mm. On POWER, everything within 5.9 mm of its pin. The FPGA's 0.47 µF sit further out (median 8.9 mm): VCCINT is in the middle of the BGA and nothing may enter the 2.5 mm escape ring. The script's pad positions are checked against the coordinates KiCad prints in its DRC report: 964 pads, 0 µm apart |
 | L4 filled on a copy (`kicad-cli pcb drc --refill-zones`) | All islands fill. The only new reports are the islands' `isolated_copper`, expected until their vias are placed |
 | J101/J102 against the original board | Position, face, rotation and all 38 pads identical. Nets as INTERFACE_SPEC §3–§4 (pin 4/5 `LINK_RX_D0`, 7/8 `LINK_RX_CLK`, 14 `HK_SCL`, 21 `FPGA_PROG_B`, 22 `HK_SDA`, 15 `FPGA_IRQ`: moved from 32 after the check against the carrier, INTERFACE_SPEC §4.3) |
-| Footprints | All 472 exist. Four are new, in `footprints/kv260-ias2rf.pretty` (`_work/make_footprints.py`): ADCLK948 and AD9484 LFCSPs with their datasheets' exposed pads, the M3SWA2's DQ3005 from its Mini-Circuits case drawing, and the Hirose BM20B |
-| TPS7A8300 (U1005–U1007) against TI's RGR0020A drawings (SBVS197, pp. 44–45) | KiCad's `QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm` fits: 3.5 mm body, pin 1 top-left and the same pin order. Its exposed pad is 2.0 mm against TI's 2.05 mm land, still 0.25 mm clear of the pins. TI's example puts four 0.2 mm vias in the pad: add them when routing, for the +1V8_D LDO's 0.49 W |
+| Footprints | All 479 exist. Four are new, in `footprints/kv260-ias2rf.pretty` (`_work/make_footprints.py`): ADCLK948 and AD9484 LFCSPs with their datasheets' exposed pads, the M3SWA2's DQ3005 from its Mini-Circuits case drawing, and the Hirose BM20B |
+| TPS7A8300 (U1005–U1007) against TI's RGR0020A drawings (SBVS197, pp. 44–45) | KiCad's `QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm` fits: 3.5 mm body, pin 1 top-left and the same pin order. Its exposed pad is 2.0 mm against TI's 2.05 mm land, still 0.25 mm clear of the pins. TI's example puts four 0.2 mm vias in the pad: add them when routing, for the +1V8_D LDO's 0.50 W |
 
 Parts chosen for this step, each checked against its datasheet (all fetched by
 `_work/fetch_datasheets.py`):
