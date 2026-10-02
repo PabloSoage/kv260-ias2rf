@@ -17,8 +17,9 @@ The zones are filled on a copy (fab/_work/): the board file itself stays
 unfilled, as it is kept in git.
 
 BOM: the symbols carry no LCSC or MPN field. Chips carry their part number
-as the value; passives carry value only. The LCSC column is left empty to
-be filled with JLCPCB's matcher at order time (docs/FABRICATION.md).
+as the value; passives carry value only. The LCSC column comes from
+_work/fab/lcsc_parts.csv, written by lcsc_select.py from JLCPCB's parts
+search (docs/FABRICATION.md). A line missing there is left empty.
 
 CPL: KiCad's position file with JLCPCB's column names. JLCPCB's rotation
 convention differs from KiCad's for some packages (SOT-23, some QFNs): check
@@ -84,8 +85,18 @@ def check(work_pcb):
     return errors, unconnected, text
 
 
+def lcsc_codes():
+    """(Comment, footprint name) -> LCSC code, from lcsc_select.py's table."""
+    path = os.path.join(HERE, "lcsc_parts.csv")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return {(r["Comment"], r["Footprint"]): r["LCSC"] for r in csv.DictReader(fh)}
+
+
 def bom(comps):
     """JLCPCB BOM: Comment, Designator, Footprint, LCSC Part #; one row per value+footprint."""
+    codes = lcsc_codes()
     groups = {}
     for c in comps.values():
         groups.setdefault((c.value, c.fpid), []).append(c.ref)
@@ -96,7 +107,8 @@ def bom(comps):
     rows = []
     for (value, fp), refs in sorted(groups.items(), key=lambda kv: natural(sorted(kv[1], key=natural)[0])):
         refs = sorted(refs, key=natural)
-        rows.append([value, ",".join(refs), fp.split(":", 1)[1], "", len(refs)])
+        name = fp.split(":", 1)[1]
+        rows.append([value, ",".join(refs), name, codes.get((value, name), ""), len(refs)])
     return rows
 
 
@@ -176,7 +188,7 @@ def main():
             fh.write(f"  {k:26s} {v}\n")
         fh.write(f"\nFiles:\n  {NAME}-gerber.zip  Gerbers + Excellon drill\n"
                  f"  {NAME}-BOM.csv     {len(brows)} lines, {sum(r[4] for r in brows)} parts; "
-                 "LCSC column to fill\n"
+                 f"{sum(1 for r in brows if r[3])} with an LCSC code (lcsc_parts.csv)\n"
                  f"  {NAME}-CPL.csv     {len(rows)} placements; check rotations in the preview\n")
     shutil.copy2(os.path.join(work, "drc.rpt"), os.path.join(dest, "drc.rpt"))
 

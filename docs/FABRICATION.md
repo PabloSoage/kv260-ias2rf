@@ -49,17 +49,30 @@ notes. The draft is there to check the files, not to order from.
 **Route the board.** Then run the script again: the folder loses its `DRAFT-` prefix only when DRC
 reports zero errors and zero unrouted connections.
 
-**Fill in the LCSC column of the BOM.** The symbols carry no LCSC or manufacturer part number: chips
-carry their part number as the value (LMR33630ADDA, XC7A50T-2FTG256I…), passives carry only a value.
-In JLCPCB's BOM step:
-- match each line to a part;
-- for passives, choose the voltage and dielectric:
-  - X7R or X5R, never Y5V;
-  - 0402 decoupling at 10 V or more;
-  - the 22 µF output capacitors at 10 V;
-  - the input capacitors at 25 V, as their values say;
-- check the parts JLCPCB does not stock. The XC7A50T, the AD converters, the ADCLK948, the Si549
-  and the M3SWA2 switches are likely to be consigned or "global sourcing".
+**Check the LCSC codes, and refresh them.** The symbols carry no part numbers, so the codes live in
+`_work/fab/lcsc_parts.csv`, one per BOM line, and `make_fab.py` copies them into the BOM. They were
+chosen on 2 October 2026 by `_work/fab/lcsc_select.py` from JLCPCB's own parts search, by rule:
+- the value, the package and, for a chip, the exact model must match;
+- capacitors: C0G below 1 nF, X7R or X5R above, never Y5V; the voltage rating at least what the
+  line's highest rail needs (16 V on the 0402 decoupling that touches 5 V, 25 V on the 12 V input);
+- resistors 1 %;
+- among the parts that qualify: JLCPCB "basic" first (no loading fee), then stock.
+
+Stock changes daily: run `py _work/fab/lcsc_select.py` again before ordering and read the diff of the
+CSV. **109 of 110 lines have a code.** Three are not the drawn value, because that value is not made
+(the CSV's Note column says so):
+
+| Line | Drawn | Fitted | Effect |
+|---|---|---|---|
+| C710, C814, C834 | 106 pF (AERIS C141) | 110 pF C0G | +3.8 % on one element of the DAC reconstruction filter. Or 100 pF plus 5.6 pF by hand |
+| L701–L704, L811–L834 | 107.3 nH (AERIS L22) | 110 nH ±2 %, Murata LQW18 | +2.5 %, same filter |
+| C1110 | T520V337M2R5ATE025 (UG483) | T520V337M006ATE025 | Same series and case, 6.3 V instead of 2.5 V |
+
+**Not stocked, or not catalogue parts:** the Si549 (Y401) has no code, because Skyworks builds its
+ordering code per configuration: order it from Skyworks or a distributor and consign it. Several codes
+exist but showed **zero stock** on 2 October: ADCLK948, AD9484, AD9708, M3SWA2-34DR+. Others are
+very short (XC7A50T 73, AD8352 9, AD9253 2, ADT2-1T+ 7). JLCPCB's "global sourcing" or consignment
+covers them.
 
 **Check every rotation in JLCPCB's placement preview.** KiCad's zero orientation and JLCPCB's
 differ for some packages (SOT-23, some QFNs and SOICs). The CPL is KiCad's; correct the rotation
