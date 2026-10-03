@@ -10,7 +10,7 @@ py _work/fab/make_fab.py
 ```
 
 **Today the output is a DRAFT.** The board is autorouted but not finished (LAYOUT §6): DRC reports
-99 unrouted connections, 33 RF clearance errors and the router's dangling ends. So the script names
+100 unrouted connections, 1 RF clearance error and 2 hole-to-hole via pairs. So the script names
 the folder `DRAFT-…` and writes *DO NOT ORDER* in the notes. The draft is there to check the files,
 not to order from.
 
@@ -38,7 +38,7 @@ not to order from.
 | Thickness | 1.6 mm | |
 | **Impedance control** | **Yes, JLC06161H-2116A** | The stack the widths were solved for (POWER_AND_STACKUP §2.6). Any other stack changes every impedance |
 | Copper | 1 oz outer, 0.5 oz inner | The stack's own |
-| Via covering | Tented | The BGA's fan-out vias sit between pads, not in them |
+| **Via covering** | **Epoxy filled & capped (POFV)** | The autorouter put about 400 vias in pads (0402 passives, chip pads). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. The BGA's own fan-out vias sit between its balls |
 | Min via | 0.20 mm hole, 0.45 mm pad | Within JLCPCB's six-layer capability |
 | Min track / space | 0.10 / 0.10 mm | The LVDS pairs are 0.117 / 0.150 mm |
 | **Surface finish** | **ENIG** | Flat pads for the 1.0 mm BGA and the LFCSPs; HASL is not flat enough |

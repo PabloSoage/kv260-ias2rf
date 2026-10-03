@@ -57,7 +57,7 @@ ORDER = [
     ("Impedance control", "Yes, stackup JLC06161H-2116A"),
     ("Outer / inner copper", "1 oz / 0.5 oz"),
     ("Material", "FR-4 (the stackup's laminate: NP-155F)"),
-    ("Via covering", "Tented (vias in BGA field not in pad)"),
+    ("Via covering", "Epoxy filled & capped (POFV): free on 6 layers; ~400 vias are in pads"),
     ("Min via hole / diameter", "0.20 / 0.45 mm"),
     ("Min track / spacing", "0.10 / 0.10 mm"),
     ("Surface finish", "ENIG (flat pads for the 1.0 mm BGA and the LFCSPs)"),
