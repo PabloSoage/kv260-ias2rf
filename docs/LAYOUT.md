@@ -12,7 +12,7 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–6 October 2026, §6): 68 connections are left for KiCad, and
+**It is autorouted, not finished** (2–6 October 2026, §6): 60 connections are left for KiCad, and
 the LVDS pairs need a hand review.
 
 The original Allied Vision board is kept, untouched, as
@@ -242,7 +242,8 @@ copy, and only tracks and vias came back: every footprint and zone is byte-ident
 | Finishing pass (5 Oct) | `_work/layout/route_finish.sh`: every complete net written into the project as protected, then only the incomplete nets routed on a 0.05 mm grid. 100 → 89 unrouted, none worse; a second pass 89 → 87. Allowing rip-up instead made it worse: the router broke the link pair and an IF line to route others |
 | L4 opened to tracks (6 Oct) | The same finishing pass with In3.Cu allowed (`LAYERS`/`COSTS` in `route_finish.sh`, cost 3). Tracks there cut the plane, so **every L4 island carries a tracks-only keep-out rule area** ("In3 islands: no tracks"); only the +3V3_D background is open. The **+1V0 island under the BGA shrank** from 24 × 24 mm to a band to the top bulk vias and a block over the nine VCCINT balls with a strip to the bottom vias, which frees L4 around the ring. 87 → 68 unrouted. Without the shrink it stopped at 78 |
 | Same-net vias | The 4 hole-to-hole pairs merged: one via of each removed, the FCO_N leg on B.Cu extended to the other |
-| DRC (zones refilled, schematic parity) | **0 parity problems. 68 connections unrouted**. **1 clearance error** (RF50, 0.197 mm against 0.2). No hole-to-hole |
+| L5 for slow nets (6 Oct) | The finishing pass once more with In4.Cu open, at cost 5, **to slow nets only** (`ONLY=` the ADAR bus, JTAG, CONV_SPI, SW_CTRL, XO_SCL; nothing fast, no supply): 68 → 60. About 125 mm of track now slots the L5 ground plane (ADAR_SCLK 27 mm, ADAR_SDIO 25, SW_CTRL3 18, SW_CTRL0 17, JTAG_TMS 14, CONV_SPI_SCLK 11, XO_SCL 10, ADAR8_TR 4). **Nine fast tracks cross those slots**: eight DAC data lines (CMOS) on B.Cu/In3 and **ADCR_D7_N** (LVDS leg on B.Cu). L4 is 0.13 mm away and carries the return across, but review them, ADCR_D7_N first |
+| DRC (zones refilled, schematic parity) | **0 parity problems. 60 connections unrouted**. **1 clearance error** (RF50, 0.197 mm against 0.2). No hole-to-hole |
 
 **The Power class clearance is now 0.15 mm** (was 0.2): the rails are 12 V at most, where IPC-2221
 asks 0.1 mm, and 0.2 mm kept the router out from between fine-pitch pins. RF50 keeps 0.2 mm,
@@ -254,7 +255,7 @@ net and keepout strips at the edge are what made it route at all.
 
 ### 6.2 What is left, by hand in KiCad
 
-1. **The 68 unrouted connections.** One is a +1V0 via (155.5, 151.5) the smaller island no longer
+1. **The 60 unrouted connections.** One is a +1V0 via (155.5, 151.5) the smaller island no longer
    reaches: tie it to the block on L1 or L6. The rest are long (median about 26 mm), to and from the FPGA: the
    DAC buses through the RN11xx arrays, JTAG, the ADAR ribbon, the HK bus from J101. Congestion
    round the BGA, not hard geometry. `route_finish.sh` can be run again for a few more.
