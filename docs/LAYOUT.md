@@ -12,7 +12,7 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–5 October 2026, §6): 87 connections are left for KiCad, and
+**It is autorouted, not finished** (2–6 October 2026, §6): 68 connections are left for KiCad, and
 the LVDS pairs need a hand review.
 
 The original Allied Vision board is kept, untouched, as
@@ -240,7 +240,9 @@ copy, and only tracks and vias came back: every footprint and zone is byte-ident
 | RF lines | The six IF lines ripped up and routed **last**, at 0.183 mm: the router keeps a net's own class clearance, so routed last they keep 0.2 mm from everything (33 RF50 errors went to 1) |
 | Dangling copper | 445 stub segments and vias removed by `_work/layout/drop_dangling.py`, which deletes what KiCad's DRC reports dangling (zones refilled) and repeats; the unrouted count did not change |
 | Finishing pass (5 Oct) | `_work/layout/route_finish.sh`: every complete net written into the project as protected, then only the incomplete nets routed on a 0.05 mm grid. 100 → 89 unrouted, none worse; a second pass 89 → 87. Allowing rip-up instead made it worse: the router broke the link pair and an IF line to route others |
-| DRC (zones refilled, schematic parity) | **0 parity problems. 87 connections unrouted**. **1 clearance error** (RF50, 0.197 mm against 0.2). 2 hole-to-hole: two pairs of same-net vias 0.08 and 0.2 mm apart, each needed (removing either drops a connection): merge them by hand |
+| L4 opened to tracks (6 Oct) | The same finishing pass with In3.Cu allowed (`LAYERS`/`COSTS` in `route_finish.sh`, cost 3). Tracks there cut the plane, so **every L4 island carries a tracks-only keep-out rule area** ("In3 islands: no tracks"); only the +3V3_D background is open. The **+1V0 island under the BGA shrank** from 24 × 24 mm to a band to the top bulk vias and a block over the nine VCCINT balls with a strip to the bottom vias, which frees L4 around the ring. 87 → 68 unrouted. Without the shrink it stopped at 78 |
+| Same-net vias | The 4 hole-to-hole pairs merged: one via of each removed, the FCO_N leg on B.Cu extended to the other |
+| DRC (zones refilled, schematic parity) | **0 parity problems. 68 connections unrouted**. **1 clearance error** (RF50, 0.197 mm against 0.2). No hole-to-hole |
 
 **The Power class clearance is now 0.15 mm** (was 0.2): the rails are 12 V at most, where IPC-2221
 asks 0.1 mm, and 0.2 mm kept the router out from between fine-pitch pins. RF50 keeps 0.2 mm,
@@ -252,16 +254,17 @@ net and keepout strips at the edge are what made it route at all.
 
 ### 6.2 What is left, by hand in KiCad
 
-1. **The 87 unrouted connections.** Most are long (median about 26 mm), to and from the FPGA: the
+1. **The 68 unrouted connections.** One is a +1V0 via (155.5, 151.5) the smaller island no longer
+   reaches: tie it to the block on L1 or L6. The rest are long (median about 26 mm), to and from the FPGA: the
    DAC buses through the RN11xx arrays, JTAG, the ADAR ribbon, the HK bus from J101. Congestion
    round the BGA, not hard geometry. `route_finish.sh` can be run again for a few more.
 2. **The LVDS pairs.** Only 5 of 26 were routed coupled end to end (the link pairs and CLK_FPGA);
    the router judged the other 21 electrically short and routed their legs singly. Re-route the
    ADC data pairs as pairs, on L1, over unbroken L2.
-3. **The last RF clearance** (0.197 mm, at T802), and the **2 hole-to-hole** via pairs (ADCR_D7_P
-   near 172.5, 155.4; ADCS_FCO_N near 174.2, 145.4).
+3. **The last RF clearance** (0.197 mm, at T802).
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
-5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs.
+5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
+   and the tracks on L4 (the +3V3_D background only) not cutting off any +3V3_D via.
 
 Before anything is ordered: DRC with zero errors and zero unconnected items, the widths
 confirmed in JLCPCB's calculator, and the checks in [FABRICATION.md](FABRICATION.md).
