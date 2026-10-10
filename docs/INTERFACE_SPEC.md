@@ -244,7 +244,7 @@ collides, and nothing can be fitted on the adapter's underside.
 
 **The answer: grow outward, off the side of the KV260.** Every other direction runs into the carrier
 within a few millimetres. The same 119 mm length, growing outward. *At layout (25 Sep) the board
-became 119 × 120 mm, not the ~90 estimated here: the parts' courtyards need it
+became 119 × 120 mm (132 mm since 10 October 2026), not the ~90 estimated here: the parts' courtyards need it
 ([LAYOUT.md](LAYOUT.md) §1). The overhang past the carrier edge is 85 mm, with three supports.*
 
 **That overhang needs a support at its outer edge**, because two corner screws are not enough for a

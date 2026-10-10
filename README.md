@@ -80,7 +80,7 @@ project.
 | [docs/IAS_LINK_SPEC.md](docs/IAS_LINK_SPEC.md) | **Phase 2.** The Hirose connectors, AC coupling and terminations of the link |
 | [docs/POWER_SPEC.md](docs/POWER_SPEC.md) | **Phase 2.** The power tree as drawn: the regulators and where every value comes from |
 | [docs/CONTROL_SPEC.md](docs/CONTROL_SPEC.md) | **Phase 2.** The front-end FPGA sheet: bank voltages, configuration, the Pmod and the AERIS ribbon |
-| [docs/LAYOUT.md](docs/LAYOUT.md) | **Phase 3.** The board: 119 × 120 mm outline, JLCPCB stackup, rules, the split power layer, placement of all 479 parts with every passive at its pin, and the routing plan |
+| [docs/LAYOUT.md](docs/LAYOUT.md) | **Phase 3.** The board: 119 × 132 mm outline, JLCPCB stackup, rules, the split power layer, placement of all 479 parts with every passive at its pin, and the routing plan |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | **Phase 3.** Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |

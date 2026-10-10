@@ -44,9 +44,10 @@ import pcbdata as P                                  # noqa: E402
 
 schgen = P.schgen
 ROOT = P.ROOT
-BOARD = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+_OUT = os.environ.get("BB_OUT", ROOT)
+BOARD = os.path.join(_OUT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
 ORIGINAL = os.path.join(ROOT, "_deprecated", "CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb")
-PRO = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
+PRO = os.path.join(_OUT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
 NS = uuid.UUID("0c5b7a4e-9d21-4f38-a6e0-3b1f2c8d7e95")
 T = "\t"
 
@@ -59,8 +60,31 @@ def f(v):
     return schgen.fmt(round(v, 4))
 
 
+# ---------------------------------------------------------------- variants
+# Placement knobs, tried with the router 7-10 Oct 2026. The defaults are the
+# placement the board was routed from (docs/LAYOUT.md §6):
+#   BB_GROW=<mm>      the board grows outward (+y) by this much; the RF row,
+#                     the SMAs and the outer supports move down with the edge
+#                     (default 12);
+#   BB_J1103=bottom   the AERIS ribbon in a band under CONTROL, not at the
+#                     top-left: its 35 bank-35 lines leave the BGA's lower-left
+#                     and no longer cross both DAC buses ("top": the old place);
+#   BB_RN=left        the AD9767's series arrays in a column left of the BGA,
+#                     on the way to U801, not above the BGA ("top": by rule);
+#   BB_CLEAR=<mm>     courtyard-to-courtyard clearance (default 0.5; 0.2 left
+#                     the router no way between the passives);
+#   BB_BOTTOM=caps    the chips' decoupling capacitors (not POWER's) on the
+#                     bottom face, under the pin they decouple. Off: the
+#                     router did worse (100 unrouted after the IF step against
+#                     73), each bottom pad costing a through via;
+#   BB_OUT=<dir>      write the board and project there instead of the repo.
+GROW = float(os.environ.get("BB_GROW", "12"))
+J1103_BOTTOM = os.environ.get("BB_J1103", "bottom") == "bottom"
+BOTTOM_CAPS = os.environ.get("BB_BOTTOM") == "caps"
+ON_BOTTOM = set()                # refs placed on the bottom face
+
 # ---------------------------------------------------------------- outline
-Y_EDGE = 202.75
+Y_EDGE = 202.75 + GROW
 OUTLINE = [(89.0, 107.25), (129.9, 107.25), (129.9, 82.75), (142.4, 82.75), (142.4, 112.25),
            (173.3, 112.25), (173.3, 96.25), (179.4, 96.25), (179.4, 82.75), (193.0, 82.75),
            (193.0, 102.25), (208.0, 102.25), (208.0, Y_EDGE), (89.0, Y_EDGE)]
@@ -70,9 +94,9 @@ THT_OK_Y = 118.5                 # through-hole parts only below this
 # board-only parts: M3 holes (two through the KV260's corner holes, three
 # supports at the outer edge, 8 mm standoffs) and fiducials
 HOLES = {"H1": (94.0, 112.25), "H2": (203.0, 112.25),
-         "H3": (93.0, 197.75), "H4": (148.5, 180.5), "H5": (204.0, 197.75)}
+         "H3": (93.0, 197.75 + GROW), "H4": (148.5, 180.5 + GROW), "H5": (204.0, 197.75 + GROW)}
 HOLE_FP = "MountingHole:MountingHole_3.2mm_M3_Pad_Via"
-FIDUCIALS = {"FID1": (100.0, 110.0), "FID2": (205.0, 120.5), "FID3": (205.0, 189.0)}
+FIDUCIALS = {"FID1": (100.0, 110.0), "FID2": (205.0, 120.5), "FID3": (205.0, 189.0 + GROW)}
 FID_FP = "Fiducial:Fiducial_1mm_Mask2mm"
 
 # ---------------------------------------------------------------- anchors
@@ -132,9 +156,23 @@ REGION = {
     "DAC_RADAR": (118.0, 131.0, 142.0, 154.0),
     "DAC_SDR":   (118.0, 154.0, 142.0, 177.0),
     "POWER":     (89.5, 131.0, 118.0, 177.0),
-    "ROUTING":   (95.0, 177.0, 207.5, 190.0),
+    "ROUTING":   (95.0, 177.0 + GROW, 207.5, 190.0 + GROW),
 }
-CLEAR = 0.2                      # courtyard to courtyard
+if J1103_BOTTOM:
+    # pin 1 at the left, as before: its centre at x 145, in the band between
+    # CONTROL and the RF row; the top-left it leaves goes to DAC_RADAR
+    ANCHOR["J1103"] = (120.9, 178.3 + GROW / 2, 90)
+    REGION["DAC_RADAR"] = (118.0, 121.0, 142.0, 154.0)
+if os.environ.get("BB_RN", "left") == "left":
+    # the AD9767's series arrays in a column left of the BGA, on the way to
+    # U801 (pads 1-4, the FPGA side, to the right), not above the BGA
+    for i, r in enumerate(["RN1106", "RN1105", "RN1104", "RN1103", "RN1107"]):
+        ANCHOR[r] = (145.0, 149.0 + 2.8 * i, 180)
+    ANCHOR["U1101"] = ANCHOR.pop("U1101")    # after them: its bulk capacitors go round them
+if GROW:
+    x0, y0, x1, y1 = REGION["ADC_SDR"]
+    REGION["ADC_SDR"] = (x0, y0, x1, y1 + GROW)
+CLEAR = float(os.environ.get("BB_CLEAR", "0.5"))   # courtyard to courtyard
 EDGE_MARGIN = 0.4
 # A ring kept free around the BGA so its outer rows can escape on L1 and the
 # fan-out vias of the inner rows have room: no part within this of its
@@ -457,6 +495,7 @@ def spiral(grid, cyd, tht, tx, ty, rmax=100.0):
 def place(comps):
     spos = schematic_positions()
     grid = Grid()
+    gridb = Grid()               # the bottom face: through-hole parts, holes, bottom parts
     placed = {}
     info = {}
     for c in comps.values():
@@ -496,9 +535,13 @@ def place(comps):
         b = box_at(cy, x, y, a)
         placed[ref] = (x, y, a)
         grid.add(b)
+        if tht:
+            gridb.add(b)
         if ref in KEEPOUT:
             m = KEEPOUT[ref]
             grid.add((b[0] - m, b[1] - m, b[2] + m, b[3] + m))
+            # the same ring on the bottom: the fan-out vias and the L6 escape
+            gridb.add((b[0] - m, b[1] - m, b[2] + m, b[3] + m))
             # Its VCCINT bulk (330, 100 and 3 x 4.7 uF, +1V0) next,
             # before anything else can take the ring's edge: from the +1V0
             # ball nearest the edge outward. Those balls are in the middle
@@ -520,6 +563,7 @@ def place(comps):
                     grid.add(spot[3])
     for name, (x, y) in HOLES.items():
         grid.add((x - 3.6, y - 3.6, x + 3.6, y + 3.6))
+        gridb.add((x - 3.6, y - 3.6, x + 3.6, y + 3.6))
     for name, (x, y) in FIDUCIALS.items():
         grid.add((x - 1.5, y - 1.5, x + 1.5, y + 1.5))
     # the rest: sheet by sheet, biggest parts first
@@ -573,13 +617,30 @@ def place(comps):
             elif ref in near_sma:
                 tx, ty = near_sma[ref]
             cyd, tht, _ = info[ref]
+            if bottom(ref, comps, attach):
+                # mirrored courtyard; past the carrier's edge only (the
+                # through-hole rule), where nothing is under the board
+                spot = spiral(gridb, (cyd[0], -cyd[3], cyd[2], -cyd[1]), True, tx, ty)
+                if spot:
+                    ON_BOTTOM.add(ref)
+                    placed[ref] = spot[:3]
+                    gridb.add(spot[3])
+                    continue
             spot = spiral(grid, cyd, tht, tx, ty)
             if not spot:
                 unplaced.append(ref)
                 continue
             placed[ref] = spot[:3]
             grid.add(spot[3])
+            if tht:
+                gridb.add(spot[3])
     return placed, info, unplaced
+
+
+def bottom(ref, comps, attach):
+    """Does this part go on the bottom face (BB_BOTTOM)?"""
+    return (BOTTOM_CAPS and ref.startswith("C") and ref in attach and attach[ref][2]
+            and comps[ref].sheet != "POWER")
 
 
 # ---------------------------------------------------------------- silkscreen
@@ -665,7 +726,7 @@ def text_box(ref, h, x, y, ang=0):
 def silk_refs(comps, placed, info):
     """ref -> (x, y, height) of its silkscreen reference, or None (hidden)."""
     boxes = Boxes()
-    top = [r for r in placed if r not in HIROSE_ORIG]
+    top = [r for r in placed if r not in HIROSE_ORIG and r not in ON_BOTTOM]
     for ref in top:
         x, y, a = placed[ref]
         cyd, _, text = info[ref]
@@ -736,7 +797,7 @@ def set_reference(body, ref, x, y, a, silk):
     i = body.index(f'(property "Reference" "{ref}"')
     blk = schgen._block(body, i)
     if silk is None:
-        new = blk.replace('(layer "F.SilkS")', '(layer "F.SilkS")\n\t\t(hide yes)', 1)
+        new = re.sub(r'\(layer "([FB])\.SilkS"\)', lambda m: m.group(0) + "\n\t\t(hide yes)", blk, count=1)
     else:
         tx, ty, h, ang = silk
         lx, ly = rot_pt(tx - x, ty - y, -a)
@@ -767,18 +828,62 @@ def add_nets(body, pads, depth):
     return "".join(out)
 
 
-def instance(c, text, x, y, a, silk="keep"):
+def flipped(text, a):
+    """A library footprint (top face, unrotated) on the bottom face at
+    rotation a, as KiCad's Flip writes it: local y negated, F./B. layers
+    swapped, pad and text angles stored absolute as a - p, texts mirrored, an
+    arc's start and end exchanged (mirroring reverses its sweep)."""
+    def swap(m):
+        return '"' + {"F": "B", "B": "F"}[m.group(1)] + "." + m.group(2) + '"'
+    out, i = [], 0
+    for m in re.finditer(r"\n\t\((\w+)", text):
+        s = m.start() + 2
+        if s < i:
+            continue
+        blk = schgen._block(text, s)
+        head, new = m.group(1), blk
+        if head in ("layer", "pad", "property", "fp_text", "fp_line", "fp_rect", "fp_circle",
+                    "fp_arc", "fp_poly"):
+            new = re.sub(r'"([FB])\.(\w+)"', swap, new)
+        if head.startswith("fp_") and head != "fp_text":
+            new = re.sub(r"\((start|end|mid|center|xy) ([\d.\-]+) ([\d.\-]+)\)",
+                         lambda q: f"({q.group(1)} {q.group(2)} {f(0.0 - float(q.group(3)))})", new)
+            if head == "fp_arc":
+                st = re.search(r"\(start [^)]*\)", new).group(0)
+                en = re.search(r"\(end [^)]*\)", new).group(0)
+                new = new.replace(st, "\0").replace(en, st.replace("start", "end")).replace(
+                    "\0", en.replace("end", "start"))
+        if head in ("pad", "property", "fp_text"):
+            new = re.sub(r"\(at ([\d.\-]+) ([\d.\-]+)(?: ([\d.\-]+))?\)",
+                         lambda q: f"(at {q.group(1)} {f(0.0 - float(q.group(2)))} "
+                                   f"{f((a - float(q.group(3) or 0)) % 360)})", new, count=1)
+            if head == "pad" and "(offset" in new:
+                raise ValueError("pad offset: no rule to flip it")
+        if head in ("property", "fp_text") and re.search(r'\(layer "[FB]\.', new):
+            if "(justify" in new:
+                new = re.sub(r"\(justify([^)]*)\)", lambda q: f"(justify{q.group(1)} mirror)", new, count=1)
+            else:
+                k = new.index("(font")
+                k = k + len(schgen._block(new, k))
+                new = new[:k] + "\n\t\t\t(justify mirror)" + new[k:]
+        out += [text[i:s], new]
+        i = s + len(blk)
+    return "".join(out) + text[i:]
+
+
+def instance(c, text, x, y, a, silk="keep", bottom=False):
     """A library footprint as a placed board footprint with its nets."""
-    body = text
+    body = flipped(text, a) if bottom else text
+    side = "B.Cu" if bottom else "F.Cu"
     name = re.match(r'\(footprint "([^"]+)"', body).group(1)
     body = body.replace(f'(footprint "{name}"', f'(footprint "{c.fpid}"', 1)
     body = re.sub(r'\n\t\((version|generator|generator_version) [^\n]*\)', "", body)
-    body = re.sub(r'\n\t\(layer "F\.Cu"\)',
-                  f'\n\t(layer "F.Cu")\n\t(uuid "{uid("fp", c.ref)}")\n\t(at {f(x)} {f(y)}'
+    body = re.sub(r'\n\t\(layer "' + side + r'"\)',
+                  f'\n\t(layer "{side}")\n\t(uuid "{uid("fp", c.ref)}")\n\t(at {f(x)} {f(y)}'
                   + (f" {f(a)})" if a else ")"), body, count=1)
     body = body.replace('(property "Reference" "REF**"', f'(property "Reference" "{c.ref}"', 1)
     body = re.sub(r'\(property "Value" "[^"]*"', f'(property "Value" "{c.value}"', body, count=1)
-    if a:
+    if a and not bottom:
         # pad and text angles are stored absolute: add the footprint's rotation
         def rot(m):
             ang = (float(m.group(3) or 0) + a) % 360
@@ -968,6 +1073,8 @@ def abs_pads(comps, placed, info):
             continue
         x, y, a = placed[ref]
         for pad, (px, py) in pad_positions(info[ref][2]).items():
+            if ref in ON_BOTTOM:
+                py = -py
             if pad in c.pads:
                 dx, dy = rot_pt(px, py, a)
                 out.append((c.pads[pad], x + dx, y + dy, ref))
@@ -987,22 +1094,23 @@ def power_layer(comps, placed, info):
                (clip is None or clip[0] <= x <= clip[2] and clip[1] <= y <= clip[3])]
         xs, ys = [p[0] for p in pts], [p[1] for p in pts]
         islands.append((net, (min(xs) - m, min(ys) - m, max(xs) + m, max(ys) + m)))
-    # +1V0, FPGA VCCINT (700 mA): the BGA and its keep-out ring, and a 5 mm
-    # corridor to it from the buck's inductor (the POWER inductor on +1V0)
-    x, y, a = placed["U1101"]
-    bga = box_at(info["U1101"][0], x, y, a)
-    k = KEEPOUT["U1101"]
+    # +1V0, FPGA VCCINT (700 mA): the block of its nine balls, and a 3 mm
+    # corridor to it from the buck's inductor (the POWER inductor on +1V0).
+    # Not the whole BGA and ring any more (6 Oct): tracks may cross L4 outside
+    # the islands, and round the BGA is where the router needs them.
+    balls = [(px, py) for n, px, py, r in pads if n == "+1V0" and r == "U1101"]
     src = [(px, py) for n, px, py, r in pads if n == "+1V0" and r.startswith("L")
            and comps[r].sheet == "POWER"]
     sx, sy = min(src, key=lambda p: p[0])
-    isl = (bga[0] - k, bga[1] - k, bga[2] + k, bga[3] + k)
+    isl = (min(p[0] for p in balls) - 1.2, min(p[1] for p in balls) - 1.2,
+           max(p[0] for p in balls) + 1.2, max(p[1] for p in balls) + 1.2)
     islands.append(("+1V0", isl))
-    # along from the inductor, then (if it is not level with the BGA) up or
-    # down into the island: an L, 5 mm wide
-    xe = isl[0] + 5.0
-    islands.append(("+1V0", (sx - 2.0, sy - 2.5, xe, sy + 2.5)))
-    if sy + 2.5 < isl[1] + 5.0 or sy - 2.5 > isl[3] - 5.0:
-        islands.append(("+1V0", (isl[0], min(sy - 2.5, isl[1]), xe, max(sy + 2.5, isl[3]))))
+    # along from the inductor, then (if it is not level with the block) up or
+    # down into it: an L, 3 mm wide
+    xe = isl[0] + 3.0
+    islands.append(("+1V0", (sx - 2.0, sy - 1.5, xe, sy + 1.5)))
+    if sy + 1.5 < isl[1] + 3.0 or sy - 1.5 > isl[3] - 3.0:
+        islands.append(("+1V0", (isl[0], min(sy - 1.5, isl[1]), xe, max(sy + 1.5, isl[3]))))
     # smaller islands win where two overlap
     order = sorted(range(len(islands)), key=lambda i: -((islands[i][1][2] - islands[i][1][0])
                                                           * (islands[i][1][3] - islands[i][1][1])))
@@ -1010,6 +1118,18 @@ def power_layer(comps, placed, info):
         net, bx = islands[i]
         out += zone("In3.Cu", net, f"L4 {net}", rect(*bx), priority=pri, clearance=0.3,
                     key=f"L4 {net} {i}")
+    # tracks may use L4 (6 Oct), but not across an island: a track there would
+    # cut it. A tracks-only keep-out rule area over each; vias and pads allowed
+    for i, (net, bx) in enumerate(islands):
+        pts_s = " ".join(f"(xy {f(x)} {f(y)})" for x, y in rect(*bx))
+        out += [f"{T}(zone", f'{T}{T}(layer "In3.Cu")', f'{T}{T}(uuid "{uid("zone", f"L4 keepout {i}")}")',
+                f'{T}{T}(name "In3 islands: no tracks ({net})")', f"{T}{T}(hatch edge 0.5)",
+                f"{T}{T}(connect_pads", f"{T}{T}{T}(clearance 0)", f"{T}{T})",
+                f"{T}{T}(min_thickness 0.25)", f"{T}{T}(filled_areas_thickness no)",
+                f"{T}{T}(keepout", f"{T}{T}{T}(tracks not_allowed)", f"{T}{T}{T}(vias allowed)",
+                f"{T}{T}{T}(pads allowed)", f"{T}{T}{T}(copperpour allowed)", f"{T}{T}{T}(footprints allowed)",
+                f"{T}{T})", f"{T}{T}(fill", f"{T}{T}{T}(thermal_gap 0.5)", f"{T}{T}{T}(thermal_bridge_width 0.5)",
+                f"{T}{T})", f"{T}{T}(polygon", f"{T}{T}{T}(pts {pts_s})", f"{T}{T})", f"{T})"]
     return out, islands
 
 
@@ -1084,7 +1204,7 @@ def main():
             body.append(hirose_from_original(ref, HIROSE_ORIG[ref], c))
         elif ref in placed:
             x, y, a = placed[ref]
-            body.append(instance(c, info[ref][2], x, y, a, silk[ref]))
+            body.append(instance(c, info[ref][2], x, y, a, silk.get(ref), bottom=ref in ON_BOTTOM))
     for ref, (x, y) in HOLES.items():
         body.append(board_only(ref, HOLE_FP, x, y, "M3"))
     for ref, (x, y) in FIDUCIALS.items():
@@ -1099,8 +1219,9 @@ def main():
     assert schgen._balanced(text)
     open(BOARD, "w", encoding="utf-8", newline="\n").write(text)
     rules()
-    print(f"{len(placed)} footprints placed by rule or anchor, {len(unplaced)} not placed: {unplaced}")
-    print(f"+ {len(HOLES)} holes, {len(FIDUCIALS)} fiducials; wrote {os.path.relpath(BOARD, ROOT)}")
+    print(f"{len(placed)} footprints placed by rule or anchor ({len(ON_BOTTOM)} on the bottom face), "
+          f"{len(unplaced)} not placed: {unplaced}")
+    print(f"+ {len(HOLES)} holes, {len(FIDUCIALS)} fiducials; wrote {BOARD}")
     for net, bx in islands:
         print(f"  L4 island {net:12s} x {bx[0]:6.1f}-{bx[2]:6.1f}  y {bx[1]:6.1f}-{bx[3]:6.1f}")
     return 1 if unplaced else 0

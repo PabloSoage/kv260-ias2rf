@@ -142,6 +142,13 @@ BANK_NC = {
     34: ["L5", "N1", "P1", "P4", "P3", "M5", "N4", "R2", "R1", "R3", "T2", "T4", "T3", "P5"],
     35: ["K1", "J1", "L3", "L2", "K3", "K2", "K5"],
 }
+# Pin swap for routability (7 Oct 2026): bank 35 whole, and the AD9767 lines
+# of bank 15, re-assigned to the balls nearest their far ends by a minimum
+# total-length matching (no crossings within either bus).
+BANK15 = {'C8': 'SW_CTRL0', 'C9': 'SW_CTRL1', 'B9': 'SW_CTRL2', 'B12': 'SW_CTRL3', 'A8': 'F_DACR_D7', 'A9': 'F_DACR_D6', 'A10': 'F_DACR_D5', 'B10': 'F_DACR_D4', 'B11': 'F_DACR_D3', 'A12': 'F_DACR_D2', 'A13': 'F_DACR_D1', 'A14': 'F_DACR_D0', 'D8': 'CLK_SEL', 'D9': 'XO_SCL', 'C14': 'XO_SDA', 'C13': 'F_DACR_CLK', 'D13': 'PMOD_SCLK', 'H16': 'PMOD_CS', 'G16': 'PMOD_MOSI', 'J15': 'PMOD_MISO', 'J16': 'BEAM_STROBE', 'H14': 'PPS_SYNC', 'G15': 'PMOD_SPARE1', 'G11': 'PMOD_SPARE2', 'A15': 'F_DACS_D12', 'B14': 'F_DACS_D8', 'B15': 'F_DACS_D10', 'B16': 'F_DACS_D13', 'C11': 'F_DACS_D3', 'C12': 'F_DACS_D5', 'C16': 'F_DACS_D11', 'D10': 'F_DACS_IQRESET', 'D11': 'F_DACS_D0', 'D14': 'F_DACS_D6', 'D15': 'F_DACS_D7', 'D16': 'F_DACS_D9', 'E11': 'F_DACS_IQCLK', 'E12': 'F_DACS_D1', 'E13': 'F_DACS_D4', 'F12': 'F_DACS_IQWRT', 'F13': 'F_DACS_D2', 'G12': 'F_DACS_IQSEL'}
+BANK35 = {'A2': 'ADAR3_TX_LOAD', 'A3': 'ADAR2_TR', 'A4': 'ADAR1_RX_LOAD', 'A5': 'ADAR1_CS', 'A7': 'ADAR1_TX_LOAD', 'B1': 'ADAR4_CS', 'B2': 'ADAR3_RX_LOAD', 'B4': 'ADAR2_RX_LOAD', 'B5': 'ADAR2_TX_LOAD', 'B6': 'ADAR1_TR', 'C1': 'ADAR5_TX_LOAD', 'C2': 'ADAR4_RX_LOAD', 'C3': 'ADAR4_TX_LOAD', 'C4': 'ADAR3_CS', 'C6': 'ADAR2_CS', 'D1': 'ADAR5_TR', 'D3': 'ADAR5_CS', 'D4': 'ADAR4_TR', 'D5': 'ADAR3_TR', 'E1': 'ADAR6_CS', 'E2': 'ADAR6_TX_LOAD', 'E3': 'ADAR5_RX_LOAD', 'F2': 'ADAR7_TX_LOAD', 'F3': 'ADAR6_RX_LOAD', 'F4': 'ADAR6_TR', 'G1': 'ADAR7_RX_LOAD', 'G2': 'ADAR7_TR', 'G4': 'ADAR7_CS', 'H1': 'ADAR8_CS', 'H2': 'ADAR8_TX_LOAD', 'H3': 'ADAR8_RX_LOAD', 'H4': 'ADAR8_TR', 'H5': 'FPGA_IRQ', 'J1': 'ADAR_SCLK', 'J3': 'ADAR_SDIO', 'J4': 'CONV_SPI_CSB_R', 'J5': 'HK_SDA', 'K1': 'ADAR_SDO', 'K2': 'HK_ALERT', 'K3': 'CONV_SPI_SCLK', 'K5': 'HK_SCL', 'L2': 'CONV_SPI_CSB_S', 'L3': 'CONV_SPI_SDIO'}
+BANK_NC[15] = ['E16', 'F15', 'E15', 'H11', 'H12', 'H13', 'G14', 'F14']
+BANK_NC[35] = ['E6', 'B7', 'C7', 'D6', 'F5', 'E5', 'G5']
 BANKS = {14: BANK14, 15: BANK15, 34: BANK34, 35: BANK35}
 # FPGA balls that must be clock capable (MRCC/SRCC), and the reason
 CLOCK_BALLS = {"N14": "AD9484 DCO", "N11": "CLK_FPGA", "P10": "AD9253 DCO",

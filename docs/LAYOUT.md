@@ -12,28 +12,29 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–6 October 2026, §6): 60 connections are left for KiCad, and
-the LVDS pairs need a hand review.
+**It is autorouted, not finished** (2–11 October 2026, §6): 49 connections are left, power
+tracks the router put on the ground planes must come off them, and the LVDS pairs need a hand
+review (§6.3).
 
 The original Allied Vision board is kept, untouched, as
 `_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
 
 ---
 
-## 1. Outline: 119 × 120 mm
+## 1. Outline: 119 × 132 mm
 
 | | |
 |---|---|
 | **Kept from the original** | The upper, U-shaped part: the two tongues that reach the IAS connectors, and the band over the carrier down to its edge (y 117.25). It is known to clear every part on the KV260 (INTERFACE_SPEC §5.3) |
 | **Changed** | The IAS0 tongue's right edge moves from x 144.9 to **142.4**, 1.5 mm clear of the carrier's J18 jumper. The original overlapped it by 1.0 mm (INTERFACE_SPEC §5.3) |
 | **Removed** | The slots for the cameras' flat cables along the old bottom edge |
-| **New** | Everything from y 127.25 to **y 202.75**, full width. Outward, off the carrier, where the KV260 has nothing at all |
+| **New** | Everything from y 127.25 to **y 214.75**, full width. Outward, off the carrier, where the KV260 has nothing at all |
 
 **Why 120 mm and not the ~90 estimated before the schematic existed.** The parts' courtyards add up
 to **5,700 mm²**. At 119 × 90 mm they would cover 75 % of a board that is populated on one face
-only, with nothing left to route between them. At 119 × 120 mm they cover about half. The
-overhang past the carrier's edge is now 85 mm, which is why three supports are added at the outer
-edge.
+only, with nothing left to route between them. At 119 × 120 mm they cover about half. **On 10
+October it grew 12 mm more, to 132 mm**, to give the router room (§6.2). The overhang past the
+carrier's edge is now 97 mm, which is why three supports are added at the outer edge.
 
 **One face only, and no through-hole parts over the carrier.** Below the board there is 0.8 mm to
 the carrier (the Hirose mated height), so nothing can go on the bottom there, and through-hole pins
@@ -48,7 +49,7 @@ drawn on `Dwgs.User`.
 |---|---|---|
 | **J101** (IAS1, the link) and **J102** (IAS0, mechanical) | (186.02, 85.60) and (135.98, 85.60), bottom face, 180° | Copied from the original board: position, face, rotation and pads, checked identical by script. They register the adapter on the KV260 |
 | **H1, H2**, M3 through the KV260's corner holes | (94.0, 112.25), (203.0, 112.25) | The original's holes, within 5 µm of the carrier's (INTERFACE_SPEC §5.3) |
-| **H3, H4, H5**, supports | (93.0, 197.75), (148.5, 180.5), (204.0, 197.75) | 8 mm M3 standoffs to the surface the KV260 stands on (INTERFACE_SPEC §5.3: 7.9 mm) |
+| **H3, H4, H5**, supports | (93.0, 209.75), (148.5, 192.5), (204.0, 209.75) | 8 mm M3 standoffs to the surface the KV260 stands on (INTERFACE_SPEC §5.3: 7.9 mm) |
 
 All five holes are plated and on GND. H3–H5, the three fiducials FID1–FID3 and the holes are
 *board-only* footprints: they have no symbol.
@@ -124,7 +125,11 @@ pins in one place for a plane to be worth it.
   - RX_A (J911/J912) and RX_B (J921/J922), under the ADCs;
   - the clock in/out (J401/J402) at the right end, nearest the ADCLK948.
 - **the DC jack**, opening at the left edge;
-- **the AERIS ribbon** (IDC 2×20), along the top of the main area;
+- **the AERIS ribbon** (IDC 2×20), in a band under CONTROL, above the RF row. It was along the
+  top of the main area until 10 October; from there its 35 bank-35 lines crossed both DAC buses
+  (§6.2);
+- **the AD9767's five series arrays** (RN1103–RN1107), in a column left of the BGA, on the way to
+  U801. Placed by rule they sat above the BGA, and the DAC lines doubled back;
 - **the Pmod and JTAG headers**;
 - **the FPGA**, rotated 90°, so bank 15 faces the DACs and bank 14 faces the ADCs and J101. **A
   2.5 mm ring around it is kept free of parts**, so the outer rows can escape on L1 and the inner
@@ -182,8 +187,9 @@ sheet, scaled down:
 **The order is the one a person would follow:** a chip, then at once its own passives (small
 decoupling first), then the next chip. So each chip's pins get their neighbourhood before a
 neighbour can take it. A legaliser puts each part at the nearest spot where its courtyard, grown
-to include its own silkscreen, is free. The spot must be inside the outline, and off the carrier
-if the part is through-hole.
+to include its own silkscreen, is free, **0.5 mm from every other** (0.2 mm until 10 October: the
+router found no way between the passives). The spot must be inside the outline, and off the
+carrier if the part is through-hole.
 
 **The silkscreen** gets a reference for every part where one fits:
 - clear of every pad, of other silk and of other parts' bodies;
@@ -201,6 +207,9 @@ routing is planned.
 ---
 
 ## 5. How it was checked
+
+*The figures below are for the first placement (0.2 mm between courtyards, 25 September); the
+re-placement of §6.2 moved parts by up to a few millimetres.*
 
 | Check | Result |
 |---|---|
@@ -226,7 +235,10 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 
 ## 6. Routing
 
-### 6.1 The autorouted board (2 October 2026)
+### 6.1 The first autorouted board (2–6 October 2026)
+
+*Superseded by §6.2, which re-placed the board and routed it again. Kept for the method and what
+each step was worth.*
 
 The board was routed by **an external autorouter**, a
 Python + Rust router that reads and writes the `.kicad_pcb` text itself. The chain is
@@ -253,16 +265,72 @@ because there it is part of the 50 Ω line.
 The bridge for it stays in the repo (`dsn_export.py`, `ses_import.py`): one polygon per plane
 net and keepout strips at the edge are what made it route at all.
 
-### 6.2 What is left, by hand in KiCad
+### 6.2 Re-placed and routed again (7–11 October 2026)
 
-1. **The 60 unrouted connections.** One is a +1V0 via (155.5, 151.5) the smaller island no longer
-   reaches: tie it to the block on L1 or L6. The rest are long (median about 26 mm), to and from the FPGA: the
-   DAC buses through the RN11xx arrays, JTAG, the ADAR ribbon, the HK bus from J101. Congestion
-   round the BGA, not hard geometry. `route_finish.sh` can be run again for a few more.
-2. **The LVDS pairs.** Only 5 of 26 were routed coupled end to end (the link pairs and CLK_FPGA);
-   the router judged the other 21 electrically short and routed their legs singly. Re-route the
-   ADC data pairs as pairs, on L1, over unbroken L2.
-3. **The last RF clearance** (0.197 mm, at T802).
+The first board stopped at 60. What was left was congestion round the BGA, and three causes of it
+were in the placement and the pinout, not in the router:
+- **the bank-35 bus to the AERIS ribbon** (35 lines) left the BGA's upper-left and crossed both
+  DAC buses on its way to J1103 at the top-left;
+- **the AD9767 (DACS) lines** went up from bank 15 to their series arrays above the BGA, then back
+  down to U801 at the bottom-left;
+- **the lines crossed each other.** Drawn straight from each ball to its far end, through a series
+  resistor where there is one, the FPGA's nets crossed **823** times; 83 crossings within the
+  bank-35 bus alone, 64 within the DACS bus.
+
+**What changed:**
+
+| | Change |
+|---|---|
+| **FPGA pinout** | Bank 35 as a whole, and the DACS lines within bank 15 (over their own balls and the bank's free ones), **re-assigned by a minimum total-length matching** of ball to far end. A Euclidean minimum matching has no crossings: 83 → 0 and 64 → 0, all FPGA nets 823 → 663. Fixed: the balls reused from AERIS-10 (DACR, ADCR, CLK_FPGA), every pair and every clock-capable ball. The tables are in `_work/sheets/control_spec.py`; `rev03/CONTROL.kicad_sch` was regenerated from it and passes `check_sheet.py control` (CONTROL_SPEC §1) |
+| **J1103** | To a band under CONTROL (§4) |
+| **RN1103–RN1107** | To a column left of the BGA (§4) |
+| **Outline** | 12 mm longer (§1) |
+| **Clearance** | 0.5 mm between courtyards, not 0.2 (§4) |
+
+All of it is in `build_board.py`, as defaults of knobs (`BB_GROW`, `BB_J1103`, `BB_RN`, `BB_CLEAR`)
+so each can be turned back for a comparison. **Not kept: decoupling capacitors on the bottom face**
+(`BB_BOTTOM=caps`, 100 of them under their pins). It routed worse, 100 unrouted after the IF step
+against 73: each bottom pad needs its own through via, and 200 more vias block the inner layers.
+
+**The routing** is `_work/layout/route_all.sh`, the whole sequence of §6.1 in one script:
+fan-out, pairs, everything with L4 open; the IF lines last; dangling copper; then finishing passes
+that alternate all incomplete nets and the slow ones with L5 open. A pass is kept only if the
+unrouted count falls and no DRC error is added. The IF step reads the **original** project:
+`route.py` writes its `--clearance` into every class of the project it hands on, and with that copy
+the IF lines came out with 32 RF50 errors.
+
+| Run | Placement | Result |
+|---|---|---|
+| v3 | Pinout, J1103, arrays, +12 mm | 52 unrouted, 6 errors |
+| v4 | v3 + decoupling on the bottom | 100 after the IF step (v3: 73); stopped |
+| **v5** | **v3 + 0.5 mm clearance** | **49 unrouted, 4 errors** (84 → 52 → 51 → 49 in three passes) |
+
+**The four errors** (three RF50 clearances of 0.15–0.195 mm, one same-net via pair) were removed by
+`_work/layout/rip_violations.py`, which deletes the track or via behind each DRC error, and the
+three nets were routed again by `route_finish.sh` (`ONLY=`). Then:
+
+| | Result |
+|---|---|
+| DRC (zones refilled, schematic parity) | **0 errors, 0 parity problems, 49 unrouted** |
+| Vias | 1,356, all 0.45/0.2 mm; about 500 in pads (POFV, FABRICATION.md) |
+| Tracks | L1 5.5 m, L3 3.6 m, L6 2.8 m, L4 0.6 m |
+| LVDS pairs routed coupled | 4: LINK_TX_D0, LINK_TX_CLK, CLK_FPGA, ADCS_D1. The rest as single legs, as in §6.1 |
+| L5 (slow nets) | JTAG_TMS 15 mm, ADAR1_TX_LOAD 5 mm |
+
+**Power tracks on the ground planes.** The router's plane-repair step ("plane finalize") routes
+supply connections on layers the run forbids: **L2 carries +1V0 (164 mm), +1V8_ADCS_A (43 mm) and
++3V3_D (23 mm); L5 carries +1V0 (45 mm) and +3V3_D (8 mm)**. The first board had the same, unnoticed
+until now: +5V0 134 mm and +3V3_D 29 mm on L2. They cut the planes and must come off (§6.3).
+
+### 6.3 What is left
+
+1. **The 49 unrouted connections.** By group: the DACS bus and its control lines (F_DACS_*,
+   DACS_*, about 14); J101, IAS1 (7: HK_SCL, HK_SDA, FPGA_IRQ, J_LINK_TX_D0_P and three GND pairs);
+   single legs of ADC pairs (6: ADCR_D2_P, ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (+1V8_D
+   4, +2V5, +1V2); CONV_SPI (3); and a few single analogue nets.
+2. **The power tracks on L2 and L5** (§6.2): rip them and route those connections on L1, L3, L4
+   or L6.
+3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
 5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
    and the tracks on L4 (the +3V3_D background only) not cutting off any +3V3_D via.

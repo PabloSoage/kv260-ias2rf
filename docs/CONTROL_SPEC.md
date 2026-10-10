@@ -36,7 +36,7 @@ clock-capable pin** (the symbol's ball names show it). So:
 | 14 | 3.3 V | AD9484 on **AERIS-10's own balls**, CLK_FPGA on AERIS's `FPGA_ADC_CLOCK` balls, AD9253, the two link pairs the FPGA receives, flash | The flash pins live in bank 14. LVDS_25 **inputs** are allowed in a 3.3 V bank with `DIFF_TERM` off (UG471 Table 1-44 note 1, DS181 Table 11 note 1), so each pair gets an external 100 Ω, as AERIS does |
 | 15 | 3.3 V | AD9708 on **AERIS's own balls**, `DACR_CLK` on AERIS's `FPGA_DAC_CLOCK`, AD9767, Pmod, `SW_CTRL0-3`, `CLK_SEL`, XO I²C | The DACs, switches and XO are 3.3 V parts |
 | 34 | 2.5 V | Only the three link pairs the FPGA **drives** | LVDS_25 outputs need VCCO = 2.5 V (UG471). The other 14 balls stay unused |
-| 35 | 1.8 V | 8 × ADAR1000 control + SPI (35 lines), converter SPI, `HK_SCL/SDA`, `FPGA_IRQ`, `HK_ALERT` (ball H3) | AERIS drives the ADAR1000s at 1.8 V; the ADCs' SPI is 1.8 V; the carrier's lines are **1.8 V `[V]`**: I2C, reset and the interrupt input all sit on `PL_1V8` on the carrier (XTP682, INTERFACE_SPEC §4.3) |
+| 35 | 1.8 V | 8 × ADAR1000 control + SPI (35 lines), converter SPI, `HK_SCL/SDA`, `FPGA_IRQ`, `HK_ALERT` (ball K2) | AERIS drives the ADAR1000s at 1.8 V; the ADCs' SPI is 1.8 V; the carrier's lines are **1.8 V `[V]`**: I2C, reset and the interrupt input all sit on `PL_1V8` on the carrier (XTP682, INTERFACE_SPEC §4.3) |
 
 The pin table is in `control_spec.py`. On import it **proves itself against the symbol's own ball
 names**:
@@ -46,6 +46,14 @@ names**:
 - the five clocks are on MRCC/SRCC balls: AD9484 DCO, AD9253 DCO, CLK_FPGA, the link receive clock
   and the Pmod SPI clock;
 - all 256 balls are accounted for.
+
+**Pin swap for routing (7 October 2026).** Bank 35 as a whole, and the AD9767 (DACS) lines within
+bank 15, were re-assigned at layout: each net to the ball nearest its far end, by a minimum
+total-length matching, so no two lines of either bus cross (LAYOUT §6.2). The AERIS-10 balls (DACR,
+ADCR, CLK_FPGA), every pair and every clock-capable ball kept their place. The new tables are an
+override block in `control_spec.py`, after the original ones, and the self-check above runs on
+them. Nothing in bank 35 or among the DACS lines needs a particular ball, so the swap only changes
+the FPGA's constraint file.
 
 ---
 
@@ -70,7 +78,7 @@ names**:
 | **FPGA_IRQ on J8 pin 15, active high, 47 kΩ pull-down (R1133)** | Pin 15 is the only single-ended pin that goes **into** the SOM, through the carrier's SN74AVC4T245 at 1.8 V. The pin first allocated, 32, is the carrier's 48 MHz camera clock (INTERFACE_SPEC §4.3). With PUDC_B high the FPGA's pin floats until configured; the pull-down holds the translator's input at "no interrupt" | Pin 32, which would fight the carrier's clock |
 | **The HK bus's addresses are free** | The carrier's TCA9546A channel 1 reaches only J8: `IAS1_I2C_SCK/SDA` appear on XTP682 sheets 8 (the switch) and 13 (J8) and nowhere else. So 0x48 and 0x50 are this board's | — |
 | **Temperature sensor TMP1075DR** (U1104), SOIC-8, I²C **0x48** | 1.7–5.5 V, ±1 °C max from −40 to 110 °C, LM75-compatible registers (TMP1075 datasheet). A2..A0 to GND gives 0x48 (its Table 7-2). The FPGA's XADC already reads the die; this one reads the board | VSSOP-8 (DGK): its 0.65 mm pitch does not fit the Power class's 0.2 mm clearance, with V+ next to A0 (GND) |
-| **`HK_ALERT`: the sensor's ALERT to the FPGA**, ball H3 (a free bank-35 ball), 10 kΩ pull-up (R1134) | ALERT is open-drain (Table 5-1). The FPGA can fold it into `FPGA_IRQ`, the one line into the SOM | Leave ALERT unconnected and poll |
+| **`HK_ALERT`: the sensor's ALERT to the FPGA**, ball K2 (a free bank-35 ball; H3 until the pin swap below), 10 kΩ pull-up (R1134) | ALERT is open-drain (Table 5-1). The FPGA can fold it into `FPGA_IRQ`, the one line into the SOM | Leave ALERT unconnected and poll |
 | **Board ID EEPROM M24C02-FMN6TP** (U1105), SOIC-8, I²C **0x50** | The -F grade runs from 1.7 V. Its output low is specified at **1.8 V: 0.2 V at 0.7 mA** (DS9398 Table 14). It holds the board's revision and serial number, written once | **AT24CS02**, which has a factory-programmed 128-bit serial number. Rejected: at 1.7 V its output low is specified for **0.15 mA** only (its Table 4-2), and this bus needs about 1 mA |
 | **Write protection: WC pulled up (R1135, 10 kΩ), solder jumper JP1101 to GND** | WC high disables writes; floating, the M24C02 enables them (DS9398 §2.4). Closed, the jumper allows writing. JP1101 is copper only: not in the BOM or the placement file | WC to GND: writable from Linux at any time |
 
