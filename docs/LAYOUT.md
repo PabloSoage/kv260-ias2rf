@@ -12,9 +12,8 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–11 October 2026, §6): 49 connections are left, power
-tracks the router put on the ground planes must come off them, and the LVDS pairs need a hand
-review (§6.3).
+**It is autorouted, not finished** (2–11 October 2026, §6): 50 connections are left, and the
+LVDS pairs need a hand review (§6.3).
 
 The original Allied Vision board is kept, untouched, as
 `_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
@@ -317,19 +316,28 @@ three nets were routed again by `route_finish.sh` (`ONLY=`). Then:
 | LVDS pairs routed coupled | 4: LINK_TX_D0, LINK_TX_CLK, CLK_FPGA, ADCS_D1. The rest as single legs, as in §6.1 |
 | L5 (slow nets) | JTAG_TMS 15 mm, ADAR1_TX_LOAD 5 mm |
 
-**Power tracks on the ground planes.** The router's plane-repair step ("plane finalize") routes
-supply connections on layers the run forbids: **L2 carries +1V0 (164 mm), +1V8_ADCS_A (43 mm) and
-+3V3_D (23 mm); L5 carries +1V0 (45 mm) and +3V3_D (8 mm)**. The first board had the same, unnoticed
-until now: +5V0 134 mm and +3V3_D 29 mm on L2. They cut the planes and must come off (§6.3).
+**Power tracks taken off the ground planes.** The router's plane-repair step ("plane
+finalize") routed supply connections on layers the run forbids: L2 carried +1V0 (164 mm),
++1V8_ADCS_A (43 mm) and +3V3_D (23 mm), L5 +1V0 (45 mm) and +3V3_D (8 mm). The first board had the
+same, unnoticed until now (+5V0 134 mm and +3V3_D 29 mm on L2). The cause is in the router:
+`route.py` hands that step its full layer list, the forbidden layers included. A local patch hands
+it only the allowed ones (`_work/layout/krt_finalize_layers.patch`, against the autorouter
+979287c; apply it to the clone before routing). Then:
+- every supply track on L2 and L5 was ripped and those three nets routed again with
+  `route_finish.sh`: +1V0 came back on the allowed layers;
+- 15 mm of +1V8_ADCS_A and 1 mm of +3V3_D came back on L2 all the same, by another path in the
+  router. Moved to L4 by hand (text edit), inside or beside the +1V8_ADCS_A island, DRC-clean;
+- one +3V3_D connection (128.2, 172.9) found no way back: **50 unrouted**, 0 errors.
+
+L2 now carries only GND (33 mm of it), and L5 only GND and the two slow tracks above.
 
 ### 6.3 What is left
 
-1. **The 49 unrouted connections.** By group: the DACS bus and its control lines (F_DACS_*,
+1. **The 50 unrouted connections.** By group: the DACS bus and its control lines (F_DACS_*,
    DACS_*, about 14); J101, IAS1 (7: HK_SCL, HK_SDA, FPGA_IRQ, J_LINK_TX_D0_P and three GND pairs);
    single legs of ADC pairs (6: ADCR_D2_P, ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (+1V8_D
-   4, +2V5, +1V2); CONV_SPI (3); and a few single analogue nets.
-2. **The power tracks on L2 and L5** (§6.2): rip them and route those connections on L1, L3, L4
-   or L6.
+   4, +3V3_D, +2V5, +1V2); CONV_SPI (3); and a few single analogue nets.
+2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
 5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
