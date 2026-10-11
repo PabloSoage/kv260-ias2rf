@@ -12,7 +12,7 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–11 October 2026, §6): 50 connections are left, and the
+**It is autorouted, not finished** (2–11 October 2026, §6): 39 connections are left, and the
 LVDS pairs need a hand review (§6.3).
 
 The original Allied Vision board is kept, untouched, as
@@ -74,7 +74,7 @@ out the 1.0 mm-pitch BGA:
 
 | Rule | Value |
 |---|---|
-| Track / clearance | 0.10 mm minimum; 0.15 mm default |
+| Track / clearance | 0.10 mm minimum; Default class 0.15 mm track, **0.10 mm clearance** (§6.2) |
 | Via | 0.45 mm pad, 0.2 mm drill |
 | Copper to edge | 0.3 mm |
 
@@ -83,7 +83,7 @@ out the 1.0 mm-pitch BGA:
 | **LVDS100** | 0.117 mm, gap 0.150 mm (100 Ω differential on L1) | Link pairs, ADC data and clock pairs, `CLK_ADC*`, `CLK_FPGA`, `FPGA_CLK` |
 | **RF50** | 0.183 mm (50 Ω on L1) | `IF_RX_*`, `IF_TX_*` |
 | **Power** | 0.4 mm | Every rail, VIN and switch nodes |
-| Default | 0.15 mm | The rest |
+| Default | 0.15 mm (0.10 mm where the router needed it), 0.10 mm clearance | The rest |
 
 The impedance widths come from a field solver run on this stack, solder mask included
 (`_work/field_solver.py`, POWER_AND_STACKUP §2.6). It agrees with exact references within 1–2.4 %.
@@ -331,12 +331,29 @@ it only the allowed ones (`_work/layout/krt_finalize_layers.patch`, against the 
 
 L2 now carries only GND (33 mm of it), and L5 only GND and the two slow tracks above.
 
+**Finer rules for the slow nets (11 October).** The finishing passes had stopped at 50: a run on a
+0.025 mm grid gained nothing, and a run allowed to rip the slow control nets (ADAR, FLASH, XADC,
+SW_CTRL...) broke five complete nets to connect five, and was rejected. Most of the 50 ended at a
+pad or ball boxed in by other nets' copper at 0.15 mm. So the **Default class clearance went from
+0.15 to 0.10 mm**, and one finishing pass routed the incomplete nets with 0.10 mm tracks and the
+supplies at 0.15 mm (`route_finish.sh` with `CLR=0.1 TW=0.1 PW=0.15`). Six-layer boards at JLCPCB
+take 0.09 mm track and space, so 0.10 mm costs nothing; LVDS100, RF50 and Power keep their own
+clearances (0.15, 0.2, 0.15 mm), and the router takes the larger of two classes. Then:
+- **50 → 40 unrouted**, no DRC error, no supply track on L2 or L5; 213 tracks of 0.10 mm;
+- a second identical pass: 40 → 40;
+- one +3V3_D gap closed by a short track: `_work/layout/fix_gap.py` joins two islands of a net
+  with a grid path on one layer, at most one via and a straight stub, checked against the board's
+  clearances (run with the router's venv, it needs shapely). **39 unrouted**, 0 errors, 0 parity
+  problems. On the other 38 it finds nothing: the pad or ball is boxed in.
+
 ### 6.3 What is left
 
-1. **The 50 unrouted connections.** By group: the DACS bus and its control lines (F_DACS_*,
-   DACS_*, about 14); J101, IAS1 (7: HK_SCL, HK_SDA, FPGA_IRQ, J_LINK_TX_D0_P and three GND pairs);
-   single legs of ADC pairs (6: ADCR_D2_P, ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (+1V8_D
-   4, +3V3_D, +2V5, +1V2); CONV_SPI (3); and a few single analogue nets.
+1. **The 39 unrouted connections.** By group: the DACS bus and its control lines between the
+   BGA, RN1107 and U801 (F_DACS_*, DACS_*, 15); J101, IAS1 (6: HK_SCL, HK_SDA, FPGA_IRQ,
+   J_LINK_TX_D0_P and two GND pads boxed in by the link pairs' vias); single legs of ADC pairs (6:
+   ADCR_D2_P, ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (6: three +1V8_D balls, +2V5, +1V2,
+   +3V3_D, the BGA balls with no free via spot next to them); CONV_SPI_CSB_S, MODE_M1; and four
+   analogue nets at the ADCs (C508, C509, U503 RDN, U601 VIN-A).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
