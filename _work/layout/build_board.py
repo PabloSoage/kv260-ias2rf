@@ -77,10 +77,18 @@ def f(v):
 #                     bottom face, under the pin they decouple. Off: the
 #                     router did worse (100 unrouted after the IF step against
 #                     73), each bottom pad costing a through via;
+#   BB_ADC=mirror     the two ADC sheets placed mirrored in x (13 Oct): the ADC
+#                     next to the FPGA and its front end outboard, at the ADC's
+#                     input side. Off, the front ends sat between the ADCs and
+#                     the BGA and the ADCs' LVDS pairs crossed over them;
+#   BB_ROT=REF:a,...  only this rotation for these parts (e.g. U601:270 puts the
+#                     AD9253's LVDS side, south at 0, towards the BGA);
 #   BB_OUT=<dir>      write the board and project there instead of the repo.
 GROW = float(os.environ.get("BB_GROW", "12"))
 J1103_BOTTOM = os.environ.get("BB_J1103", "bottom") == "bottom"
 BOTTOM_CAPS = os.environ.get("BB_BOTTOM") == "caps"
+ADC_MIRROR = os.environ.get("BB_ADC") == "mirror"
+ROT = {r: int(a) for r, a in (s.split(":") for s in os.environ.get("BB_ROT", "").split(",") if s)}
 ON_BOTTOM = set()                # refs placed on the bottom face
 
 # ---------------------------------------------------------------- outline
@@ -477,7 +485,7 @@ def extent(text):
     return min(xs), min(ys), max(xs), max(ys)
 
 
-def spiral(grid, cyd, tht, tx, ty, rmax=100.0):
+def spiral(grid, cyd, tht, tx, ty, rmax=100.0, angles=(0, 90)):
     """Nearest legal, free spot to (tx, ty): (x, y, angle, box) or None."""
     for r in [i * 0.25 for i in range(0, int(rmax / 0.25))]:
         n = max(1, int(2 * math.pi * r / 0.5))
@@ -485,7 +493,7 @@ def spiral(grid, cyd, tht, tx, ty, rmax=100.0):
             ang = 2 * math.pi * j / n
             x = round((tx + r * math.cos(ang)) / 0.05) * 0.05
             y = round((ty + r * math.sin(ang)) / 0.05) * 0.05
-            for a in (0, 90):
+            for a in angles:
                 b = box_at(cyd, x, y, a)
                 if box_ok(b, tht) and grid.free(b):
                     return (x, y, a, b)
@@ -610,6 +618,8 @@ def place(comps):
         for ref in order:
             sx, sy = spos.get(ref, (scx, scy))
             tx, ty = cx + (sx - scx) * k, cy_ + (sy - scy) * k
+            if ADC_MIRROR and sheet in ("ADC_RADAR", "ADC_SDR"):
+                tx = cx - (sx - scx) * k
             if ref in attach and attach[ref][0] in placed:
                 t = pad_target(ref)
                 if t:
@@ -626,7 +636,7 @@ def place(comps):
                     placed[ref] = spot[:3]
                     gridb.add(spot[3])
                     continue
-            spot = spiral(grid, cyd, tht, tx, ty)
+            spot = spiral(grid, cyd, tht, tx, ty, angles=(ROT[ref],) if ref in ROT else (0, 90))
             if not spot:
                 unplaced.append(ref)
                 continue
@@ -1157,7 +1167,7 @@ def rules():
               "min_copper_edge_clearance": 0.3, "min_hole_to_hole": 0.25, "min_hole_clearance": 0.2})
     ns = pro["net_settings"]
     base = dict(ns["classes"][0])
-    base.update({"track_width": 0.15, "clearance": 0.15, "via_diameter": 0.45, "via_drill": 0.2,
+    base.update({"track_width": 0.15, "clearance": 0.1, "via_diameter": 0.45, "via_drill": 0.2,
                  "diff_pair_width": 0.117, "diff_pair_gap": 0.15})
 
     def cls(name, **kw):
