@@ -12,7 +12,7 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–11 October 2026, §6): 39 connections are left, and the
+**It is autorouted, not finished** (2–13 October 2026, §6): 30 connections are left, and the
 LVDS pairs need a hand review (§6.3).
 
 The original Allied Vision board is kept, untouched, as
@@ -346,14 +346,27 @@ clearances (0.15, 0.2, 0.15 mm), and the router takes the larger of two classes.
   clearances (run with the router's venv, it needs shapely). **39 unrouted**, 0 errors, 0 parity
   problems. On the other 38 it finds nothing: the pad or ball is boxed in.
 
+**The DACS bus first (12–13 October).** Two more full re-routes at 0.10 mm did not beat 39. The
+first had 499 class clearance errors: the fan-out step writes its clearance into every class of
+the project it hands on, and the later steps read that copy (`route_krt.sh` now restores the
+original project after each step). The second reached 42. But ten of the 39 were BGA balls of the
+DACS bus with **no copper at all**: routed late, they found the BGA's left side full of slow
+tracks. So `route_region.sh` ripped every slow net with copper left of the BGA (box 139–158 ×
+140–162 mm: 109 nets, 1,779 tracks and vias, supplies, pairs and RF untouched and protected) and
+routed them again with the 15 DACS nets **first** (`region_first_dacs.txt`, route.py
+`--ordering original`), 0.10 mm tracks and clearance. A first run let tracks onto L4 under the
+BGA, which split the +3V3_D plane into three islands; a temporary tracks-only keep-out on L4 under
+the BGA, removed after routing, fixed that. **39 → 30 unrouted**, 0 errors, 0 parity problems; L2
+and L5 carry only GND.
+
 ### 6.3 What is left
 
-1. **The 39 unrouted connections.** By group: the DACS bus and its control lines between the
-   BGA, RN1107 and U801 (F_DACS_*, DACS_*, 15); J101, IAS1 (6: HK_SCL, HK_SDA, FPGA_IRQ,
-   J_LINK_TX_D0_P and two GND pads boxed in by the link pairs' vias); single legs of ADC pairs (6:
-   ADCR_D2_P, ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (6: three +1V8_D balls, +2V5, +1V2,
-   +3V3_D, the BGA balls with no free via spot next to them); CONV_SPI_CSB_S, MODE_M1; and four
-   analogue nets at the ADCs (C508, C509, U503 RDN, U601 VIN-A).
+1. **The 30 unrouted connections.** By group: the DACS control lines at RN1107 (4:
+   F_DACS_IQCLK ×2, F_DACS_IQSEL ×2); J101, IAS1 (6: HK_SCL, HK_SDA, FPGA_IRQ, J_LINK_TX_D0_P and
+   two GND pads boxed in by the link pairs' vias); single legs of ADC pairs (6: ADCR_D2_P,
+   ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (6: three +1V8_D balls, +2V5, +1V2, +3V3_D, the
+   BGA balls with no free via spot next to them); CONV_SPI_CSB_S, MODE_M1, SW_CTRL3, XO_SCL; and
+   four analogue nets at the ADCs (C508, C509, U503 RDN, U601 VIN-A).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
