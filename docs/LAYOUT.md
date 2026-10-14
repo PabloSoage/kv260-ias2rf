@@ -12,7 +12,7 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–14 October 2026, §6): 24 connections are left, and the
+**It is autorouted, not finished** (2–14 October 2026, §6): 20 connections are left, and the
 LVDS pairs need a hand review (§6.3).
 
 The original Allied Vision board is kept, untouched, as
@@ -387,14 +387,19 @@ The second, after its finishing passes, was taken. By hand (text edits, DRC afte
 **24 unrouted**, 0 errors, 0 parity problems. L2 carries only GND; L5 GND and 19.5 mm of
 XADC_GND. Every analogue net of the front ends is now routed.
 
+Then three region passes in parallel on that board: the DACS box with the 15 DACS nets first
+(24, no gain), with the six DACS nets still open first and the rest of the bus after them
+(**20**), and the box right of the BGA with its open slow nets first (25). The second was taken:
+**24 → 20 unrouted**, 0 errors, 0 parity problems; it also closed the open +3V3_D connection and
+took XADC_GND off L5, so L2 and L5 carry only GND.
+
 ### 6.3 What is left
 
-1. **The 24 unrouted connections.** By group: the DACS bus at RN1106/RN1107 and U801 (9:
-   F_DACS_D10, F_DACS_IQCLK ×2, F_DACS_IQSEL, DACS_D8, DACS_D13, DACS_IQWRT and two RN1107 items
-   KiCad reports under an "unconnected-" name); J101, IAS1 (4: J_LINK_TX_CLK_P/N, J_LINK_TX_D0_N,
-   FPGA_IRQ); single legs of LVDS pairs (3: ADCR_D4_N ×2, LINK_RX_D1_P); supplies (3: +1V2, +2V5,
-   +3V3_D, BGA balls); slow control lines (5: ADAR1_RX_LOAD, ADAR2_RX_LOAD, SW_CTRL2, XO_SCL,
-   XADC_GND). The DACS region pass (§6.2) on this board gained nothing (23 → 24).
+1. **The 20 unrouted connections.** By group: the DACS control lines at RN1107 (4:
+   F_DACS_IQRESET, F_DACS_IQSEL and two RN1107 items KiCad reports under an "unconnected-" name);
+   J101, IAS1 (4: J_LINK_TX_CLK_P/N, J_LINK_TX_D0_N, FPGA_IRQ); single legs of LVDS pairs (3:
+   ADCR_D4_N ×2, LINK_RX_D1_P); supplies (2: +1V2, +2V5, BGA balls); slow control lines (7:
+   ADAR1_RX_LOAD, ADAR2_RX_LOAD, CLK_SEL, JTAG_TMS, SW_CTRL1, SW_CTRL2, XO_SCL).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
