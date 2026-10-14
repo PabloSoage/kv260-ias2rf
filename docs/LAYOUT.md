@@ -12,7 +12,7 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–13 October 2026, §6): 30 connections are left, and the
+**It is autorouted, not finished** (2–14 October 2026, §6): 24 connections are left, and the
 LVDS pairs need a hand review (§6.3).
 
 The original Allied Vision board is kept, untouched, as
@@ -161,7 +161,7 @@ sheet, scaled down:
 | Left | POWER, beside the jack |
 | Centre-left | DAC_RADAR, DAC_SDR |
 | Centre | CONTROL, around the FPGA |
-| Right | CLOCK, ADC_RADAR, ADC_SDR |
+| Right | CLOCK, ADC_RADAR, ADC_SDR (each ADC next to the FPGA, its front end outboard: §6.2, 14 October) |
 | Top-right tongue | IAS_LINK, beside J101 |
 | Bottom band | ROUTING. Each RF switch sits right above its own pair of SMAs |
 
@@ -359,14 +359,42 @@ BGA, which split the +3V3_D plane into three islands; a temporary tracks-only ke
 the BGA, removed after routing, fixed that. **39 → 30 unrouted**, 0 errors, 0 parity problems; L2
 and L5 carry only GND.
 
+**The ADCs moved next to the FPGA (13–14 October).** Region passes elsewhere gained nothing (right
+of the BGA: 31, then 30 with other nets open; the ADC front ends: 37). The plot showed why: each
+ADC sat east, with its front end (U502/U503, U602/U603) **between it and the BGA**, so the ADCs'
+LVDS pairs ran over the amplifiers. That boxed in their resistors and capacitors (C508, C509, U503
+RDN, U601 VIN-A were unroutable) and put fast digital lines over the analogue inputs. Now the two
+ADC sheets are placed mirrored in x (`build_board.py`, `BB_ADC=mirror`, the default): the ADC next
+to the FPGA, its front end outboard at the ADC's input side, the IF lines coming up to it from the
+SMA row. U501 at 0° (inputs east, LVDS north, west and south) and U601 at 270° (its LVDS side, south
+at 0°, towards the BGA): `BB_ROT=U501:0,U601:270`, the default. Three variants were routed in
+parallel with the whole chain (`route_all.sh` at 0.10 mm, then the DACS region pass):
+
+| Variant | After IF | After finishing | After the DACS pass |
+|---|---|---|---|
+| U501 0°, U601 free | 40 | 27 (3 errors) | 29, 0 errors |
+| **U501 0°, U601 270°** | 50 | **23** (3 errors) | 24 (3 errors) |
+| mirror only | 51 | 43 | 40 |
+
+The second, after its finishing passes, was taken. By hand (text edits, DRC after each):
+- the three errors were one +1V8_D track on L1 passing 0.116 mm from ball A3 (ADAR2_TR): its first
+  millimetre redrawn 0.5 mm clear of the ball;
+- the router's plane step had again put supply tracks on L2: +1V8_ADCS_A (15 tracks, 0.8 mm) and
+  +3V3_D (7) moved to L4, where they lie in their own island or the +3V3_D background. Three of
+  the +3V3_D tracks, beside the BGA, crossed slow tracks on every layer: removed, which leaves one
+  +3V3_D connection open.
+
+**24 unrouted**, 0 errors, 0 parity problems. L2 carries only GND; L5 GND and 19.5 mm of
+XADC_GND. Every analogue net of the front ends is now routed.
+
 ### 6.3 What is left
 
-1. **The 30 unrouted connections.** By group: the DACS control lines at RN1107 (4:
-   F_DACS_IQCLK ×2, F_DACS_IQSEL ×2); J101, IAS1 (6: HK_SCL, HK_SDA, FPGA_IRQ, J_LINK_TX_D0_P and
-   two GND pads boxed in by the link pairs' vias); single legs of ADC pairs (6: ADCR_D2_P,
-   ADCR_D4_P/N, ADCS_D0_N, ADCS_FCO_P/N); supplies (6: three +1V8_D balls, +2V5, +1V2, +3V3_D, the
-   BGA balls with no free via spot next to them); CONV_SPI_CSB_S, MODE_M1, SW_CTRL3, XO_SCL; and
-   four analogue nets at the ADCs (C508, C509, U503 RDN, U601 VIN-A).
+1. **The 24 unrouted connections.** By group: the DACS bus at RN1106/RN1107 and U801 (9:
+   F_DACS_D10, F_DACS_IQCLK ×2, F_DACS_IQSEL, DACS_D8, DACS_D13, DACS_IQWRT and two RN1107 items
+   KiCad reports under an "unconnected-" name); J101, IAS1 (4: J_LINK_TX_CLK_P/N, J_LINK_TX_D0_N,
+   FPGA_IRQ); single legs of LVDS pairs (3: ADCR_D4_N ×2, LINK_RX_D1_P); supplies (3: +1V2, +2V5,
+   +3V3_D, BGA balls); slow control lines (5: ADAR1_RX_LOAD, ADAR2_RX_LOAD, SW_CTRL2, XO_SCL,
+   XADC_GND). The DACS region pass (§6.2) on this board gained nothing (23 → 24).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.

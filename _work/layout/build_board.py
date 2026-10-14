@@ -77,18 +77,20 @@ def f(v):
 #                     bottom face, under the pin they decouple. Off: the
 #                     router did worse (100 unrouted after the IF step against
 #                     73), each bottom pad costing a through via;
-#   BB_ADC=mirror     the two ADC sheets placed mirrored in x (13 Oct): the ADC
+#   BB_ADC=mirror     (default; "off" for the old placement) the two ADC sheets
+#                     placed mirrored in x (13-14 Oct): the ADC
 #                     next to the FPGA and its front end outboard, at the ADC's
 #                     input side. Off, the front ends sat between the ADCs and
 #                     the BGA and the ADCs' LVDS pairs crossed over them;
-#   BB_ROT=REF:a,...  only this rotation for these parts (e.g. U601:270 puts the
-#                     AD9253's LVDS side, south at 0, towards the BGA);
+#   BB_ROT=REF:a,...  only this rotation for these parts (default U501:0,U601:270:
+#                     each ADC's inputs towards its front end, its LVDS side
+#                     towards the BGA; the AD9253's LVDS side is south at 0);
 #   BB_OUT=<dir>      write the board and project there instead of the repo.
 GROW = float(os.environ.get("BB_GROW", "12"))
 J1103_BOTTOM = os.environ.get("BB_J1103", "bottom") == "bottom"
 BOTTOM_CAPS = os.environ.get("BB_BOTTOM") == "caps"
-ADC_MIRROR = os.environ.get("BB_ADC") == "mirror"
-ROT = {r: int(a) for r, a in (s.split(":") for s in os.environ.get("BB_ROT", "").split(",") if s)}
+ADC_MIRROR = os.environ.get("BB_ADC", "mirror") == "mirror"
+ROT = {r: int(a) for r, a in (s.split(":") for s in os.environ.get("BB_ROT", "U501:0,U601:270").split(",") if s)}
 ON_BOTTOM = set()                # refs placed on the bottom face
 
 # ---------------------------------------------------------------- outline
