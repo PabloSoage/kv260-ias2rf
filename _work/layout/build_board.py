@@ -187,7 +187,7 @@ EDGE_MARGIN = 0.4
 # A ring kept free around the BGA so its outer rows can escape on L1 and the
 # fan-out vias of the inner rows have room: no part within this of its
 # courtyard (1.0 mm pitch, 0.45 mm vias; LAYOUT.md §4).
-KEEPOUT = {"U1101": 2.5}
+KEEPOUT = {"U1101": float(os.environ.get("BB_RING", "2.5"))}   # BB_RING: its width in mm
 
 
 # ---------------------------------------------------------------- geometry
