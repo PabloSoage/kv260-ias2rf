@@ -131,7 +131,7 @@ pins in one place for a plane to be worth it.
   U801. Placed by rule they sat above the BGA, and the DAC lines doubled back;
 - **the Pmod and JTAG headers**;
 - **the FPGA**, rotated 90°, so bank 15 faces the DACs and bank 14 faces the ADCs and J101. **A
-  2.5 mm ring around it is kept free of parts**, so the outer rows can escape on L1 and the inner
+  3.5 mm ring around it is kept free of parts** (2.5 mm until 19 Oct, §6.2), so the outer rows can escape on L1 and the inner
   rows' fan-out vias have room.
 
 - **the POWER block, along the flow of the power** (below);
@@ -393,13 +393,32 @@ Then three region passes in parallel on that board: the DACS box with the 15 DAC
 **24 → 20 unrouted**, 0 errors, 0 parity problems; it also closed the open +3V3_D connection and
 took XADC_GND off L5, so L2 and L5 carry only GND.
 
+**A wider ring round the BGA (17–19 Oct).** Three placements routed in parallel with the same
+chain: the part-free ring round U1101 at 3.5 mm (`BB_RING`, 2.5 until then), 0.6 mm between
+parts (`BB_CLEAR`), and both (ring 3.0). After the DACS pass: 21, 49 and 41 unrouted. The 3.5 mm
+ring was kept, from its third finishing pass rather than the end of the chain: that pass had
+reached 20 unrouted but was dropped for four clearance errors of 0.1493 mm against 0.15 (+3V3_D
+vias beside slow tracks, a rounding of the router's grid). `_work/layout/nudge_vias.py` moves
+each such via (and its own tracks' ends) by under 0.01 mm until the clearance holds. Then, on
+that board:
+- the router's plane step had put 30 +3V3_D tracks on L2: removed. They had been carrying
+  +3V3_D across an L4 background cut by 74 signal tracks under the BGA, so 25 unrouted;
+- a region pass over the whole BGA (box 139–167 × 138–162 mm, the DACS nets and the open slow
+  nets first, L4 keep-out under the BGA) took the signal tracks on L4 there from 74 to 11 and
+  reached **17**; the DACS box alone gave 19, the open nets first 24;
+- `route_finish.sh` on the supplies only (L4 open to them): 15;
+- one ADCR_D1_N leg on L2 removed and the open LVDS legs re-routed on L1, L3 and L6;
+- two ADCR_D4_N vias 0.14 mm apart (hole to hole) merged into one.
+
+**24 → 20 → 15 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+
 ### 6.3 What is left
 
-1. **The 20 unrouted connections.** By group: the DACS control lines at RN1107 (4:
-   F_DACS_IQRESET, F_DACS_IQSEL and two RN1107 items KiCad reports under an "unconnected-" name);
-   J101, IAS1 (4: J_LINK_TX_CLK_P/N, J_LINK_TX_D0_N, FPGA_IRQ); single legs of LVDS pairs (3:
-   ADCR_D4_N ×2, LINK_RX_D1_P); supplies (2: +1V2, +2V5, BGA balls); slow control lines (7:
-   ADAR1_RX_LOAD, ADAR2_RX_LOAD, CLK_SEL, JTAG_TMS, SW_CTRL1, SW_CTRL2, XO_SCL).
+1. **The 15 unrouted connections.** By group: supplies (4: +2V5 at ball R4, three +3V3_D
+   connections where the L4 background is cut); single legs of LVDS pairs (4: ADCS_D1_P,
+   ADCS_D1_N, ADCS_FCO_N, LINK_RX_D1_P); J101, IAS1 (2: J_LINK_TX_D0_P, HK_SDA); slow control
+   lines (5: CLK_SEL, HK_SDA, MODE_M1, SW_CTRL1, F_DACS_D10 at RN1105, which KiCad reports under
+   an RN1107 "unconnected-" name).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.

@@ -186,8 +186,9 @@ CLEAR = float(os.environ.get("BB_CLEAR", "0.5"))   # courtyard to courtyard
 EDGE_MARGIN = 0.4
 # A ring kept free around the BGA so its outer rows can escape on L1 and the
 # fan-out vias of the inner rows have room: no part within this of its
-# courtyard (1.0 mm pitch, 0.45 mm vias; LAYOUT.md §4).
-KEEPOUT = {"U1101": float(os.environ.get("BB_RING", "2.5"))}   # BB_RING: its width in mm
+# courtyard (1.0 mm pitch, 0.45 mm vias; LAYOUT.md §4). 3.5 mm since 19 Oct (2.5 until then):
+# the wider ring routed to 15 unrouted against 20 (LAYOUT.md §6.2).
+KEEPOUT = {"U1101": float(os.environ.get("BB_RING", "3.5"))}   # BB_RING: its width in mm
 
 
 # ---------------------------------------------------------------- geometry
