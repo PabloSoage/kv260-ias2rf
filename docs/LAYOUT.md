@@ -408,13 +408,20 @@ that board:
   reached **17**; the DACS box alone gave 19, the open nets first 24;
 - `route_finish.sh` on the supplies only (L4 open to them): 15;
 - one ADCR_D1_N leg on L2 removed and the open LVDS legs re-routed on L1, L3 and L6;
-- two ADCR_D4_N vias 0.14 mm apart (hole to hole) merged into one.
+- two ADCR_D4_N vias 0.14 mm apart (hole to hole) merged into one;
+- `route_finish.sh` on the supplies only once more, on a 0.025 mm grid (19 Oct): 14, one +3V3_D
+  connection closed.
 
-**24 → 20 → 15 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+
+What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
+15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
+passes are now zero-sum; new placements with a 4.0 or 4.5 mm ring, or 3.5 mm with 0.6 mm between
+parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 25 for 3.5 mm).
 
 ### 6.3 What is left
 
-1. **The 15 unrouted connections.** By group: supplies (4: +2V5 at ball R4, three +3V3_D
+1. **The 14 unrouted connections.** By group: supplies (3: +2V5 at ball R4, two +3V3_D
    connections where the L4 background is cut); single legs of LVDS pairs (4: ADCS_D1_P,
    ADCS_D1_N, ADCS_FCO_N, LINK_RX_D1_P); J101, IAS1 (2: J_LINK_TX_D0_P, HK_SDA); slow control
    lines (5: CLK_SEL, HK_SDA, MODE_M1, SW_CTRL1, F_DACS_D10 at RN1105, which KiCad reports under
