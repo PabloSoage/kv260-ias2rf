@@ -244,6 +244,12 @@ Python + Rust router that reads and writes the `.kicad_pcb` text itself. The cha
 `_work/layout/route_krt.sh`: BGA fan-out, then the LVDS pairs, then everything else. It ran on a
 copy, and only tracks and vias came back: every footprint and zone is byte-identical.
 
+Setup on a new machine (26 Oct 2026): KiCad 10 and Python from winget/mise (`mise.toml` pins
+the host Python), then `bash _work/layout/setup_krt.sh <dir>` clones the router at the commit
+used here, applies the local patch, makes its venv and builds the Rust part; put
+the router's path under `[env]` in an untracked `mise.local.toml`. The scripts find kicad-cli
+themselves (`_work/toolpaths.py`, `_work/layout/toolpaths.sh`; `KICAD_CLI` overrides).
+
 | | Result |
 |---|---|
 | BGA fan-out | 146 of 147 nets out of U1101, **dog-bone only**: a 0.45/0.2 mm via between four balls, no via in any pad |
@@ -411,6 +417,10 @@ that board:
 - two ADCR_D4_N vias 0.14 mm apart (hole to hole) merged into one;
 - `route_finish.sh` on the supplies only once more, on a 0.025 mm grid (19 Oct): 14, one +3V3_D
   connection closed.
+
+KiCad 10.0.6 (26 Oct) reported 38 supply stubs of 0.01–0.2 mm on L4, left at pads by the plane
+finalize, as items not allowed in the islands' no-tracks keep-outs; the earlier KiCad did not.
+They were removed (`drop_dangling.py` now removes them too); the plane connects those pads.
 
 **24 → 20 → 15 → 14 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
