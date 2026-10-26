@@ -15,11 +15,11 @@ WORK = os.path.dirname(HERE)
 ROOT = os.path.dirname(WORK)
 sys.path.insert(0, WORK)
 import schgen                                        # noqa: E402
+from toolpaths import KICAD_CLI, stock_footprints   # noqa: E402
 
-KICAD_CLI = "E:/Program Files/KiCad/10.0/bin/kicad-cli.exe"
 ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
 FP_DIRS = {"kv260-ias2rf": os.path.join(ROOT, "footprints", "kv260-ias2rf.pretty")}
-STOCK_FP = "E:/Program Files/KiCad/10.0/share/kicad/footprints/"
+STOCK_FP = stock_footprints()
 
 
 class Comp:

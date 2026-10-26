@@ -23,3 +23,6 @@ _work/datasheets/
 
 # Salidas de fabricacion: se regeneran con _work/fab/make_fab.py
 /fab/
+
+# Ajustes locales de mise (rutas de esta maquina: ROUTER, KICAD_CLI)
+mise.local.toml
