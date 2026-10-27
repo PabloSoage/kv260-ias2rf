@@ -448,12 +448,15 @@ The same with LVDS rip on ADCS_D1_P (box 166–178 × 154.5–161.3 mm, right of
 broke PROGRAM_B, which a plain local pass then re-closed: **7**. **Review:** in that box the ADC
 LVDS legs ADCR_D4, D6, D7, OR (both legs), ADCS_D0, ADCS_D1_N, ADCS_DCO_N, ADCS_FCO_P, LINK_RX_CLK_P
 and LINK_RX_D0_N were re-routed as single tracks for a few millimetres.
+Then ADCS_FCO_P (box 160.5–177.5 × 147.5–151.5 mm, between the BGA and the ADCS series
+resistors): **6**. **Review:** there the legs ADCR_D0_N, D2_P, D3_P, D4–D7, ADCS_D0, ADCS_DCO,
+ADCS_FCO_N, FPGA_CLK_P and LINK_RX_D0_P were re-routed as single tracks for a few millimetres.
 
 Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (not only between
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -462,9 +465,8 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 7 unrouted connections.** By group: supplies (2: +3V3_D where the L4 background is
-   cut, at FB401 and under the BGA); single legs of LVDS pairs (3: ADCS_D1_N, ADCS_FCO_P,
-   LINK_RX_D1_P); J101, IAS1 (1: J_LINK_TX_D0_P); RN1107 pad 4 (1: an
+1. **The 6 unrouted connections.** By group: supplies (2: +3V3_D where the L4 background is
+   cut, at FB401 and under the BGA); single legs of LVDS pairs (2: ADCS_D1_N, LINK_RX_D1_P); J101, IAS1 (1: J_LINK_TX_D0_P); RN1107 pad 4 (1: an
    "unconnected-" net KiCad reports there, F_DACS_D10).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
