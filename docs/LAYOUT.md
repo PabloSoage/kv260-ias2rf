@@ -422,7 +422,16 @@ KiCad 10.0.6 (26 Oct) reported 38 supply stubs of 0.01–0.2 mm on L4, left at p
 finalize, as items not allowed in the islands' no-tracks keep-outs; the earlier KiCad did not.
 They were removed (`drop_dangling.py` now removes them too); the plane connects those pads.
 
-**24 → 20 → 15 → 14 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+Escapes for the stuck balls (27 Oct): eight of the 14 started at a U1101 ball with no copper
+at all. Every spot round those balls, and the ball itself, was crossed by other nets' inner
+tracks; `_work/layout/add_escapes.py --rip` put a via at each ball (in the pad, or 0.5 mm off
+diagonally) and deleted the 47 track segments it hit, `route_finish.sh` re-routed those 22
+nets (L1, L3, L6), the 61 +3V3_D segments it put on L2 were removed, and a supplies-only pass
+(0.025 mm grid, L4 open) closed one more: **13**. +2V5 at R4, ADCS_FCO_N and F_DACS_D10 are now
+routed; ADCS_FCO_P and CONV_SPI_CSB_R lost theirs. One escape via stayed in a ball pad (P9,
+ADCS_FCO_N), filled and capped like the others (FABRICATION.md).
+
+**24 → 20 → 15 → 14 → 13 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -431,11 +440,10 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 14 unrouted connections.** By group: supplies (3: +2V5 at ball R4, two +3V3_D
-   connections where the L4 background is cut); single legs of LVDS pairs (4: ADCS_D1_P,
-   ADCS_D1_N, ADCS_FCO_N, LINK_RX_D1_P); J101, IAS1 (2: J_LINK_TX_D0_P, HK_SDA); slow control
-   lines (5: CLK_SEL, HK_SDA, MODE_M1, SW_CTRL1, F_DACS_D10 at RN1105, which KiCad reports under
-   an RN1107 "unconnected-" name).
+1. **The 13 unrouted connections.** By group: supplies (1: +3V3_D where the L4 background is
+   cut); single legs of LVDS pairs (4: ADCS_D1_P, ADCS_D1_N, ADCS_FCO_P, LINK_RX_D1_P); J101,
+   IAS1 (2: J_LINK_TX_D0_P, HK_SDA); slow control lines (6: CLK_SEL, HK_SDA, MODE_M1, SW_CTRL1,
+   CONV_SPI_CSB_R, and RN1107 pad 4, an "unconnected-" net KiCad reports there).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
