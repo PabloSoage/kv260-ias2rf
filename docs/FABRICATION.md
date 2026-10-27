@@ -10,7 +10,7 @@ py _work/fab/make_fab.py
 ```
 
 **Today the output is a DRAFT.** The board is autorouted but not finished (LAYOUT §6): DRC reports
-11 unrouted connections (no DRC errors). So the script names
+10 unrouted connections (no DRC errors). So the script names
 the folder `DRAFT-…` and writes *DO NOT ORDER* in the notes. The draft is there to check the files,
 not to order from.
 
