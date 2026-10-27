@@ -439,12 +439,17 @@ L4 kept out under the BGA HK_SCL did not close. `_work/layout/close_pass.sh` doe
 (escapes, local pass, finishing on every incomplete net with L4 open); on ADCS_D1_P it closed
 SW_CTRL1 and JTAG_TCK instead and cut one more +3V3_D connection under the BGA: **9**
 (38 signal segments on L4 under the BGA; the cut +3V3_D at 152 × 146 mm is one of the 9).
+J101's pins are boxed in by the link pairs' vias, so the local pass there may rip LVDS copper too
+(`CLASSES="Default|LVDS100"`): HK_SDA closed in a 7 × 5 mm box at J101 (182–189 × 82.5–87.5
+mm): **8**. **Review:** inside that box the link pairs there (J_LINK_RX_CLK, RX_D0, RX_D1,
+TX_CLK, TX_D0_N, LINK_RX_CLK, LINK_RX_D0_P, LINK_RX_D1_N, LINK_TX_D0_P) were re-routed as single
+tracks, so they run uncoupled for a few millimetres next to the connector.
 
 Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (not only between
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -453,9 +458,9 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 9 unrouted connections.** By group: supplies (2: +3V3_D where the L4 background is
+1. **The 8 unrouted connections.** By group: supplies (2: +3V3_D where the L4 background is
    cut, at FB401 and under the BGA); single legs of LVDS pairs (4: ADCS_D1_P, ADCS_D1_N,
-   ADCS_FCO_P, LINK_RX_D1_P); J101, IAS1 (2: J_LINK_TX_D0_P, HK_SDA); RN1107 pad 4 (1: an
+   ADCS_FCO_P, LINK_RX_D1_P); J101, IAS1 (1: J_LINK_TX_D0_P); RN1107 pad 4 (1: an
    "unconnected-" net KiCad reports there, F_DACS_D10).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
