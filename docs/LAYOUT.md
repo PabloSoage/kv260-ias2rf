@@ -451,12 +451,30 @@ and LINK_RX_D0_N were re-routed as single tracks for a few millimetres.
 Then ADCS_FCO_P (box 160.5–177.5 × 147.5–151.5 mm, between the BGA and the ADCS series
 resistors): **6**. **Review:** there the legs ADCR_D0_N, D2_P, D3_P, D4–D7, ADCS_D0, ADCS_DCO,
 ADCS_FCO_N, FPGA_CLK_P and LINK_RX_D0_P were re-routed as single tracks for a few millimetres.
+Beam search (28 Oct): `_work/layout/close_search.py` runs `close_pass.sh` on every open signal
+connection of every board in a beam (two box margins, with and without LVDS rip), keeps the best
+few results (a pass that closes its target and breaks one other stays, `--slack`) and goes on
+from them; the greedy form of it stalls at 6-7. Run on a compute-cluster node
+(below), round 1 on J_LINK_TX_D0_P (box 180.5–190.4 × 80.4–88.9 mm at J101,
+LVDS rip) gave another 6, and round 2 on that board closed F_DACS_D10 and the +3V3_D connection
+under the BGA (box 141.5–155.5 × 139.5–163.5 mm, Default nets only) and broke SW_CTRL1: **5**.
+**Review:** at J101 the legs J_LINK_RX_CLK_N, J_LINK_RX_D0_N, J_LINK_RX_D1_P, J_LINK_TX_CLK,
+J_LINK_TX_D0_N, LINK_RX_CLK_N, LINK_RX_D0_P, LINK_RX_D1_N and LINK_TX_D0_P were re-routed as
+single tracks for a few millimetres.
+
+The the cluster runs (the cluster scripts): `env.sh` loads
+apptainer and Python, KiCad 10.0.6 runs from the `kicad/kicad` image and the router is built in
+the maturin (manylinux2014) image by `setup.sbatch`, which also runs one test pass;
+`search.sbatch <boards>...` runs `close_search.py` on one node (`JOBS` passes at once, about
+10 GB each) and copies `search.log`, `best_<N>` and the current `beam_<i>_<N>` boards to
+`$STORE/kv260-route/runs/<job>` every 10 minutes and before the time limit; a new job resumes
+from the `beam_*` boards. Everything runs through `sbatch`, never on the login node.
 
 Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (not only between
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -465,9 +483,9 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 6 unrouted connections.** By group: supplies (2: +3V3_D where the L4 background is
-   cut, at FB401 and under the BGA); single legs of LVDS pairs (2: ADCS_D1_N, LINK_RX_D1_P); J101, IAS1 (1: J_LINK_TX_D0_P); RN1107 pad 4 (1: an
-   "unconnected-" net KiCad reports there, F_DACS_D10).
+1. **The 5 unrouted connections.** By group: supplies (1: +3V3_D where the L4 background is
+   cut, 183–204 × 142–146 mm); single legs of LVDS pairs (2: ADCS_D1_N, LINK_RX_D1_P); J101, IAS1
+   (1: J_LINK_TX_D0_P); SW_CTRL1 (1: BGA ball C9 to its track south of the BGA).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
