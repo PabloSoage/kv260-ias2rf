@@ -461,6 +461,13 @@ under the BGA (box 141.5–155.5 × 139.5–163.5 mm, Default nets only) and bro
 **Review:** at J101 the legs J_LINK_RX_CLK_N, J_LINK_RX_D0_N, J_LINK_RX_D1_P, J_LINK_TX_CLK,
 J_LINK_TX_D0_N, LINK_RX_CLK_N, LINK_RX_D0_P, LINK_RX_D1_N and LINK_TX_D0_P were re-routed as
 single tracks for a few millimetres.
+Then (3 Nov) `--long` (boxes round each end of a connection longer than 30 mm) and `--supplies`
+(the open supply connections too): a local search had closed J_LINK_TX_D0_P at J101 (box
+182.5–188.4 × 82.6–86.9 mm, LVDS rip) and opened J_LINK_TX_D0_N, still 5; on that board a pass
+on +3V3_D (box 180.9–206.2 × 139.7–147.6 mm, Default nets only) closed it: **4**. Two
+Net-(U401-~{Q2}) vias it left 0.2 mm apart (hole_to_hole) were merged by hand. **Review:** at
+J101 the legs J_LINK_RX_CLK_N, J_LINK_RX_D0_N, J_LINK_TX_CLK_N, J_LINK_TX_D0, LINK_RX_CLK_N,
+LINK_RX_D1_N and LINK_TX_D0_P were re-routed as single tracks again.
 
 The the cluster runs (the cluster scripts): `env.sh` loads
 apptainer and Python, KiCad 10.0.6 runs from the `kicad/kicad` image and the router is built in
@@ -474,7 +481,7 @@ Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (no
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -483,9 +490,8 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 5 unrouted connections.** By group: supplies (1: +3V3_D where the L4 background is
-   cut, 183–204 × 142–146 mm); single legs of LVDS pairs (2: ADCS_D1_N, LINK_RX_D1_P); J101, IAS1
-   (1: J_LINK_TX_D0_P); SW_CTRL1 (1: BGA ball C9 to its track south of the BGA).
+1. **The 4 unrouted connections.** Single legs of LVDS pairs (2: ADCS_D1_N, LINK_RX_D1_P);
+   J101, IAS1 (1: J_LINK_TX_D0_N); SW_CTRL1 (1: BGA ball C9 to its track south of the BGA).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
