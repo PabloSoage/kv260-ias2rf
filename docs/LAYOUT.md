@@ -468,6 +468,16 @@ on +3V3_D (box 180.9–206.2 × 139.7–147.6 mm, Default nets only) closed it: 
 Net-(U401-~{Q2}) vias it left 0.2 mm apart (hole_to_hole) were merged by hand. **Review:** at
 J101 the legs J_LINK_RX_CLK_N, J_LINK_RX_D0_N, J_LINK_TX_CLK_N, J_LINK_TX_D0, LINK_RX_CLK_N,
 LINK_RX_D1_N and LINK_TX_D0_P were re-routed as single tracks again.
+LINK_RX_D1_P (ball M2) could not escape: its dogbone spots were taken by CONV_SPI_SDIO,
+CONV_SPI_SCLK and +2V5 vias, and its AC cap C105 sat right over the J101 pad field. With C105
+moved to the free spot left of J101 (180.5, 84.25 mm, F.Cu, 90°) and LINK_RX_D1_P/N,
+CONV_SPI_SDIO, CONV_SPI_SCLK and J_LINK_RX_D1_P ripped, a fan-out and a diff-pair pass for
+LINK_RX_D1 (fan-out clearance 0.15 mm, then the finishing passes) closed it
+and opened CONV_SPI_SDIO instead (still 4); a beam search round from that board closed
+CONV_SPI_SDIO (box 172.4–193.2 × 159–178.2 mm, Default nets only): **3**. **Review:** LINK_RX_D1
+now runs as two single tracks, not as a coupled pair: P is 151.8 mm with 10 vias, N 108.5 mm
+with 3, so 43 mm of skew (about 0.27 ns). Check that against the link's bit rate before
+ordering, or re-route the pair as a pair. CONV_SPI_SDIO and CONV_SPI_SCLK (slow) were re-routed.
 
 The the cluster runs (the cluster scripts): `env.sh` loads
 apptainer and Python, KiCad 10.0.6 runs from the `kicad/kicad` image and the router is built in
@@ -481,7 +491,7 @@ Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (no
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -490,8 +500,9 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 4 unrouted connections.** Single legs of LVDS pairs (2: ADCS_D1_N, LINK_RX_D1_P);
-   J101, IAS1 (1: J_LINK_TX_D0_N); SW_CTRL1 (1: BGA ball C9 to its track south of the BGA).
+1. **The 3 unrouted connections.** A single leg of an LVDS pair (ADCS_D1_N); J101, IAS1
+   (J_LINK_TX_D0_N); SW_CTRL1 (BGA ball C9 to its track south of the BGA).
+   LINK_RX_D1's 43 mm skew (§6.2) is to be checked or re-routed as a pair.
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
