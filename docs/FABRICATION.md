@@ -11,7 +11,7 @@ py _work/fab/make_fab.py
 
 **Since 10 Nov the output is not a draft:** DRC reports no errors and no unrouted connections, so
 the script names the folder without `DRAFT-`. Before ordering, the review items of LAYOUT §6.2
-(LVDS skew above all) are still to be closed.
+(the LVDS termination stubs above all) are still to be closed.
 
 ---
 
@@ -78,9 +78,21 @@ covers them.
 differ for some packages (SOT-23, some QFNs and SOICs). The CPL is KiCad's; correct the rotation
 there if a part shows turned.
 
-**Confirm the impedances in JLCPCB's own calculator:** 117 / 150 µm differential and 183 µm single
-on L1, with stack 2116A selected. The field solver gives 100.2 Ω and 49.8 Ω. JLCPCB's calculator
-should agree within a few ohms; if it does not, its widths win (POWER_AND_STACKUP §2.6).
+**Confirm the impedances in JLCPCB's own calculator** (`jlcpcb.com/pcb-impedance-calculator`):
+6 layers, 1.6 mm, outer copper 1 oz, inner 0.5 oz, stack **JLC06161H-2116A**. The field solver
+(`_work/field_solver.py`, POWER_AND_STACKUP §2.6) gives:
+
+| Row | Type | Layer | References | Width / spacing | Field solver | Used on the board by |
+|---|---|---|---|---|---|---|
+| 1 | Single-ended | L1 | L2 | 183 µm | 49.8 Ω | `IF_RX_*`, `IF_TX_*` (RF50) |
+| 2 | Single-ended | L1 | L2 | 100 µm | 63.7 Ω | Every LVDS leg on L1 (and L6 over L5, the same stack mirrored) |
+| 3 | Single-ended | L3 | L2 / L4 | 100 µm | 62.5 Ω | Every LVDS leg on L3 |
+| 4 | Differential | L1 | L2 | 117 / 150 µm | 100.2 Ω | The LVDS100 class's own geometry, for a pair-routed revision |
+
+JLCPCB's calculator works from a target impedance to a width, so enter 50 Ω for row 1, 64 Ω for
+row 2, 62 Ω for row 3 and 100 Ω for row 4, and compare the widths it gives. It should agree within
+a few per cent; if it does not, its widths win. Row 1 is the one that matters most (the RF lines'
+match); rows 2–3 tell how far the uncoupled LVDS legs sit from 100 Ω between them (LAYOUT §6.3).
 
 ---
 
