@@ -274,7 +274,7 @@ board file is the source, as the drawn sheets are once accepted.
 counted as one: LINK_* plus J_LINK_*), turns it into delay with 6.0 ps/mm on L1/L6 and 6.9 ps/mm
 on L3 (POWER_AND_STACKUP §2.5), counts vias and measures how much of the P leg runs next to the
 N leg. Rates: LINK ≤ 1 Gb/s a lane (INTERFACE_SPEC §3, 1 ns a bit), ADCS 1 Gb/s a lane (AD9253
-one-lane, 62.5 MSPS × 16), ADCR 400 MSPS. Board as of af3bc19:
+one-lane, 62.5 MSPS × 16), ADCR 400 MSPS. Board as of da14df5:
 
 | Pair | P / N mm | P − N ps | Vias P/N | Verdict |
 |---|---|---|---|---|
