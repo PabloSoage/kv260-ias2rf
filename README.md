@@ -114,7 +114,10 @@ BGA, for one).
    better. The skew (every pair at 1 Gb/s within 42 ps) and the termination stubs were fixed on
    10 Nov, and the trace widths agree with JLCPCB's calculator within 1–3 %
    ([FABRICATION.md](docs/FABRICATION.md)).
-2. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it.
+2. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it. JLCPCB's
+   calculator lists the cheaper JLC06161H-3313 first, whose L1–L2 prepreg is thinner (0.099 mm
+   against 0.116 mm); on that stack the 183 µm RF lines would sit at about 45 Ω instead of 50 Ω
+   ([FABRICATION.md](docs/FABRICATION.md)).
 3. **The AERIS-10 end of the ribbon does not exist yet.**
 4. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
