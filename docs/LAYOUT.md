@@ -489,6 +489,15 @@ LINK_RX_D1 +43.3 → +74.8, LINK_RX_CLK −16.7 → −13.9, ADCS_D1 +28.6 → +
 −54.8 (unchanged), ADCS_DCO +8.9 → −6.2, ADCR_OR −24.3 → −8.9, ADCR_D4 +16.3 → −5.6, ADCR_D5
 +5.3 → −11.0, ADCR_D6 −1.4 → −10.0, CLK_ADCS +1.0 → +10.3; the rest within 3 mm of before.
 
+J_LINK_TX_D0_N (J101 pad 26 to C108 pad 2) was then routed by hand, by an A* search over F.Cu, In2.Cu
+and B.Cu with through vias that checks every step against the netclass clearances (10 Nov).
+Pad 26 is 0.23 mm wide at 0.4 mm pitch, so a 0.15 mm LVDS clearance only lets a track leave it
+lengthwise, and both ends were taken: the P leg below, a B.Cu GND track over the pad row above.
+That GND track was cut over pad 26 (four pieces); the N leg now leaves upwards to a via at
+(186.05, 84.2), runs down In2.Cu and comes up next to C108 (via at 185.25, 87.65), 0.1 mm wide.
+The cut left J101 pad 31 (GND) without its track, so it got its own 0.15 mm GND track to the
+nearest GND pad of the lower row. **1**.
+
 The the cluster runs (the cluster scripts): `env.sh` loads
 apptainer and Python, KiCad 10.0.6 runs from the `kicad/kicad` image and the router is built in
 the maturin (manylinux2014) image by `setup.sbatch`, which also runs one test pass;
@@ -501,7 +510,7 @@ Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (no
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 → 1 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -510,8 +519,7 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The 2 unrouted connections.** J101, IAS1 (J_LINK_TX_D0_N); SW_CTRL1 (BGA ball C9 to its
-   track south of the BGA).
+1. **The last unrouted connection.** SW_CTRL1 (BGA ball C9 to its track south of the BGA).
 2. **LVDS skew.** Most LVDS legs run as single tracks; LINK_RX_D0 and LINK_RX_D1 differ by about
    74 mm (about 0.47 ns) between P and N, ADCS_FCO by 55 mm (§6.2). Check them against the bit
    rates before ordering, or re-route the pairs as pairs.
