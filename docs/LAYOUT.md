@@ -88,7 +88,9 @@ out the 1.0 mm-pitch BGA:
 
 The impedance widths come from a field solver run on this stack, solder mask included
 (`_work/field_solver.py`, POWER_AND_STACKUP §2.6). It agrees with exact references within 1–2.4 %.
-Before ordering, run the same geometries through JLCPCB's impedance calculator as a last check.
+JLCPCB's impedance calculator, run on 10 Nov 2026 with stack 2116A, agrees within 1–3 %
+([FABRICATION.md](FABRICATION.md)); order that stack explicitly, since the default 3313 would put
+the 183 µm RF lines at about 45 Ω.
 
 ### 3.1 L4, the power layer
 

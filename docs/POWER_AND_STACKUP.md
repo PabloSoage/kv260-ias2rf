@@ -293,10 +293,11 @@ is the property §2.1 was built around.
 - **L3 changes the most**, because it now sits 0.13 mm from its ground, not 0.2 mm.
 - **The net classes on the board use 117 / 150 µm and 183 µm.** 117 µm is 4.6 mil, inside
   JLCPCB's 3.5 mil six-layer minimum.
-- **Before ordering, run the same geometries through JLCPCB's impedance calculator** with this
-  stack selected. It should agree within a few ohms; if it doesn't, use its widths. The solver
-  reads 1–2.4 % low against the two exact references, so if anything the true impedance is that
-  much higher than the table.
+- **Checked in JLCPCB's impedance calculator on 10 Nov 2026**, with this stack selected: it
+  wants 181.4 µm for 50 Ω, 102.9 µm for 64 Ω on L1, 106.4 µm for 62 Ω on L3 and 119.1 µm for
+  100 Ω differential at 150 µm spacing. The board's 183, 100, 100 and 117 µm are within 1–3 %
+  (about 50, 65, 64 and 101 Ω), so the widths stand ([FABRICATION.md](FABRICATION.md)). On the
+  default 3313 stack the 183 µm lines would sit at about 45 Ω: order 2116A explicitly.
 
 ---
 
