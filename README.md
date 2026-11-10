@@ -122,6 +122,11 @@ BGA, for one).
 4. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
 
+**Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), 10 Nov 2026): about **$2,030 for two
+assembled boards** and $4,190 for five, three quarters of it parts. Seven parts are out of stock at
+LCSC today (the ADCs, the RF switches, the clock buffer, the DAC, a balun and the drivers): JLCPCB's
+global sourcing or consigned parts cover them.
+
 ---
 
 ## Documentation
@@ -138,6 +143,7 @@ BGA, for one).
 | Sheet specifications | One per schematic sheet, in the table above: every value and where it comes from |
 | [docs/LAYOUT.md](docs/LAYOUT.md) | The board: outline, stackup, rules, the split power layer, placement, routing and the LVDS review |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
+| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026): boards, assembly fees and every part with its LCSC link and price. About $2,030 for two assembled boards, $4,190 for five |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md), [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | What the inherited files contained, and the record of the earlier work |
 
@@ -161,6 +167,7 @@ Reproducing the checks and the outputs (KiCad 10):
 kicad-cli sch erc --severity-all CSI2-KRIA-KV260_Rev01.kicad_sch
 kicad-cli pcb drc --schematic-parity --refill-zones --severity-all CSI2-KRIA-KV260_Rev01.kicad_pcb
 python _work/fab/make_fab.py                                   # fab/: Gerbers, drill, BOM, CPL
+python _work/fab/quote.py                                      # today's LCSC prices and stock; refreshes docs/JLCPCB_QUOTE.md
 python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS delays, skew and stubs; --stubs PS lists the branches (needs shapely)
 ```
 
