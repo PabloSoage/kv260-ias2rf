@@ -6,7 +6,7 @@ folders winget and the KiCad installer use (per user, then per machine).
 The stock footprints sit next to it in the same install.
 
 Set KICAD_CLI only when KiCad is somewhere else (an untracked mise.local.toml
-[env] section is the place for it, see _work/layout/toolpaths.sh).
+[env] section is the place for it).
 """
 
 import os

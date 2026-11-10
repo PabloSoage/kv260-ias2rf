@@ -61,8 +61,8 @@ def f(v):
 
 
 # ---------------------------------------------------------------- variants
-# Placement knobs, tried with the router 7-10 Oct 2026. The defaults are the
-# placement the board was routed from (docs/LAYOUT.md §6):
+# Placement knobs, tried 7-10 Oct 2026. The defaults are the placement the
+# board was routed from:
 #   BB_GROW=<mm>      the board grows outward (+y) by this much; the RF row,
 #                     the SMAs and the outer supports move down with the edge
 #                     (default 12);
@@ -187,7 +187,7 @@ EDGE_MARGIN = 0.4
 # A ring kept free around the BGA so its outer rows can escape on L1 and the
 # fan-out vias of the inner rows have room: no part within this of its
 # courtyard (1.0 mm pitch, 0.45 mm vias; LAYOUT.md §4). 3.5 mm since 19 Oct (2.5 until then):
-# the wider ring routed to 15 unrouted against 20 (LAYOUT.md §6.2).
+# the wider ring left the escapes more room.
 KEEPOUT = {"U1101": float(os.environ.get("BB_RING", "3.5"))}   # BB_RING: its width in mm
 
 
@@ -1110,7 +1110,7 @@ def power_layer(comps, placed, info):
     # +1V0, FPGA VCCINT (700 mA): the block of its nine balls, and a 3 mm
     # corridor to it from the buck's inductor (the POWER inductor on +1V0).
     # Not the whole BGA and ring any more (6 Oct): tracks may cross L4 outside
-    # the islands, and round the BGA is where the router needs them.
+    # the islands, and round the BGA is where they need the room.
     balls = [(px, py) for n, px, py, r in pads if n == "+1V0" and r == "U1101"]
     src = [(px, py) for n, px, py, r in pads if n == "+1V0" and r.startswith("L")
            and comps[r].sheet == "POWER"]
@@ -1186,7 +1186,7 @@ def rules():
         # 50 ohm single-ended on L1, W 183 um (same source)
         cls("RF50", priority=1, track_width=0.183, clearance=0.2),
         # 0.15 mm, not 0.2 (2 Oct, at routing): 12 V at most, where IPC-2221 asks
-        # 0.1 mm; 0.2 only cost the autorouter its way between fine-pitch pins
+        # 0.1 mm; 0.2 left no way between fine-pitch pins
         cls("Power", priority=2, track_width=0.4, clearance=0.15, via_diameter=0.6, via_drill=0.3),
     ]
     ns["netclass_patterns"] = (

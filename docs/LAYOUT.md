@@ -1,4 +1,4 @@
-# Layout — board, rules, placement and first routing
+# Layout — board, rules, placement and routing
 
 *25 September 2026 · `CSI2-KRIA-KV260_Rev01.kicad_pcb` · built by `_work/layout/build_board.py`
 from the schematic's netlist; placement refined and L4 drawn the same day*
@@ -12,8 +12,8 @@ The Rev03 board exists. It has:
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
-**It is autorouted, not finished** (2–14 October 2026, §6): 20 connections are left, and the
-LVDS pairs need a hand review (§6.3).
+**It is fully routed** (§6): 0 DRC errors, 0 unrouted connections, 0 schematic-parity problems.
+Open before ordering: the LVDS skew of three pairs and the trace widths (§6.2).
 
 The original Allied Vision board is kept, untouched, as
 `_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
@@ -32,7 +32,7 @@ The original Allied Vision board is kept, untouched, as
 **Why 120 mm and not the ~90 estimated before the schematic existed.** The parts' courtyards add up
 to **5,700 mm²**. At 119 × 90 mm they would cover 75 % of a board that is populated on one face
 only, with nothing left to route between them. At 119 × 120 mm they cover about half. **On 10
-October it grew 12 mm more, to 132 mm**, to give the router room (§6.2). The overhang past the
+October it grew 12 mm more, to 132 mm**, to give the routing room. The overhang past the
 carrier's edge is now 97 mm, which is why three supports are added at the outer edge.
 
 **One face only, and no through-hole parts over the carrier.** Below the board there is 0.8 mm to
@@ -74,7 +74,7 @@ out the 1.0 mm-pitch BGA:
 
 | Rule | Value |
 |---|---|
-| Track / clearance | 0.10 mm minimum; Default class 0.15 mm track, **0.10 mm clearance** (§6.2) |
+| Track / clearance | 0.10 mm minimum; Default class 0.15 mm track, **0.10 mm clearance** |
 | Via | 0.45 mm pad, 0.2 mm drill |
 | Copper to edge | 0.3 mm |
 
@@ -83,7 +83,7 @@ out the 1.0 mm-pitch BGA:
 | **LVDS100** | 0.117 mm, gap 0.150 mm (100 Ω differential on L1) | Link pairs, ADC data and clock pairs, `CLK_ADC*`, `CLK_FPGA`, `FPGA_CLK` |
 | **RF50** | 0.183 mm (50 Ω on L1) | `IF_RX_*`, `IF_TX_*` |
 | **Power** | 0.4 mm | Every rail, VIN and switch nodes |
-| Default | 0.15 mm (0.10 mm where the router needed it), 0.10 mm clearance | The rest |
+| Default | 0.15 mm (0.10 mm in the dense areas), 0.10 mm clearance | The rest |
 
 The impedance widths come from a field solver run on this stack, solder mask included
 (`_work/field_solver.py`, POWER_AND_STACKUP §2.6). It agrees with exact references within 1–2.4 %.
@@ -125,13 +125,12 @@ pins in one place for a plane to be worth it.
   - the clock in/out (J401/J402) at the right end, nearest the ADCLK948.
 - **the DC jack**, opening at the left edge;
 - **the AERIS ribbon** (IDC 2×20), in a band under CONTROL, above the RF row. It was along the
-  top of the main area until 10 October; from there its 35 bank-35 lines crossed both DAC buses
-  (§6.2);
+  top of the main area until 10 October; from there its 35 bank-35 lines crossed both DAC buses;
 - **the AD9767's five series arrays** (RN1103–RN1107), in a column left of the BGA, on the way to
   U801. Placed by rule they sat above the BGA, and the DAC lines doubled back;
 - **the Pmod and JTAG headers**;
 - **the FPGA**, rotated 90°, so bank 15 faces the DACs and bank 14 faces the ADCs and J101. **A
-  3.5 mm ring around it is kept free of parts** (2.5 mm until 19 Oct, §6.2), so the outer rows can escape on L1 and the inner
+  3.5 mm ring around it is kept free of parts** (2.5 mm until 19 Oct), so the outer rows can escape on L1 and the inner
   rows' fan-out vias have room.
 
 - **the POWER block, along the flow of the power** (below);
@@ -161,7 +160,7 @@ sheet, scaled down:
 | Left | POWER, beside the jack |
 | Centre-left | DAC_RADAR, DAC_SDR |
 | Centre | CONTROL, around the FPGA |
-| Right | CLOCK, ADC_RADAR, ADC_SDR (each ADC next to the FPGA, its front end outboard: §6.2, 14 October) |
+| Right | CLOCK, ADC_RADAR, ADC_SDR (each ADC next to the FPGA, its front end outboard, since 14 October) |
 | Top-right tongue | IAS_LINK, beside J101 |
 | Bottom band | ROUTING. Each RF switch sits right above its own pair of SMAs |
 
@@ -186,8 +185,8 @@ sheet, scaled down:
 **The order is the one a person would follow:** a chip, then at once its own passives (small
 decoupling first), then the next chip. So each chip's pins get their neighbourhood before a
 neighbour can take it. A legaliser puts each part at the nearest spot where its courtyard, grown
-to include its own silkscreen, is free, **0.5 mm from every other** (0.2 mm until 10 October: the
-router found no way between the passives). The spot must be inside the outline, and off the
+to include its own silkscreen, is free, **0.5 mm from every other** (0.2 mm until 10 October, which
+left no room for tracks between the passives). The spot must be inside the outline, and off the
 carrier if the part is through-hole.
 
 **The silkscreen** gets a reference for every part where one fits:
@@ -208,7 +207,7 @@ routing is planned.
 ## 5. How it was checked
 
 *The figures below are for the first placement (0.2 mm between courtyards, 25 September); the
-re-placement of §6.2 moved parts by up to a few millimetres.*
+re-placement of 7–19 October moved parts by up to a few millimetres.*
 
 | Check | Result |
 |---|---|
@@ -234,305 +233,24 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 
 ## 6. Routing
 
-### 6.1 The first autorouted board (2–6 October 2026)
+### 6.1 The routed board (10 November 2026)
 
-*Superseded by §6.2, which re-placed the board and routed it again. Kept for the method and what
-each step was worth.*
-
-The board was routed by **an external autorouter**, a
-Python + Rust router that reads and writes the `.kicad_pcb` text itself. The chain is
-`_work/layout/route_krt.sh`: BGA fan-out, then the LVDS pairs, then everything else. It ran on a
-copy, and only tracks and vias came back: every footprint and zone is byte-identical.
-
-Setup on a new machine (26 Oct 2026): KiCad 10 and Python from winget/mise (`mise.toml` pins
-the host Python), then `bash _work/layout/setup_krt.sh <dir>` clones the router at the commit
-used here, applies the local patch, makes its venv and builds the Rust part; put
-the router's path under `[env]` in an untracked `mise.local.toml`. The scripts find kicad-cli
-themselves (`_work/toolpaths.py`, `_work/layout/toolpaths.sh`; `KICAD_CLI` overrides).
-
-| | Result |
+| | |
 |---|---|
-| BGA fan-out | 146 of 147 nets out of U1101, **dog-bone only**: a 0.45/0.2 mm via between four balls, no via in any pad |
-| Tracks and vias | 1,278 through vias of 0.45/0.2 mm (0.6/0.3 not used). **About 400 sit in pads** (0402 passives, chip pads): JLCPCB fills and caps them free on 6-layer boards (POFV), see FABRICATION.md |
-| RF lines | The six IF lines ripped up and routed **last**, at 0.183 mm: the router keeps a net's own class clearance, so routed last they keep 0.2 mm from everything (33 RF50 errors went to 1) |
-| Dangling copper | 445 stub segments and vias removed by `_work/layout/drop_dangling.py`, which deletes what KiCad's DRC reports dangling (zones refilled) and repeats; the unrouted count did not change |
-| Finishing pass (5 Oct) | `_work/layout/route_finish.sh`: every complete net written into the project as protected, then only the incomplete nets routed on a 0.05 mm grid. 100 → 89 unrouted, none worse; a second pass 89 → 87. Allowing rip-up instead made it worse: the router broke the link pair and an IF line to route others |
-| L4 opened to tracks (6 Oct) | The same finishing pass with In3.Cu allowed (`LAYERS`/`COSTS` in `route_finish.sh`, cost 3). Tracks there cut the plane, so **every L4 island carries a tracks-only keep-out rule area** ("In3 islands: no tracks"); only the +3V3_D background is open. The **+1V0 island under the BGA shrank** from 24 × 24 mm to a band to the top bulk vias and a block over the nine VCCINT balls with a strip to the bottom vias, which frees L4 around the ring. 87 → 68 unrouted. Without the shrink it stopped at 78 |
-| Same-net vias | The 4 hole-to-hole pairs merged: one via of each removed, the FCO_N leg on B.Cu extended to the other |
-| L5 for slow nets (6 Oct) | The finishing pass once more with In4.Cu open, at cost 5, **to slow nets only** (`ONLY=` the ADAR bus, JTAG, CONV_SPI, SW_CTRL, XO_SCL; nothing fast, no supply): 68 → 60. About 125 mm of track now slots the L5 ground plane (ADAR_SCLK 27 mm, ADAR_SDIO 25, SW_CTRL3 18, SW_CTRL0 17, JTAG_TMS 14, CONV_SPI_SCLK 11, XO_SCL 10, ADAR8_TR 4). **Nine fast tracks cross those slots**: eight DAC data lines (CMOS) on B.Cu/In3 and **ADCR_D7_N** (LVDS leg on B.Cu). L4 is 0.13 mm away and carries the return across, but review them, ADCR_D7_N first |
-| DRC (zones refilled, schematic parity) | **0 parity problems. 60 connections unrouted**. **1 clearance error** (RF50, 0.197 mm against 0.2). No hole-to-hole |
+| Result | **0 DRC errors, 0 unrouted connections, 0 schematic-parity problems** (zones refilled); 8 library-footprint warnings |
+| Copper | 13.7 m of track: L1 5.8 m, L3 3.7 m, L6 3.5 m, L4 0.6 m. Mostly 0.10 mm; the supplies 0.30 mm; the RF lines 0.183 mm (50 Ω) |
+| Vias | 1,495 through vias, 0.45 mm on a 0.20 mm drill. 29 sit in U1101 ball pads and are filled and capped (FABRICATION.md) |
+| L2, L5 | Ground only: no other net has a track there (`_work/layout/planechk.py`) |
+| L4 | Tracks only on the +3V3_D background; every other island carries a tracks-only keep-out ("In3 islands: no tracks"), so the islands stay whole |
+| LVDS | Every pair is routed as two single 0.10 mm tracks, not as a coupled pair; the skew is reviewed in §6.3 |
 
-**The Power class clearance is now 0.15 mm** (was 0.2): the rails are 12 V at most, where IPC-2221
-asks 0.1 mm, and 0.2 mm kept the router out from between fine-pitch pins. RF50 keeps 0.2 mm,
-because there it is part of the 50 Ω line.
+### 6.2 What is left
 
-**An external autorouter was tried first and stopped at about 540 unrouted** after nine passes and six hours.
-The bridge for it stays in the repo (`dsn_export.py`, `ses_import.py`): one polygon per plane
-net and keepout strips at the edge are what made it route at all.
-
-### 6.2 Re-placed and routed again (7–11 October 2026)
-
-The first board stopped at 60. What was left was congestion round the BGA, and three causes of it
-were in the placement and the pinout, not in the router:
-- **the bank-35 bus to the AERIS ribbon** (35 lines) left the BGA's upper-left and crossed both
-  DAC buses on its way to J1103 at the top-left;
-- **the AD9767 (DACS) lines** went up from bank 15 to their series arrays above the BGA, then back
-  down to U801 at the bottom-left;
-- **the lines crossed each other.** Drawn straight from each ball to its far end, through a series
-  resistor where there is one, the FPGA's nets crossed **823** times; 83 crossings within the
-  bank-35 bus alone, 64 within the DACS bus.
-
-**What changed:**
-
-| | Change |
-|---|---|
-| **FPGA pinout** | Bank 35 as a whole, and the DACS lines within bank 15 (over their own balls and the bank's free ones), **re-assigned by a minimum total-length matching** of ball to far end. A Euclidean minimum matching has no crossings: 83 → 0 and 64 → 0, all FPGA nets 823 → 663. Fixed: the balls reused from AERIS-10 (DACR, ADCR, CLK_FPGA), every pair and every clock-capable ball. The tables are in `_work/sheets/control_spec.py`; `rev03/CONTROL.kicad_sch` was regenerated from it and passes `check_sheet.py control` (CONTROL_SPEC §1) |
-| **J1103** | To a band under CONTROL (§4) |
-| **RN1103–RN1107** | To a column left of the BGA (§4) |
-| **Outline** | 12 mm longer (§1) |
-| **Clearance** | 0.5 mm between courtyards, not 0.2 (§4) |
-
-All of it is in `build_board.py`, as defaults of knobs (`BB_GROW`, `BB_J1103`, `BB_RN`, `BB_CLEAR`)
-so each can be turned back for a comparison. **Not kept: decoupling capacitors on the bottom face**
-(`BB_BOTTOM=caps`, 100 of them under their pins). It routed worse, 100 unrouted after the IF step
-against 73: each bottom pad needs its own through via, and 200 more vias block the inner layers.
-
-**The routing** is `_work/layout/route_all.sh`, the whole sequence of §6.1 in one script:
-fan-out, pairs, everything with L4 open; the IF lines last; dangling copper; then finishing passes
-that alternate all incomplete nets and the slow ones with L5 open. A pass is kept only if the
-unrouted count falls and no DRC error is added. The IF step reads the **original** project:
-`route.py` writes its `--clearance` into every class of the project it hands on, and with that copy
-the IF lines came out with 32 RF50 errors.
-
-| Run | Placement | Result |
-|---|---|---|
-| v3 | Pinout, J1103, arrays, +12 mm | 52 unrouted, 6 errors |
-| v4 | v3 + decoupling on the bottom | 100 after the IF step (v3: 73); stopped |
-| **v5** | **v3 + 0.5 mm clearance** | **49 unrouted, 4 errors** (84 → 52 → 51 → 49 in three passes) |
-
-**The four errors** (three RF50 clearances of 0.15–0.195 mm, one same-net via pair) were removed by
-`_work/layout/rip_violations.py`, which deletes the track or via behind each DRC error, and the
-three nets were routed again by `route_finish.sh` (`ONLY=`). Then:
-
-| | Result |
-|---|---|
-| DRC (zones refilled, schematic parity) | **0 errors, 0 parity problems, 49 unrouted** |
-| Vias | 1,356, all 0.45/0.2 mm; about 500 in pads (POFV, FABRICATION.md) |
-| Tracks | L1 5.5 m, L3 3.6 m, L6 2.8 m, L4 0.6 m |
-| LVDS pairs routed coupled | 4: LINK_TX_D0, LINK_TX_CLK, CLK_FPGA, ADCS_D1. The rest as single legs, as in §6.1 |
-| L5 (slow nets) | JTAG_TMS 15 mm, ADAR1_TX_LOAD 5 mm |
-
-**Power tracks taken off the ground planes.** The router's plane-repair step ("plane
-finalize") routed supply connections on layers the run forbids: L2 carried +1V0 (164 mm),
-+1V8_ADCS_A (43 mm) and +3V3_D (23 mm), L5 +1V0 (45 mm) and +3V3_D (8 mm). The first board had the
-same, unnoticed until now (+5V0 134 mm and +3V3_D 29 mm on L2). The cause is in the router:
-`route.py` hands that step its full layer list, the forbidden layers included. A local patch hands
-it only the allowed ones (`_work/layout/krt_finalize_layers.patch`, against the autorouter
-979287c; apply it to the clone before routing). Then:
-- every supply track on L2 and L5 was ripped and those three nets routed again with
-  `route_finish.sh`: +1V0 came back on the allowed layers;
-- 15 mm of +1V8_ADCS_A and 1 mm of +3V3_D came back on L2 all the same, by another path in the
-  router. Moved to L4 by hand (text edit), inside or beside the +1V8_ADCS_A island, DRC-clean;
-- one +3V3_D connection (128.2, 172.9) found no way back: **50 unrouted**, 0 errors.
-
-L2 now carries only GND (33 mm of it), and L5 only GND and the two slow tracks above.
-
-**Finer rules for the slow nets (11 October).** The finishing passes had stopped at 50: a run on a
-0.025 mm grid gained nothing, and a run allowed to rip the slow control nets (ADAR, FLASH, XADC,
-SW_CTRL...) broke five complete nets to connect five, and was rejected. Most of the 50 ended at a
-pad or ball boxed in by other nets' copper at 0.15 mm. So the **Default class clearance went from
-0.15 to 0.10 mm**, and one finishing pass routed the incomplete nets with 0.10 mm tracks and the
-supplies at 0.15 mm (`route_finish.sh` with `CLR=0.1 TW=0.1 PW=0.15`). Six-layer boards at JLCPCB
-take 0.09 mm track and space, so 0.10 mm costs nothing; LVDS100, RF50 and Power keep their own
-clearances (0.15, 0.2, 0.15 mm), and the router takes the larger of two classes. Then:
-- **50 → 40 unrouted**, no DRC error, no supply track on L2 or L5; 213 tracks of 0.10 mm;
-- a second identical pass: 40 → 40;
-- one +3V3_D gap closed by a short track: `_work/layout/fix_gap.py` joins two islands of a net
-  with a grid path on one layer, at most one via and a straight stub, checked against the board's
-  clearances (run with the router's venv, it needs shapely). **39 unrouted**, 0 errors, 0 parity
-  problems. On the other 38 it finds nothing: the pad or ball is boxed in.
-
-**The DACS bus first (12–13 October).** Two more full re-routes at 0.10 mm did not beat 39. The
-first had 499 class clearance errors: the fan-out step writes its clearance into every class of
-the project it hands on, and the later steps read that copy (`route_krt.sh` now restores the
-original project after each step). The second reached 42. But ten of the 39 were BGA balls of the
-DACS bus with **no copper at all**: routed late, they found the BGA's left side full of slow
-tracks. So `route_region.sh` ripped every slow net with copper left of the BGA (box 139–158 ×
-140–162 mm: 109 nets, 1,779 tracks and vias, supplies, pairs and RF untouched and protected) and
-routed them again with the 15 DACS nets **first** (`region_first_dacs.txt`, route.py
-`--ordering original`), 0.10 mm tracks and clearance. A first run let tracks onto L4 under the
-BGA, which split the +3V3_D plane into three islands; a temporary tracks-only keep-out on L4 under
-the BGA, removed after routing, fixed that. **39 → 30 unrouted**, 0 errors, 0 parity problems; L2
-and L5 carry only GND.
-
-**The ADCs moved next to the FPGA (13–14 October).** Region passes elsewhere gained nothing (right
-of the BGA: 31, then 30 with other nets open; the ADC front ends: 37). The plot showed why: each
-ADC sat east, with its front end (U502/U503, U602/U603) **between it and the BGA**, so the ADCs'
-LVDS pairs ran over the amplifiers. That boxed in their resistors and capacitors (C508, C509, U503
-RDN, U601 VIN-A were unroutable) and put fast digital lines over the analogue inputs. Now the two
-ADC sheets are placed mirrored in x (`build_board.py`, `BB_ADC=mirror`, the default): the ADC next
-to the FPGA, its front end outboard at the ADC's input side, the IF lines coming up to it from the
-SMA row. U501 at 0° (inputs east, LVDS north, west and south) and U601 at 270° (its LVDS side, south
-at 0°, towards the BGA): `BB_ROT=U501:0,U601:270`, the default. Three variants were routed in
-parallel with the whole chain (`route_all.sh` at 0.10 mm, then the DACS region pass):
-
-| Variant | After IF | After finishing | After the DACS pass |
-|---|---|---|---|
-| U501 0°, U601 free | 40 | 27 (3 errors) | 29, 0 errors |
-| **U501 0°, U601 270°** | 50 | **23** (3 errors) | 24 (3 errors) |
-| mirror only | 51 | 43 | 40 |
-
-The second, after its finishing passes, was taken. By hand (text edits, DRC after each):
-- the three errors were one +1V8_D track on L1 passing 0.116 mm from ball A3 (ADAR2_TR): its first
-  millimetre redrawn 0.5 mm clear of the ball;
-- the router's plane step had again put supply tracks on L2: +1V8_ADCS_A (15 tracks, 0.8 mm) and
-  +3V3_D (7) moved to L4, where they lie in their own island or the +3V3_D background. Three of
-  the +3V3_D tracks, beside the BGA, crossed slow tracks on every layer: removed, which leaves one
-  +3V3_D connection open.
-
-**24 unrouted**, 0 errors, 0 parity problems. L2 carries only GND; L5 GND and 19.5 mm of
-XADC_GND. Every analogue net of the front ends is now routed.
-
-Then three region passes in parallel on that board: the DACS box with the 15 DACS nets first
-(24, no gain), with the six DACS nets still open first and the rest of the bus after them
-(**20**), and the box right of the BGA with its open slow nets first (25). The second was taken:
-**24 → 20 unrouted**, 0 errors, 0 parity problems; it also closed the open +3V3_D connection and
-took XADC_GND off L5, so L2 and L5 carry only GND.
-
-**A wider ring round the BGA (17–19 Oct).** Three placements routed in parallel with the same
-chain: the part-free ring round U1101 at 3.5 mm (`BB_RING`, 2.5 until then), 0.6 mm between
-parts (`BB_CLEAR`), and both (ring 3.0). After the DACS pass: 21, 49 and 41 unrouted. The 3.5 mm
-ring was kept, from its third finishing pass rather than the end of the chain: that pass had
-reached 20 unrouted but was dropped for four clearance errors of 0.1493 mm against 0.15 (+3V3_D
-vias beside slow tracks, a rounding of the router's grid). `_work/layout/nudge_vias.py` moves
-each such via (and its own tracks' ends) by under 0.01 mm until the clearance holds. Then, on
-that board:
-- the router's plane step had put 30 +3V3_D tracks on L2: removed. They had been carrying
-  +3V3_D across an L4 background cut by 74 signal tracks under the BGA, so 25 unrouted;
-- a region pass over the whole BGA (box 139–167 × 138–162 mm, the DACS nets and the open slow
-  nets first, L4 keep-out under the BGA) took the signal tracks on L4 there from 74 to 11 and
-  reached **17**; the DACS box alone gave 19, the open nets first 24;
-- `route_finish.sh` on the supplies only (L4 open to them): 15;
-- one ADCR_D1_N leg on L2 removed and the open LVDS legs re-routed on L1, L3 and L6;
-- two ADCR_D4_N vias 0.14 mm apart (hole to hole) merged into one;
-- `route_finish.sh` on the supplies only once more, on a 0.025 mm grid (19 Oct): 14, one +3V3_D
-  connection closed.
-
-KiCad 10.0.6 (26 Oct) reported 38 supply stubs of 0.01–0.2 mm on L4, left at pads by the plane
-finalize, as items not allowed in the islands' no-tracks keep-outs; the earlier KiCad did not.
-They were removed (`drop_dangling.py` now removes them too); the plane connects those pads.
-
-Escapes for the stuck balls (27 Oct): eight of the 14 started at a U1101 ball with no copper
-at all. Every spot round those balls, and the ball itself, was crossed by other nets' inner
-tracks; `_work/layout/add_escapes.py --rip` put a via at each ball (in the pad, or 0.5 mm off
-diagonally) and deleted the 47 track segments it hit, `route_finish.sh` re-routed those 22
-nets (L1, L3, L6), the 61 +3V3_D segments it put on L2 were removed, and a supplies-only pass
-(0.025 mm grid, L4 open) closed one more: **13**. +2V5 at R4, ADCS_FCO_N and F_DACS_D10 are now
-routed; ADCS_FCO_P and CONV_SPI_CSB_R lost theirs. The same round once more on the 13 board
-(`_work/layout/escape_pass.sh`, the whole sequence in one script): **12**, and again: **11**.
-Then a small local region pass for MODE_M1 (`region_prep.py --local`: only the copper inside the
-box round the connection ripped, the BGA escapes kept; the whole-net rip of a small box lost 2-4
-connections) routed it but broke HK_SCL; a finishing pass on HK_SCL with L4 open closed it:
-**10**. HK_SCL (I2C, slow) runs 18 segments on L4 under the BGA, through the +3V3_D background
-there (32 signal segments on L4 under the BGA in all, 14 before); the plane stays connected. With
-L4 kept out under the BGA HK_SCL did not close. `_work/layout/close_pass.sh` does that sequence
-(escapes, local pass, finishing on every incomplete net with L4 open); on ADCS_D1_P it closed
-SW_CTRL1 and JTAG_TCK instead and cut one more +3V3_D connection under the BGA: **9**
-(38 signal segments on L4 under the BGA; the cut +3V3_D at 152 × 146 mm is one of the 9).
-J101's pins are boxed in by the link pairs' vias, so the local pass there may rip LVDS copper too
-(`CLASSES="Default|LVDS100"`): HK_SDA closed in a 7 × 5 mm box at J101 (182–189 × 82.5–87.5
-mm): **8**. **Review:** inside that box the link pairs there (J_LINK_RX_CLK, RX_D0, RX_D1,
-TX_CLK, TX_D0_N, LINK_RX_CLK, LINK_RX_D0_P, LINK_RX_D1_N, LINK_TX_D0_P) were re-routed as single
-tracks, so they run uncoupled for a few millimetres next to the connector.
-The same with LVDS rip on ADCS_D1_P (box 166–178 × 154.5–161.3 mm, right of the BGA) closed it and
-broke PROGRAM_B, which a plain local pass then re-closed: **7**. **Review:** in that box the ADC
-LVDS legs ADCR_D4, D6, D7, OR (both legs), ADCS_D0, ADCS_D1_N, ADCS_DCO_N, ADCS_FCO_P, LINK_RX_CLK_P
-and LINK_RX_D0_N were re-routed as single tracks for a few millimetres.
-Then ADCS_FCO_P (box 160.5–177.5 × 147.5–151.5 mm, between the BGA and the ADCS series
-resistors): **6**. **Review:** there the legs ADCR_D0_N, D2_P, D3_P, D4–D7, ADCS_D0, ADCS_DCO,
-ADCS_FCO_N, FPGA_CLK_P and LINK_RX_D0_P were re-routed as single tracks for a few millimetres.
-Beam search (28 Oct): `_work/layout/close_search.py` runs `close_pass.sh` on every open signal
-connection of every board in a beam (two box margins, with and without LVDS rip), keeps the best
-few results (a pass that closes its target and breaks one other stays, `--slack`) and goes on
-from them; the greedy form of it stalls at 6-7. Run on a compute-cluster node
-(below), round 1 on J_LINK_TX_D0_P (box 180.5–190.4 × 80.4–88.9 mm at J101,
-LVDS rip) gave another 6, and round 2 on that board closed F_DACS_D10 and the +3V3_D connection
-under the BGA (box 141.5–155.5 × 139.5–163.5 mm, Default nets only) and broke SW_CTRL1: **5**.
-**Review:** at J101 the legs J_LINK_RX_CLK_N, J_LINK_RX_D0_N, J_LINK_RX_D1_P, J_LINK_TX_CLK,
-J_LINK_TX_D0_N, LINK_RX_CLK_N, LINK_RX_D0_P, LINK_RX_D1_N and LINK_TX_D0_P were re-routed as
-single tracks for a few millimetres.
-Then (3 Nov) `--long` (boxes round each end of a connection longer than 30 mm) and `--supplies`
-(the open supply connections too): a local search had closed J_LINK_TX_D0_P at J101 (box
-182.5–188.4 × 82.6–86.9 mm, LVDS rip) and opened J_LINK_TX_D0_N, still 5; on that board a pass
-on +3V3_D (box 180.9–206.2 × 139.7–147.6 mm, Default nets only) closed it: **4**. Two
-Net-(U401-~{Q2}) vias it left 0.2 mm apart (hole_to_hole) were merged by hand. **Review:** at
-J101 the legs J_LINK_RX_CLK_N, J_LINK_RX_D0_N, J_LINK_TX_CLK_N, J_LINK_TX_D0, LINK_RX_CLK_N,
-LINK_RX_D1_N and LINK_TX_D0_P were re-routed as single tracks again.
-LINK_RX_D1_P (ball M2) could not escape: its dogbone spots were taken by CONV_SPI_SDIO,
-CONV_SPI_SCLK and +2V5 vias, and its AC cap C105 sat right over the J101 pad field. With C105
-moved to the free spot left of J101 (180.5, 84.25 mm, F.Cu, 90°) and LINK_RX_D1_P/N,
-CONV_SPI_SDIO, CONV_SPI_SCLK and J_LINK_RX_D1_P ripped, a fan-out and a diff-pair pass for
-LINK_RX_D1 (fan-out clearance 0.15 mm, then the finishing passes) closed it
-and opened CONV_SPI_SDIO instead (still 4); a beam search round from that board closed
-CONV_SPI_SDIO (box 172.4–193.2 × 159–178.2 mm, Default nets only): **3**. **Review:** LINK_RX_D1
-now runs as two single tracks, not as a coupled pair: P is 151.8 mm with 10 vias, N 108.5 mm
-with 3, so 43 mm of skew (about 0.27 ns). Check that against the link's bit rate before
-ordering, or re-route the pair as a pair. CONV_SPI_SDIO and CONV_SPI_SCLK (slow) were re-routed.
-
-ADCS_D1_N (ball T5) ran into the corridor towards U601 (pad 21) blocked by its own old copper. With
-ADCS_D1_N ripped in 168–188 × 156–182 mm and routed first (Default and LVDS100 nets in the box),
-it closed and opened five others (+3V3_D, FLASH_DQ0, J_LINK_TX_D0_N, LINK_RX_D1_P, SW_CTRL1); a
-beam search from that board on a compute cluster (`--long --supplies`, two rounds, 9 Nov) closed +3V3_D,
-FLASH_DQ0 and LINK_RX_D1_P again: **2**. The search re-routed many LVDS legs as single tracks, so
-the P/N length differences changed (mm, P − N, before → after): LINK_RX_D0 −9.7 → −74.0,
-LINK_RX_D1 +43.3 → +74.8, LINK_RX_CLK −16.7 → −13.9, ADCS_D1 +28.6 → +15.4, ADCS_FCO −51.5 →
-−54.8 (unchanged), ADCS_DCO +8.9 → −6.2, ADCR_OR −24.3 → −8.9, ADCR_D4 +16.3 → −5.6, ADCR_D5
-+5.3 → −11.0, ADCR_D6 −1.4 → −10.0, CLK_ADCS +1.0 → +10.3; the rest within 3 mm of before.
-
-J_LINK_TX_D0_N (J101 pad 26 to C108 pad 2) was then routed by hand, by an A* search (`_work/layout/handroute.py`) over F.Cu, In2.Cu
-and B.Cu with through vias that checks every step against the netclass clearances (10 Nov).
-Pad 26 is 0.23 mm wide at 0.4 mm pitch, so a 0.15 mm LVDS clearance only lets a track leave it
-lengthwise, and both ends were taken: the P leg below, a B.Cu GND track over the pad row above.
-That GND track was cut over pad 26 (four pieces); the N leg now leaves upwards to a via at
-(186.05, 84.2), runs down In2.Cu and comes up next to C108 (via at 185.25, 87.65), 0.1 mm wide.
-The cut left J101 pad 31 (GND) without its track, so it got its own 0.15 mm GND track to the
-nearest GND pad of the lower row. **1**.
-
-SW_CTRL1 (ball C9, caged by the F_DACS_IQRESET via and track, the XO_SCL via and a GND track on F.Cu)
-was routed the same way, with the A* allowed to cross other nets' tracks and vias (never pads) at a
-cost, to find the fewest items to move: the F.Cu GND track under C9 (cut over 152.1–152.9 mm,
-y 150), an ADAR6_TR via and an In2.Cu segment of ADAR8_TX_LOAD, each re-routed after it. SW_CTRL1 now runs 46 mm with 10 vias down to its track south of the BGA (a slow switch
-control). The cut GND track had been ball B8's only connection, and no via fits next to B8, so a
-GND via at (151.55, 150.1) took the place of two In2 segments of F_DACR_D6, F_DACR_D6 was re-routed
-(crossing one SW_CTRL0 via, 151.0, 150.8), and SW_CTRL0 was re-joined on In2.Cu from its other via
-(152.05, 150.5). ADAR6_TR's via moved 0.05 mm; ADAR8_TX_LOAD got a new 9.7 mm In2.Cu run. **0**.
-
-The the cluster runs (the cluster scripts): `env.sh` loads
-apptainer and Python, KiCad 10.0.6 runs from the `kicad/kicad` image and the router is built in
-the maturin (manylinux2014) image by `setup.sbatch`, which also runs one test pass;
-`search.sbatch <boards>...` runs `close_search.py` on one node (`JOBS` passes at once, about
-10 GB each) and copies `search.log`, `best_<N>` and the current `beam_<i>_<N>` boards to
-`$STORE/kv260-route/runs/<job>` every 10 minutes and before the time limit; a new job resumes
-from the `beam_*` boards. Everything runs through `sbatch`, never on the login node.
-
-Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (not only between
-balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
-are filled and capped like every via in a pad (FABRICATION.md).
-
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 → 1 → 0 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
-
-What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
-15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
-passes are now zero-sum; new placements with a 4.0 or 4.5 mm ring, or 3.5 mm with 0.6 mm between
-parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 25 for 3.5 mm).
-
-### 6.3 What is left
-
-1. **LVDS skew, reviewed 10 Nov (§6.4): three pairs to fix before ordering.** LINK_RX_D0 and
+1. **LVDS skew, reviewed 10 Nov (§6.3): three pairs to fix before ordering.** LINK_RX_D0 and
    LINK_RX_D1 (P−N −479 and +519 ps, half a bit at 1 Gb/s) and ADCS_FCO (−353 ps).
-2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
+2. **No supply track on L2 or L5** after any further routing: check with `_work/layout/planechk.py`.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
-4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
+4. **No dangling copper** after any rip-up: the DRC's `track_dangling` and `via_dangling` at zero.
 5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
    and the tracks on L4 (the +3V3_D background only) not cutting off any +3V3_D via.
 
@@ -550,7 +268,7 @@ py _work/fab/make_fab.py                     # Gerbers, drill, BOM, CPL into fab
 every track. From then on the
 board file is the source, as the drawn sheets are once accepted.
 
-### 6.4 LVDS skew review (10 Nov)
+### 6.3 LVDS skew review (10 Nov)
 
 `_work/layout/lvds_skew.py board` sums each leg per layer (a link pair broken by its AC caps
 counted as one: LINK_* plus J_LINK_*), turns it into delay with 6.0 ps/mm on L1/L6 and 6.9 ps/mm

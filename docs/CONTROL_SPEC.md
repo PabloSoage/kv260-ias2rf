@@ -49,7 +49,7 @@ names**:
 
 **Pin swap for routing (7 October 2026).** Bank 35 as a whole, and the AD9767 (DACS) lines within
 bank 15, were re-assigned at layout: each net to the ball nearest its far end, by a minimum
-total-length matching, so no two lines of either bus cross (LAYOUT §6.2). The AERIS-10 balls (DACR,
+total-length matching, so no two lines of either bus cross. The AERIS-10 balls (DACR,
 ADCR, CLK_FPGA), every pair and every clock-capable ball kept their place. The new tables are an
 override block in `control_spec.py`, after the original ones, and the self-check above runs on
 them. Nothing in bank 35 or among the DACS lines needs a particular ball, so the swap only changes
