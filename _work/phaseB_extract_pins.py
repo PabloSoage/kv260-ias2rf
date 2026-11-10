@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Phase B v5 - parser tops basado por bloque de pin."""
+"""Phase B v5 - parser based on the pin block."""
 from __future__ import annotations
 import pathlib, re, sys, io
 
-# Redirigir stdout to UTF-8 (windows console cp1252)
+# Redirect stdout to UTF-8 (Windows console cp1252)
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
 
 LIB = pathlib.Path(r"C:\Users\pablo\KiCad\EasyEDA.kicad_sym")
@@ -41,8 +41,8 @@ def compute_depth(line):
     return s.count("(") - s.count(")")
 
 def parse_pins(blk_start, blk_end):
-    """Para cada apertura de (pin en el bloque, captura las lineas hasta
-    que el bloque cierra (parentesis balanceado). Extraer campos dentro."""
+    """For each (pin opening in the block, capture the lines until
+    the block closes (balanced parentheses). Extract the fields inside."""
     pins = []
     i = blk_start
     while i <= blk_end:
@@ -51,17 +51,17 @@ def parse_pins(blk_start, blk_end):
         if not m:
             i += 1
             continue
-        # inicio encontrado en linea i. Acumular bloques linea a linea
+        # start found on line i. Gather the block line by line
         block_lines = []
-        # Determinar column del '(' del pin
+        # Find the column of the pin's '('
         col = ln.find("(pin", 0, m.start())
-        # Cantidad de '(' antes del col dentro de esta linea
+        # Number of '(' before col on this line
         prefix = ln[:col]
-        # Hacer un pseudo-balanceo: depth inicial = (#occurrencias '(' en ln[0:col]) - parentesis de ')'
-        # pero partiendo de 0; el '(' del pin abre depth=1.
+        # A pseudo-balance: starting depth = (#'(' in ln[0:col]) - the ')' parentheses
+        # but starting from 0; the pin's '(' opens depth=1.
         depth = 1
         block_lines.append(ln[col:])
-        # seguimos en lineas siguientes hasta depth=0
+        # carry on over the following lines until depth=0
         j = i
         while depth > 0 and j+1 <= blk_end:
             j += 1
@@ -90,8 +90,8 @@ with OUT.open("w", encoding="utf-8") as f:
         rng = find_block(name)
         f.write(f"\n\n\n=== {name} ===\n")
         if not rng:
-            f.write("  [NO ENCONTRADO]\n"); continue
-        f.write(f"  lineas {rng[0]+1}..{rng[1]+1}\n")
+            f.write("  [NOT FOUND]\n"); continue
+        f.write(f"  lines {rng[0]+1}..{rng[1]+1}\n")
         pins = parse_pins(rng[0], rng[1])
         def num_key(p):
             x = p.get("num") or ""
@@ -105,10 +105,10 @@ with OUT.open("w", encoding="utf-8") as f:
         for p in pins_sorted:
             f.write(f"  {(p.get('num') or '?'):<8} {(p.get('name') or '?'):<32} {p.get('dir','?'):<14} ({p.get('x','?')},{p.get('y','?')})\n")
 
-print("Pinouts por chip:")
+print("Pinouts per chip:")
 for name in CHIPS:
     rng = find_block(name)
     if rng:
         pins = parse_pins(rng[0], rng[1])
         print(f"  {name}: {len(pins)} pins")
-print(f"Archivo: {OUT}")
+print(f"File: {OUT}")

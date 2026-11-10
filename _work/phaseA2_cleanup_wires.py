@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Phase A2 v2 - Limpieza blocks (wire)/(label)/(junction)/(no_connect) colgados tras A1.
+"""Phase A2 v2 - Clean up the (wire)/(label)/(junction)/(no_connect) blocks left dangling after A1.
 
-Formato real en el .kicad_sch:
+The real format in the .kicad_sch:
   (wire
       (pts
           (xy X1 Y1) (xy X2 Y2)
@@ -10,11 +10,11 @@ Formato real en el .kicad_sch:
       (uuid "...")
   )
 
-Asi que parseamos por parentesis balanceado, no por regex de 1 linea.
-Las coordenadas orphanas vienen del ERC: @(X mm, Y mm) bajo headers
-[unconnected_wire_endpoint] o [wire_dangling].
+So it parses by balanced parentheses, not by a one-line regex.
+The orphan coordinates come from the ERC: @(X mm, Y mm) under the headers
+[unconnected_wire_endpoint] or [wire_dangling].
 
-Tambien borra labels (NO protegidos) cuyo (at X Y) coincide, y junctions.
+Also deletes (unprotected) labels whose (at X Y) matches, and junctions.
 """
 from __future__ import annotations
 import pathlib, re, sys, datetime
@@ -34,7 +34,7 @@ KEEP_LABEL_PATTERNS = [
 def is_protected_label(name: str) -> bool:
     return any(re.match(p, name) for p in KEEP_LABEL_PATTERNS)
 
-# -------- 1) Coords orphanas del ERC --------
+# -------- 1) Orphan coordinates from the ERC --------
 erctxt = ERC.read_text(encoding="utf-8")
 coord_set = set()
 headers = ("[unconnected_wire_endpoint]", "[wire_dangling]")
@@ -53,14 +53,14 @@ while i < len(els):
         i = j
     else:
         i += 1
-print(f"[i] Coords orphanas en ERC (3dp): {len(coord_set)}")
+print(f"[i] Orphan coordinates in the ERC (3dp): {len(coord_set)}")
 
 # -------- 2) Localizar (lib_symbols ...) --------
 sch_text = SCH.read_text(encoding="utf-8")
 sch_lines = sch_text.splitlines(keepends=False)
 
 def find_top_block_start(start_idx: int, keyword: str):
-    """Encuentra ` (keyword` abriendo en o despues de start_idx y devuelve
+    """Find ` (keyword` opening at or after start_idx and return
     (start,end) 0-based cerrado. keyword no incluira parentesis."""
     pat = re.compile(r"^\s*\(" + re.escape(keyword) + r"\b")
     for i in range(start_idx, len(sch_lines)):
@@ -74,10 +74,10 @@ def find_top_block_start(start_idx: int, keyword: str):
     return None
 
 libsyms = find_top_block_start(0, "lib_symbols")
-print(f"[i] (lib_symbols) L{libsyms[0]+1}..{libsyms[1]+1}" if libsyms else "[!] lib_symbols no encontrado")
+print(f"[i] (lib_symbols) L{libsyms[0]+1}..{libsyms[1]+1}" if libsyms else "[!] lib_symbols not found")
 
 def block_balance(start_idx):
-    """Dado un idx de apertura de parentesis (en la misma linea), devuelve end_idx."""
+    """Given the index of an opening parenthesis (on the same line), return end_idx."""
     depth = 0
     for j in range(start_idx, len(sch_lines)):
         s = re.sub(r'"[^"]*"', '""', sch_lines[j])
@@ -86,10 +86,10 @@ def block_balance(start_idx):
             return j
     return None
 
-# -------- 3) Localizar todos los bloques top-level relevantes --------
-# Recorremos el archivo a nivel "top-level" (keywords directamente al
-# nivel de indents " \t" para wired/labels/junctions).
-# Patrones de apertura por keyword:
+# -------- 3) Find every relevant top-level block --------
+# Walk the file at "top level" (keywords directly at the
+# indent level " \t" for wires/labels/junctions).
+# Opening patterns per keyword:
 OPEN_PATS = {
     "wire":      re.compile(r'^\s*\(wire\b'),
     "label":     re.compile(r'^\s*\(label\s+"([^"]+)"'),
@@ -130,7 +130,7 @@ while i < n:
         i += 1; continue
     end = block_balance(i)
     if end is None:
-        print(f"[!!] Bloque abierto sin cerrar en L{i+1}. Abortando.")
+        print(f"[!!] Block opened and never closed at L{i+1}. Aborting.")
         sys.exit(7)
     coords = extract_xy_inside_block(i, end)
     orphan = any(c in coord_set for c in coords)
@@ -156,9 +156,9 @@ if delta != 0:
 SCH.write_text(new_text, encoding="utf-8")
 LOG.write_text(
     f"# Purge A2 - {datetime.datetime.now().isoformat()}\n"
-    f"# Coords orphanas en ERC: {len(coord_set)}\n"
+    f"# Orphan coordinates in the ERC: {len(coord_set)}\n"
     f"# Borrado: {stats}\n"
     f"# Conservado: {kept}\n"
-    f"# Lineas antes: {len(sch_lines)}, despues: {len(nuevas)}\n",
+    f"# Lines before: {len(sch_lines)}, after: {len(nuevas)}\n",
     encoding="utf-8")
-print(f"[ok] Antes {len(sch_lines)} -> despues {len(nuevas)}.")
+print(f"[ok] Before {len(sch_lines)} -> after {len(nuevas)}.")

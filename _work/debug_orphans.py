@@ -13,7 +13,7 @@ while i < len(t):
         hits.append((t[i].split(']:')[0]+']', block))
         i = j
     else: i += 1
-print('Total entradas:', len(hits))
+print('Total entries:', len(hits))
 print()
 import collections
 cnt = collections.Counter(h[0] for h in hits)

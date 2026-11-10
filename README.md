@@ -1,43 +1,180 @@
 # KV260-IAS2RF — an RF front-end carrier for the AMD Kria KV260
 
-**Status: architecture stage. Not manufacturable. No hardware has been validated.**
+**Status (10 November 2026): schematic and layout complete. The board is fully routed, with zero
+DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
+been validated.** A few review items remain before an order (see [Status](#status)).
 
-An adapter board for the **AMD Kria KV260 Vision AI Starter Kit** that mounts on the Hirose
-connectors of the IAS interfaces and carries the converters, the common clock and a front-end
-FPGA, serving two chains:
+![The board, 3D render](docs/img/board_iso.png)
 
-- **Software-defined radio** — HF, AM, FM, airband, amateur bands and PMR446 walkies. Receive,
-  and transmit on the bands a licence covers.
-- **Radar at 10.5 GHz** — the IF of the X-band chain from the open
+An adapter board for the **AMD Kria KV260 Vision AI Starter Kit**. It plugs into the KV260's IAS1
+camera connector and carries the converters, a common clock and a front-end FPGA. It serves two
+signal chains:
+
+- **Software-defined radio**: HF, AM, FM, airband, amateur bands and PMR446. Receive, and
+  transmit on the bands a licence covers.
+- **Radar at 10.5 GHz**: the IF of the X-band chain from the open
   [AERIS-10 / PLFM_RADAR](https://github.com/NawfalMotii79/PLFM_RADAR) project, with ADAR1000
-  beamforming.
-
-The 10.5 GHz chain is **not redesigned here**: AERIS-10 is reused. The board is sized for
-**8 ADAR1000s (32 channels)** so that it supports both the Nexus variant (4 chips) and the
-Extended one (8 chips).
+  beamforming. The 10.5 GHz chain itself is reused from AERIS-10, not redesigned here. The board
+  is sized for 8 ADAR1000s (32 channels), so it covers both the Nexus variant (4 chips) and the
+  Extended one (8 chips).
 
 > ### The finding that shapes the whole project
 >
 > The **IAS0 (J7) connector on the KV260 does not reach the programmable logic**: its MIPI lanes
 > run into an AP1302 ISP soldered on the carrier card. Only **IAS1 (J8)** is wired straight to
-> the SOM. On top of that, **the KV260 has no 40-pin Raspberry Pi header** — J9 is a 15-pin
-> camera connector — and **the GTH transceivers are not exposed**.
+> the SOM. On top of that, **the KV260 has no 40-pin Raspberry Pi header** (J9 is a 15-pin
+> camera connector), and **the GTH transceivers are not exposed**.
 >
 > The real I/O budget between a KV260 and an external board is **8 differential pairs and about
-> 14 single-ended signals**. That is where the front-end FPGA comes from. Evidence and sources in
-> [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md).
+> 14 single-ended signals**. That is why the board has its own FPGA. The evidence and sources are
+> in [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md).
 
 ---
 
-## This board is one subsystem of something larger
+## The board at a glance
 
-The end goal is a sensing and communications platform for an expedition 4×4: LiDAR for fog and
-night driving, SDR to listen and **locate** transmissions, emergency radio, radar, and OBD2
-telemetry. See [docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md) — **read it before making any
-design decision**, because it changes the priorities completely.
+| | |
+|---|---|
+| Size | 119 × 132 mm. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
+| Stackup | 6 layers, JLCPCB JLC06161H-2116A: signal, GND, signal, split power, GND, signal ([POWER_AND_STACKUP](docs/POWER_AND_STACKUP.md)) |
+| Parts | 479, on one face |
+| Front-end FPGA | Xilinx XC7A50T-2FTG256I (the same part as AERIS-10) with a 128 Mb QSPI flash, plus JTAG |
+| Radar ADC | AD9484, 8 bit, 400 MSPS, driven by two cascaded AD8352s |
+| SDR ADC | AD9253, 14 bit, two channels at 62.5 MSPS (one LVDS lane each) |
+| Radar DAC | AD9708, with reconstruction filter and balun |
+| SDR DAC | AD9767, dual 14 bit, two output chains |
+| Clock | Si549 programmable XO (400 or 500 MHz, GPS-disciplinable) into an ADCLK948 LVPECL fan-out |
+| RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs |
+| Link to the Kria | IAS1 (Hirose BM20B), five LVDS pairs at up to 1 Gb/s each, AC-coupled; the Pmod J2 for control |
+| To AERIS-10 | 2×20 IDC ribbon for eight ADAR1000s |
+| Power | 12 V in; buck and LDO tree for 5 V, 3.3 V, 2.5 V, 1.8 V and 1.0 V, plus −3.3 V for the switches |
 
-In particular: **four high-value stages need no custom hardware at all** and come before this
-board. They are listed in [docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md).
+```mermaid
+flowchart LR
+  KV260["Kria KV260<br/>(K26 SOM)"] <-- "IAS1: 5 LVDS pairs<br/>Pmod: control" --> FPGA["XC7A50T<br/>front-end FPGA"]
+  FPGA <-- LVDS --> ADCR["AD9484<br/>radar ADC"]
+  FPGA <-- LVDS --> ADCS["AD9253<br/>SDR ADC"]
+  FPGA --> DACR["AD9708<br/>radar DAC"]
+  FPGA --> DACS["AD9767<br/>SDR DAC"]
+  CLK["Si549 + ADCLK948<br/>clock"] --> ADCR & ADCS & DACR & DACS & FPGA
+  ADCR & ADCS & DACR & DACS <--> RF["RF switches<br/>10 SMAs"]
+  FPGA <-- "IDC ribbon" --> AERIS["AERIS-10<br/>8 × ADAR1000"]
+  RF <--> AERIS
+```
+
+| Top | Bottom |
+|---|---|
+| ![Top](docs/img/board_top.png) | ![Bottom](docs/img/board_bottom.png) |
+
+The renders come from KiCad. Some parts have no 3D model, so they show only their pads (the FPGA's
+BGA, for one).
+
+---
+
+## Schematics and layout
+
+- **[Schematic, all 10 sheets (PDF)](docs/CSI2-KRIA-KV260_Rev03_schematic.pdf)**
+- **[Layout, the six copper layers and both silkscreens (PDF)](docs/CSI2-KRIA-KV260_Rev03_layout.pdf)**
+- KiCad 10 sources: [`CSI2-KRIA-KV260_Rev01.kicad_pro`](CSI2-KRIA-KV260_Rev01.kicad_pro), the root
+  schematic and [`rev03/`](rev03/) (the nine sheets), the board
+  [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and the project's own
+  symbols and footprints in [`symbols/`](symbols/) and [`footprints/`](footprints/). The file names
+  keep the Rev01 name of the board they started from; the contents are Rev03.
+
+| Sheet | Contents | Specification |
+|---|---|---|
+| [Root](docs/img/sch/ROOT.png) | Sheet hierarchy and the interface nets | [ARCHITECTURE](ARCHITECTURE.md) |
+| [IAS_LINK](docs/img/sch/IAS_LINK.png) | The Hirose connectors, AC coupling and terminations of the link | [IAS_LINK_SPEC](docs/IAS_LINK_SPEC.md) |
+| [CLOCK](docs/img/sch/CLOCK.png) | Si549, reference select and LVPECL fan-out | [CLOCK_SPEC](docs/CLOCK_SPEC.md) |
+| [ADC_RADAR](docs/img/sch/ADC_RADAR.png) | AD9484 and its two AD8352 drivers | [ADC_RADAR_SPEC](docs/ADC_RADAR_SPEC.md) |
+| [ADC_SDR](docs/img/sch/ADC_SDR.png) | AD9253, two channels | [ADC_SDR_SPEC](docs/ADC_SDR_SPEC.md) |
+| [DAC_RADAR](docs/img/sch/DAC_RADAR.png) | AD9708, filter and balun | [DAC_RADAR_SPEC](docs/DAC_RADAR_SPEC.md) |
+| [DAC_SDR](docs/img/sch/DAC_SDR.png) | AD9767 in interleaved mode, two output chains | [DAC_SDR_SPEC](docs/DAC_SDR_SPEC.md) |
+| [ROUTING](docs/img/sch/ROUTING.png) | Four RF switches and the SMAs | [ROUTING_SPEC](docs/ROUTING_SPEC.md) |
+| [CONTROL](docs/img/sch/CONTROL.png) | The front-end FPGA: banks, configuration, Pmod, AERIS ribbon, housekeeping | [CONTROL_SPEC](docs/CONTROL_SPEC.md) |
+| [POWER](docs/img/sch/POWER.png) | The power tree | [POWER_SPEC](docs/POWER_SPEC.md) |
+
+![Root sheet](docs/img/sch/ROOT.png)
+
+---
+
+## Status
+
+| Check | Result |
+|---|---|
+| ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
+| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems.** The only warnings are 8 library-footprint notices |
+| Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
+| Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
+
+**Open before ordering** ([docs/LAYOUT.md §6.3–6.4](docs/LAYOUT.md)):
+
+1. **LVDS skew.** Three pairs have a P–N length mismatch of about half a bit at 1 Gb/s:
+   LINK_RX_D0, LINK_RX_D1 and ADCS_FCO. They need their long leg re-routed. The pairs also run as
+   two separate tracks rather than as coupled pairs; that is acceptable at these rates, but a
+   pair-routed board would be better.
+2. **Trace widths.** They come from a field solver on the fabricator's stack and still need to be
+   confirmed in JLCPCB's own calculator.
+3. **The AERIS-10 end of the ribbon does not exist yet.**
+4. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
+   written yet.
+
+---
+
+## Documentation
+
+| Document | Contents |
+|---|---|
+| **[HANDOFF.md](HANDOFF.md)** | **Start here if you are picking the project up.** State, findings, open decisions and working rules |
+| **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** The whole vehicle project: LiDAR, SDR, radar, OBD2 |
+| [docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md) | Parts and checklist per stage, with indicative costs |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Master document for this board: the Rev03 architecture and BOM |
+| [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The five blockers, closed, with evidence and sources, plus the open risks |
+| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | Pin map for J8 and the Pmod, the mechanical envelope, the adapter registered on the KV260 model |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | Per-rail current budget and the 6-layer stackup with computed trace widths |
+| [docs/SYMBOLS.md](docs/SYMBOLS.md) | The project's symbols, each from its datasheet, cross-checked against a second source where one exists |
+| Sheet specifications | One per schematic sheet, in the table above: every value and where it comes from |
+| [docs/LAYOUT.md](docs/LAYOUT.md) | The board: outline, stackup, rules, the split power layer, placement, routing and the LVDS review |
+| [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
+| [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md), [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | What the inherited files contained, and the record of the earlier work |
+
+---
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `CSI2-KRIA-KV260_Rev01.*`, `rev03/` | The KiCad project: root schematic, nine sheets, board |
+| `symbols/`, `footprints/` | The project's own libraries |
+| `docs/` | Specifications, layout and fabrication notes, renders and the PDFs |
+| `_work/` | The scripts behind every finding and every step of the layout: placement, routing, checks, fabrication outputs. `_work/layout/` holds the routing tools |
+| `fab/` | Not tracked. `python _work/fab/make_fab.py` writes Gerbers, drill, BOM and CPL there for JLCPCB |
+| `PCB/`, `Documents/` | The original Allied Vision sources (Altium) and their outputs, untouched |
+| `_backup_original/`, `_deprecated/` | Snapshots of the inherited files and the sheets removed from the project |
+
+Reproducing the checks and the outputs (KiCad 10):
+
+```bash
+kicad-cli sch erc --severity-all CSI2-KRIA-KV260_Rev01.kicad_sch
+kicad-cli pcb drc --schematic-parity --refill-zones --severity-all CSI2-KRIA-KV260_Rev01.kicad_pcb
+python _work/fab/make_fab.py                                   # fab/: Gerbers, drill, BOM, CPL
+python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS lengths and skew (needs shapely)
+```
+
+---
+
+## Related work
+
+The DSP core this board will need already exists, runs on real silicon and is published
+separately:
+
+**[scanner64](https://github.com/PabloSoage/scanner64)**: a real-time multichannel DDC bank for
+the KV260's PL. Measured on the board: 100.05 MSPS sustained, no samples dropped across
+200 million, bit-exact against its Python model, 8.38 mW per channel, 169.9 MHz Fmax post-route.
+
+That project answers, with hardware, the question this board is built around: whether the PL can
+sustain a converter stream in real time. It can.
 
 ---
 
@@ -47,176 +184,12 @@ This is a **fork** of the open hardware design
 [Allied Vision Adapter Board CSI-2 for Kria KV260](https://github.com/alliedvision), published
 under the MIT licence (see [LICENSE](LICENSE)). What is kept from that design:
 
-- the board outline and its mechanical fit to the KV260
+- the board's mechanical fit to the KV260 (the outline was extended)
 - the two Hirose BM20B(0.8)-34DP connectors (IAS0 / IAS1) and their wiring to the SOM
-- the original stackup and fabrication rules
 
-Everything else — the MIPI camera electronics, level shifters, USB power — was removed and is
-being replaced by the RF chain described in the documentation. **This repository no longer
-produces an Allied Vision camera adapter board.** If that is what you want, use the original
-project.
-
----
-
-## Documentation
-
-| Document | Contents |
-|---|---|
-| **[HANDOFF.md](HANDOFF.md)** | **Start here if you are picking the project up.** Self-contained: state, findings, open decisions and working rules |
-| **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** The whole vehicle project: LiDAR, SDR, radar, OBD2 |
-| **[docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md)** | Parts and checklist per stage, with indicative costs |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Master document **for this board**. Rev03 architecture |
-| [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers, closed, with evidence and sources, plus the open risks |
-| [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the KiCad files actually contain, with evidence |
-| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | **Phase 1.** Frozen pin map for J8 and the Pmod, the mechanical envelope, and the adapter registered on the KV260 model — where the board can grow |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | **Phase 1.** Per-rail current budget (18 of 24 loads from datasheets) and the 6-layer stackup with computed trace widths |
-| [docs/SYMBOLS.md](docs/SYMBOLS.md) | **Phase 2.** 17 symbols, 15 from datasheets, cross-checked against a second source where one exists |
-| [docs/CLOCK_SPEC.md](docs/CLOCK_SPEC.md) | **Phase 2.** The first drawn sheet, reviewed and accepted: the clock plan, every value's source |
-| [docs/ADC_RADAR_SPEC.md](docs/ADC_RADAR_SPEC.md) | **Phase 2.** The radar ADC and its two AD8352 drivers, the split of CONVERTERS in four, and how to review it |
-| [docs/ADC_SDR_SPEC.md](docs/ADC_SDR_SPEC.md) | **Phase 2.** The SDR ADC, two channels, and the second SDR input `IF_RX_C` |
-| [docs/DAC_RADAR_SPEC.md](docs/DAC_RADAR_SPEC.md) | **Phase 2.** The radar DAC, its reconstruction filter and balun, and a reference error found in AERIS-10 |
-| [docs/DAC_SDR_SPEC.md](docs/DAC_SDR_SPEC.md) | **Phase 2.** The dual SDR DAC in interleaved mode, two output chains |
-| [docs/ROUTING_SPEC.md](docs/ROUTING_SPEC.md) | **Phase 2.** The four RF switches, the switching plan, ten SMAs |
-| [docs/IAS_LINK_SPEC.md](docs/IAS_LINK_SPEC.md) | **Phase 2.** The Hirose connectors, AC coupling and terminations of the link |
-| [docs/POWER_SPEC.md](docs/POWER_SPEC.md) | **Phase 2.** The power tree as drawn: the regulators and where every value comes from |
-| [docs/CONTROL_SPEC.md](docs/CONTROL_SPEC.md) | **Phase 2.** The front-end FPGA sheet: bank voltages, configuration, the Pmod and the AERIS ribbon |
-| [docs/LAYOUT.md](docs/LAYOUT.md) | **Phase 3.** The board: 119 × 132 mm outline, JLCPCB stackup, rules, the split power layer, placement of all 479 parts with every passive at its pin, and the routing plan |
-| [docs/FABRICATION.md](docs/FABRICATION.md) | **Phase 3.** Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
-| [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of the earlier work and an assessment of it |
-
----
-
-## Related work
-
-The DSP core this board will need already exists, runs on real silicon and is published
-separately:
-
-**[scanner64](https://github.com/PabloSoage/scanner64)** — a real-time multichannel DDC bank for
-the KV260's PL. Measured on the board: 100.05 MSPS sustained, no samples dropped across
-200 million, bit-exact against its Python model, 8.38 mW per channel, 169.9 MHz Fmax post-route.
-
-That project answers, with hardware, the question this board is built around: whether the PL can
-sustain a converter stream in real time. It can.
-
----
-
-## State of the design files
-
-The KiCad files correspond to a **Rev01 work-in-progress** and **do not implement the Rev03
-architecture** documented here.
-
-| File | Actual state |
-|---|---|
-| `rev03/*.kicad_sch` | The Rev03 schematic, nine sheets under the root. The Rev01 IAS0/IAS1 sheet is in `_deprecated/` since 25 Sep |
-| `CSI2-KRIA-KV260_Rev01.kicad_pcb` | Original layout, intact and valid. Cleared of the 34 empty footprints a previous pass had inserted. |
-| `PCB/`, `Documents/` | Original Altium sources and fabrication outputs, untouched. |
-| `_deprecated/` | The two script-generated sheets, removed from the project. See the README in that folder. |
-| `_work/` | Analysis and transformation scripts. Every finding in the documentation has its script here. |
-
-Detail and evidence in [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md).
-
-### Measured ERC state
-
-Removing the two dead sheets took the root schematic from **1130 to 427 violations**, measured
-with `kicad-cli 10.0.1`:
-
-| Category | Before | After |
-|---|---|---|
-| `pin_not_connected` | 442 | 71 |
-| `endpoint_off_grid` | 209 | 136 |
-| `lib_symbol_issues` | 119 | 99 |
-| `label_dangling` | 97 | 23 |
-| **`pin_to_pin`** | **63** | **0** |
-| `hier_label_mismatch` | 36 | 36 |
-| `isolated_pin_label` | 26 | 0 |
-| `lib_symbol_mismatch` | 25 | 0 |
-| `no_connect_dangling` | 24 | 22 |
-| `same_local_global_label` | 13 | 0 |
-| `power_pin_not_driven` | 10 | 9 |
-| **`missing_power_pin`** | **8** | **0** |
-| `missing_unit` | 8 | 0 |
-| `footprint_link_issues` | 39 | 28 |
-| `multiple_net_names` | 6 | 0 |
-| `unconnected_wire_endpoint` | 4 | 3 |
-| `label_multiple_wires` | 1 | 0 |
-| **Total** | **1130** | **427** |
-
-Two further passes since, both measured:
-
-| Stage | Total | Notable |
-|---|---|---|
-| Dead sheets removed | 427 | `pin_to_pin` 63 → 0 |
-| Multi-channel annotation fixed | **411** | netlist exports: 48 components, 61 nets |
-| Rev03 hierarchy skeleton added | 496 | **`hier_label_mismatch` 36 → 0**; +121 `label_dangling`, which is the 108 new interface labels awaiting their circuits |
-| CLOCK sheet drawn | 500 | On the sheet: 2 "power input not driven" (`+3V3_D`, `GND`, until POWER exists) and 6 `isolated_pin_label` (outputs, until their receivers exist). Wiring verified by `_work/check_sheet.py clock`: PASS |
-| CONVERTERS split, ADC_RADAR drawn | 672 | +144 `pin_not_connected` on root sheet pins that KiCad had not reported before, though they were just as unwired (why is not established; the root is wired last). On ADC_RADAR: 3 rails and 2 SPI inputs undriven until POWER and CONTROL exist. `check_sheet.py adc_radar`: PASS. [ADC_RADAR_SPEC.md](docs/ADC_RADAR_SPEC.md) §4 |
-| All Rev03 sheets drawn (to CONTROL) | 660 | Every Rev03 rail driven. On CONTROL: 7 `pin_to_pin` warnings, config and XADC pins KiCad types bidirectional, tied to power on purpose. Most of the rest: the 109 unwired root sheet pins, and the old Rev01 IAS0/IAS1 sheets. [CONTROL_SPEC.md](docs/CONTROL_SPEC.md) §5 |
-| **Root wired**, Rev01 IAS0/IAS1 and Altium relics removed | **9, no errors** | 7 are CONTROL's explained `pin_to_pin` warnings; 2 are J101/J102's Hirose footprint, whose library (`AVT_KHK_Lib`) is not registered - to be extracted from the original board at layout. `_work/check_root.py`: all 92 interface nets exact, every sheet PASS |
-
-What remains is pre-existing noise from the Altium import (off-grid endpoints, library symbols
-the CLI cannot resolve) plus leftovers of the purge. The serious electrical categories are gone.
-
-Reproduce it with:
-
-```bash
-kicad-cli sch erc --severity-all -o erc.rpt CSI2-KRIA-KV260_Rev01.kicad_sch
-```
-
-### Measured mechanical fit
-
-The adapter is registered on AMD's official 3D model of the KV260 (the STEP, XTP679). The IAS
-connectors are found in it by part name, and the fit is confirmed three independent ways. The
-decisive one: **the adapter's two M3 holes land on the carrier's corner holes within 5 µm.**
-
-![Clearance under the adapter](docs/img/kv260_clearance.svg)
-
-Red is a carrier part that would rise through the adapter, which sits only 0.8 mm above the
-carrier. **The board can grow outward, off the side of the KV260, and in no other direction.**
-Detail, and one tight spot (the J18 jumper), in [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md)
-§5.3. Reproduced by `_work/kv260_register_adapter.py`.
-
-### Measured PCB state
-
-**DRC: 1909 violations** (down from 1942, the 33 difference being the 34 empty footprints that
-were removed). They are pre-existing violations of the original Altium design: 502 clearance,
-199 track width, 199 silkscreen overlap, 199 drill out of range, 145 library footprint issues.
-
-### The netlist now exports — a blocker that is closed
-
-`kicad-cli sch export netlist` used to fail with *"the schematic has annotation errors"*, which
-meant `Update PCB from Schematic` could never run and no schematic change could reach the layout.
-
-There were **two independent causes**, both now fixed by `_work/fix_multichannel_annotation.py`:
-
-1. **Duplicate instance references.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is instantiated twice (as
-   IAS0 and as IAS1), and both instance paths carried the *same* reference. Rewritten as
-   `<ref>_IAS0` / `<ref>_IAS1` — which is the convention the PCB already used, so schematic and
-   layout now agree on all 38 references.
-2. **The root schematic's UUID did not match its own instance paths.** The file declared
-   `(uuid "e5fa38a9-…")` while every instance path in the project pointed at `/56c49378-…`. The
-   instance tree referenced a root that did not exist, so KiCad could not resolve a single
-   annotation. The declared UUID appeared **once** in the whole project; the one used by the paths
-   appeared **188 times**, so the declaration was the outlier and was rewritten.
-
-Result, measured:
-
-| | Before | After |
-|---|---|---|
-| `sch export netlist` | fails | **48 components, 61 nets** |
-| `sch export bom` | fails | **48 rows** |
-| ERC violations | 427 | **411** |
-
-The 19 `_IAS0` + 19 `_IAS1` + 10 root-sheet components in the netlist are exactly what the
-schematic contains.
-
----
-
-## Environment
-
-- **KiCad 10** for schematic and layout (migrated from Altium Designer 22)
-- The original Altium files are kept in `PCB/` for reference
-- Scripts in `_work/` run with plain Python 3, no dependencies
+Everything else (the MIPI camera electronics, level shifters, USB power) was removed and replaced
+by the RF chain described here. **This repository no longer produces an Allied Vision camera
+adapter board.** If that is what you want, use the original project.
 
 ---
 

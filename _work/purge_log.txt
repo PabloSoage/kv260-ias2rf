@@ -1,6 +1,6 @@
 # Purge log - 2026-08-02T17:05:19.555760
-# Archivo: E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch
-# Lineas antes: 29298
+# File: E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch
+# Lines before: 29298
 
   BORRADO J5    L28279-L28418 (140 ln): Jumper 2.54
   BORRADO J1    L27626-L27791 (166 ln): USB 2.0 Type B (camara/alim)
@@ -18,5 +18,5 @@
   BORRADO D3    L14109-L14278 (170 ln): LED verde camara
   BORRADO D2    L13862-L14030 (169 ln): LED rojo camara
 
-# Total borradas: 2469 lineas
-# Lineas despues: 26829
+# Total deleted: 2469 lines
+# Lines after: 26829

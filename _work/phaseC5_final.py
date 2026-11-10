@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tareas finales: no-connect en pines no usados + conectores SMA + documentar interfaz externa."""
+"""Final tasks: no-connects on the unused pins + SMA connectors + document the external interface."""
 import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
@@ -8,7 +8,7 @@ DST = ROOT / "FRONTEND.kicad_sch"
 text = DST.read_text(encoding="utf-8")
 lines = text.splitlines(keepends=False)
 
-# ---- 1. NO-CONNECT en pines no usados del ADC AD9253 ----
+# ---- 1. NO-CONNECT on the unused pins of the AD9253 ADC ----
 # Pinout AD9253:
 # Channel A (SDR): D0±A (pins 28,27) + D1±A (pins 26,25) — D1±A UNUSED
 # Channel B (Radar): D0±B (pins 24,23) + D1±B (pins 22,21) — D1±B UNUSED
@@ -29,7 +29,7 @@ adc_unused_pins = [
     ("U_ADC", 38), ("U_ADC", 37),  # VNI±B
 ]
 
-# ---- Posiciones absolutas de los pines (usando offsets de pinouts.txt) ----
+# ---- Absolute pin positions (from the offsets in pinouts.txt) ----
 # AD9253 at (160, 110)
 # Pin rel positions from pinouts.txt:
 adc_rel = {
@@ -71,7 +71,7 @@ dac_rel = {
     41:(17.78,11.43),  # FSADJ2
     40:(17.78,8.89),   # IOUTB2
     39:(17.78,6.35),   # IOUTA2
-    45:(17.78,21.59),  # IOUTB1 (solo IOUTA1 usado)
+    45:(17.78,21.59),  # IOUTB1 (only IOUTA1 used)
 }
 dac_x, dac_y = 240, 110
 for pin_num in [23,24,25,26,27,28,29,30,31,32,33,34,35,36,19,20,39,40,41,42,45,48]:
@@ -80,7 +80,7 @@ for pin_num in [23,24,25,26,27,28,29,30,31,32,33,34,35,36,19,20,39,40,41,42,45,4
     abs_y = round(dac_y + dy, 4)
     no_connects.append((abs_x, abs_y))
 
-# ---- Generar bloques (no_connect ...) ----
+# ---- Generate the (no_connect ...) blocks ----
 nc_blocks = []
 for x, y in no_connects:
     u = uuid.uuid4()
@@ -89,14 +89,14 @@ for x, y in no_connects:
 		(uuid "{u}")
 	)""")
 
-# Insertar antes de sheet_instances
+# Insert before sheet_instances
 text2 = "\n".join(lines) + "\n"
 insert_pos = text2.rfind("(sheet_instances")
 if insert_pos == -1:
     insert_pos = text2.rfind("(embedded_fonts")
 text3 = text2[:insert_pos] + "\n".join(nc_blocks) + "\n\n" + text2[insert_pos:]
 
-# ---- 2. Labels de conexión RF hacia conectores SMA (a colocar en GUI) ----
+# ---- 2. RF labels towards the SMA connectors (to be placed in the GUI) ----
 sma_labels = [
     (45, 245, "ANT_SDR_RX", "input"),
     (75, 245, "ANT_SDR_TX", "output"),
@@ -115,8 +115,8 @@ for x, y, name, shape in sma_labels:
 insert2 = text3.rfind("(sheet_instances")
 text4 = text3[:insert2] + "\n".join(sma_blocks) + "\n\n" + text3[insert2:]
 
-# ---- 3. Labels de interfaz para placa externa Phased Array ----
-# GPIOs 16-20 del J_RPI (SPI bus daisy-chain hacia placa externa de ADAR1000)
+# ---- 3. Interface labels for the external phased-array board ----
+# GPIOs 16-20 of J_RPI (SPI daisy-chain bus to the external ADAR1000 board)
 interface_labels = [
     (317.30, 163.34 - 15.24, "SPI_SCLK_EXT"),   # GPIO16
     (342.70, 163.34 - 15.24, "SPI_SDIO_EXT"),   # GPIO17

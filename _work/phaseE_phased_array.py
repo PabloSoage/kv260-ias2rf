@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genera PHASED_ARRAY.kicad_sch: placa externa con 8x ADAR1000 + SPI daisy-chain."""
+"""Generate PHASED_ARRAY.kicad_sch: external board with 8x ADAR1000 + SPI daisy-chain."""
 import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
@@ -21,12 +21,12 @@ def find_symbol_block(name):
     return None
 
 def transform_block(block):
-    """Anade prefijo EasyEDA: y elimina properties no estandar con balanceo."""
+    """Add the EasyEDA: prefix and drop non-standard properties, with balancing."""
     lines = block.splitlines()
     out = []
     skip_depth = 0
     for ln in lines:
-        # Si estamos saltando un bloque, contar parentesis
+        # If a block is being skipped, count parentheses
         if skip_depth > 0:
             s = re.sub(r'"[^"]*"', '""', ln)
             skip_depth += s.count("(") - s.count(")")
@@ -46,14 +46,14 @@ def transform_block(block):
         out.append(ln)
     return "\n".join(out)
 
-# 1. Obtener lib symbol del ADAR1000
+# 1. Get the ADAR1000 lib symbol
 adar_block = find_symbol_block("ADAR1000ACCZN")
 if not adar_block:
-    print("[!] ADAR1000 no encontrado")
+    print("[!] ADAR1000 not found")
     exit(1)
 adar_def = transform_block(adar_block)
 
-# 2. Cabecera del archivo
+# 2. File header
 header = f"""(kicad_sch
 	(version 20260306)
 	(generator "eeschema")
@@ -70,9 +70,9 @@ header = f"""(kicad_sch
 \t)
 """
 
-# 3. Generar 8 instancias ADAR1000 en columna
+# 3. Generate 8 ADAR1000 instances in a column
 instances = ""
-spacing_y = 90  # mm entre cada ADAR1000
+spacing_y = 90  # mm between ADAR1000s
 base_x, base_y = 60, 300
 adar_refs = []
 for i in range(8):
@@ -106,18 +106,18 @@ for i in range(8):
 	)
 """
 
-# 4. Labels para SPI daisy-chain en cada ADAR1000
-# Pines relevantes del ADAR1000:
+# 4. Labels for the SPI daisy-chain on each ADAR1000
+# Relevant ADAR1000 pins:
 # SCLK (M6), SDIO (M5), SDO (M4), CSB (M3), ADDR0 (N4), ADDR1 (N5)
 # TR (N6), TX_LOAD (N3), RX_LOAD (N2)
-# RF_IO (A7) - salida a antena
+# RF_IO (A7) - out to the antenna
 
-# Coordenadas relativas de los pines en el simbolo ADAR1000 (de pinouts.txt):
-# Los pines en el ADAR1000 tienen coordenadas:
-#   SDIO -> pin M5, pero no tenemos coordenadas exactas. Veamos el pinout.
+# Relative coordinates of the pins in the ADAR1000 symbol (from pinouts.txt):
+# The ADAR1000 pins have the coordinates:
+#   SDIO -> pin M5, but there are no exact coordinates. See the pinout.
 #
-# ADAR1000 tiene los pines:
-#   SPI: CSB(M3), SCLK(M6), SDIO(M5), SDO(M4) - todos en columna izquierda central
+# The ADAR1000 has the pins:
+#   SPI: CSB(M3), SCLK(M6), SDIO(M5), SDO(M4) - all in the left centre column
 #   ADDR: ADDR0(N4), ADDR1(N5) 
 #   RF: RF_IO(A7) - unico pin RF combinado
 #   TX_LOAD(N3), RX_LOAD(N2), TR(N6)
@@ -125,7 +125,7 @@ for i in range(8):
 #   TR_SW_POS(B5), TR_SW_NEG(A3), PA_ON(B3), TR_POL(B4)
 #   LNA_BIAS(A11), DET1(N13), DET2(G13), DET3(A1), DET4(G1)
 #   Power: AVDD(B11), AVDD3(M10,M11,N11), VDD_5V
-#   GND: 40+ pines
+#   GND: 40+ pins
 
 # Pin coordinates from pinouts.txt - the ADAR1000 pins have no (x,y) because the format
 # was different (LGA grid positions). The AT positions weren't parsed.
@@ -282,7 +282,7 @@ for net, x, y in [
 """
 
 
-# 8. Componer archivo
+# 8. Assemble the file
 file_text = header + instances + spi_labels + sma_inst + iface_labels + global_labels
 file_text += f"""	(sheet_instances
 		(path "/"

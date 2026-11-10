@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convierte (label ...) a (hierarchical_label ...) en-2.kicad_sch."""
+"""Convert (label ...) to (hierarchical_label ...) in -2.kicad_sch."""
 import pathlib, re, sys
 
 SCH = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch")
@@ -39,7 +39,7 @@ while i < n:
 
 SCH.write_text("\n".join(lines)+"\n", encoding="utf-8")
 print(f"[ok] Convertidos {converted} labels a hierarchical_label")
-print("[ok] Verificando con ERC...")
+print("[ok] Checking with ERC...")
 import subprocess
 r = subprocess.run([r"E:\Program Files\KiCad\10.0\bin\kicad-cli.exe","sch","erc",
     str(SCH.parent/"CSI2-KRIA-KV260_Rev01.kicad_sch")], capture_output=True, text=True)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PCB placement - extrae bordes y posiciones, anade footprints nuevos."""
+"""PCB placement - extract the edges and positions, add the new footprints."""
 import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
@@ -21,30 +21,30 @@ if edge_coords:
     ys = [c[1] for c in edge_coords]
     print(f"Board bounds: X=[{min(xs):.1f}..{max(xs):.1f}] Y=[{min(ys):.1f}..{max(ys):.1f}]")
 else:
-    print("No Edge.Cuts encontrados")
+    print("No Edge.Cuts found")
 
-# 2. Extraer footprints existentes con posiciones
+# 2. Extract the existing footprints with their positions
 fps = re.findall(
     r'\(footprint\s+"([^"]+)"(?:\s+\(layer[^)]+\))?\s*\n\s*(?:.*\n)*?\s*\(at\s+([-0-9.]+)\s+([-0-9.]+)\s+([-0-9.]+)\)',
     text
 )
 print(f"\nFootprints: {len(fps)}")
-# Buscar los Hirose
+# Find the Hirose connectors
 for i, (fp, x, y, r) in enumerate(fps):
     if "BM20B" in fp or "Hirose" in fp:
         print(f"  {fp} @ ({float(x):.1f},{float(y):.1f}) rot={r}")
 
-# Posiciones min/max de todos los footprints
+# Min/max positions of all footprints
 all_x = [float(x) for _,x,_,_ in fps]
 all_y = [float(y) for _,_,y,_ in fps]
 print(f"\nComponentes: X=[{min(all_x):.1f}..{max(all_x):.1f}] Y=[{min(all_y):.1f}..{max(all_y):.1f}]")
 
-# Determinar zona libre (arriba de los componentes existentes)
+# Find the free area (above the existing parts)
 top_y = max(all_y) if all_y else 0
-print(f"Top Y de componentes: {top_y:.1f}")
+print(f"Top Y of the parts: {top_y:.1f}")
 
-# 3. Generar bloques de footprint para colocar arriba
-# Zona libre: Y > top_y (con margen de 10mm)
+# 3. Generate footprint blocks to place above
+# Free area: Y > top_y (10 mm margin)
 place_y_start = top_y + 15
 
 FOOTPRINTS = {
@@ -96,8 +96,8 @@ for ref, val, fp_name, x, y, rot in caps:
 	)
 """)
 
-# Insertar al final, antes del cierre del archivo
-# Buscar el ultimo \n)\n que cierra el (kicad_pcb ...)
+# Insert at the end, before the file closes
+# Find the last \n)\n that closes the (kicad_pcb ...)
 last_close = text.rfind("\n)\n")
 if last_close == -1:
     last_close = len(text) - 2
@@ -114,6 +114,6 @@ print(f"Parentesis delta: {delta}")
 
 if delta == 0:
     PCB.write_text(new_text, encoding="utf-8")
-    print(f"[ok] PCB actualizado. Antes {len(text.splitlines())}, ahora {len(new_text.splitlines())} lineas")
+    print(f"[ok] PCB updated. Before {len(text.splitlines())}, now {len(new_text.splitlines())} lines")
 else:
     print(f"[!!] Delta={delta}, NO guardado")

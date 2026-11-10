@@ -19,8 +19,8 @@ while i < len(els):
         i = j
     else:
         i += 1
-print(f"coords orphanas: {len(coord_set)}")
-print("primeras 8:", coord_set[:8])
+print(f"orphan coords: {len(coord_set)}")
+print("first 8:", coord_set[:8])
 sch = SCH.read_text(encoding="utf-8")
 for raw in coord_set[:8]:
     nn, mm = raw
@@ -28,12 +28,12 @@ for raw in coord_set[:8]:
     pat = re.compile(r"\(xy\s+("+re.escape(nn)+r"|"+re.escape(nn)+r"\d+)\s+("+re.escape(mm)+r"|"+re.escape(mm)+r"\d+)\)")
     n = len(pat.findall(sch))
     print(f"  ({nn},{mm}) -> ocurrencias tolerantes (xy): {n}")
-# ahora con float parseo
+# now with float parsing
 fset = {(round(float(a),3), round(float(b),3)) for a,b in coord_set}
 print("fset size:", len(fset))
-# escanear todos (xy X Y)
+# scan every (xy X Y)
 allxy = re.findall(r"\(xy\s+([-0-9.]+)\s+([-0-9.]+)\)", sch)
 allxy_r = [(round(float(a),3), round(float(b),3)) for a,b in allxy]
 print("total (xy) en sch:", len(allxy_r))
 match = sum(1 for c in allxy_r if c in fset)
-print("(xy) que aparecen en fset:", match)
+print("(xy) found in fset:", match)

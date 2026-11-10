@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Phase C2 - Wiring: añade labels a los pins de los simbolos en FRONTEND.kicad_sch.
+"""Phase C2 - Wiring: add labels to the symbol pins in FRONTEND.kicad_sch.
 
-Usa conexion por nombre de net (label matching) en vez de wires explicitos.
-Genera bloques (label "NET_X" (at X Y) ...) en posiciones de pin absolutas.
+Connects by net name (label matching) instead of explicit wires.
+Generates (label "NET_X" (at X Y) ...) blocks at absolute pin positions.
 """
 from __future__ import annotations
 import pathlib, re, uuid, json, math
@@ -11,7 +11,7 @@ ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
 FRONT = ROOT / "FRONTEND.kicad_sch"
 PINOUTS = ROOT / "_work" / "pinouts.txt"
 
-# Layout de los chips (mismo que phaseC)
+# Chip layout (the same as phaseC)
 LAYOUT = {
     "J_PWR": (40, 40),   "D_TVS": (60, 40),
     "U_PWR1": (90, 40),  "U_PWR2": (130, 40), "U_PWR3": (170, 40),
@@ -56,9 +56,9 @@ def load_pin_offsets():
     return sections
 
 pin_offsets = load_pin_offsets()
-print(f"[i] Chips con offsets: {list(pin_offsets.keys())}")
+print(f"[i] Chips with offsets: {list(pin_offsets.keys())}")
 
-# Para un chip dado, obtener la posición absoluta de un pin por su número
+# For a given chip, the absolute position of a pin by its number
 def pin_abs(key, pin_number):
     if key not in LAYOUT:
         return None
@@ -66,14 +66,14 @@ def pin_abs(key, pin_number):
     if chip not in pin_offsets:
         return None
     sx, sy = LAYOUT[key]
-    # Buscar pin por numero (clave string)
+    # Find the pin by number (string key)
     for (num, name), (dx, dy) in pin_offsets[chip].items():
         if num == str(pin_number):
             return (round(sx + dx, 4), round(sy + dy, 4))
     return None
 
 def pin_abs_by_name(key, pin_name_str):
-    """Buscar por nombre parcial (case insensitive)"""
+    """Find by partial name (case insensitive)"""
     if key not in LAYOUT:
         return None
     chip = CHIP_NAMES.get(key, "")
@@ -275,12 +275,12 @@ for idx, (sx, sy) in enumerate(switch_positions):
     labels_blocks.append(gen_label("GND", sx+1.27, sy+12.70))
     labels_blocks.append(gen_label("GND", sx+1.27, sy-12.70))
 
-# ====== Insertar labels al final del FRONTEND.kicad_sch ======
+# ====== Insert the labels at the end of FRONTEND.kicad_sch ======
 front_text = FRONT.read_text(encoding="utf-8")
-# insertar antes de (sheet_instances
+# insert before (sheet_instances
 insert_pos = front_text.rfind("(sheet_instances")
 if insert_pos == -1:
-    print("[!] No se encontro sheet_instances")
+    print("[!] sheet_instances not found")
     exit(1)
 
 labels_text = "\n".join(labels_blocks) + "\n\n"

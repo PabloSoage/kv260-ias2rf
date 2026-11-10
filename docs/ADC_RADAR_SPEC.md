@@ -63,7 +63,7 @@ have parallel CMOS buses. Done by `_work/rev03_split_converters.py`; `hier_label
 | FB501–FB503 + 51 passives | see `adc_radar_spec.py` | 0402, bulk 0805, ferrites 0603 | Each with its source |
 
 The two datasheets are in the AERIS-10 repository, not in `_work/datasheets/`:
-`E:\Repos\PLFM_RADAR\7_Components Datasheets and Application notes\AD9484\` holds `AD9484.pdf`
+The PLFM_RADAR repository's `7_Components Datasheets and Application notes/AD9484/` holds `AD9484.pdf`
 (Rev. A), `ad8352.pdf` (Rev. C) and the AD9484 evaluation board schematic.
 
 ---

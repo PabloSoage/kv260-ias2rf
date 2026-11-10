@@ -3,7 +3,7 @@
 
 
 === AD9268BCPZ-125 ===
-  lineas 5..468
+  lines 5..468
   Total pins: 65
   Pin      Nombre                           Dir            (x,y)
   1        CLK+                             ?              (-20.32,38.10)
@@ -75,7 +75,7 @@
 
 
 === AD9779BSVZ ===
-  lineas 470..1149
+  lines 470..1149
   Total pins: 101
   Pin      Nombre                           Dir            (x,y)
   1        CVDD18                           ?              (-19.05,60.96)
@@ -183,7 +183,7 @@
 
 
 === 8132H-T125.000LJ33DT ===
-  lineas 1151..1241
+  lines 1151..1241
   Total pins: 4
   Pin      Nombre                           Dir            (x,y)
   1        E/D/NC                           ?              (-17.78,1.27)
@@ -194,7 +194,7 @@
 
 
 === HMC547ALC3TR ===
-  lineas 1243..1418
+  lines 1243..1418
   Total pins: 17
   Pin      Nombre                           Dir            (x,y)
   1        NC                               ?              (-11.43,3.81)
@@ -218,7 +218,7 @@
 
 
 === ADL5801ACPZ ===
-  lineas 1420..1643
+  lines 1420..1643
   Total pins: 25
   Pin      Nombre                           Dir            (x,y)
   1        GND                              ?              (-11.43,12.70)
@@ -250,7 +250,7 @@
 
 
 === ADAR1000ACCZN ===
-  lineas 1645..2125
+  lines 1645..2125
   Total pins: 89
   Pin      Nombre                           Dir            (x,y)
   89       GND                              ?              (?,?)
@@ -346,7 +346,7 @@
 
 
 === ADCLK944BCPZ-R2 ===
-  lineas 2127..2302
+  lines 2127..2302
   Total pins: 17
   Pin      Nombre                           Dir            (x,y)
   1        CLK                              ?              (-10.16,7.62)
@@ -370,7 +370,7 @@
 
 
 === AD9253BCPZ-125 ===
-  lineas 2304..2664
+  lines 2304..2664
   Total pins: 49
   Pin      Nombre                           Dir            (x,y)
   1        VIN+D                            ?              (-16.51,30.48)
@@ -426,7 +426,7 @@
 
 
 === DAC3174IRGCR ===
-  lineas 3229..3692
+  lines 3229..3692
   Total pins: 65
   Pin      Nombre                           Dir            (x,y)
   1        DACCLKP                          ?              (-17.78,38.10)
@@ -498,7 +498,7 @@
 
 
 === TPS54202DDCR ===
-  lineas 2666..2775
+  lines 2666..2775
   Total pins: 6
   Pin      Nombre                           Dir            (x,y)
   1        GND                              ?              (-12.70,2.54)
@@ -511,7 +511,7 @@
 
 
 === TPS82140SILR ===
-  lineas 2777..2904
+  lines 2777..2904
   Total pins: 9
   Pin      Nombre                           Dir            (x,y)
   1        EN                               ?              (-11.43,2.54)
@@ -527,7 +527,7 @@
 
 
 === ADP151AUJZ-1.8-R7_C462184 ===
-  lineas 2906..3009
+  lines 2906..3009
   Total pins: 5
   Pin      Nombre                           Dir            (x,y)
   1        VIN                              ?              (-10.16,2.54)
@@ -539,7 +539,7 @@
 
 
 === SMBJ15A_C83846 ===
-  lineas 3011..3098
+  lines 3011..3098
   Total pins: 2
   Pin      Nombre                           Dir            (x,y)
   1        1                                ?              (-5.08,-0.00)
@@ -548,7 +548,7 @@
 
 
 === PJ-102AH_C3096093 ===
-  lineas 3100..3227
+  lines 3100..3227
   Total pins: 3
   Pin      Nombre                           Dir            (x,y)
   1        1                                ?              (6.35,1.27)
@@ -558,7 +558,7 @@
 
 
 === AD9767ASTZ ===
-  lineas 3694..4055
+  lines 3694..4055
   Total pins: 48
   Pin      Nombre                           Dir            (x,y)
   1        DB13P1(MSB)                      ?              (-17.78,29.21)
