@@ -53,7 +53,7 @@ The comparison that led here:
 | Direction finding | **4 coherent channels** | 2, with ambiguity |
 | Transmission | 14 bits, local bus | 8 bits split across 2 connectors |
 | ADAR1000 control | Trivial, with a synchronous strobe | Unsolved for 8 chips |
-| AERIS firmware | **Runs almost unported** | Has to be rewritten |
+| AERIS firmware | **Front-end modules run unported**; the back end (pulse compression, Doppler, CFAR) moves to the Kria | Has to be rewritten |
 | Connectors used | J8 + Pmod | J8 + J9 (FFC) + Pmod |
 | Board complexity | **An FPGA board**: boot, sequencing, JTAG | Passive board |
 | Second toolchain | Yes (Vivado for the front-end FPGA) | No |

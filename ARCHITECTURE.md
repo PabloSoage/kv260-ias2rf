@@ -129,11 +129,19 @@ architecture could not close.
 
 **Recommendation: XC7A50T-2FTG256I** — exactly the part AERIS-10 uses `[V]`.
 
-The deciding argument is not technical but about risk: **all of AERIS-10's FPGA firmware runs on
-that part with nothing ported**. `ddc_400m.v`, the chirp controller, pulse compression, Doppler,
-MTI and CFAR are written and tested for it, with documented regressions and timing closure at
-400 MHz `[V]`. Its design occupies 6,092 LUTs (4.5 %), 9,024 FFs, 16 BRAMs and 140 DSP48s `[V]`:
-there is ample room to add the link to the Kria.
+The deciding argument is not technical but about risk: **the AERIS-10 modules this board keeps on
+the front-end FPGA run on that part unported**, on the same balls. Those are the AD9484 capture at
+400 MHz, `ddc_400m.v` with its CIC and FIR, and the chirp controller and DAC interface. AERIS's
+repository has regressions for them and a 400 MHz MMCM clocking note with +0.062 ns of setup slack
+`[V]`.
+
+**Not the whole firmware** (corrected 10 November 2026). This section used to say that all of it
+fits the 50T, occupying "6,092 LUTs (4.5 %) … 140 DSP48s". Those are not 50T figures: 4.5 % of the
+LUTs is a 200T's share, and 140 DSPs exceed the 50T's 120 (32,600 LUTs, 75 BRAM36, 120 DSP48E1).
+AERIS closes its full chain on an XC7A200T dev board, and the figure no longer appears in its
+repository. Pulse compression, Doppler, MTI and CFAR therefore go to the Kria (§8), which is the
+split this board was designed for. The front-end subset plus the link and an SDR DDC is estimated at
+35–50 % of the 50T's LUTs `[E]`.
 
 Cheaper alternatives: Spartan-7 XC7S25/S50 (same Vivado flow, no transceivers, which are not needed
 here). The cost would be having to port the firmware.
@@ -422,7 +430,7 @@ does what it is good at:
 | Chirp generation and DAC control | Target tracking |
 | ADAR1000 fan-out and strobe | **Inference on the DPU**: target classification |
 | Level translation | Linux, networking, storage, user interface |
-| *AERIS firmware, almost unported* | *Replaces AERIS's Python GUI on a PC* |
+| *AERIS's front-end modules, unported* | *AERIS's back-end modules, ported; replaces its Python GUI on a PC* |
 
 That last point is the real value: AERIS ends in a USB link to a PC running a Python GUI. With the
 Kria you have an embedded SoC with four Cortex-A53s, a DPU for inference and networking, sitting
