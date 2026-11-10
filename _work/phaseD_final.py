@@ -10,7 +10,7 @@ text = DST.read_text(encoding="utf-8")
 lines = text.splitlines(keepends=False)
 
 # ============================================================
-# 1. AÑADIR SÍMBOLO SMA genérico a lib_symbols
+# 1. ADD a generic SMA SYMBOL to lib_symbols
 # ============================================================
 sma_lib_def = """	(symbol "Connector_Coaxial:SMA_EdgeMount"
 		(in_bom yes)
@@ -25,7 +25,7 @@ sma_lib_def = """	(symbol "Connector_Coaxial:SMA_EdgeMount"
 		)
 	)"""
 
-# símbolo genérico de capacitor SMD 0603
+# generic 0603 SMD capacitor symbol
 cap_lib_def = """	(symbol "Device:C_Small"
 		(in_bom yes)
 		(on_board yes)
@@ -40,18 +40,18 @@ cap_lib_def = """	(symbol "Device:C_Small"
 		)
 	)"""
 
-# Encontrar donde termina lib_symbols para insertar
+# Find where lib_symbols ends, to insert there
 lib_close = None
 for i, ln in enumerate(lines):
     if ln.strip() == ")" and i > 0 and "lib_symbols" in lines[i-5] if i > 5 else False:
         pass
-# Encontrar: el ); cierra lib_symbols 
+# Find: the ); that closes lib_symbols 
 for i in range(len(lines)-1,0,-1):
     if lines[i].strip() == ")":
-        # ver si la línea anterior comienza una seccion de instancias
+        # see whether the line before starts an instances section
         if i+1 < len(lines) and " symbol " in lines[i+1] and lines[i+1].strip().startswith("(symbol"):
             pass
-# Mejor: buscar (lib_symbols explicitamente y encontrar su cierre
+# Better: find (lib_symbols explicitly and find its end
 lib_open = None
 for i, ln in enumerate(lines):
     if ln.strip() == "(lib_symbols":
@@ -69,7 +69,7 @@ if lib_close is None:
     print("[!] No encontre lib_symbols close")
     exit(1)
 
-# Insert lib defs antes del cierre
+# Insert the lib definitions before the end
 lib_insert = [sma_lib_def, cap_lib_def]
 lines[lib_close:lib_close] = lib_insert
 print(f"[i] Lib defs SMA + C_Small insertadas en L{lib_close+1}")
@@ -111,7 +111,7 @@ for ref, x, y, val in smas:
 	)
 """
 
-# Labels en pines SMA (pin 1 = señal, pin 2 = GND)
+# Labels on the SMA pins (pin 1 = signal, pin 2 = GND)
 sma_labels = ""
 for ref, x, y, val in smas:
     u = uuid.uuid4()
@@ -135,7 +135,7 @@ for ref, x, y, val in smas:
 # ============================================================
 cap_instances = ""
 cap_labels = ""
-# Lista de (ref, x, y, value, net1, net2)
+# List of (ref, x, y, value, net1, net2)
 caps = [
     ("C_BP1", 155, 95, "100n", "VCC1V8_RAW", "GND"),
     ("C_BP2", 155, 100, "100n", "VCC3V3_RAW", "GND"),
@@ -197,7 +197,7 @@ for ref, x, y, val, net1, net2 in caps:
 # 4. ADL5801 MIXER WIRING (IF → ADC, RF → switches, LO → SMA)
 # ============================================================
 mixer_labels = ""
-# U_MIX at (240, 180). Pines ADL5801:
+# U_MIX at (240, 180). ADL5801 pins:
 # IFOP/IFON (pins 20/21) at (11.43,2.54)/(11.43,5.08) → abs (251.43,182.54)/(251.43,185.08)
 # VIN+A/VIN-A of ADC at (16.51,-0.00)/(16.51,-2.54) abs (176.51,110)/(176.51,107.46)
 # Conectar IFOP→VIN+A, IFON→VIN-A via labels
@@ -254,12 +254,12 @@ mixer_labels += f"""	(label "RF_SW_RADAR_P"
 """
 
 # ============================================================
-# 5. INSERTAR TODO en el archivo
+# 5. INSERT EVERYTHING in the file
 # ============================================================
 all_blocks = sma_instances + sma_labels + cap_instances + cap_labels + mixer_labels
 text2 = "\n".join(lines) + "\n"
 
-# Hay lineas adicionales; añadir tambien las 5 labels SPI existentes (ya estan del script C5)
+# There are more lines; also add the 5 existing SPI labels (already there from script C5)
 insert_pos = text2.rfind("(sheet_instances")
 if insert_pos == -1:
     print("[!] No sheet_instances, buscando (embedded_fonts")
@@ -273,6 +273,6 @@ print(f"[i] Parentesis delta: {delta}")
 
 if delta == 0:
     DST.write_text(text3, encoding="utf-8")
-    print(f"[ok] SMA={len(smas)} caps={len(caps)} ADL5801 labels={3} añadidos a FRONTEND")
+    print(f"[ok] SMA={len(smas)} caps={len(caps)} ADL5801 labels={3} added to FRONTEND")
 else:
     print(f"[!!] Error parentesis, delta={delta}")

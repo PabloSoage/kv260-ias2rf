@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Elimina los 8 ADAR1000 de FRONTEND.kicad_sch.
+"""Remove the 8 ADAR1000s from FRONTEND.kicad_sch.
 
-1. Borra las 8 instancias de simbolo (U_ADR1..U_ADR8) - bloques (symbol ...)
-2. Borra la definicion lib_symbol del ADAR1000ACCZN
-3. Conserva: J_RPI GPIOs SPI, conectores SMA para RF, y el mezclador ADL5801
+1. Deletes the 8 symbol instances (U_ADR1..U_ADR8) - (symbol ...) blocks
+2. Deletes the ADAR1000ACCZN lib_symbol definition
+3. Keeps: the J_RPI SPI GPIOs, the RF SMA connectors, and the ADL5801 mixer
 """
 import pathlib, re, uuid
 
@@ -12,7 +12,7 @@ text = DST.read_text(encoding="utf-8")
 lines = text.splitlines(keepends=False)
 n_orig = len(lines)
 
-# ---- 1. Encontrar y eliminar instancias U_ADR1..U_ADR8 ----
+# ---- 1. Find and remove the U_ADR1..U_ADR8 instances ----
 to_delete = set()
 i = 0
 while i < len(lines):
@@ -29,7 +29,7 @@ while i < len(lines):
             block = "\n".join(lines[j_start:j+1])
             ref_m = re.search(r'\(property\s+"Reference"\s+"(U_ADR\d)"', block)
             if ref_m:
-                # eliminar todo el bloque
+                # remove the whole block
                 for k in range(j_start, j+1):
                     to_delete.add(k)
             i = j + 1
@@ -37,7 +37,7 @@ while i < len(lines):
     else:
         i += 1
 
-# ---- 2. Encontrar y eliminar la def lib_symbol del ADAR1000 ----
+# ---- 2. Find and remove the ADAR1000's lib_symbol definition ----
 i = 0
 while i < len(lines):
     if "(symbol" in lines[i] and "ADAR1000ACCZN" in lines[i] and "EasyEDA" in lines[i]:
@@ -61,10 +61,10 @@ new_text = "\n".join(nuevas) + "\n"
 
 cleaned = re.sub(r'"[^"]*"', '""', new_text)
 delta = cleaned.count("(") - cleaned.count(")")
-print(f"[i] Lineas borradas: {len(to_delete)}. Delta parentesis: {delta}")
+print(f"[i] Lines deleted: {len(to_delete)}. Parentheses delta: {delta}")
 
 if delta == 0:
     DST.write_text(new_text, encoding="utf-8")
-    print(f"[ok] ADAR1000 purgados. Antes {n_orig}, ahora {len(nuevas)} lineas")
+    print(f"[ok] ADAR1000s removed. Before {n_orig}, now {len(nuevas)} lines")
 else:
     print(f"[!!] Error parentesis")

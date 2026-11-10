@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Anade el conector J_RPI 2x20 (RPi 40-pin header) a FRONTEND.kicad_sch.
-Crea definicion lib + instancia + labels en pines DAC y GND."""
+"""Add the J_RPI 2x20 connector (RPi 40-pin header) to FRONTEND.kicad_sch.
+Creates the lib definition + instance + labels on the DAC and GND pins."""
 import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
@@ -8,7 +8,7 @@ DST = ROOT / "FRONTEND.kicad_sch"
 
 text = DST.read_text(encoding="utf-8")
 
-# ---- 1. Definicion del simbolo RPi 40-pin en lib_symbols ----
+# ---- 1. Definition of the RPi 40-pin symbol in lib_symbols ----
 rpi_sym = """	(symbol "Connector:Conn_02x20_RPi"
 		(in_bom yes)
 		(on_board yes)
@@ -19,7 +19,7 @@ rpi_sym = """	(symbol "Connector:Conn_02x20_RPi"
 		(symbol "Conn_02x20_RPi_0_1"
 			(rectangle (start -10.16 55.88) (end 10.16 -55.88) (stroke (width 0) (type default)) (fill (type background)))
 )"""
-# generar 40 pines
+# generate 40 pins
 for row in range(20):
     pin_n = 2*row + 1
     x_left, x_right = -12.70, 12.70
@@ -29,7 +29,7 @@ for row in range(20):
 			(pin bidirectional line (at {x_right} {y} 0) (length 2.54) (name "GPIO{pin_n+1}" (effects (font (size 1.27 1.27)))) (number "{pin_n+1}" (effects (font (size 1.27 1.27)))))"""
 rpi_sym += "\n\t)"
 
-# Insertar en lib_symbols (antes del primer (symbol "EasyEDA" ...)
+# Insert in lib_symbols (before the first (symbol "EasyEDA" ...)
 insert_lib = None
 lines = text.splitlines()
 for i, ln in enumerate(lines):
@@ -37,7 +37,7 @@ for i, ln in enumerate(lines):
         insert_lib = i
         break
 if insert_lib is None:
-    # buscar el uncierre de lib_symbols
+    # find the end of lib_symbols
     for i, ln in enumerate(lines):
         if ln.strip() == ")" and i > 0:
             insert_lib = i
@@ -48,7 +48,7 @@ if insert_lib:
 else:
     print("[!] No encontre donde insertar lib_symbol")
 
-# ---- 2. Instanciar el conector J_RPI a la derecha ----
+# ---- 2. Instantiate the J_RPI connector on the right ----
 u_jrpi = uuid.uuid4()
 jrpi_x, jrpi_y = 330, 110
 jrpi_instance = f"""	(symbol
@@ -75,13 +75,13 @@ jrpi_instance = f"""	(symbol
 		)
 	)"""
 
-# Insertar antes de sheet_instances
+# Insert before sheet_instances
 text2 = "\n".join(lines) + "\n"
 insert2 = text2.rfind("(sheet_instances")
 text3 = text2[:insert2] + jrpi_instance + "\n\n" + text2[insert2:]
 
-# ---- 3. Labels en los pines del J_RPI ----
-# Pines GND: 6,9,14,20,25,30,34,39
+# ---- 3. Labels on the J_RPI pins ----
+# GND pins: 6,9,14,20,25,30,34,39
 gnd_pins = [6,9,14,20,25,30,34,39]
 labels = []
 for gpio in range(1,41):
@@ -107,7 +107,7 @@ for gpio in range(1,41):
 		(uuid "{uuid.uuid4()}")
 	)""")
     elif 16 <= gpio <= 20:
-        # Resto para SPI ADAR + RF control
+        # The rest for the ADAR SPI + RF control
         label_map = {16:"EXT-GPIO0-I2C-SCL", 17:"EXT-GPIO1-I2C-SDA", 18:"EXT-GPIO2", 19:"EXT-GPIO3", 20:"GPIO2"}
         net = label_map[gpio]
         labels.append(f"""	(label "{net}"
@@ -127,4 +127,4 @@ if delta != 0:
     print(f"[!!] Delta parentesis = {delta}")
 else:
     DST.write_text(text4, encoding="utf-8")
-    print(f"[ok] Conector J_RPI añadido + {len(labels)} labels en FRONTEND")
+    print(f"[ok] J_RPI connector added + {len(labels)} labels in FRONTEND")

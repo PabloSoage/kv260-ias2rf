@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """Anade power symbols (GND_BAR, VCC_CIRCLE variants) a FRONTEND.kicad_sch.
-Copia definiciones lib de -2.kicad_sch y las instancia con labels."""
+Copies the lib definitions from -2.kicad_sch and instantiates them with labels."""
 import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
 SRC = ROOT / "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
 DST = ROOT / "FRONTEND.kicad_sch"
 
-# 1. Extraer defs de GND_BAR, VCC3V3_CIRCLE, etc. del -2.kicad_sch
+# 1. Extract the definitions of GND_BAR, VCC3V3_CIRCLE, etc. from -2.kicad_sch
 src_text = SRC.read_text(encoding="utf-8")
 src_lines = src_text.splitlines()
 
 def find_all_blocks(lines, keyword_part):
-    """Devuelve [(start,end,block_text)] de bloques top-level con keyword en el nombre."""
+    """Return [(start,end,block_text)] of the top-level blocks with keyword in the name."""
     res = []
     i = 0
     n = len(lines)
@@ -41,11 +41,11 @@ power_defs += find_all_blocks(src_lines, "VCC1V2_CIRCLE")
 power_defs += find_all_blocks(src_lines, "C-GND_POWER_GROUND")
 print(f"[i] Power symbol defs: {len(power_defs)}")
 
-# 2. Insertarlas en el lib_symbols de FRONTEND (despues de los EasyEDA syms, antes del cierre)
+# 2. Insert them in FRONTEND's lib_symbols (after the EasyEDA symbols, before the end)
 dst_text = DST.read_text(encoding="utf-8")
 dst_lines = dst_text.splitlines()
 
-# encontrar el cierre de lib_symbols: buscar (lib_symbols primero, luego balancear
+# find the end of lib_symbols: find (lib_symbols first, then balance
 lib_open = None
 lib_close = None
 in_lib = False
@@ -64,11 +64,11 @@ for i, ln in enumerate(dst_lines):
             break
 
 if lib_open is None:
-    print("[!] No se encontro lib_symbols")
+    print("[!] lib_symbols not found")
     exit(1)
-print(f"[i] Insertando power defs antes de L{lib_close+1} (cierre lib_symbols)")
+print(f"[i] Inserting the power definitions before L{lib_close+1} (end of lib_symbols)")
 
-# Insertar defs antes del cierre
+# Insert the definitions before the end
 power_lines = []
 for blk in power_defs:
     for ln in blk.splitlines():
@@ -77,7 +77,7 @@ for blk in power_defs:
 
 dst_lines[lib_close:lib_close] = power_lines
 
-# 3. Anadir instancias de power symbols al final del archivo y labels en posiciones
+# 3. Add power symbol instances at the end of the file, and labels at positions
 power_instances = []
 # GND_BAR en varias posiciones
 for name, x, y, value in [
@@ -156,7 +156,7 @@ for sym_name, x, y, value in vcc_syms:
 	)"""
     power_instances.append(instance)
 
-# Insertar antes de sheet_instances
+# Insert before sheet_instances
 final_text = "\n".join(dst_lines) + "\n"
 insert2 = final_text.rfind("(sheet_instances")
 final_text = final_text[:insert2] + "\n".join(power_instances) + "\n\n" + final_text[insert2:]

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Phase C - Genera FRONTEND.kicad_sch con TODOS los bloques:
+"""Phase C - Generate FRONTEND.kicad_sch with ALL the blocks:
 
   (Power tree) Barrel-J -> TVS-SMBJ15A -> TPS54202(12->5V) -> TPS82140(5V->3V3) -> ADP151(5V->1V8)
   (Master Clock) TCXO-8132H-125M -> ADCLK944 fan-out (4 salidas LVPECL)
   (RX) AD9253 dual-channel 14-bit +ADC clock IN+ via HMC547/ADL5801
   (TX) AD9767 dual-channel 14-bit parallel -> alimentación + driven from RPi header J_RPI
   (Radar) 8x ADAR1000 daisy-chain SPI -> ADL5801 mixer
-  (RF front) 3x HMC547 SPDT para multiplex bands + duplexor T/R
+  (RF front) 3x HMC547 SPDT to switch bands + T/R duplexer
   (Connectors) J_PWR barrel + J_RPI 2x20 + SMA antennas (placeholders)
   (Hierarchical labels expuestos al padre) :
-     - B7-CSI2-TXC_P/N, TXD0/1/2/3_P/N  (RX LVDS ADC->IAS0 Hirose; reutilizan los labels ya en -2.kicad_sch)
+     - B7-CSI2-TXC_P/N, TXD0/1/2/3_P/N  (RX LVDS ADC->IAS0 Hirose; reusing the labels already in -2.kicad_sch)
      - I2C_SCL, I2C_SDA, I2C_SCL_3V3, I2C_SDA_3V3  (SPI ADAR1000 via GPIO)
      - EXT-GPIO0/1/2/3, GPIO2, GPIO3   (Control RF switch)
      - PWDN, PWDN_3V3                   (ADC power-down / DAC sleep)
@@ -27,7 +27,7 @@ EASY = pathlib.Path(r"C:\Users\pablo\KiCad\EasyEDA.kicad_sym")
 OUT  = ROOT / "FRONTEND.kicad_sch"
 
 # ----------------------------------------------------------------------------
-# Chips del FRONTEND y su lib_id en EasyEDA
+# FRONTEND chips and their EasyEDA lib_id
 # ----------------------------------------------------------------------------
 CHIPS = {
     # Power tree
@@ -45,16 +45,16 @@ CHIPS = {
     "U_DAC":  {"lib_id": "EasyEDA:AD9767ASTZ",         "ref": "U_DAC",   "value": "AD9767ASTZ","fp":"EasyEDA:LQFP-48_L7.0-W7.0-P0.50-LS9.0-BL"},
     # Mixer
     "U_MIX":  {"lib_id": "EasyEDA:ADL5801ACPZ",        "ref": "U_MIX",   "value": "ADL5801ACPZ","fp":"EasyEDA:LFCSP-24_L4.0-W4.0-P0.50-TL-EP"},
-    # 8x ADAR1000 (beamformer) - REMOVIDO (va a placa externa de alta frecuencia)
+    # 8x ADAR1000 (beamformer) - REMOVED (goes on the external high-frequency board)
     # 3x HMC547 SPDT RF switches
     "U_SW1": {"lib_id": "EasyEDA:HMC547ALC3TR", "ref": "U_SW1", "value":"HMC547ALC3TR", "fp":"EasyEDA:QFN-16_L3.0-W3.0-P0.50-TL-EP1.5-1"},
     "U_SW2": {"lib_id": "EasyEDA:HMC547ALC3TR", "ref": "U_SW2", "value":"HMC547ALC3TR", "fp":"EasyEDA:QFN-16_L3.0-W3.0-P0.50-TL-EP1.5-1"},
     "U_SW3": {"lib_id": "EasyEDA:HMC547ALC3TR", "ref": "U_SW3", "value":"HMC547ALC3TR", "fp":"EasyEDA:QFN-16_L3.0-W3.0-P0.50-TL-EP1.5-1"},
 }
 
-# Layout grid (mm). Cada bloque se separa en columnas.
+# Layout grid (mm). Each block in its own column.
 LAYOUT = {
-    # (x, y) del centro del símbolo
+    # (x, y) of the symbol's centre
     "J_PWR":  (40,  40),
     "D_TVS":  (60,  40),
     "U_PWR1": (90,  40),
@@ -70,8 +70,8 @@ LAYOUT = {
     "U_SW3":  (100, 180),
 }
 
-# Hierarchical labels que FRONTEND expone al padre. Conectan con los labels
-# presentes en las sub-hojas IAS0/IAS1.
+# Hierarchical labels FRONTEND exposes to its parent. They connect to the labels
+# on the IAS0/IAS1 sub-sheets.
 HIER_LABELS = [
     # LVDS RX ADC -> Hirose IAS0 (4 pares datos + 1 par reloj)
     ("B7-CSI2-TXC_P", "input"),  ("B7-CSI2-TXC_N", "input"),
@@ -79,7 +79,7 @@ HIER_LABELS = [
     ("B7-CSI2-TXD1_P","input"), ("B7-CSI2-TXD1_N","input"),
     ("B7-CSI2-TXD2_P","input"), ("B7-CSI2-TXD2_N","input"),
     ("B7-CSI2-TXD3_P","input"), ("B7-CSI2-TXD3_N","input"),
-    # I2C/SPI ADAR + GPIOs RF switch controls (via labels I2C/GPIO de sub hojas)
+    # ADAR I2C/SPI + RF switch control GPIOs (through the sub-sheets' I2C/GPIO labels)
     ("I2C_SCL","bidirectional"), ("I2C_SDA","bidirectional"),
     ("I2C_SCL_3V3","bidirectional"), ("I2C_SDA_3V3","bidirectional"),
     ("EXT-GPIO0-I2C-SCL","bidirectional"),
@@ -87,9 +87,9 @@ HIER_LABELS = [
     ("EXT-GPIO2","bidirectional"), ("EXT-GPIO3","bidirectional"),
     ("GPIO2","bidirectional"), ("GPIO3","bidirectional"),
     ("GPIO2_3V3","bidirectional"), ("GPIO3_3V3","bidirectional"),
-    # Power-down de chips
+    # Chip power-down
     ("PWDN","input"), ("PWDN_3V3","input"),
-    # Power rails Kria (recibidos desde sub-hojas)
+    # Kria power rails (received from the sub-sheets)
     ("VCC5V-EXT","power_in"), ("VCC-EXT-IN","power_in"),
     ("VCC3V3","power_in"), ("VCC1V8","power_in"),
     ("VCC1V2","power_in"), ("VCC2V75","power_in"),
@@ -108,7 +108,7 @@ HIER_LABELS = [
 ]
 
 # ----------------------------------------------------------------------------
-# 1) Copiar definiciones de lib_symbols desde EasyEDA.kicad_sym
+# 1) Copy the lib_symbols definitions from EasyEDA.kicad_sym
 # ----------------------------------------------------------------------------
 print("[i] Leyendo EasyEDA.kicad_sym ...")
 easy_text = EASY.read_text(encoding="utf-8")
@@ -127,32 +127,32 @@ def find_symbol_block_by_name(name):
     return None
 
 needed_symbols = sorted(set(c["lib_id"].split(":",1)[1] for c in CHIPS.values()))
-print(f"[i] Simbolos necesarios: {needed_symbols}")
+print(f"[i] Symbols needed: {needed_symbols}")
 
 # Transformaciones:
-#  - añadir prefijo "EasyEDA:" al top-level (symbol "X"  si X es un nombre de chip
-#  - quitar las lineas con (id N)   (campo obsoleto easyeda2kicad.py)
+#  - add the "EasyEDA:" prefix to the top-level (symbol "X"  if X is a chip name
+#  - drop the (id N) lines   (an obsolete easyeda2kicad.py field)
 #  - quitar properties 'ki_keywords', 'Manufacturer', 'MPN', 'LCSC Part', etc.
 
 ALLOWED_PROPS = {"Reference", "Value", "Footprint", "Datasheet", "Description"}
 
 def transform_symbol_block(block_lines):
     out = []
-    skip_until_close = None  # si estamos dentro de una property prohibida, saltar
+    skip_until_close = None  # inside a forbidden property: skip
     prop_depth = 0
     for ln in block_lines:
-        # 1. renombrar el primer (symbol "X"  añadiendo prefijo
+        # 1. rename the first (symbol "X"  adding the prefix
         m = re.match(r'^(\s*)\(symbol\s+"([^"]+)"', ln)
         if m and not re.match(r'^[^"]*_(\d)+_(\d)+$', m.group(2)):
             name = m.group(2)
             ln = f"{m.group(1)}(symbol \"EasyEDA:{name}\""
             if ln.rstrip() != ln.rstrip() and ")" in block_lines[block_lines.index(ln) if ln in block_lines else 0]:
-                # Mantenería el resto de la línea si hubiera más contenido; aquí se cortó
+                # Would keep the rest of the line if there were more on it; here it was cut
                 pass
-        # 2. quitar lineas con (id N)
+        # 2. drop the (id N) lines
         if re.match(r'^\s*\(id\s+\d+\)\s*$', ln):
             continue
-        # 3. capturar inicio de (property "NAME"  ) y decidir
+        # 3. catch the start of (property "NAME"  ) and decide
         mp = re.match(r'^\s*\(property\s+"([^"]+)"', ln)
         if mp:
             pname = mp.group(1)
@@ -161,7 +161,7 @@ def transform_symbol_block(block_lines):
                 out.append(ln)
                 continue
             else:
-                # saltar hasta el cierre de este property: balanceo con lines siguientes
+                # skip to the end of this property: balance against the following lines
                 # marcamos skip
                 depth = 0
                 depth += re.sub(r'"[^"]*"', '""', ln).count("(") - re.sub(r'"[^"]*"', '""', ln).count(")")
@@ -170,7 +170,7 @@ def transform_symbol_block(block_lines):
                     idx += 1
                     s = re.sub(r'"[^"]*"', '""', block_lines[idx])
                     depth += s.count("(") - s.count(")")
-                # saltar las lineas idx+1 desde ln
+                # skip the lines idx+1 from ln
                 # marcar como omitidas
                 block_lines[:] = block_lines[:block_lines.index(ln)] + block_lines[idx+1:]
                 # reiniciar el bucle
@@ -182,7 +182,7 @@ lib_syms_blocks = []
 for sym_name in needed_symbols:
     rng = find_symbol_block_by_name(sym_name)
     if not rng:
-        print(f"[!] Simbolo {sym_name} no encontrado en EasyEDA.kicad_sym")
+        print(f"[!] Symbol {sym_name} not found in EasyEDA.kicad_sym")
         continue
     block_lines = easy_lines[rng[0]:rng[1]+1]
     block_lines = transform_symbol_block(block_lines)
@@ -192,7 +192,7 @@ for sym_name in needed_symbols:
 lib_symbols_text = "\n".join(lib_syms_blocks)
 
 # ----------------------------------------------------------------------------
-# 2) Generar instancias (symbol ...) de cada chip con properties basicas.
+# 2) Generate a (symbol ...) instance of each chip with basic properties.
 # ----------------------------------------------------------------------------
 def gen_uuid():
     return str(uuid.uuid4())
@@ -236,10 +236,10 @@ def gen_symbol_instance(chip_key, lines_list):
     return "\n".join(txt)
 
 # ----------------------------------------------------------------------------
-# 3) Hierarchical labels del FRONTEND (expuestos al sheet padre)
+# 3) FRONTEND's hierarchical labels (exposed to the parent sheet)
 # Discipline: labelnames the same as in -2.kicad_sch (B7-CSI2-*, I2C_*, PWDN*, etc.)
-# Hacemos 4 columnas a la derecha del bloque (enumerados de arriba abajo) para
-# cada grupo.
+# 4 columns to the right of the block (listed top to bottom), one for
+# each group.
 # ----------------------------------------------------------------------------
 def gen_hlabels():
     out = []
@@ -258,7 +258,7 @@ def gen_hlabels():
     return "\n".join(out)
 
 # ----------------------------------------------------------------------------
-# 4) Componer archivo
+# 4) Assemble the file
 # ----------------------------------------------------------------------------
 header = """(kicad_sch
 	(version 20260306)
@@ -289,7 +289,7 @@ symbols_text = "\n".join(
 hlabels_text = gen_hlabels()
 
 # ----------------------------------------------------------------------------
-# 5) Escribir el archivo
+# 5) Write the file
 # ----------------------------------------------------------------------------
 file_text = header + lib_symbols_text + "\n\t)\n\n" + symbols_text + "\n\n" + hlabels_text + footer
 OUT.write_text(file_text, encoding="utf-8")

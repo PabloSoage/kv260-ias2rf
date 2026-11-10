@@ -1,10 +1,10 @@
-===== INVENTARIO CSI2-KRIA-KV260_Rev01-2.kicad_sch =====
-Archivo: E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch
-Lineas totales: 19431
+===== INVENTORY OF CSI2-KRIA-KV260_Rev01-2.kicad_sch =====
+File: E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-2.kicad_sch
+Total lines: 19431
 Rango (lib_symbols ...): 12..8469
-Total (symbol) top-level instanciados: 85
+Top-level (symbol) instances: 85
 
------ 1. CLASIFICACION DE COMPONENTES (por bucket) -----
+----- 1. PARTS BY BUCKET -----
 
 == HIROSE_IAS  (n=1) ==
   L 14972-L15188  ( 217 ln) | J8       | BM20B(0.8)-34DP-0.4V(51)         | fp='J-BM20B(0.8)-34DP' | lib=AVT_KHK_Lib:IAS1_0_CON BM20B(0.8)-34DP_AVT_KHK_Lib.IntLib
@@ -169,33 +169,33 @@ Total (symbol) top-level instanciados: 85
   L11437: I2C_SCL
 
 
------ 3. LIBRERIAS DEFINIDAS EN (lib_symbols) -----
-Total simbolos definidos: 49
-  Passive: 15 simbolos
-  AVT_KHK_Lib: 12 simbolos
-  CSI2-KRIA-KV260_Rev01-altium-import: 9 simbolos
-  Connector: 6 simbolos
-  Bipolar: 3 simbolos
-  Logic: 2 simbolos
-  Power: 2 simbolos
+----- 3. LIBRARIES DEFINED IN (lib_symbols) -----
+Symbols defined: 49
+  Passive: 15 symbols
+  AVT_KHK_Lib: 12 symbols
+  CSI2-KRIA-KV260_Rev01-altium-import: 9 symbols
+  Connector: 6 symbols
+  Bipolar: 3 symbols
+  Logic: 2 symbols
+  Power: 2 symbols
 
 
 ----- 4. CHIPS NUEVOS: presentes en lib_symbols? -----
-  AD9268: NO (faltan por importar)
-  AD9779: NO (faltan por importar)
-  ADAR1000: NO (faltan por importar)
-  HMC547: NO (faltan por importar)
-  ADL5801: NO (faltan por importar)
-  8132H: NO (faltan por importar)
-  ADCLK944: NO (faltan por importar)
+  AD9268: NO (still to import)
+  AD9779: NO (still to import)
+  ADAR1000: NO (still to import)
+  HMC547: NO (still to import)
+  ADL5801: NO (still to import)
+  8132H: NO (still to import)
+  ADCLK944: NO (still to import)
 
 
------ 5. PINES DEL HIROSE BM20B(0.8)-34DP -----
-Total pins detectados en la definicion: 0
+----- 5. PINS OF THE HIROSE BM20B(0.8)-34DP -----
+Pins found in the definition: 0
 
 
 ----- 6. OTROS DATOS UTILES -----
-Menciones de palabras clave en el archivo (excluye lib_symbols):
+Keyword mentions in the file (lib_symbols excluded):
   MIPI           : 0
   CSI            : 172
   MIPI           : 0

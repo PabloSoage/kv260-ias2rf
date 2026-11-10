@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Anade wires visuales entre componentes clave del FRONTEND."""
+"""Add visual wires between the key FRONTEND parts."""
 import pathlib, re, uuid
 
 DST = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\FRONTEND.kicad_sch")
@@ -56,6 +56,6 @@ print(f"Wires: {len(wires)}, delta: {delta}")
 
 if delta == 0:
     DST.write_text(new_text, encoding="utf-8")
-    print("[ok] Wires visuales añadidos a FRONTEND")
+    print("[ok] Visual wires added to FRONTEND")
 else:
     print(f"[!!] delta={delta}")

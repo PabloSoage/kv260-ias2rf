@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Phase A1 - PURGA del CSI2-KRIA-KV260_Rev01-2.kicad_sch
+"""Phase A1 - PURGE of CSI2-KRIA-KV260_Rev01-2.kicad_sch
 
-Borra bloques top-level (symbol ...) por rango de lineas confirmado en
-el inventario. NO toca wires/labels/junctions (se asume que el usuario
-limpiara visualmente en KiCad). Producimos un diff estilo "antes/despues"
-y un archivo de log con el borrado.
+Deletes top-level (symbol ...) blocks by the line ranges confirmed in the
+inventory. Does NOT touch wires/labels/junctions (the user is assumed to have
+cleaned up visually in KiCad). A "before/after" style diff is produced
+and a log file of what was deleted.
 
-DEFENSIVO: solo borra si al leer la primera linea del rango se confirma
-que empieza con '(symbol ' (con indentacion), para evitar corromper.
+DEFENSIVE: deletes only if, reading the first line of the range, it is confirmed
+starts with '(symbol ' (indented), so as not to corrupt the file.
 """
 from __future__ import annotations
 import pathlib, sys, re, datetime
@@ -16,7 +16,7 @@ ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
 SCH  = ROOT / "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
 LOG  = ROOT / "_work" / "purge_log.txt"
 
-# Refs y rangos (1-based, inclusive) confirmados por inventario
+# Refs and ranges (1-based, inclusive) confirmed by the inventory
 TO_DELETE = [
     # AGroup: FFC camara
     ("J7", 17595, 17806, "FFC22 camara MIPI"),
@@ -43,45 +43,45 @@ TO_DELETE = [
 rngs = sorted([(s,e) for _,s,e,_ in TO_DELETE])
 for i in range(len(rngs)-1):
     if rngs[i][1] >= rngs[i+1][0]:
-        print(f"[!!] SOLAPAMIENTO entre {rngs[i]} y {rngs[i+1]}")
+        print(f"[!!] OVERLAP between {rngs[i]} and {rngs[i+1]}")
         sys.exit(2)
 
 text = SCH.read_text(encoding="utf-8")
 lines = text.splitlines(keepends=False)
 total_before = len(lines)
 
-# Verificar cada rango
-print(f"[i] Archivo: {SCH.name}, lineas originales: {total_before}")
-print(f"[i] Componentes a borrar: {len(TO_DELETE)}")
+# Check each range
+print(f"[i] File: {SCH.name}, original lines: {total_before}")
+print(f"[i] Parts to delete: {len(TO_DELETE)}")
 log_lines = []
 log_lines.append(f"# Purge log - {datetime.datetime.now().isoformat()}\n")
-log_lines.append(f"# Archivo: {SCH}\n")
-log_lines.append(f"# Lineas antes: {total_before}\n\n")
+log_lines.append(f"# File: {SCH}\n")
+log_lines.append(f"# Lines before: {total_before}\n\n")
 
-# vamos a borrar lineas con indices 0-based [s-1, e-1] inclusive.
-# Verificamos que la primera linea del rango empieza (ignorando espacios)
-# con '(symbol' para confirmar:
+# lines with 0-based indices [s-1, e-1] inclusive are deleted.
+# Check that the first line of the range starts (ignoring spaces)
+# with '(symbol', to confirm:
 confirmados = []
 for ref, s, e, descr in TO_DELETE:
     s0 = s - 1
     e0 = e - 1
     head = lines[s0].lstrip()
     if not head.startswith("(symbol"):
-        print(f"[!!] Rango para {ref} L{s}-L{e}: la primera linea NO empieza con '(symbol'. Abortando.")
+        print(f"[!!] Range for {ref} L{s}-L{e}: the first line does NOT start with '(symbol'. Aborting.")
         print(f"     L{s}: {lines[s0][:120]!r}")
         sys.exit(3)
-    # tambien verificar paridad de parentesis en el rango
+    # also check the parentheses balance over the range
     block = "\n".join(lines[s0:e0+1])
-    # limpiar strings para no confundir
+    # drop strings so as not to be misled
     cleaned = re.sub(r'"[^"]*"', '""', block)
     depth = cleaned.count("(") - cleaned.count(")")
     if depth != 0:
-        print(f"[!!] Rango {ref} L{s}-L{e}: parentesis NO balanceados (delta={depth}). Abortando rango.")
+        print(f"[!!] Range {ref} L{s}-L{e}: parentheses NOT balanced (delta={depth}). Skipping the range.")
         continue
     confirmados.append((ref, s0, e0, descr))
-    print(f"[ok] {ref:5} L{s}-L{e} confirmado ({e-s+1} lineas): {descr}")
+    print(f"[ok] {ref:5} L{s}-L{e} confirmed ({e-s+1} lines): {descr}")
 
-# Ahora borrar de abajo a arriba para preservar indices
+# Now delete from the bottom up, to keep the indices
 confirmados.sort(key=lambda x: x[1], reverse=True)
 borradas = 0
 nuevas = list(lines)
@@ -90,12 +90,12 @@ for ref, s0, e0, descr in confirmados:
     del nuevas[s0:e0+1]
     borradas += (e0 - s0 + 1)
 
-log_lines.append(f"\n# Total borradas: {borradas} lineas\n")
-log_lines.append(f"# Lineas despues: {len(nuevas)}\n")
+log_lines.append(f"\n# Total deleted: {borradas} lines\n")
+log_lines.append(f"# Lines after: {len(nuevas)}\n")
 LOG.write_text("".join(log_lines), encoding="utf-8")
 
-# Guardar archivo
+# Save the file
 SCH.write_text("\n".join(nuevas) + "\n", encoding="utf-8")
-print(f"\n[ok] Borradas {borradas} lineas. Lineas ahora: {len(nuevas)}.")
+print(f"\n[ok] Deleted {borradas} lines. Lines now: {len(nuevas)}.")
 print(f"[ok] Log: {LOG}")
 print(f"[ok] Backup previo en _backup_original/ (ya hecho).")

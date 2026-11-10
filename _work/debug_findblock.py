@@ -7,12 +7,12 @@ ms = list(pat.finditer(text))
 print(f"matches: {len(ms)}")
 for m in ms:
     start = text.count("\n", 0, m.start())
-    print(f"  match at char {m.start()} = line 0idx {start} (1idx {start+1}); antes hay {start} newlines")
+    print(f"  match at char {m.start()} = line 0idx {start} (1idx {start+1}); {start} newlines before it")
     print(f"    first 80 chars of match: {m.group(0)[:80]!r}")
-# Probar find_block (igual que el script)
+# Try find_block (as the script does)
 m = pat.search(text)
 start = text.count("\n", 0, m.start())
-print(f"\nfind_block: search devuelve match en char {m.start()} = 0-idx line {start}, 1-idx {start+1}")
+print(f"\nfind_block: search returns a match at char {m.start()} = 0-idx line {start}, 1-idx {start+1}")
 depth = 0
 last_j = -1
 for j in range(start, min(start+5, len(lines))):
