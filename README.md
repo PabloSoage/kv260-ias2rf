@@ -109,12 +109,13 @@ BGA, for one).
 
 **Open before ordering** ([docs/LAYOUT.md §6.2–6.3](docs/LAYOUT.md)):
 
-1. **LVDS skew.** Three pairs have a P–N length mismatch of about half a bit at 1 Gb/s:
-   LINK_RX_D0, LINK_RX_D1 and ADCS_FCO. They need their long leg re-routed. The pairs also run as
-   two separate tracks rather than as coupled pairs; that is acceptable at these rates, but a
-   pair-routed board would be better.
+1. **LVDS stubs.** The P–N skew is fixed: every pair at 1 Gb/s is within 42 ps (it was up to half a
+   bit on two link pairs). Some legs still branch to their 100 Ω termination instead of passing
+   through it; the longest stubs, 12–22 mm on ADCS_DCO and CLK_ADCR, want re-routing. The pairs
+   also run as two separate tracks rather than as coupled pairs; that is acceptable at these
+   rates, but a pair-routed board would be better.
 2. **Trace widths.** They come from a field solver on the fabricator's stack and still need to be
-   confirmed in JLCPCB's own calculator.
+   confirmed in JLCPCB's own calculator ([FABRICATION.md](docs/FABRICATION.md) lists the inputs).
 3. **The AERIS-10 end of the ribbon does not exist yet.**
 4. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
@@ -158,7 +159,7 @@ Reproducing the checks and the outputs (KiCad 10):
 kicad-cli sch erc --severity-all CSI2-KRIA-KV260_Rev01.kicad_sch
 kicad-cli pcb drc --schematic-parity --refill-zones --severity-all CSI2-KRIA-KV260_Rev01.kicad_pcb
 python _work/fab/make_fab.py                                   # fab/: Gerbers, drill, BOM, CPL
-python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS lengths and skew (needs shapely)
+python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS delays, skew and stubs (needs shapely)
 ```
 
 ---
