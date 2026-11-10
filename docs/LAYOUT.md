@@ -528,9 +528,8 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **LVDS skew.** Most LVDS legs run as single tracks; LINK_RX_D0 and LINK_RX_D1 differ by about
-   74 mm (about 0.47 ns) between P and N, ADCS_FCO by 55 mm (§6.2). Check them against the bit
-   rates before ordering, or re-route the pairs as pairs.
+1. **LVDS skew, reviewed 10 Nov (§6.4): three pairs to fix before ordering.** LINK_RX_D0 and
+   LINK_RX_D1 (P−N −479 and +519 ps, half a bit at 1 Gb/s) and ADCS_FCO (−353 ps).
 2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
@@ -550,3 +549,42 @@ py _work/fab/make_fab.py                     # Gerbers, drill, BOM, CPL into fab
 **The board is routed: do not run `build_board.py` again.** It would rebuild the board and drop
 every track. From then on the
 board file is the source, as the drawn sheets are once accepted.
+
+### 6.4 LVDS skew review (10 Nov)
+
+`_work/layout/lvds_skew.py board` sums each leg per layer (a link pair broken by its AC caps
+counted as one: LINK_* plus J_LINK_*), turns it into delay with 6.0 ps/mm on L1/L6 and 6.9 ps/mm
+on L3 (POWER_AND_STACKUP §2.5), counts vias and measures how much of the P leg runs next to the
+N leg. Rates: LINK ≤ 1 Gb/s a lane (INTERFACE_SPEC §3, 1 ns a bit), ADCS 1 Gb/s a lane (AD9253
+one-lane, 62.5 MSPS × 16), ADCR 400 MSPS. Board as of af3bc19:
+
+| Pair | P / N mm | P − N ps | Vias P/N | Verdict |
+|---|---|---|---|---|
+| LINK_RX_D1 | 207.2 / 128.0 | **+519** | 8/8 | **Fix.** 0.52 bit at 1 Gb/s |
+| LINK_RX_D0 | 110.4 / 186.8 | **−479** | 9/14 | **Fix.** 0.48 bit |
+| ADCS_FCO | 52.5 / 107.3 | **−353** | 7/12 | **Fix**, or align words on a test pattern and leave FCO unused |
+| CLK_ADCR | 11.7 / 30.1 | −110 | 0/0 | Check: the 400 MHz sample clock; skew turns into common mode at the ADC |
+| CLK_FPGA | 25.7 / 42.0 | −100 | 0/2 | Check: a clock input, same reason |
+| ADCS_D1 | 58.5 / 43.1 | +98 | 6/5 | Tolerable (0.1 bit), better shortened |
+| ADCR_D3, D5, D6, OR, CLK_ADCS, LINK_RX_CLK | | 59–70 | | Tolerable at 400 Mb/s (2.5 ns a bit) and on the clocks |
+| the rest | | ≤ 50 | | Fine |
+
+What a P−N skew does: the two legs switch apart, so the differential voltage sits at zero for the
+skew time at every edge; that much of each bit is lost and cannot be tuned out at the receiver
+(IDELAY moves the pair, not one leg). Half a bit leaves no margin at 1 Gb/s. At 400 Mb/s or less
+on the link it would be 0.2 bit, workable. The three to fix are all long detours of one leg on
+the FPGA side of the AC caps (LINK_RX_D1_P 199 mm, LINK_RX_D0_N 183 mm; the J_LINK_* stubs are
+1–8 mm), so the fix is a shorter route for the long leg, then matching to a few mm.
+
+Data to clock, by mean pair delay (ps): LINK_RX_D0 +229 and LINK_RX_D1 +336 against LINK_RX_CLK;
+LINK_TX_D0 −7; ADCS_D0 −98, ADCS_D1 −108, ADCS_FCO +82 against ADCS_DCO; ADCR data −62 to −122
+against ADCR_DCO. The ADC buses land on the XC7A50T's IDELAYE2 (78 ps taps, 2.5 ns range), so
+those are calibrated per lane at start-up. LINK_RX lands on the K26 (IDELAYE3), which can deskew
+too, but only if the Kria firmware trains each lane; the KV260's own trace lengths add to this
+and are not known here.
+
+Not coupled: no pair runs as a coupled pair (0–3 % of the P leg within 0.35 mm of N, CLK_ADCR
+23 %). Each leg is a 0.10 mm track on its own, about 60 Ω on L1 over L2, so about 120 Ω between
+the legs against the 100 Ω termination (some reflection; less rejection of noise picked up on
+the way). Many legs also cross L4 (In3.Cu, the power layer). Acceptable for a first board at
+these rates; a pair-routed version is the better board.
