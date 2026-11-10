@@ -10,8 +10,8 @@ py _work/fab/make_fab.py
 ```
 
 **Since 10 Nov the output is not a draft:** DRC reports no errors and no unrouted connections, so
-the script names the folder without `DRAFT-`. Before ordering, the review items of LAYOUT §6.2
-(the LVDS termination stubs above all) are still to be closed.
+the script names the folder without `DRAFT-`. The LVDS review of LAYOUT §6.2–6.3 and the
+calculator check above were closed on 10 Nov.
 
 ---
 
@@ -89,10 +89,20 @@ there if a part shows turned.
 | 3 | Single-ended | L3 | L2 / L4 | 100 µm | 62.5 Ω | Every LVDS leg on L3 |
 | 4 | Differential | L1 | L2 | 117 / 150 µm | 100.2 Ω | The LVDS100 class's own geometry, for a pair-routed revision |
 
-JLCPCB's calculator works from a target impedance to a width, so enter 50 Ω for row 1, 64 Ω for
-row 2, 62 Ω for row 3 and 100 Ω for row 4, and compare the widths it gives. It should agree within
-a few per cent; if it does not, its widths win. Row 1 is the one that matters most (the RF lines'
-match); rows 2–3 tell how far the uncoupled LVDS legs sit from 100 Ω between them (LAYOUT §6.3).
+JLCPCB's calculator works from a target impedance to a width. Entered on 10 November 2026 (50 Ω,
+64 Ω, 62 Ω, 100 Ω at 0.15 mm spacing), stack JLC06161H-2116A:
+
+| Row | Target | JLCPCB's width | On the board | Difference |
+|---|---|---|---|---|
+| 1 | 50 Ω | 181.4 µm | 183 µm | +0.9 % |
+| 2 | 64 Ω | 102.9 µm | 100 µm | −2.8 % (about 65 Ω) |
+| 3 | 62 Ω | 106.4 µm | 100 µm | −6 % (about 64 Ω) |
+| 4 | 100 Ω diff., 150 µm gap | 119.1 µm | 117 µm | −1.8 % |
+
+**The widths stand.** The RF lines are within 1 %; the LVDS legs within 1–2 Ω of the solver, far
+inside JLCPCB's ±10 % impedance tolerance. **Order stack 2116A explicitly:** the calculator's first
+(cheapest) stack, JLC06161H-3313, has a thinner L1–L2 prepreg (0.099 mm against 0.116 mm) and
+would want 151 µm for 50 Ω; with 183 µm the RF lines would sit at about 45 Ω.
 
 ---
 

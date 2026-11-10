@@ -13,7 +13,8 @@ The Rev03 board exists. It has:
 - a placement with every passive at its pin, and a readable silkscreen.
 
 **It is fully routed** (§6): 0 DRC errors, 0 unrouted connections, 0 schematic-parity problems.
-Open before ordering: the stubs to some LVDS terminations and the trace widths (§6.2).
+The LVDS skew and termination stubs were reviewed and fixed, and the trace widths confirmed in
+JLCPCB's calculator, on 10 November (§6.2–6.3).
 
 The original Allied Vision board is kept, untouched, as
 `_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
@@ -238,19 +239,18 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 | | |
 |---|---|
 | Result | **0 DRC errors, 0 unrouted connections, 0 schematic-parity problems** (zones refilled); 8 library-footprint warnings |
-| Copper | 13.6 m of track: L1 5.7 m, L3 3.6 m, L6 3.7 m, L4 0.7 m. Mostly 0.10 mm; the supplies 0.30 mm; the RF lines 0.183 mm (50 Ω) |
-| Vias | 1,492 through vias, 0.45 mm on a 0.20 mm drill. 29 sit in U1101 ball pads and are filled and capped (FABRICATION.md) |
+| Copper | 13.5 m of track: L1 5.6 m, L3 3.6 m, L6 3.6 m, L4 0.7 m. Mostly 0.10 mm; the supplies 0.30 mm; the RF lines 0.183 mm (50 Ω) |
+| Vias | 1,483 through vias, 0.45 mm on a 0.20 mm drill. 29 sit in U1101 ball pads and are filled and capped (FABRICATION.md) |
 | L2, L5 | Ground only: no other net has a track there (`_work/layout/planechk.py`) |
 | L4 | Tracks only on the +3V3_D background; every other island carries a tracks-only keep-out ("In3 islands: no tracks"), so the islands stay whole. 51 signal segments on L4 have an end under the BGA (45 before the skew fixes of §6.3); the refilled planes still reach every pin |
 | LVDS | Every pair is routed as two single 0.10 mm tracks, not as a coupled pair; skew and stubs are reviewed in §6.3 |
 
 ### 6.2 What is left
 
-1. **LVDS skew: fixed 10 Nov (§6.3).** LINK_RX_D0 and LINK_RX_D1 were half a bit apart; every
-   pair at 1 Gb/s is now within 42 ps. Still open from the same review: the **stubs to the
-   terminations** of ADCS_DCO (22 / 12 mm), CLK_ADCR (N, 18 mm), ADCR_DCO (N, 13 mm) and the N
-   legs of ADCS_D0 and ADCS_D1 (11 and 9 mm). They want those legs routed through the resistor's
-   pad (fly-by), as ADCS_FCO now is.
+1. **LVDS skew and termination stubs: fixed 10 Nov (§6.3).** LINK_RX_D0 and LINK_RX_D1 were half
+   a bit apart; every pair at 1 Gb/s is now within 42 ps. Four terminations (R1109, R1111, R1112,
+   R1113) moved next to the FPGA, where their pairs pass, and R514 turned round, so no leg at
+   1 Gb/s has a stub over 27 ps. What is left is in §6.3 and is tolerable.
 2. **No supply track on L2 or L5** after any further routing: check with `_work/layout/planechk.py`.
 3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
 4. **No dangling copper** after any rip-up: the DRC's `track_dangling` and `via_dangling` at zero.
@@ -290,7 +290,7 @@ that board had:
 | LINK_RX_D0 | −478 ps | N looped down to y 190 and back (187 mm) | +4 ps | N re-routed (52 mm in the middle); P meandered by 15 mm on L1 |
 | ADCS_D1 | +152 ps | N short | +42 ps | N meandered by 18 mm (as far as the room goes) |
 | CLK_FPGA | −111 ps | P short | −13 ps | P meandered by 16 mm |
-| CLK_ADCR | −74 ps | P short | −63 ps | P meandered by 6 mm; no more room |
+| CLK_ADCR | −74 ps | P short | −42 ps | P meandered by 6 mm; two of its bumps touched and shorted 4 mm out, now apart; no more room |
 | ADCS_DCO | −93 ps | P short | −27 ps | P meandered by 13 mm |
 | CLK_ADCS | +54 ps | N short | 0 ps | N meandered by 9 mm |
 | ADCS_FCO | −11 ps | No skew, but a **55 mm stub** on N to R1114 (346 ps) | −27 ps, stubs 3 / 5 ps | N re-routed through R1114's pad (fly-by), as P was; P meandered by 11 mm |
@@ -303,24 +303,37 @@ space only.
 
 | Pair | P − N ps | Stub P / N ps | Verdict |
 |---|---|---|---|
-| LINK_RX_D0, D1, LINK_TX_D0, ADCS_FCO, CLK_ADCS, CLK_FPGA, ADCR_D1, ADCR_DCO | −27 to +5 | ≤ 45 (ADCR_DCO 34 / 79) | Fine |
-| ADCS_D1 | +42 | 2 / 56 | Tolerable: 0.04 bit; no more room for meanders on N |
-| LINK_TX_CLK, LINK_RX_CLK, ADCS_DCO | −27 to −60 | ADCS_DCO **134 / 73** | Fine as skew; ADCS_DCO's stubs are not (below) |
-| CLK_ADCR | −63 | 36 / **111** | Check: the 400 MHz sample clock; no more room to meander P |
+| LINK_RX_D0, D1, LINK_TX_D0, ADCS_D0, ADCS_DCO, ADCS_FCO, CLK_ADCS, CLK_FPGA, ADCR_D1, ADCR_DCO | −27 to +33 | ≤ 27, but CLK_ADCS N 45 (a bias resistor, below) | Fine |
+| ADCS_D1 | +42 | 22 / 2 | Tolerable: 0.04 bit; no more room for meanders on N |
+| LINK_TX_CLK, LINK_RX_CLK | −36, −60 | ≤ 19 | Fine |
+| CLK_ADCR | −42 | 11 / 57 (a bias resistor, below) | Tolerable: the 400 MHz sample clock; no more room to meander P |
 | ADCR data and OR | −86 to +64 | up to 52 | Tolerable at 400 Mb/s (2.5 ns a bit) |
-| ADCS_D0 | +33 | 13 / 66 | Fine as skew; an 11 mm stub on N |
 
 What a P−N skew does: the two legs switch apart, so the differential voltage sits at zero for the
 skew time at every edge; that much of each bit is lost and cannot be tuned out at the receiver
 (IDELAY moves the pair, not one leg). Under 50 ps is 0.05 bit at 1 Gb/s.
 
-**Still open: stubs.** A termination 100 Ω sits across each pair the FPGA receives (R1101–R1116,
-CONTROL_SPEC §3, no DIFF_TERM in a 3.3 V bank). Where a leg branches to the resistor instead of
-passing through its pad, the branch is a stub, and it reflects. At 1 Gb/s with edges of about
-300 ps, a stub up to about 8 mm (50 ps) is harmless; longer ones round the edges. Over that:
-ADCS_DCO (22 mm on P, 12 mm on N; the ADC's 500 MHz bit clock), CLK_ADCR (N, 18 mm), ADCS_D0 and
-ADCS_D1 (N, 11 and 9 mm), ADCR_DCO (N, 13 mm). The fix is the one ADCS_FCO got: route the leg
-into the resistor's pad and on to the FPGA from there.
+**Termination stubs: fixed 10 Nov.** A 100 Ω termination sits across each pair the FPGA receives
+(R1101–R1116, CONTROL_SPEC §3, no DIFF_TERM in a 3.3 V bank), and one across each ADC clock at the
+ADC (R514, R642). What matters is the copper between the termination and the receiver's pin: it
+is an unterminated stub, as is a branch from the leg to a resistor the leg does not pass through.
+At 1 Gb/s with edges of about 300 ps, up to about 8 mm (50 ps) is harmless; longer rounds the
+edges. `lvds_skew.py --stubs PS` lists every branch longer than PS and where it goes.
+
+| Pair | Was: stub P / N; termination to pin P / N (ps) | Now | Change |
+|---|---|---|---|
+| ADCS_DCO | 134 / 73; 182 / 110 | 9 / 27; 57 / 64 | R1113 moved from 10 mm out to where the legs part, 6 mm from the FPGA; old branches removed |
+| ADCR_DCO | 34 / 79; 88 / 149 | 0 / 12; 53 / 61 | R1109 moved onto P's via, 6 mm from the FPGA; N joined by a 2 mm stub |
+| ADCS_D0 | 13 / 66; 83 / 104 | 7 / 7; 36 / 31 | R1111 moved between the legs, 5 mm from the FPGA |
+| ADCS_D1 | 2 / 56; 112 / 125 | 22 / 2; 73 / 47 | R1112 moved onto N's via, 6 mm from the FPGA; P joined by a 3 mm stub |
+| CLK_ADCR | N 54 to R514; N 132 | none; N 31 | R514 turned 180°, so each leg meets its own pad on the way to its ADC pin; N passes through its pad |
+
+Left as it is:
+- **U401's LVPECL pull-downs** R405 (CLK_ADCR N, 9 mm branch) and R407 (CLK_ADCS N, 7 mm): 200 Ω
+  to ground, a weak tap; no free spot within 4 mm of the driver.
+- **ADCR_D0 N and ADCR_D7 N**, 8 mm branches at 400 Mb/s; no free spot nearer the FPGA.
+- **ADCS_FCO N** passes through R1114, which sits 141 ps (about 23 mm of route) from its FPGA pin;
+  the area by the FPGA has no room for it. FCO is the frame clock, one edge per sample.
 
 Data to clock, by mean leg delay (ps): LINK_RX_D0 +79 and LINK_RX_D1 +207 against LINK_RX_CLK;
 LINK_TX_D0 +2; ADCS_D0 −73, ADCS_D1 −17, ADCS_FCO +45 against ADCS_DCO; ADCR data −16 to −80

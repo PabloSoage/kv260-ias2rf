@@ -1,6 +1,9 @@
 """LVDS pair delays, P/N skew and data-to-clock skew of the routed board (text parse, no pcbnew).
 
-Usage:  py _work/layout/lvds_skew.py board.kicad_pcb [--json out.json]
+Usage:  py _work/layout/lvds_skew.py board.kicad_pcb [--json out.json] [--stubs PS]
+
+--stubs PS lists, for each leg with more than PS ps of stub, every branch off its path: the
+point where it leaves the path, its length and the pads it reaches.
 
 A pair is two legs, P and N. A leg is every net on the way from the driver's pin to the
 receiver's: nets ending _P/_N grouped by their name without the sheet path and a leading J_
@@ -33,6 +36,7 @@ GROUPS = {   # bus: (clock pair, data pairs), names as grouped (no sheet path, n
 
 ap = argparse.ArgumentParser()
 ap.add_argument("board"); ap.add_argument("--json")
+ap.add_argument("--stubs", type=float)
 a = ap.parse_args()
 t = open(a.board, encoding="utf-8").read()
 
@@ -170,17 +174,38 @@ def path_ps(k):
             q = [x for x in parts if x is not p][0]
             if q[2] in leg_nets[k]: edge(pn, ("pad", q[0], q[1]), 0.0)
     if len(ends) < 2: return None, ends
-    best = None
+    best, path = None, []
     for i, src in enumerate(ends):
-        dist = {src: 0.0}; h = [(0.0, src)]
+        dist = {src: 0.0}; prev = {}; h = [(0.0, src)]
         while h:
             d, u = heapq.heappop(h)
             if d > dist[u]: continue
             for v, w in G.get(u, []):
-                if d + w < dist.get(v, 1e18): dist[v] = d + w; heapq.heappush(h, (d + w, v))
+                if d + w < dist.get(v, 1e18): dist[v] = d + w; prev[v] = u; heapq.heappush(h, (d + w, v))
         for dst in ends[i + 1:]:
-            if dst in dist and (best is None or dist[dst] > best): best = dist[dst]
+            if dst in dist and (best is None or dist[dst] > best):
+                best, path = dist[dst], [dst]
+                while path[-1] != src: path.append(prev[path[-1]])
+    leg["graph"], leg["path"] = G, path
     return best, ends
+
+
+def branches(k):
+    """The leg's copper off its path: (ps, attach node, pads reached) per branch."""
+    G, on = legs[k]["graph"], set(legs[k]["path"])
+    seen, out = set(), []
+    for u in G:
+        if u in on or u in seen: continue
+        comp, stack, ps, att = [], [u], 0.0, set()
+        seen.add(u)
+        while stack:
+            x = stack.pop(); comp.append(x)
+            for v, w in G[x]:
+                if v in on: att.add(v); ps += w
+                elif v not in seen: seen.add(v); stack.append(v)
+                if v not in on: ps += w / 2   # inner edges are seen from both ends
+        out.append((ps, sorted(att, key=str), sorted(f"{n[1]}.{n[2]}" for n in comp if n[0] == "pad")))
+    return sorted(out, reverse=True)
 
 
 pairs = {}
@@ -212,6 +237,16 @@ for p in sorted(pairs):
           f"{q['P_stub_ps']:6.0f}/{q['N_stub_ps']:<5.0f} {q['P_mm']:7.1f}/{q['N_mm']:<6.1f} "
           f"{q['P_vias']:>4d}/{q['N_vias']:<3d} {100 * q['coupled']:6.0f}%  {','.join(q['layers'])}")
 print()
+if a.stubs is not None:
+    for p in sorted(pairs):
+        for side in "PN":
+            if pairs[p][f"{side}_stub_ps"] <= a.stubs: continue
+            print(f"{p}_{side}: stub {pairs[p][f'{side}_stub_ps']:.0f} ps")
+            for ps, att, pd in branches((p, side)):
+                if ps < 1: continue
+                at = ", ".join(f"{n[1]} {n[2]} {n[3]}" if n[0] == "p" else f"{n[0]} {n[1]} {n[2]}" for n in att[:2])
+                print(f"    {ps:5.0f} ps  from {at}  to {' '.join(pd) or 'nothing (dangling)'}")
+    print()
 for g, (clk, data) in GROUPS.items():
     if clk not in pairs:
         print(f"{g}: no {clk} pair on the board"); continue
