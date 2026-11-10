@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Check the planes after any routing pass (19 Oct 2026): the router's plane finalize and
-route_finish.sh have put supply tracks on the GND planes more than once, and signal
-tracks on L4 under the BGA cut the +3V3_D background there.
+Check the planes after any change to the routing (19 Oct 2026): no supply or signal track
+may run on the GND planes (L2, L5), and signal tracks on L4 under the BGA cut the
++3V3_D background there.
 
 Prints a dict: (layer, net) -> segments for every non-GND segment on In1/In4 (must be
-empty), and 'L4-BGA' -> signal segments on In3 with an end inside the BGA box (14 on the 14-unrouted board).
+empty), and 'L4-BGA' -> signal segments on In3 with an end inside the BGA box.
 
 Usage:  py _work/layout/planechk.py board.kicad_pcb
 """

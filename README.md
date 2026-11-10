@@ -107,7 +107,7 @@ BGA, for one).
 | Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
-**Open before ordering** ([docs/LAYOUT.md §6.3–6.4](docs/LAYOUT.md)):
+**Open before ordering** ([docs/LAYOUT.md §6.2–6.3](docs/LAYOUT.md)):
 
 1. **LVDS skew.** Three pairs have a P–N length mismatch of about half a bit at 1 Gb/s:
    LINK_RX_D0, LINK_RX_D1 and ADCS_FCO. They need their long leg re-routed. The pairs also run as
@@ -125,7 +125,6 @@ BGA, for one).
 
 | Document | Contents |
 |---|---|
-| **[HANDOFF.md](HANDOFF.md)** | **Start here if you are picking the project up.** State, findings, open decisions and working rules |
 | **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** The whole vehicle project: LiDAR, SDR, radar, OBD2 |
 | [docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md) | Parts and checklist per stage, with indicative costs |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Master document for this board: the Rev03 architecture and BOM |
@@ -148,7 +147,7 @@ BGA, for one).
 | `CSI2-KRIA-KV260_Rev01.*`, `rev03/` | The KiCad project: root schematic, nine sheets, board |
 | `symbols/`, `footprints/` | The project's own libraries |
 | `docs/` | Specifications, layout and fabrication notes, renders and the PDFs |
-| `_work/` | The scripts behind every finding and every step of the layout: placement, routing, checks, fabrication outputs. `_work/layout/` holds the routing tools |
+| `_work/` | The scripts behind every finding and every step of the layout: symbols and footprints, sheet checks, placement (`_work/layout/build_board.py`), plane and LVDS checks, fabrication outputs |
 | `fab/` | Not tracked. `python _work/fab/make_fab.py` writes Gerbers, drill, BOM and CPL there for JLCPCB |
 | `PCB/`, `Documents/` | The original Allied Vision sources (Altium) and their outputs, untouched |
 | `_backup_original/`, `_deprecated/` | Snapshots of the inherited files and the sheets removed from the project |
