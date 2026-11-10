@@ -215,7 +215,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
 | ◆ | Board redesign with FPGA | QSPI boot, power sequencing, JTAG | €800 – 1,500 |
-| ☐ | **XC7A50T-2FTG256I** | Same part as AERIS: its firmware runs unported | €80 |
+| ☐ | **XC7A50T-2FTG256I** | Same part as AERIS: its front-end modules (capture, DDC, chirp) run unported | €80 |
 | ☐ | QSPI flash + sequencing PMIC + JTAG | | €40 |
 | ☐ | ADC **AD9484BCPZ-500** (8 b, 400 MSPS) | The one AERIS uses | €120 |
 | ☐ | Vivado licence/installation | Free for these devices | — |
