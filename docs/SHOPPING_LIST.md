@@ -150,7 +150,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
-| ◆ | **Board design and fabrication** | 6 layers, short run with assembly | €400 – 800 |
+| ◆ | **Board design and fabrication** | 6 layers, short run with assembly. **Quoted 10 Nov 2026: ≈ $2,030 for two assembled boards, parts included** ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)); the chip lines below are inside that figure | €400 – 800 |
 | ☐ | ADC **AD9253BCPZ-125** | 14 b, 2 of 4 channels at 62.5 MSPS, 1-lane | €40 |
 | ☐ | Clock: **ADCLK948BCPZ** (select + 1:8 fan-out) + **Si549** programmable XO | Si549 ordered configured: LVPECL, 3.3 V, 5×7 mm, pinout C. See docs/CLOCK_SPEC.md | €50 – 70 |
 | ☐ | Differential drivers **AD8352ACPZ** ×2 | The ones AERIS uses | €30 |

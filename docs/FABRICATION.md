@@ -59,7 +59,9 @@ chosen on 2 October 2026 by `_work/fab/lcsc_select.py` from JLCPCB's own parts s
 - among the parts that qualify: JLCPCB "basic" first (no loading fee), then stock.
 
 Stock changes daily: run `py _work/fab/lcsc_select.py` again before ordering and read the diff of the
-CSV. **109 of 110 lines have a code.** Three are not the drawn value, because that value is not made
+CSV, then `python _work/fab/quote.py` for today's prices ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)). On 10 Nov
+two lines were re-selected because their part ran out: the 22.6 kΩ (now C100316) and the PROG switch
+(now TL3342F450QG). **109 of 110 lines have a code.** Three are not the drawn value, because that value is not made
 (the CSV's Note column says so):
 
 | Line | Drawn | Fitted | Effect |
