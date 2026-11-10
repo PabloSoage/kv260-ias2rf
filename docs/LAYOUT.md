@@ -489,7 +489,7 @@ LINK_RX_D1 +43.3 → +74.8, LINK_RX_CLK −16.7 → −13.9, ADCS_D1 +28.6 → +
 −54.8 (unchanged), ADCS_DCO +8.9 → −6.2, ADCR_OR −24.3 → −8.9, ADCR_D4 +16.3 → −5.6, ADCR_D5
 +5.3 → −11.0, ADCR_D6 −1.4 → −10.0, CLK_ADCS +1.0 → +10.3; the rest within 3 mm of before.
 
-J_LINK_TX_D0_N (J101 pad 26 to C108 pad 2) was then routed by hand, by an A* search over F.Cu, In2.Cu
+J_LINK_TX_D0_N (J101 pad 26 to C108 pad 2) was then routed by hand, by an A* search (`_work/layout/handroute.py`) over F.Cu, In2.Cu
 and B.Cu with through vias that checks every step against the netclass clearances (10 Nov).
 Pad 26 is 0.23 mm wide at 0.4 mm pitch, so a 0.15 mm LVDS clearance only lets a track leave it
 lengthwise, and both ends were taken: the P leg below, a B.Cu GND track over the pad row above.
@@ -497,6 +497,15 @@ That GND track was cut over pad 26 (four pieces); the N leg now leaves upwards t
 (186.05, 84.2), runs down In2.Cu and comes up next to C108 (via at 185.25, 87.65), 0.1 mm wide.
 The cut left J101 pad 31 (GND) without its track, so it got its own 0.15 mm GND track to the
 nearest GND pad of the lower row. **1**.
+
+SW_CTRL1 (ball C9, caged by the F_DACS_IQRESET via and track, the XO_SCL via and a GND track on F.Cu)
+was routed the same way, with the A* allowed to cross other nets' tracks and vias (never pads) at a
+cost, to find the fewest items to move: the F.Cu GND track under C9 (cut over 152.1–152.9 mm,
+y 150), an ADAR6_TR via and an In2.Cu segment of ADAR8_TX_LOAD, each re-routed after it. SW_CTRL1 now runs 46 mm with 10 vias down to its track south of the BGA (a slow switch
+control). The cut GND track had been ball B8's only connection, and no via fits next to B8, so a
+GND via at (151.55, 150.1) took the place of two In2 segments of F_DACR_D6, F_DACR_D6 was re-routed
+(crossing one SW_CTRL0 via, 151.0, 150.8), and SW_CTRL0 was re-joined on In2.Cu from its other via
+(152.05, 150.5). ADAR6_TR's via moved 0.05 mm; ADAR8_TX_LOAD got a new 9.7 mm In2.Cu run. **0**.
 
 The the cluster runs (the cluster scripts): `env.sh` loads
 apptainer and Python, KiCad 10.0.6 runs from the `kicad/kicad` image and the router is built in
@@ -510,7 +519,7 @@ Vias in BGA ball pads: the router had already put 25 vias in U1101 ball pads (no
 balls, as the fan-out table above says of the first fan-out); the escape rounds add 4 (29 now). They
 are filled and capped like every via in a pad (FABRICATION.md).
 
-**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 → 1 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
+**24 → 20 → 15 → 14 → 13 → 12 → 11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 → 1 → 0 unrouted**, 0 errors, 0 parity problems; L2 and L5 carry only GND.
 
 What did not help (19 Oct, run in parallel on two extra machines): about 45 region passes from the
 15 board, with other boxes, other nets first and other orders, reached 16 at best, so region
@@ -519,14 +528,13 @@ parts, routed worse (30, 35 and 45 unrouted after the finishing passes, against 
 
 ### 6.3 What is left
 
-1. **The last unrouted connection.** SW_CTRL1 (BGA ball C9 to its track south of the BGA).
-2. **LVDS skew.** Most LVDS legs run as single tracks; LINK_RX_D0 and LINK_RX_D1 differ by about
+1. **LVDS skew.** Most LVDS legs run as single tracks; LINK_RX_D0 and LINK_RX_D1 differ by about
    74 mm (about 0.47 ns) between P and N, ADCS_FCO by 55 mm (§6.2). Check them against the bit
    rates before ordering, or re-route the pairs as pairs.
-3. **No supply track on L2 or L5** after any further routing: check, as §6.2.
-4. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
-5. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
-6. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
+2. **No supply track on L2 or L5** after any further routing: check, as §6.2.
+3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
+4. **Re-run `drop_dangling.py`** after any rip-up, before ordering.
+5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
    and the tracks on L4 (the +3V3_D background only) not cutting off any +3V3_D via.
 
 Before anything is ordered: DRC with zero errors and zero unconnected items, the widths

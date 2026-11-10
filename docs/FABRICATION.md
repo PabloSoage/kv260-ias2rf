@@ -9,10 +9,9 @@ always regenerated, never edited.
 py _work/fab/make_fab.py
 ```
 
-**Today the output is a DRAFT.** The board is autorouted but not finished (LAYOUT §6): DRC reports
-1 unrouted connection (no DRC errors). So the script names
-the folder `DRAFT-…` and writes *DO NOT ORDER* in the notes. The draft is there to check the files,
-not to order from.
+**Since 10 Nov the output is not a draft:** DRC reports no errors and no unrouted connections, so
+the script names the folder without `DRAFT-`. Before ordering, the review items of LAYOUT §6.3
+(LVDS skew above all) are still to be closed.
 
 ---
 
