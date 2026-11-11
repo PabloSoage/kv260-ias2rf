@@ -2,5 +2,12 @@
 # RF50 lines are 183 um with 0.2 mm clearance. Where one leaves a 0.5 mm pitch pin it is necked
 # down to 0.15 mm for the first millimetre or so, and that neck keeps the default clearance.
 (rule "RF50 neck-down at fine-pitch pins"
-	(condition "A.NetClass == 'RF50' && A.Type == 'Track' && A.Width < 0.18mm")
+	(condition "A.NetClass == 'RF50' && A.Type == 'Track' && A.Width < 0.18mm && A.Width >= 0.12mm")
 	(constraint clearance (min 0.1mm)))
+
+# Beside each SMA's ESD diode the line is 0.1 mm for 0.76 mm before and 1.4 mm after its pad: two
+# high-impedance sections that tune out the diode's 0.4-0.5 pF (docs/SIGNAL_INTEGRITY.md 7.1). The
+# ground pour keeps 0.24 mm off them, i.e. where it is beside the 183 um line, as simulated.
+(rule "RF50 ESD compensation sections"
+	(condition "A.NetClass == 'RF50' && A.Type == 'Track' && A.Width < 0.12mm")
+	(constraint clearance (min 0.24mm)))
