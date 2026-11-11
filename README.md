@@ -208,6 +208,43 @@ adapter board.** If that is what you want, use the original project.
 
 ---
 
+## Simulation results
+
+From the RF/high-speed review of 11 November 2026; the method, the other plots and what is still a
+compromise are in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md). Raw data (CSV) next to
+each figure in [docs/sim/](docs/sim/).
+
+**Edge SMA launch** (openEMS FDTD, stack 2116A). Clearing L2–L4 under the SMA's signal pad turns a
+13.5 dB return loss at 1 GHz into 24.5 dB; the bare 50 Ω line is the set-up check.
+Data: [sma_plain.csv](docs/sim/sma_plain.csv), [sma_cutout.csv](docs/sim/sma_cutout.csv),
+[sma_line.csv](docs/sim/sma_line.csv).
+
+![SMA launch](docs/sim/sma_launch.png)
+
+**FPGA core supply impedance** at the XC7A50T's VCCINT balls, from the board's copper. Over its
+120 mΩ target from 64 MHz now, from 14 MHz before; UG483 asks for 100 kHz–10 MHz.
+Data: [pdn_1V0.csv](docs/sim/pdn_1V0.csv); the other rails:
+[+1V8_D](docs/sim/pdn_1V8_D.png), [+2V5](docs/sim/pdn_2V5.png), [+3V3_D](docs/sim/pdn_3V3_D.png).
+
+![VCCINT impedance](docs/sim/pdn_1V0.png)
+
+**LVDS eyes** (ngspice, PRBS7 at 1 Gb/s, each leg's copper by layer and width). Left to right: an
+ideal 100 Ω pair, the legs as routed on 10 Nov (0.117 mm, 59 Ω), the legs widened to 50 Ω.
+Data: [lvds_eye.csv](docs/sim/lvds_eye.csv).
+
+![LINK_RX_D1 eye](docs/sim/eye_LINK_RX_D1_1G.png)
+![LINK_RX_CLK eye](docs/sim/eye_LINK_RX_CLK_1G.png)
+
+| Pair | Edge spread: ideal / 10 Nov / now | Eye opening now |
+|---|---|---|
+| LINK_RX_D1 (144 mm) | 75 / 103 / 77 ps | 561 mV |
+| LINK_RX_D0 (126 mm) | 36 / 68 / 33 ps | 572 mV |
+| LINK_RX_CLK (118 mm) | 12 / 53 / 13 ps | 528 mV |
+| ADCS_FCO (63 mm) | 48 / 49 / 50 ps | 644 mV |
+| CLK_ADCS (63 mm) | 13 / 13 / 18 ps | 602 mV |
+
+---
+
 ## Legal notice
 
 This design transmits on regulated bands. Operating the SDR transmitter requires an amateur radio
