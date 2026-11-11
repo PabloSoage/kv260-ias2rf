@@ -18,7 +18,12 @@ a series part (two pads on the same leg) joining its pads. Copper off that path 
 reported on its own: the branch to a termination resistor that is not passed through, say.
 Vias are counted, not timed (about 10 ps each through 1.6 mm). "Coupled" is the share of the
 P leg within 0.35 mm (centre to centre) of the N leg on the same layer.
-Groups: each source-synchronous bus, data against its clock, by mean leg delay."""
+Groups: each source-synchronous bus, data against its clock, by mean leg delay.
+
+Package: a leg ending on a ball of the FPGA (U1101) gets that ball's package flight time, the mean
+of Vivado's MIN_DELAY/MAX_DELAY for the XC7A50T-FTG256 (xc7a50t_ftg256_pkg_delays.csv next to this
+script, exported with `get_package_pins`). The P, N and P-N columns and the groups include it;
+"pkg P-N" is the package's share. --no-pkg leaves it out."""
 import re, sys, math, json, heapq, argparse
 from shapely.geometry import LineString, Point, box
 from shapely import affinity
@@ -37,7 +42,15 @@ GROUPS = {   # bus: (clock pair, data pairs), names as grouped (no sheet path, n
 ap = argparse.ArgumentParser()
 ap.add_argument("board"); ap.add_argument("--json")
 ap.add_argument("--stubs", type=float)
+ap.add_argument("--no-pkg", action="store_true")
 a = ap.parse_args()
+PKG = {}
+if not a.no_pkg:
+    import csv, os
+    for r in csv.DictReader(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "xc7a50t_ftg256_pkg_delays.csv"))):
+        if r["min_delay_fs"]:   # power and config balls have none
+            PKG[r["pin"]] = (int(r["min_delay_fs"]) + int(r["max_delay_fs"])) / 2000.0   # fs -> ps
+FPGA = "U1101"
 t = open(a.board, encoding="utf-8").read()
 
 
@@ -138,7 +151,7 @@ def path_ps(k):
     pts = {}   # (layer) -> [(x, y, node)]
     def node(x, y, l):
         for qx, qy, n in pts.setdefault(l, []):
-            if math.hypot(qx - x, qy - y) < 0.06: return n   # overlapping track ends
+            if math.hypot(qx - x, qy - y) < 0.08: return n   # overlapping track ends (0.07 apart happens; any track is wider)
         n = ("p", l, round(x, 3), round(y, 3)); pts[l].append((x, y, n)); return n
     for s, e, L, w in leg["edges"]:
         node(*s, L); node(*e, L)
@@ -224,16 +237,20 @@ for (p, side), leg in legs.items():
                 pt = ln.interpolate((i + 0.5) / n, normalized=True)
                 tot += ln.length / n
                 if other is not None and other.distance(pt) <= 0.35: cov += ln.length / n
-    pairs[p] = {"P_ps": pp, "N_ps": nn, "P_mm": sum(P["mm"].values()), "N_mm": sum(N["mm"].values()),
+    def pkg(k):
+        return sum(PKG.get(n[2], 0.0) for n in (legs[k]["path"][0], legs[k]["path"][-1])
+                   if n[0] == "pad" and n[1] == FPGA)
+    kp, kn = pkg((p, "P")), pkg((p, "N"))
+    pairs[p] = {"P_ps": pp + kp, "N_ps": nn + kn, "P_pkg_ps": kp, "N_pkg_ps": kn, "P_mm": sum(P["mm"].values()), "N_mm": sum(N["mm"].values()),
                 "P_stub_ps": P["ps"] - pp, "N_stub_ps": N["ps"] - nn,
                 "P_vias": len(P["vias"]), "N_vias": len(N["vias"]), "coupled": cov / tot if tot else 0.0,
                 "layers": sorted(set(P["mm"]) | set(N["mm"]))}
 
-print(f"{'pair':14s} {'P ps':>6s} {'N ps':>6s} {'P-N ps':>7s} {'stub P/N ps':>12s} {'copper P/N mm':>14s} "
+print(f"{'pair':14s} {'P ps':>6s} {'N ps':>6s} {'P-N ps':>7s} {'pkg P-N':>7s} {'stub P/N ps':>12s} {'copper P/N mm':>14s} "
       f"{'vias P/N':>8s} {'coupled':>7s}  layers")
 for p in sorted(pairs):
     q = pairs[p]
-    print(f"{p:14s} {q['P_ps']:6.0f} {q['N_ps']:6.0f} {q['P_ps'] - q['N_ps']:+7.0f} "
+    print(f"{p:14s} {q['P_ps']:6.0f} {q['N_ps']:6.0f} {q['P_ps'] - q['N_ps']:+7.0f} {q['P_pkg_ps'] - q['N_pkg_ps']:+7.1f} "
           f"{q['P_stub_ps']:6.0f}/{q['N_stub_ps']:<5.0f} {q['P_mm']:7.1f}/{q['N_mm']:<6.1f} "
           f"{q['P_vias']:>4d}/{q['N_vias']:<3d} {100 * q['coupled']:6.0f}%  {','.join(q['layers'])}")
 print()

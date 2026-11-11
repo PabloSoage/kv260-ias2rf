@@ -13,7 +13,7 @@ what is still a compromise.
 | The switch → SMA legs were not 50 Ω | **Right**: the RF50 net class missed the auto-named nets, so they were 0.10 mm | Every RF50 net (28) at 183 µm, checked by net class and DRC (§2) |
 | The SMA launch is not a transmission line | **Right**: one ground via per SMA, pad over L2 | Three vias per ground leg, L2–L4 cut out under the pad; openEMS: return loss 13.5 → 24.5 dB at 1 GHz (§2.1) |
 | Controlled impedance and length matching | Half right: lengths were matched, but the LVDS legs were 59 Ω single tracks (119 Ω pairs) | Legs widened to 50 Ω where they run apart: 74 % of their length at 50 Ω, eye as an ideal pair (§3) |
-| Power planes / decoupling loop inductance | **Right** for VCCINT: its L4 island was cut off from its own decoupling and from the regulator by the plane clearance | Zone clearance 0.15 mm, island extended under its caps; VCCINT meets its target to 64 MHz (was 14 MHz) (§4) |
+| Power planes / decoupling loop inductance | **Right** for VCCINT: its L4 island was cut off from its own decoupling and from the regulator by the plane clearance | Zone clearance 0.15 mm, island extended under its caps; VCCINT meets its target to 81 MHz (was 26 MHz) (§4) |
 | Autorouted, "random" placement | A style point | The checks below are what decides whether it works; they were all run |
 
 Other things a reviewer would look at, found and fixed in the same pass: return vias at the LVDS
@@ -109,7 +109,9 @@ centre lines did not move, so lengths and skew are unchanged.
 
 ngspice, PRBS7 at 1 Gb/s, LVDS current driver (3.5 mA, 300 ps edges), 100 Ω across the receiver and
 2 pF per input; each leg is its own copper by layer and width, with Z0 and delay from the field
-solver, the mismatched sections put together at the receiver end (sections under 3 mm lumped).
+solver, the mismatched sections put together at the receiver end (ordered by Z0; sections under
+3 mm lumped). Re-run on the final board of 11 Nov (with the ESD parts); differences from the first
+run are within 15 mV and 10 ps.
 Three cases per pair: an ideal 100 Ω pair of the same length, the legs at 0.117 mm (10 Nov), the
 legs as now.
 
@@ -117,11 +119,11 @@ legs as now.
 
 | Pair (P leg) | Zero-crossing spread: ideal / 0.117 mm / **now** | Eye opening: ideal / 0.117 mm / **now** |
 |---|---|---|
-| LINK_RX_D1 (144 mm, the longest) | 75 / 103 / **77 ps** | 575 / 563 / **561 mV** |
-| LINK_RX_D0 (126 mm) | 36 / 68 / **33 ps** | 603 / 616 / **572 mV** |
-| LINK_RX_CLK (118 mm) | 12 / 53 / **13 ps** | 548 / 627 / **528 mV** |
-| ADCS_FCO (63 mm) | 48 / 49 / **50 ps** | 643 / 640 / **644 mV** |
-| CLK_ADCS (63 mm) | 13 / 13 / **18 ps** | 619 / 668 / **602 mV** |
+| LINK_RX_D1 (144 mm, the longest) | 75 / 102 / **77 ps** | 575 / 547 / **559 mV** |
+| LINK_RX_D0 (126 mm) | 36 / 67 / **33 ps** | 603 / 607 / **569 mV** |
+| LINK_RX_CLK (118 mm) | 12 / 54 / **14 ps** | 548 / 625 / **516 mV** |
+| ADCS_FCO (63 mm) | 48 / 51 / **40 ps** | 643 / 641 / **650 mV** |
+| CLK_ADCS (63 mm) | 13 / 13 / **11 ps** | 619 / 668 / **630 mV** |
 
 On the long link pairs the narrow legs doubled the edge spread (the reflections off a 59 Ω leg
 into a 100 Ω load come back on the next edges); widened, they match the ideal pair. On the 63 mm
@@ -142,6 +144,23 @@ Unchanged by the widening (`_work/layout/lvds_skew.py`, pin to pin). One change:
 was −60 ps, over the 50 ps rule of LAYOUT §6.3; its P leg now has 10 mm of meander on L1, on the
 side of its own N leg: **0 ps**. Data to clock on LINK_RX: D0 +79 → +51 ps, D1 +207 → +177 ps
 (the Kria's IDELAYE3 trains these).
+
+**With the FPGA's package delays** (11 Nov evening). The figures above are pad to pad. AMD gives each
+XC7A50T-FTG256 ball's flight time inside the package (Vivado `get_package_pins`, MIN_DELAY and
+MAX_DELAY; 35–133 ps across the I/O balls). They are in `_work/layout/xc7a50t_ftg256_pkg_delays.csv`, and
+`lvds_skew.py` now adds each FPGA ball's mean delay to its leg (`--no-pkg` for pad to pad):
+
+| | Pad to pad | With the package |
+|---|---|---|
+| Package share of a pair's P−N | — | −4.4 to +9.4 ps |
+| Worst P−N, pairs at 1 Gb/s | ±42 ps | ±40 ps (LINK_TX_CLK −40, ADCS_D1 +38) |
+| LINK_RX data − clock | D0 +51, D1 +177 ps | D0 +40, D1 +190 ps |
+| LINK_TX data − clock | +2 ps | −15 ps |
+| ADCS (AD9253) data − DCO | −74 to +45 ps | −81 to +24 ps |
+| ADCR (AD9484) data − DCO | −80 to −16 ps | −86 to +2 ps |
+
+The P−N skews stay within the rule. The data-to-clock offsets are what each lane's IDELAY calibrates
+at start-up (78 ps taps on the Artix-7, 1.1 ns range on the K26's IDELAYE3).
 
 ### 3.5 Crosstalk
 
@@ -192,10 +211,16 @@ all there is.
 
 | Rail | Target | |Z| max, 0.1–10 MHz (before → now) | Over the target |
 |---|---|---|---|
-| +1V0 VCCINT | 120 mΩ | 100 → **81 mΩ** | 14 MHz and up → **64 MHz and up**; 881 → 195 mΩ at 100 MHz |
+| +1V0 VCCINT | 120 mΩ | 67 → **69 mΩ** | 26 MHz and up → **81 MHz and up**; 470 → 149 mΩ at 100 MHz |
 | +1V8_D VCCAUX, VCCO_35 | 700 mΩ | 127 → 109 mΩ | nowhere to 100 MHz |
 | +2V5 VCCO_34 | 2 Ω | 149 → 146 mΩ | nowhere |
 | +3V3_D VCCO | 1 Ω | 36 → 37 mΩ | nowhere |
+
+Model (`pdn2.py`): each capacitor's loop is its ESL, its pads and vias, and the copper path to the
+balls; the die draws on all its balls of a rail at once, so from a plane the paths to the balls are
+in parallel. Both boards above are computed with the same model. The step that is left for VCCINT
+above 80 MHz is 0402 caps on the bottom face inside the BGA footprint (L4 is 0.25 mm from the
+bottom face and 1.18 mm from the top): it needs the BGA's bottom-side fan-out redone (§6).
 
 The other rails' plots: [`sim/pdn_1V8_D.png`](sim/pdn_1V8_D.png), [`sim/pdn_2V5.png`](sim/pdn_2V5.png),
 [`sim/pdn_3V3_D.png`](sim/pdn_3V3_D.png).
@@ -235,15 +260,18 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 - **17 of the FPGA's 69 supply balls have no via of their own**: VCCINT F7, G6, K9, L8; GND A1,
   F8, G13, K7, K14, N5, N15; +1V8_D A6, J2, K11; +3V3_D L16, T11; +2V5 R4. Each reaches its plane
   through a short top track to a neighbour's via (VCCINT: 5 of 9 balls have one). Adding one means
-  re-routing the BGA escape under it; the incremental attempt kept six and reverted fifteen.
+  re-routing the BGA escape under it; the incremental attempt kept six and reverted fifteen. Tried
+  again for the four VCCINT balls (rip the blocking tracks, re-route, then rip around what is left):
+  every attempt left 1–12 nets unroutable. It needs the BGA fan-out redone by hand, together with
+  the bottom-side VCCINT capacitors (§4.3).
 - **The LVDS pairs are loosely coupled**, not routed as coupled pairs: 100 Ω by leg width, but
   less rejection of common-mode noise picked up on the way. A pair-routed board is still the
   better board.
-- **21 LVDS/clock layer changes have no ground via within 3 mm**, all in the dense field between
-  the FPGA and the ADCs.
+- **21 LVDS/clock layer changes have their nearest ground via 3.0–4.0 mm away** (the limit set
+  here is 3 mm; λ/20 at a 300 ps edge is 6 mm), all in the dense field between the FPGA and the
+  ADCs and at the link connector. No free spot nearer clears the other nets by 0.15 mm.
 - **VCCINT's 4.7 µF caps** sit 6 mm above the BGA, fed by track (7–13 nH): no room on either face
   over the island. UG483 allows "within two electrical inches"; the impedance target holds.
-- No ESD protection on the SMAs, the Pmod or JTAG (§7).
 
 ## 7. Environment
 
@@ -254,7 +282,22 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 | Input | 12 V: PTC, reverse-polarity P-FET, SMBJ15CA TVS (POWER_SPEC). Vehicle use needs ISO 7637-2 (VEHICLE_PLATFORM V-05) |
 | Mechanics | Five M3 holes (two through the KV260, three to standoffs); edge SMAs soldered and through the board. For vibration: staking of the SMAs and the 7343 capacitor, or a conformal coat, at assembly |
 | EMI | Ground planes next to every signal layer, edge fence, power plane pulled back, return vias (§5) |
-| ESD | Not on the SMAs, Pmod or JTAG: adding it changes the schematic (low-capacitance diodes at each connector) |
+| ESD | Every external connector: a PESD5V0F1BL (0.4 pF, bidirectional, IEC 61000-4-2) on each of the 12 SMAs, 2.15 mm from the SMA pad; TPD4E05U06DQAR four-channel arrays (0.5 pF) on the Pmod (U1108, U1109) and JTAG (U1110) next to their headers. Each ground pad has its own GND via (0.4–1 mm). The 12 V input already has its SMBJ15CA. §7.1 |
+
+### 7.1 ESD on the SMAs
+
+The SMAs carry HF from 100 kHz, the wideband SDR to about 250 MHz, the radar IF at 120 MHz and the
+reference clock to 500 MHz. A shunt inductor to ground (an "RF choke") that does not load 50 Ω at
+100 kHz needs more than 80 µH, which self-resonates at a few MHz: it would short VHF and protect
+nothing. A low-capacitance TVS is the part for this band. openEMS, the launch of §2.1 with the
+diode's pad and 0.5 pF where it is placed (2.15 mm from the SMA pad):
+
+| | 0.5 GHz | 1 GHz | 3 GHz |
+|---|---|---|---|
+| S11 | −34.0 dB | −26.8 dB | −11.8 dB |
+| S21 | −0.15 dB | −0.16 dB | −0.47 dB |
+
+In the band used the launch is as good as without it (the `tvs` curve in the §2.1 figure).
 
 ## 8. How it was checked
 
