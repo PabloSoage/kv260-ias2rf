@@ -658,11 +658,15 @@
       },
       {
         "netclass": "RF50",
-        "pattern": "Net-(J4*-In)"
+        "pattern": "Net-(D40*-A1)"
       },
       {
         "netclass": "RF50",
-        "pattern": "Net-(J9*-In)"
+        "pattern": "Net-(D96*-A1)"
+      },
+      {
+        "netclass": "RF50",
+        "pattern": "Net-(D970-A1)"
       },
       {
         "netclass": "RF50",
