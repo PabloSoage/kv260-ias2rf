@@ -245,7 +245,7 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 |---|---|
 | Result | **0 DRC errors, 0 unrouted connections, 0 schematic-parity problems** (zones refilled); re-checked after the review of 11 Nov (§6.4) |
 | Copper | 13.3 m of track (11 Nov): L1 5.2 m, L3 3.6 m, L6 3.8 m, L4 0.7 m. Mostly 0.10 mm; the supplies 0.30 mm; the RF lines 0.183 mm and most LVDS legs 0.175–0.183 mm (50 Ω) |
-| Vias | 2,173 through vias since 11 Nov (1,483 before), 0.45 mm on a 0.20 mm drill; 896 are ground (return vias, the RF band fence, the edge fence, exposed pads). 543 sit in pads and are filled and capped (FABRICATION.md) |
+| Vias | 2,222 through vias since 11 Nov (1,483 before), 0.45 mm on a 0.20 mm drill; 924 are ground (return vias, the RF band fence, the edge fence, exposed pads). 543 sit in pads and are filled and capped (FABRICATION.md) |
 | L2, L5 | Ground only: no other net has a track there (`_work/layout/planechk.py`) |
 | L4 | Tracks only on the +3V3_D background; every other island carries a tracks-only keep-out ("In3 islands: no tracks"), so the islands stay whole. 51 signal segments on L4 have an end under the BGA (45 before the skew fixes of §6.3); the refilled planes still reach every pin |
 | LVDS | Every pair is routed as two single tracks, not as a coupled pair (loosely coupled); since 11 Nov each leg is 50 Ω where the room allows (§6.4); skew and stubs are reviewed in §6.3 |
@@ -364,7 +364,7 @@ The full record, with the simulations, is [SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY
 |---|---|
 | RF band | Rebuilt by hand: straight 183 µm switch → DC block → SMA legs on L1, bias parts on the bottom, four vias in each switch pad, L1/L6 ground pours with a 226-via fence, three vias per SMA ground leg, L2–L4 cut out under each SMA signal pad (openEMS: return loss 13.5 → 24.5 dB at 1 GHz) |
 | RF lines | The eight long lines 183 µm end to end, ≤ 2 vias each, two ground vias at every via; the 64.9 Ω terminations moved under their caps (7–10 mm stubs gone); U401's input and output lines separated (−19.5 → about −45 dB) |
-| LVDS | Legs widened to 50 Ω (74 % of the length at 0.175–0.183 mm); LINK_RX_CLK skew −60 → 0 ps; LINK_RX_CLK_P and LINK_RX_D0_P pulled apart (−18 → −46 dB); 118 return vias at layer changes |
+| LVDS | Legs widened to 50 Ω (74 % of the length at 0.175–0.183 mm); LINK_RX_CLK skew −60 → 0 ps; LINK_RX_CLK_P and LINK_RX_D0_P pulled apart (−18 → −46 dB); 136 return vias at layer changes (one layer change left with its ground via beyond 3 mm); legs of different pairs moved apart where there was room (SIGNAL_INTEGRITY §3.5) |
 | PDN | Zone clearance 0.3 → 0.15 mm on L2/L4/L5; the +1V0 island joined to its corridor and extended under its caps; five vias in L1030's pad; four 0.47 µF (C1184–C1187) on the bottom face under the BGA, on ball vias; VCCINT under its target to 100 MHz (over it from 26 MHz before; `SIGNAL_INTEGRITY.md` §4.3) |
 | Pads and edge | Via grids in every exposed pad (LMR33630, TPS7A8300 ×3, AD8352 ×4, ADCs, ADCLK948); a 176-via ground fence round the edge; L4 pulled back 1 mm from the edge |
 | ESD | PESD5V0F1BL (D961–D970, D401, D402) on the SMA lines 2.15 mm from each SMA pad, ground pad on its own via, tuned out by 0.1 mm line sections either side (0.76 mm before, 1.4 mm after; openEMS −39 dB at 500 MHz); TPD4E05U06DQAR arrays U1108/U1109 above the Pmod and U1110 beside JTAG, GND vias butted to their ground pins (SIGNAL_INTEGRITY §7.1) |

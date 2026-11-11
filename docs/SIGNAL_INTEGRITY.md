@@ -18,7 +18,7 @@ what is still a compromise.
 
 Other things a reviewer would look at, found and fixed in the same pass: return vias at the LVDS
 and clock layer changes, two clock lines coupled at −19.5 dB, a clock leg beside a data leg on the
-link, exposed pads without vias, the board edge without stitching, the power plane running to the
+link, legs of different pairs side by side (§3.5), exposed pads without vias, the board edge without stitching, the power plane running to the
 edge (§5).
 
 ---
@@ -164,11 +164,11 @@ MAX_DELAY; 35–133 ps across the I/O balls). They are in `_work/layout/xc7a50t_
 | | Pad to pad | With the package |
 |---|---|---|
 | Package share of a pair's P−N | — | −4.4 to +9.4 ps |
-| Worst P−N, pairs at 1 Gb/s | ±42 ps | ±40 ps (LINK_TX_CLK −40, ADCS_D1 +38) |
-| LINK_RX data − clock | D0 +51, D1 +177 ps | D0 +40, D1 +190 ps |
-| LINK_TX data − clock | +2 ps | −15 ps |
-| ADCS (AD9253) data − DCO | −74 to +45 ps | −81 to +24 ps |
-| ADCR (AD9484) data − DCO | −80 to −16 ps | −86 to +2 ps |
+| Worst P−N, pairs at 1 Gb/s | ±42 ps | ±40 ps (ADCS_D1 +40, LINK_TX_CLK −36) |
+| LINK_RX data − clock | D0 +51, D1 +177 ps | D0 +41, D1 +190 ps |
+| LINK_TX data − clock | +2 ps | −17 ps |
+| ADCS (AD9253) data − DCO | −74 to +45 ps | −81 to +26 ps |
+| ADCR (AD9484) data − DCO | −80 to −16 ps | −88 to 0 ps |
 
 The P−N skews stay within the rule. The data-to-clock offsets are what each lane's IDELAY calibrates
 at start-up (78 ps taps on the Artix-7, 1.1 ns range on the K26's IDELAYE3).
@@ -183,8 +183,34 @@ with the field solver (even/odd mode):
 | U401's reference input (CLK0) and its output Q3, 47 mm side by side on L3 | 0.22 mm gap, NEXT −19.5 dB: the buffer's output fed back into its own input pin | Q3 moved out to the board edge (x 207.55) and its diagonal 1.3 mm off | 1.0–1.3 mm, about −45 dB |
 | LINK_RX_CLK_P beside LINK_RX_D0_P, 31 mm on L1 | 0.16 mm gap, about −18 dB | Each P leg moved next to its own N leg | 1.0 mm between the pairs, about −46 dB |
 
-What is left on the list is a data leg beside a supply track, flash or I²C lines (static while the
-board runs), or another lane of the same bus at ≥ 0.3 mm.
+**Legs of different pairs side by side.** Because the pairs are not coupled, a leg can run beside
+a leg of another pair with nothing of its own partner to cancel it. Every fast leg was walked in
+0.25 mm steps against every other pair's copper on its layer: 133 mm (of 3,639 mm) ran with less
+than 0.25 mm to another pair's leg, at the class clearance of 0.15 mm in the worst places. Field
+solver, 0.183 mm legs on L1/L6: backward coupling 14.5 % at a 0.15 mm gap, 7.7 % at 0.25 mm,
+4.6 % at 0.35 mm, 2 % at 0.55 mm (L3: 16.7 / 9.7 / 6.1 / 2.8 %). A run shorter than 25 mm (half
+a 300 ps edge) couples in proportion to its length.
+
+Where there was room the leg was moved away with a 45° jog at each end (seven runs, 42 mm; skew
+changed by 3 ps at most): ADCS_FCO_N off ADCS_D1_N (14 mm, 0.15 → 0.35 mm), off LINK_RX_CLK_P,
+ADCR_D2_P off ADCR_D0_P, LINK_RX_D0_N off ADCR_OR_N and three shorter ones. **98 mm are left**
+with less than 0.25 mm, none with room to move without re-routing its neighbours. The worst:
+
+| Run | Layer | Length under 0.25 mm | Near-end crosstalk on the victim leg |
+|---|---|---|---|
+| ADCR_D0_P beside ADCR_D1_N | L6 | 12.6 mm at 0.15 mm | 7 % of the aggressor's swing |
+| ADCR_D1_P beside ADCR_D3_P | L1 | 7.7 mm | 4.5 % |
+| F_DACR_CLK beside LINK_RX_CLK_N | L1 | 6.4 mm | 3.7 % |
+| ADCR_D4_P beside ADCS_FCO_P | L1 | 6.0 mm | 3.5 % |
+| ADCR_OR_N beside ADCS_D1_P | L6 | 5.7 mm | 3.3 % |
+| ADCR_D6_N beside ADCR_D7_N | L1 | 5.6 mm | 3.2 % |
+| LINK_TX_CLK_P beside LINK_TX_D0_N | L3 | 3.9 mm at 0.18 mm | 2.5 % |
+
+7 % of a 350 mV leg is 25 mV on one leg of a pair whose eye opens 550–650 mV and whose receiver
+threshold is ±100 mV: it works, with less margin than a coupled pair would have (a coupled pair
+sees the same aggressor on both legs). These are in the escape between the FPGA and the two ADCs;
+they go with the fan-out (§6). The rest of the list is a data leg beside a supply track, or flash
+and I²C lines that are static while the board runs.
 
 ---
 
@@ -262,7 +288,7 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 
 | Check | Found | Fixed |
 |---|---|---|
-| Return vias at layer changes (LVDS, clocks) | 145 of 185 reference-changing vias without a ground via within 1 mm | 118 ground vias added; now 39 within 1 mm, 76 within 2 mm, 49 within 3 mm, 21 farther (λ/20 at the 1.2 GHz knee of a 300 ps edge is 6 mm). RF50: two within 1.8 mm, one exception with one |
+| Return vias at layer changes (LVDS, clocks) | 145 of 185 reference-changing vias without a ground via within 1 mm | 136 ground vias added (118 at 0.2 mm from other nets, then 18 more at the 0.15 mm the net classes ask for, two of them after moving a supply and an I²C track aside): 50 within 1 mm, 91 within 2 mm, 44 within 3 mm, **one at 3.1 mm** (ADCR_D4_P; λ/20 at the 1.2 GHz knee of a 300 ps edge is 6 mm). RF50: two within 1.8 mm, one exception with one |
 | Exposed pads | LMR33630, all three TPS7A8300 (one dissipates 0.5 W), one AD8352 with **no via**; AD9253 3 vias in 31 mm² | Via grids in every pad (POFV): LMR33630 15, each TPS7A8300 4, AD8352s 2–5, AD9253 15, AD9484 16, ADCLK948 6 |
 | Board edge | 256 of 1,122 points on the outline had a ground via within 3 mm | 176-via fence 0.8 mm in, 2.5 mm pitch (22 stations blocked by connectors) |
 | Power plane at the edge | L4 ran to the edge with L2/L5 | Every L4 zone pulled back 1 mm from the edge |
@@ -273,20 +299,24 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 
 ## 6. What is still a compromise
 
-- **15 of the FPGA's 69 supply balls have no via of their own**: VCCINT F7, G6, K9, L8; GND A1,
-  F8, G13, N5, N15; +1V8_D A6, J2, K11; +3V3_D L16, T11; +2V5 R4. Each reaches its plane through a
-  short top track to a neighbour's via (VCCINT: 5 of 9 balls have one; the four bottom-side caps
-  of §4.3 sit on those vias). Adding one means re-routing the BGA escape under it. All 17 were
-  tried one at a time (rip what blocks the spot, re-route, keep only a result with zero unrouted
-  and zero violations): GND K7 and K14 now have their own via; A6's spot has no +1V8_D copper
-  under it, N15 and T11 have no free spot, and every other ball left 1–6 nets unroutable. It needs
-  the BGA fan-out redone by hand.
+- **11 of the FPGA's 69 supply balls have no via of their own.** Seven have a plane to reach and
+  no room for the via: VCCINT K9, L8; GND A1, F8, G13, N5; +3V3_D L16. Each reaches its plane
+  through a short top track to a neighbour's via (VCCINT: 7 of 9 balls have their own; the four
+  bottom-side caps of §4.3 sit on those vias). The other four (+1V8_D A6, J2, K11; +2V5 R4) are on
+  rails that have no plane under the BGA at all: they are fed by tracks, and a via would reach
+  nothing. Their impedance is inside the target all the same (§4.3: 109 mΩ against 700, 144 mΩ
+  against 2 Ω). Two ways were tried on every ball: ripping what blocks the spot and re-routing
+  (GND K7, K14), and leaving the routing alone but bending the blocking tracks round the new via
+  (VCCINT F7, G6; GND N15; +3V3_D T11); each kept only at zero unrouted and zero violations. What
+  is left needs the escape of those rows redone.
 - **The LVDS pairs are loosely coupled**, not routed as coupled pairs: 100 Ω by leg width, but
-  less rejection of common-mode noise picked up on the way. A pair-routed board is still the
-  better board.
-- **21 LVDS/clock layer changes have their nearest ground via 3.0–4.0 mm away** (the limit set
-  here is 3 mm; λ/20 at a 300 ps edge is 6 mm), all in the dense field between the FPGA and the
-  ADCs and at the link connector. No free spot nearer clears the other nets by 0.15 mm.
+  less rejection of common-mode noise picked up on the way, and legs of different pairs side by
+  side between the FPGA and the ADCs (§3.5: 98 mm under 0.25 mm, 7 % crosstalk on the worst
+  leg). A pair-routed board is the better board; on this placement and pin assignment the pairs
+  cross each other on the way out of the BGA, which is why the router could not keep them
+  together. It is a change of FPGA pin assignment and escape, not a touch-up.
+- **One LVDS layer change has its nearest ground via 3.1 mm away** (ADCR_D4_P; the limit set here
+  is 3 mm, λ/20 at a 300 ps edge is 6 mm). The other 185 are within 3 mm, 141 of them within 2 mm.
 - **VCCINT's 4.7 µF caps** sit 6 mm above the BGA, fed by track (7–13 nH): no room on either face
   over the island. UG483 allows "within two electrical inches"; the impedance target holds.
 

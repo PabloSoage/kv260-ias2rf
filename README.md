@@ -117,9 +117,10 @@ BGA, for one).
    42 ps) and the termination stubs were fixed on 10 Nov, and the trace widths agree with
    JLCPCB's calculator within 1–3 % ([FABRICATION.md](docs/FABRICATION.md)).
 2. **What the review left as compromises** ([SIGNAL_INTEGRITY.md §6](docs/SIGNAL_INTEGRITY.md)):
-   15 of the FPGA's 69 supply balls reach their plane through a neighbour's via (it needs the BGA
-   fan-out redone by hand); 21 LVDS
-   layer changes have their nearest ground via 3–4 mm away. The skew figures include the FPGA's
+   11 of the FPGA's 69 supply balls have no via of their own (seven reach their plane through a
+   neighbour's via, four are on rails fed by tracks); legs of different LVDS pairs run side by
+   side for 98 mm in the escape between the FPGA and the ADCs (7 % crosstalk on the worst leg);
+   one LVDS layer change has its nearest ground via 3.1 mm away, the rest within 3 mm. The skew figures include the FPGA's
    package delays since 11 Nov (Vivado's per-ball flight times; [SIGNAL_INTEGRITY.md §3.4](docs/SIGNAL_INTEGRITY.md)).
 3. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it. JLCPCB's
    calculator lists the cheaper JLC06161H-3313 first, whose L1–L2 prepreg is thinner (0.099 mm
