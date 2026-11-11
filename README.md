@@ -103,23 +103,28 @@ BGA, for one).
 | Check | Result |
 |---|---|
 | ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
-| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems.** The only warnings are 8 library-footprint notices |
+| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** (11 Nov, after the RF/high-speed review) |
+| Signal and power integrity | Reviewed on 11 Nov ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): RF band rebuilt, SMA launch simulated in openEMS (return loss 24.5 dB at 1 GHz), LVDS legs at 50 Ω with simulated eyes, VCCINT's plane and decoupling fixed (target met to 64 MHz), return vias, exposed-pad vias and an edge fence |
 | Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
 **Open before ordering** ([docs/LAYOUT.md §6.2–6.3](docs/LAYOUT.md)):
 
-1. **LVDS pairs run as two separate tracks** rather than as coupled pairs (about 125 Ω between the
-   legs against the 100 Ω termination). Acceptable at these rates; a pair-routed board would be
-   better. The skew (every pair at 1 Gb/s within 42 ps) and the termination stubs were fixed on
-   10 Nov, and the trace widths agree with JLCPCB's calculator within 1–3 %
-   ([FABRICATION.md](docs/FABRICATION.md)).
-2. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it. JLCPCB's
+1. **LVDS pairs run as two separate tracks** (loosely coupled) rather than as coupled pairs. Since
+   11 Nov each leg is 50 Ω where the room allows, so the pairs are about 100 Ω and the simulated
+   eye matches an ideal pair's ([SIGNAL_INTEGRITY.md §3](docs/SIGNAL_INTEGRITY.md)); a pair-routed
+   board would still reject common-mode noise better. The skew (every pair at 1 Gb/s within
+   42 ps) and the termination stubs were fixed on 10 Nov, and the trace widths agree with
+   JLCPCB's calculator within 1–3 % ([FABRICATION.md](docs/FABRICATION.md)).
+2. **What the review left as compromises** ([SIGNAL_INTEGRITY.md §6](docs/SIGNAL_INTEGRITY.md)):
+   17 of the FPGA's 69 supply balls reach their plane through a neighbour's via; 21 LVDS layer
+   changes have no ground via within 3 mm; no ESD protection on the SMAs, Pmod or JTAG.
+3. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it. JLCPCB's
    calculator lists the cheaper JLC06161H-3313 first, whose L1–L2 prepreg is thinner (0.099 mm
    against 0.116 mm); on that stack the 183 µm RF lines would sit at about 45 Ω instead of 50 Ω
    ([FABRICATION.md](docs/FABRICATION.md)).
-3. **The AERIS-10 end of the ribbon does not exist yet.**
-4. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
+4. **The AERIS-10 end of the ribbon does not exist yet.**
+5. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
 
 **Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), 10 Nov 2026): about **$2,030 for two
@@ -142,6 +147,7 @@ global sourcing or consigned parts cover them.
 | [docs/SYMBOLS.md](docs/SYMBOLS.md) | The project's symbols, each from its datasheet, cross-checked against a second source where one exists |
 | Sheet specifications | One per schematic sheet, in the table above: every value and where it comes from |
 | [docs/LAYOUT.md](docs/LAYOUT.md) | The board: outline, stackup, rules, the split power layer, placement, routing and the LVDS review |
+| [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review of 11 Nov: impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
 | [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026): boards, assembly fees and every part with its LCSC link and price. About $2,030 for two assembled boards, $4,190 for five |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |

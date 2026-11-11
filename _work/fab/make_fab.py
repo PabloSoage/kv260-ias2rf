@@ -130,7 +130,7 @@ def main():
     work_pcb = os.path.join(work, NAME + ".kicad_pcb")
     shutil.copy2(BOARD, work_pcb)
     shutil.copy2(os.path.join(ROOT, NAME + ".kicad_pro"), work)
-    for f in ("fp-lib-table", "sym-lib-table"):
+    for f in ("fp-lib-table", "sym-lib-table", NAME + ".kicad_dru"):    # .kicad_dru: the custom rules
         if os.path.exists(os.path.join(ROOT, f)):
             shutil.copy2(os.path.join(ROOT, f), work)
     # the schematic, for the parity check, and the project's own libraries

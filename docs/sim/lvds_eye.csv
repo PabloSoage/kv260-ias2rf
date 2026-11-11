@@ -1,0 +1,16 @@
+pair,rate_bps,case,eye_opening_mV,zero_crossing_spread_ps,P_minus_N_ps
+/LINK_RX_D1,1e+09,ideal,575,75,-42.0
+/LINK_RX_D1,1e+09,orig,563,103,-40.6
+/LINK_RX_D1,1e+09,routed,561,77,-42.0
+/LINK_RX_D0,1e+09,ideal,603,36,18.7
+/LINK_RX_D0,1e+09,orig,616,68,18.6
+/LINK_RX_D0,1e+09,routed,572,33,18.7
+/LINK_RX_CLK,1e+09,ideal,548,12,-2.6
+/LINK_RX_CLK,1e+09,orig,627,53,-1.3
+/LINK_RX_CLK,1e+09,routed,528,13,-2.6
+/ADCS_FCO,1e+09,ideal,643,48,-28.5
+/ADCS_FCO,1e+09,orig,640,49,-28.8
+/ADCS_FCO,1e+09,routed,644,50,-28.5
+/CLK_ADCS,1e+09,ideal,619,13,6.2
+/CLK_ADCS,1e+09,orig,668,13,6.4
+/CLK_ADCS,1e+09,routed,602,18,6.2
