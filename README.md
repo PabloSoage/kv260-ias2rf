@@ -104,7 +104,7 @@ BGA, for one).
 |---|---|
 | ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
 | DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** (11 Nov, after the RF/high-speed review) |
-| Signal and power integrity | Reviewed on 11 Nov ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): RF band rebuilt, SMA launch simulated in openEMS (return loss 24.5 dB at 1 GHz), LVDS legs at 50 Ω with simulated eyes, VCCINT's plane and decoupling fixed (target met to 81 MHz); ESD protection on every SMA, the Pmod and JTAG, return vias, exposed-pad vias and an edge fence |
+| Signal and power integrity | Reviewed on 11 Nov ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): RF band rebuilt, SMA launch simulated in openEMS (return loss 39 dB at 500 MHz, 30.6 dB at 1 GHz, with the ESD diode), LVDS legs at 50 Ω with simulated eyes, VCCINT's plane and decoupling fixed, four caps on the bottom face under the BGA (target met to 100 MHz); ESD protection on every SMA, the Pmod and JTAG, return vias, exposed-pad vias and an edge fence |
 | Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
@@ -117,8 +117,8 @@ BGA, for one).
    42 ps) and the termination stubs were fixed on 10 Nov, and the trace widths agree with
    JLCPCB's calculator within 1–3 % ([FABRICATION.md](docs/FABRICATION.md)).
 2. **What the review left as compromises** ([SIGNAL_INTEGRITY.md §6](docs/SIGNAL_INTEGRITY.md)):
-   17 of the FPGA's 69 supply balls reach their plane through a neighbour's via, and VCCINT has no
-   capacitors on the bottom face under the BGA (both need the BGA fan-out redone by hand); 21 LVDS
+   15 of the FPGA's 69 supply balls reach their plane through a neighbour's via (it needs the BGA
+   fan-out redone by hand); 21 LVDS
    layer changes have their nearest ground via 3–4 mm away. The skew figures include the FPGA's
    package delays since 11 Nov (Vivado's per-ball flight times; [SIGNAL_INTEGRITY.md §3.4](docs/SIGNAL_INTEGRITY.md)).
 3. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it. JLCPCB's
@@ -217,15 +217,20 @@ compromise are in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md). Raw data
 each figure in [docs/sim/](docs/sim/).
 
 **Edge SMA launch** (openEMS FDTD, stack 2116A). Clearing L2–L4 under the SMA's signal pad turns a
-13.5 dB return loss at 1 GHz into 24.5 dB; with the ESD diode (0.4 pF, 2.15 mm from the pad) it
-stays at 26.8 dB; the bare 50 Ω line is the set-up check.
+13.5 dB return loss at 1 GHz into 24.4 dB. The ESD diode (0.4 pF, 2.15 mm from the pad) is tuned
+out by 0.1 mm line sections either side of it: −39 dB at 500 MHz, the top of the band used
+(shaded), and better than 20 dB to 2 GHz. The grey curve is a bare 50 Ω line with no connector: the
+simulation's own floor, not a target a connector can reach. Above 2 GHz the diode's capacitance
+shows; nothing on this board runs there.
 Data: [sma_plain.csv](docs/sim/sma_plain.csv), [sma_cutout.csv](docs/sim/sma_cutout.csv),
-[sma_tvs.csv](docs/sim/sma_tvs.csv), [sma_line.csv](docs/sim/sma_line.csv).
+[sma_tvs.csv](docs/sim/sma_tvs.csv), [sma_tvsn08_14.csv](docs/sim/sma_tvsn08_14.csv) (on the board),
+[sma_line.csv](docs/sim/sma_line.csv).
 
 ![SMA launch](docs/sim/sma_launch.png)
 
-**FPGA core supply impedance** at the XC7A50T's VCCINT balls, from the board's copper. Over its
-120 mΩ target from 81 MHz now, from 26 MHz before; UG483 asks for 100 kHz–10 MHz.
+**FPGA core supply impedance** at the XC7A50T's VCCINT balls, from the board's copper. Under its
+120 mΩ target over the whole sweep now (51 mΩ at most in UG483's 100 kHz–10 MHz, 61 mΩ at 100 MHz),
+with four 0.47 µF caps on the bottom face under the BGA; before, over it from 26 MHz.
 Data: [pdn_1V0.csv](docs/sim/pdn_1V0.csv); the other rails:
 [+1V8_D](docs/sim/pdn_1V8_D.png), [+2V5](docs/sim/pdn_2V5.png), [+3V3_D](docs/sim/pdn_3V3_D.png).
 

@@ -10,10 +10,10 @@ what is still a compromise.
 
 | Point raised | Verdict | Now |
 |---|---|---|
-| The switch → SMA legs were not 50 Ω | **Right**: the RF50 net class missed the auto-named nets, so they were 0.10 mm | Every RF50 net (28) at 183 µm, checked by net class and DRC (§2) |
+| The switch → SMA legs were not 50 Ω | **Right**: the RF50 net class missed the auto-named nets, so they were 0.10 mm | Every RF50 net (28) at 183 µm, checked by net class and DRC (§2); the only narrower copper is deliberate: 0.15 mm necks at 0.5 mm-pitch pins and 0.1 mm sections that tune out each ESD diode (§7.1) |
 | The SMA launch is not a transmission line | **Right**: one ground via per SMA, pad over L2 | Three vias per ground leg, L2–L4 cut out under the pad; openEMS: return loss 13.5 → 24.5 dB at 1 GHz (§2.1) |
 | Controlled impedance and length matching | Half right: lengths were matched, but the LVDS legs were 59 Ω single tracks (119 Ω pairs) | Legs widened to 50 Ω where they run apart: 74 % of their length at 50 Ω, eye as an ideal pair (§3) |
-| Power planes / decoupling loop inductance | **Right** for VCCINT: its L4 island was cut off from its own decoupling and from the regulator by the plane clearance | Zone clearance 0.15 mm, island extended under its caps; VCCINT meets its target to 81 MHz (was 26 MHz) (§4) |
+| Power planes / decoupling loop inductance | **Right** for VCCINT: its L4 island was cut off from its own decoupling and from the regulator by the plane clearance | Zone clearance 0.15 mm, island extended under its caps, four 0.47 µF on the bottom face under the BGA; VCCINT meets its target to 100 MHz (was over it from 26 MHz) (§4) |
 | Autorouted, "random" placement | A style point | The checks below are what decides whether it works; they were all run |
 
 Other things a reviewer would look at, found and fixed in the same pass: return vias at the LVDS
@@ -59,7 +59,8 @@ Rebuilt by hand, not by the router:
   the 7–10 mm stubs to them are gone;
 - the RF50 net-class patterns now cover the auto-named nets (`Net-(J4*-In)`, `Net-(J9*-In)`,
   `Net-(U90*-RFOUT*)`, U401's clock nets). A design rule (`CSI2-KRIA-KV260_Rev01.kicad_dru`) lets
-  the 0.15 mm neck at a 0.5 mm-pitch pin keep the default clearance.
+  the 0.15 mm neck at a 0.5 mm-pitch pin keep the default clearance, and a second one keeps the
+  ground pour 0.24 mm off the 0.1 mm ESD compensation sections (§7.1).
 
 The eight long RF lines (six IF, CLK_REF_IN, CLK_OUT) are 183 µm end to end with at most two vias
 each, and every via has two ground vias within 0.75–1.8 mm.
@@ -75,10 +76,20 @@ A bare line through the same set-up is the control: |S11| ≤ −32 dB, |S21| �
 | |S11| | 0.5 GHz | 1 GHz | 2 GHz | 3 GHz |
 |---|---|---|---|---|
 | Pad over L2 (10 Nov) | −19.4 dB | −13.5 dB | −8.0 dB | −5.2 dB |
-| **L2–L4 cut out under the pad (now)** | **−30.3 dB** | **−24.5 dB** | **−19.0 dB** | **−16.4 dB** |
+| L2–L4 cut out under the pad | −30.2 dB | −24.4 dB | −19.0 dB | −16.4 dB |
+| Cut-out + ESD diode, uncompensated | −34.0 dB | −26.8 dB | −17.6 dB | −11.8 dB |
+| **Cut-out + ESD diode, compensated (on the board, §7.1)** | **−39.0 dB** | **−30.6 dB** | **−19.9 dB** | **−13.5 dB** |
+| Bare line (the set-up's floor) | −42.5 dB | −38.4 dB | −33.8 dB | −31.9 dB |
 
 The wide pad 0.116 mm over L2 is a 13 Ω shunt capacitance; with the planes cleared it references
 L5 (1.36 mm down) and comes close to 50 Ω. |S21| at 3 GHz: −1.76 → −0.28 dB.
+
+How to read the figure: the bare line is not a target a connector can reach, it is what the
+simulation itself returns for a uniform 50 Ω line with no connector (mesh and port error), so it is
+the floor. The band the SMAs carry ends at 500 MHz (shaded). There the board's launch is at
+−39 dB, 3.5 dB from the floor; return loss better than 20 dB (VSWR 1.22, the dotted line) holds to
+2 GHz, four times the highest frequency used. Above 2 GHz the ESD diode's capacitance shows: the
+cost of protecting the connector, and outside the band.
 
 ---
 
@@ -199,6 +210,10 @@ track, via barrels by height; UG483's criterion is the impedance from 100 kHz to
 - Five vias in the buck inductor L1030's output pad, straight into the strip.
 - Butted vias on decoupling pads where there was room (UG483: "never connect vias to the lands with
   a section of trace").
+- **Four more 0.47 µF 0402 (C1184–C1187) on the bottom face inside the BGA footprint**, each pad on
+  a +1V0 or a GND ball via (via in pad, filled and capped): L4 is 0.25 mm from the bottom face and
+  1.18 mm from the top, so their loops are 0.60–0.71 nH, against 1.1–1.4 nH for the best top-side
+  caps and 7–13 nH for the 4.7 µF ones. FPGA_IRQ was re-routed off one of them.
 
 UG483's required caps for the XC7A50T in FTG256 (Table 2-2: VCCINT 1 × 330 µF, 3 × 4.7 µF,
 5 × 0.47 µF; VCCBRAM 1 × 100 µF, 1 × 0.47 µF; VCCAUX 1 × 47 µF, 2 × 4.7 µF, 3 × 0.47 µF) are all
@@ -211,16 +226,17 @@ all there is.
 
 | Rail | Target | |Z| max, 0.1–10 MHz (before → now) | Over the target |
 |---|---|---|---|
-| +1V0 VCCINT | 120 mΩ | 67 → **69 mΩ** | 26 MHz and up → **81 MHz and up**; 470 → 149 mΩ at 100 MHz |
+| +1V0 VCCINT | 120 mΩ | 67 → **51 mΩ** | 26 MHz and up → **nowhere to 100 MHz**; 470 → 61 mΩ at 100 MHz |
 | +1V8_D VCCAUX, VCCO_35 | 700 mΩ | 127 → 109 mΩ | nowhere to 100 MHz |
 | +2V5 VCCO_34 | 2 Ω | 149 → 146 mΩ | nowhere |
 | +3V3_D VCCO | 1 Ω | 36 → 37 mΩ | nowhere |
 
 Model (`pdn2.py`): each capacitor's loop is its ESL, its pads and vias, and the copper path to the
 balls; the die draws on all its balls of a rail at once, so from a plane the paths to the balls are
-in parallel. Both boards above are computed with the same model. The step that is left for VCCINT
-above 80 MHz is 0402 caps on the bottom face inside the BGA footprint (L4 is 0.25 mm from the
-bottom face and 1.18 mm from the top): it needs the BGA's bottom-side fan-out redone (§6).
+in parallel. Both boards above are computed with the same model. Without the four bottom-side
+caps VCCINT went over its target from 81 MHz (149 mΩ at 100 MHz). Above 100 MHz the package and
+the die's own capacitance take over, which a board model cannot see; UG483 sets the board's job at
+100 kHz–10 MHz, where VCCINT is at less than half its target.
 
 The other rails' plots: [`sim/pdn_1V8_D.png`](sim/pdn_1V8_D.png), [`sim/pdn_2V5.png`](sim/pdn_2V5.png),
 [`sim/pdn_3V3_D.png`](sim/pdn_3V3_D.png).
@@ -257,13 +273,14 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 
 ## 6. What is still a compromise
 
-- **17 of the FPGA's 69 supply balls have no via of their own**: VCCINT F7, G6, K9, L8; GND A1,
-  F8, G13, K7, K14, N5, N15; +1V8_D A6, J2, K11; +3V3_D L16, T11; +2V5 R4. Each reaches its plane
-  through a short top track to a neighbour's via (VCCINT: 5 of 9 balls have one). Adding one means
-  re-routing the BGA escape under it; the incremental attempt kept six and reverted fifteen. Tried
-  again for the four VCCINT balls (rip the blocking tracks, re-route, then rip around what is left):
-  every attempt left 1–12 nets unroutable. It needs the BGA fan-out redone by hand, together with
-  the bottom-side VCCINT capacitors (§4.3).
+- **15 of the FPGA's 69 supply balls have no via of their own**: VCCINT F7, G6, K9, L8; GND A1,
+  F8, G13, N5, N15; +1V8_D A6, J2, K11; +3V3_D L16, T11; +2V5 R4. Each reaches its plane through a
+  short top track to a neighbour's via (VCCINT: 5 of 9 balls have one; the four bottom-side caps
+  of §4.3 sit on those vias). Adding one means re-routing the BGA escape under it. All 17 were
+  tried one at a time (rip what blocks the spot, re-route, keep only a result with zero unrouted
+  and zero violations): GND K7 and K14 now have their own via; A6's spot has no +1V8_D copper
+  under it, N15 and T11 have no free spot, and every other ball left 1–6 nets unroutable. It needs
+  the BGA fan-out redone by hand.
 - **The LVDS pairs are loosely coupled**, not routed as coupled pairs: 100 Ω by leg width, but
   less rejection of common-mode noise picked up on the way. A pair-routed board is still the
   better board.
@@ -282,7 +299,7 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 | Input | 12 V: PTC, reverse-polarity P-FET, SMBJ15CA TVS (POWER_SPEC). Vehicle use needs ISO 7637-2 (VEHICLE_PLATFORM V-05) |
 | Mechanics | Five M3 holes (two through the KV260, three to standoffs); edge SMAs soldered and through the board. For vibration: staking of the SMAs and the 7343 capacitor, or a conformal coat, at assembly |
 | EMI | Ground planes next to every signal layer, edge fence, power plane pulled back, return vias (§5) |
-| ESD | Every external connector: a PESD5V0F1BL (0.4 pF, bidirectional, IEC 61000-4-2) on each of the 12 SMAs, 2.15 mm from the SMA pad; TPD4E05U06DQAR four-channel arrays (0.5 pF) on the Pmod (U1108, U1109) and JTAG (U1110) next to their headers. Each ground pad has its own GND via (0.4–1 mm). The 12 V input already has its SMBJ15CA. §7.1 |
+| ESD | Every external connector: a PESD5V0F1BL (0.4 pF, bidirectional, IEC 61000-4-2) on each of the 12 SMAs, 2.15 mm from the SMA pad and tuned out by 0.1 mm line sections either side; TPD4E05U06DQAR four-channel arrays (0.5 pF) on the Pmod (U1108, U1109) and JTAG (U1110) next to their headers. Each ground pad has its own GND via (0.4–1 mm). The 12 V input already has its SMBJ15CA. §7.1 |
 
 ### 7.1 ESD on the SMAs
 
@@ -292,12 +309,20 @@ reference clock to 500 MHz. A shunt inductor to ground (an "RF choke") that does
 nothing. A low-capacitance TVS is the part for this band. openEMS, the launch of §2.1 with the
 diode's pad and 0.5 pF where it is placed (2.15 mm from the SMA pad):
 
-| | 0.5 GHz | 1 GHz | 3 GHz |
-|---|---|---|---|
-| S11 | −34.0 dB | −26.8 dB | −11.8 dB |
-| S21 | −0.15 dB | −0.16 dB | −0.47 dB |
+| | 0.5 GHz | 1 GHz | 2 GHz | 3 GHz |
+|---|---|---|---|---|
+| S11, diode alone | −34.0 dB | −26.8 dB | −17.6 dB | −11.8 dB |
+| **S11, compensated (on the board)** | **−39.0 dB** | **−30.6 dB** | **−19.9 dB** | **−13.5 dB** |
+| S21, compensated | −0.15 dB | −0.15 dB | −0.20 dB | −0.37 dB |
 
-In the band used the launch is as good as without it (the `tvs` curve in the §2.1 figure).
+The diode is a shunt capacitance on the line. It is tuned out by two short high-impedance sections
+either side of it (series inductance, so the three make a low-pass π section close to 50 Ω): the
+line is 0.1 mm wide from the DC-block pad up to the diode pad (0.76 mm, all the room there is) and
+for 1.4 mm past it towards the SMA, with the ground pour kept 0.24 mm off them (a design rule).
+openEMS sweep of the length, 0.1 mm each side: 0.8 mm −38.3 dB at 0.5 GHz, 1.4 mm −39.4, 2.0 mm
+−37.1, 2.8 mm −32.2; 0.8 mm before and 1.4 or 1.8 mm after, as fits: −39.0 dB
+(`_work/sim/sma_launch.py tvsnAA_BB`). With it the launch with the diode is better in the band
+than the bare cut-out was (−30.2 dB at 0.5 GHz).
 
 ## 8. How it was checked
 
