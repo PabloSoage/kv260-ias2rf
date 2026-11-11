@@ -655,6 +655,26 @@
       {
         "netclass": "Power",
         "pattern": "*_SW"
+      },
+      {
+        "netclass": "RF50",
+        "pattern": "Net-(J4*-In)"
+      },
+      {
+        "netclass": "RF50",
+        "pattern": "Net-(J9*-In)"
+      },
+      {
+        "netclass": "RF50",
+        "pattern": "Net-(U90*-RFOUT*)"
+      },
+      {
+        "netclass": "RF50",
+        "pattern": "Net-(U401-CLK0)"
+      },
+      {
+        "netclass": "RF50",
+        "pattern": "Net-(U401-Q3)"
       }
     ]
   },

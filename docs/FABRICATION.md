@@ -11,7 +11,10 @@ py _work/fab/make_fab.py
 
 **Since 10 Nov the output is not a draft:** DRC reports no errors and no unrouted connections, so
 the script names the folder without `DRAFT-`. The LVDS review of LAYOUT §6.2–6.3 and the
-calculator check above were closed on 10 Nov.
+calculator check above were closed on 10 Nov; the RF/high-speed review of 11 Nov
+([SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY.md)) was checked the same way. The script copies the
+project's custom rules (`CSI2-KRIA-KV260_Rev01.kicad_dru`) with the board: without them the RF
+lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 
 ---
 
@@ -37,7 +40,7 @@ calculator check above were closed on 10 Nov.
 | Thickness | 1.6 mm | |
 | **Impedance control** | **Yes, JLC06161H-2116A** | The stack the widths were solved for (POWER_AND_STACKUP §2.6). Any other stack changes every impedance |
 | Copper | 1 oz outer, 0.5 oz inner | The stack's own |
-| **Via covering** | **Epoxy filled & capped (POFV)** | About 400 vias sit in pads (0402 passives, chip pads). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. Most of the BGA's fan-out vias sit between its balls; 29 sit in ball pads (LAYOUT §6.1) |
+| **Via covering** | **Epoxy filled & capped (POFV)** | 543 vias sit in pads since 11 Nov (0402 passives, butted decoupling vias, every IC's exposed pad, five in L1030's output pad). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. Most of the BGA's fan-out vias sit between its balls; 29 sit in ball pads (LAYOUT §6.1) |
 | Min via | 0.20 mm hole, 0.45 mm pad | Within JLCPCB's six-layer capability |
 | Min track / space | 0.10 / 0.10 mm | The LVDS pairs are 0.117 / 0.150 mm |
 | **Surface finish** | **ENIG** | Flat pads for the 1.0 mm BGA and the LFCSPs; HASL is not flat enough |

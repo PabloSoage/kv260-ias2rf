@@ -1,0 +1,6 @@
+(version 1)
+# RF50 lines are 183 um with 0.2 mm clearance. Where one leaves a 0.5 mm pitch pin it is necked
+# down to 0.15 mm for the first millimetre or so, and that neck keeps the default clearance.
+(rule "RF50 neck-down at fine-pitch pins"
+	(condition "A.NetClass == 'RF50' && A.Type == 'Track' && A.Width < 0.18mm")
+	(constraint clearance (min 0.1mm)))
