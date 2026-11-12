@@ -47,6 +47,12 @@ names**:
   and the Pmod SPI clock;
 - all 256 balls are accounted for.
 
+**ADCR_DCO is wired inverted (12 November 2026).** N14 carries ADCR_DCO_N and P14 ADCR_DCO_P (the
+`INVERTED` set in `control_spec.py`; the check above expects the swap). The AD9484 has DCO's P pin
+west of N, so a pair from the FPGA arrived with its legs crossed and had to go round the chip
+(51 mm against 39). **The gateware must invert the clock:** `IS_CLK_INVERTED` on the ISERDESE2
+(or `IS_C_INVERTED` on an IDDR), or capture on the opposite edge.
+
 **Pin swap for routing (7 October 2026).** Bank 35 as a whole, and the AD9767 (DACS) lines within
 bank 15, were re-assigned at layout: each net to the ball nearest its far end, by a minimum
 total-length matching, so no two lines of either bus cross. The AERIS-10 balls (DACR,

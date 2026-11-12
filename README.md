@@ -113,10 +113,15 @@ BGA, for one).
 1. **Ten of the 19 LVDS pairs are not coupled.** Since 12 Nov the board has 8 layers and nine pairs
    run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
    two 50 Ω legs matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV).
-   LINK_RX leaves the FPGA's south rows and crosses every ADC pair; a pin swap putting it on
-   north-side balls would let those pairs couple.
-2. **ADCR data to DCO skew, −28 to −177 ps.** DCO runs 51 mm against 27–44 mm for the data: 7 % of
-   the 2.5 ns bit at 400 MSPS, inside IDELAYE2's range and calibrated per bit.
+   LINK_RX leaves bank 34, the only 2.5 V bank, in the BGA's south-east corner, and crosses every
+   ADC pair to AC capacitors spread 9 mm apart; moving it to the bank's outer balls was tried on
+   12 Nov and dropped (the corner has no room left for the vias). Coupling it would need the
+   capacitors at J101 moved together first.
+2. **ADCR data to DCO skew, −90 to +5 ps** (was −177 to −28). DCO's legs are swapped at the FPGA
+   (N14 = DCO_N, P14 = DCO_P) so the pair reaches the AD9484 the right way round without going
+   round the chip: 39 mm instead of 51. **The gateware must invert that clock** (ISERDESE2
+   `IS_CLK_INVERTED`, or capture on the other edge) ([CONTROL_SPEC §1](docs/CONTROL_SPEC.md)).
+   The rest is inside IDELAYE2's range and calibrated per bit.
 3. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
    ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $282.92 ($236.88 on 6 layers).
 4. **The AERIS-10 end of the ribbon does not exist yet.**
@@ -219,9 +224,9 @@ the method in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md).
 | Eye lost to routing (routed − ideal) | mean −22 mV, worst −113 mV | mean −8 mV, worst −52 mV |
 | Zero-crossing spread added | mean 5 ps, worst 29 ps | mean 1 ps, worst 10 ps |
 | Layer changes with no GND via within 3 mm | 1 of 186 | 0 of 89 |
-| Other pairs' legs within 0.25 mm | 97.6 mm | 69.3 mm |
+| Other pairs' legs within 0.25 mm | 97.6 mm | 65.8 mm |
 | Signal tracks on L4 under the BGA | 64 segments | 3 (supply stubs) |
-| ADCR data − DCO | −88 … −23 ps | −177 … −28 ps (worse; IDELAY absorbs it) |
+| ADCR data − DCO | −88 … −23 ps | −90 … +5 ps (DCO re-routed 12 Nov; IDELAY absorbs it) |
 | VCCINT impedance, max in band / at 100 MHz (target 120 mΩ) | 51 / 61 mΩ | 41 / 63 mΩ |
 | DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV |
 | SMA launch S11 at 1 / 3 GHz, with the ESD diode | −30.6 / −13.5 dB | −30.9 / −13.7 dB |

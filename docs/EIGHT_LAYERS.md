@@ -37,11 +37,11 @@ pair necks to 0.09 mm tracks 0.12 mm apart, which is 98.5 Ω.
 | Worst intra-pair \|P−N\| | 84 ps | 9 ps | better |
 | LINK_RX data − clock | D0 +41, D1 +190 ps | D0 +95, D1 +39 ps | same |
 | ADCS data − clock | −81 … +26 ps | −34 … −8 ps | better |
-| ADCR data − DCO | −88 … −23 ps | −177 … −28 ps | **worse** |
-| Layer changes with no GND via within 3 mm | 1 of 186 | 0 of 89 | better |
+| ADCR data − DCO | −88 … −23 ps | −90 … +5 ps | same |
+| Layer changes with no GND via within 3 mm | 1 of 186 | 0 of 95 | better |
 | Track over a plane void | 10 runs, 11 mm | 5 runs, 5 mm | better |
-| Other pairs' legs within 0.25 mm | 97.6 mm | 69.3 mm | better |
-| … within 0.55 mm | 328.4 mm | 213.5 mm | better |
+| Other pairs' legs within 0.25 mm | 97.6 mm | 65.8 mm | better |
+| … within 0.55 mm | 328.4 mm | 191.0 mm | better |
 | Signal tracks on L4 under the BGA | 64 segments | 3 (supply stubs) | better |
 | Eye lost to routing (routed − ideal) | mean −22 mV, worst −113 mV | mean −8 mV, worst −52 mV | better |
 | Zero-crossing spread added | mean 5 ps, worst 29 ps | mean 1 ps, worst 10 ps | better |
@@ -117,13 +117,19 @@ stacks, and so is the launch.*
 
 ## Still open on the 8-layer board
 
-- **ADCR data to DCO, −28 to −177 ps** (6 layers: −23 to −88 ps). DCO leaves the AD9484 on its
-  north side and runs 51 mm, against 27–44 mm for the data. That is 7 % of the 2.5 ns bit at
-  400 MSPS. It is within IDELAYE2's 2.4 ns range, and each bit is calibrated as before.
+- **ADCR data to DCO, −90 to +5 ps** (6 layers: −23 to −88 ps; −177 to −28 before 12 Nov). The
+  AD9484 has DCO's P pin west of N, so a coupled pair from the FPGA arrived with its legs crossed
+  and went round the chip (51 mm). The legs are now swapped at the FPGA instead (N14 = DCO_N,
+  P14 = DCO_P, the gateware inverts the clock) and DCO runs 39 mm, 89 % coupled. What is left is
+  within IDELAYE2's 2.4 ns range, calibrated per bit as before. CLK_ADCR's P−N went from −44 to
+  −3 ps on the way (C414/C415 side by side, a meander on P).
 - **Ten pairs are not coupled.** LINK_RX leaves the FPGA's south rows and must cross every ADC pair
   to reach its capacitors, and the AD9253's 0.5 mm pins leave no room for a coupled fan-out. These
   ten are routed as two 50 Ω legs matched to ±5 ps. Each comes within 1–26 mV of its ideal eye,
-  except LINK_RX_D0 (−52 mV). A pin swap putting LINK_RX on north-side balls would let them couple.
+  except LINK_RX_D0 (−52 mV). LINK_RX's bank (34, the only 2.5 V one) is in the BGA's south-east
+  corner, so there are no north-side balls to move it to; its outer balls were tried and the
+  corner had no room for the vias. Coupling LINK_RX would need its AC capacitors, now 9 mm apart,
+  moved together at J101 first.
 - **Price.** Five 8-layer bare boards cost $282.92 on JLCPCB's quote page, against $236.88 on
   6 layers: $46 more, mostly the engineering fee ([JLCPCB_QUOTE.md §2](JLCPCB_QUOTE.md)).
 

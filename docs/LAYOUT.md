@@ -265,7 +265,8 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
    1 Gb/s has a stub over 27 ps. What is left is in §6.3 and is tolerable.
 2. **No supply track on L2 or L5** after any further routing: check with `_work/layout/planechk.py`.
 3. **The LVDS pairs: re-routed as pairs on 12 Nov (§6.5).** Ten pairs could not be coupled; a
-   pin swap putting LINK_RX on the FPGA's north balls would let the link pairs couple.
+   LINK_RX's bank 34 is in the BGA's south-east corner; coupling it needs its AC capacitors at
+   J101 moved together (§6.6).
 4. **No dangling copper** after any rip-up: the DRC's `track_dangling` and `via_dangling` at zero.
 5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
    and the tracks on L4 (the +3V3_D background only) not cutting off any +3V3_D via.
@@ -390,6 +391,18 @@ comparison with the 6-layer board, with the simulations, is SIGNAL_INTEGRITY §8
 | LVDS routing | Pairs ripped and re-routed by a negotiated-congestion pair router: 9 of 19 coupled; the rest completed single-ended, widened to 50 Ω and matched to ±5 ps (worst \|P−N\| 9 ps, was 84) |
 | Return vias | 0 of 89 reference-changing vias without a GND via within 3 mm (was 1 of 186) |
 | +2V5 | The trunk widened to 0.5 mm where it fits: 122–129 mV drop at 601 mA (173–185 before) |
-| Left open | ADCR data to DCO −28 to −177 ps (DCO is 51 mm, the data 27–44 mm): calibrated per bit by IDELAYE2, as before |
+| Left open | ADCR data to DCO −28 to −177 ps (DCO is 51 mm, the data 27–44 mm): calibrated per bit by IDELAYE2, as before; done 12 Nov (§6.6) |
 
 DRC on 12 Nov: 0 violations of any kind, 0 unconnected, 0 schematic-parity problems (zones refilled).
+
+### 6.6 DCO and CLK_ADCR skew (12 Nov)
+
+| Item | Before | Change | After |
+|---|---|---|---|
+| ADCR_DCO | 51.6 mm, data − DCO −177 to −28 ps | The AD9484 has DCO's P pin west of N, so the coupled pair from the FPGA arrived crossed and went round the chip. Its legs are swapped at the FPGA instead (N14 = DCO_N, P14 = DCO_P; `INVERTED` in `control_spec.py`, the gateware inverts the clock) and R1109 turned 180°. Re-routed: the old L3 escape to a via pair, L6 to above the AD9484, a coupled drop to its pins | 38.9 mm, 89 % coupled, P−N +2 ps; data − DCO −90 to +5 ps |
+| CLK_ADCR | P−N −44 ps: C414 and C415 were 10 mm apart, N 16 mm longer | C414/C415 placed side by side (vertical, 1 mm pitch) next to U401; the pair coupled from the capacitors to R514; 1.5 mm meander on P (L3) between U401 and C414 | P−N −3 ps |
+| LINK_RX | South-east balls, legs matched | Moving the pairs to bank 34's outer balls (R2/R1, T4/T3, R3/T2) was tried and dropped: the router completed 3 of 6 legs, T2 and R2 have no free spot for a via on any layer, and T4/T3's vias land on ADCS_D1. Coupling would need the AC capacitors (C101–C106, up to 9 mm apart) moved together first | Unchanged |
+
+DRC on 12 Nov: 0 violations, 0 unconnected, 0 schematic-parity problems. Eyes, PDN, return vias
+unchanged (mean eye loss −8 mV, worst LINK_RX_D0 −52 mV; 0 of 95 layer changes without a GND via
+within 3 mm); other pairs' legs within 0.25 mm 65.8 mm (was 69.3).

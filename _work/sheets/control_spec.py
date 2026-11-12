@@ -90,7 +90,7 @@ BANK14 = {
     "P15": "ADCR_D0_P", "P16": "ADCR_D0_N", "R15": "ADCR_D1_P", "R16": "ADCR_D1_N",
     "T14": "ADCR_D2_P", "T15": "ADCR_D2_N",
     "N13": "LINK_TX_CLK_P", "P13": "LINK_TX_CLK_N",      # L11 SRCC
-    "N14": "ADCR_DCO_P", "P14": "ADCR_DCO_N",            # L12 MRCC, as AERIS
+    "N14": "ADCR_DCO_N", "P14": "ADCR_DCO_P",            # L12 MRCC, as AERIS; inverted (INVERTED)
     "N11": "FPGA_CLK_P", "N12": "FPGA_CLK_N",            # L13 MRCC, AERIS's FPGA_ADC_CLOCK
     "P10": "ADCS_DCO_P", "P11": "ADCS_DCO_N",            # L14 SRCC
     "R13": "ADCR_D3_P", "T13": "ADCR_D3_N", "R10": "ADCR_D4_P", "R11": "ADCR_D4_N",
@@ -150,6 +150,12 @@ BANK35 = {'A2': 'ADAR3_TX_LOAD', 'A3': 'ADAR2_TR', 'A4': 'ADAR1_RX_LOAD', 'A5': 
 BANK_NC[15] = ['E16', 'F15', 'E15', 'H11', 'H12', 'H13', 'G14', 'F14']
 BANK_NC[35] = ['E6', 'B7', 'C7', 'D6', 'F5', 'E5', 'G5']
 BANKS = {14: BANK14, 15: BANK15, 34: BANK34, 35: BANK35}
+# Pairs wired with P and N swapped at the FPGA (12 Nov 2026). The AD9484 has DCO's
+# P pin west of N on its north side, so a coupled pair from the FPGA arrives with its
+# legs the wrong way round unless it detours round the chip (51 mm against ~35 mm).
+# Swapping the legs at the FPGA instead costs nothing: the gateware inverts the clock
+# (ISERDESE2 IS_CLK_INVERTED / IDDR IS_C_INVERTED, or capture on the other edge).
+INVERTED = {"ADCR_DCO"}
 # FPGA balls that must be clock capable (MRCC/SRCC), and the reason
 CLOCK_BALLS = {"N14": "AD9484 DCO", "N11": "CLK_FPGA", "P10": "AD9253 DCO",
                "N13": "link receive clock", "D13": "Pmod SPI clock"}
@@ -457,8 +463,9 @@ def check_pins():
             if not m or net.startswith("+"):
                 continue
             pm = re.match(r"IO_L(\d+)([PN])_", name[ball])
-            assert pm and pm.group(2) == m.group(1), f"{net} on {ball} {name[ball]}"
-            pairs.setdefault(net[:-2], {})[m.group(1)] = pm.group(1)
+            want = {"P": "N", "N": "P"}[m.group(1)] if net[:-2] in INVERTED else m.group(1)
+            assert pm and pm.group(2) == want, f"{net} on {ball} {name[ball]}"
+            pairs.setdefault(net[:-2], {})[want] = pm.group(1)
         for base, pn in pairs.items():
             assert pn.get("P") == pn.get("N"), f"{base}: P and N on different pairs {pn}"
     # every user I/O of the four banks accounted for
