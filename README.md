@@ -145,7 +145,9 @@ BGA, for one).
    Still to confirm in DS925: its input threshold and the −2LV rate ceiling. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
    pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
    ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
-6. **Not simulated yet: a 3-D full-wave model of the board.**
+6. **3-D full-wave: one sub-model of four.** An LVDS pair changing layer from L1 to L6 reflects
+   under −29 dB up to 1.25 GHz, with or without ground vias (openEMS). Not modelled yet in 3-D:
+   the BGA escape, the Hirose footprint, and two parallel pairs.
 
    Done, in [SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md):
    - **Receive budgets.** Radar: full scale −17.6 dBm, NF 26.8 dB. SDR: full scale −2.4 and
@@ -317,6 +319,11 @@ main ICs, the same with the regulators, and heatsink plus fan
 ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
 
 ![Board temperature for five ways of cooling it](docs/sim/rev05_cooling.png)
+
+**An LVDS pair changing layer**, L1 to L6 through two vias, in 3-D (openEMS), four via
+arrangements ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
+
+![LVDS pair changing layer](docs/sim/rev05_layer_change.png)
 
 ---
 
