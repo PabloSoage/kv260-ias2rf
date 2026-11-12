@@ -654,23 +654,29 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
 | At 25 °C ambient, still air | h = 10 W/m²K per face (convection only) | h = 15 (with radiation) |
 |---|---|---|
 | Board, mean / hottest rise | +26 / +48 °C | +17 / +38 °C |
-| Under the ADCLK948 (0.95 W) | 73 °C | 63 °C |
-| AD9484, junction (θJC 1.7 °C/W) | 68 °C | 58 °C |
+| ADCLK948, junction (0.95 W, θJC 8.8 °C/W, Rev. B Table 6) | **82 °C** (board 73) | 71 °C |
 | LMR33630, junction (θJB 13.6) | 79 °C | 70 °C |
+| Si549, junction (θJB 17) | 74 °C | 64 °C |
 | TPS7A8300 for +1V8_D, junction (θJB 12.3) | 71 °C | 62 °C |
-| XC7A50T, under the package | 56 °C | 47 °C |
+| AD9484, junction (θJC 1.7) | 68 °C | 58 °C |
+| AD9253, junction (0.46 W at most, θJC 7.1, Rev. E Table 7) | 65 °C | 55 °C |
+| XC7A50T, junction (0.73 W, θJB 8.4, UG475 Table 5-1 FTG256) | 62 °C | 53 °C |
+| AD9767, junction (LQFP, only θJA 91 is given) | under 83 °C (board 54 + P × θJA, a bound) | under 74 °C |
 
 **On the bench this is comfortable. In a vehicle it is not.**
 - **The cause.** The board is small (134 cm²) for 6.9 W. The clock buffer, the radar ADC, the
   four drivers and the 5 V buck share it.
 - **The arithmetic.** At 60–70 °C ambient, add 35–45 °C to every figure above. Around the clock
   buffer and the ADCs the board then passes 110 °C.
-- **What it exceeds.** The ADCs' 85 °C ambient rating, and the FPGA's 100 °C junction limit
-  (I grade) where its own rise is added.
+- **What it exceeds.**
+  - The parts' 85 °C ambient rating: the board under the ADCs and the clock buffer is the
+    ambient they see.
+  - The FPGA's 100 °C junction limit (I grade): 62 °C on the bench becomes 97–107 °C.
+  - The ADCLK948 reaches 117–127 °C at the junction. That is under its 150 °C maximum, but
+    outside its rated range.
 - **What a vehicle install needs.** The KV260's fan blowing across this board, or a thermal path
-  to the enclosure, as VEHICLE_PLATFORM plans.
-- **Still to compute** with the AMD and ADI θ figures, which could not be fetched here: the FPGA,
-  the AD9253, the ADCLK948 and the AD9767.
+  to the enclosure, as VEHICLE_PLATFORM plans. At 1 m/s the data sheets' θJA fall by 10–15 %, and
+  the board's h roughly doubles, which halves every rise.
 - **Not modelled.** Heat flowing into the KV260 through the connector and the standoffs, and any
   airflow.
 
@@ -693,8 +699,23 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
   linearity.
 - **More gain here would only move full scale down.** The receiver's sensitivity is decided ahead
   of this board, in AERIS-10's own IF chain.
-- **The SDR receive chains (AD9253) are still to fill.** Its data sheet could not be fetched here:
-  analog.com does not answer this machine, and the Internet Archive was rate-limiting.
+
+| SDR receive, AD8352 12 dB → AD9253 (Rev. E, −125 grade: 2 V p-p, SNR 75.2 dBFS at 30.5 MHz, 5.2 kΩ) | `IF_RX_A` (through SW1) | `IF_RX_C` |
+|---|---|---|
+| Full scale at the SMA | **−2.4 dBm** | **−3.0 dBm** |
+| Noise figure, front end only | 15.4 dB | 14.8 dB |
+| Noise figure including the ADC | **22.4 dB**: the AD9253 is 80 % of the noise | **21.8 dB** |
+| Noise floor at the SMA | −152 dBm/Hz | −152 dBm/Hz |
+| Input IP3 | +29 dBm, 31 dB above full scale | +28 dBm |
+
+- **The 14-bit ADC still sets the floor.** One AD8352 at 12 dB does not lift the input far enough
+  above the AD9253's own noise. The SNR is taken over the 31.25 MHz Nyquist band of the 62.5 MSPS
+  one-lane mode, taking the ADC's noise voltage as independent of its clock.
+- **For weak signals, gain belongs ahead of this board.** The SDR's own LNA must give at least
+  15–20 dB to bring the system NF below about 5 dB. More gain on this board would only lower full
+  scale.
+- **Linearity is set by the ADC too.** The AD9253's SFDR is about 90 dBc, and the driver's IIP3 is
+  31 dB above full scale.
 
 | Transmit, full-scale tone at the SMA | |
 |---|---|
@@ -716,16 +737,14 @@ switch's 0.6 dB (ADT2-1T+, M3SWA2-34DR+). The filter's passband ripple, 0 to −
    - two parallel pairs, for real rather than 2-D crosstalk.
 
    A cheaper first step is to add conductor and dielectric loss to `lvds_eye.py`'s lines.
-2. **The RF chains in cascade.** Per channel:
-   - gain, noise figure (Friis), IP3 and the ADC's full scale, giving the dynamic range from the
-     data-sheet figures;
-   - the anti-alias and reconstruction filters in ngspice, with this copper (§9.3) and the parts'
-     tolerances;
-   - the baluns from their manufacturers' S-parameters.
-3. **Thermal.**
-   - First, a table: each part's dissipation and junction rise from its package's θJA.
-   - Then a 2-D conduction map of the board: the real copper per layer and natural convection, for
-     the regulator corner and the ADCs.
+2. **What the RF budget above leaves out.**
+   - The parts' tolerances, run through the filters as a Monte Carlo.
+   - The baluns from their manufacturers' S-parameters, not as ideal.
+   - The anti-alias networks at the ADC inputs, with their copper.
+3. **What the thermal map leaves out.**
+   - Airflow.
+   - Heat lost into the KV260.
+   - A through-thickness model under the hottest parts.
 
 ## 10. How it was checked
 

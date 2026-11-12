@@ -144,14 +144,17 @@ BGA, for one).
    Still to confirm in DS925: its input threshold and the −2LV rate ceiling. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
    pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
    ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
-6. **Not simulated yet:**
-   - No 3-D full-wave model of the board.
-   - The SDR receive budget waits for the AD9253's data sheet.
-   - Junction temperatures for the FPGA, the AD9253, the ADCLK948 and the AD9767.
+6. **Not simulated yet: a 3-D full-wave model of the board.**
 
-   The radar receive budget, the transmit levels, the DAC filters with their copper and the
-   board's thermal map are done ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)). The first
-   boards are for evaluation.
+   Done, in [SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md):
+   - **Receive budgets.** Radar: full scale −17.6 dBm, NF 26.8 dB. SDR: full scale −2.4 and
+     −3.0 dBm, NF 22 dB. On both, the ADC is 80–92 % of the noise.
+   - **Transmit levels** and **the DAC filters with their copper.**
+   - **The board's thermal map**, with junctions for every part that has data. At 25 °C in still
+     air, the hottest junction is the ADCLK948 at 82 °C and the FPGA is at 62 °C. A vehicle
+     needs airflow.
+
+   The first boards are for evaluation.
 7. **The AERIS-10 end of the ribbon does not exist yet.**
 8. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
