@@ -427,14 +427,19 @@ the schematic change, the +2V5 widening and the return vias carry over as they a
 terminations and the coupled pairs need the second inner signal layer.
 
 Still open on the 8-layer board:
-- **ADCR data to DCO: −28 to −177 ps** (6 layers: −23 to −88). ADCR_DCO leaves the AD9484 on its
-  north side and is 51 mm long, the data pairs 27–44 mm. At 400 MSPS that is 7 % of the 2.5 ns
-  bit, inside the IDELAYE2's 2.4 ns range, calibrated per bit at start-up as before.
+- **ADCR data to DCO: −90 to +5 ps** (6 layers: −23 to −88; −177 to −28 until 12 Nov). ADCR_DCO's
+  legs are swapped at the FPGA (the gateware inverts the clock), so the pair no longer goes round
+  the AD9484 to reach its pins the right way round: 39 mm instead of 51, 89 % coupled, eye 2 mV
+  under ideal. The rest is inside the IDELAYE2's 2.4 ns range, calibrated per bit at start-up.
 - **Ten pairs are not coupled** (LINK_RX_D0/D1, LINK_TX_D0/CLK, the four ADCS pairs, ADCR_D2,
   ADCR_D4 partly). The LINK_RX pairs leave the FPGA's south rows and must cross every ADC pair on
   the way north; the AD9253's 0.5 mm pins leave no room for a coupled fan-out. They are 50 Ω legs
-  matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV). Moving LINK_RX to
-  north-side balls (a pin swap in CONTROL) would let them couple.
+  matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV). LINK_RX's bank 34
+  sits in the BGA's south-east corner: there are no north-side balls for it, and its outer balls
+  (tried 12 Nov) leave no room for the vias. Coupling it needs the AC capacitors at J101, now 9 mm
+  apart, placed together first.
+- **CLK_ADCR P−N: −3 ps** (−44 until 12 Nov): C414 and C415 side by side at 1 mm pitch, so both
+  legs leave U401 together, and a meander on P on L3.
 - Supersedes in §6: the pairs are now partly coupled, and every layer change has a ground via
   within 3 mm.
 

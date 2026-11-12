@@ -18008,7 +18008,7 @@
 	)
 	(hierarchical_label "ADCR_DCO_P"
 		(shape input)
-		(at 172.72 170.18 180)
+		(at 172.72 172.72 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -18019,7 +18019,7 @@
 	)
 	(hierarchical_label "ADCR_DCO_N"
 		(shape input)
-		(at 172.72 172.72 180)
+		(at 172.72 170.18 180)
 		(effects
 			(font
 				(size 1.27 1.27)
