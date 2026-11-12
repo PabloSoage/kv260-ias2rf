@@ -554,14 +554,19 @@ threaded between the DAC bus and the `+1V0` feed on L1/L3:
 | C814 | `DACS_D4` | 4 mm at 0.10 mm |
 | C834 | `ADAR2_CS` | 3 mm at 0.10 mm |
 
-The fix is the one in §9.3: re-place the filter.
+The fix is the one in §9.3: re-place the filter. **Done on 12 Nov (§9.3):** the four filter rows
+are gone. Other nets within 0.3 mm of the DAC1/DAC2 filter nodes (each node's own partner not
+counted) went from 59 mm to 14 mm. What is left is `+5V0` beside T801's secondary (5.9 mm at
+0.15 mm, unchanged) and the DAC's own `FSADJ` pins next to its outputs.
 
-### 9.3 Long differential analogue paths (open)
+### 9.3 Long differential analogue paths (the SDR DAC filters re-placed 12 Nov)
 
 | Path | P / N | Vias |
 |---|---|---|
-| SDR DAC1 filter, between its two inductor sections (C814) | 57 / 66 mm | 8 / 6 |
-| SDR DAC2 filter (C834) | 39 / 62 mm | 4 / 6 |
+| SDR DAC1 filter, between its two inductor sections (C814), before 12 Nov | 57 / 66 mm | 8 / 6 |
+| SDR DAC2 filter (C834), before 12 Nov | 39 / 62 mm | 4 / 6 |
+| SDR DAC1 filter (C814), now: re-routed as a pair | 51 / 47 mm | 3 / 3 |
+| SDR DAC2 filter (C834), now: re-placed | 4 / 4 mm | 0 / 0 |
 | SDR ADC driver → ADC (C605 / C606) | 45 / 32 mm | 4 / 4 |
 | Reference oscillator → U401 (Y401 CLK±) | 10.5 / 20.8 mm | 3 / 2 |
 
@@ -572,6 +577,22 @@ The fix is the one in §9.3: re-place the filter.
 
 These were routed as unrelated nets. The fix is to place the filter parts in two rows beside the
 DAC and route each pair together.
+
+**Done on 12 Nov, DRC 0/0/0 with parity:**
+- **DAC2 (AD9767 → T802): the filter moved next to its balun.** L831–L834 sit in two rows, one
+  per leg, between J1103 and T802, with C834 between the rows and C835 at T802's pins. The DAC
+  end keeps its loads (R831/R832, C831–C833).
+  - **What the move changes.** The long copper is now between the 49.9 Ω loads and the first
+    coils, as a coupled 100 Ω pair (0.10 / 0.15 mm, 77 / 84 % coupled, 49 / 46 mm). A matched
+    line there is close to transparent, where the same copper inside the filter added to its
+    coils. Inside the filter each node is under 10 mm, with no vias.
+  - **Moved for it.** `SW_CTRL0` and `SW_CTRL2`, two static switch controls, were re-routed
+    across the area.
+- **DAC1 (AD9767 → T801): the middle node re-routed as a pair, no parts moved.** There is no room
+  for L811/L812 near T801, which is where the second section already is: one free 0603 spot was
+  found. The C814 node now runs as a coupled pair, 83 / 90 % coupled, 51 / 47 mm, with 3 vias a
+  leg instead of 8 / 6. C814's second pad joins its leg through a via placed by hand, beside the
+  pair.
 
 **Simulated (12 Nov), and the copper costs little.** Each filter was run in ngspice twice: with
 ideal connections, and with every node's copper as a line of its field-solved Z0 and delay. The
@@ -587,7 +608,23 @@ balun is taken as ideal.
 - **The corner moves 4–9 % lower**, and the stop band rolls off slightly faster.
 - **The legs' imbalance** leaves a common mode at least 30 dB under the signal inside the passband.
 
-![DAC reconstruction filters, ideal and as routed](sim/rev05_filters.png)
+The same simulation after the re-placement:
+
+| Filter, as routed | −3 dB, before / now | At 100 MHz | Common mode below differential, 10 / 30 / 50 MHz, before → now |
+|---|---|---|---|
+| AD9767 DAC1 → T801 | 64.0 / 64.8 MHz | −29 / −28 dB | −59 / −45 / −35 → −53 / −42 / −35 dB |
+| AD9767 DAC2 → T802 | 64.0 / 64.0 MHz | −29 / −28 dB | −47 / −36 / −31 → **−68 / −50 / −40 dB** |
+
+- **DAC2 gains 9–21 dB of common-mode rejection** across the passband, and the most common mode
+  anywhere below 100 MHz falls from −9 to −19 dB. The corner does not move. The model takes each
+  net's copper as uncoupled lines, so the matched pair's benefit is if anything understated.
+- **DAC1 is a trade.** Under 50 MHz its common mode is 3–6 dB worse than before, still under
+  −42 dB to 30 MHz. Above 50 MHz it is better, and the worst below 100 MHz goes from −11 to
+  −18 dB. The corner moves up 1 %.
+- **Fewer vias and fewer digital neighbours on both.** A full re-placement of DAC1 would need
+  room near T801 that only moving other parts can give.
+
+![DAC reconstruction filters, ideal and as routed, and their common mode before and after the re-placement](sim/rev05_filters.png)
 
 The DAC buses are not matched either:
 - `DACS` data bits run 37–84 mm, with `IQSEL` at 104 mm;
@@ -596,16 +633,18 @@ The DAC buses are not matched either:
 Those 48 mm are about 0.3 ns on an 8 ns period: inside the FPGA's output timing, set by
 constraints.
 
-### 9.4 Pairs not coupled: 12 of 22, counting the clocks
+### 9.4 Pairs not coupled: 11 of 22, counting the clocks
 
 §8 counts 19 data and link pairs, of which 10 are not coupled. U401 drives three clock pairs as
-well. Of those, `CLK_ADCS` was coupled on 12 Nov, so 12 of the 22 are still not coupled:
+well. Of those, `CLK_ADCS` and `CLK_FPGA` were coupled on 12 Nov, so 11 of the 22 are still not
+coupled:
 
 | Pair | Coupled | Copper P / N | Vias P / N |
 |---|---|---|---|
 | `CLK_ADCS`, before 12 Nov | 0 % | 63 / 67 mm | 5 / 6 |
 | `CLK_ADCS`, now (below) | **74 / 80 %** | 56 / 52 mm of track | 2 / 3 |
-| `CLK_FPGA` | 0 % | 85 / 71 mm | 2 / 5 |
+| `CLK_FPGA`, before 12 Nov | 0 % | 85 / 71 mm | 2 / 5 |
+| `CLK_FPGA`, now (below) | **62 / 56 %** | 43 / 46 mm, cap to ball | 5 / 6 |
 | `CLK_ADCR` | 36 % | 24 / 28 mm | 2 / 3 |
 | ADCS ×4, ADCR_D2, ADCR_D4 | 0–41 % | 27–43 mm | 2–5 |
 | LINK_RX_D0/D1, LINK_TX_D0/CLK | 0–2 % | 71–119 mm | 4–9 |
@@ -641,17 +680,30 @@ legs with a 0.15 mm gap, from vias in C416/C417's pads to vias in the terminatio
   but the pins have no room for it in a 0.5 mm pitch corner already full of supply vias.
 - **Checks.** DRC 0/0/0 with parity. No other net changed.
 
-**`CLK_FPGA`, tried on 12 Nov and left as it was.** Its series resistors R1115/R1116 sit 12 mm
-apart, and its bias resistors R1117/R1118 sit apart too.
-- **Routed with the resistors where they are**, the same router coupled only 10 mm. The legs then
-  differed by 15 mm (about 100 ps), against 3 mm now. That is worse, so it was not kept.
-- **Re-placing them** needs room for four 0402s together east of the BGA, close to balls N11/N12,
-  because the pad's shunt resistors should sit near the receiver. A search of both sides found
-  only one free column, a single 0402 wide (x ≈ 168, y 135–141 on L1), and scattered single
-  spots on L8.
-- **It is the next re-placement to do by hand in KiCad.** Put R1115–R1118 in two rows of two at
-  x ≈ 167–169. Then re-route `CONTROL/FPGA_CLK_*` from the balls and `CLK_FPGA_*` from C418/C419
-  as pairs.
+**`CLK_FPGA`, re-placed and re-routed on 12 Nov: now coupled.** The pad (CONTROL_SPEC §2:
+24.9 Ω in series and 24.9 Ω to +1V2 on each leg) had its series resistors 12 mm apart and each
+shunt 8 mm from its series resistor, so the line from U401 was not terminated in one place.
+- **Re-placed.** The four 0402s now sit stacked in the one free column east of the BGA, at
+  x = 168.4: R1116 and R1115 (series, N and P) at y 139.7 and 140.7, R1117 (P shunt) under them
+  at 141.6, R1118 (N shunt) above at 137.8. Each shunt is 1–2 mm from its series resistor. Upright
+  pairs side by side did not fit: the BGA's courtyard ends at x 167.5 and `ADCR_DCO`'s vias sit at
+  x 169.3.
+- **Re-routed.** `CLK_FPGA_*` runs from C418/C419 as a coupled 100 Ω pair, mostly on L3 (In2),
+  62 / 56 % coupled. `FPGA_CLK_*` runs from the pad to balls N11/N12, about 10 mm a leg, and
+  the shunts' +1V2 ends reach the bias node through two vias.
+
+| `CLK_FPGA` | Before | Now |
+|---|---|---|
+| Coupled (partner within 0.4 mm, same layer), C418/C419 to the series resistors | 0 / 0 % | **62 / 56 %** |
+| Copper, capacitor to ball, P / N | 85 / 71 mm | 43 / 46 mm |
+| Pad to ball (the unterminated stub) | 13–14 mm, shunts 8 mm off | about 10 mm, shunts 1–2 mm off |
+| Other pairs' legs within 0.25 mm | 3.5 mm (LINK_RX_D0_N) | none |
+| Over a void in the reference plane | 8.5 mm (`CLK_FPGA_P` over `+3V3_D`) | none |
+
+- **How it was done.** As for `CLK_ADCS`: KiCadRoutingTools' diff-pair router for the pair, then
+  its router with `--keep-input-copper` for the short legs and +1V2. That router also moved one
+  far +1V2 track to another layer; it was put back as it was.
+- **Checks.** DRC 0/0/0 with parity. Only `CLK_FPGA_*`, `FPGA_CLK_*` and the shunts' +1V2 changed.
 
 ### 9.5 Supply balls without their own via
 

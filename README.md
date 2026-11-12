@@ -117,14 +117,15 @@ BGA, for one).
      widened (865 mm at ≥ 0.5 mm, against 119), and +1V8_A starts at 1.85 V to cover what is
      left of the drop.
    - **Analogue nodes.** Digital tracks beside the analogue nodes are down to 81 mm within
-     0.3 mm, from 91. The rest is where the SDR DAC's filter is threaded through the DAC bus: it
-     needs the filter re-placed. Its long, unmatched legs were simulated: they cost 4–9 % of
-     cut-off and nothing in the passband.
+     0.3 mm, from 91. Most of what was left was where the SDR DAC's filters crossed the DAC bus.
+     On 12 Nov DAC2's filter was re-placed next to its balun and DAC1's middle node re-routed as
+     a pair: their digital neighbours went from 59 mm to 14 mm. DAC2's common mode at the balun
+     fell by 9–21 dB; DAC1's moved by a few dB either way.
    - **Thermal.** 6.9 W on 134 cm² in still air: +26 °C mean and +48 °C at the clock buffer. Fine
      on the bench. A vehicle install needs airflow or a path to the enclosure.
-2. **Ten of the 19 LVDS pairs are not coupled** (12 of 22 counting U401's three clock pairs:
-   `CLK_ADCS` was re-routed as a coupled pair on 12 Nov, `CLK_FPGA` needs its four resistors
-   re-placed first; SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
+2. **Ten of the 19 LVDS pairs are not coupled** (11 of 22 counting U401's three clock pairs:
+   `CLK_ADCS` and `CLK_FPGA` were re-routed as coupled pairs on 12 Nov, `CLK_FPGA` after its
+   four pad resistors were re-placed together; SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
    run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
    two 50 Ω legs matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV).
    LINK_RX leaves bank 34, the only 2.5 V bank, in the BGA's south-east corner, and crosses every
@@ -304,7 +305,8 @@ stacks, and so is the launch.
 ![SMA launch](docs/sim/rev04_sma.png)
 
 **DAC reconstruction filters** (ngspice), ideal and with each node's copper. The cut-off moves 4–9 %
-down and the passband does not change ([SIGNAL_INTEGRITY §9.3](docs/SIGNAL_INTEGRITY.md)).
+down and the passband does not change. Below, the common mode at the balun before and after the
+re-placement of 12 Nov ([SIGNAL_INTEGRITY §9.3](docs/SIGNAL_INTEGRITY.md)).
 
 ![DAC reconstruction filters](docs/sim/rev05_filters.png)
 
