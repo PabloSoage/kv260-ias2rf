@@ -146,9 +146,15 @@ BGA, for one).
    Still to confirm in DS925: its input threshold and the −2LV rate ceiling. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
    pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
    ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
-6. **3-D full-wave: one sub-model of four.** An LVDS pair changing layer from L1 to L6 reflects
-   under −29 dB up to 1.25 GHz, with or without ground vias (openEMS). Not modelled yet in 3-D:
-   the BGA escape, the Hirose footprint, and two parallel pairs.
+6. **3-D full-wave sub-models (openEMS), not yet inside the eye simulation.**
+   - **Layer change L1 to L6.** The pair reflects under −29 dB up to 1.25 GHz, with or without
+     ground vias. Without them 7 % of the common mode's power leaks into the plane cavity; with
+     two, 1 %.
+   - **BGA escape.** The 0.10 mm necks reflect under −24 dB at 1.25 GHz.
+   - **Two pairs side by side.** The board's worst run couples 1.9 % of a 300 ps edge onto the
+     nearest leg, not the 7 % the 2-D estimate gave.
+   - **J101's footprint**, from the Hirose pins to the AC capacitors: reflection under −25 dB to 1.25 GHz,
+     but the legs' different escapes turn 9 % of the differential wave into common mode.
 
    Done, in [SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md):
    - **Receive budgets.** Radar: full scale −17.6 dBm, NF 26.8 dB. SDR: full scale −2.4 and
@@ -326,6 +332,12 @@ main ICs, the same with the regulators, and heatsink plus fan
 arrangements ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
 
 ![LVDS pair changing layer](docs/sim/rev05_layer_change.png)
+
+**The other 3-D sub-models**: the BGA escape, J101's pins to the AC capacitors, two pairs side by
+side, and the common mode through the layer change
+([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
+
+![The other 3-D sub-models](docs/sim/rev05_3d.png)
 
 ---
 

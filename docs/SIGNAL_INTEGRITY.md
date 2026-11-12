@@ -855,17 +855,83 @@ Both ports are driven in odd mode, so the result is the differential S-parameter
 
 ![LVDS pair changing layer, four via arrangements](sim/rev05_layer_change.png)
 
+**3-D full-wave: the other sub-models (12 Nov).** Same stack, loss and odd-mode ports; each also
+run in even mode, which gives the mode conversion. They share `stack3d.py`.
+Three things had to be fixed before the numbers could be trusted:
+- **Transverse cells.** Cells over 40 µm across the lines made the absorbing boundary unstable
+  within 1 ns.
+- **DC in the excitation.** An excitation with DC left a charge the ports could not drain.
+- **Ports on coupled lines.** A port on a line coupled to its neighbour read the neighbour's field
+  as its own wave.
+
+The runs below are after those fixes; each energy trace decays to −40 dB.
+
+| BGA escape (`bga_escape.py`): a pair from two adjacent balls, via in pad, out on L6 across three ball columns, then coupled | Sdd11 at 0.625 / 1.25 GHz | Sdd21 at 1.25 GHz | Scd21 (to common mode) at 1.25 GHz |
+|---|---|---|---|
+| Legs 0.10 mm in the via field (the board's necks) | −30.4 / −24.6 dB | −0.1 dB | −39.7 dB |
+| Legs 0.183 mm (50 Ω) in the via field | −41.9 / −37.1 dB | −0.1 dB | −39.7 dB |
+| Coupled from the vias, one channel (under the 0.15 mm rule) | −38.0 / −34.6 dB | −0.1 dB | −47.1 dB |
+
+- **The necks cost 12 dB of return loss and still reflect under −24 dB** at 1.25 GHz: 6 % of the
+  wave at most, on a pair whose eye has 450–650 mV. They are not worth a re-route.
+- **The conversion to common mode comes from where the legs meet, not from the necks.** The two
+  legs reach the coupled pair after different jogs, so it is the same with 0.10 or 0.183 mm legs.
+
+| Two pairs side by side for 12.6 mm on L6 (`pair_xtalk.py`), the board's worst run (§3.5) | NEXT at 0.625 / 1.25 GHz | Peak for a 300 ps edge: on the pair / on the nearest leg |
+|---|---|---|
+| Legs 1 mm apart (not coupled), 0.15 mm to the other pair (the board) | −32.5 / −27.0 dB | **0.94 % / 1.9 %** |
+| Same, 0.35 mm | −44.2 / −38.6 dB | 0.25 % / 0.51 % |
+| Coupled pairs, 0.15 mm | −34.0 / −28.5 dB | 0.82 % / 1.9 % |
+| Coupled pairs, 0.35 mm | −46.3 / −40.7 dB | 0.20 % / 0.47 % |
+
+- **The 2-D estimate of §3.5 was pessimistic by about 3.5 times.** It gave 7 % of the
+  aggressor's swing on the nearest leg; the 3-D model gives 1.9 %, about 7 mV on a 350 mV leg.
+- **The far end hardly couples on stripline** (FEXT under −50 dB), as expected with one
+  dielectric round the lines.
+- **Spacing matters more than coupling.** 0.35 mm instead of 0.15 mm cuts the crosstalk four
+  times. Coupling the pairs at the same spacing gains only 13 %: at 0.15 mm the victim's far leg
+  is too far off to cancel much.
+
+| Common mode through the layer change (`layer_change.py even`) | Scc21 at 1.25 GHz | Common-mode power not reflected and not through, at 1.25 GHz | Sdc21, up to 4 GHz |
+|---|---|---|---|
+| No ground via | −0.55 dB | **7 %** (into the plane cavity, mostly) | under −93 dB |
+| 2 ground vias | −0.17 dB | 0.9 % | under −89 dB |
+| 4 ground vias | −0.14 dB | 0.5 % | under −94 dB |
+
+- **This is what the return vias are for.** The differential signal did not need them. The
+  common mode does: without them 7 % of its power goes into the cavity between the planes at
+  1.25 GHz, where it can reach every other via. Two return vias 0.75 mm off bring that to 1 %.
+  Every layer change on the board has a ground via within 3 mm (§5, §8), most of them 1–3 mm off,
+  so the board sits between the two cases; how fast the benefit falls with distance was not run.
+- **The symmetric layer change converts nothing between the modes** (Sdc21 under −89 dB).
+
+| J101 to the AC capacitors (`hirose_escape.py`), `LINK_RX_D0` as on the board | 0.625 GHz | 1.25 GHz | 2.5 GHz |
+|---|---|---|---|
+| Sdd11, reflection | −30.2 dB | −25.7 dB | −20.3 dB |
+| Sdd21, through | −0.1 dB | −0.1 dB | −0.3 dB |
+| Scd21, differential turned into common mode | −26.0 dB | **−20.6 dB** | −14.7 dB |
+
+- **The modelled path.** The pins are on the bottom, at 0.4 mm pitch, and the capacitors
+  C101/C102 sit right above them on the top. P leaves pin 4 outwards and goes up a via 0.65 mm
+  away. N leaves pin 5 between the two pin rows, at 0.10 mm, and goes round on L1 to C102, 1.5 mm
+  further on. The mating connector is not modelled.
+- **For the eye, the footprint is clean.** Reflection stays under −25 dB to 1.25 GHz.
+- **It is the link's largest source of common mode.** The legs' different routes turn about 9 %
+  of the differential wave into common mode at 1.25 GHz, and 5 % at 0.625 GHz. The receiver
+  rejects it. What matters is that common mode radiates, and the ribbon to AERIS-10 starts here.
+  `LINK_RX_CLK` at J101 escapes the same way (one via outside the rows, one between them);
+  the other pairs were not checked.
+- **The fix would be the one noted in §9.4 for LINK.** Escape both legs the same way, with
+  the AC capacitors placed together. Both runs (odd and even) give the same conversion, as
+  reciprocity requires: a check on the model.
+
+![The other 3-D sub-models: BGA escape, J101 to the AC capacitors, two pairs side by side, common mode through the layer change](sim/rev05_3d.png)
+
 **What is still not simulated:**
 
-1. **The other 3-D sub-models.** Their S-parameters would replace the lumped sections of the
-   eye simulation:
-   - the BGA escape, with its 0.09 mm necks;
-   - the Hirose footprint;
-   - two parallel pairs, for real rather than 2-D crosstalk;
-   - the common mode through the layer change.
-
-   `layer_change.py` is the template. A cheaper first step is conductor and dielectric loss in
-   `lvds_eye.py`'s lines.
+1. **The 3-D sub-models' S-parameters inside the eye simulation.** `lvds_eye.py` still uses
+   lumped sections; the sub-models above say those were not hiding anything at 1 Gb/s. A cheaper
+   step first is conductor and dielectric loss in its lines.
 2. **What the RF budget above leaves out.**
    - The parts' tolerances, run through the filters as a Monte Carlo.
    - The baluns from their manufacturers' S-parameters, not as ideal.
