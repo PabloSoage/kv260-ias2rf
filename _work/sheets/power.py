@@ -159,7 +159,7 @@ for (u, vin_r, vout_r, gnd_pins, b), cx in zip(LDOS, (90.17, 250.19, 410.21)):
     for n in PROG:
         if n not in gnd_pins:
             s.no_connect(D.pin(n))
-    volts = {(7, 10): "0.8 + 0.2 + 0.8", (6, 10, 11): "0.8 + 0.1 + 0.8 + 1.6"}[tuple(gnd_pins)]
+    volts = {(7, 10): "0.8 + 0.2 + 0.8", (5, 7, 10): "0.8 + 0.05 + 0.2 + 0.8", (6, 10, 11): "0.8 + 0.1 + 0.8 + 1.6"}[tuple(gnd_pins)]
     s.text(f"{u} TPS7A8300: {vin_r} -> {vout_r} = {volts} V (ANY-OUT, Table 2).",
            (cx - 40.64, CYL + 30.48))
 

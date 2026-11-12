@@ -307,7 +307,7 @@ is the property §2.1 was built around.
 |---|---|
 | Pin map of J8 and the Pmod | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §3, §4 |
 | SOM-side mapping verified | ✅ against XTP682 |
-| `VCCO` and the link I/O standard | ✅ 1.2 V, `LVDS_12` with AC coupling |
+| `VCCO` and the link I/O standard | ✅ 1.2 V, AC coupling, `DIFF_SSTL12` on the Kria side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §6.3) |
 | Mechanical envelope | ✅ measured |
 | Power tree topology and regulator sizing | ✅ §1.1–1.3 |
 | Per-rail load figures | ⚠️ 16 of 25 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |

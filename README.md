@@ -111,31 +111,40 @@ BGA, for one).
 
 **Open before ordering** ([docs/LAYOUT.md §6.2–6.3](docs/LAYOUT.md)):
 
-1. **Ten of the 19 LVDS pairs are not coupled.** Since 12 Nov the board has 8 layers and nine pairs
+1. **The rest of the board, reviewed on 12 Nov** ([SIGNAL_INTEGRITY §9](docs/SIGNAL_INTEGRITY.md)).
+   - **Fixed.** The router had necked supply tracks and the bucks' switch nodes to 0.1 mm: 1.6 A
+     through 0.1 mm at U1001, and a 251 mV drop on the ADCs' +1V8_A. The supply tracks are now
+     widened (865 mm at ≥ 0.5 mm, against 119), and +1V8_A starts at 1.85 V to cover what is
+     left of the drop.
+   - **Still open.** Digital tracks run beside the SDR's filter and ADC-input nodes for 4–13 mm at
+     0.1–0.3 mm, and those differential analogue paths are long and unmatched (39–66 mm).
+2. **Ten of the 19 LVDS pairs are not coupled** (13 of 22 counting U401's three clock pairs,
+   SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
    run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
    two 50 Ω legs matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV).
    LINK_RX leaves bank 34, the only 2.5 V bank, in the BGA's south-east corner, and crosses every
    ADC pair to AC capacitors spread 9 mm apart; moving it to the bank's outer balls was tried on
    12 Nov and dropped (the corner has no room left for the vias). Coupling it would need the
    capacitors at J101 moved together first.
-2. **ADCR data to DCO skew, −90 to +5 ps** (was −177 to −28). DCO's legs are swapped at the FPGA
+3. **ADCR data to DCO skew, −90 to +5 ps** (was −177 to −28). DCO's legs are swapped at the FPGA
    (N14 = DCO_N, P14 = DCO_P) so the pair reaches the AD9484 the right way round without going
    round the chip: 39 mm instead of 51. **The gateware must invert that clock** (ISERDESE2
    `IS_CLK_INVERTED`, or capture on the other edge) ([CONTROL_SPEC §1](docs/CONTROL_SPEC.md)).
    The rest is inside IDELAYE2's range and calibrated per bit.
-3. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
+4. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
    ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $282.92 ($236.88 on 6 layers).
-4. **Confirm the Kria side's I/O standard in AMD's UG571.** INTERFACE_SPEC §6.1 takes `LVDS_12`
-   on the SOM's 1.2 V HP bank. Which differential receiver and driver an UltraScale+ HP bank
-   offers at a 1.2 V VCCO must be read there before any link gateware. The AC coupling leaves
-   room for fallbacks. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
+5. **The Kria side of the link is `DIFF_SSTL12`, not `LVDS_12`** (UG571 read on 12 Nov,
+   [INTERFACE_SPEC §6.3](docs/INTERFACE_SPEC.md)). No `LVDS_12` exists. `LVDS` at 1.2 V is
+   input-only with no internal termination. `DIFF_SSTL12` has on-die split termination
+   (`RTT_48`, about 96 Ω biased at 0.6 V) and drives through `RDRV_60_60`. No change to the board.
+   Still to confirm in DS925: its input threshold and the −2LV rate ceiling. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
    pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
    ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
-5. **Not simulated:** no 3-D full-wave model of the board, no noise or linearity budget of the RF
-   chains, no thermal model ([SIGNAL_INTEGRITY §6](docs/SIGNAL_INTEGRITY.md)). The first boards are
-   for evaluation.
-6. **The AERIS-10 end of the ribbon does not exist yet.**
-7. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
+6. **Not simulated:** no 3-D full-wave model of the board, no noise or linearity budget of the RF
+   chains, no thermal model ([SIGNAL_INTEGRITY §6](docs/SIGNAL_INTEGRITY.md); how each would be
+   done in §9.6). The first boards are for evaluation.
+7. **The AERIS-10 end of the ribbon does not exist yet.**
+8. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
 
 **Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), bare boards re-quoted on 8 layers on 12 Nov 2026): about **$2,070 for two

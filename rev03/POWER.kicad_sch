@@ -3804,9 +3804,31 @@
 		(at 105.41 274.32)
 		(uuid "7a55d01e-f3ba-5593-bca6-3ad04b9b8d92")
 	)
-	(no_connect
-		(at 78.74 280.67)
-		(uuid "b03ad73e-7b6e-5cb1-b574-07d8f2fc62f4")
+	(junction
+		(at 83.82 285.75)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b8eaa440-7822-4862-8d4a-2c11e1a1df9d")
+	)
+	(wire
+		(pts
+			(xy 78.74 280.67) (xy 78.74 285.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1d877d92-e895-45b2-b04c-d4f787cea968")
+	)
+	(wire
+		(pts
+			(xy 78.74 285.75) (xy 83.82 285.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "33035772-7941-461f-80d7-589cd95cc99b")
 	)
 	(no_connect
 		(at 81.28 280.67)
@@ -5733,7 +5755,7 @@
 		)
 		(uuid "f30cb550-24e2-5f29-b7c4-bb0f8350588d")
 	)
-	(text "U1005 TPS7A8300: +2V5 -> +1V8_A = 0.8 + 0.2 + 0.8 V (ANY-OUT, Table 2)."
+	(text "U1005 TPS7A8300: +2V5 -> +1V8_A = 0.8 + 0.05 + 0.2 + 0.8 V (ANY-OUT, Table 2)."
 		(exclude_from_sim no)
 		(at 49.53 294.64 0)
 		(effects

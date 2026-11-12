@@ -32,7 +32,7 @@ and 23/24 are left unconnected: the adapter takes no power from the connector (A
 | Decision | Evidence | Alternative |
 |---|---|---|
 | **Termination and bias for the FPGA-bound pairs at `+1V2`** | An AC-coupled LVDS input needs its common mode restored. The XC7A50T has only HR banks, and those have no internal bias for AC-coupled inputs, so it's external. 1.2 V is the LVDS common mode, and the rail already exists | A resistor divider from another rail |
-| **No parts for the Kria-bound pairs beyond the capacitors** | Their receiver is inside the SOM, in an HP bank, which has internal termination and bias (`DIFF_TERM_ADV`, `DQS_BIAS`). **To confirm** in AMD's UltraScale+ SelectIO guide (UG571), which isn't in the repository | Footprints for an external bias network, fitted only if needed |
+| **No parts for the Kria-bound pairs beyond the capacitors** | Their receiver is inside the SOM, in an HP bank at 1.2 V. UG571 (read 12 Nov, INTERFACE_SPEC §6.3): `LVDS` there would be input-only with no internal termination, but `DIFF_SSTL12` with `ODT = RTT_48` terminates the pair (about 96 Ω) and re-biases it at 0.6 V on the die. The Kria side drives `LINK_TX` as `DIFF_SSTL12` with `RDRV_60_60` | Footprints for an external bias network, fitted only if needed |
 | **The single-ended signals pass straight through** | `HK_SCL`/`HK_SDA` (14/22), `FPGA_PROG_B` (21) and `FPGA_IRQ` (15) are at the carrier's levels, **1.8 V, verified** in XTP682 (INTERFACE_SPEC §4.3). Translating them belongs next to the FPGA, on CONTROL. Pin 32, first given to FPGA_IRQ, is the carrier's 48 MHz camera clock and is left unconnected | — |
 
 ---
@@ -104,11 +104,11 @@ point.
 
 | Direction | Receiver | Delay line | Step | Points per 1 ns bit |
 |---|---|---|---|---|
-| `LINK_RX_*` (FPGA → Kria) | K26, HP bank | `IDELAYE3`, 512 taps, `TIME` mode | a few ps | hundreds |
+| `LINK_RX_*` (FPGA → Kria) | K26, HP bank | `IDELAYE3`, 512 taps, `TIME` mode, up to 1.1 ns | about 2 ps | about 500 |
 | `LINK_TX_*` (Kria → FPGA) | XC7A50T, HR bank | `IDELAYE2`, 32 taps, `IDELAYCTRL` at 200 MHz | 78 ps | about 13 |
 
 So the `LINK_TX` bathtub comes out much coarser than the `LINK_RX` one. Both ranges span more
-than one bit. The `IDELAYE3` step and range are **to confirm** in UG571.
+than one bit, `IDELAYE3`'s only just: 1.1 ns on UltraScale+ (UG571 Table 2-12).
 
 **What it cannot measure.**
 - **The eye's height.** The delay moves the data against the clock, but the receiver's threshold

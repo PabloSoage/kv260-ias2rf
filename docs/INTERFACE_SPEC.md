@@ -20,7 +20,7 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | KV260 mechanical envelope | ✅ `[V]` measured from the official 3D model (§5) |
 | Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks — §5.3 |
 | `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
-| Serial link electrical standard | ✅ AC coupling, `LVDS_12` assumed — see §6.1; the HP bank's standard at 1.2 V VCCO **to confirm in UG571** |
+| Serial link electrical standard | ✅ AC coupling; Kria side `DIFF_SSTL12` with on-die termination (UG571 read, §6.3). There is no `LVDS_12`. DS925 levels still to confirm |
 | Per-rail current budget | ⚠️ 18 of 24 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup and impedances | ✅ computed; fabricator to confirm |
 
@@ -297,7 +297,7 @@ to be at 1.2 V as well. **`VCCO_HPA` = 1.2 V** `[E, strongly supported]`.
 
 | Consequence | |
 |---|---|
-| The link runs **`LVDS_12`** | Not plain `LVDS`, which wants 1.8 V |
+| The Kria side of the link runs **`DIFF_SSTL12`** (§6.3) | Not `LVDS`: at 1.2 V it is input-only and without internal termination. (Until 12 Nov this said `LVDS_12`, a standard that does not exist) |
 | The ADC's ANSI LVDS output sits at 1.2 V common mode | Into a 1.2 V bank there is no headroom → **AC coupling and re-biasing are required** |
 | The Pmod is on a 3.3 V HD bank | So the single-ended control signals **do** need level translation |
 
@@ -312,6 +312,52 @@ Either read `VCCO_HPA` directly in the **K26 SOM datasheet (DS987)** pin table, 
 on an assembled board. Neither is urgent: the design that follows from 1.2 V also survives 1.8 V,
 because the AC coupling is stuffable.
 
+### 6.3 The link's I/O standard on the Kria side: what UG571 says (12 Nov)
+
+Read in AMD's *UltraScale Architecture SelectIO Resources*, UG571 v1.9. It covers the K26's HP
+banks.
+
+**There is no `LVDS_12`.** In an HP bank, `LVDS` is an output only at VCCO = 1.8 V
+(Table 1-77).
+
+**`LVDS` as an input at 1.2 V is allowed, under three conditions** (Table 1-77, note 1; LVDS
+section):
+- **No internal termination:** `DIFF_TERM_ADV = TERM_NONE`. The 100 Ω would have to be an
+  external resistor *"placed physically close to the device inputs"*. Those inputs are inside the
+  SOM, so this board cannot place it.
+- **The input levels meet the data sheet's VIN and VIDIFF**, which may need an external circuit
+  that both AC-couples and DC-biases the pins.
+- **Internal bias needs equalisation.** `DQS_BIAS = TRUE` is an internal bias for AC-coupled
+  `LVDS` inputs, and it requires `EQUALIZATION = EQ_LEVEL0`…`4`.
+
+**`DIFF_SSTL12` fits a 1.2 V bank.** It is an input and an output at VCCO = 1.2 V.
+- As an input it has an on-die split termination, `ODT = RTT_40 / RTT_48 / RTT_60`: two resistors
+  of 2R, one to VCCO and one to ground (*"Uncalibrated Input Termination"*). Each leg sees R to
+  0.6 V. `RTT_48` gives about 96 Ω across the pair and re-biases the AC-coupled pair at the same
+  time. Note 2 requires VCCO to be 1.2 V when ODT is used: here it is.
+- As an output its source impedance is set with `OUTPUT_IMPEDANCE = RDRV_40_40 / 48_48 / 60_60`.
+
+**The baseline from now on:**
+
+| Direction | Kria side | Level at the receiver, estimated | Change to this board |
+|---|---|---|---|
+| `LINK_RX_*` (FPGA → Kria) | `DIFF_SSTL12` input, `ODT = RTT_48` | The Artix-7's `LVDS_25` current (about 3.5 mA) into 96 Ω: about ±0.34 V | None: the capacitors stay, the SOM terminates and biases |
+| `LINK_TX_*` (Kria → FPGA) | `DIFF_SSTL12` output, `OUTPUT_IMPEDANCE = RDRV_60_60` | 1.2 V × 50 / (60 + 50) ≈ 0.55 V differential across R101–R104 | None |
+
+**On the transmit side, keep 60 Ω.** `RDRV_48_48` would give 0.61 V, above the 0.6 V maximum
+VIDIFF of the Artix-7's `LVDS_25` input. That 0.6 V is from memory, to confirm in DS181.
+
+**Two caveats.**
+- UG571 says SSTL12 *"should only interface with SSTL12"*. Receiving an LVDS driver with
+  `DIFF_SSTL12` is common practice, and AMD's answer record AR 66786 names it as the alternative.
+  Even so, it is outside the standard, and the bring-up test (IAS_LINK_SPEC §6) is what proves it.
+- DS925 could not be read here. Two things are still to confirm there: `DIFF_SSTL12`'s input
+  threshold, and the rate ceiling at the K26's −2LV grade. The eyes of `LINK_TX` are still to be
+  re-simulated with an SSTL12 driver in place of the LVDS model.
+
+**`IDELAYE3`** (UG571 Table 2-12): 512 taps; in `TIME` mode up to **1.1 ns** on UltraScale+,
+about 2 ps per tap. That is just over one 1 ns bit.
+
 ---
 
 ## 7. Exit criteria for phase 1
@@ -322,7 +368,7 @@ because the AC coupling is stuffable.
 | SOM-side mapping verified | ✅ §3.2, against XTP682 |
 | Clock pair on a clock-capable pin | ✅ §3.2, `HPA05_CC` |
 | Mechanical envelope measured | ✅ §5.1, §5.2 |
-| `VCCO` and the link's I/O standard | ✅ §6, 1.2 V / `LVDS_12` with AC coupling |
+| `VCCO` and the link's I/O standard | ✅ §6, 1.2 V; AC coupling, `DIFF_SSTL12` on the Kria side (§6.3) |
 | ADC/DAC operating points fixed | ✅ [ARCHITECTURE.md](../ARCHITECTURE.md) §5 |
 | Growth direction within the envelope | ✅ §5.3 — registered on the STEP; grow outward, off the carrier's side |
 | Per-rail current budget from datasheets | ⚠️ 18 of 24 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |

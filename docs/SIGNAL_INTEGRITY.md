@@ -350,6 +350,9 @@ simulation and the openEMS SMA launch. None of it replaces measuring a built boa
 - **Nothing is measured.** The first boards are for evaluation: the link's bring-up test is in
   IAS_LINK_SPEC §6, and its capacity and rate ceiling in §7.
 
+How each of these would be done is in §9.6. §9 also covers the rest of the board: the supply
+tracks, fixed on 12 Nov (§9.1), and what is still open there (§9.2–9.4).
+
 ## 7. Environment
 
 | | State |
@@ -456,7 +459,158 @@ Still open on the 8-layer board:
 - Supersedes in §6: the pairs are now partly coupled, and every layer change has a ground via
   within 3 mm.
 
-## 9. How it was checked
+## 9. The rest of the board (12 November, evening)
+
+Sections 2–8 cover what the review named: the RF band, the LVDS pairs and the FPGA's supplies.
+This pass looks at every other net, with three checks run on the board file:
+- **Current through each supply track.** Each track that every path from a rail's source to some
+  of its loads must cross is given those loads' current (the budget of POWER_AND_STACKUP §1.3–1.4).
+  The check reports its IPC-2221 temperature rise and the series drop.
+- **Other nets' copper beside analogue nets**, on the same layer, within 0.3 mm. Broadside coupling
+  to the next layer is not counted.
+- **Each net's routed length against its shortest tree.** In all, 11.5 m of track for 9.4 m of
+  minimum tree (×1.21), and 1,099 signal vias.
+
+### 9.1 Supply tracks necked to 0.1 mm (fixed 12 Nov)
+
+The router had necked supply tracks down to 0.1 mm wherever space was short. The `Power` netclass
+did not stop it, for two reasons:
+- **It sets the default width for new tracks, not a minimum.** The necks on the named rails were
+  legal.
+- **It does not cover the switch nodes or the input path.** `Net-(U100x-SW)`, `Net-(F1001-Pad1)`
+  and `Net-(Q1001-D)` have no name to match: the same gap the review found on the SMA legs.
+
+| Path | Current | Before | After |
+|---|---|---|---|
+| Input, J1001 → F1001 → Q1001 | 0.75 A | 0.1 mm, 8 mm (ΔT ≈ 32 °C) | 1.0 mm |
+| +12V, Q1001 → U1001 | 0.75 A | 0.3 mm, a 1.6 mm piece on L3 | 0.4–1.0 mm |
+| U1001's switch node → L1001 (+5V0) | 1.6 A | **0.1 mm, 8 mm (ΔT ≈ 180 °C)** | 0.4–1.0 mm; two 0.4 mm pieces at 0.2 mm by the pins |
+| U1002's switch node (+3V3_D) | 1.13 A | 0.1 mm, 6 mm | 0.15–1.0 mm; the narrow 2 mm next to the pins |
+| U1003 / U1004's switch nodes (+2V5, +1V0) | 0.6 / 0.7 A | 0.1 mm, 7–9 mm | 0.15–1.0 mm |
+| **+1V8_A, U1005 → FB502/FB602**: 75 mm, mostly on L3 (15 µm copper) | 0.5 A | 0.1 mm for 11 mm, then 0.3 mm: 0.50 Ω, **251 mV drop**, ΔT ≈ 240 °C on the narrow part | 1.0 mm for 99 mm, narrower only between vias and pads: **66 + 8 mV** |
+
+The ΔT figures are the IPC-2221 chart for a long track. A piece under a millimetre between wide
+copper runs cooler. Every `Power` track was widened where its clearances allowed (1.0, 0.8, 0.6 …
+0.15 mm, judged in 0.5 mm pieces):
+
+| `Power`-class track | Before | After |
+|---|---|---|
+| ≤ 0.15 mm | 365 mm | 161 mm |
+| ≥ 0.5 mm | 119 mm | 865 mm |
+| Total | 1,554 mm | 1,554 mm |
+
+L4, the supply plane layer, was left alone. DRC is 0 / 0 / 0 with schematic parity.
+
+**+1V8_A, the ADCs' AVDD, now starts at 1.85 V.** Its LDO sits 75 mm from the ADCs.
+- **The problem.** At the budget's 0.5 A the copper drops 74 mV and FB502's ferrite up to 30 mV
+  (DCR ≤ 0.1 Ω, ADC_RADAR_SPEC). From 1.8 V that leaves 1.69 V at the AD9484, under its 1.7 V
+  minimum. Before the widening it would have been about 1.5 V.
+- **The fix.** U1005's 50 mV ANY-OUT pin is now grounded (POWER sheet, `power_spec.py`):
+  0.8 + 0.05 + 0.2 + 0.8 = 1.85 V. The ADCs see about 1.74 V at full budget and 1.85 V unloaded,
+  both inside 1.7–1.9 V even with the LDO's 1 % tolerance.
+- **What else would work.** Moving U1005 next to the ADCs would remove the drop, at the cost of a
+  re-placement.
+
+### 9.2 Analogue nets beside digital ones (open)
+
+`xtalk.py` (§3.5) compares LVDS legs only. Against the analogue nets, the longest same-layer
+parallels within 0.3 mm are:
+
+| Victim | Aggressor | Layer | Parallel, gap |
+|---|---|---|---|
+| SDR DAC reconstruction filter, DAC2 (C834) | `DACS_D0` | L3 | 12.5 mm at 0.11 mm |
+| SDR DAC reconstruction filter, DAC1 (C814) | `+1V0` (a buck's output) | L1 | 13.5 mm at 0.20 mm |
+| SDR DAC reconstruction filter, DAC1 (C814) | `DACS_D4` | L8 | 4.0 mm at 0.10 mm |
+| SDR DAC reconstruction filter, DAC2 (C834) | `ADAR2_CS` | L3 | 4.1 mm at 0.10 mm |
+| SDR ADC input network (C605) | `CONV_SPI_SDIO` | L3 | 4.4 mm at 0.10 mm |
+| SDR ADC input network (C607) | `CLK_ADCS_P` | L1 | 4.0 mm at 0.15 mm |
+| Radar IF, between the two AD8352s (C508) | the external reference clock `Net-(U401-CLK0)` | L3 | 5.0 mm at 0.28 mm |
+| `IF_TX_B` | `FPGA_PROG_B` | L8 | 7.7 mm at 0.26 mm |
+
+**Why it matters.** A data bit beside a filter node couples its edges straight into the SDR's
+baseband. The DAC bus toggles at up to 125 MSPS, and the filter passes everything under 50 MHz.
+
+**The remedy.** Move those aggressors away, at least 3× the width and ideally behind a ground
+via. That is part of the re-route of §9.4.
+
+### 9.3 Long differential analogue paths (open)
+
+| Path | P / N | Vias |
+|---|---|---|
+| SDR DAC1 filter, between its two inductor sections (C814) | 57 / 66 mm | 8 / 6 |
+| SDR DAC2 filter (C834) | 39 / 62 mm | 4 / 6 |
+| SDR ADC driver → ADC (C605 / C606) | 45 / 32 mm | 4 / 4 |
+| Reference oscillator → U401 (Y401 CLK±) | 10.5 / 20.8 mm | 3 / 2 |
+
+- **The DAC filters.** At 0.4 nH/mm, 60 mm of 0.1 mm track is about 25 nH: a quarter of the
+  filter's own 107 nH coils. The legs also differ by 23 mm, about 160 ps, which unbalances the
+  balun's input.
+- **Y401's outputs.** They differ by 10 mm, about 70 ps on the master reference.
+
+These were routed as unrelated nets. The fix is to place the filter parts in two rows beside the
+DAC and route each pair together. Until then, simulate the filter with this copper before
+trusting its response (§9.6).
+
+The DAC buses are not matched either:
+- `DACS` data bits run 37–84 mm, with `IQSEL` at 104 mm;
+- `DACR` runs 34–51 mm.
+
+Those 48 mm are about 0.3 ns on an 8 ns period: inside the FPGA's output timing, set by
+constraints.
+
+### 9.4 Pairs not coupled: 13 of 22, counting the clocks
+
+§8 counts 19 data and link pairs, of which 10 are not coupled. Counting U401's three clock pairs
+as well, 13 of 22 are not coupled:
+
+| Pair | Coupled | Copper P / N | Vias P / N |
+|---|---|---|---|
+| `CLK_ADCS` | 0 % | 63 / 67 mm | 5 / 6 |
+| `CLK_FPGA` | 0 % | 85 / 71 mm | 2 / 5 |
+| `CLK_ADCR` | 36 % | 24 / 28 mm | 2 / 3 |
+| ADCS ×4, ADCR_D2, ADCR_D4 | 0–41 % | 27–43 mm | 2–5 |
+| LINK_RX_D0/D1, LINK_TX_D0/CLK | 0–2 % | 71–119 mm | 4–9 |
+
+**The order to re-route them in:**
+1. **The sampling clocks.** Common-mode noise on them becomes jitter.
+2. **The ADCS pairs.** The AD9253's P and N pins are adjacent, so the pair can leave the chip
+   together.
+3. **LINK.** It needs its AC capacitors at J101 placed together first. It gains least: its eyes
+   are already within 1–52 mV of ideal.
+
+The tool is the one that re-routed ADCR_DCO (from 0 to 89 % coupled), driving KiCad's own
+push-and-shove router. What coupling buys is common-mode rejection and less crosstalk, not
+millivolts of eye.
+
+### 9.5 Supply balls without their own via
+
+Unchanged: 11 of 69 (§6). Both ways were tried on every ball, and four of them are on rails with
+no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63 mΩ against
+120). A further gain needs the BGA's escape redone by hand.
+
+### 9.6 What has not been simulated, and how it would be
+
+1. **3-D full-wave.** The whole board is out of reach of FDTD: 0.1 mm features over 100 mm. Four
+   sub-models in openEMS give the parts that matter, and their S-parameters go into the eye
+   simulation in place of the lumped sections:
+   - the BGA escape and its via;
+   - a layer change with its return via;
+   - the Hirose footprint;
+   - two parallel pairs, for real rather than 2-D crosstalk.
+
+   A cheaper first step is to add conductor and dielectric loss to `lvds_eye.py`'s lines.
+2. **The RF chains in cascade.** Per channel:
+   - gain, noise figure (Friis), IP3 and the ADC's full scale, giving the dynamic range from the
+     data-sheet figures;
+   - the anti-alias and reconstruction filters in ngspice, with this copper (§9.3) and the parts'
+     tolerances;
+   - the baluns from their manufacturers' S-parameters.
+3. **Thermal.**
+   - First, a table: each part's dissipation and junction rise from its package's θJA.
+   - Then a 2-D conduction map of the board: the real copper per layer and natural convection, for
+     the regulator corner and the ADCs.
+
+## 10. How it was checked
 
 The checks were scripts run on the board file, none by hand: a KiCad-style plane fill, the
 connectivity graph of each net, the field solver, ngspice and openEMS (built from source in WSL).
