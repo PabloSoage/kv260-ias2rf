@@ -38878,4 +38878,193 @@
 		)
 		(uuid "405f24ee-4394-4be8-bb8c-c097b031cca3")
 	)
+	(symbol
+		(lib_id "Device:R")
+		(at 152.40 508.00 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "080fd0f0-ea25-45d4-8893-d1dddfa7b3ac")
+		(property "Reference" "R105"
+			(at 154.94 504.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100"
+			(at 154.94 511.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 152.40 508.00 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.40 508.00 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 152.40 508.00 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "937b0f90-062d-4231-b4df-1ccf915b771b")
+		)
+		(pin "2"
+			(uuid "81ed157e-6826-4bb6-9acd-7addd72e1f4a")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R105")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "LINK_TX_D0_P"
+		(at 152.40 504.19 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e3f859fa-e564-4cda-8093-05e94d5ce4fe")
+	)
+	(label "LINK_TX_D0_N"
+		(at 152.40 511.81 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "be422caa-f75e-4024-a956-ad8b678e30d8")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 165.10 508.00 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "61aaab6c-9f45-4a03-ba76-2eb479695d87")
+		(property "Reference" "R106"
+			(at 167.64 504.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100"
+			(at 167.64 511.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 165.10 508.00 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 165.10 508.00 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 165.10 508.00 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "58582ee9-9580-4287-b39f-50fb470472f6")
+		)
+		(pin "2"
+			(uuid "43525e0d-cd0e-4ae8-a7a5-b91f52050f67")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R106")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "LINK_TX_CLK_P"
+		(at 165.10 504.19 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fd663217-e439-4db0-ae51-ef6bb3791d7d")
+	)
+	(label "LINK_TX_CLK_N"
+		(at 165.10 511.81 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8b4c9325-df2a-4719-bc91-ea5d254351cc")
+	)
+	(text "LINK_TX termination at the receiver (bottom face, on the ball vias)"
+		(exclude_from_sim no)
+		(at 149.86 497.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fb258c71-26fd-4c5b-b90e-fccdfd6ba6e6")
+	)
 )

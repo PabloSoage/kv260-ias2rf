@@ -11,3 +11,15 @@
 (rule "RF50 ESD compensation sections"
 	(condition "A.NetClass == 'RF50' && A.Type == 'Track' && A.Width < 0.12mm")
 	(constraint clearance (min 0.24mm)))
+
+# LVDS pairs are routed coupled since the 8-layer board: 0.10 mm legs 0.15 mm apart (100 ohm on
+# L3/L6), necked to 0.09 / 0.12 mm under the FPGA (98.5 ohm), which passes between two vias at 1 mm
+# pitch. The two legs of a pair keep that gap; inside the FPGA's courtyard the pair keeps 0.1 mm to
+# everything else, as the BGA's own fan-out does. Both orders (A, B) are written out: KiCad takes
+# the larger of the two, so a rule on A alone leaves the other item's netclass in charge.
+(rule "LVDS coupled legs"
+	(condition "A.NetClass == 'LVDS100' && A.isCoupledDiffPair() && B.NetClass == 'LVDS100' && B.isCoupledDiffPair()")
+	(constraint clearance (min 0.1mm)))
+(rule "LVDS escape under the FPGA"
+	(condition "(A.NetClass == 'LVDS100' && A.intersectsCourtyard('U1101')) || (B.NetClass == 'LVDS100' && B.intersectsCourtyard('U1101'))")
+	(constraint clearance (min 0.1mm)))

@@ -36,8 +36,8 @@ signal chains:
 | | |
 |---|---|
 | Size | 119 × 132 mm. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
-| Stackup | 6 layers, JLCPCB JLC06161H-2116A: signal, GND, signal, split power, GND, signal ([POWER_AND_STACKUP](docs/POWER_AND_STACKUP.md)) |
-| Parts | 479, on one face |
+| Stackup | 8 layers, JLCPCB JLC08161H-2116C: signal, GND, signal, split power, GND, signal, GND, signal ([LAYOUT §3](docs/LAYOUT.md); 6 layers until 12 Nov, [compared in EIGHT_LAYERS](docs/EIGHT_LAYERS.md)) |
+| Parts | 499: the top face, plus 20 on the bottom face under the FPGA (LVDS terminations and VCCINT caps) |
 | Front-end FPGA | Xilinx XC7A50T-2FTG256I (the same part as AERIS-10) with a 128 Mb QSPI flash, plus JTAG |
 | Radar ADC | AD9484, 8 bit, 400 MSPS, driven by two cascaded AD8352s |
 | SDR ADC | AD9253, 14 bit, two channels at 62.5 MSPS (one LVDS lane each) |
@@ -74,7 +74,7 @@ BGA, for one).
 ## Schematics and layout
 
 - **[Schematic, all 10 sheets (PDF)](docs/CSI2-KRIA-KV260_Rev03_schematic.pdf)**
-- **[Layout, the six copper layers and both silkscreens (PDF)](docs/CSI2-KRIA-KV260_Rev03_layout.pdf)**
+- **[Layout, the eight copper layers and both silkscreens (PDF)](docs/CSI2-KRIA-KV260_Rev03_layout.pdf)**
 - KiCad 10 sources: [`CSI2-KRIA-KV260_Rev01.kicad_pro`](CSI2-KRIA-KV260_Rev01.kicad_pro), the root
   schematic and [`rev03/`](rev03/) (the nine sheets), the board
   [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and the project's own
@@ -103,34 +103,27 @@ BGA, for one).
 | Check | Result |
 |---|---|
 | ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
-| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** (11 Nov, after the RF/high-speed review) |
+| DRC, zones refilled | **0 violations, 0 unrouted connections, 0 schematic-parity problems** (12 Nov, on 8 layers) |
 | Signal and power integrity | Reviewed on 11 Nov ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): RF band rebuilt, SMA launch simulated in openEMS (return loss 39 dB at 500 MHz, 30.6 dB at 1 GHz, with the ESD diode), LVDS legs at 50 Ω with simulated eyes, VCCINT's plane and decoupling fixed, four caps on the bottom face under the BGA (target met to 100 MHz); ESD protection on every SMA, the Pmod and JTAG, return vias, exposed-pad vias and an edge fence |
 | Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
 **Open before ordering** ([docs/LAYOUT.md §6.2–6.3](docs/LAYOUT.md)):
 
-1. **LVDS pairs run as two separate tracks** (loosely coupled) rather than as coupled pairs. Since
-   11 Nov each leg is 50 Ω where the room allows, so the pairs are about 100 Ω and the simulated
-   eye matches an ideal pair's ([SIGNAL_INTEGRITY.md §3](docs/SIGNAL_INTEGRITY.md)); a pair-routed
-   board would still reject common-mode noise better. The skew (every pair at 1 Gb/s within
-   42 ps) and the termination stubs were fixed on 10 Nov, and the trace widths agree with
-   JLCPCB's calculator within 1–3 % ([FABRICATION.md](docs/FABRICATION.md)).
-2. **What the review left as compromises** ([SIGNAL_INTEGRITY.md §6](docs/SIGNAL_INTEGRITY.md)):
-   11 of the FPGA's 69 supply balls have no via of their own (seven reach their plane through a
-   neighbour's via, four are on rails fed by tracks); legs of different LVDS pairs run side by
-   side for 98 mm in the escape between the FPGA and the ADCs (7 % crosstalk on the worst leg);
-   one LVDS layer change has its nearest ground via 3.1 mm away, the rest within 3 mm. The skew figures include the FPGA's
-   package delays since 11 Nov (Vivado's per-ball flight times; [SIGNAL_INTEGRITY.md §3.4](docs/SIGNAL_INTEGRITY.md)).
-3. **Order the 2116A stack explicitly** (JLC06161H-2116A): the widths are solved for it. JLCPCB's
-   calculator lists the cheaper JLC06161H-3313 first, whose L1–L2 prepreg is thinner (0.099 mm
-   against 0.116 mm); on that stack the 183 µm RF lines would sit at about 45 Ω instead of 50 Ω
-   ([FABRICATION.md](docs/FABRICATION.md)).
+1. **Ten of the 19 LVDS pairs are not coupled.** Since 12 Nov the board has 8 layers and nine pairs
+   run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
+   two 50 Ω legs matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV).
+   LINK_RX leaves the FPGA's south rows and crosses every ADC pair; a pin swap putting it on
+   north-side balls would let those pairs couple.
+2. **ADCR data to DCO skew, −28 to −177 ps.** DCO runs 51 mm against 27–44 mm for the data: 7 % of
+   the 2.5 ns bit at 400 MSPS, inside IDELAYE2's range and calibrated per bit.
+3. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
+   ([FABRICATION.md](docs/FABRICATION.md)). The 8-layer bare board has not been quoted yet.
 4. **The AERIS-10 end of the ribbon does not exist yet.**
 5. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
 
-**Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), 10 Nov 2026): about **$2,030 for two
+**Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), 10 Nov 2026, quoted on 6 layers): about **$2,030 for two
 assembled boards** and $4,190 for five, three quarters of it parts. Seven parts are out of stock at
 LCSC today (the ADCs, the RF switches, the clock buffer, the DAC, a balun and the drivers): JLCPCB's
 global sourcing or consigned parts cover them.
@@ -146,10 +139,11 @@ global sourcing or consigned parts cover them.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Master document for this board: the Rev03 architecture and BOM |
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The five blockers, closed, with evidence and sources, plus the open risks |
 | [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | Pin map for J8 and the Pmod, the mechanical envelope, the adapter registered on the KV260 model |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | Per-rail current budget and the 6-layer stackup with computed trace widths |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | Per-rail current budget and the original 6-layer stackup with computed trace widths |
 | [docs/SYMBOLS.md](docs/SYMBOLS.md) | The project's symbols, each from its datasheet, cross-checked against a second source where one exists |
 | Sheet specifications | One per schematic sheet, in the table above: every value and where it comes from |
 | [docs/LAYOUT.md](docs/LAYOUT.md) | The board: outline, stackup, rules, the split power layer, placement, routing and the LVDS review |
+| [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md) | The 8-layer board against the 6-layer one: stacks, every check side by side, eyes, skew, PDN, SMA, and what the same corrections would give on 6 layers |
 | [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review of 11 Nov: impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
 | [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026): boards, assembly fees and every part with its LCSC link and price. About $2,030 for two assembled boards, $4,190 for five |
@@ -213,7 +207,31 @@ adapter board.** If that is what you want, use the original project.
 
 ## Simulation results
 
-From the RF/high-speed review of 11 November 2026; the method, the other plots and what is still a
+### 6 layers against 8 layers (12 November)
+
+The same scripts run on the board on 6 layers and on 8 layers; the full comparison, with every plot,
+is in [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md).
+
+| Check | 6 layers | 8 layers |
+|---|---|---|
+| Pairs routed coupled | 0 of 19 | 9 of 19 |
+| Worst intra-pair \|P−N\| | 84 ps | 9 ps |
+| Eye lost to routing (routed − ideal) | mean −22 mV, worst −113 mV | mean −8 mV, worst −52 mV |
+| Zero-crossing spread added | mean 5 ps, worst 29 ps | mean 1 ps, worst 10 ps |
+| Layer changes with no GND via within 3 mm | 1 of 186 | 0 of 89 |
+| Other pairs' legs within 0.25 mm | 97.6 mm | 69.3 mm |
+| Signal tracks on L4 under the BGA | 64 segments | 3 (supply stubs) |
+| DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV |
+| ADCR data − DCO | −88 … −23 ps | −177 … −28 ps (worse; IDELAY absorbs it) |
+| PDN, SMA launch | — | unchanged |
+
+![Folded eyes: ideal, 6 layers, 8 layers](docs/sim/rev04_eyes.png)
+
+![Eye penalty per pair](docs/sim/rev04_eye_penalty.png)
+
+### The 6-layer review (11 November)
+
+The rest of this section is the 6-layer board, from the RF/high-speed review of 11 November 2026; the method, the other plots and what is still a
 compromise are in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md). Raw data (CSV) next to
 each figure in [docs/sim/](docs/sim/).
 

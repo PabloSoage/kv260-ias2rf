@@ -4,7 +4,7 @@ Check the planes after any change to the routing (19 Oct 2026): no supply or sig
 may run on the GND planes (L2, L5), and signal tracks on L4 under the BGA cut the
 +3V3_D background there.
 
-Prints a dict: (layer, net) -> segments for every non-GND segment on In1/In4 (must be
+Prints a dict: (layer, net) -> segments for every non-GND segment on In1/In4/In6 (must be
 empty), and 'L4-BGA' -> signal segments on In3 with an end inside the BGA box.
 
 Usage:  py _work/layout/planechk.py board.kicad_pcb
@@ -31,7 +31,7 @@ out = Counter()
 for m in SEG.finditer(open(sys.argv[1], encoding="utf-8").read()):
     x0, y0, x1, y1 = map(float, m.group(1, 2, 3, 4))
     layer, net = m.group(5, 6)
-    if layer in ("In1.Cu", "In4.Cu") and net != "GND":
+    if layer in ("In1.Cu", "In4.Cu", "In6.Cu") and net != "GND":
         out[(layer, net)] += 1
     elif layer == "In3.Cu" and not supply(net) and (inside(x0, y0) or inside(x1, y1)):
         out["L4-BGA"] += 1
