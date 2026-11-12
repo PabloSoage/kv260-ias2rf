@@ -918,7 +918,10 @@ The runs below are after those fixes; each energy trace decays to −40 dB.
 - **For the eye, the footprint is clean.** Reflection stays under −25 dB to 1.25 GHz.
 - **It is the link's largest source of common mode.** The legs' different routes turn about 9 %
   of the differential wave into common mode at 1.25 GHz, and 5 % at 0.625 GHz. The receiver
-  rejects it. What matters is that common mode radiates, and the ribbon to AERIS-10 starts here.
+  rejects it. J101 mates board to board with the KV260's IAS1 socket, so no cable starts here:
+  the common mode crosses the connector into the carrier's 2–3 cm of track and can radiate
+  little. (An earlier version of this line said the AERIS-10 ribbon starts here. It does not:
+  that is J1103.)
   `LINK_RX_CLK` at J101 escapes the same way (one via outside the rows, one between them);
   the other pairs were not checked.
 - **The fix would be the one noted in §9.4 for LINK.** Escape both legs the same way, with
