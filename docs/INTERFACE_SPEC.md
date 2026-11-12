@@ -20,7 +20,7 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | KV260 mechanical envelope | ✅ `[V]` measured from the official 3D model (§5) |
 | Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks — §5.3 |
 | `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
-| Serial link electrical standard | ✅ `LVDS_12` with AC coupling — see §6.1 |
+| Serial link electrical standard | ✅ AC coupling, `LVDS_12` assumed — see §6.1; the HP bank's standard at 1.2 V VCCO **to confirm in UG571** |
 | Per-rail current budget | ⚠️ 18 of 24 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup and impedances | ✅ computed; fabricator to confirm |
 

@@ -135,3 +135,61 @@ PRBS7; `lvds_skew.py` for the skew).
 - **The centres.** The data − clock skew moves each lane's centre. On the Kria side,
   `LINK_RX_D0`'s floor should sit about 56 ps (95 − 39) away from `LINK_RX_D1`'s, give or take
   each receiver's own input delay. That is a direct check of the routed lengths.
+
+---
+
+## 7. Bandwidth: what the five pairs carry, and how fast they can go
+
+*Added 12 November 2026.*
+
+**Five pairs at 1 Gb/s are not 5 Gb/s of data.** Two of the five pairs are the forwarded clocks,
+one per direction, and carry no data. One data pair runs the other way.
+
+| Pair | Direction | Carries | Raw rate |
+|---|---|---|---|
+| `LINK_RX_D0` | FPGA → Kria | data | 1 Gb/s |
+| `LINK_RX_D1` | FPGA → Kria | data | 1 Gb/s |
+| `LINK_RX_CLK` | FPGA → Kria | the 500 MHz DDR clock for the two above | — |
+| `LINK_TX_D0` | Kria → FPGA | data | 1 Gb/s |
+| `LINK_TX_CLK` | Kria → FPGA | its clock | — |
+
+That makes 2 Gb/s towards the Kria and 1 Gb/s back.
+
+**Payload after line coding.** The link is AC-coupled (C101–C106), so the stream must be DC-balanced:
+either 8b/10b, or a scrambler with 64b/66b framing.
+
+| Direction | Raw | 8b/10b (80 %) | 64b/66b (97 %) | Needed | Margin, 8b/10b / 64b/66b |
+|---|---|---|---|---|---|
+| FPGA → Kria | 2 Gb/s | 1.6 Gb/s | 1.94 Gb/s | radar DDC ÷16, one channel, 0.8 Gb/s + two SDR channels of 16-bit I/Q at 3.9 MSPS, 0.25 Gb/s = **1.05 Gb/s** | ~35 % / ~45 % |
+| Kria → FPGA | 1 Gb/s | 0.8 Gb/s | 0.97 Gb/s | beam tables, TX baseband, control | — |
+
+Two radar channels at ÷16 (1.6 Gb/s) would leave no margin under 8b/10b, and 18 % under 64b/66b
+(ARCHITECTURE §3.2).
+
+**How fast the pairs can go.** These pins are SelectIO, not transceivers: the K26's GTH lanes do not
+reach any KV260 connector (BLOCKERS_AND_RISKS, item 3). The silicon sets the ceiling, about
+**1.25 Gb/s** per pair for the Artix-7 −2 HR banks (DS181) and about **1.6 Gb/s** for the
+UltraScale+ HP banks in native mode (DS925). Both figures are **to confirm** in those data sheets.
+Several Gb/s per pair is out of reach on this connector.
+
+The board as routed, simulated at higher rates (`lvds_eye.py`, PRBS7; eye opening, routed / an
+ideal 100 Ω pair of the same length):
+
+| Rate per pair | `LINK_RX_D0` | `LINK_RX_D1` | `LINK_TX_D0` |
+|---|---|---|---|
+| 1.0 Gb/s | 457 / 509 mV | 372 / 385 mV | 665 / 674 mV |
+| 1.25 Gb/s | 576 / 581 mV | 491 / 524 mV | 401 / 401 mV |
+| 1.6 Gb/s | 271 / 225 mV | **44 / 48 mV** | 324 / 328 mV |
+| 2.5 Gb/s | 0 / 0 | 0 / 0 | 0 / 0 |
+
+The routed pair follows the ideal one at every rate. What closes the eye is the LVDS driver's edges
+and the receiver's input capacitance, not the copper. The opening also varies non-monotonically
+with rate, because the reflections of the 2 pF inputs land at different points of the bit. So
+**the routing holds at 1.25 Gb/s, which is also the silicon's ceiling**. At 1.6 Gb/s `LINK_RX_D1` is
+nearly closed, even in the ideal case.
+
+**If more is ever needed:**
+- run the pairs at 1.25 Gb/s: 2.5 Gb/s raw towards the Kria, 2.4 Gb/s of payload under 64b/66b;
+- add J9, the KV260's 15-pin camera connector: two more data pairs and a clock, on another cable
+  (R-04 in ARCHITECTURE §4.1);
+- reduce what crosses the link: decimate further on the Artix-7.
