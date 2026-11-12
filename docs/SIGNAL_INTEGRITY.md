@@ -776,17 +776,44 @@ solved, not estimated.
 These levels take the 49.9 Ω loads in parallel with the balun's 100 Ω, the balun's 0.4 dB and the
 switch's 0.6 dB (ADT2-1T+, M3SWA2-34DR+). The filter's passband ripple, 0 to −2 dB, comes on top.
 
+**3-D full-wave: the layer change (12 Nov), `layer_change.py`.** This is the first of the
+sub-models. In openEMS, an LVDS pair goes from L1 to L6 the way the board's pairs do:
+- the L1 microstrip pair (0.117 / 0.15 mm, 100 Ω) jogs out to two through vias (0.45 / 0.2 mm,
+  0.75 mm apart);
+- it goes on as the L6 stripline pair (0.10 / 0.15 mm);
+- each plane has a 0.85 mm antipad round each via, and FR-4 loss is included.
+
+Both ports are driven in odd mode, so the result is the differential S-parameters. Four cases,
+3.5 minutes each on the workstation's CPU:
+
+| Differential | No ground via | 2 ground vias | 4 ground vias | 2, and no via stub below L6 |
+|---|---|---|---|---|
+| Sdd11 at 0.625 / 1.25 GHz | −35.5 / −29.6 dB | −36.0 / −30.1 | −36.4 / −30.4 | −34.5 / −28.7 |
+| Sdd11 at 2.5 / 4 GHz | −23.7 / −19.8 | −24.0 / −19.8 | −24.2 / −19.8 | −23.2 / −20.2 |
+| Sdd21 at 1.25 GHz (18 mm of line included) | −0.15 dB | −0.15 | −0.15 | −0.15 |
+
+- **For the differential signal, the layer change does no harm.** Reflection stays under −29 dB
+  up to 1.25 GHz, the Nyquist of a 2.5 Gb/s lane, more than twice the link's 1 Gb/s. The lumped sections of
+  `lvds_eye.py` were not hiding anything here.
+- **Return vias barely matter for the differential mode.** Each leg's return current flows in
+  its partner's via. The ground vias do matter for the common mode and for what leaks into the
+  plane cavity: that is the crosstalk and EMI side, not the eye.
+- **The 0.3 mm stub below L6 is negligible** at these rates: under 1 dB of Sdd11 either way, up to
+  4 GHz.
+
+![LVDS pair changing layer, four via arrangements](sim/rev05_layer_change.png)
+
 **What is still not simulated:**
 
-1. **3-D full-wave.** The whole board is out of reach of FDTD: 0.1 mm features over 100 mm. Four
-   sub-models in openEMS give the parts that matter, and their S-parameters go into the eye
-   simulation in place of the lumped sections:
-   - the BGA escape and its via;
-   - a layer change with its return via;
+1. **The other 3-D sub-models.** Their S-parameters would replace the lumped sections of the
+   eye simulation:
+   - the BGA escape, with its 0.09 mm necks;
    - the Hirose footprint;
-   - two parallel pairs, for real rather than 2-D crosstalk.
+   - two parallel pairs, for real rather than 2-D crosstalk;
+   - the common mode through the layer change.
 
-   A cheaper first step is to add conductor and dielectric loss to `lvds_eye.py`'s lines.
+   `layer_change.py` is the template. A cheaper first step is conductor and dielectric loss in
+   `lvds_eye.py`'s lines.
 2. **What the RF budget above leaves out.**
    - The parts' tolerances, run through the filters as a Monte Carlo.
    - The baluns from their manufacturers' S-parameters, not as ideal.
