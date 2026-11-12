@@ -127,27 +127,40 @@ ngspice, PRBS7 at 1 Gb/s, LVDS current driver (3.5 mA, 300 ps edges), 100 Ω acr
 solver, the mismatched sections put together at the receiver end (ordered by Z0; sections under
 3 mm lumped). Re-run on the final board of 11 Nov (with the ESD parts); differences from the first
 run are within 15 mV and 10 ps.
-Three cases per pair: an ideal 100 Ω pair of the same length, the legs at 0.117 mm (10 Nov), the
-legs as now.
+Three cases per pair: an ideal 100 Ω pair of the same length and termination, the board on 6 layers
+(11 Nov) and on 8 layers (12 Nov, §8).
 
-![LINK_RX_D1 eye](sim/eye_LINK_RX_D1_1G.png)
+![LVDS eyes: ideal, 6 and 8 layers](sim/rev04_eyes.png)
 
-| Pair (P leg) | Zero-crossing spread: ideal / 0.117 mm / **now** | Eye opening: ideal / 0.117 mm / **now** |
+| Pair | 6 layers: ideal / routed | 8 layers: ideal / routed |
 |---|---|---|
-| LINK_RX_D1 (144 mm, the longest) | 75 / 102 / **77 ps** | 575 / 547 / **559 mV** |
-| LINK_RX_D0 (126 mm) | 36 / 67 / **33 ps** | 603 / 607 / **569 mV** |
-| LINK_RX_CLK (118 mm) | 12 / 54 / **14 ps** | 548 / 625 / **516 mV** |
-| ADCS_FCO (63 mm) | 48 / 51 / **40 ps** | 643 / 641 / **650 mV** |
-| CLK_ADCS (63 mm) | 13 / 13 / **11 ps** | 619 / 668 / **630 mV** |
+| ADCR_D0 | 600 / 583 mV, 29 / 25 ps | 634 / 632 mV, 16 / 16 ps |
+| ADCR_D1 | 515 / 484 mV, 14 / 15 ps | 474 / 473 mV, 19 / 19 ps |
+| ADCR_D2 | 594 / 481 mV, 27 / 56 ps | 465 / 463 mV, 23 / 23 ps |
+| ADCR_D3 | 531 / 526 mV, 62 / 53 ps | 464 / 463 mV, 23 / 23 ps |
+| ADCR_D4 | 542 / 557 mV, 34 / 54 ps | 633 / 607 mV, 19 / 17 ps |
+| ADCR_D5 | 458 / 446 mV, 54 / 71 ps | 505 / 505 mV, 16 / 16 ps |
+| ADCR_D6 | 540 / 513 mV, 20 / 41 ps | 471 / 500 mV, 22 / 25 ps |
+| ADCR_D7 | 633 / 609 mV, 18 / 18 ps | 471 / 466 mV, 16 / 17 ps |
+| ADCR_DCO | 626 / 581 mV, 24 / 35 ps | 609 / 610 mV, 17 / 18 ps |
+| ADCR_OR | 450 / 465 mV, 69 / 85 ps | 647 / 646 mV, 19 / 18 ps |
+| ADCS_D0 | 581 / 564 mV, 41 / 51 ps | 618 / 614 mV, 22 / 25 ps |
+| ADCS_D1 | 589 / 533 mV, 53 / 39 ps | 625 / 607 mV, 16 / 15 ps |
+| ADCS_DCO | 597 / 602 mV, 40 / 35 ps | 632 / 609 mV, 18 / 20 ps |
+| ADCS_FCO | 648 / 650 mV, 49 / 46 ps | 628 / 617 mV, 17 / 17 ps |
+| FPGA_CLK | 448 / 446 mV, 16 / 17 ps | 517 / 499 mV, 29 / 29 ps |
+| LINK_RX_CLK | 548 / 516 mV, 12 / 14 ps | 395 / 392 mV, 10 / 10 ps |
+| LINK_RX_D0 | 607 / 559 mV, 35 / 30 ps | 509 / 457 mV, 25 / 31 ps |
+| LINK_RX_D1 | 575 / 559 mV, 75 / 77 ps | 385 / 372 mV, 41 / 51 ps |
+| LINK_TX_CLK | 661 / 635 mV, 63 / 69 ps | 642 / 643 mV, 63 / 63 ps |
+| LINK_TX_D0 | 664 / 653 mV, 65 / 68 ps | 674 / 665 mV, 64 / 62 ps |
 
-On the long link pairs the narrow legs doubled the edge spread (the reflections off a 59 Ω leg
-into a 100 Ω load come back on the next edges); widened, they match the ideal pair. On the 63 mm
-ADC pairs it makes no difference worth the name. The narrow legs show a slightly larger opening
-because the same 3.5 mA into a higher impedance gives more volts; the opening is in every case
-five times the receiver's ±100 mV threshold. The spread includes each pair's own P−N delay (from
-the copper by layer here; `lvds_skew.py`'s pin-to-pin figures are in §3.4). At 1.25 Gb/s (the
-Artix-7's LVDS ceiling) LINK_RX_D1 opens 378 mV; at 1.5 Gb/s 208 mV, still above threshold. Each
-pair's figure is in [`docs/sim/`](sim/), the numbers in `lvds_eye.csv`.
+*Eye opening at the centre of the bit, then zero-crossing spread; each board against the ideal line of its own pair length and termination.*
+
+The ideal line differs between the two boards because the pair lengths and the termination point
+changed (on 8 layers every termination sits on the FPGA's ball vias). The opening is in every case
+several times the receiver's ±100 mV threshold. For LINK_RX the model ends at the AC capacitors,
+so those eyes are indicative only. The numbers are in [`docs/sim/`](sim/) (`lvds_eye.csv`).
 
 **On the rate.** IAS1 carries five pairs, but two are source-synchronous clocks: three data lanes
 at up to 1 Gb/s each (two to the Kria, one back; INTERFACE_SPEC §3). What signal integrity sees is

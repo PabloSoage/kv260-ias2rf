@@ -1,6 +1,6 @@
 # KV260-IAS2RF — an RF front-end carrier for the AMD Kria KV260
 
-**Status (10 November 2026): schematic and layout complete. The board is fully routed, with zero
+**Status (12 November 2026): schematic and layout complete, on 8 layers. The board is fully routed, with zero
 DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
 been validated.** A few review items remain before an order (see [Status](#status)).
 
@@ -104,7 +104,7 @@ BGA, for one).
 |---|---|
 | ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
 | DRC, zones refilled | **0 violations, 0 unrouted connections, 0 schematic-parity problems** (12 Nov, on 8 layers) |
-| Signal and power integrity | Reviewed on 11 Nov ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): RF band rebuilt, SMA launch simulated in openEMS (return loss 39 dB at 500 MHz, 30.6 dB at 1 GHz, with the ESD diode), LVDS legs at 50 Ω with simulated eyes, VCCINT's plane and decoupling fixed, four caps on the bottom face under the BGA (target met to 100 MHz); ESD protection on every SMA, the Pmod and JTAG, return vias, exposed-pad vias and an edge fence |
+| Signal and power integrity | Reviewed on 11 Nov and re-run on 8 layers on 12 Nov, ideal / 6 / 8 layers side by side ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md), [SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch in openEMS (S11 −30.9 dB at 1 GHz with the ESD diode), LVDS eyes within 1–26 mV of ideal except LINK_RX_D0 (−52 mV), worst intra-pair skew 9 ps, VCCINT under its target to 100 MHz with four caps under the BGA; ESD protection on every SMA, the Pmod and JTAG, a GND via within 3 mm of every LVDS layer change, exposed-pad vias and an edge fence |
 | Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
@@ -144,7 +144,7 @@ global sourcing or consigned parts cover them.
 | Sheet specifications | One per schematic sheet, in the table above: every value and where it comes from |
 | [docs/LAYOUT.md](docs/LAYOUT.md) | The board: outline, stackup, rules, the split power layer, placement, routing and the LVDS review |
 | [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md) | The 8-layer board against the 6-layer one: stacks, every check side by side, eyes, skew, PDN, SMA, and what the same corrections would give on 6 layers |
-| [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review of 11 Nov: impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
+| [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review (11 Nov) and the 8-layer re-run (12 Nov, §8): impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
 | [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026): boards, assembly fees and every part with its LCSC link and price. About $2,030 for two assembled boards, $4,190 for five |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
@@ -207,10 +207,10 @@ adapter board.** If that is what you want, use the original project.
 
 ## Simulation results
 
-### 6 layers against 8 layers (12 November)
-
-The same scripts run on the board on 6 layers and on 8 layers; the full comparison, with every plot,
-is in [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md).
+Every figure compares three cases: an **ideal** line, the board on **6 layers** (JLC06161H-2116A,
+11 November 2026) and on **8 layers** (JLC08161H-2116C, the board in this repository), all run
+through the same scripts. The full comparison is in [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md),
+the method in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md).
 
 | Check | 6 layers | 8 layers |
 |---|---|---|
@@ -221,54 +221,43 @@ is in [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md).
 | Layer changes with no GND via within 3 mm | 1 of 186 | 0 of 89 |
 | Other pairs' legs within 0.25 mm | 97.6 mm | 69.3 mm |
 | Signal tracks on L4 under the BGA | 64 segments | 3 (supply stubs) |
-| DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV |
 | ADCR data − DCO | −88 … −23 ps | −177 … −28 ps (worse; IDELAY absorbs it) |
-| PDN, SMA launch | — | unchanged |
+| VCCINT impedance, max in band / at 100 MHz (target 120 mΩ) | 51 / 61 mΩ | 41 / 63 mΩ |
+| DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV |
+| SMA launch S11 at 1 / 3 GHz, with the ESD diode | −30.6 / −13.5 dB | −30.9 / −13.7 dB |
+
+**LVDS eyes** (ngspice, PRBS7 at 1 Gb/s, each leg's copper by layer and width). The ideal line
+depends on each board's pair length and termination, so each board is shown against its own ideal.
+
+| Pair | 6 layers: ideal / routed | 8 layers: ideal / routed |
+|---|---|---|
+| LINK_RX_D1 | 575 / 559 mV, 75 / 77 ps | 385 / 372 mV, 41 / 51 ps |
+| LINK_RX_D0 | 607 / 559 mV, 35 / 30 ps | 509 / 457 mV, 25 / 31 ps |
+| LINK_RX_CLK | 548 / 516 mV, 12 / 14 ps | 395 / 392 mV, 10 / 10 ps |
+| ADCS_FCO | 648 / 650 mV, 49 / 46 ps | 628 / 617 mV, 17 / 17 ps |
+| ADCR_DCO | 626 / 581 mV, 24 / 35 ps | 609 / 610 mV, 17 / 18 ps |
+
+Eye opening at the centre of the bit, then zero-crossing spread. The LINK_RX eyes end at the AC
+capacitors, not at the Kria's receiver, so they are indicative only; the opening is in every case
+several times the receiver's ±100 mV threshold.
 
 ![Folded eyes: ideal, 6 layers, 8 layers](docs/sim/rev04_eyes.png)
 
 ![Eye penalty per pair](docs/sim/rev04_eye_penalty.png)
 
-### The 6-layer review (11 November)
+**Intra-pair skew**, ball to pad, with the FPGA's package delay.
 
-The rest of this section is the 6-layer board, from the RF/high-speed review of 11 November 2026; the method, the other plots and what is still a
-compromise are in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md). Raw data (CSV) next to
-each figure in [docs/sim/](docs/sim/).
+![Intra-pair skew](docs/sim/rev04_skew.png)
 
-**Edge SMA launch** (openEMS FDTD, stack 2116A). Clearing L2–L4 under the SMA's signal pad turns a
-13.5 dB return loss at 1 GHz into 24.4 dB. The ESD diode (0.4 pF, 2.15 mm from the pad) is tuned
-out by 0.1 mm line sections either side of it: −39 dB at 500 MHz, the top of the band used
-(shaded), and better than 20 dB to 2 GHz. The grey curve is a bare 50 Ω line with no connector: the
-simulation's own floor, not a target a connector can reach. Above 2 GHz the diode's capacitance
-shows; nothing on this board runs there.
-Data: [sma_plain.csv](docs/sim/sma_plain.csv), [sma_cutout.csv](docs/sim/sma_cutout.csv),
-[sma_tvs.csv](docs/sim/sma_tvs.csv), [sma_tvsn08_14.csv](docs/sim/sma_tvsn08_14.csv) (on the board),
-[sma_line.csv](docs/sim/sma_line.csv).
+**Power distribution** seen from the XC7A50T's balls. The L4/L5 plane pair keeps its spacing, so
+the impedance barely moves.
 
-![SMA launch](docs/sim/sma_launch.png)
+![PDN impedance](docs/sim/rev04_pdn.png)
 
-**FPGA core supply impedance** at the XC7A50T's VCCINT balls, from the board's copper. Under its
-120 mΩ target over the whole sweep now (51 mΩ at most in UG483's 100 kHz–10 MHz, 61 mΩ at 100 MHz),
-with four 0.47 µF caps on the bottom face under the BGA; before, over it from 26 MHz.
-Data: [pdn_1V0.csv](docs/sim/pdn_1V0.csv); the other rails:
-[+1V8_D](docs/sim/pdn_1V8_D.png), [+2V5](docs/sim/pdn_2V5.png), [+3V3_D](docs/sim/pdn_3V3_D.png).
+**Edge SMA launch** (openEMS FDTD) with its ESD diode. The outer prepreg is the same on both
+stacks, and so is the launch.
 
-![VCCINT impedance](docs/sim/pdn_1V0.png)
-
-**LVDS eyes** (ngspice, PRBS7 at 1 Gb/s, each leg's copper by layer and width). Left to right: an
-ideal 100 Ω pair, the legs as routed on 10 Nov (0.117 mm, 59 Ω), the legs widened to 50 Ω.
-Data: [lvds_eye.csv](docs/sim/lvds_eye.csv).
-
-![LINK_RX_D1 eye](docs/sim/eye_LINK_RX_D1_1G.png)
-![LINK_RX_CLK eye](docs/sim/eye_LINK_RX_CLK_1G.png)
-
-| Pair | Edge spread: ideal / 10 Nov / now | Eye opening now |
-|---|---|---|
-| LINK_RX_D1 (144 mm) | 75 / 102 / 77 ps | 559 mV |
-| LINK_RX_D0 (126 mm) | 36 / 67 / 33 ps | 569 mV |
-| LINK_RX_CLK (118 mm) | 12 / 54 / 14 ps | 516 mV |
-| ADCS_FCO (63 mm) | 48 / 51 / 40 ps | 650 mV |
-| CLK_ADCS (63 mm) | 13 / 13 / 11 ps | 630 mV |
+![SMA launch](docs/sim/rev04_sma.png)
 
 ---
 
