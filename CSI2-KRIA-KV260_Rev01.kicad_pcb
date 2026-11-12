@@ -8,10 +8,10 @@
 	)
 	(paper "A3")
 	(title_block
-		(title "KV260-IAS2RF Rev03")
-		(rev "03")
+		(title "KV260-IAS2RF Rev04")
+		(rev "04")
 		(company "KV260-IAS2RF")
-		(comment 1 "Placement by _work/layout/build_board.py - first pass, to be refined by hand")
+		(comment 1 "8 layers, JLCPCB JLC08161H-2116C")
 	)
 	(layers
 		(0 "F.Cu" signal "L1 SIG")

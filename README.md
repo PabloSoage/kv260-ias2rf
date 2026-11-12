@@ -73,13 +73,14 @@ BGA, for one).
 
 ## Schematics and layout
 
-- **[Schematic, all 10 sheets (PDF)](docs/CSI2-KRIA-KV260_Rev03_schematic.pdf)**
-- **[Layout, the eight copper layers and both silkscreens (PDF)](docs/CSI2-KRIA-KV260_Rev03_layout.pdf)**
+- **[Schematic, all 10 sheets (PDF)](docs/CSI2-KRIA-KV260_Rev04_schematic.pdf)**
+- **[Layout, the eight copper layers and both silkscreens (PDF)](docs/CSI2-KRIA-KV260_Rev04_layout.pdf)**
 - KiCad 10 sources: [`CSI2-KRIA-KV260_Rev01.kicad_pro`](CSI2-KRIA-KV260_Rev01.kicad_pro), the root
   schematic and [`rev03/`](rev03/) (the nine sheets), the board
   [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and the project's own
   symbols and footprints in [`symbols/`](symbols/) and [`footprints/`](footprints/). The file names
-  keep the Rev01 name of the board they started from; the contents are Rev03.
+  keep the Rev01 name of the board they started from, and the sheets sit in `rev03/` where they
+  were drawn; the contents are Rev04 (the 8-layer board, 12 Nov 2026).
 
 | Sheet | Contents | Specification |
 |---|---|---|

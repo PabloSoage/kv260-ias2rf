@@ -5,8 +5,8 @@
 	(uuid "56c49378-41a8-4cbc-b1f4-3d0ea65d2366")
 	(paper "A2")
 	(title_block
-		(title "KV260-IAS2RF Rev03 - root: sheet hierarchy")
-		(rev "03")
+		(title "KV260-IAS2RF Rev04 - root: sheet hierarchy")
+		(rev "04")
 		(company "KV260-IAS2RF")
 		(comment 1 "Derived from the Allied Vision CSI-2 adapter for Kria KV260 (MIT), see README")
 	)
