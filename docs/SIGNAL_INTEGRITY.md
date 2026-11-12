@@ -596,14 +596,15 @@ The DAC buses are not matched either:
 Those 48 mm are about 0.3 ns on an 8 ns period: inside the FPGA's output timing, set by
 constraints.
 
-### 9.4 Pairs not coupled: 13 of 22, counting the clocks
+### 9.4 Pairs not coupled: 12 of 22, counting the clocks
 
-§8 counts 19 data and link pairs, of which 10 are not coupled. Counting U401's three clock pairs
-as well, 13 of 22 are not coupled:
+§8 counts 19 data and link pairs, of which 10 are not coupled. U401 drives three clock pairs as
+well. Of those, `CLK_ADCS` was coupled on 12 Nov, so 12 of the 22 are still not coupled:
 
 | Pair | Coupled | Copper P / N | Vias P / N |
 |---|---|---|---|
-| `CLK_ADCS` | 0 % | 63 / 67 mm | 5 / 6 |
+| `CLK_ADCS`, before 12 Nov | 0 % | 63 / 67 mm | 5 / 6 |
+| `CLK_ADCS`, now (below) | **74 / 80 %** | 56 / 52 mm of track | 2 / 3 |
 | `CLK_FPGA` | 0 % | 85 / 71 mm | 2 / 5 |
 | `CLK_ADCR` | 36 % | 24 / 28 mm | 2 / 3 |
 | ADCS ×4, ADCR_D2, ADCR_D4 | 0–41 % | 27–43 mm | 2–5 |
@@ -620,19 +621,37 @@ The tool is the one that re-routed ADCR_DCO (from 0 to 89 % coupled), driving Ki
 push-and-shove router. What coupling buys is common-mode rejection and less crosstalk, not
 millivolts of eye.
 
-**Tried on 12 Nov, on `CLK_ADCS`, and stopped before changing the board:**
-- **The middle has room.** The legs run 63 and 67 mm, P on L1 and N on L8. An A\* search finds a
-  pair corridor on L6 (In5) of 36.5 mm from C416/C417 to above the AD9253, and there is room for
-  the pair's vias at (188.0, 165.95) and (189.5, 165.8).
-- **The ends do not.**
-  - KiCad's router will not start from C416/C417's vias, which sit in the pads.
-  - At the AD9253 the clock pins are boxed in by C670 and two supply vias. The router went round
-    them for that reason, and a straight descent shorts four nets.
+**`CLK_ADCS`, re-routed on 12 Nov: now coupled.** It runs on L6 (In5) as a 100 Ω pair, 0.10 mm
+legs with a 0.15 mm gap, from vias in C416/C417's pads to vias in the termination R642's pads.
 
-  Coupling it needs C670 moved first.
+| `CLK_ADCS` | Before | Now |
+|---|---|---|
+| Layers | P on L1, N on L8, apart | both on L6 for 42 mm, then 4–11 mm to the pins |
+| Coupled (partner within 0.4 mm on the same layer) | 0 / 1 % | **74 / 80 %** (41.7 mm) |
+| Track P / N | 54.0 / 52.7 mm | 56.2 / 51.5 mm |
+| Other nets within 0.3 mm on the same layer | 7 nets, 5.0 mm (closest 0.15 mm) | 2 nets, 1.1 mm (closest 0.23 mm) |
 
-`CLK_FPGA` is the same case: its series resistors R1115/R1116 sit 12 mm apart, and its bias
-resistors R1117/R1118 sit apart too. Both need re-placing before the pair can couple.
+- **How it was done.** KiCad's PNS router could not start from a via in a pad. The diff-pair
+  router of KiCadRoutingTools could, once the pair had two ends: the AD9253's pins were taken off
+  the nets for the routing and put back after. Then the router added the short legs from R642 to
+  the pins (`--keep-input-copper`), on layers other than L6.
+- **What is left.** P's leg from R642 to pin 6 goes round C670 and C671 on L1: 11.5 mm against
+  N's 4.6 mm. The 4.7 mm difference is about 30 ps. At a 62.5 MHz clock with 1 ns edges that
+  moves the crossing by about 15 ps, a fixed offset and not jitter. Moving C670 would shorten it,
+  but the pins have no room for it in a 0.5 mm pitch corner already full of supply vias.
+- **Checks.** DRC 0/0/0 with parity. No other net changed.
+
+**`CLK_FPGA`, tried on 12 Nov and left as it was.** Its series resistors R1115/R1116 sit 12 mm
+apart, and its bias resistors R1117/R1118 sit apart too.
+- **Routed with the resistors where they are**, the same router coupled only 10 mm. The legs then
+  differed by 15 mm (about 100 ps), against 3 mm now. That is worse, so it was not kept.
+- **Re-placing them** needs room for four 0402s together east of the BGA, close to balls N11/N12,
+  because the pad's shunt resistors should sit near the receiver. A search of both sides found
+  only one free column, a single 0402 wide (x ≈ 168, y 135–141 on L1), and scattered single
+  spots on L8.
+- **It is the next re-placement to do by hand in KiCad.** Put R1115–R1118 in two rows of two at
+  x ≈ 167–169. Then re-route `CONTROL/FPGA_CLK_*` from the balls and `CLK_FPGA_*` from C418/C419
+  as pairs.
 
 ### 9.5 Supply balls without their own via
 
@@ -681,6 +700,37 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
   airflow.
 
 ![Board temperature](sim/rev05_thermal.png)
+
+**With cooling (12 Nov).** `thermal2d.py --sink` adds one heatsink, a node of Rsa °C/W to ambient,
+pressed onto each listed part's top through θJC(top) and a gap pad (3 W/m·K, 0.5 mm). Each of
+those parts' heat then splits between the board (through θJB) and the sink, and its junction is
+solved, not estimated.
+- **Fan only.** h = 25 W/m²K per face, roughly 1–2 m/s across the board.
+- **Passive sink.** One finned plate about the board's size, Rsa = 3 °C/W in still air.
+- **Active sink.** The same plate with a 40 mm fan: Rsa = 0.8 °C/W, and h = 25 on the board.
+- **Contacts.** The FPGA 4.8 °C/W (UG475 θJC 4.24 plus the pad). The ADCLK948 27, and the AD9484
+  and AD9253 18 each (an assumed QFN top θJC of 15–20 plus the pad). The regulators 30–40.
+
+| Hottest junction, at 25 °C ambient (and at 70 °C) | Still air | Fan only | Passive sink, 4 ICs | Passive sink, ICs + regulators | Sink + fan, ICs + regulators |
+|---|---|---|---|---|---|
+| Board, max / mean | 73 / 51 °C | 54 / 35 | 63 / 41 | 49 / 38 | 40 / 30 |
+| Hottest part | ADCLK948 82 (127) | ADCLK948 62 (107) | LMR33630 75 (120) | Si549 53 (98) | Si549 45 (90) |
+| ADCLK948 | 82 (127) | 62 (107) | 50 (95) | 51 (96) | 43 (88) |
+| XC7A50T | 62 (107) | 45 (90) | 37 (82) | 38 (83) | 31 (76) |
+| AD9484 / AD9253 | 68 / 65 | 50 / 47 | 43 / 41 | 45 / 42 | 36 / 34 |
+| LMR33630 | 79 (124) | 61 (106) | 75 (120) | 52 (97) | 44 (89) |
+
+![Board temperature for five ways of cooling it](sim/rev05_cooling.png)
+
+- **Airflow alone halves every rise.** At 70 °C it brings the FPGA to 90 °C, inside its limit.
+  The board under the clock buffer still reaches about 99 °C.
+- **A sink on the four ICs alone leaves the power corner hot.** The buck then becomes the hottest
+  part. The sink has to touch the regulators too: the LMR33630, and the two TPS7A8300 and
+  TPS562201 that dissipate most.
+- **Sink plus fan keeps everything under 90 °C at 70 °C ambient.** It takes 3.3 of the 6.9 W.
+  Every board temperature is then under 85 °C, the parts' rating, with margin.
+- **Not modelled.** The contacts' tops are estimates; the ADI data sheets give no θJC(top). The
+  sink is taken as isothermal. Heat into the KV260 is not counted, which errs on the hot side.
 
 **RF budget (12 Nov), `cascade.py`.** Noise is followed as voltage density node by node:
 - the source and its 64.9 Ω termination;

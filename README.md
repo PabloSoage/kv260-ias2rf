@@ -122,8 +122,9 @@ BGA, for one).
      cut-off and nothing in the passband.
    - **Thermal.** 6.9 W on 134 cm² in still air: +26 °C mean and +48 °C at the clock buffer. Fine
      on the bench. A vehicle install needs airflow or a path to the enclosure.
-2. **Ten of the 19 LVDS pairs are not coupled** (13 of 22 counting U401's three clock pairs,
-   SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
+2. **Ten of the 19 LVDS pairs are not coupled** (12 of 22 counting U401's three clock pairs:
+   `CLK_ADCS` was re-routed as a coupled pair on 12 Nov, `CLK_FPGA` needs its four resistors
+   re-placed first; SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
    run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
    two 50 Ω legs matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV).
    LINK_RX leaves bank 34, the only 2.5 V bank, in the BGA's south-east corner, and crosses every
@@ -152,7 +153,8 @@ BGA, for one).
    - **Transmit levels** and **the DAC filters with their copper.**
    - **The board's thermal map**, with junctions for every part that has data. At 25 °C in still
      air, the hottest junction is the ADCLK948 at 82 °C and the FPGA is at 62 °C. A vehicle
-     needs airflow.
+     needs airflow: a heatsink on the ICs and the regulators, with a fan, keeps every junction
+     under 90 °C at 70 °C ambient.
 
    The first boards are for evaluation.
 7. **The AERIS-10 end of the ribbon does not exist yet.**
@@ -309,6 +311,12 @@ convection from both faces, and the power budget's 6.9 W
 ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
 
 ![Board temperature](docs/sim/rev05_thermal.png)
+
+**Five ways of cooling it**, on one colour scale: still air, a fan, a passive heatsink on the four
+main ICs, the same with the regulators, and heatsink plus fan
+([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
+
+![Board temperature for five ways of cooling it](docs/sim/rev05_cooling.png)
 
 ---
 
