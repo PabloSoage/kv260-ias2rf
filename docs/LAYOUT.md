@@ -4,7 +4,7 @@
 from the schematic's netlist; placement refined and L4 drawn the same day*
 
 The Rev03 board exists. It has:
-- the outline and the 6-layer stackup;
+- the outline and the 8-layer stackup (6 layers until 12 November 2026, §6.5);
 - design rules and net classes;
 - the two ground planes and the split power layer;
 - **every one of the 479 parts with its nets**, linked to its symbol (472 until the housekeeping
@@ -16,7 +16,10 @@ The Rev03 board exists. It has:
 The LVDS skew and termination stubs were reviewed and fixed, and the trace widths confirmed in
 JLCPCB's calculator, on 10 November (§6.2–6.3). **On 11 November an RF/high-speed review** rebuilt the
 RF band, widened the LVDS legs to 50 Ω, fixed VCCINT's plane and decoupling, and added return
-vias, exposed-pad vias and an edge fence (§6.4, [SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY.md)).
+vias, exposed-pad vias and an edge fence (§6.4, [SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY.md)). **On 12 November
+it moved to 8 layers** (JLC08161H-2116C): two inner signal layers, L4 for power only, the LVDS pairs
+re-routed (9 of 19 as coupled 100 Ω pairs, the rest as matched 50 Ω legs), their terminations moved
+under the FPGA's balls on the bottom face, and LINK_TX terminated at its receiver (§6.5).
 
 The original Allied Vision board is kept, untouched, as
 `_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
@@ -60,41 +63,43 @@ All five holes are plated and on GND. H3–H5, the three fiducials FID1–FID3 a
 
 ## 3. Stackup and rules
 
-The stackup is **JLCPCB's JLC06161H-2116A**: 6 layers, 1.556 mm. It has the shape of
-POWER_AND_STACKUP §2.1, and the reasons it was chosen are in §2.6.
+The stackup is **JLCPCB's JLC08161H-2116C**: 8 layers, 1.54 mm (6 layers, JLC06161H-2116A, until
+12 November 2026: §6.5). Same outer prepreg as before, so the outer 50 Ω width stands.
 
 | Layer | Use | Dielectric below |
 |---|---|---|
-| L1 F.Cu | SIG: IAS pairs, converter LVDS, IF lines | 2116 prepreg 0.1164 mm, Er 4.16 |
-| L2 In1.Cu | **GND plane** (zone drawn, to fill in KiCad) | core 0.130, Er 4.17 |
-| L3 In2.Cu | SIG | 2116 + core 0.70 + 2116, 0.933 mm (one layer in KiCad, Er 4.44 weighted) |
-| L4 In3.Cu | **PWR, split** (zones drawn, §3.1) | core 0.130, Er 4.17 |
-| L5 In4.Cu | **GND plane** (zone drawn) | 2116 prepreg 0.1164, Er 4.16 |
-| L6 B.Cu | SIG, slow | — |
+| L1 F.Cu | SIG: RF lines, fan-outs, part of the LVDS | 2116 prepreg 0.1194 mm, Er 4.29 |
+| L2 In1.Cu | **GND plane** | core 0.130, Er 4.17 |
+| L3 In2.Cu | SIG: LVDS pairs (LINK, ADCR), slow nets | 2116 + 1080 + 2116 prepreg 0.3658, Er 4.29 |
+| L4 In3.Cu | **PWR, split** (§3.1); no signal tracks | core 0.130, Er 4.17 |
+| L5 In4.Cu | **GND plane** (new) | prepreg 0.3658, Er 4.29 |
+| L6 In5.Cu | SIG: LVDS pairs (ADCR, ADCS, LINK_RX_CLK), between two GND planes | core 0.130, Er 4.17 |
+| L7 In6.Cu | **GND plane** | 2116 prepreg 0.1194, Er 4.29 |
+| L8 B.Cu | SIG: slow nets, the 100 Ω terminations under the FPGA, VCCINT caps | — |
 
-The rules in the project file are for a standard 6-layer process, with a 0.2 mm drill for fanning
+The rules in the project file are for a standard 8-layer process, with a 0.2 mm drill for fanning
 out the 1.0 mm-pitch BGA:
 
 | Rule | Value |
 |---|---|
-| Track / clearance | 0.10 mm minimum; Default class 0.15 mm track, **0.10 mm clearance** |
+| Track / clearance | 0.09 mm minimum (the LVDS necks under the FPGA); Default class 0.15 mm track, **0.10 mm clearance** |
 | Via | 0.45 mm pad, 0.2 mm drill |
 | Copper to edge | 0.3 mm |
-| Zones on L2, L4, L5 | 0.15 mm clearance (0.3 before 11 Nov: no copper was left between BGA vias at 1 mm pitch); L4 kept 1 mm in from the edge |
-| Custom rule (`CSI2-KRIA-KV260_Rev01.kicad_dru`) | An RF50 track under 0.18 mm (the 0.15 mm neck at a 0.5 mm-pitch pin) keeps the default clearance |
+| Zones on L2, L4, L5, L7 | 0.15 mm clearance; L4 kept 1 mm in from the edge |
+| Custom rules (`CSI2-KRIA-KV260_Rev01.kicad_dru`) | An RF50 track under 0.18 mm (the 0.15 mm neck at a 0.5 mm-pitch pin) keeps the default clearance; the ESD tuning sections keep 0.24 mm; an LVDS pair's two legs keep 0.10 mm to each other, and inside the FPGA's courtyard an LVDS track keeps 0.10 mm to everything but supply copper (the Power class's 0.15 mm holds: KiCad takes the larger of the two items' rules, so the rules are written for both orders) |
 
 | Net class | Track | Applies to (patterns in the project file) |
 |---|---|---|
-| **LVDS100** | 0.117 mm, gap 0.150 mm (100 Ω differential on L1). The legs as routed run apart, so they were widened to 50 Ω each on 11 Nov: 0.183 mm on L1/L6, 0.175 mm on L3/L4 (§6.4) | Link pairs, ADC data and clock pairs, `CLK_ADC*`, `CLK_FPGA`, `FPGA_CLK` |
-| **RF50** | 0.183 mm (50 Ω on L1), 0.2 mm clearance | `IF_RX_*`, `IF_TX_*`, and since 11 Nov the auto-named switch/SMA nets `Net-(J4*-In)`, `Net-(J9*-In)`, `Net-(U90*-RFOUT*)` and U401's `CLK0`/`Q3` |
-| **Power** | 0.4 mm | Every rail, VIN and switch nodes |
+| **LVDS100** | Coupled: 0.10 mm, gap 0.15 mm (100.2 Ω on L3/L6), necked to 0.09 / 0.12 mm under the FPGA (98.5 Ω); on L1 0.117 / 0.15. Legs that run apart are 50 Ω each: 0.151 mm on L3/L6, 0.183 mm on L1/L8 | Link pairs, ADC data and clock pairs, `CLK_ADC*`, `CLK_FPGA`, `FPGA_CLK` |
+| **RF50** | 0.183 mm (50.4 Ω on L1), 0.2 mm clearance | `IF_RX_*`, `IF_TX_*`, the auto-named switch/SMA nets `Net-(J4*-In)`, `Net-(J9*-In)`, `Net-(U90*-RFOUT*)` and U401's `CLK0`/`Q3` |
+| **Power** | 0.4 mm, 0.15 mm clearance | Every rail, VIN and switch nodes |
 | Default | 0.15 mm (0.10 mm in the dense areas), 0.10 mm clearance | The rest |
 
 The impedance widths come from a field solver run on this stack, solder mask included
-(`_work/field_solver.py`, POWER_AND_STACKUP §2.6). It agrees with exact references within 1–2.4 %.
-JLCPCB's impedance calculator, run on 10 Nov 2026 with stack 2116A, agrees within 1–3 %
-([FABRICATION.md](FABRICATION.md)); order that stack explicitly, since the default 3313 would put
-the 183 µm RF lines at about 45 Ω.
+(`_work/field_solver8.py`; `_work/field_solver.py` for the 6-layer stack and the solver's checks
+against exact references, within 1–2.4 %). Order stack JLC08161H-2116C explicitly
+([FABRICATION.md](FABRICATION.md)): 2116A and 2116B were looked at and dropped (the field solver's
+docstring says why).
 
 ### 3.1 L4, the power layer
 
@@ -110,12 +115,14 @@ rail's pads so they follow the placement:
 | **+5V_IFR, +5V_IFS** | Around each pair of AD8352 drivers | The drivers' supplies |
 | **+1V8_ADCR_A/D, +1V8_ADCS_A/D** | Around each ADC | Their analogue and digital supplies, kept apart |
 
-Where two islands overlap, the smaller wins. **Everything else is routed as tracks**: +1V8_D, +2V5,
+Where two islands overlap, the smaller wins. **Everything else is routed as tracks**: +1V8_D, +2V5 (a
+0.5 mm trunk where it fits, since 12 Nov),
 +3V3_A, +1V8_A, +12V, −3V3, +1V2 and the XADC supply. They are either low current or have too few
 pins in one place for a plane to be worth it.
 
-- **L3 references L2**, 0.2 mm away, far more than L4, 0.8 mm away. So the splits on L4 matter
-  little to L3's signals. Anything impedance-controlled stays on L1 anyway (POWER_AND_STACKUP §2.3).
+- **L3 references L2**, 0.13 mm away, far more than L4, 0.37 mm away, so the splits on L4 matter
+  little to L3's signals. **L6 sits between L5 and L7**, both ground. Since 12 Nov L4 carries no
+  signal track, only a few supply stubs.
 - The islands are fed by their pads' vias since the routing (§6).
 
 ---
@@ -244,11 +251,11 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 | | |
 |---|---|
 | Result | **0 DRC errors, 0 unrouted connections, 0 schematic-parity problems** (zones refilled); re-checked after the review of 11 Nov (§6.4) |
-| Copper | 13.3 m of track (11 Nov): L1 5.2 m, L3 3.6 m, L6 3.8 m, L4 0.7 m. Mostly 0.10 mm; the supplies 0.30 mm; the RF lines 0.183 mm and most LVDS legs 0.175–0.183 mm (50 Ω) |
-| Vias | 2,222 through vias since 11 Nov (1,483 before), 0.45 mm on a 0.20 mm drill; 924 are ground (return vias, the RF band fence, the edge fence, exposed pads). 543 sit in pads and are filled and capped (FABRICATION.md) |
-| L2, L5 | Ground only: no other net has a track there (`_work/layout/planechk.py`) |
-| L4 | Tracks only on the +3V3_D background; every other island carries a tracks-only keep-out ("In3 islands: no tracks"), so the islands stay whole. 51 signal segments on L4 have an end under the BGA (45 before the skew fixes of §6.3); the refilled planes still reach every pin |
-| LVDS | Every pair is routed as two single tracks, not as a coupled pair (loosely coupled); since 11 Nov each leg is 50 Ω where the room allows (§6.4); skew and stubs are reviewed in §6.3 |
+| Copper | 12.5 m of track (12 Nov): L1 4.9 m, L3 3.3 m, L6 1.2 m, L8 3.0 m, L4 0.1 m (supply stubs). Mostly 0.10 mm; the supplies 0.30 mm (+2V5 up to 0.5); the RF lines 0.183 mm; LVDS as §3 |
+| Vias | 2,089 through vias, 0.45 mm on a 0.20 mm drill; 993 are ground (return vias, the RF band fence, the edge fence, exposed pads). About 590 sit in pads and are filled and capped (FABRICATION.md) |
+| L2, L5, L7 | Ground only (`_work/layout/planechk.py`) |
+| L4 | No signal tracks since 12 Nov; three supply stubs under the BGA |
+| LVDS | 9 of 19 pairs coupled end to end (0.10/0.15 mm on L3/L6), ADCR_D4 for 41 %; the others as two 50 Ω legs matched to ±5 ps. Every pair's 100 Ω termination sits on its two ball vias on the bottom face (§6.5) |
 
 ### 6.2 What is left
 
@@ -257,7 +264,8 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
    R1113) moved next to the FPGA, where their pairs pass, and R514 turned round, so no leg at
    1 Gb/s has a stub over 27 ps. What is left is in §6.3 and is tolerable.
 2. **No supply track on L2 or L5** after any further routing: check with `_work/layout/planechk.py`.
-3. **The LVDS pairs.** Re-route the ADC data pairs as pairs, on L1, over unbroken L2.
+3. **The LVDS pairs: re-routed as pairs on 12 Nov (§6.5).** Ten pairs could not be coupled; a
+   pin swap putting LINK_RX on the FPGA's north balls would let the link pairs couple.
 4. **No dangling copper** after any rip-up: the DRC's `track_dangling` and `via_dangling` at zero.
 5. **Check the planes** after a refill: every L4 island fed by vias, L2 unbroken under the pairs,
    and the tracks on L4 (the +3V3_D background only) not cutting off any +3V3_D via.
@@ -368,3 +376,20 @@ The full record, with the simulations, is [SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY
 | PDN | Zone clearance 0.3 → 0.15 mm on L2/L4/L5; the +1V0 island joined to its corridor and extended under its caps; five vias in L1030's pad; four 0.47 µF (C1184–C1187) on the bottom face under the BGA, on ball vias; VCCINT under its target to 100 MHz (over it from 26 MHz before; `SIGNAL_INTEGRITY.md` §4.3) |
 | Pads and edge | Via grids in every exposed pad (LMR33630, TPS7A8300 ×3, AD8352 ×4, ADCs, ADCLK948); a 176-via ground fence round the edge; L4 pulled back 1 mm from the edge |
 | ESD | PESD5V0F1BL (D961–D970, D401, D402) on the SMA lines 2.15 mm from each SMA pad, ground pad on its own via, tuned out by 0.1 mm line sections either side (0.76 mm before, 1.4 mm after; openEMS −39 dB at 500 MHz); TPD4E05U06DQAR arrays U1108/U1109 above the Pmod and U1110 beside JTAG, GND vias butted to their ground pins (SIGNAL_INTEGRITY §7.1) |
+
+### 6.5 Eight layers (12 Nov)
+
+The board moved from JLC06161H-2116A to JLC08161H-2116C and the LVDS were redone. The full
+comparison with the 6-layer board, with the simulations, is SIGNAL_INTEGRITY §8. What changed:
+
+| Area | Change |
+|---|---|
+| Stack | L5 GND and L6 SIG added; the old L4's signal tracks moved to L6; SMA launch cut-outs extended to L2–L6, so the pad references L7 at the same depth as it referenced L5 |
+| Terminations | R1101–R1114 and the new R105/R106 on the bottom face, each 0402 straddling its pair's two ball vias (via in pad): no stub between the termination and the receiver |
+| LINK_TX | Terminated at the FPGA by R105/R106 (100 Ω); R101–R104 become 10 k bias to +1V2. Before, 2 × 49.9 Ω at the connector left the receiver 45 mm down an open line |
+| LVDS routing | Pairs ripped and re-routed by a negotiated-congestion pair router: 9 of 19 coupled; the rest completed single-ended, widened to 50 Ω and matched to ±5 ps (worst \|P−N\| 9 ps, was 84) |
+| Return vias | 0 of 89 reference-changing vias without a GND via within 3 mm (was 1 of 186) |
+| +2V5 | The trunk widened to 0.5 mm where it fits: 122–129 mV drop at 601 mA (173–185 before) |
+| Left open | ADCR data to DCO −28 to −177 ps (DCO is 51 mm, the data 27–44 mm): calibrated per bit by IDELAYE2, as before |
+
+DRC on 12 Nov: 0 violations of any kind, 0 unconnected, 0 schematic-parity problems (zones refilled).

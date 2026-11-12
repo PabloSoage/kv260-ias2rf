@@ -6,7 +6,7 @@ order notes, into fab/ (git-ignored: regenerate them, never edit them).
 Settings follow JLCPCB's own KiCad guide ("How to generate Gerber and drill
 files in KiCad 8"): Protel extensions, soldermask subtracted from silkscreen,
 zones refilled before plotting; drill in Excellon, mm, decimal, absolute
-origin, alternate mode for oval holes. Inner layers In1..In4 are included.
+origin, alternate mode for oval holes. Inner layers In1..In6 are included.
 
 What this script refuses to hide: the board is checked first (DRC with the
 zones refilled, on a copy). If there is any error, or any unrouted
@@ -46,20 +46,20 @@ CLI = P.KICAD_CLI
 NAME = "CSI2-KRIA-KV260_Rev01"
 BOARD = os.path.join(ROOT, NAME + ".kicad_pcb")
 OUT = os.path.join(ROOT, "fab")
-LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu", "F.Paste", "B.Paste",
+LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu", "F.Paste", "B.Paste",
           "F.SilkS", "B.SilkS", "F.Mask", "B.Mask", "Edge.Cuts"]
 
 # The order, as it must be entered on jlcpcb.com (docs/FABRICATION.md explains each)
 ORDER = [
-    ("Layers", "6"),
+    ("Layers", "8"),
     ("Dimensions", "119 x 120 mm (outline in the Gerbers)"),
     ("PCB thickness", "1.6 mm"),
-    ("Impedance control", "Yes, stackup JLC06161H-2116A"),
+    ("Impedance control", "Yes, stackup JLC08161H-2116C"),
     ("Outer / inner copper", "1 oz / 0.5 oz"),
     ("Material", "FR-4 (the stackup's laminate: NP-155F)"),
-    ("Via covering", "Epoxy filled & capped (POFV): free on 6 layers; ~400 vias are in pads"),
+    ("Via covering", "Epoxy filled & capped (POFV): ~590 vias are in pads (BGA balls under the bottom-side terminations and caps, exposed pads)"),
     ("Min via hole / diameter", "0.20 / 0.45 mm"),
-    ("Min track / spacing", "0.10 / 0.10 mm"),
+    ("Min track / spacing", "0.09 / 0.10 mm (LVDS necks under the FPGA)"),
     ("Surface finish", "ENIG (flat pads for the 1.0 mm BGA and the LFCSPs)"),
     ("Solder mask / silkscreen", "any / any"),
     ("Remove order number", "Specify a location, or pay to remove"),

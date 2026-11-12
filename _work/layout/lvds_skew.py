@@ -29,8 +29,8 @@ from shapely.geometry import LineString, Point, box
 from shapely import affinity
 from shapely.ops import unary_union
 
-PS_MM = {"F.Cu": 6.0, "B.Cu": 6.0, "In2.Cu": 6.9, "In1.Cu": 6.9, "In3.Cu": 6.9, "In4.Cu": 6.9}
-CU = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"]
+PS_MM = {"F.Cu": 6.0, "B.Cu": 6.0, "In2.Cu": 6.9, "In1.Cu": 6.9, "In3.Cu": 6.9, "In4.Cu": 6.9, "In5.Cu": 6.9, "In6.Cu": 6.9}
+CU = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu"]
 ALIAS = {"FPGA_CLK": "CLK_FPGA"}
 GROUPS = {   # bus: (clock pair, data pairs), names as grouped (no sheet path, no J_)
     "LINK_RX (FPGA -> Kria, <=1 Gb/s)": ("LINK_RX_CLK", ["LINK_RX_D0", "LINK_RX_D1"]),

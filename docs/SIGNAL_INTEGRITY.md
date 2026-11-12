@@ -3,6 +3,10 @@
 *Board `CSI2-KRIA-KV260_Rev01.kicad_pcb` as committed on 11 Nov · stack JLC06161H-2116A · figures
 and their data in [`docs/sim/`](sim/)*
 
+> **12 November 2026: the board is now 8 layers (JLC08161H-2116C).** Sections 1–7 are the record of
+> the 6-layer review. §8 is the 8-layer board, measured with the same scripts and compared with the
+> 6-layer one and with an ideal line; where it changes a statement above, §8 says so.
+
 An RF/high-speed engineer looked at the board of 10 November and raised the points below. Every one
 was checked against the board's own copper, fixed where it was right, and measured or simulated
 again. This page is the record: what was wrong, what changed, the numbers before and after, and
@@ -354,8 +358,76 @@ openEMS sweep of the length, 0.1 mm each side: 0.8 mm −38.3 dB at 0.5 GHz, 1.4
 (`_work/sim/sma_launch.py tvsnAA_BB`). With it the launch with the diode is better in the band
 than the bare cut-out was (−30.2 dB at 0.5 GHz).
 
-## 8. How it was checked
+## 8. Eight layers (12 November)
+
+The stack moved to JLC08161H-2116C: L1 · L2 GND · L3 · L4 PWR · L5 GND · L6 · L7 GND · L8, with
+2116 prepreg (0.1194 mm) under the outer layers, so the 183 µm RF width and the SMA launch stand.
+Field solver (`_work/field_solver8.py`):
+
+| Line | Width / gap | Z |
+|---|---|---|
+| L1/L8 microstrip | 0.183 mm | 50.4 Ω |
+| L3/L6 stripline, single | 0.151 mm | 50 Ω |
+| L3/L6 coupled pair | 0.10 / 0.15 mm | 100.2 Ω |
+| L3/L6 pair under the FPGA | 0.09 / 0.12 mm | 98.5 Ω |
+| L1 coupled pair | 0.117 / 0.15 mm | 100.4 Ω |
+
+What changed on the board: L4 carries no signal; L6 lies between two ground planes; 9 of the 19
+LVDS pairs are coupled 100 Ω pairs end to end and the other 10 are two 50 Ω legs matched to ±5 ps;
+every 100 Ω termination sits on its pair's two ball vias on the bottom face (no stub); LINK_TX is
+terminated at the FPGA (R105/R106 added, R101–R104 now 10 k bias), where before the 2 × 49.9 Ω at
+the connector left the FPGA's receiver at the end of a 45 mm open line.
+
+| Check | 6 layers (11 Nov) | 8 layers (12 Nov) |
+|---|---|---|
+| DRC | 0 errors, 0 unconnected, 0 parity | 0 violations of any kind, 0 unconnected, 0 parity |
+| Pairs coupled | 0 of 19 | 9 of 19 (ADCR_D4 41 %) |
+| Worst intra-pair \|P−N\|, package included | 84 ps | 9 ps |
+| Layer changes without a GND via within 3 mm | 1 of 186 | 0 of 89 |
+| Track over a plane void | 10 runs, 11 mm | 5 runs, 5 mm |
+| Legs of other pairs within 0.25 / 0.55 mm | 97.6 / 328.4 mm | 69.3 / 213.5 mm |
+| Eye lost to the routing (routed − ideal, 20 pairs) | mean −22 mV, worst −113 mV | mean −8 mV, worst −52 mV |
+| Zero-crossing spread added by the routing | mean 5 ps, worst 29 ps | mean 1 ps, worst 10 ps |
+| VCCINT impedance (target 120 mΩ) | 51 mΩ max to 10 MHz, 61 at 100 MHz | 41 / 63 mΩ |
+| +1V8_D / +2V5 / +3V3_D at 100 MHz | 545 / 488 / 40 mΩ | 545 / 460 / 37 mΩ |
+| DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV (trunk widened to 0.5 mm) |
+| SMA launch S11 at 1 / 3 GHz, with the ESD diode | −30.6 / −13.5 dB | −30.9 / −13.7 dB |
+
+![LVDS eyes: ideal, 6 and 8 layers](sim/rev04_eyes.png)
+
+The eye model drives each leg from a current source into the routed sections and a 100 Ω, 2 pF
+receiver. The receiver's capacitance reflects and the driver re-reflects, so even the ideal line
+has some ISI and it depends on length: the "ideal" of a pair differs between the two boards. The
+fair comparison is each board against its own ideal line:
+
+![Eye lost to the routing](sim/rev04_eye_penalty.png)
+![Eye opening and spread, every pair](sim/rev04_eye_open.png)
+![Intra-pair skew](sim/rev04_skew.png)
+![PDN impedance](sim/rev04_pdn.png)
+![SMA launch](sim/rev04_sma.png)
+
+The third series in the eye and skew plots is the 6-layer board with the same corrections
+(terminations at the balls, coupled pairs, LINK_TX at its receiver), routed the same way: only 8
+pairs fit coupled, because under the FPGA L4 is +1V0 islands where no track may go and L3 is the
+only inner layer, and the board could not be completed (seven nets left unconnected). On six layers
+the schematic change, the +2V5 widening and the return vias carry over as they are; the stub-free
+terminations and the coupled pairs need the second inner signal layer.
+
+Still open on the 8-layer board:
+- **ADCR data to DCO: −28 to −177 ps** (6 layers: −23 to −88). ADCR_DCO leaves the AD9484 on its
+  north side and is 51 mm long, the data pairs 27–44 mm. At 400 MSPS that is 7 % of the 2.5 ns
+  bit, inside the IDELAYE2's 2.4 ns range, calibrated per bit at start-up as before.
+- **Ten pairs are not coupled** (LINK_RX_D0/D1, LINK_TX_D0/CLK, the four ADCS pairs, ADCR_D2,
+  ADCR_D4 partly). The LINK_RX pairs leave the FPGA's south rows and must cross every ADC pair on
+  the way north; the AD9253's 0.5 mm pins leave no room for a coupled fan-out. They are 50 Ω legs
+  matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV). Moving LINK_RX to
+  north-side balls (a pin swap in CONTROL) would let them couple.
+- Supersedes in §6: the pairs are now partly coupled, and every layer change has a ground via
+  within 3 mm.
+
+## 9. How it was checked
 
 The checks were scripts run on the board file, none by hand: a KiCad-style plane fill, the
 connectivity graph of each net, the field solver, ngspice and openEMS (built from source in WSL).
-The DRC after every change: **0 errors, 0 unconnected, 0 schematic-parity problems**.
+The DRC after every change: **0 errors, 0 unconnected, 0 schematic-parity problems** (on 12 Nov,
+for the 8-layer board, 0 violations of any kind).

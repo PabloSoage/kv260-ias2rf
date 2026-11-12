@@ -1,6 +1,10 @@
 # Fabrication — ordering the board from JLCPCB
 
-*26 September 2026 · outputs by `_work/fab/make_fab.py` · stack JLC06161H-2116A*
+*26 September 2026 · outputs by `_work/fab/make_fab.py` · stack JLC08161H-2116C since 12 November 2026*
+
+> **8 layers since 12 Nov 2026.** Order **8 layers, stack JLC08161H-2116C**, as `fab/<date>/ORDER.txt`
+> says; the widths for that stack are in LAYOUT §3 and `_work/field_solver8.py`. The 6-layer 2116A
+> figures further down are the record of the earlier board.
 
 One command writes everything JLCPCB asks for into `fab/`. That folder is git-ignored: the files are
 always regenerated, never edited.
@@ -38,7 +42,7 @@ lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 |---|---|---|
 | Layers | 6 | |
 | Thickness | 1.6 mm | |
-| **Impedance control** | **Yes, JLC06161H-2116A** | The stack the widths were solved for (POWER_AND_STACKUP §2.6). Any other stack changes every impedance |
+| **Impedance control** | **Yes, JLC08161H-2116C** (8 layers; JLC06161H-2116A until 12 Nov) | The stack the widths were solved for (`_work/field_solver8.py`). Any other stack changes every impedance |
 | Copper | 1 oz outer, 0.5 oz inner | The stack's own |
 | **Via covering** | **Epoxy filled & capped (POFV)** | 543 vias sit in pads since 11 Nov (0402 passives, butted decoupling vias, every IC's exposed pad, five in L1030's output pad). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. Most of the BGA's fan-out vias sit between its balls; 29 sit in ball pads (LAYOUT §6.1) |
 | Min via | 0.20 mm hole, 0.45 mm pad | Within JLCPCB's six-layer capability |
