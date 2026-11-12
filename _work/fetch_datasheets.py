@@ -90,6 +90,10 @@ SHEETS = [
      "https://www.xilinx.com/content/dam/xilinx/support/packagefiles/a7packages/"
      "xc7a50tftg256pkg.txt", "pkg file"),
     # Housekeeping (2 Oct): st.com does not answer scripts; the Archive does.
+    # RF cascade and thermal review (12 Nov): the IF drivers, the radar ADC and DAC.
+    ("AD8352.pdf", "20240717024840", ADI + "AD8352.pdf", "Rev. C"),
+    ("AD9484.pdf", "20250214182700", ADI + "AD9484.pdf", "Rev. A"),
+    ("AD9708.pdf", "20240716043405", ADI + "AD9708.pdf", "Rev. ?"),
     ("M24C02.pdf", ("20241116070424", "20240430160457"),
      "https://www.st.com/resource/en/datasheet/m24c02-r.pdf", "DS9398 Rev 8"),
 ]
@@ -112,6 +116,8 @@ DIRECT = [
     ("ADT2-1T.pdf", "https://www.minicircuits.com/pdfs/ADT2-1T+.pdf"),
     ("PL-052.pdf", "https://www.minicircuits.com/pcb/98-pl052.pdf"),
     ("PL-768.pdf", "https://www.minicircuits.com/pcb/98-pl768.pdf"),
+    ("M3SWA2-34DR.pdf", "https://www.minicircuits.com/pdfs/M3SWA2-34DR+.pdf"),
+    ("TPS562201.pdf", "https://www.ti.com/lit/ds/symlink/tps562201.pdf"),
     ("DQ3005.pdf", "https://www.minicircuits.com/case_style/DQ3005.pdf"),   # M3SWA2 package
     ("CD542.pdf", "https://www.minicircuits.com/case_style/CD542.pdf"),     # ADT2-1T package
     # the power inductors and the reverse-polarity MOSFET, chosen at layout

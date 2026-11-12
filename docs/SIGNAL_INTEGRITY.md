@@ -530,8 +530,31 @@ parallels within 0.3 mm are:
 **Why it matters.** A data bit beside a filter node couples its edges straight into the SDR's
 baseband. The DAC bus toggles at up to 125 MSPS, and the filter passes everything under 50 MHz.
 
-**The remedy.** Move those aggressors away, at least 3× the width and ideally behind a ground
-via. That is part of the re-route of §9.4.
+**What was done (12 Nov).** Two scripted passes, each kept only at DRC 0/0/0:
+- **The widened supply tracks were narrowed again where they ran beside analogue nodes.** That
+  was 64 pieces, cut back to the width that keeps 0.3 mm, but never under 0.3 mm. The widening of
+  §9.1 had brought them closer.
+- **Seven tracks were moved 0.15–0.5 mm sideways, with a 45° jog at each end.** Four were
+  aggressors (`ADAR2_CS`, `CONV_SPI_SDIO`, `+2V5`, `+1V8_D`) and three were analogue legs, moved
+  away from `DACS_D0`, `CLK_ADCS_P` and `ADAR2_CS`.
+
+| Same-layer run beside analogue nodes | Board of 11 Nov | After the widening | Now |
+|---|---|---|---|
+| Within 0.3 mm | 91 mm | 109 mm | **81 mm** |
+| Within 0.2 mm | 43 mm | 59 mm | **33 mm** |
+
+**What is left needs parts moved, not tracks.** Every case below is where the SDR DAC's filter is
+threaded between the DAC bus and the `+1V0` feed on L1/L3:
+
+| Victim | Aggressor | Run |
+|---|---|---|
+| C814 | `+1V0` | 13.5 mm at 0.20 mm |
+| C834 | `DACS_D0` | 11 mm at 0.11 mm |
+| `IF_TX_B` | `FPGA_PROG_B` | 7.7 mm at 0.26 mm |
+| C814 | `DACS_D4` | 4 mm at 0.10 mm |
+| C834 | `ADAR2_CS` | 3 mm at 0.10 mm |
+
+The fix is the one in §9.3: re-place the filter.
 
 ### 9.3 Long differential analogue paths (open)
 
@@ -548,8 +571,23 @@ via. That is part of the re-route of §9.4.
 - **Y401's outputs.** They differ by 10 mm, about 70 ps on the master reference.
 
 These were routed as unrelated nets. The fix is to place the filter parts in two rows beside the
-DAC and route each pair together. Until then, simulate the filter with this copper before
-trusting its response (§9.6).
+DAC and route each pair together.
+
+**Simulated (12 Nov), and the copper costs little.** Each filter was run in ngspice twice: with
+ideal connections, and with every node's copper as a line of its field-solved Z0 and delay. The
+balun is taken as ideal.
+
+| Filter | −3 dB, ideal / routed | At 100 MHz, ideal / routed | Common mode below differential, 10 / 50 MHz |
+|---|---|---|---|
+| AD9708 → T701 | 70 / 67 MHz | −24 / −26 dB | −57 / −36 dB |
+| AD9767 DAC1 → T801 | 70 / 64 MHz | −24 / −29 dB | −59 / −35 dB |
+| AD9767 DAC2 → T802 | 70 / 64 MHz | −24 / −29 dB | −47 / −31 dB |
+
+- **The passband is unchanged.** It keeps the filter's own ripple of about 2 dB at 30 MHz.
+- **The corner moves 4–9 % lower**, and the stop band rolls off slightly faster.
+- **The legs' imbalance** leaves a common mode at least 30 dB under the signal inside the passband.
+
+![DAC reconstruction filters, ideal and as routed](sim/rev05_filters.png)
 
 The DAC buses are not matched either:
 - `DACS` data bits run 37–84 mm, with `IQSEL` at 104 mm;
@@ -582,13 +620,92 @@ The tool is the one that re-routed ADCR_DCO (from 0 to 89 % coupled), driving Ki
 push-and-shove router. What coupling buys is common-mode rejection and less crosstalk, not
 millivolts of eye.
 
+**Tried on 12 Nov, on `CLK_ADCS`, and stopped before changing the board:**
+- **The middle has room.** The legs run 63 and 67 mm, P on L1 and N on L8. An A\* search finds a
+  pair corridor on L6 (In5) of 36.5 mm from C416/C417 to above the AD9253, and there is room for
+  the pair's vias at (188.0, 165.95) and (189.5, 165.8).
+- **The ends do not.**
+  - KiCad's router will not start from C416/C417's vias, which sit in the pads.
+  - At the AD9253 the clock pins are boxed in by C670 and two supply vias. The router went round
+    them for that reason, and a straight descent shorts four nets.
+
+  Coupling it needs C670 moved first.
+
+`CLK_FPGA` is the same case: its series resistors R1115/R1116 sit 12 mm apart, and its bias
+resistors R1117/R1118 sit apart too. Both need re-placing before the pair can couple.
+
 ### 9.5 Supply balls without their own via
 
 Unchanged: 11 of 69 (§6). Both ways were tried on every ball, and four of them are on rails with
 no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63 mΩ against
 120). A further gain needs the BGA's escape redone by hand.
 
-### 9.6 What has not been simulated, and how it would be
+### 9.6 Thermal, RF budget, and what is still not simulated
+
+**Thermal (12 Nov).**
+- **The model.** `thermal2d.py` treats the board as a 2-D sheet. In-plane conduction runs through
+  each layer's real copper coverage: L2, L5 and L7 85 %, L4 82 %, the outer layers 16–24 %, the
+  signal layers 5–7 %. Both faces cool by natural convection.
+- **The heat.** 6.9 W, from the power budget (POWER_AND_STACKUP §1.3–1.4), spread over each part's
+  pads.
+- **The junctions.** Each is the board temperature under the part plus P × θJB, or θJC for the
+  exposed-pad parts, from the data sheets read.
+
+| At 25 °C ambient, still air | h = 10 W/m²K per face (convection only) | h = 15 (with radiation) |
+|---|---|---|
+| Board, mean / hottest rise | +26 / +48 °C | +17 / +38 °C |
+| Under the ADCLK948 (0.95 W) | 73 °C | 63 °C |
+| AD9484, junction (θJC 1.7 °C/W) | 68 °C | 58 °C |
+| LMR33630, junction (θJB 13.6) | 79 °C | 70 °C |
+| TPS7A8300 for +1V8_D, junction (θJB 12.3) | 71 °C | 62 °C |
+| XC7A50T, under the package | 56 °C | 47 °C |
+
+**On the bench this is comfortable. In a vehicle it is not.**
+- **The cause.** The board is small (134 cm²) for 6.9 W. The clock buffer, the radar ADC, the
+  four drivers and the 5 V buck share it.
+- **The arithmetic.** At 60–70 °C ambient, add 35–45 °C to every figure above. Around the clock
+  buffer and the ADCs the board then passes 110 °C.
+- **What it exceeds.** The ADCs' 85 °C ambient rating, and the FPGA's 100 °C junction limit
+  (I grade) where its own rise is added.
+- **What a vehicle install needs.** The KV260's fan blowing across this board, or a thermal path
+  to the enclosure, as VEHICLE_PLATFORM plans.
+- **Still to compute** with the AMD and ADI θ figures, which could not be fetched here: the FPGA,
+  the AD9253, the ADCLK948 and the AD9767.
+- **Not modelled.** Heat flowing into the KV260 through the connector and the standoffs, and any
+  airflow.
+
+![Board temperature](sim/rev05_thermal.png)
+
+**RF budget (12 Nov), `cascade.py`.** Noise is followed as voltage density node by node:
+- the source and its 64.9 Ω termination;
+- each AD8352's 2.7 nV/√Hz referred to its input (Rev. C Table 2);
+- the ADC's own noise, from its SNR over its Nyquist band.
+
+| Radar receive, IF_RX_B → SW2 → AD8352 15 dB → AD8352 10 dB → AD9484 | |
+|---|---|
+| Full scale at the SMA | **−17.6 dBm** (ADC_RADAR_SPEC estimated −17) |
+| Noise figure, front end only (switch and drivers) | 15.5 dB |
+| Noise figure including the ADC | **26.8 dB**: the 8-bit AD9484 is 92 % of the noise |
+| Noise floor at the SMA | −147 dBm/Hz; 47 dB SNR over 200 MHz, plus 12 dB of processing gain after the ÷16 DDC |
+| Input IP3 | +15 dBm, 33 dB above full scale |
+
+- **The ADC sets the floor.** Its SFDR of 79 dBc, not the drivers' OIP3 of +40 dBm, sets the
+  linearity.
+- **More gain here would only move full scale down.** The receiver's sensitivity is decided ahead
+  of this board, in AERIS-10's own IF chain.
+- **The SDR receive chains (AD9253) are still to fill.** Its data sheet could not be fetched here:
+  analog.com does not answer this machine, and the Internet Archive was rate-limiting.
+
+| Transmit, full-scale tone at the SMA | |
+|---|---|
+| AD9708, 20 mA, → T701 → SW4 → `IF_TX_B` | **0 dBm** |
+| AD9767 DAC1, 10 mA, → T801 → SW3 → `IF_TX_A` | **−6.1 dBm** |
+| AD9767 DAC2, 10 mA, → T802 → `IF_TX_C` | **−5.5 dBm** |
+
+These levels take the 49.9 Ω loads in parallel with the balun's 100 Ω, the balun's 0.4 dB and the
+switch's 0.6 dB (ADT2-1T+, M3SWA2-34DR+). The filter's passband ripple, 0 to −2 dB, comes on top.
+
+**What is still not simulated:**
 
 1. **3-D full-wave.** The whole board is out of reach of FDTD: 0.1 mm features over 100 mm. Four
    sub-models in openEMS give the parts that matter, and their S-parameters go into the eye

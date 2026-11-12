@@ -116,8 +116,12 @@ BGA, for one).
      through 0.1 mm at U1001, and a 251 mV drop on the ADCs' +1V8_A. The supply tracks are now
      widened (865 mm at ≥ 0.5 mm, against 119), and +1V8_A starts at 1.85 V to cover what is
      left of the drop.
-   - **Still open.** Digital tracks run beside the SDR's filter and ADC-input nodes for 4–13 mm at
-     0.1–0.3 mm, and those differential analogue paths are long and unmatched (39–66 mm).
+   - **Analogue nodes.** Digital tracks beside the analogue nodes are down to 81 mm within
+     0.3 mm, from 91. The rest is where the SDR DAC's filter is threaded through the DAC bus: it
+     needs the filter re-placed. Its long, unmatched legs were simulated: they cost 4–9 % of
+     cut-off and nothing in the passband.
+   - **Thermal.** 6.9 W on 134 cm² in still air: +26 °C mean and +48 °C at the clock buffer. Fine
+     on the bench. A vehicle install needs airflow or a path to the enclosure.
 2. **Ten of the 19 LVDS pairs are not coupled** (13 of 22 counting U401's three clock pairs,
    SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
    run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
@@ -140,9 +144,14 @@ BGA, for one).
    Still to confirm in DS925: its input threshold and the −2LV rate ceiling. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
    pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
    ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
-6. **Not simulated:** no 3-D full-wave model of the board, no noise or linearity budget of the RF
-   chains, no thermal model ([SIGNAL_INTEGRITY §6](docs/SIGNAL_INTEGRITY.md); how each would be
-   done in §9.6). The first boards are for evaluation.
+6. **Not simulated yet:**
+   - No 3-D full-wave model of the board.
+   - The SDR receive budget waits for the AD9253's data sheet.
+   - Junction temperatures for the FPGA, the AD9253, the ADCLK948 and the AD9767.
+
+   The radar receive budget, the transmit levels, the DAC filters with their copper and the
+   board's thermal map are done ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)). The first
+   boards are for evaluation.
 7. **The AERIS-10 end of the ribbon does not exist yet.**
 8. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
@@ -269,6 +278,10 @@ several times the receiver's ±100 mV threshold.
 
 ![Eye penalty per pair](docs/sim/rev04_eye_penalty.png)
 
+**Eye opening and zero-crossing spread** of every pair, three cases.
+
+![Eye opening per pair](docs/sim/rev04_eye_open.png)
+
 **Intra-pair skew**, ball to pad, with the FPGA's package delay.
 
 ![Intra-pair skew](docs/sim/rev04_skew.png)
@@ -282,6 +295,17 @@ the impedance barely moves.
 stacks, and so is the launch.
 
 ![SMA launch](docs/sim/rev04_sma.png)
+
+**DAC reconstruction filters** (ngspice), ideal and with each node's copper. The cut-off moves 4–9 %
+down and the passband does not change ([SIGNAL_INTEGRITY §9.3](docs/SIGNAL_INTEGRITY.md)).
+
+![DAC reconstruction filters](docs/sim/rev05_filters.png)
+
+**Board temperature** at 25 °C ambient in still air: a 2-D model with each layer's real copper,
+convection from both faces, and the power budget's 6.9 W
+([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
+
+![Board temperature](docs/sim/rev05_thermal.png)
 
 ---
 
