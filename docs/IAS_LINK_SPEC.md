@@ -69,3 +69,69 @@ About 15 minutes.
 ```
 py _work/check_sheet.py ias_link
 ```
+
+---
+
+## 6. Bring-up: measuring the link on the board
+
+*Added 12 November 2026. Nothing here is built yet: it is the test plan for the first boards.*
+
+**Why not Vivado's IBERT.** The IBERT IP, the one that plots 2-D eyes, drives only the gigabit
+transceivers (GTH/GTY). This link runs on ordinary SelectIO pins through `OSERDESE2`/`ISERDESE2`
+on the Artix-7 and `ISERDESE3` on the Kria, so IBERT cannot see it. The eye is measured instead
+with each receiver's input delay line, as a **bathtub curve**: bit errors against the sampling
+point.
+
+**The test.**
+
+1. The transmitter sends PRBS7 on every data lane of a direction, with the lane's clock forwarded
+   as usual (source-synchronous DDR, up to 1 Gb/s per lane on a 500 MHz clock).
+   - No clock recovery is involved, and the PRBS7 checker locks by itself after seven bits, so no
+     8b/10b is needed for the test.
+   - PRBS7 is balanced enough for the AC-coupling capacitors (C101–C106): its longest run is seven
+     bits. The real traffic still needs 8b/10b or a scrambler (ARCHITECTURE §4.2).
+2. The receiver steps its delay line through its whole range, one tap at a time. At each tap it
+   counts errors over a fixed number of bits and stores tap against count.
+   - 10⁹ bits per tap is one second and resolves a BER of 10⁻⁹. Each further decade costs ten times
+     as long.
+3. The counts go to the PS on the Kria side (AXI), or over the return channel and the HK bus from
+   the Artix-7 side. Plotted, they make a U: its flat floor, where the count is zero, is the eye's
+   open width at that BER.
+4. The gateware keeps the same routine for start-up: centre each lane in its floor, as the ADCR
+   bits are calibrated (CONTROL_SPEC).
+
+**Resolution on each side.**
+
+| Direction | Receiver | Delay line | Step | Points per 1 ns bit |
+|---|---|---|---|---|
+| `LINK_RX_*` (FPGA → Kria) | K26, HP bank | `IDELAYE3`, 512 taps, `TIME` mode | a few ps | hundreds |
+| `LINK_TX_*` (Kria → FPGA) | XC7A50T, HR bank | `IDELAYE2`, 32 taps, `IDELAYCTRL` at 200 MHz | 78 ps | about 13 |
+
+So the `LINK_TX` bathtub comes out much coarser than the `LINK_RX` one. Both ranges span more
+than one bit. The `IDELAYE3` step and range are **to confirm** in UG571.
+
+**What it cannot measure.**
+- **The eye's height.** The delay moves the data against the clock, but the receiver's threshold
+  cannot be moved, so the simulated eye openings in mV cannot be checked this way.
+- **The sampling window, separately.** The floor is the bit minus the jitter on the lane minus the
+  input flip-flop's setup and hold window. Take that window from the data sheets (DS181 for the
+  Artix-7, DS925 for the Zynq UltraScale+ HP banks) before comparing with the simulation.
+
+**What to expect, from the board as routed** (SIGNAL_INTEGRITY §8, `lvds_eye.py` at 1 Gb/s
+PRBS7; `lvds_skew.py` for the skew).
+
+| Pair | Eye opening, routed / ideal | Zero-crossing spread, routed / ideal | Data − clock skew |
+|---|---|---|---|
+| `LINK_RX_D0` | 457 / 509 mV | 31 / 25 ps | +95 ps |
+| `LINK_RX_D1` | 372 / 385 mV | 51 / 41 ps | +39 ps |
+| `LINK_RX_CLK` | 392 / 395 mV | 10 / 10 ps | — |
+| `LINK_TX_D0` | 665 / 674 mV | 62 / 64 ps | −40 ps |
+| `LINK_TX_CLK` | 643 / 642 mV | 63 / 63 ps | — |
+
+- **The width.** The simulation's spread is the board's own contribution: lossless lines, an ideal
+  driver edge, no crosstalk, no driver or clock jitter. The floor should come out as roughly 1 ns
+  minus that spread minus the receiver's window, and **narrower** by whatever the silicon adds.
+  A floor much narrower than that points at the board: crosstalk, a reflection or a return path.
+- **The centres.** The data − clock skew moves each lane's centre. On the Kria side,
+  `LINK_RX_D0`'s floor should sit about 56 ps (95 − 39) away from `LINK_RX_D1`'s, give or take
+  each receiver's own input delay. That is a direct check of the routed lengths.
