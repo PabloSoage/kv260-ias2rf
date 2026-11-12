@@ -1,6 +1,6 @@
 # JLCPCB order — quote
 
-*10 November 2026 · board CSI2-KRIA-KV260_Rev01 · not ordered yet*
+*10 November 2026, bare boards re-quoted on 8 layers on 12 November · board CSI2-KRIA-KV260_Rev01 · not ordered yet*
 
 What ordering the board from JLCPCB, made and assembled, would cost today. This is a budget, not an
 order: nothing was uploaded and no cart was created. How to enter the order is in
@@ -16,13 +16,16 @@ table in §4.
 
 | | 2 assembled boards | 5 assembled boards | Source |
 |---|---|---|---|
-| Bare boards (5 made either way) | 236.88 | 236.88 | JLCPCB's quote page, §2 |
+| Bare boards, 8 layers (5 made either way) | 282.92 | 282.92 | JLCPCB's quote page, §2 |
 | Assembly fees | 244.79 | 267.38 | JLCPCB's price page, §3 |
 | Parts (94 LCSC codes) | 1,478.40 | 3,558.41 | JLCPCB's parts search, §4 |
 | Si549 oscillator, bought apart and consigned | ~40 `[E]` | ~100 `[E]` | No LCSC code, §5 |
-| Shipping, UPS Express Saver, duties paid (DDP) | 26.60 | 26.60 | Quote page, for the bare boards' 0.37 kg; more for assembled ones |
-| **Total** | **≈ 2,027** | **≈ 4,189** | |
-| Per board | ≈ 1,013 | ≈ 838 | |
+| Shipping, UPS Express Saver, duties paid (DDP) | 26.60 | 26.60 | Quote page, for the bare boards' 0.42 kg; more for assembled ones |
+| **Total** | **≈ 2,073** | **≈ 4,235** | |
+| Per board | ≈ 1,037 | ≈ 847 | |
+
+On 6 layers the bare boards were $236.88, so the move to 8 layers adds **$46.04 to the order**,
+2 % of the total for two boards. The parts list grew by two 0402 resistors (R105, R106), a few cents.
 
 **Parts are three quarters of the cost,** and eight lines are almost 90 % of the parts (about $654 of $739 per board):
 
@@ -47,28 +50,33 @@ Mouser, often for less than the LCSC list price.
 
 ---
 
-## 2. Bare boards: $236.88 for 5
+## 2. Bare boards: $282.92 for 5
 
-Entered on [jlcpcb.com/quote](https://cart.jlcpcb.com/quote) on 10 Nov 2026 with the values of
-FABRICATION §2. Nothing was uploaded: the page prices from the dimensions.
+Entered on [jlcpcb.com/quote](https://cart.jlcpcb.com/quote) on 12 Nov 2026 with the values of
+FABRICATION §2 (8 layers); the 6-layer column is the same page on 10 Nov. Nothing was uploaded: the
+page prices from the dimensions.
 
-| Field | Value | Charge |
-|---|---|---|
-| Layers, size, quantity | 6, 119 × 120 mm, 5 | Board **9.30** |
-| Thickness, finish | 1.6 mm, ENIG 1 µ" | Surface finish **18.20** |
-| Material | FR4 TG155 (set by the stack and the small vias) | **3.66** |
-| Copper | 1 oz outer, 0.5 oz inner | — |
-| **Stack** | **JLC06161H-2116A** | Stack-up fee **102.79** |
-| Impedance control | ±10 % | **33.08** |
-| Via covering | Epoxy filled & capped (POFV) | 0.00 |
-| Min via | 0.2 mm hole (the board's 0.20 / 0.45 mm vias) | **18.31** |
-| 4-wire Kelvin test | Forced on by the 0.2 mm vias | **17.49** |
-| Confirm production file | Forced on by the specified stack | **1.05** |
-| Engineering fee | | **33.00** |
-| Build time | 7–8 days | 0.00 |
-| **Total** | | **236.88** (desktop app: 231.88) |
+| Field | Value | 6 layers (2116A) | 8 layers (2116C) |
+|---|---|---|---|
+| Layers, size, quantity | 119 × 120 mm, 5 | Board **9.30** | Board **11.90** |
+| Thickness, finish | 1.6 mm (2116C is 1.52 mm actual), ENIG 1 µ" | Surface finish **18.20** | **18.20** |
+| Material | FR4 TG155 | **3.66** | 0.00 |
+| Copper | 1 oz outer, 0.5 oz inner | — | — |
+| **Stack** | JLC06161H-2116A / **JLC08161H-2116C** | Stack-up fee **102.79** | **83.89** |
+| Impedance control | ±10 % | **33.08** | **33.08** |
+| Via covering | Epoxy filled & capped (POFV) | 0.00 | 0.00 |
+| Min via | 0.2 mm hole (the board's 0.20 / 0.45 mm vias) | **18.31** | **18.31** |
+| 4-wire Kelvin test | Forced on by the 0.2 mm vias | **17.49** | **17.49** |
+| Confirm production file | Forced on by the specified stack | **1.05** | **1.05** |
+| Engineering fee | | **33.00** | **99.00** |
+| Build time | 7–8 days | 0.00 | 0.00 |
+| **Total** | | **236.88** | **282.92** (desktop app: 277.92) |
 
-**The 2116A stack costs $102.79 on its own**, and it rules out JLCPCB's Economic assembly. The page
+The difference is the engineering fee ($99 on 8 layers against $33) and the board itself; the
+2116C stack-up fee is lower than 2116A's. The page warns that 2116C is 1.5216 mm thick, not 1.6 mm
+(within the ±10 % tolerance); the board has nothing that depends on its thickness.
+
+**The specified stack costs $83.89 on its own** ($102.79 for 2116A on 6 layers), and it rules out JLCPCB's Economic assembly. The page
 says the stack "doesn't support economic PCB assembly". Both are the price of the impedances:
 POWER_AND_STACKUP §2.6 explains why the board uses this stack and not the default 3313.
 
@@ -78,7 +86,7 @@ POWER_AND_STACKUP §2.6 explains why the board uses this stack and not the defau
 
 ## 3. Assembly fees: Standard PCBA
 
-The 2116A stack allows only **Standard** PCBA. Its fees, from JLCPCB's
+The 2116C stack, like 2116A, allows only **Standard** PCBA. Its fees, from JLCPCB's
 [price page](https://jlcpcb.com/help/article/pcb-assembly-price) (last updated 22 Oct 2026). The
 assembly quote itself needs the Gerbers uploaded, so it was not run:
 

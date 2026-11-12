@@ -124,8 +124,8 @@ stacks, and so is the launch.*
   to reach its capacitors, and the AD9253's 0.5 mm pins leave no room for a coupled fan-out. These
   ten are routed as two 50 Ω legs matched to ±5 ps. Each comes within 1–26 mV of its ideal eye,
   except LINK_RX_D0 (−52 mV). A pin swap putting LINK_RX on north-side balls would let them couple.
-- **No price yet for the 8-layer bare board.** The 6-layer stack was $236.88 for 5 boards
-  ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)).
+- **Price.** Five 8-layer bare boards cost $282.92 on JLCPCB's quote page, against $236.88 on
+  6 layers: $46 more, mostly the engineering fee ([JLCPCB_QUOTE.md §2](JLCPCB_QUOTE.md)).
 
 ## The same corrections on 6 layers
 

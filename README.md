@@ -118,13 +118,13 @@ BGA, for one).
 2. **ADCR data to DCO skew, −28 to −177 ps.** DCO runs 51 mm against 27–44 mm for the data: 7 % of
    the 2.5 ns bit at 400 MSPS, inside IDELAYE2's range and calibrated per bit.
 3. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
-   ([FABRICATION.md](docs/FABRICATION.md)). The 8-layer bare board has not been quoted yet.
+   ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $282.92 ($236.88 on 6 layers).
 4. **The AERIS-10 end of the ribbon does not exist yet.**
 5. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
 
-**Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), 10 Nov 2026, quoted on 6 layers): about **$2,030 for two
-assembled boards** and $4,190 for five, three quarters of it parts. Seven parts are out of stock at
+**Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), bare boards re-quoted on 8 layers on 12 Nov 2026): about **$2,070 for two
+assembled boards** and $4,240 for five, three quarters of it parts. Seven parts are out of stock at
 LCSC today (the ADCs, the RF switches, the clock buffer, the DAC, a balun and the drivers): JLCPCB's
 global sourcing or consigned parts cover them.
 
@@ -146,7 +146,7 @@ global sourcing or consigned parts cover them.
 | [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md) | The 8-layer board against the 6-layer one: stacks, every check side by side, eyes, skew, PDN, SMA, and what the same corrections would give on 6 layers |
 | [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review (11 Nov) and the 8-layer re-run (12 Nov, §8): impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
-| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026): boards, assembly fees and every part with its LCSC link and price. About $2,030 for two assembled boards, $4,190 for five |
+| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026, bare boards on 8 layers 12 Nov): boards, assembly fees and every part with its LCSC link and price. About $2,070 for two assembled boards, $4,240 for five |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md), [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | What the inherited files contained, and the record of the earlier work |
 
