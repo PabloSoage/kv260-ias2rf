@@ -337,6 +337,19 @@ at full estimated load: inside, with little to spare. If Vivado's power report c
 - **VCCINT's 4.7 µF caps** sit 6 mm above the BGA, fed by track (7–13 nH): no room on either face
   over the island. UG483 allows "within two electrical inches"; the impedance target holds.
 
+**What has not been simulated** (12 Nov). Everything above is 2-D field solving, circuit
+simulation and the openEMS SMA launch. None of it replaces measuring a built board:
+- **No 3-D full-wave model of the board.** The LVDS eyes use lossless lines with the field-solved
+  Z0 and delay of each section, and the crosstalk figures are 2-D coupling coefficients times the
+  parallel length. Vias, the BGA breakout and the Hirose connector enter only as lumped sections.
+- **No cascade analysis of the RF chains.** The ADC drivers' gains (15 + 10 dB, as AERIS-10), the
+  baluns, the anti-alias and reconstruction filters and the RF switches are drawn from their data
+  sheets and application notes. Nobody has computed a noise figure, IP3 or ripple-and-gain budget
+  per channel, nor simulated the filters' responses with the board's parasitics.
+- **No thermal analysis** beyond the per-part dissipation and thermal vias in §7.
+- **Nothing is measured.** The first boards are for evaluation: the link's bring-up test is in
+  IAS_LINK_SPEC §6, and its capacity and rate ceiling in §7.
+
 ## 7. Environment
 
 | | State |

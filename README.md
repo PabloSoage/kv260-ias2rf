@@ -125,8 +125,17 @@ BGA, for one).
    The rest is inside IDELAYE2's range and calibrated per bit.
 3. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
    ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $282.92 ($236.88 on 6 layers).
-4. **The AERIS-10 end of the ribbon does not exist yet.**
-5. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
+4. **Confirm the Kria side's I/O standard in AMD's UG571.** INTERFACE_SPEC §6.1 takes `LVDS_12`
+   on the SOM's 1.2 V HP bank. Which differential receiver and driver an UltraScale+ HP bank
+   offers at a 1.2 V VCCO must be read there before any link gateware. The AC coupling leaves
+   room for fallbacks. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
+   pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
+   ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
+5. **Not simulated:** no 3-D full-wave model of the board, no noise or linearity budget of the RF
+   chains, no thermal model ([SIGNAL_INTEGRITY §6](docs/SIGNAL_INTEGRITY.md)). The first boards are
+   for evaluation.
+6. **The AERIS-10 end of the ribbon does not exist yet.**
+7. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
    written yet.
 
 **Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), bare boards re-quoted on 8 layers on 12 Nov 2026): about **$2,070 for two
