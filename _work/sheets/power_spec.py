@@ -83,7 +83,7 @@ for u, rail, r1, l, b in BUCKS:
 
 # ---- TPS7A8300 LDOs (Figure 51, ANY-OUT). ref, in, out, grounded program pins, base
 LDOS = [
-    ("U1005", "+2V5", "+1V8_A", (7, 10), 1040),     # 0.8 + 0.2 + 0.8 = 1.8 V (Table 2)
+    ("U1005", "+2V5", "+1V8_A", (5, 7, 10), 1040),  # 0.8 + 0.05 + 0.2 + 0.8 = 1.85 V (Table 2): +50 mV for the ~70 mV drop on the way to the ADCs (SIGNAL_INTEGRITY 9.1)
     ("U1006", "+3V3_D", "+1V8_D", (7, 10), 1050),
     ("U1007", "+5V0", "+3V3_A", (6, 10, 11), 1060),  # 0.8 + 0.1 + 0.8 + 1.6 = 3.3 V
 ]

@@ -93,7 +93,7 @@ The PLFM_RADAR repository's `7_Components Datasheets and Application notes/AD948
 | Item | Value | Reasoning |
 |---|---|---|
 | FB501, the drivers' ferrite | 600 Ω at 100 MHz, ≥ 0.5 A | Isolates the RF drivers from the `+5V0` buck. 78 mA flows through it |
-| FB502, FB503, the ADC's ferrites | 220 Ω at 100 MHz, ≥ 1 A, DCR ≤ 0.1 Ω | The evaluation board has a ferrite per rail (E302, E303, *"50 ohms"*) without a part number. At 300 mA and 0.1 Ω, AVDD drops 30 mV and stays inside 1.7–1.9 V |
+| FB502, FB503, the ADC's ferrites | 220 Ω at 100 MHz, ≥ 1 A, DCR ≤ 0.1 Ω | The evaluation board has a ferrite per rail (E302, E303, *"50 ohms"*) without a part number. At 300 mA and 0.1 Ω, AVDD drops 30 mV and stays inside 1.7–1.9 V. Since 12 Nov +1V8_A starts at 1.85 V, to cover the copper's drop on the way as well (SIGNAL_INTEGRITY §9.1) |
 | CML joined to the centre tap | as Figure 30 | **AERIS leaves CML open** and only decouples the centre tap. CML is an output that the SPI enables; while disabled it does nothing, and enabled it biases the inputs where the ADC wants them. Following the datasheet costs nothing |
 | Load tables for 200 Ω | Tables 5 and 7 | The stages actually see about 300–350 Ω (400 Ω of load legs in parallel with the next input). The datasheet says to interpolate between its 200 Ω and 1 kΩ tables; AERIS uses the 200 Ω values on the same circuit |
 
