@@ -56,8 +56,25 @@ drawn on `Dwgs.User`.
 | **H1, H2**, M3 through the KV260's corner holes | (94.0, 112.25), (203.0, 112.25) | The original's holes, within 5 µm of the carrier's (INTERFACE_SPEC §5.3) |
 | **H3, H4, H5**, supports | (93.0, 209.75), (148.5, 192.5), (204.0, 209.75) | 8 mm M3 standoffs to the surface the KV260 stands on (INTERFACE_SPEC §5.3: 7.9 mm) |
 
-All five holes are plated and on GND. H3–H5, the three fiducials FID1–FID3 and the holes are
-*board-only* footprints: they have no symbol.
+All five holes are plated and on GND. H3–H5, the fiducials and the holes are *board-only*
+footprints: they have no symbol. FID1–FID3 are on the top face; FID4–FID6, added on 13 Nov, on the
+bottom face at (104, 119), (100, 190) and (201, 196) for that face's assembly pass.
+
+**Test pads (13 Nov).** TP1–TP13 are bare 1.0 mm pads on the top face, board-only as the holes
+(project footprint `TestPad_D1.0mm_BoardOnly`, the name on F.Fab, no silkscreen), each on a via
+of its rail or joined to one by a short track:
+
+| Pad | Net | At | Pad | Net | At |
+|---|---|---|---|---|---|
+| TP1 | +5V0 | (174.3, 177.05) | TP8 | +1V0 | (116.9, 172.6) |
+| TP2 | +3V3_D | (151.65, 129.59) | TP9 | −3V3 | (98.4, 203.8) |
+| TP3 | +3V3_A | (128.90, 127.00) | TP10 | +3V3_CLK | (184.1, 146.8) |
+| TP4 | +2V5 | (110.02, 154.53) | TP11 | DONE | (138.90, 160.78) |
+| TP5 | +1V8_D | (179.87, 184.93) | TP12 | GND | (203.5, 182.8) |
+| TP6 | +1V8_A | (187.4, 188.8) | TP13 | GND | (170.25, 199.75) |
+| TP7 | +1V2 | (171.99, 130.11) | | | |
+
++12V has none: J1001's pins and D1001 are reachable.
 
 ---
 
