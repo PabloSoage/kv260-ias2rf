@@ -31,7 +31,13 @@ $glblPath = Join-Path $Vivado 'data\verilog\src\glbl.v'
 
 $benchFile = Join-Path $simDir "$Bench.v"
 if (-not (Test-Path $benchFile)) {
-    throw "Testbench not found: $benchFile"
+    $ethTestDir = Join-Path $fpgaDir 'eth\test'
+    $altBench   = Join-Path $ethTestDir "$Bench.v"
+    if (Test-Path $altBench) {
+        $benchFile = $altBench
+    } else {
+        throw "Testbench not found: $benchFile"
+    }
 }
 if (-not (Test-Path $glblPath)) {
     throw "Vivado glbl.v not found: $glblPath"
@@ -63,12 +69,17 @@ if ($Mutate) {
     $xvlogArgs += @('-d', $mutMacro)
 }
 
-# Include any shared RTL files under fpga/{third_party,link,artix,kria} if present.
+# Include shared RTL files under fpga/{third_party,link,artix,kria}, plus
+# fpga/eth/test/sgmii_lvds_test.v when running tb_sgmii_lvds.
 $rtlFiles = @()
-foreach ($sub in @('third_party', 'link', 'artix', 'kria')) {
-    $dir = Join-Path $fpgaDir $sub
-    if (Test-Path $dir) {
-        $rtlFiles += Get-ChildItem $dir -Recurse -Include *.v, *.sv | ForEach-Object { $_.FullName }
+if ($Bench -eq 'tb_sgmii_lvds') {
+    $rtlFiles += (Join-Path $fpgaDir 'eth\test\sgmii_lvds_test.v')
+} else {
+    foreach ($sub in @('third_party', 'link', 'artix', 'kria')) {
+        $dir = Join-Path $fpgaDir $sub
+        if (Test-Path $dir) {
+            $rtlFiles += Get-ChildItem $dir -Recurse -Include *.v, *.sv | ForEach-Object { $_.FullName }
+        }
     }
 }
 
