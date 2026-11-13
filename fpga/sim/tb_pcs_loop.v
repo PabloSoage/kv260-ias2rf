@@ -143,6 +143,7 @@ module tb_pcs_loop;
     ) u_pcs_rx (
         .clk                (clk_125m),
         .rst                (rst),
+        .link_ready         (1'b1),
         .rx_byte_l0         (rx_byte_l0),
         .rx_byte_l1         (rx_byte_l1),
         .out_valid          (rx_out_v),

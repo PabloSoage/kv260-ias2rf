@@ -49,16 +49,18 @@ All five pairs are AC-coupled with 100 nF capacitors (`C101`–`C110`) on the ad
 - **`LINK_RX_CLK_P/N` -> K26 `C1/B1` (`IO_L7P/N_T1L_N0/N1_QBC_AD13P/N_66`):** `QBC` (Quad-Byte Clock) in UltraScale+ Bank 66 HP. Although XTP682 labels the carrier net `HPA05_CC_P/N`, `C1/B1` is a `QBC` pin (`GC` pins in Bank 66 are `L11..L14`), which directly drives Bank 66 byte-clock routing (`BITSLICE` / `ISERDESE3` component-mode `CLK` via `BUFGCE`/`BUFGCE_DIV` or same-bank MMCM/PLL per UG572). `LINK_RX_D0` (`A2/A1` in `T1L_N2/N3`) and `LINK_RX_D1` (`B3/A3` in `T1L_N4/N5`) sit in the **exact same `T1L` lower nibble/byte group** as `LINK_RX_CLK`.
 - **`LINK_TX_CLK_P/N` -> Artix `N13/P13` (`IO_L11P/N_T1_SRCC_14`):** `SRCC` (Single-Region Clock Capable) in Artix-7 Bank 14. Drives `BUFIO` + `BUFR` directly in Bank 14, and `LINK_TX_D0` (`M16/N16`, `IO_L7P/N_T1_14`) sits in the same `T1` byte group of Bank 14.
 
-### Routed PCB & Package Delays (`[M]`)
-Measured by `_work/layout/lvds_skew.py` on `CSI2-KRIA-KV260_Rev01.kicad_pcb` (with `_work/layout/xc7a50t_ftg256_pkg_delays.csv`) and K26 SOM trace delays (`k26c/2.0/part0_pins.xml`):
+### Routed PCB & Package Delays (`[M]` / `[I]`)
+Measured by `_work/layout/lvds_skew.py` on `CSI2-KRIA-KV260_Rev01.kicad_pcb` (with `_work/layout/xc7a50t_ftg256_pkg_delays.csv`), K26 SOM trace delays (`k26c/2.0/part0_pins.xml`), and KV260 carrier estimate (`kv260_carrier/2.0/board.xml` / `XTP682`):
 
-| Pair | Adapter PCB + Artix Pkg P / N (ps) | Intra-Pair P-N (ps) | Data - Clock Skew on Adapter+Pkg (ps) | K26 SOM Trace Delay (ps) |
-| :--- | :---: | :---: | :---: | :---: |
-| `LINK_RX_CLK` | `678` / `677` (`+1` ps) | `+1` | Reference | `371.8 – 454.5` |
-| `LINK_RX_D0` | `773` / `772` (`+0` ps) | `+0` | `+95` ps vs `LINK_RX_CLK` | `365.5 – 446.7` |
-| `LINK_RX_D1` | `717` / `717` (`-0` ps) | `-0` | `+39` ps vs `LINK_RX_CLK` (**56 ps** inter-lane vs `D0`) | `364.6 – 445.7` |
-| `LINK_TX_CLK` | `661` / `665` (`-4` ps) | `-4` | Reference | `364.3 – 445.4` |
-| `LINK_TX_D0` | `805` / `810` (`-5` ps) | `-5` | `+145` ps vs `LINK_TX_CLK` | `366.9 – 448.6` |
+| Pair | Adapter PCB + Artix Pkg P / N (ps) | K26 SOM Min–Max P / N (ps) | K26 SOM Mid P / N (ps) | KV260 Carrier `J8 <-> SOM240_1` (ps) | End-to-End Total P / N (ps) | Skew vs Ref Clock (ps) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| `LINK_RX_CLK` (`A->K`) | `678` / `677` (`[M]`) | `371.84–454.47` / `371.74–454.36` (`[M]`) | **`413` / `413`** (`[M]`) | `180` / `180` (`[I]`*) | **`1271` / `1270`** | Reference (`A->K`) |
+| `LINK_RX_D0` (`A->K`) | `773` / `772` (`[M]`) | `365.49–446.71` / `365.46–446.68` (`[M]`) | **`406` / `406`** (`[M]`) | `180` / `180` (`[I]`*) | **`1359` / `1358`** | **`+88` ps** vs `LINK_RX_CLK` |
+| `LINK_RX_D1` (`A->K`) | `717` / `717` (`[M]`) | `364.58–445.60` / `364.68–445.72` (`[M]`) | **`405` / `405`** (`[M]`) | `180` / `180` (`[I]`*) | **`1302` / `1302`** | **`+31` ps** vs `LINK_RX_CLK` (**`-57` ps** vs `D0`) |
+| `LINK_TX_CLK` (`K->A`) | `661` / `665` (`[M]`) | `364.37–445.35` / `364.28–445.23` (`[M]`) | **`405` / `405`** (`[M]`) | `180` / `180` (`[I]`*) | **`1246` / `1250`** | Reference (`K->A`) |
+| `LINK_TX_D0` (`K->A`) | `805` / `810` (`[M]`) | `366.85–448.37` / `366.99–448.55` (`[M]`) | **`408` / `408`** (`[M]`) | `180` / `180` (`[I]`*) | **`1393` / `1398`** | **`+147` / `+148` ps** vs `LINK_TX_CLK` |
+
+*\*Carrier delay note (`[I]`): `kv260_carrier/2.0/board.xml` lists a uniform placeholder `typical_delay="5"` on every `connection_map` entry and `XTP682` does not publish per-net PCB trace lengths. The `J8 <-> SOM240_1` carrier flight time is modeled as `[I] 180 ps` common-mode (~27 mm length-matched MIPI CSI-2 stripline/microstrip with `< 5 ps` inter-pair skew).*
 
 ---
 

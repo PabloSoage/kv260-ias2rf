@@ -102,6 +102,10 @@ Every packet transfers between **1 and 4096 payload bytes** framed as a contiguo
 - **Dropped packet counter (`dropped_cnt[23:0]`):** TX-side saturating counter incremented whenever the upstream radar FIFO overflows or rejects a frame; piggybacked in every `/T/` trailer so Kria PS/PL observes upstream losses even if whole packets never entered the link.
 - **IEEE 802.3 CRC-32:** Polynomial `0x04C11DB7` (reflected `0xEDB88320`), initial seed `0xFFFFFFFF`, final XOR `0xFFFFFFFF`. Computed LSB-first over the **complete 64-bit `START` word**, the **64-bit `TIMESTAMP` word**, and all **`N` 64-bit `DATA` words** (all `8*N` bytes, with unused trailing bytes in the final word `= 8'h00`).
 - **Receiver validation (`link_deframer`):** Buffers or tags incoming packet words and checks `crc32` upon receiving `/T/` plus `1 <= pkt_len <= 4096`. Only asserts `pkt_done_ok` if CRC matches and protocol framing is intact; otherwise asserts `pkt_done_err` and increments `crc_err_cnt`.
+- **Intentional error-injection self-test in simulation (`PASS` lines with non-zero `crc_err`):** Normal clean runs of the verification testbenches deliberately inject single-bit channel errors on designated packets to confirm end-to-end CRC-32 error detection and packet rejection (`pkt_done_err` + `crc_err_cnt`):
+  - `tb_pcs_loop`: deliberately injects bit errors into `3` packets (`p == 5, 13, 21` -> expects **`crc_err=3`**, `rx_good=25` out of `28`, `0` payload mismatches).
+  - `tb_link_a2k` and `tb_link_k2a`: each deliberately inject a bit error into `1` packet (`p == 7` -> expects **`crc_err=1`**, `rx_good=19` out of `20`, `0` payload mismatches).
+  In all benches, a non-zero `crc_err` matching the exact injected packet count is required for `PASS`; a `0` `crc_err_cnt` causes the run (or the `skip_crc` mutation) to `FAIL`.
 
 ### 6.2 Radar Stream IDs (Aligned with AERIS `radar_protocol.py` Semantics)
 
@@ -120,16 +124,19 @@ Rather than tunneling AERIS's legacy 11-byte (`0xAA .. 0x55`) UART/FTDI USB reco
 
 ## 7. Hardware Training FSM & Register Map
 
-### 7.1 Kria RX Training FSM (`link_rx_train_fsm`)
-On the Kria K26 receiver (`IDELAYE3` TIME mode with `VAR_LOAD = TRUE` on Bank 66 HP, 512 fine taps @ ~4–5 ps/tap nominal ≈ 2.2 ns span; in Vivado XSim `ULTRASCALE_PLUS` behavioral simulation, `IDELAYE3` models `127 ps + cnt*4 ps` fixed fine delay without VT drift, requiring `EN_VTC = 0` during `LOAD` and `>= 4` `CLK` cycles after `RST` deassertion):
+### 7.1 Hardware Training FSM (`link_rx_train_fsm`)
+The receiver training FSM (`link_rx_train_fsm`) supports both receivers via parameterization:
+- **Kria K26 Uplink RX (`Bank 66 HP`, 2 lanes):** `IDELAYE3` TIME mode with `VAR_LOAD = TRUE` (512 fine taps @ 4 ps/tap in XSim `ULTRASCALE_PLUS` behavioral simulation; requires `EN_VTC = 0` during `LOAD` and `>= 4` `CLK` cycles after `RST` deassertion per UG571). Sweeps `CNTVALUEIN` across `[0 .. 511]`.
+- **Artix-7 Downlink RX (`Bank 14 HR`, 1 lane):** `IDELAYE2` `VAR_LOAD` mode (`REFCLK_FREQUENCY = 200.0`, 32 taps @ 78 ps/tap + 600 ps intrinsic in XSim `7SERIES`). Sweeps `CNTVALUEIN` across `[0 .. 31]`, bypassing multi-lane deskew (`SINGLE_LANE = 1`).
 
 | State | Code | Action | Exit Condition |
 | :--- | :---: | :--- | :--- |
-| `ST_RESET` | `3'd0` | Hold `en_vtc = 0`; wait `>= 16` `CLKDIV` cycles after `rst == 0` so `IDELAYE3` reset synchronizer settles | Wait timer expired |
-| `ST_EYE_SCAN` | `3'd1` | If `cfg_tap_override`, load `cfg_tap_l0`/`l1` directly; else sweep taps `[0 .. 511]` (step `TAP_STEP`), measure sync-header lock / bit stability per tap, compute widest passing window midpoint `(t_start + t_end) / 2` and load optimal `CNTVALUEIN` (`en_vtc = 0`, 1-cycle `LOAD` pulse) | Optimal center tap loaded |
-| `ST_BLOCK_LOCK` | `3'd2` | Wait for Clause 49 `l0_block_lock && l1_block_lock` while `IDELAYE3` settles | Both lanes locked (or timeout -> re-scan) |
-| `ST_DESKEW` | `3'd3` | Enable `link_rx_lanes` AM deskew across Lane 0 and Lane 1 | `deskew_lock == 1` (or timeout -> restart) |
-| `ST_LINK_UP` | `3'd4` | Assert `link_up = 1` (optional `en_vtc = 1` once BISC/VTC policy allows); monitor loss of `block_lock` or `deskew_lock` | Drops to `ST_BLOCK_LOCK` / `ST_EYE_SCAN` if lock lost |
+| `ST_RESET` | `3'd0` | Hold `en_vtc = 0`; wait `>= 16` `CLKDIV` cycles after `rst == 0` so `IDELAY` reset synchronizer settles | Wait timer expired |
+| `ST_EYE_SCAN` | `3'd1` | If `cfg_tap_override`, jump to load override; else sweep `CNTVALUEIN` from `0` to `MAX_TAP` (step `TAP_STEP`), allowing `link_block_lock` to align on entry into an eye and checking that descrambled blocks are error-free `/I/` (`8'h1E`) or `/A/` (`8'h4B`) training blocks (`l*_rx_blk_ok`); track the full passing tap window `[eye_left .. eye_right]` per lane | Full sweep complete |
+| `ST_LOAD_OPT` | `3'd2` | Compute midpoint `(eye_left + eye_right) >> 1` per active lane and issue a 1-cycle `LOAD` pulse with `en_vtc = 0` | Optimal center tap loaded |
+| `ST_BLOCK_LOCK` | `3'd3` | Wait for Clause 49 `l0_block_lock` (and `l1_block_lock` when `SINGLE_LANE == 0`) while `IDELAY` settles | Active lane(s) locked (or timeout -> re-scan) |
+| `ST_DESKEW` | `3'd4` | Enable `link_rx_lanes` AM deskew across Lane 0 and Lane 1 (bypassed when `SINGLE_LANE == 1`) | `deskew_lock == 1` (or timeout -> restart) |
+| `ST_LINK_UP` | `3'd5` | Assert `link_up = 1` (optional `en_vtc = 1` once BISC/VTC policy allows); monitor loss of `block_lock` or `deskew_lock` | Drops to `ST_BLOCK_LOCK` / `ST_DESKEW` if lock lost |
 
 ### 7.2 Control & Diagnostic Register Map (Both Ends)
 
