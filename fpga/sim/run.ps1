@@ -63,9 +63,9 @@ if ($Mutate) {
     $xvlogArgs += @('-d', $mutMacro)
 }
 
-# Include any shared RTL files under fpga/{link,artix,kria} if present.
+# Include any shared RTL files under fpga/{third_party,link,artix,kria} if present.
 $rtlFiles = @()
-foreach ($sub in @('link', 'artix', 'kria')) {
+foreach ($sub in @('third_party', 'link', 'artix', 'kria')) {
     $dir = Join-Path $fpgaDir $sub
     if (Test-Path $dir) {
         $rtlFiles += Get-ChildItem $dir -Recurse -Include *.v, *.sv | ForEach-Object { $_.FullName }

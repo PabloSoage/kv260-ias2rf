@@ -1,3 +1,6 @@
+// Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/fir_lowpass.v)
+// Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
+// License: MIT (see fpga/third_party/aeris/README.md)
 `timescale 1ns / 1ps
 
 module fir_lowpass_parallel_enhanced (

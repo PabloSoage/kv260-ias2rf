@@ -1,3 +1,6 @@
+// Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/ddc_input_interface.v)
+// Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
+// License: MIT (see fpga/third_party/aeris/README.md)
 `timescale 1ns / 1ps
 // ddc_input_interface.v
 module ddc_input_interface (

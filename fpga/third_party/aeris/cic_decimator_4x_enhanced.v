@@ -1,3 +1,6 @@
+// Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/cic_decimator_4x_enhanced.v)
+// Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
+// License: MIT (see fpga/third_party/aeris/README.md)
 module cic_decimator_4x_enhanced (
     input wire clk,                 // 400MHz input clock
     input wire reset_n,

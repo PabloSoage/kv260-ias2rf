@@ -1,3 +1,7 @@
+// Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/ddc_400m.v)
+// Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
+// License: MIT (see fpga/third_party/aeris/README.md)
+// Adaptation for kv260-ias2rf: wired cic_i_inst/cic_q_inst monitor ports.
 `timescale 1ns / 1ps
 
 module ddc_400m_enhanced (
@@ -569,7 +573,10 @@ cic_decimator_4x_enhanced cic_i_inst (
     .data_in(mixed_i[33:16]),
     .data_valid(mixed_valid),
     .data_out(cic_i_out),
-    .data_out_valid(cic_valid_i)
+    .data_out_valid(cic_valid_i),
+    .saturation_detected(),
+    .max_value_monitor(),
+    .reset_monitors(reset_monitors)
 );
 
 cic_decimator_4x_enhanced cic_q_inst (
@@ -578,7 +585,10 @@ cic_decimator_4x_enhanced cic_q_inst (
     .data_in(mixed_q[33:16]),
     .data_valid(mixed_valid),
     .data_out(cic_q_out),
-    .data_out_valid(cic_valid_q)
+    .data_out_valid(cic_valid_q),
+    .saturation_detected(),
+    .max_value_monitor(),
+    .reset_monitors(reset_monitors)
 );
 
 assign cic_valid = cic_valid_i & cic_valid_q;
