@@ -6,11 +6,13 @@
 
 ## 1. Physical & PCS Layering
 
-| Direction | Data Lanes | Clock Pair | Raw Rate / Lane | Aggregate Raw Rate | Net 64b/66b Rate | SERDES Width | Parallel Clock (`CLKDIV`) |
+| Direction | Data Lanes | Clock Pair | Raw Rate / Lane (Nom.) | Aggregate Raw Rate | Net 64b/66b Rate | SERDES Width | Parallel Clock (`CLKDIV`) |
 | :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Uplink (Artix -> Kria)** | 2 (`LINK_RX_D0`, `LINK_RX_D1`) | `LINK_RX_CLK` (200 MHz DDR) | 400 Mb/s | **800 Mb/s** | 775.76 Mb/s | 8-bit DDR | 100 MHz |
-| **Downlink (Kria -> Artix)** | 1 (`LINK_TX_D0`) | `LINK_TX_CLK` (200 MHz DDR) | 400 Mb/s | **400 Mb/s** | 387.88 Mb/s | 8-bit DDR | 100 MHz |
+| **Uplink (Artix -> Kria)** | 2 (`LINK_RX_D0`, `LINK_RX_D1`) | `LINK_RX_CLK` (500 MHz DDR) | 1.0 Gb/s | **2.0 Gb/s** | 1.939 Gb/s | 8-bit DDR | 125 MHz |
+| **Downlink (Kria -> Artix)** | 1 (`LINK_TX_D0`) | `LINK_TX_CLK` (500 MHz DDR) | 1.0 Gb/s | **1.0 Gb/s** | 0.970 Gb/s | 8-bit DDR | 125 MHz |
 
+- **Rate scaling (`link-decisions.md` #6):** All PCS and SERDES RTL is clock-rate agnostic; `400 MHz DDR` (`800 Mb/s/lane`, `CLKDIV = 100 MHz`) and `500 MHz DDR` (`1.0 Gb/s/lane`, `CLKDIV = 125 MHz`, nominal operating point) run on the exact same gateware.
+- **Forwarded clock (`link-decisions.md` #8):** Edge-aligned source-synchronous forwarding driven by an `OSERDES` lane transmitting constant `8'b1010_1010` (`10101010` LSB-first = `0,1,0,1,0,1,0,1` on wire) from the same serial/parallel clocks as the data lanes. Each receiver independently centers the sampling eye with `IDELAY`.
 - **Bit ordering on wire (LSB-first):** Within each parallel SERDES byte `tx_byte[7:0]`, bit `0` (`tx_byte[0]`) is transmitted first in time and bit `7` (`tx_byte[7]`) last. Within each 66-bit block `blk[65:0]`, `sync[1:0] = blk[1:0]` is transmitted first (`blk[0]` then `blk[1]`), followed by payload bits `blk[2]` through `blk[65]`.
 - **AC-coupling DC balance:** All `LINK_*` pairs are AC-coupled through 100 nF series capacitors (`C101`–`C110`). IEEE 802.3 Clause 49 self-synchronous scrambling bounds continuous run length and keeps DC baseline wander within the 100 nF + 100 Ω (`τ = 10 µs` high-pass) time constant.
 
@@ -52,9 +54,9 @@ Each 66-bit block on a physical lane is formed as `{payload[63:0], sync[1:0]}`:
 ## 4. 66:8 / 8:66 Gearboxes & Block Lock FSM
 
 ### 4.1 Gearbox Framing
-- At 8 bits per `CLKDIV` (100 MHz), **33 `CLKDIV` cycles = 264 bits = 4 x 66-bit blocks**.
-- `link_gearbox_tx` accepts a new 66-bit block via `in_ready` on cycles where internal accumulator occupancy `bit_cnt <= 58` (4 cycles out of every 33). If `in_valid` is low when `in_ready` asserts, an Idle block `{64'h0000_0000_0000_001E, 2'b10}` is substituted automatically after scrambling.
-- `link_gearbox_rx` appends 8 bits per `CLKDIV` cycle into a 132-bit shift accumulator and asserts `out_valid` whenever `>= 66` bits are available (4 cycles out of every 33). When `rx_slip` is pulsed for one cycle, 1 bit is discarded from the accumulator head, advancing the 66-bit extraction window by 1 bit time (1 UI = 2.5 ns). This unifies both intra-byte bit alignment (`0..7`) and block boundary alignment (`0..65`) inside plain Verilog-2001 logic.
+- At 8 bits per `CLKDIV` (125 MHz @ 1.0 Gb/s nominal), **33 `CLKDIV` cycles = 264 bits = 4 x 66-bit blocks**.
+- `link_gearbox_tx` accepts a new 66-bit block via `in_ready` on cycles where internal accumulator occupancy `bit_cnt <= 65` (4 cycles out of every 33). If `in_valid` is low when `in_ready` asserts, an Idle block `{64'h0000_0000_0000_001E, 2'b10}` is substituted automatically after scrambling.
+- `link_gearbox_rx` appends 8 bits per `CLKDIV` cycle into a 140-bit shift accumulator and asserts `out_valid` whenever `>= 66` bits are available (4 cycles out of every 33). When `rx_slip` is pulsed for one cycle, 1 bit is discarded from the accumulator head, advancing the 66-bit extraction window by 1 bit time (1 UI = 1.0 ns @ 1.0 Gb/s). This unifies both intra-byte bit alignment (`0..7`) and block boundary alignment (`0..65`) inside plain Verilog-2001 logic.
 
 ### 4.2 Clause 49.2.13 Block Lock State Machine (`link_block_lock`)
 - **Valid sync header check:** `sh_valid = (rx_sync == 2'b01) || (rx_sync == 2'b10)`.
@@ -119,7 +121,7 @@ Rather than tunneling AERIS's legacy 11-byte (`0xAA .. 0x55`) UART/FTDI USB reco
 ## 7. Hardware Training FSM & Register Map
 
 ### 7.1 Kria RX Training FSM (`link_rx_train_fsm`)
-On the Kria K26 receiver (`IDELAYE3` TIME mode with `VAR_LOAD = TRUE` on Bank 66 HP, 512 fine taps @ ~4–5 ps/tap nominal ≈ 2.2 ns span):
+On the Kria K26 receiver (`IDELAYE3` TIME mode with `VAR_LOAD = TRUE` on Bank 66 HP, 512 fine taps @ ~4–5 ps/tap nominal ≈ 2.2 ns span; in Vivado XSim `ULTRASCALE_PLUS` behavioral simulation, `IDELAYE3` models `127 ps + cnt*4 ps` fixed fine delay without VT drift, requiring `EN_VTC = 0` during `LOAD` and `>= 4` `CLK` cycles after `RST` deassertion):
 
 | State | Code | Action | Exit Condition |
 | :--- | :---: | :--- | :--- |
