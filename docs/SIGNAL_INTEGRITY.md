@@ -1015,7 +1015,9 @@ is 21.7 ps shorter. ETH_SGRX_PHY_P makes it up with a 3.2 mm bump on L8 (PHY-sid
 end to end, PHY to FPGA, the legs match within 1 ps in this model (vias not counted).
 
 In Ethernet mode the paths through the PHY's own pairs measure 350 mV / 50 ps (FPGA to PHY) and
-637 mV / 53 ps (PHY to FPGA). The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
+637 mV / 53 ps (PHY to FPGA).
+
+![Eye openings with the Ethernet option's branches](sim/eth_branches.png) The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
 0.17 mm; the gateware should hold LINK_RX_D1 static in Ethernet mode.
 
 ## 10. How it was checked
