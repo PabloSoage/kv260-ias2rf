@@ -1,0 +1,646 @@
+{
+  "board": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
+  "kicad_version": "10.0.6",
+  "audit_summary": {
+    "total_footprints": 570,
+    "broken_kicad10_paths_resolved": 19,
+    "missing_functional_models_resolved": 7,
+    "non_functional_omitted_count": 27,
+    "non_functional_omitted_types": [
+      "TP*",
+      "FID*",
+      "MH*",
+      "JP1101 SolderJumper"
+    ]
+  },
+  "storage_buckets": {
+    "repo": "mech/models3d/",
+    "cache": "../kv260-ias2rf/_work/mech/cache/models3d/"
+  },
+  "mappings": [
+    {
+      "ref": "U1001",
+      "value": "LMR33630ADDA",
+      "footprint": "Package_SO:Texas_HSOP-8-1EP_3.9x4.9mm_P1.27mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "LMR33630ADDA HSOP-8 EP"
+    },
+    {
+      "ref": "U1101",
+      "value": "XC7A50T-2FTG256I",
+      "footprint": "Package_BGA:Xilinx_FTG256",
+      "bucket": "repo",
+      "model_path": "mech/models3d/BGA-256_17.0x17.0mm_Layout16x16_P1.0mm_Ball0.5mm_Pad0.4mm_NSMD.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "XC7A50T-2FTG256I 17x17mm 1.0mm BGA"
+    },
+    {
+      "ref": "U1005",
+      "value": "TPS7A8300RGR",
+      "footprint": "Package_DFN_QFN:QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/Texas_VQFN-RGR-20-1EP_3.5x3.5mm_Pitch0.5mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "TPS7A8300RGR VQFN-20 3.5x3.5mm"
+    },
+    {
+      "ref": "U1006",
+      "value": "TPS7A8300RGR",
+      "footprint": "Package_DFN_QFN:QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/Texas_VQFN-RGR-20-1EP_3.5x3.5mm_Pitch0.5mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "TPS7A8300RGR VQFN-20 3.5x3.5mm"
+    },
+    {
+      "ref": "U1007",
+      "value": "TPS7A8300RGR",
+      "footprint": "Package_DFN_QFN:QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/Texas_VQFN-RGR-20-1EP_3.5x3.5mm_Pitch0.5mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "TPS7A8300RGR VQFN-20 3.5x3.5mm"
+    },
+    {
+      "ref": "U401",
+      "value": "ADCLK948BCPZ",
+      "footprint": "kv260-ias2rf:LFCSP-32-1EP_5x5mm_P0.5mm_EP2.7x2.7mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/LFCSP-32-1EP_5x5mm_P0.5mm_EP3.6x3.6mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "ADCLK948BCPZ LFCSP-32 5x5mm"
+    },
+    {
+      "ref": "U501",
+      "value": "AD9484BCPZ-500",
+      "footprint": "kv260-ias2rf:LFCSP-56-1EP_8x8mm_P0.5mm_EP5.1x5.1mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/QFN-56-1EP_8x8mm_P0.5mm_EP4.5x5.2mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "AD9484BCPZ-500 LFCSP-56 8x8mm"
+    },
+    {
+      "ref": "U601",
+      "value": "AD9253BCPZ-125",
+      "footprint": "Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/TQFN-48-1EP_7x7mm_P0.5mm_EP5.1x5.1mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "AD9253BCPZ-125 LFCSP-48 7x7mm"
+    },
+    {
+      "ref": "U1201",
+      "value": "RTL8211FSI-CG",
+      "footprint": "Package_DFN_QFN:QFN-48-1EP_6x6mm_P0.4mm_EP4.4x4.4mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/UQFN-48-1EP_6x6mm_P0.4mm_EP4.45x4.45mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "RTL8211FSI-CG QFN-48 6x6mm P0.4mm"
+    },
+    {
+      "ref": "U901",
+      "value": "M3SWA2-34DR+",
+      "footprint": "kv260-ias2rf:MiniCircuits_DQ3005",
+      "bucket": "repo",
+      "model_path": "mech/models3d/WQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "M3SWA2-34DR+ Mini-Circuits DQ3005 3x3mm QFN-16"
+    },
+    {
+      "ref": "U902",
+      "value": "M3SWA2-34DR+",
+      "footprint": "kv260-ias2rf:MiniCircuits_DQ3005",
+      "bucket": "repo",
+      "model_path": "mech/models3d/WQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "M3SWA2-34DR+ Mini-Circuits DQ3005 3x3mm QFN-16"
+    },
+    {
+      "ref": "U903",
+      "value": "M3SWA2-34DR+",
+      "footprint": "kv260-ias2rf:MiniCircuits_DQ3005",
+      "bucket": "repo",
+      "model_path": "mech/models3d/WQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "M3SWA2-34DR+ Mini-Circuits DQ3005 3x3mm QFN-16"
+    },
+    {
+      "ref": "U904",
+      "value": "M3SWA2-34DR+",
+      "footprint": "kv260-ias2rf:MiniCircuits_DQ3005",
+      "bucket": "repo",
+      "model_path": "mech/models3d/WQFN-16-1EP_3x3mm_P0.5mm_EP1.6x1.6mm.step",
+      "source": "KiCad 10 official (CC-BY-SA-4.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "M3SWA2-34DR+ Mini-Circuits DQ3005 3x3mm QFN-16"
+    },
+    {
+      "ref": "T701",
+      "value": "ADT2-1T+",
+      "footprint": "RF_Mini-Circuits:Mini-Circuits_CD542_H2.84mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/SMD-6_L7.9-W5.6-P2.54-LS7.0-BL.wrl",
+      "source": "EasyEDA / LCSC C3304975 (ADT1.5-17+ CD542 pin-compatible)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "ADT2-1T+ Mini-Circuits CD542 H2.84mm"
+    },
+    {
+      "ref": "T801",
+      "value": "ADT2-1T+",
+      "footprint": "RF_Mini-Circuits:Mini-Circuits_CD542_H2.84mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/SMD-6_L7.9-W5.6-P2.54-LS7.0-BL.wrl",
+      "source": "EasyEDA / LCSC C3304975 (ADT1.5-17+ CD542 pin-compatible)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "ADT2-1T+ Mini-Circuits CD542 H2.84mm"
+    },
+    {
+      "ref": "T802",
+      "value": "ADT2-1T+",
+      "footprint": "RF_Mini-Circuits:Mini-Circuits_CD542_H2.84mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/SMD-6_L7.9-W5.6-P2.54-LS7.0-BL.wrl",
+      "source": "EasyEDA / LCSC C3304975 (ADT1.5-17+ CD542 pin-compatible)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "ADT2-1T+ Mini-Circuits CD542 H2.84mm"
+    },
+    {
+      "ref": "Y401",
+      "value": "Si549 LVPECL 3V3 pinout C",
+      "footprint": "Oscillator:Oscillator_SMD_SI570_SI571_Standard",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/OSC-SMD_8P-L7.0-W5.0-BL.wrl",
+      "source": "EasyEDA / LCSC C2027087 (Si570 7050-8P)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "Si549 LVPECL 3V3 7x5mm XO"
+    },
+    {
+      "ref": "F1001",
+      "value": "PTC 1.5A hold",
+      "footprint": "Fuse:Fuse_1812_4532Metric",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/F1812_L4.5-W3.2-H1.0.wrl",
+      "source": "EasyEDA / LCSC C369174 (1812 PTC Fuse)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "PTC 1.5A hold 1812"
+    },
+    {
+      "ref": "L1001",
+      "value": "SRP7028A-8R2M",
+      "footprint": "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/IND-SMD_SRP7028A-8R2M.wrl",
+      "source": "EasyEDA / LCSC C2041815 (Bourns SRP7028A)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "SRP7028A-8R2M"
+    },
+    {
+      "ref": "L1010",
+      "value": "SRP7028A-3R3M",
+      "footprint": "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/IND-SMD_SRP7028A-8R2M.wrl",
+      "source": "EasyEDA / LCSC C2041815 (Bourns SRP7028A)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "SRP7028A-3R3M"
+    },
+    {
+      "ref": "L1020",
+      "value": "SRP7028A-3R3M",
+      "footprint": "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/IND-SMD_SRP7028A-8R2M.wrl",
+      "source": "EasyEDA / LCSC C2041815 (Bourns SRP7028A)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "SRP7028A-3R3M"
+    },
+    {
+      "ref": "L1030",
+      "value": "SRP7028A-2R2M",
+      "footprint": "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/IND-SMD_SRP7028A-8R2M.wrl",
+      "source": "EasyEDA / LCSC C2041815 (Bourns SRP7028A)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "SRP7028A-2R2M"
+    },
+    {
+      "ref": "J1001",
+      "value": "12V IN",
+      "footprint": "Connector_BarrelJack:BarrelJack_CUI_PJ-102AH_Horizontal",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/DC-IN-TH_PJ-102AH.wrl",
+      "source": "EasyEDA / LCSC C3096093 (CUI PJ-102AH)",
+      "offset_mm": [
+        2.25,
+        -3.0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "PJ-102AH barrel jack facing left board edge"
+    },
+    {
+      "ref": "J101",
+      "value": "BM20B(0.8)-34DP",
+      "footprint": "kv260-ias2rf:J-BM20B(0.8)-34DP",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/CONN-SMD_34P-P0.40_BM20B-0.8-34DP-0.4V-51.wrl",
+      "source": "EasyEDA / LCSC C424540 (Hirose BM20B(0.8)-34DP)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "Bottom-side MIPI/IAS1 Hirose 34-pin B2B plug"
+    },
+    {
+      "ref": "J102",
+      "value": "BM20B(0.8)-34DP",
+      "footprint": "kv260-ias2rf:J-BM20B(0.8)-34DP",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/CONN-SMD_34P-P0.40_BM20B-0.8-34DP-0.4V-51.wrl",
+      "source": "EasyEDA / LCSC C424540 (Hirose BM20B(0.8)-34DP)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "Bottom-side MIPI/IAS1 Hirose 34-pin B2B plug"
+    },
+    {
+      "ref": "J1201",
+      "value": "HR911130C",
+      "footprint": "kv260-ias2rf:RJ45_Hanrun_HR911130C",
+      "bucket": "cache",
+      "model_path": "../kv260-ias2rf/_work/mech/cache/models3d/RJ45-TH_HR911130C.wrl",
+      "source": "EasyEDA / LCSC C50933 (Hanrun HR911130C)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        180
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "RJ45 magnetics jack facing right board edge"
+    }
+  ]
+}
