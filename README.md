@@ -345,6 +345,23 @@ side, and the common mode through the layer change
 
 ---
 
+## Mounted on the KV260
+
+A printed base holds the KV260 and the adapter together: posts in place of the carrier's rubber feet,
+posts under the overhang, a wall that takes the SMA cables' torque, and a pedestal and strap that
+carry the Ethernet tab ([MECHANICAL](docs/MECHANICAL.md); STLs in `mech/`). Rendered in Blender
+(Cycles) with AMD's KV260 model.
+
+![The KV260 and the adapter on the printed base](docs/img/mount_iso.jpg)
+
+| The RJ45 tab, pedestal and strap | The SMA wall |
+|---|---|
+| ![RJ45](docs/img/mount_rj45.jpg) | ![SMA wall](docs/img/mount_sma.jpg) |
+
+![From the other side](docs/img/mount_iso_back.jpg)
+
+---
+
 ## Legal notice
 
 This design transmits on regulated bands. Operating the SDR transmitter requires an amateur radio
