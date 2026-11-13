@@ -52,7 +52,7 @@ LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B
 # The order, as it must be entered on jlcpcb.com (docs/FABRICATION.md explains each)
 ORDER = [
     ("Layers", "8"),
-    ("Dimensions", "119 x 120 mm (outline in the Gerbers)"),
+    ("Dimensions", "140 x 132 mm (bounding box with the Ethernet tab; outline in the Gerbers)"),
     ("PCB thickness", "1.6 mm"),
     ("Impedance control", "Yes, stackup JLC08161H-2116C"),
     ("Outer / inner copper", "1 oz / 0.5 oz"),

@@ -1,6 +1,6 @@
 # JLCPCB order — quote
 
-*10 November 2026, bare boards re-quoted on 8 layers on 12 November, parts and assembly for the Ethernet option on 13 November · board CSI2-KRIA-KV260_Rev01 · not ordered yet*
+*10 November 2026, bare boards re-quoted on 8 layers on 12 November, parts, assembly and bare boards for the Ethernet option (140 × 132 mm) on 13 November · board CSI2-KRIA-KV260_Rev01 · not ordered yet*
 
 What ordering the board from JLCPCB, made and assembled, would cost today. This is a budget, not an
 order: nothing was uploaded and no cart was created. How to enter the order is in
@@ -16,22 +16,22 @@ table in §4.
 
 | | 2 assembled boards | 5 assembled boards | Source |
 |---|---|---|---|
-| Bare boards, 8 layers (5 made either way) | 282.92 | 282.92 | JLCPCB's quote page, §2 |
+| Bare boards, 8 layers, 140 × 132 mm (5 made either way) | 287.96 | 287.96 | JLCPCB's quote page, §2 |
 | Assembly fees | 265.73 | 290.51 | JLCPCB's price page, §3 |
 | Parts (107 LCSC codes) | 1,503.56 | 3,602.84 | JLCPCB's parts search, §4 |
 | Si549 oscillator, bought apart and consigned | ~40 `[E]` | ~100 `[E]` | No LCSC code, §5 |
-| Shipping, UPS Express Saver, duties paid (DDP) | 26.60 | 26.60 | Quote page, for the bare boards' 0.42 kg; more for assembled ones |
-| **Total** | **≈ 2,119** | **≈ 4,303** | |
-| Per board | ≈ 1,059 | ≈ 861 | |
+| Shipping, UPS Express Saver, duties paid (DDP) | 26.08 | 26.08 | Quote page, for the bare boards' 0.50 kg; more for assembled ones |
+| **Total** | **≈ 2,124** | **≈ 4,308** | |
+| Per board | ≈ 1,062 | ≈ 862 | |
 
 On 6 layers the bare boards were $236.88, so the move to 8 layers adds **$46.04 to the order**,
 2 % of the total for two boards. The parts list grew by two 0402 resistors (R105, R106), a few cents.
 
 **The Ethernet option (13 November, CONTROL_SPEC §7) adds about $46 to two boards:** $25 of parts
 (the PHY and the RJ45 are most of it) and $21 of assembly, mostly the 12 new feeders. Its four
-DNP capacitors are not in the BOM. **The bare boards were not re-quoted:** the RJ45's tab makes the
-board's bounding box 140 × 132 mm (119 × 132 before), and JLCPCB prices by it. Re-quote before
-ordering.
+DNP capacitors are not in the BOM. **The bare boards, re-quoted for the tab's 140 × 132 mm bounding
+box, cost $5.04 more** ($287.96 against $282.92): the board line $15.30 against $11.90, the rest a
+few cents up since 12 Nov (§2).
 
 **Parts are three quarters of the cost,** and eight lines are almost 90 % of the parts (about $654 of $739 per board):
 
@@ -56,27 +56,27 @@ Mouser, often for less than the LCSC list price.
 
 ---
 
-## 2. Bare boards: $282.92 for 5
+## 2. Bare boards: $287.96 for 5
 
 Entered on [jlcpcb.com/quote](https://cart.jlcpcb.com/quote) on 12 Nov 2026 with the values of
 FABRICATION §2 (8 layers); the 6-layer column is the same page on 10 Nov. Nothing was uploaded: the
 page prices from the dimensions.
 
-| Field | Value | 6 layers (2116A) | 8 layers (2116C) |
-|---|---|---|---|
-| Layers, size, quantity | 119 × 120 mm, 5 | Board **9.30** | Board **11.90** |
-| Thickness, finish | 1.6 mm (2116C is 1.52 mm actual), ENIG 1 µ" | Surface finish **18.20** | **18.20** |
-| Material | FR4 TG155 | **3.66** | 0.00 |
-| Copper | 1 oz outer, 0.5 oz inner | — | — |
-| **Stack** | JLC06161H-2116A / **JLC08161H-2116C** | Stack-up fee **102.79** | **83.89** |
-| Impedance control | ±10 % | **33.08** | **33.08** |
-| Via covering | Epoxy filled & capped (POFV) | 0.00 | 0.00 |
-| Min via | 0.2 mm hole (the board's 0.20 / 0.45 mm vias) | **18.31** | **18.31** |
-| 4-wire Kelvin test | Forced on by the 0.2 mm vias | **17.49** | **17.49** |
-| Confirm production file | Forced on by the specified stack | **1.05** | **1.05** |
-| Engineering fee | | **33.00** | **99.00** |
-| Build time | 7–8 days | 0.00 | 0.00 |
-| **Total** | | **236.88** | **282.92** (desktop app: 277.92) |
+| Field | Value | 6 layers (2116A) | 8 layers (2116C) | 8 layers, 140 × 132 (13 Nov) |
+|---|---|---|---|---|
+| Layers, size, quantity | 119 × 120 mm, 5 (140 × 132 on 13 Nov) | Board **9.30** | Board **11.90** | Board **15.30** |
+| Thickness, finish | 1.6 mm (2116C is 1.52 mm actual), ENIG 1 µ" | Surface finish **18.20** | **18.20** | **18.70** |
+| Material | FR4 TG155 | **3.66** | 0.00 | 0.00 |
+| Copper | 1 oz outer, 0.5 oz inner | — | — | — |
+| **Stack** | JLC06161H-2116A / **JLC08161H-2116C** | Stack-up fee **102.79** | **83.89** | **84.24** |
+| Impedance control | ±10 % | **33.08** | **33.08** | **33.08** |
+| Via covering | Epoxy filled & capped (POFV) | 0.00 | 0.00 | 0.00 |
+| Min via | 0.2 mm hole (the board's 0.20 / 0.45 mm vias) | **18.31** | **18.31** | **18.83** |
+| 4-wire Kelvin test | Forced on by the 0.2 mm vias | **17.49** | **17.49** | **17.76** |
+| Confirm production file | Forced on by the specified stack | **1.05** | **1.05** | **1.05** |
+| Engineering fee | | **33.00** | **99.00** | **99.00** |
+| Build time | 7–8 days | 0.00 | 0.00 | 0.00 |
+| **Total** | | **236.88** | **282.92** (desktop app: 277.92) | **287.96** (desktop app: 282.96) |
 
 The difference is the engineering fee ($99 on 8 layers against $33) and the board itself; the
 2116C stack-up fee is lower than 2116A's. The page warns that 2116C is 1.5216 mm thick, not 1.6 mm
