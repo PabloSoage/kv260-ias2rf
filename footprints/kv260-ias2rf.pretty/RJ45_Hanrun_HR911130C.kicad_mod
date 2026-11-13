@@ -270,4 +270,15 @@
 		(uuid "7a52077e-9669-5af1-ad1f-647142f91ad3")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/RJ45_Hanrun_HR911130C.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )

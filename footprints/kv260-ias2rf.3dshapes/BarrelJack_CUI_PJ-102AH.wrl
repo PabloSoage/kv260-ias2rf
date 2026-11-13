@@ -1,0 +1,7 @@
+#VRML V2.0 utf8
+# simple model, kv260-ias2rf _work/layout/models3d.py
+Transform { scale 0.393701 0.393701 0.393701 children [
+Transform { translation 0.0000 -6.8000 5.5000 children Shape { appearance Appearance { material Material { diffuseColor 0.080 0.080 0.090 specularColor 0.18 0.18 0.18 shininess 0.30 } } geometry Box { size 9.0000 14.4000 11.0000 } } }
+Transform { translation 0.0000 -14.1000 2.2500 rotation 0 0 1 0 children Shape { appearance Appearance { material Material { diffuseColor 0.320 0.330 0.350 specularColor 0.18 0.18 0.18 shininess 0.30 } } geometry Cylinder { radius 3.2500 height 0.1000 } } }
+Transform { translation 0.0000 -14.1500 4.5000 rotation 0 0 1 0 children Shape { appearance Appearance { material Material { diffuseColor 0.780 0.780 0.760 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Cylinder { radius 1.0000 height 0.1000 } } }
+] }
