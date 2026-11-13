@@ -999,16 +999,23 @@ branch ending on an empty 0402 pad. Each leg was simulated as routed, with the b
 
 | Pair | No branch | As built | Branch |
 |---|---|---|---|
-| LINK_TX_D0 | 518 mV, 21 ps | 489–499 mV, 17 ps | P: C1218 on the bottom face, on the via of R101's pad, so only its pad. N: 1.0 mm. About 10 mm from the connector |
+| LINK_TX_D0 | 518 mV, 21 ps | 477–484 mV, 18–23 ps | P: C1218 on the top face at (178.9, 98.3), a via in each pad: 0.9 mm of L3 and the via up, about 14 mm from the connector. N: 1.0 mm, about 10 mm from it |
 | LINK_RX_D0 | 609 mV, 93 ps | 601–607 mV, 109 ps | 4.3 mm (P) and 5.2 mm (N, 2 vias), near the connector |
 
-A 6.6 mm branch on LINK_TX_D0_P, the first placement, gave 461 mV. **C1218 sits on the bottom face
-over the carrier:** the clearance map (INTERFACE_SPEC §5.3) shows no carrier part rising through
-the board there, but it cannot show parts lower than 0.8 mm. That matters only if C1218 is fitted
-(Ethernet mode). Check under that spot before fitting it.
+Where C1218 went (all three simulated the same way):
+
+| C1218 | LINK_TX_D0 eye | Why not kept |
+|---|---|---|
+| Top face beside R101, 6.6 mm branch | 461 mV | the branch |
+| Bottom face on R101's via, only its pad | 489–499 mV | over the carrier, 0.8 mm above it: no part may go on the underside there (LAYOUT §1) |
+| **Top face below the notch, 0.9 mm of L3 + via (kept, 13 Nov)** | **477–484 mV** | — |
+
+Its tap now sits 3.2 mm further down LINK_TX_D0_P than C1219's on N, so in Ethernet mode the P path
+is 21.7 ps shorter. ETH_SGRX_PHY_P makes it up with a 3.2 mm bump on L8 (PHY-side P−N +20.9 ps):
+end to end, PHY to FPGA, the legs match within 1 ps in this model (vias not counted).
 
 In Ethernet mode the paths through the PHY's own pairs measure 350 mV / 50 ps (FPGA to PHY) and
-647 mV / 86 ps (PHY to FPGA). The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
+637 mV / 53 ps (PHY to FPGA). The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
 0.17 mm; the gateware should hold LINK_RX_D1 static in Ethernet mode.
 
 ## 10. How it was checked
