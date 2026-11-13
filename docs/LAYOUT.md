@@ -258,7 +258,7 @@ Parts chosen for this step, each checked against its datasheet (all fetched by
 | **T701, T801, T802** | **Mini-Circuits ADT2-1T+**, CD542 | Impedance ratio 2, 0.4–450 MHz, 50 Ω. The 100 Ω secondary (6/4) goes to the DAC, the primary (3/1) to the line. KiCad's PL-052 variant of the footprint grounds pin 4, which a balun must not, so the plain CD542 pads are used |
 | **L1001** | Bourns SRP7028A-8R2M | Isat 7.5 A ≥ the LMR33630's 5.05 A current limit; Irms 4 A |
 | **L1010, L1020, L1030** | Bourns SRP7028A-3R3M, -3R3M, -2R2M | Isat 12 / 12 / 14 A ≥ 3.5 A |
-| **Q1001** | Diodes DMP3013SFV | −30 V, −12 A, 9.5 mΩ at −10 V, VGSS ±25 V |
+| **Q1001** | Diodes DMT10H015LFG (was DMP3013SFV) | 100 V N-FET, back to back with Q1003 under LM74502-Q1 U1009: [POWER_SPEC.md](POWER_SPEC.md) §1.1 |
 
 ---
 

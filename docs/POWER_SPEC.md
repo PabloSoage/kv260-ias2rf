@@ -9,7 +9,8 @@ sizing are in [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1, recomputed by `_
 for the tree as drawn.
 
 ```
-12 V jack ─ PTC ─ P-MOSFET (reverse polarity) ─ TVS ─► +12V
+12 V jack ─ PTC ─ SMCJ33CA ─ Q1001 ┐ back-to-back N-FETs, LM74502-Q1 (U1009): reverse battery,
+                              Q1003 ┘ overvoltage cut-off at 18.3 V ─ SMBJ18CA ─► +12V   (§1.1, Rev05)
 +12V   ─ U1001 LMR33630  buck ─► +5V0    1605 mA   (3 A part)
 +5V0   ─ U1002 TPS562201 buck ─► +3V3_D  1157 mA   (2 A part)
        ─ U1003 TPS562201 buck ─► +2V5     601 mA   FPGA LVDS banks, and feeds +1V8_A
@@ -39,6 +40,42 @@ The four regulator symbols are new, each transcribed from its datasheet's pin ta
 LMR33630 symbol, but it inherits from another one (`extends`), which the generator doesn't
 support.
 
+
+### 1.1 Input protection for a vehicle supply (Rev05, 13 Nov)
+
+The RF review of 13 November (finding B1) was right: the old chain was jack, PTC, a −30 V P-MOSFET and only
+then the TVS. ISO 7637-2 pulse 1 (−150 V from 10 Ω, LM74502-Q1 datasheet §10.2.3) puts its whole amplitude
+across that MOSFET before anything clamps. The input is now TI's 12 V battery design (LM74502-Q1 datasheet
+SNOSDE0A, Figure 10-1), oversized where the board allows it:
+
+| Part | Value | Why |
+|---|---|---|
+| F1001 | PTC 1.5 A hold, 24 V (unchanged) | Ahead of everything. Only a sustained input above the TVS breakdown (36.7 V) can trip it: an abnormal fault, see the limits below |
+| D1003 | **SMCJ33CA**, bidirectional, 1500 W, at VIN_F | Breakdown ≥ 36.7 V: above the 24 V jump start and the 35 V suppressed load dump (ISO 16750-2 test B), as §10.2.3 requires; ≥ 16 V reverse battery. Clamps pulse 1 to about 47–53 V at 15 A. TI's design uses the 600 W SMBJ33CA; the SMC part doubles its energy rating |
+| Q1001, Q1003 | **DMT10H015LFG**, 100 V, 13.5 mΩ at 10 V, PowerDI3333-8 | Back to back, common source. With the TVS clamping pulse 1 at −53 V and the output held at +12 V by its capacitors, the blocking FET sees about 65 V: TI's 60 V example would have no margin. VGS(max) ±20 V > the 13.9 V gate drive (§10.2.2.2). Q1001 keeps its footprint |
+| U1009 | **LM74502-Q1** (SOT-23-8) | 3.2–65 V, −65 V reverse (Features), charge pump 12.4 V, 60 µA gate source, 2 A sink |
+| R1004, R1005 | 100 k / 7.32 k (0603) | Overvoltage cut-off. V<sub>OVR</sub> = 1.165 / 1.25 / 1.333 V (§7.5) gives **17.1 / 18.3 / 19.5 V**. That is above the 14.8 V a charging alternator gives and below D1001's 20.0 V minimum breakdown, so D1001 never conducts steadily. 171 µA in the divider against 110 nA OV leakage |
+| C1090 | 100 nF 100 V at VS | Pin Functions: "Connect a 100-nF capacitor across VS and GND" |
+| C1091 | 220 nF 25 V, VCAP to VS | §10.2.2.4: ≥ 10 × C<sub>ISS</sub> of the two FETs; TI's value |
+| D1001 | **SMBJ18CA** on +12V (was SMBJ15CA) | Catches the microseconds before the OV comparator opens the FETs, at ≤ 29 V: inside the 36 V of the LMR33630 and a brief overshoot for the 25 V input capacitors. Its 20 V minimum breakdown keeps it off below the cut-off |
+
+EN/UVLO is tied to VS (always on). The +12V rail now sees at most about 19.5 V steady state; anything above
+opens both FETs and the board resets, which is the intended response to a load dump or a 24 V jump start.
+
+**Layout.** Q1001 stays where it was on the top side. U1009, Q1003, D1003, C1090 and C1091 are on the bottom
+under the jack, outside the KV260's outline (y > 117.25 mm), where the bottom was empty; R1004 and R1005 take
+D1002's and R1001's place on the top. DRC with zones refilled and schematic parity: 0 errors, 0 unconnected,
+0 parity issues (one warning: D1003's flipped footprint differs from the library copy in its silkscreen only).
+
+**Limits, said plainly.**
+- A sustained input above 36.7 V (an unsuppressed load dump, or a 24 V system's alternator fault) makes D1003
+  conduct; the PTC then trips with more than its 24 V rating across it. A 1812 PTC rated 60 V at 1.5 A does
+  not exist. Fit the vehicle harness with its usual inline fuse (3 A) in any case.
+- The new parts are not in [JLCPCB_QUOTE.md](JLCPCB_QUOTE.md) yet; LCSC stock of the DMT10H015LFG was not
+  confirmed (alternative: any 80–100 V N-FET, ≤ 20 mΩ at 10 V, VGS ±20 V, in PowerDI3333-8).
+- The enclosure's tray honeycomb must be pocketed under the new bottom parts (D1003 is 2.3 mm tall) before
+  printing: see [ENCLOSURE.md](ENCLOSURE.md).
+
 ---
 
 ## 2. Decisions this sheet makes, for your approval
@@ -52,13 +89,13 @@ support.
 | **No power sequencing** | Every regulator comes up as soon as its input does. Xilinx recommends an order for the 7 series (VCCINT, then VCCAUX, then VCCO) to minimise inrush current. **Checked in DS181 since** ([CONTROL_SPEC.md](CONTROL_SPEC.md) §4): the order is a recommendation; the one hard limit, VCCO − VCCAUX > 2.625 V for at most 300 ms per cycle, is met because +1V8_D is an LDO fed from +3V3_D | An EN chain, or an RC delay on each EN |
 | **Switching frequencies 400 and 580 kHz** | The datasheets' own designs. Their harmonics fall in the HF band the SDR receives. The layout has to keep the switchers away from the SDR front-end inputs, and the ADCs have ferrite-filtered rails | 2.1 MHz LMR33630 version: fewer harmonics in HF, a little less efficient |
 | **LM2663 gives about −3.25 V** | ROUT 3.5 Ω typ × 8 mA pulls it about 30 mV below −3.3 V in magnitude. The M3SWA2 quotes VEE −3.3 V typical, −3.6 V minimum, and no maximum | A regulated negative rail |
-| **Bidirectional TVS** (SMBJ15CA) | KiCad's TVS symbol is bidirectional. The BOM had SMBJ15A. On a DC input either works: reverse polarity is blocked by Q1001 | Unidirectional SMBJ15A with a diode symbol |
+| **Bidirectional TVS** (SMBJ15CA, now SMBJ18CA on +12V and SMCJ33CA at the input) | Superseded by §1.1 | — |
 
 **Chosen at layout (25 Sep; [LAYOUT.md](LAYOUT.md) §5), each against its datasheet:**
 - **Inductors:** Bourns SRP7028A. The 8R2M has Isat 7.5 A, above the LMR33630's 5.05 A current
   limit. The 3R3M and 2R2M have Isat 12 A and 14 A, above the 3.5 A needed.
 - **P-MOSFET:** Diodes DMP3013SFV (−30 V, −12 A, 9.5 mΩ, VGSS ±25 V), with numbered pins that
-  match its PowerDI3333-8 footprint.
+  match its PowerDI3333-8 footprint. **Replaced on 13 Nov (§1.1).**
 
 The TPS7A8300's stock footprint has a 2 × 2 mm pad; check it against the RGR drawing.
 
