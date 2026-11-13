@@ -29,3 +29,11 @@ mise.local.toml
 
 # The private working repository (kv260-ias2rf-docs), checked out inside this one
 /docs-repo/
+
+# Vivado / XSim scratch written to the working directory
+.Xil/
+.gen/
+.srcs/
+clockInfo.txt
+*.jou
+*.log.bak

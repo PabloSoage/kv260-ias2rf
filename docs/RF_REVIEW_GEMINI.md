@@ -184,3 +184,35 @@ python fpga/review/calc_rf_si_margins.py
 3. **PDN Target Impedance `Z(f)` & Measured Transient Load Step:** Verified rail topology, buck switching frequencies, and bypass capacitance counts from schematics, but did not simulate frequency-domain PDN impedance poles/anti-resonances with vendor MLCC ESL/ESR DC-bias derating models (`0402/0603/1210`).
 4. **3D Structural Modal / Shock-Response FEA & Thermal CFD:** The bare FR4 fundamental plate frequency (`~258 Hz`) highlights mechanical risk, but exact resonant shift under the bolted Kria KV260 SOM + heatsink (center-of-mass eccentricity, standoffs, connector stiffness) and forced convection / solar enclosure temperatures require SolidWorks/ANSYS FEA + CFD.
 5. **Internal KV260 SOM Carrier Stackup & Connector Routing:** Evaluated carrier pins (`J101/J102`) strictly against [`fpga/kria/xck26.xdc`](../fpga/kria/xck26.xdc) and [`docs/PINMAP.md`](PINMAP.md) without Xilinx internal K26 SOM KiCad/Allegro CAD sources.
+
+---
+
+## 12. Verification of these findings (Claude, 13 November 2026)
+
+Every finding was re-checked against the board file, the netlist and the project's own analyses before
+anything was changed. Most of what follows uses `docs/SIGNAL_INTEGRITY.md` (SI), `docs/POWER_SPEC.md`,
+`docs/CONTROL_SPEC.md` and the board itself.
+
+**A modelling error that affects H1, H4 and H5.** The review treats `In3.Cu` as a reference plane under the
+inner signal layers and counts crossings of its splits as broken return paths. On this 8-layer stack
+(JLC08161H-2116C, SI §8) `In3.Cu` is **L4, the split power layer, and carries no signal**. Every inner
+signal layer has a solid ground 0.12–0.13 mm away: L3 (`In2.Cu`) returns in L2, L6 (`In5.Cu`) in L5 and L7.
+A split in L4 under an L3 or L6 line does not interrupt that return (SI §1, §5 *Plane splits under fast
+lines: none*). The "split crossings" in H1/H4/H5 are therefore not defects.
+
+| # | Verdict | Evidence | Action |
+|---|---|---|---|
+| B1 | **Real, fixed** | Q1001 was a −30 V P-FET ahead of the TVS | Rev05 input protection: LM74502-Q1, back-to-back 100 V N-FETs, SMCJ33CA (POWER_SPEC §1.1, commit 0cccb05) |
+| B2 | Not a defect | C414–C421 sit on LVDS/LVPECL clock pairs at 100–500 MHz, not on the 10 MHz reference input; the external reference enters U401's CLK0 through C413 (100 nF), as the review itself notes | None |
+| H1 | **Known, documented; two numbers wrong** | The uncoupled LINK/ADCS pairs are listed in SI §8 (*ten pairs are not coupled*, with why and their eye cost). They are matched in **time** including the FPGA package delays, not in length; layer changes alter the velocity. ETH_SGRX's "9.369 mm / 63.8 ps skew" is the PHY-side segment alone: it deliberately offsets the 3.2 mm tap of C1218 on LINK_TX_D0 and the end-to-end legs match within 1 ps (SI §9.7). `In3.Cu` crossings: see above | Rev06 removes the ETH taps and gives Ethernet its own pairs (fpga/eth/REDUNDANCY.md §4) |
+| H2 | Not a defect (as stated) | DS181's order is a *recommendation* for minimum inrush and tri-stated I/O; the hard limit (VCCO − VCCAUX ≤ 2.625 V for ≤ 300 ms) is met because +1V8_D is an LDO fed from +3V3_D (POWER_SPEC §2, CONTROL_SPEC §4) | None now; an EN chain is the listed alternative |
+| H3 | **Partly real, overstated** | The review counts only the bead's impedance; FB401 / FB501 / FB601 work with 10 µF + local caps as an LC low-pass (≈ 40 dB at 580 kHz with ~1 µH). But FB401 carries 483 mA DC (CLOCK_SPEC), and ferrite beads lose much of their low-frequency inductance under DC bias | Rev06: replace FB401 with a real shielded inductor (≥ 1 µH, I_sat > 1 A) + 22 µF, or a dedicated LDO for +3V3_CLK; quantify with the vendor's DC-bias curves first |
+| H4 | Mostly not a defect | Split crossings: see above. CLK0 / Q3 were already separated in SI §3.5 (0.22 → 1.0–1.3 mm). CLK_ADCS is a coupled pair on L6 since 12 Nov (74/80 % coupled, SI §9.4) | Y401's 3.04 / 4.01 mm return-via distances are re-checked in the final review pass |
+| H5 | **Known, documented decision** | J1103 is the ribbon to AERIS-10's ADAR1000s; its 5 grounds for 35 lines are a recorded decision (CONTROL_SPEC §2): static control lines and a few-MHz SPI, with `SLEW = SLOW` | `SLEW = SLOW`, `DRIVE = 4/8` on every J1103 output in the Artix XDC (asked of the gateware, task 17). Rev06 candidate: a 2 × 25 with a ground beside every signal |
+| H6 | **Real, fixed** | U1201's 4.4 × 4.4 mm exposed pad had a single via | Nine GND vias added (ten in all), placed clear of the In2 LED track, ETH_SGRX_N on In5 and the B.Cu ETH_1V0 track and caps; DRC 0 errors. The AD8352s' 2–5 vias in a 1.6 mm pad are adequate (≈ 0.25 W each) |
+| H7 | **Partly real, fixed in the docs** | FABRICATION.md's order table and impedance table still described 6 layers: corrected to JLC08161H-2116C, 0.09 mm min track. The in-pad vias carry `capping yes / filling yes` individually; the board-wide default being "no" is cosmetic, the order form asks POFV. The 8 stock shortfalls are in JLCPCB_QUOTE §1. The 26.65 mm overhang of J101/J102 is supported in the enclosure by the honeycomb floor under both boards (docs/ENCLOSURE.md §2) | — |
+| M1 | **Real, fixed** | In this board's termination (100 Ω differential at both ends: R702+R703 and the 50 Ω line through the 1:2 balun) AERIS-10's filter sags 2.0 dB from 10 to 45 MHz; reproduced with an independent ABCD model from the netlist | 5th-order Butterworth for 100 Ω on all three DAC filters, values only (DAC_RADAR_SPEC §1). The balun's 0.4 MHz lower edge is a band-plan question, noted |
+| M2 | To re-check | — | Final review pass (RF50 pour edge and the 64.9 Ω input shunt, which follows AD8352 Figure 26) |
+| M3 | Partly relevant | The board goes in a vehicle, not a UAV; the enclosure clamps the boards. A barrel jack in vibration is a fair concern | Rev06 candidate: a locking power connector |
+| M4 | **Real, doc only** | The IAS_LINK schematic note still said "2 × 49.9 Ω"; the board has 100 Ω at the receiver and 10 k bias since 12 Nov | Note corrected |
+| L1 | Mostly addressed | E24 values: the new DAC filter is E24. ERC's 7 warnings are known and benign | — |

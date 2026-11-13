@@ -2704,7 +2704,7 @@
 		)
 		(uuid "4bb9ca6e-1784-56a2-ab89-016924bf0beb")
 	)
-	(text "2. Kria -> FPGA pairs: 2 x 49.9 ohm to +1V2 terminate and re-bias them for the FPGA."
+	(text "2. Kria -> FPGA pairs: 10k to +1V2 re-bias them; 100 ohm across each pair at the FPGA (R105, R106) terminates them."
 		(exclude_from_sim no)
 		(at 152.4 213.36 0)
 		(effects

@@ -19,7 +19,7 @@ DACR_D0..7, DACR_CLK ──► U701 AD9708 ──► 50 Ω loads ──► LC fi
 |---|---|---|
 | **Internal 1.2 V reference, not AERIS's arrangement** | AERIS ties REFLO to AVDD, which disables the internal reference, and REFIO to +3.3 V. That makes 3.3 V the reference input, but the datasheet allows **0.1–1.25 V** there (Table 1, *Reference Input, Input Compliance Range*). Here REFLO goes to ACOM and REFIO gets its 0.1 µF, as the pin description says. **Worth telling the AERIS-10 author**: it may explain a lower-than-expected full scale on their board | — |
 | **20 mA full scale** (RSET = 1.91 kΩ) | I_OUTFS = 32 × V_REFIO / RSET (Table 1 note 2). 20 mA is the maximum and gives the most output. Across 49.9 Ω that's 1.0 V, inside the 1.25 V output compliance | A larger RSET for less output: 3.83 kΩ gives 10 mA |
-| **AERIS-10's reconstruction filter, unchanged** | Measured on their board. By its values the cut-off is around 50 MHz, which suits a DAC clocked up to 125 MSPS. The values are "as designed" (107.3 nH, 32.8 pF, 106 pF); the BOM should take the nearest real parts | Redesign it for this board's own chirp band, once that is fixed |
+| **A 5th-order Butterworth for 100 Ω, −3 dB at 50 MHz (13 Nov), same topology and footprints as AERIS-10's filter** | Here the filter sits between 100 Ω differential at both ends: R702 + R703 at the DAC, and the 50 Ω line seen through T701's ratio of 2. AERIS-10's values (fitted as 110 nH / 110 pF) sag **2.0 dB** between 10 and 45 MHz in that termination (−3 dB at 70 MHz, −24 dB at 100 MHz). An independent review found this (docs/RF_REVIEW_GEMINI.md M1) and the ABCD model confirms it. New values, all E24, same parts and topology: C707/C708 22 pF to ground (11 pF differential) plus **C709 8.2 pF**, **L701–L704 270 nH** (Murata LQW18ANR27G, ±2 %), **C710 62 pF**, **C711 20 pF**. Response: flat to 30 MHz, −0.4 dB at 40, −3.4 dB at 50, −31 dB at 100, −40 dB at 125 MHz (the image of a 0–40 MHz tone clocked at 125 MSPS). The inductors' 3.4 Ω DCR, two per leg, costs about 0.6 dB flat | AERIS's values: wider passband (to ~65 MHz) but with the sag |
 | **A balun after the filter (T701)** | The routing switch and the SMAs are single-ended; AERIS fed its mixer differentially | Keep the output differential and route it as a pair. That breaks the single-ended interface of §1.2 of ADC_RADAR_SPEC |
 | **Series resistors on the data lines sit on CONTROL**, not here | A series resistor terminates the line at its *source* (the FPGA). AERIS uses 22 Ω (R23–R30); the datasheet suggests 20–100 Ω (p.9) | — |
 | **SLEEP tied low** | It has an internal pull-down (pin 15); AERIS drives it from the FPGA | One more FPGA line |
@@ -41,7 +41,7 @@ the datasheet's Pin Connections table.
 | REFIO, C705 | 100 nF | Pin 17: *"Requires 0.1 µF capacitor to ACOM when internal reference activated"* |
 | RSET, R701 | 1.91 kΩ 1 % | 32 × 1.20 V / 1.91 kΩ = 20.1 mA |
 | Loads, R702/R703 | 49.9 Ω | AERIS R115, R116 (50 Ω) |
-| Filter | 22 p, 33 p, 107.3 nH, 106 p, 107.3 nH, 33 p | AERIS C308/C309, C127, L22/L25, C141, L26/L27, C59 (`_work/aeris_reference_circuit.py L26 L27 C141`) |
+| Filter | 22 p (×2, to ground), 8.2 p, 270 nH, 62 p, 270 nH, 20 p | 100 Ω Butterworth, §1; topology from AERIS C308/C309, C127, L22/L25, C141, L26/L27, C59 (`_work/aeris_reference_circuit.py L26 L27 C141`) |
 | AVDD decoupling | 10 µF + 100 nF | Figure 22 (bulk) and p.10 (*"as close to the chip as physically possible"*) |
 | DVDD decoupling | 100 nF | p.10 |
 
