@@ -1,0 +1,60 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Fri Nov 13 19:45:07 2026
+| Host         : Akasha running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -file D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/utilization.rpt
+| Design       : artix_top
+| Device       : xc7a50tftg256-2
+| Speed File   : -2
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++--------------------+---------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|      Instance      |              Module             | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++--------------------+---------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| artix_top          |                           (top) |       4441 |       4341 |     100 |    0 | 6311 |      0 |      0 |         87 |
+|   (artix_top)      |                           (top) |         99 |         99 |       0 |    0 |  618 |      0 |      0 |          0 |
+|   u_adc_cap        |                     adc_capture |        473 |        461 |      12 |    0 |  586 |      0 |      0 |          0 |
+|   u_ddc            |                     ddc_wrapper |       1565 |       1521 |      44 |    0 | 3387 |      0 |      0 |         87 |
+|     (u_ddc)        |                     ddc_wrapper |        105 |         61 |      44 |    0 |  294 |      0 |      0 |          0 |
+|     u_ddc          |               ddc_400m_enhanced |       1460 |       1460 |       0 |    0 | 3058 |      0 |      0 |         87 |
+|       (u_ddc)      |               ddc_400m_enhanced |         51 |         51 |       0 |    0 |  215 |      0 |      0 |          2 |
+|       CDC_FIR_i    |           cdc_adc_to_processing |         42 |         42 |       0 |    0 |  112 |      0 |      0 |          0 |
+|       CDC_FIR_q    |         cdc_adc_to_processing_3 |         42 |         42 |       0 |    0 |  112 |      0 |      0 |          0 |
+|       cic_i_inst   |       cic_decimator_4x_enhanced |         60 |         60 |       0 |    0 |  175 |      0 |      0 |         10 |
+|       cic_q_inst   |     cic_decimator_4x_enhanced_4 |         60 |         60 |       0 |    0 |  175 |      0 |      0 |         10 |
+|       fir_i_inst   |   fir_lowpass_parallel_enhanced |        548 |        548 |       0 |    0 | 1051 |      0 |      0 |         32 |
+|       fir_q_inst   | fir_lowpass_parallel_enhanced_5 |        549 |        549 |       0 |    0 | 1051 |      0 |      0 |         32 |
+|       nco_core     |               nco_400m_enhanced |         97 |         97 |       0 |    0 |  159 |      0 |      0 |          1 |
+|   u_dl_pcs_rx      |              link_pcs_single_rx |        609 |        609 |       0 |    0 |  531 |      0 |      0 |          0 |
+|     u_bl_l0        |                 link_block_lock |         31 |         31 |       0 |    0 |   51 |      0 |      0 |          0 |
+|     u_dec_l0       |                 link_64b66b_dec |         60 |         60 |       0 |    0 |  126 |      0 |      0 |          0 |
+|     u_deframer     |                   link_deframer |        216 |        216 |       0 |    0 |  139 |      0 |      0 |          0 |
+|       (u_deframer) |                   link_deframer |         52 |         52 |       0 |    0 |  139 |      0 |      0 |          0 |
+|       u_crc        |                    link_crc32_2 |        164 |        164 |       0 |    0 |    0 |      0 |      0 |          0 |
+|     u_gb_rx_l0     |                 link_gearbox_rx |        307 |        307 |       0 |    0 |  215 |      0 |      0 |          0 |
+|   u_dl_train_fsm   |               link_rx_train_fsm |        136 |        136 |       0 |    0 |  104 |      0 |      0 |          0 |
+|   u_pmod_spi       |                        pmod_spi |        254 |        210 |      44 |    0 |  133 |      0 |      0 |          0 |
+|   u_ul_pcs_tx      |                     link_pcs_tx |       1308 |       1308 |       0 |    0 |  952 |      0 |      0 |          0 |
+|     u_enc_l0       |                 link_64b66b_enc |        187 |        187 |       0 |    0 |  125 |      0 |      0 |          0 |
+|     u_enc_l1       |               link_64b66b_enc_0 |        187 |        187 |       0 |    0 |  125 |      0 |      0 |          0 |
+|     u_framer       |                     link_framer |        416 |        416 |       0 |    0 |  133 |      0 |      0 |          0 |
+|       (u_framer)   |                     link_framer |        205 |        205 |       0 |    0 |  133 |      0 |      0 |          0 |
+|       u_crc        |                      link_crc32 |        211 |        211 |       0 |    0 |    0 |      0 |      0 |          0 |
+|     u_gb_tx_l0     |                 link_gearbox_tx |        201 |        201 |       0 |    0 |  136 |      0 |      0 |          0 |
+|     u_gb_tx_l1     |               link_gearbox_tx_1 |        201 |        201 |       0 |    0 |  136 |      0 |      0 |          0 |
+|     u_tx_lanes     |                   link_tx_lanes |        116 |        116 |       0 |    0 |  297 |      0 |      0 |          0 |
++--------------------+---------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

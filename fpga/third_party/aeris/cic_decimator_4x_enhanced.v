@@ -1,6 +1,7 @@
 // Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/cic_decimator_4x_enhanced.v)
 // Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
 // License: MIT (see fpga/third_party/aeris/README.md)
+// Modified for kv260-ias2rf: register active-high DSP reset locally for 400 MHz timing closure.
 module cic_decimator_4x_enhanced (
     input wire clk,                 // 400MHz input clock
     input wire reset_n,
@@ -39,7 +40,11 @@ localparam COMB_WIDTH = 28;
 // CEP (clock enable for P register) gated by data_valid.
 // ============================================================================
 
-wire reset_h = ~reset_n;  // active-high reset for DSP48E1 RSTP
+// Active-high registered reset for DSP48E1 RSTP/RSTC ports (eliminates LUT1 + cross-chip route at 400 MHz)
+(* max_fanout = 16 *) reg reset_h = 1'b1;
+always @(posedge clk) begin
+    reset_h <= ~reset_n;
+end
 
 // Sign-extended input for integrator_0 C port (48-bit)
 wire [ACC_WIDTH-1:0] data_in_c = {{(ACC_WIDTH-18){data_in[17]}}, data_in};
@@ -705,7 +710,7 @@ end
 // Sync reset: enables FDRE inference for better timing at 400 MHz.
 // Reset is already synchronous to clk via reset synchronizer in parent module.
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (reset_h) begin
         integrator_sampled <= 0;
         decimation_counter <= 0;
         data_valid_delayed <= 0;
@@ -760,7 +765,7 @@ end
 // Pipeline the valid signal for comb section
 // Sync reset: matches decimation control block reset style.
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (reset_h) begin
         data_valid_comb <= 0;
         data_valid_comb_pipe <= 0;
         data_valid_comb_0_out <= 0;
@@ -795,7 +800,7 @@ end
 //   - Each stage: comb[i] = comb[i-1] - comb_delay[i][last]
 
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (reset_h) begin
         for (i = 0; i < STAGES; i = i + 1) begin
             comb[i] <= 0;
             for (j = 0; j < COMB_DELAY; j = j + 1) begin
