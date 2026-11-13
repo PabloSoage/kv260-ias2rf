@@ -200,6 +200,7 @@ VIEWS = {   # name: (target mm, camera mm, lens mm)
     "lid":         ((8, 45, 0), (250, -300, 330), 50),
     "section":     ((5, 47, -2), (110, -300, 75), 40),
     "sma":         ((-112, 50, 3), (-260, -60, 70), 55),
+    "kria":        ((55, 118, 4), (170, 400, 95), 50),
 }
 os.makedirs(os.path.join(ROOT, "docs", "img"), exist_ok=True)
 for v in views:

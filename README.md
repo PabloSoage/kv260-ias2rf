@@ -382,6 +382,8 @@ play. Optional TPU 95A corner bumpers are for handling. It prints on a Bambu A1 
 | ![Open](docs/img/case_open.jpg) | ![Section](docs/img/case_section.jpg) |
 | **The tray: honeycomb, posts, pockets** | **The lid from inside: clamp posts and pads** |
 | ![Tray](docs/img/case_tray.jpg) | ![Lid](docs/img/case_lid.jpg) |
+| **The KV260 side: its connectors through the rear opening** | **The SMA side** |
+| ![KV260 side](docs/img/case_kria.jpg) | ![SMA side](docs/img/case_sma.jpg) |
 
 CalculiX FEA of the case with the boards in it, per material, at 23 °C and 70 °C:
 - first mode;
