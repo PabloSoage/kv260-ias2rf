@@ -77,9 +77,10 @@ RULES = {
     ("0.3p", "C_0402_1005Metric"): ("C", "0.3p", "0402", 25, C0G),
     ("5p", "C_0402_1005Metric"): ("C", "5p", "0402", 25, C0G),
     ("22p", "C_0402_1005Metric"): ("C", "22p", "0402", 25, C0G),
-    ("33p", "C_0402_1005Metric"): ("C", "33p", "0402", 25, C0G),
+    ("8.2p", "C_0402_1005Metric"): ("C", "8.2p", "0402", 25, C0G),
+    ("20p", "C_0402_1005Metric"): ("C", "20p", "0402", 25, C0G),
+    ("62p", "C_0402_1005Metric"): ("C", "62p", "0402", 25, C0G),
     ("27p", "C_0402_1005Metric"): ("C", "27p", "0402", 25, C0G),       # Y1201 load
-    ("106p", "C_0402_1005Metric"): ("C", "110p", "0402", 25, C0G),       # see NOTES
     ("22n", "C_0402_1005Metric"): ("C", "22n", "0402", 16, XR),
     ("47u 25V", "C_1210_3225Metric"): ("C", "47u", "1210", 25, XR),
     ("10u 25V", "C_1206_3216Metric"): ("C", "10u", "1206", 25, XR),
@@ -98,12 +99,17 @@ RULES = {
     ("5.6V", "D_SOD-123"): ("P", "MMSZ5232B", r"^MMSZ5232B"),
     ("15V", "D_SOD-123"): ("P", "MMSZ5245B", r"^MMSZ5245B"),
     ("SMBJ15CA", "D_SMB"): ("P", "SMBJ15CA", r"^SMBJ15CA"),
+    ("SMBJ18CA", "D_SMB"): ("P", "SMBJ18CA", r"^SMBJ18CA"),
+    ("SMCJ33CA", "D_SMC"): ("P", "SMCJ33CA", r"^SMCJ33CA"),
+    ("DMT10H015LFG", "Diodes_PowerDI3333-8"): ("P", "DMT10H015LFG", r"^DMT10H015LFG-7"),
+    ("LM74502-Q1", "SOT-23-8"): ("P", "LM74502QDDFRQ1", r"^LM74502QDDFRQ1"),
+    ("100n 100V", "C_0603_1608Metric"): ("C", "100n", "0603", 100, XR),
     ("green", "LED_0603_1608Metric"): ("P", "KT-0603G", r"^KT-0603G$"),
     ("PTC 1.5A hold", "Fuse_1812_4532Metric"): ("P", "1812 PTC 1.5A", r"(150|1\.5)"),
     ("600R@100MHz >=1A", "L_0603_1608Metric"): ("FB", 600, "0603", 1.0),
     ("600R@100MHz", "L_0603_1608Metric"): ("FB", 600, "0603", 1.0),
     ("220R@100MHz", "L_0603_1608Metric"): ("FB", 220, "0603", 1.0),
-    ("107.3n", "L_0603_1608Metric"): ("P", "LQW18ANR11G", r"^LQW18ANR11G"),  # see NOTES
+    ("270n", "L_0603_1608Metric"): ("P", "LQW18ANR27G", r"^LQW18ANR27G"),  # DAC filters, 100 ohm Butterworth
     ("SRP7028A-8R2M", "L_Bourns_SRP7028A_7.3x6.6mm"): ("P", "SRP7028A-8R2M", r"^SRP7028A-8R2M"),
     ("SRP7028A-3R3M", "L_Bourns_SRP7028A_7.3x6.6mm"): ("P", "SRP7028A-3R3M", r"^SRP7028A-3R3M"),
     ("SRP7028A-2R2M", "L_Bourns_SRP7028A_7.3x6.6mm"): ("P", "SRP7028A-2R2M", r"^SRP7028A-2R2M"),
@@ -145,10 +151,6 @@ RULES = {
 }
 # Where the part is not the drawn value, and why. Copied into the CSV's Note.
 NOTES = {
-    ("106p", "C_0402_1005Metric"): "106 pF (AERIS C141) is not made; nearest E24 value 110 pF (+3.8 %). "
-                                   "Or fit 100 pF and add 5.6 pF by hand",
-    ("107.3n", "L_0603_1608Metric"): "107.3 nH (AERIS L22) is not made; nearest 110 nH +-2 % (+2.5 %), "
-                                     "Murata LQW18 wire-wound",
     ("330u", "CP_EIA-7343-20_Kemet-V"): "UG483 names T520V337M2R5ATE025 (2.5 V); the 6.3 V of the same "
                                         "series and case is what JLCPCB stocks",
 }
@@ -160,6 +162,8 @@ def rule_for(comment, fp):
         return RULES[("SMA", fp)]
     if fp.startswith("R_0402") and comment != "4x22":
         return ("R", comment.split()[0], "0402")
+    if fp.startswith("R_0603"):
+        return ("R", comment.split()[0], "0603")
     return RULES.get((comment, fp))
 
 

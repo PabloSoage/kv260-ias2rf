@@ -40,21 +40,21 @@ lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 
 | Field | Value | Why |
 |---|---|---|
-| Layers | 6 | |
+| Layers | **8** (6 until 12 Nov) | |
 | Thickness | 1.6 mm | |
 | **Impedance control** | **Yes, JLC08161H-2116C** (8 layers; JLC06161H-2116A until 12 Nov) | The stack the widths were solved for (`_work/field_solver8.py`). Any other stack changes every impedance |
 | Copper | 1 oz outer, 0.5 oz inner | The stack's own |
 | **Via covering** | **Epoxy filled & capped (POFV)** | 543 vias sit in pads since 11 Nov (0402 passives, butted decoupling vias, every IC's exposed pad, five in L1030's output pad). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. Most of the BGA's fan-out vias sit between its balls; 29 sit in ball pads (LAYOUT §6.1) |
-| Min via | 0.20 mm hole, 0.45 mm pad | Within JLCPCB's six-layer capability |
-| Min track / space | 0.10 / 0.10 mm | The LVDS pairs are 0.117 / 0.150 mm |
+| Min via | 0.20 mm hole, 0.45 mm pad | Within JLCPCB's 8-layer capability |
+| Min track / space | **0.09** / 0.10 mm | Inner LVDS pairs 0.10 / 0.15 mm, 0.09 / 0.12 mm under the FPGA (110 segments at 0.09 mm); L1 pairs 0.117 / 0.150 mm |
 | **Surface finish** | **ENIG** | Flat pads for the 1.0 mm BGA and the LFCSPs; HASL is not flat enough |
 
 ---
 
 ## 3. What is left for the day of the order
 
-**Route the board.** Then run the script again: the folder loses its `DRAFT-` prefix only when DRC
-reports zero errors and zero unrouted connections.
+**The board is routed** (0 errors, 0 unrouted since 10 Nov). Run the script again after any change:
+the folder loses its `DRAFT-` prefix only when DRC reports zero errors and zero unrouted connections.
 
 **Check the LCSC codes, and refresh them.** The symbols carry no part numbers, so the codes live in
 `_work/fab/lcsc_parts.csv`, one per BOM line, and `make_fab.py` copies them into the BOM. They were
@@ -88,30 +88,21 @@ differ for some packages (SOT-23, some QFNs and SOICs). The CPL is KiCad's; corr
 there if a part shows turned.
 
 **Confirm the impedances in JLCPCB's own calculator** (`jlcpcb.com/pcb-impedance-calculator`):
-6 layers, 1.6 mm, outer copper 1 oz, inner 0.5 oz, stack **JLC06161H-2116A**. The field solver
-(`_work/field_solver.py`, POWER_AND_STACKUP §2.6) gives:
+8 layers, 1.6 mm, outer copper 1 oz, inner 0.5 oz, stack **JLC08161H-2116C** (L1 · L2 GND · L3 · L4 PWR ·
+L5 GND · L6 · L7 GND · L8). The field solver (`_work/field_solver8.py`, SIGNAL_INTEGRITY §8) gives:
 
 | Row | Type | Layer | References | Width / spacing | Field solver | Used on the board by |
 |---|---|---|---|---|---|---|
-| 1 | Single-ended | L1 | L2 | 183 µm | 49.8 Ω | `IF_RX_*`, `IF_TX_*` (RF50) |
-| 2 | Single-ended | L1 | L2 | 100 µm | 63.7 Ω | Every LVDS leg on L1 (and L6 over L5, the same stack mirrored) |
-| 3 | Single-ended | L3 | L2 / L4 | 100 µm | 62.5 Ω | Every LVDS leg on L3 |
-| 4 | Differential | L1 | L2 | 117 / 150 µm | 100.2 Ω | The LVDS100 class's own geometry, for a pair-routed revision |
+| 1 | Single-ended | L1 / L8 | L2 / L7 | 183 µm | 50.4 Ω | `IF_RX_*`, `IF_TX_*` (RF50), the SMA launches |
+| 2 | Single-ended | L3 / L6 | L2+L4 / L5+L7 | 151 µm | 50 Ω | Single 50 Ω inner lines |
+| 3 | Differential | L3 / L6 | as row 2 | 100 / 150 µm | 100.2 Ω | The coupled LVDS pairs |
+| 4 | Differential | L3 / L6 | as row 2 | 90 / 120 µm | 98.5 Ω | The same pairs under the FPGA |
+| 5 | Differential | L1 | L2 | 117 / 150 µm | 100.4 Ω | The L1 pairs |
 
-JLCPCB's calculator works from a target impedance to a width. Entered on 10 November 2026 (50 Ω,
-64 Ω, 62 Ω, 100 Ω at 0.15 mm spacing), stack JLC06161H-2116A:
-
-| Row | Target | JLCPCB's width | On the board | Difference |
-|---|---|---|---|---|
-| 1 | 50 Ω | 181.4 µm | 183 µm | +0.9 % |
-| 2 | 64 Ω | 102.9 µm | 100 µm | −2.8 % (about 65 Ω) |
-| 3 | 62 Ω | 106.4 µm | 100 µm | −6 % (about 64 Ω) |
-| 4 | 100 Ω diff., 150 µm gap | 119.1 µm | 117 µm | −1.8 % |
-
-**The widths stand.** The RF lines are within 1 %; the LVDS legs within 1–2 Ω of the solver, far
-inside JLCPCB's ±10 % impedance tolerance. **Order stack 2116A explicitly:** the calculator's first
-(cheapest) stack, JLC06161H-3313, has a thinner L1–L2 prepreg (0.099 mm against 0.116 mm) and
-would want 151 µm for 50 Ω; with 183 µm the RF lines would sit at about 45 Ω.
+The 6-layer check of 10 November (stack JLC06161H-2116A, every width within 1–6 % of JLCPCB's
+calculator) is superseded; **enter these five rows in the calculator for the 8-layer stack before
+paying**, and order stack 2116C explicitly: a cheaper stack with thinner outer prepreg would move the
+RF lines off 50 Ω.
 
 ---
 
