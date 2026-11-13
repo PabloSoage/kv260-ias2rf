@@ -67,11 +67,8 @@ flowchart LR
 |---|---|
 | ![Top](docs/img/board_top.png) | ![Bottom](docs/img/board_bottom.png) |
 
-The renders come from KiCad. Every part has a 3D model: KiCad's own, the library model of the same
-package where KiCad 10's has none under the footprint's name (the FPGA is drawn as its generic
-17 × 17 mm, 1.0 mm-pitch BGA-256), or a simple box model at the data sheet's size and height for the
-RF switches, transformers, RJ45, Hirose connectors, oscillator, inductors, fuse, barrel jack and
-three QFN/LFCSP packages (`footprints/kv260-ias2rf.3dshapes/`, written by `_work/layout/models3d.py`).
+The renders come from KiCad. Some parts have no 3D model, so they show only their pads (the FPGA's
+BGA, for one).
 
 ---
 

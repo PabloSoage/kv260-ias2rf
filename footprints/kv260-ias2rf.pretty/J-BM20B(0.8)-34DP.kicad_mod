@@ -1467,15 +1467,4 @@
 		(solder_paste_margin -0.025)
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Hirose_BM20B_0.8_34DP.wrl"
-		(offset
-			(xyz 0 0 0)
-		)
-		(scale
-			(xyz 1 1 1)
-		)
-		(rotate
-			(xyz 0 0 0)
-		)
-	)
 )
