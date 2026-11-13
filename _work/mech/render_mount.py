@@ -27,19 +27,20 @@ sc.cycles.use_denoising = True
 sc.render.resolution_x, sc.render.resolution_y = W, H
 sc.view_settings.view_transform = "AgX"
 sc.view_settings.look = "AgX - Medium High Contrast"
+sc.view_settings.exposure = float(argv[argv.index("--exposure") + 1]) if "--exposure" in argv else -1.8
 
 w = bpy.data.worlds.new("w")
 sc.world = w
 w.use_nodes = True
-w.node_tree.nodes["Background"].inputs[0].default_value = (0.82, 0.84, 0.88, 1)
+w.node_tree.nodes["Background"].inputs[0].default_value = (0.20, 0.22, 0.25, 1)
 w.node_tree.nodes["Background"].inputs[1].default_value = 0.25
 bpy.ops.mesh.primitive_plane_add(size=4, location=(0, 0, -11.2 * MM))
 fl = bpy.context.object
 m = bpy.data.materials.new("floor")
 m.use_nodes = True
 b = m.node_tree.nodes["Principled BSDF"]
-b.inputs["Base Color"].default_value = (0.75, 0.76, 0.78, 1)
-b.inputs["Roughness"].default_value = 0.6
+b.inputs["Base Color"].default_value = (0.16, 0.17, 0.19, 1)
+b.inputs["Roughness"].default_value = 0.7
 fl.data.materials.append(m)
 
 # KiCad's glTF gives the solder mask alpha 0.83, which lets the laminate show through in Cycles
@@ -49,12 +50,32 @@ for m in bpy.data.materials:
         continue
     col = tuple(round(x, 2) for x in b.inputs["Base Color"].default_value)[:3]
     if col == (0.08, 0.2, 0.14):
-        b.inputs["Base Color"].default_value = (0.012, 0.11, 0.035, 1)
+        b.inputs["Base Color"].default_value = (0.006, 0.07, 0.022, 1)
         b.inputs["Alpha"].default_value = 1.0
-        b.inputs["Roughness"].default_value = 0.42
+        b.inputs["Roughness"].default_value = 0.62
+        if "Specular IOR Level" in b.inputs:
+            b.inputs["Specular IOR Level"].default_value = 0.3
     elif col == (1.0, 1.0, 1.0) and b.inputs["Alpha"].default_value < 1:
         b.inputs["Alpha"].default_value = 1.0
         b.inputs["Base Color"].default_value = (0.9, 0.9, 0.88, 1)
+
+# ... and puts the mask and silkscreen in the outer copper's plane: the gold copper fights through them
+# and mirrors the sky. Lift them off the copper, outwards on each face.
+rig = bpy.data.objects.get("ADAPTER")
+if rig:
+    stack = list(rig.children)
+    while stack:
+        o = stack.pop()
+        stack += list(o.children)
+        if o.type != "MESH" or not o.material_slots or not o.material_slots[0].material:
+            continue
+        b = o.material_slots[0].material.node_tree.nodes.get("Principled BSDF")
+        col = tuple(round(x, 2) for x in b.inputs["Base Color"].default_value)[:3]
+        if col in ((0.006, 0.07, 0.022), (0.9, 0.9, 0.88)) and o.dimensions.z < 1e-5:
+            zc = (rig.matrix_world.inverted() @ o.matrix_world.translation).z + \
+                 sum(v.co.z for v in o.data.vertices[:50]) / min(50, len(o.data.vertices)) * o.matrix_world.to_scale().z
+            lift = (0.04 if col[0] < 0.5 else 0.06) * MM
+            o.location.z += lift if zc > 0.8 * MM else -lift
 
 tgt = bpy.data.objects.new("tgt", None)
 sc.collection.objects.link(tgt)
