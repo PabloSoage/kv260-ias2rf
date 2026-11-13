@@ -13,7 +13,9 @@ protect the corners. Every board rests on a honeycomb or on a clamp post with a 
 | ![open](img/case_open.jpg) | ![section](img/case_section.jpg) |
 | ![tray](img/case_tray.jpg) | ![lid, inside](img/case_lid.jpg) |
 
-![SMA side](img/case_sma.jpg)
+| | |
+|---|---|
+| ![KV260 side: its connectors](img/case_kria.jpg) | ![SMA side](img/case_sma.jpg) |
 
 ---
 
@@ -77,7 +79,9 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
 - **Fitting.** Slide it on from the front or back. The lug's own M4 screw goes through it, so it cannot come
   off.
 - **Why.** §5 shows they are what makes a 1 m drop survivable.
-- **Clearance.** They stay clear of the SMA band and the side vents.
+- **Clearance.** They stay clear of the SMA band, the side vents and every connector opening: each arm along the
+  front or rear wall stops 4 mm short of that wall's openings. The right-rear one is therefore shorter (11.3 mm
+  instead of 22 mm), so the KV260's RJ45 plug goes in freely (13 Nov, found in the KV260-side render).
 
 ### 3.3 In the vehicle
 
