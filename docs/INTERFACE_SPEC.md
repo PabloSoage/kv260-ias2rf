@@ -342,9 +342,9 @@ section):
 | Direction | Kria side | Level at the receiver, estimated | Change to this board |
 |---|---|---|---|
 | `LINK_RX_*` (FPGA → Kria) | `DIFF_SSTL12` input, `ODT = RTT_48` | The Artix-7's `LVDS_25` current (about 3.5 mA) into 96 Ω: about ±0.34 V | None: the capacitors stay, the SOM terminates and biases |
-| `LINK_TX_*` (Kria → FPGA) | `DIFF_SSTL12` output, `OUTPUT_IMPEDANCE = RDRV_60_60` | 1.2 V × 50 / (60 + 50) ≈ 0.55 V differential across R101–R104 | None |
+| `LINK_TX_*` (Kria → FPGA) | `DIFF_SSTL12` output, `OUTPUT_IMPEDANCE = RDRV_60_60` | 1.2 V × 100 / (60 + 60 + 100) ≈ 0.55 V differential across R105/R106 (100 Ω at the FPGA since 12 Nov; before, 2 × 49.9 Ω at the connector gave the same figure) | None |
 
-**On the transmit side, keep 60 Ω.** `RDRV_48_48` would give 0.61 V, above the 0.6 V maximum
+**On the transmit side, keep 60 Ω.** `RDRV_48_48` would give 0.61 V (1.2 × 100 / 196), above the 0.6 V maximum
 VIDIFF of the Artix-7's `LVDS_25` input. That 0.6 V is from memory, to confirm in DS181.
 
 **Two caveats.**

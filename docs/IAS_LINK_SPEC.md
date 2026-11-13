@@ -19,7 +19,8 @@ against the carrier schematic (XTP682). This sheet adds no new allocation.
 | **J101** | Hirose BM20B(0.8)-34DP on **IAS1** (KV260 J8). Pins as INTERFACE_SPEC §2–§4. Footprint `AVT_KHK_Lib:J-BM20B(0.8)-34DP`, the one in the original layout |
 | **J102** | The same part on **IAS0** (KV260 J7). The SOM reaches IAS0 only through the carrier's AP1302 (B-01), so it's **mechanical only**: its 11 grounds connected, everything else marked no-connect |
 | C101–C110 | 100 nF in series on all ten lines (§6.1: the HPA bank is at 1.2 V and the FPGA's LVDS is not). 0 Ω is the alternative stuffing if `VCCO_HPA` turns out to be 1.8 V |
-| R101–R104, C111, C112 | On the two pairs the **FPGA receives** (`LINK_TX_D0`, `LINK_TX_CLK`): 2 × 49.9 Ω per pair with the centre at `+1V2`, decoupled. That terminates the pair and restores the common mode the capacitors removed |
+| R101–R104, C111, C112 | On the two pairs the **FPGA receives** (`LINK_TX_D0`, `LINK_TX_CLK`): 10 k from each leg to `+1V2`, decoupled. That restores the common mode the capacitors removed. *Until 12 Nov these were 2 × 49.9 Ω, which also terminated the pair here, 45 mm from the receiver; the termination is now R105/R106 at the FPGA (below, and LAYOUT §6.5)* |
+| R105, R106 (CONTROL sheet) | 100 Ω across `LINK_TX_D0` and `LINK_TX_CLK` on the bottom face under the FPGA's balls: the termination, at the receiver |
 
 The connector splits every pair across its two rows of pins, so it is drawn with a label on each
 pin, and the capacitors sit in an orderly block beside it. The carrier's rails on pins 13, 17/18
