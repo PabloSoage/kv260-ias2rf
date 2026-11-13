@@ -43,16 +43,18 @@ b.inputs["Base Color"].default_value = (0.16, 0.17, 0.19, 1)
 b.inputs["Roughness"].default_value = 0.7
 fl.data.materials.append(m)
 
-# KiCad's glTF gives the solder mask alpha 0.83, which lets the laminate show through in Cycles
+# KiCad's glTF gives the solder mask alpha 0.83. Kept translucent (as real LPI mask is) so the copper under it
+# reads as lighter green, as in KiCad's own raytraced board_iso.png; lifted off the copper below.
+MASK_ALPHA = float(argv[argv.index("--mask") + 1]) if "--mask" in argv else 0.72
 for m in bpy.data.materials:
     b = m.node_tree.nodes.get("Principled BSDF") if m.use_nodes else None
     if not b:
         continue
     col = tuple(round(x, 2) for x in b.inputs["Base Color"].default_value)[:3]
     if col == (0.08, 0.2, 0.14):
-        b.inputs["Base Color"].default_value = (0.006, 0.07, 0.022, 1)
-        b.inputs["Alpha"].default_value = 1.0
-        b.inputs["Roughness"].default_value = 0.62
+        b.inputs["Base Color"].default_value = (0.010, 0.085, 0.030, 1)
+        b.inputs["Alpha"].default_value = MASK_ALPHA
+        b.inputs["Roughness"].default_value = 0.42
         if "Specular IOR Level" in b.inputs:
             b.inputs["Specular IOR Level"].default_value = 0.3
     elif col == (1.0, 1.0, 1.0) and b.inputs["Alpha"].default_value < 1:
@@ -71,7 +73,7 @@ if rig:
             continue
         b = o.material_slots[0].material.node_tree.nodes.get("Principled BSDF")
         col = tuple(round(x, 2) for x in b.inputs["Base Color"].default_value)[:3]
-        if col in ((0.006, 0.07, 0.022), (0.9, 0.9, 0.88)) and o.dimensions.z < 1e-5:
+        if col in ((0.01, 0.09, 0.03), (0.9, 0.9, 0.88)) and o.dimensions.z < 1e-5:
             zc = (rig.matrix_world.inverted() @ o.matrix_world.translation).z + \
                  sum(v.co.z for v in o.data.vertices[:50]) / min(50, len(o.data.vertices)) * o.matrix_world.to_scale().z
             lift = (0.04 if col[0] < 0.5 else 0.06) * MM

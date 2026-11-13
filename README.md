@@ -368,6 +368,34 @@ carry the Ethernet tab ([MECHANICAL](docs/MECHANICAL.md); STLs in `mech/`). Rend
 
 ---
 
+## The enclosure
+
+A closed printed case for vehicle use ([ENCLOSURE](docs/ENCLOSURE.md); STLs in `mech/`). It has a tray and a
+lid that close on six lugs, with printed snap pins for a tool-free fit test or stainless M4 screws. The SMA
+bodies are clamped in the split line. A honeycomb floor and TPU-padded clamp posts hold both boards without
+play. Optional TPU 95A corner bumpers are for handling. It prints on a Bambu A1 in PETG-CF, ASA or PAHT-CF.
+
+![Closed, with the TPU bumpers](docs/img/case_closed.jpg)
+
+| Opened | Section through the boards |
+|---|---|
+| ![Open](docs/img/case_open.jpg) | ![Section](docs/img/case_section.jpg) |
+| **The tray: honeycomb, posts, pockets** | **The lid from inside: clamp posts and pads** |
+| ![Tray](docs/img/case_tray.jpg) | ![Lid](docs/img/case_lid.jpg) |
+
+CalculiX FEA of the case with the boards in it, per material, at 23 °C and 70 °C:
+- first mode;
+- a 50 g shock;
+- a 1 m corner drop, bare and with the bumpers;
+- off-road vibration fatigue.
+
+Method, assumptions and the full table are in [ENCLOSURE §5](docs/ENCLOSURE.md#5-simulation-calculix). The
+case passes shock and vibration in PETG-CF, ASA and PAHT-CF. A bare 1 m drop needs the bumpers.
+
+![FEA by material](docs/sim/case_materials.png)
+
+---
+
 ## Legal notice
 
 This design transmits on regulated bands. Operating the SDR transmitter requires an amateur radio
