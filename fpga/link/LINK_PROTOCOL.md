@@ -140,18 +140,62 @@ The receiver training FSM (`link_rx_train_fsm`) supports both receivers via para
 
 ### 7.2 Control & Diagnostic Register Map (Both Ends)
 
-| Offset | Register | Access | Fields & Description |
-| :---: | :--- | :---: | :--- |
-| `0x00` | `LINK_CTRL` | R/W | `[0]` Soft Reset; `[1]` Loopback Enable; `[2]` Retrain Pulse (self-clearing); `[3]` `tap_override_en` (use `IDELAY_CTRL_L0/L1`); `[4]` `prbs7_tx_en` (bypass framer with PRBS-7 test pattern); `[5]` `prbs7_rx_chk_en`; `[6]` Clear Error Counters (W1C pulse) |
-| `0x04` | `LINK_STATUS` | RO | `[2:0]` `train_state`; `[3]` `l0_block_lock`; `[4]` `l1_block_lock`; `[5]` `deskew_lock`; `[6]` `link_up`; `[7]` `idelayctrl_rdy`; `[23:16]` `remote_status[7:0]` (from `/I/`) |
-| `0x08` | `IDELAY_CTRL_L0` | R/W | `[8:0]` Software `CNTVALUEIN` override for Lane 0 (`0..511`); `[24:16]` Readback active tap loaded on Lane 0; `[31]` Force `LOAD` |
-| `0x0C` | `IDELAY_CTRL_L1` | R/W | `[8:0]` Software `CNTVALUEIN` override for Lane 1 (`0..511`); `[24:16]` Readback active tap loaded on Lane 1; `[31]` Force `LOAD` |
-| `0x10` | `ERR_CNT_SH_L0` | RO | `[31:0]` Saturating invalid sync-header error count on Lane 0 |
-| `0x14` | `ERR_CNT_SH_L1` | RO | `[31:0]` Saturating invalid sync-header error count on Lane 1 |
-| `0x18` | `ERR_CNT_CRC` | RO | `[31:0]` Saturating deframer CRC-32 error packet count |
-| `0x1C` | `PKT_CNT_RX` | RO | `[31:0]` Valid packets received (`pkt_done_ok`) |
-| `0x20` | `PKT_CNT_DROP` | RO | `[23:0]` Latest TX `dropped_cnt` reported in `/T/` trailer; `[31:24]` RX FIFO overflow drops |
-| `0x24` | `DESKEW_STATUS` | RO | `[7:0]` Signed measured inter-lane skew (`skew_blocks`); `[23:8]` Last matched `am_seq[15:0]` |
-| `0x28` | `PRBS_ERR_CNT` | RO | `[31:0]` Saturating bit-error counter when `prbs7_rx_chk_en == 1` |
-| `0x2C` | `EYE_SCAN_L0` | RO | `[8:0]` Discovered eye-left tap; `[24:16]` Discovered eye-right tap (Lane 0) |
-| `0x30` | `EYE_SCAN_L1` | RO | `[8:0]` Discovered eye-left tap; `[24:16]` Discovered eye-right tap (Lane 1) |
+| Offset | Register | Access | Reset | Fields & Description |
+| :---: | :--- | :---: | :---: | :--- |
+| `0x00` | `LINK_CTRL` | R/W | `0x0000_0000` | `[0]` Soft Reset; `[1]` Loopback Enable; `[2]` Retrain Pulse (self-clearing); `[3]` `tap_override_en` (use `IDELAY_CTRL_L0/L1`); `[4]` `prbs7_tx_en` (bypass framer with PRBS-7 test pattern); `[5]` `prbs7_rx_chk_en`; `[6]` Clear Error Counters (W1C pulse) |
+| `0x04` | `LINK_STATUS` | RO | `0x0000_0000` | `[2:0]` `train_state`; `[3]` `l0_block_lock`; `[4]` `l1_block_lock`; `[5]` `deskew_lock`; `[6]` `link_up`; `[7]` `idelayctrl_rdy`; `[23:16]` `remote_status[7:0]` (from `/I/`) |
+| `0x08` | `IDELAY_CTRL_L0` | R/W | `0x0000_0000` | `[8:0]` Software `CNTVALUEIN` override for Lane 0 (`0..511`); `[24:16]` Readback active tap loaded on Lane 0; `[31]` Force `LOAD` |
+| `0x0C` | `IDELAY_CTRL_L1` | R/W | `0x0000_0000` | `[8:0]` Software `CNTVALUEIN` override for Lane 1 (`0..511`); `[24:16]` Readback active tap loaded on Lane 1; `[31]` Force `LOAD` |
+| `0x10` | `ERR_CNT_SH_L0` | RO | `0x0000_0000` | `[31:0]` Saturating invalid sync-header error count on Lane 0 |
+| `0x14` | `ERR_CNT_SH_L1` | RO | `0x0000_0000` | `[31:0]` Saturating invalid sync-header error count on Lane 1 |
+| `0x18` | `ERR_CNT_CRC` | RO | `0x0000_0000` | `[31:0]` Saturating deframer CRC-32 error packet count |
+| `0x1C` | `PKT_CNT_RX` | RO | `0x0000_0000` | `[31:0]` Valid packets received (`pkt_done_ok`) |
+| `0x20` | `PKT_CNT_DROP` | RO | `0x0000_0000` | `[23:0]` Latest TX `dropped_cnt` reported in `/T/` trailer; `[31:24]` RX FIFO overflow drops |
+| `0x24` | `DESKEW_STATUS` | RO | `0x0000_0000` | `[7:0]` Signed measured inter-lane skew (`skew_blocks`); `[23:8]` Last matched `am_seq[15:0]` |
+| `0x28` | `PRBS_ERR_CNT` | RO | `0x0000_0000` | `[31:0]` Saturating bit-error counter when `prbs7_rx_chk_en == 1` |
+| `0x2C` | `EYE_SCAN_L0` | RO | `0x0000_0000` | `[8:0]` Discovered eye-left tap; `[24:16]` Discovered eye-right tap (Lane 0) |
+| `0x30` | `EYE_SCAN_L1` | RO | `0x0000_0000` | `[8:0]` Discovered eye-left tap; `[24:16]` Discovered eye-right tap (Lane 1) |
+| `0x34` | `ADCS_CTRL` | R/W | `0x0000_0001` | **Task 13 (AD9253 + DDC):** `[0]` `adcs_enable`; `[1]` `conv_spi_start_init` (W1P); `[3:2]` `sdr_ddc_ch_enable` (`[2]=ChA, [3]=ChB`) |
+| `0x38` | `ADCS_STATUS` | RO | `0x0000_0000` | `[0]` `aligned`; `[1]` `idelay_done`; `[2]` `idelay_err`; `[3]` `bitslip_err`; `[8:4]` `best_tap`; `[16]` `conv_init_done`; `[17]` `conv_init_err`; `[31:24]` `ad9253_id` |
+| `0x3C` | `CONV_SPI_CMD` | R/W | `0x0000_0000` | `[7:0]` `req_wdata`; `[20:8]` `req_addr[12:0]`; `[21]` `req_rw` (`0=W,1=R`); `[22]` `req_target` (`0=AD9484,1=AD9253`); `[31]` Start (W1P) |
+| `0x40` | `CONV_SPI_RDATA` | RO | `0x0000_0000` | `[7:0]` `resp_rdata`; `[8]` `resp_valid_sticky`; `[9]` `req_ready` |
+| `0x44` | `SDR_DDC_NCO_A` | R/W | `0x0000_0000` | `[31:0]` SDR DDC Ch A NCO frequency tuning word (`nco_ftw_a`) |
+| `0x48` | `SDR_DDC_NCO_B` | R/W | `0x0000_0000` | `[31:0]` SDR DDC Ch B NCO frequency tuning word (`nco_ftw_b`) |
+| `0x4C` | `SDR_DDC_DECIM` | R/W | `0x0040_0004` | `[15:0]` `decim_ratio` (`>=2`, even `>=4` enables HB FIR); `[25:16]` `words_per_pkt` (default `64` = `512 B`) |
+| `0x50` | `SDR_DDC_DROP` | RO | `0x0000_0000` | `[23:0]` Saturating `sdr_ddc.dropped_cnt` across async CDC FIFO |
+| `0x54` | `DACR_CTRL` | R/W | `0x00FF_0000` | **Task 14 (AD9708 + AD9767):** `[0]` `chirp_enable`; `[1]` `chirp_trig` (W1P); `[23:16]` `amp_scale[7:0]` (`0xFF` = full scale) |
+| `0x58` | `DACR_F0_FTW` | R/W | `0x0000_0000` | `[31:0]` AD9708 radar chirp start FTW (`f0_ftw`) |
+| `0x5C` | `DACR_DF_FTW` | R/W | `0x0000_0000` | `[31:0]` Signed AD9708 chirp slope step per clock (`df_ftw`) |
+| `0x60` | `DACR_PULSE_LEN` | R/W | `0x0000_0400` | `[31:0]` Radar chirp duration in `dac_clk` cycles (`pulse_len`) |
+| `0x64` | `DACR_PRI_LEN` | R/W | `0x0000_2000` | `[31:0]` Radar PRI in `dac_clk` cycles (`0` = trigger-only single shot) |
+| `0x68` | `DACR_STATUS` | RO | `0x0000_0000` | `[0]` `chirp_active` |
+| `0x6C` | `DACR_PULSE_CNT` | RO | `0x0000_0000` | `[31:0]` Total radar chirps transmitted (`pulse_cnt`) |
+| `0x70` | `DACS_CTRL` | R/W | `0x0000_0000` | `[0]` AD9767 `tx_enable`; `[1]` clear/latch note (soft reset via `LINK_CTRL`) |
+| `0x74` | `DACS_UNDERFLOW` | RO | `0x0000_0000` | `[31:0]` AD9767 `underflow_cnt` |
+| `0x78` | `DACS_FIFO_LVL` | RO | `0x0000_0000` | `[9:0]` `dac_sdr.fifo_level_link` |
+| `0x7C` | `ADAR_CTRL` | R/W | `0x0000_0000` | **Task 15 (ADAR1000 + RF SW):** `[4:0]` `active_beam_id`; `[5]` `tr_req` (`0=RX,1=TX`); `[6]` `soft_load` (W1P); `[7]` `start_init` (W1P); `[11:8]` `rf_sw_req[3:0]`; `[12]` `auto_tr_chirp` (drive `tr_req` from `chirp_active`) |
+| `0x80` | `ADAR_GUARD` | R/W | `0x000C_000A` | `[15:0]` `guard_pre` cycles; `[31:16]` `guard_post` cycles |
+| `0x84` | `ADAR_SW_SETTLE` | R/W | `0x0000_007D` | `[15:0]` `rf_switch.settle_cycles` (default `125` = `1 us @ 125 MHz`) |
+| `0x88` | `ADAR_TBL_WR` | WO | `0x0000_0000` | `[7:0]` `tbl_wdata`; `[12:8]` `byte_idx` (`0..23`); `[15:13]` `chip_id` (`0..7`); `[20:16]` `beam_id` (`0..31`); `[31]` Write strobe (W1P) |
+| `0x8C` | `ADAR_SPI_CMD` | R/W | `0x0000_0000` | `[7:0]` `wdata`; `[22:8]` `addr[14:0]`; `[23]` `rw`; `[26:24]` `chip_id`; `[31]` Trigger (W1P) |
+| `0x90` | `ADAR_STATUS` | RO | `0x0000_0000` | `[0]` `init_done`; `[1]` `init_err`; `[2]` `load_busy`; `[3]` `tr_ready`; `[4]` `sw_ready`; `[9:5]` `current_beam_id`; `[17:10]` `spi_resp_rdata`; `[18]` `spi_req_ready`; `[22:19]` `sw_ctrl[3:0]` |
+| `0x94` | `HK_I2C_CTRL` | R/W | `0x0000_0001` | **Task 16 (HK + XO + XADC + PPS):** `[0]` `poll_en` (auto-poll TMP1075 `7'h48` Reg `0x00`) |
+| `0x98` | `HK_I2C_CMD` | R/W | `0x0000_0000` | `[6:0]` `dev_addr` (`0x48` TMP1075 / `0x50` M24C02); `[9:7]` `wr_len` (`0..4`); `[11:10]` `rd_len` (`0..2`); `[31]` Trigger (W1P) |
+| `0x9C` | `HK_I2C_WDATA` | R/W | `0x0000_0000` | `[31:0]` Packed TX bytes (`[7:0]`=byte0 .. `[31:24]`=byte3) |
+| `0xA0` | `HK_I2C_STATUS` | RO | `0x0000_0000` | `[15:0]` `req_rdata`; `[16]` `req_ready`; `[17]` `last_ack_err`; `[18]` `busy`; `[19]` `alert_active` (`~HK_ALERT_N`); `[20]` `tmp_valid` |
+| `0xA4` | `HK_TEMP_ERR` | RO | `0x0000_0000` | `[15:0]` `tmp_raw` (TMP1075 `[15:4]*0.0625 C`); `[31:16]` `ack_err_cnt` |
+| `0xA8` | `XO_CTRL` | R/W | `0x0000_0000` | `[0]` `use_ext_clk` (`CLK_SEL` `D8`: `0=Si549 Z`, `1=SMA 0`); `[1]` `prog_freq_500m` (`0=400MHz,1=500MHz`); `[2]` `prog_start` (W1P); `[3]` `delta_start` (W1P); `[8]` `xo_busy` (RO); `[9]` `xo_prog_done` (RO); `[10]` `xo_active_freq_500m` (RO); `[11]` `xo_ack_err` (RO); `[31:16]` `xo_ack_err_cnt` (RO) |
+| `0xAC` | `XO_DELTA_M` | R/W | `0x0000_0000` | `[23:0]` Si549 `ADPLL_DELTA_M` (`±950 ppm`, Regs `231..233`) |
+| `0xB0` | `XO_RAW_CMD` | R/W | `0x0000_0000` | `[7:0]` Si549 `reg_addr`; `[15:8]` `wdata`; `[16]` `rw` (`0=W,1=R`); `[31]` Trigger (W1P) |
+| `0xB4` | `XO_RAW_RDATA` | RO | `0x0000_0000` | `[7:0]` `raw_resp_rdata`; `[8]` `raw_resp_valid_sticky`; `[9]` `raw_req_ready`; `[10]` `raw_resp_err` |
+| `0xB8` | `XADC_TEMPV` | RO | `0x0000_0000` | `[11:0]` `xadc_temp_raw`; `[23:12]` `xadc_vccint_raw`; `[24]` `xadc_valid`; `[25]` `xadc_overtemp` |
+| `0xBC` | `XADC_VCCAUX` | RO | `0x0000_0000` | `[11:0]` `xadc_vccaux_raw` |
+| `0xC0` | `PPS_CTRL` | R/W | `0x0000_0800` | `[15:0]` `cfg_ts_step_q8` (default `0x0800` = `8.0 ns/clk`); `[16]` `cfg_pps_disc_en`; `[17]` `cfg_ts_clear` (W1P); `[24]` `pps_locked` (RO) |
+| `0xC4` | `PPS_NOM_CYC` | R/W | `0x0773_5940` | `[31:0]` `cfg_nom_period_cyc` (default `125,000,000` @ `125 MHz`) |
+| `0xC8` | `PPS_PERIOD_CYC` | RO | `0x0000_0000` | `[31:0]` Measured PPS period in `adc_clk` cycles |
+| `0xCC` | `PPS_PPM_ERR` | RO | `0x0000_0000` | `[31:0]` Signed integer frequency offset (`ppm`) vs `PPS_NOM_CYC` |
+| `0xD0` | `PPS_CNT` | RO | `0x0000_0000` | `[31:0]` Rising `PPS_SYNC` edge counter |
+| `0xD4` | `TS_NOW_LO` | RO | `0x0000_0000` | `[31:0]` `pps_timestamp_ns[31:0]` snapshot (`sys_clk`) |
+| `0xD8` | `TS_NOW_HI` | RO | `0x0000_0000` | `[31:0]` `pps_timestamp_ns[63:32]` snapshot (`sys_clk`) |
+| `0xDC` | `PPS_LATCH_LO` | RO | `0x0000_0000` | `[31:0]` `pps_latch_ts[31:0]` captured on last `PPS_SYNC` edge |
+| `0xE0` | `PPS_LATCH_HI` | RO | `0x0000_0000` | `[31:0]` `pps_latch_ts[63:32]` captured on last `PPS_SYNC` edge |
