@@ -754,37 +754,39 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
 
 ### 9.6 Thermal, RF budget, and what is still not simulated
 
-**Thermal (12 Nov).**
+**Thermal (12 Nov; re-run 13 Nov with the Ethernet PHY).**
 - **The model.** `thermal2d.py` treats the board as a 2-D sheet. In-plane conduction runs through
   each layer's real copper coverage: L2, L5 and L7 85 %, L4 82 %, the outer layers 16–24 %, the
   signal layers 5–7 %. Both faces cool by natural convection.
-- **The heat.** 6.9 W, from the power budget (POWER_AND_STACKUP §1.3–1.4), spread over each part's
-  pads.
+- **The heat.** 7.5 W, from the power budget (POWER_AND_STACKUP §1.3–1.4), spread over each part's
+  pads. 6.9 W until 13 Nov; the Ethernet PHY adds 0.5 W (0.15 A at 3.3 V, always powered) and its
+  load 0.1 W more in the bucks. Its θJB is taken as 12 °C/W, typical of a 6 × 6 mm QFN, not read.
 - **The junctions.** Each is the board temperature under the part plus P × θJB, or θJC for the
   exposed-pad parts, from the data sheets read.
 
 | At 25 °C ambient, still air | h = 10 W/m²K per face (convection only) | h = 15 (with radiation) |
 |---|---|---|
-| Board, mean / hottest rise | +26 / +48 °C | +17 / +38 °C |
-| ADCLK948, junction (0.95 W, θJC 8.8 °C/W, Rev. B Table 6) | **82 °C** (board 73) | 71 °C |
-| LMR33630, junction (θJB 13.6) | 79 °C | 70 °C |
-| Si549, junction (θJB 17) | 74 °C | 64 °C |
-| TPS7A8300 for +1V8_D, junction (θJB 12.3) | 71 °C | 62 °C |
-| AD9484, junction (θJC 1.7) | 68 °C | 58 °C |
-| AD9253, junction (0.46 W at most, θJC 7.1, Rev. E Table 7) | 65 °C | 55 °C |
-| XC7A50T, junction (0.73 W, θJB 8.4, UG475 Table 5-1 FTG256) | 62 °C | 53 °C |
-| AD9767, junction (LQFP, only θJA 91 is given) | under 83 °C (board 54 + P × θJA, a bound) | under 74 °C |
+| Board, mean / hottest rise | +27 / +51 °C | +18 / +40 °C |
+| ADCLK948, junction (0.95 W, θJC 8.8 °C/W, Rev. B Table 6) | **84 °C** (board 76) | 73 °C |
+| LMR33630, junction (θJB 13.6) | 82 °C | 72 °C |
+| Si549, junction (θJB 17) | 77 °C | 66 °C |
+| TPS7A8300 for +1V8_D, junction (θJB 12.3) | 72 °C | 62 °C |
+| RTL8211FSI, the Ethernet PHY (0.5 W, θJB 12 assumed) | 70 °C | 59 °C |
+| AD9484, junction (θJC 1.7) | 70 °C | 59 °C |
+| AD9253, junction (0.46 W at most, θJC 7.1, Rev. E Table 7) | 66 °C | 56 °C |
+| XC7A50T, junction (0.73 W, θJB 8.4, UG475 Table 5-1 FTG256) | 63 °C | 53 °C |
+| AD9767, junction (LQFP, only θJA 91 is given) | under 84 °C (board 55 + P × θJA, a bound) | under 75 °C |
 
 **On the bench this is comfortable. In a vehicle it is not.**
-- **The cause.** The board is small (134 cm²) for 6.9 W. The clock buffer, the radar ADC, the
+- **The cause.** The board is small (134 cm²) for 7.5 W. The clock buffer, the radar ADC, the
   four drivers and the 5 V buck share it.
 - **The arithmetic.** At 60–70 °C ambient, add 35–45 °C to every figure above. Around the clock
   buffer and the ADCs the board then passes 110 °C.
 - **What it exceeds.**
   - The parts' 85 °C ambient rating: the board under the ADCs and the clock buffer is the
     ambient they see.
-  - The FPGA's 100 °C junction limit (I grade): 62 °C on the bench becomes 97–107 °C.
-  - The ADCLK948 reaches 117–127 °C at the junction. That is under its 150 °C maximum, but
+  - The FPGA's 100 °C junction limit (I grade): 63 °C on the bench becomes 98–108 °C.
+  - The ADCLK948 reaches 119–129 °C at the junction. That is under its 150 °C maximum, but
     outside its rated range.
 - **What a vehicle install needs.** The KV260's fan blowing across this board, or a thermal path
   to the enclosure, as VEHICLE_PLATFORM plans. At 1 m/s the data sheets' θJA fall by 10–15 %, and
@@ -806,22 +808,25 @@ solved, not estimated.
 
 | Hottest junction, at 25 °C ambient (and at 70 °C) | Still air | Fan only | Passive sink, 4 ICs | Passive sink, ICs + regulators | Sink + fan, ICs + regulators |
 |---|---|---|---|---|---|
-| Board, max / mean | 73 / 51 °C | 54 / 35 | 63 / 41 | 49 / 38 | 40 / 30 |
-| Hottest part | ADCLK948 82 (127) | ADCLK948 62 (107) | LMR33630 75 (120) | Si549 53 (98) | Si549 45 (90) |
-| ADCLK948 | 82 (127) | 62 (107) | 50 (95) | 51 (96) | 43 (88) |
-| XC7A50T | 62 (107) | 45 (90) | 37 (82) | 38 (83) | 31 (76) |
-| AD9484 / AD9253 | 68 / 65 | 50 / 47 | 43 / 41 | 45 / 42 | 36 / 34 |
-| LMR33630 | 79 (124) | 61 (106) | 75 (120) | 52 (97) | 44 (89) |
+| Board, max / mean | 76 / 52 °C | 55 / 36 | 65 / 43 | 51 / 39 | 41 / 31 |
+| Hottest part | ADCLK948 84 (129) | ADCLK948 63 (108) | LMR33630 78 (123) | Si549 56 (101) | Si549 46 (91) |
+| ADCLK948 | 84 (129) | 63 (108) | 52 (97) | 53 (98) | 44 (89) |
+| XC7A50T | 63 (108) | 46 (91) | 37 (82) | 39 (84) | 31 (76) |
+| AD9484 / AD9253 | 70 / 66 | 50 / 47 | 44 / 41 | 46 / 43 | 36 / 34 |
+| LMR33630 | 82 (127) | 63 (108) | 78 (123) | 54 (99) | 45 (90) |
+| RTL8211FSI (not under the sink) | 70 (115) | 50 (95) | 54 (99) | 55 (100) | 45 (90) |
 
 ![Board temperature for five ways of cooling it](sim/rev05_cooling.png)
 
-- **Airflow alone halves every rise.** At 70 °C it brings the FPGA to 90 °C, inside its limit.
-  The board under the clock buffer still reaches about 99 °C.
+- **Airflow alone halves every rise.** At 70 °C it brings the FPGA to 91 °C, inside its limit.
+  The board under the clock buffer still reaches about 100 °C.
 - **A sink on the four ICs alone leaves the power corner hot.** The buck then becomes the hottest
   part. The sink has to touch the regulators too: the LMR33630, and the two TPS7A8300 and
   TPS562201 that dissipate most.
-- **Sink plus fan keeps everything under 90 °C at 70 °C ambient.** It takes 3.3 of the 6.9 W.
-  Every board temperature is then under 85 °C, the parts' rating, with margin.
+- **Sink plus fan keeps every junction under 92 °C at 70 °C ambient.** It takes 3.4 of the 7.5 W.
+  The board's hottest spot is then 86 °C, at the parts' 85 °C rating, no longer under it with
+  margin (85 °C before the PHY). The PHY on its tab is outside the sink here; touching it too, or a
+  pad to the RJ45 pedestal of the mount (MECHANICAL), would win that back.
 - **Not modelled.** The contacts' tops are estimates; the ADI data sheets give no θJC(top). The
   sink is taken as isothermal. Heat into the KV260 is not counted, which errs on the hot side.
 
