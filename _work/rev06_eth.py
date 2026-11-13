@@ -5,15 +5,19 @@ docs/CONTROL_SPEC.md section 7).
 
 Rev05 shared two IAS1 pairs with the PHY by an assembly option (C1218-C1221 DNP, C101/C102/C107/C108 to
 be removed for Ethernet). Rev06 gives the PHY its own bank-34 pairs, on the OUTER ring of the BGA so they
-can be escaped (Rev05 could not escape any inner free ball):
+can be escaped (Rev05 could not escape any inner free ball). Chosen by what the board allows: T4/T3 and
+N1 are walled in by matched LVDS legs; R2/R1 escape with a via in each ball, and R3 does once a
+LINK_RX_D0_N skew meander that ran under the corner is moved:
 
-  ETH_SGTX_FPGA_P/N  T4 / T3 (IO_L9P/N_T1_DQS_34), LVDS_25 out  -> C1220/C1221 (at the PHY) -> HSIP/N
-  ETH_SGRX_FPGA_P/N  N1 / P1 (IO_L4P/N_T0_34), LVDS_25 in, DIFF_TERM <- C1218/C1219 <- HSOP/N;
+  ETH_SGTX_FPGA_P/N  R2 / R1 (IO_L7P/N_T1_34), LVDS_25 out  -> C1220/C1221 (at the PHY) -> HSIP/N
+  ETH_SGRX_FPGA_P/N  R3 / T2 (IO_L8P/N_T1_34), LVDS_25 in, DIFF_TERM <- C1218/C1219 <- HSOP/N;
                      R1215/R1216 10 k to +1V2 restore the common mode the capacitors remove
                      (the scheme of R101-R104 on LINK_TX)
-  ETH_MDC            R1 (IO_L7N_T1_34), LVCMOS25 (the PHY's I/O run at 2.5 V: CFG_LDO = 01)
-  ETH_MDIO           T2 (IO_L8N_T1_34), LVCMOS25, R1213 1.5 k up to ETH_DVDDRG stays
-  ETH_RSTN           T12 (IO_L15N_T2_DQS_DOUT_CSO_B_14), LVCMOS33; R1214/C1216 power-on reset stays,
+  ETH_MDC            P1 (IO_L4N_T0_34), LVCMOS25 (the PHY's I/O run at 2.5 V: CFG_LDO = 01)
+  ETH_MDIO           M15 (IO_L3N_T0_DQS_EMCCLK_14), LVCMOS33 driven OPEN-DRAIN (the gateware only pulls low);
+                     R1213 1.5 k pulls it up to ETH_DVDDRG (2.5 V), which the 3.3 V bank reads as high (VIH 2.0 V),
+                     so the PHY never sees 3.3 V. P5, the 2.5 V choice, sits on a +3V3_D run that feeds ball L6
+  ETH_RSTN           K13 (IO_L5P_T0_D06_14), LVCMOS33; R1214/C1216 power-on reset stays,
                      the FPGA can hold the PHY in reset or release it
   INTB               open, as before (the gateware polls MDIO)
 
@@ -27,15 +31,15 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "_work"))
 import add_ethernet as AE                                          # noqa: E402
 
-AE.BALLS = {"T4": "ETH_SGTX_FPGA_P", "T3": "ETH_SGTX_FPGA_N", "N1": "ETH_SGRX_FPGA_P", "P1": "ETH_SGRX_FPGA_N",
-            "R1": "ETH_MDC", "T2": "ETH_MDIO", "T12": "ETH_RSTN"}
+AE.BALLS = {"R2": "ETH_SGTX_FPGA_P", "R1": "ETH_SGTX_FPGA_N", "R3": "ETH_SGRX_FPGA_P", "T2": "ETH_SGRX_FPGA_N",
+            "P1": "ETH_MDC", "M15": "ETH_MDIO", "K13": "ETH_RSTN"}
 # cap -> (pin, old net, new net): the side that used to tap the IAS1 pair
 RELABEL = {"C1218": ("2", "LINK_TX_D0_P", "ETH_SGRX_FPGA_P"), "C1219": ("2", "LINK_TX_D0_N", "ETH_SGRX_FPGA_N"),
            "C1220": ("1", "LINK_RX_D0_P", "ETH_SGTX_FPGA_P"), "C1221": ("1", "LINK_RX_D0_N", "ETH_SGTX_FPGA_N")}
-DESC = {"C1218": "SGMII PHY -> FPGA, AC coupling (Rev06: own pins N1/P1)",
-        "C1219": "SGMII PHY -> FPGA, AC coupling (Rev06: own pins N1/P1)",
-        "C1220": "SGMII FPGA -> PHY, AC coupling (Rev06: own pins T4/T3)",
-        "C1221": "SGMII FPGA -> PHY, AC coupling (Rev06: own pins T4/T3)"}
+DESC = {"C1218": "SGMII PHY -> FPGA, AC coupling (Rev06: own pins R3/T2)",
+        "C1219": "SGMII PHY -> FPGA, AC coupling (Rev06: own pins R3/T2)",
+        "C1220": "SGMII FPGA -> PHY, AC coupling (Rev06: own pins R2/R1)",
+        "C1221": "SGMII FPGA -> PHY, AC coupling (Rev06: own pins R2/R1)"}
 
 
 def highest(tag):
