@@ -724,7 +724,7 @@
 		(roundrect_rratio 0.25)
 	)
 	(embedded_fonts no)
-	(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/LFCSP-56-1EP_8x8mm_P0.5mm.wrl"
+	(model "${KICAD10_3DMODEL_DIR}/Package_CSP.3dshapes/LFCSP-56-1EP_8x8mm_P0.5mm_EP6.6x6.6mm.step"
 		(offset
 			(xyz 0 0 0)
 		)

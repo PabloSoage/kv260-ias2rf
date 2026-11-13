@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """
+NOT USED by the board (13 Nov 2026: the owner found the renders looked worse with them). Kept here
+for reference; --apply would point the board at them again.
+
 Simple 3D models (VRML) for the parts whose footprint has no model, or names a model file that the
 KiCad 10 3D library does not ship, and the board's model paths pointed at them.
 
@@ -11,16 +14,15 @@ generic BGA of the same body and pitch), the footprint is pointed at that one in
 Written to footprints/kv260-ias2rf.3dshapes/ and referenced as ${KIPRJMOD}/footprints/...; the
 project library's own footprints get the same model, so the board and the library agree.
 
-Usage:  py _work/layout/models3d.py            (writes the models, patches the board and the library)
-        py _work/layout/models3d.py --models   (only the .wrl files)
+Usage:  py _work/layout/simple3d/models3d.py   (writes the .wrl files here; --apply also patches the board)
 """
 import math
 import os
 import re
 import sys
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-OUT = os.path.join(ROOT, "footprints", "kv260-ias2rf.3dshapes")
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+OUT = os.path.dirname(os.path.abspath(__file__))
 BOARD = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
 LIB = os.path.join(ROOT, "footprints", "kv260-ias2rf.pretty")
 PRJ = "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/"
@@ -250,7 +252,7 @@ def main():
     for f, build in MODELS.items():
         open(os.path.join(OUT, f), "w", newline="\n").write(build().wrl())
     print(f"{len(MODELS)} models in {os.path.relpath(OUT, ROOT)}")
-    if "--models" in sys.argv:
+    if "--apply" not in sys.argv:
         return 0
     print(f"board: {patch_board()} footprints pointed at a model")
     print("library:", ", ".join(patch_library()))
