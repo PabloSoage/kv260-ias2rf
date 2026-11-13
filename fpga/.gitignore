@@ -1,2 +1,8 @@
-__pycache__/
-*.pyc
+sim/out/
+sim/work/
+xsim.dir/
+*.jou
+*.log
+*.pb
+*.wdb
+.Xil/
