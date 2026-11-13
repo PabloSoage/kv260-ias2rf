@@ -1,0 +1,48 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Fri Nov 13 20:51:24 2026
+| Host         : Akasha running 64-bit major release  (build 9200)
+| Command      : report_drc -file D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/drc.rpt
+| Design       : kria_top
+| Device       : xck26-sfvc784-2LV-c
+| Speed File   : -2LV
+| Design State : Fully Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: kria_top
+          Floorplan: design_1
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max checks: <unlimited>
+             Checks found: 1
++---------+----------+---------------------+--------+
+| Rule    | Severity | Description         | Checks |
++---------+----------+---------------------+--------+
+| PLCK-58 | Warning  | Clock Placer Checks | 1      |
++---------+----------+---------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+PLCK-58#1 Warning
+Clock Placer Checks  
+Sub-optimal placement for a global clock-capable IO pin and BUFG pair.
+Resolution: A dedicated routing path between the two can be used if: (a) The global clock-capable IO (GCIO) is placed on a GCIO capable site (b) The BUFG is placed in the same bank of the device as the GCIO pin. Both the above conditions must be met at the same time, else it may lead to longer and less predictable clock insertion delays.
+ This is normally an ERROR but the CLOCK_DEDICATED_ROUTE constraint is set to FALSE allowing your design to continue. The use of this override is highly discouraged as it may lead to very poor timing results. It is recommended that this error condition be corrected in the design.
+
+	u_ibuf_rx_clk/IBUFCTRL_INST (in u_ibuf_rx_clk macro) (IBUFCTRL.O) is locked to C1
+	u_bufg_rx_div (BUFGCE_DIV.I) is provisionally placed by clockplacer on BUFGCE_DIV_X0Y15
+	u_bufg_rx_hs (BUFGCE.I) is provisionally placed by clockplacer on BUFGCE_X0Y76
+
+Related violations: <none>
+
+
