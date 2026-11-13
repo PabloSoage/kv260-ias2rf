@@ -1,0 +1,96 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Fri Nov 13 21:41:09 2026
+| Host         : Akasha running 64-bit major release  (build 9200)
+| Command      : report_pulse_width -significant_digits 3 -file D:/Repos/kv260-ias2rf-gemini/fpga/eth/test/reports/pulse_width.rpt
+| Design       : sgmii_lvds_test
+| Device       : 7a50t-ftg256
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Pulse Width Report
+
+Clock Name:         clk_125_u
+Waveform(ns):       { 0.000 4.000 }
+Period(ns):         8.000
+Sources:            { u_mmcm_sgmii/CLKOUT5 }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     BUFG/I              n/a            1.592         8.000       6.408      BUFGCTRL_X0Y5    u_bufg_125/I
+Max Period        n/a     MMCME2_ADV/CLKOUT5  n/a            213.360       8.000       205.360    MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKOUT5
+Low Pulse Width   Slow    FDPE/C              n/a            0.500         4.000       3.500      SLICE_X7Y35      rst_125_sync_reg[0]/C
+High Pulse Width  Slow    FDPE/C              n/a            0.500         4.000       3.500      SLICE_X7Y35      rst_125_sync_reg[0]/C
+
+Clock Name:         clk_200m_u
+Waveform(ns):       { 0.000 2.500 }
+Period(ns):         5.000
+Sources:            { u_mmcm_sgmii/CLKOUT0 }
+
+Check Type        Corner  Lib Pin            Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     IDELAYCTRL/REFCLK  n/a            2.438         5.000       2.562      IDELAYCTRL_X0Y0  u_idelayctrl_b14/REFCLK
+Max Period        n/a     IDELAYCTRL/REFCLK  n/a            5.264         5.000       0.264      IDELAYCTRL_X0Y0  u_idelayctrl_b14/REFCLK
+Low Pulse Width   Slow    FDPE/C             n/a            0.500         2.500       2.000      SLICE_X0Y25      rst_200_sync_reg[0]/C
+High Pulse Width  Slow    FDPE/C             n/a            0.500         2.500       2.000      SLICE_X0Y25      rst_200_sync_reg[0]/C
+
+Clock Name:         clk_312p5_45_u
+Waveform(ns):       { 0.400 2.000 }
+Period(ns):         3.200
+Sources:            { u_mmcm_sgmii/CLKOUT4 }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     BUFG/I              n/a            1.592         3.200       1.608      BUFGCTRL_X0Y2    u_bufg_312p5_45/I
+Max Period        n/a     MMCME2_ADV/CLKOUT4  n/a            213.360       3.200       210.160    MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKOUT4
+Low Pulse Width   Slow    FDPE/C              n/a            0.500         1.600       1.100      SLICE_X0Y35      u_sgmii_rx/rst_312p5_45_sync_reg[0]/C
+High Pulse Width  Slow    FDPE/C              n/a            0.500         1.600       1.100      SLICE_X0Y35      u_sgmii_rx/rst_312p5_45_sync_reg[0]/C
+
+Clock Name:         clk_312p5_u
+Waveform(ns):       { 0.000 1.600 }
+Period(ns):         3.200
+Sources:            { u_mmcm_sgmii/CLKOUT3 }
+
+Check Type        Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     IDELAYE2/C          n/a            2.360         3.200       0.840      IDELAY_X0Y35     u_sgmii_rx/u_idelay_n/C
+Max Period        n/a     MMCME2_ADV/CLKOUT3  n/a            213.360       3.200       210.160    MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKOUT3
+Low Pulse Width   Slow    RAMD32/CLK          n/a            1.130         1.600       0.470      SLICE_X6Y34      u_sgmii_rx/fifo_mem_reg_0_31_0_5/RAMA/CLK
+High Pulse Width  Slow    RAMD32/CLK          n/a            1.130         1.600       0.470      SLICE_X6Y34      u_sgmii_rx/fifo_mem_reg_0_31_0_5/RAMA/CLK
+
+Clock Name:         clk_625_0_u
+Waveform(ns):       { 0.000 0.800 }
+Period(ns):         1.600
+Sources:            { u_mmcm_sgmii/CLKOUT1 }
+
+Check Type  Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period  n/a     BUFG/I              n/a            1.592         1.600       0.008      BUFGCTRL_X0Y3    u_bufg_625_0/I
+Max Period  n/a     MMCME2_ADV/CLKOUT1  n/a            213.360       1.600       211.760    MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKOUT1
+
+Clock Name:         clk_625_90_u
+Waveform(ns):       { 0.400 1.200 }
+Period(ns):         1.600
+Sources:            { u_mmcm_sgmii/CLKOUT2 }
+
+Check Type  Corner  Lib Pin             Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period  n/a     BUFG/I              n/a            1.592         1.600       0.008      BUFGCTRL_X0Y4    u_bufg_625_90/I
+Max Period  n/a     MMCME2_ADV/CLKOUT2  n/a            213.360       1.600       211.760    MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKOUT2
+
+Clock Name:         mmcm_fb
+Waveform(ns):       { 0.000 5.000 }
+Period(ns):         10.000
+Sources:            { u_mmcm_sgmii/CLKFBOUT }
+
+Check Type  Corner  Lib Pin              Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period  n/a     MMCME2_ADV/CLKFBOUT  n/a            1.249         10.000      8.751      MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKFBOUT
+Max Period  n/a     MMCME2_ADV/CLKFBIN   n/a            100.000       10.000      90.000     MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKFBIN
+
+Clock Name:         sys_clk_100m
+Waveform(ns):       { 0.000 5.000 }
+Period(ns):         10.000
+Sources:            { fpga_clk_p }
+
+Check Type        Corner  Lib Pin            Reference Pin  Required(ns)  Actual(ns)  Slack(ns)  Location         Pin
+Min Period        n/a     BUFG/I             n/a            1.592         10.000      8.408      BUFGCTRL_X0Y6    u_bufg_in/I
+Max Period        n/a     MMCME2_ADV/CLKIN1  n/a            100.000       10.000      90.000     MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKIN1
+Low Pulse Width   Slow    MMCME2_ADV/CLKIN1  n/a            2.000         5.000       3.000      MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKIN1
+High Pulse Width  Slow    MMCME2_ADV/CLKIN1  n/a            2.000         5.000       3.000      MMCME2_ADV_X1Y0  u_mmcm_sgmii/CLKIN1
+
