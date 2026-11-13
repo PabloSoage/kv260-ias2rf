@@ -343,6 +343,12 @@ side, and the common mode through the layer change
 
 ![The other 3-D sub-models](docs/sim/rev05_3d.png)
 
+**The Ethernet option** shares two link pairs through unfitted capacitors: what their branches cost
+the IAS1 link, where C1218 went, and the Ethernet paths themselves
+([SIGNAL_INTEGRITY §9.7](docs/SIGNAL_INTEGRITY.md)).
+
+![Eye openings with the Ethernet option's branches](docs/sim/eth_branches.png)
+
 ---
 
 ## Mounted on the KV260
