@@ -37,3 +37,4 @@ mise.local.toml
 clockInfo.txt
 *.jou
 *.log.bak
+_scratch/
