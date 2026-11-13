@@ -225,12 +225,14 @@ opening; jitter is the spread of the zero crossings.
 
 | Pair | Before | With the DNP branch | Branch |
 |---|---|---|---|
-| LINK_TX_D0 | 518 mV, 21 ps | 489–499 mV, 17 ps | P: C1218 sits on the bottom face, on the via of R101's pad, so its only stub is that pad. N: 1.0 mm from R102's bias branch. Both about 10 mm from the connector |
+| LINK_TX_D0 | 518 mV, 21 ps | 477–484 mV, 18–23 ps | P: C1218 on the top face just below the notch, at (178.9, 98.3), with a via in each pad; the branch is 0.9 mm of L3 and the via to L1, about 14 mm from the connector. N: 1.0 mm from R102's bias branch, about 10 mm from it |
 | LINK_RX_D0 | 609 mV, 93 ps | 601–607 mV, 109 ps | 4.3 mm (P) and 5.2 mm (N, 2 vias) to C1220/C1221, near the connector |
 
-A first placement of C1218 left a 6.6 mm branch. That cut LINK_TX_D0's eye to 461 mV, which is why
-the part went to the bottom face. The RX_D0 branches could not be shortened: the space around
-C101/C102 and J101 is full.
+C1218 went through three places. Beside R101 on the top face it left a 6.6 mm branch (461 mV). On
+the bottom face, on R101's own via, it cost least (489–499 mV), but there it sits over the carrier,
+0.8 mm above it, where nothing may be fitted (LAYOUT §1). Where it is now, the only free top-face
+spot near the leg, it costs 10–15 mV more than on the bottom and stays off the underside. The RX_D0
+branches could not be shortened: the space around C101/C102 and J101 is full.
 
 **Ethernet mode, measured the same way.** The path runs from the FPGA to the PHY's input, and from
 the PHY's output to the FPGA, branch and PHY run included:
@@ -238,11 +240,11 @@ the PHY's output to the FPGA, branch and PHY run included:
 | Path | Eye | Jitter | PHY-side pair |
 |---|---|---|---|
 | LINK_RX_D0 → PHY | 350 mV | 50 ps | ETH_SGTX_PHY: 53.3 / 52.2 mm, 53 % coupled, P−N +6.5 ps; alone 640 mV |
-| PHY → LINK_TX_D0 | 647 mV | 86 ps | ETH_SGRX_PHY: 52.9 / 46.5 mm on different layers (P on L8, N on L6): P−N +2.9 ps; alone 647 mV |
+| PHY → LINK_TX_D0 | 637 mV | 53 ps | ETH_SGRX_PHY: P on L8 with a 3.2 mm bump, N on L6: P−N +20.9 ps on the PHY side, which cancels the −21.7 ps of C1218's tap sitting 3.2 mm further down LINK_TX_D0_P than C1219's on N; alone 637 mV |
 
-The PHY's SGRX legs are matched in **delay**, not length. A meander that matched their lengths
-left 41 ps of skew, because L8 microstrip is faster than L6 stripline, so it was taken out. The
-PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at 0.17 mm.
+The PHY's SGRX legs are matched in **delay**, not length, and end to end, PHY to FPGA. L8
+microstrip is faster than L6 stripline: a meander that matched their lengths left 41 ps of skew.
+The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at 0.17 mm.
 
 **Gateware.** Xilinx's 1G/2.5G Ethernet PCS/PMA or SGMII core (PG047), in its "SGMII over LVDS,
 asynchronous oversampling" form (XAPP523), which supports 7-series −2 parts. 1.25 Gb/s is also
