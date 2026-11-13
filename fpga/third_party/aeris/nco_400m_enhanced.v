@@ -151,7 +151,7 @@ always @(posedge clk_400m or negedge reset_n) begin
         phase_accumulator <= phase_accumulator + frequency_tuning_word;
         phase_accum_reg   <= phase_accumulator;
         // Stage 2: offset addition (uses previous cycle's phase_accum_reg)
-        phase_with_offset <= phase_accum_reg + {phase_offset, 16'b0};
+        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8], 24'd0};
     end
 end
 
@@ -259,7 +259,7 @@ always @(posedge clk_400m or negedge reset_n) begin
         // Stage 1: just capture DSP output (no CARRY4 chain)
         phase_accum_reg   <= phase_accum_p[31:0];
         // Stage 2: offset add (CARRY4 chain from registered fabric→fabric, easy timing)
-        phase_with_offset <= phase_accum_reg + {phase_offset, 16'b0};
+        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8], 24'd0};
     end
 end
 

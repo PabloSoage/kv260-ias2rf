@@ -1,7 +1,7 @@
 // Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/ddc_400m.v)
 // Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
 // License: MIT (see fpga/third_party/aeris/README.md)
-// Adaptation for kv260-ias2rf: wired cic_i_inst/cic_q_inst monitor ports.
+// Adaptation for kv260-ias2rf: wired cic_i_inst/cic_q_inst monitor ports and split 400 MHz reset tree.
 `timescale 1ns / 1ps
 
 module ddc_400m_enhanced (
@@ -75,20 +75,34 @@ reg [7:0] error_counter;
 // All 100 MHz submodules (FIR, output stage) continue using reset_n directly
 // (already synchronized to 100 MHz at radar_system_top level).
 // ============================================================================
-(* ASYNC_REG = "TRUE" *) reg [1:0] reset_sync_400m;
-(* max_fanout = 50 *) wire reset_n_400m = reset_sync_400m[1];
+(* ASYNC_REG = "TRUE" *) reg [1:0] reset_sync_400m = 2'b00;
+(* max_fanout = 24 *) reg rst_n_400_nco  = 1'b0;
+(* max_fanout = 24 *) reg rst_400_nco    = 1'b1;
+(* max_fanout = 24 *) reg rst_400_mix    = 1'b1;
+(* max_fanout = 24 *) reg rst_n_400_cici = 1'b0;
+(* max_fanout = 24 *) reg rst_n_400_cicq = 1'b0;
+wire reset_n_400m = ~rst_400_mix;
 
-// Active-high reset for DSP48E1 RST ports (avoids LUT1 inverter fan-out)
-(* max_fanout = 50 *) reg reset_400m;
+// Active-high resets for DSP48E1 RST ports (avoids LUT1 inverter fan-out)
+(* max_fanout = 24 *) reg reset_400m   = 1'b1;
+(* max_fanout = 24 *) reg reset_400m_q = 1'b1;
 
 always @(posedge clk_400m or negedge reset_n) begin
     if (!reset_n) begin
         reset_sync_400m <= 2'b00;
-        reset_400m      <= 1'b1;
     end else begin
         reset_sync_400m <= {reset_sync_400m[0], 1'b1};
-        reset_400m      <= ~reset_sync_400m[1];
     end
+end
+
+always @(posedge clk_400m) begin
+    rst_n_400_nco  <= reset_sync_400m[1];
+    rst_400_nco    <= ~reset_sync_400m[1];
+    rst_400_mix    <= ~reset_sync_400m[1];
+    rst_n_400_cici <= reset_sync_400m[1];
+    rst_n_400_cicq <= reset_sync_400m[1];
+    reset_400m     <= ~reset_sync_400m[1];
+    reset_400m_q   <= ~reset_sync_400m[1];
 end
 
 // CDC synchronization for control signals (2-stage synchronizers)
@@ -151,8 +165,8 @@ assign debug_mixed_q_trunc = mixed_q[25:8];
 assign mixers_enable_sync = mixers_enable_sync_chain[1];
 assign force_saturation_sync = force_saturation_sync_chain[1];
 
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         mixers_enable_sync_chain <= 2'b00;
         force_saturation_sync_chain <= 2'b00;
     end else begin
@@ -164,8 +178,8 @@ end
 // ============================================================================
 // Sample Counter and Debug Monitoring
 // ============================================================================
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m || reset_monitors) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix || reset_monitors) begin
         sample_counter <= 0;
         error_counter <= 0;
     end else if (adc_data_valid_i && adc_data_valid_q ) begin
@@ -181,7 +195,7 @@ lfsr_dither_enhanced #(
     .DITHER_WIDTH(8)
 ) phase_dither_gen (
     .clk(clk_400m),
-    .reset_n(reset_n_400m),
+    .reset_n(rst_n_400_nco),
     .enable(nco_ready),
     .dither_out(phase_dither_bits)
 );
@@ -193,8 +207,8 @@ lfsr_dither_enhanced #(
 localparam PHASE_INC_120MHZ = 32'h4CCCCCCD;
 
 // Apply dithering to reduce spurious tones (registered for 400 MHz timing)
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m)
+always @(posedge clk_400m) begin
+    if (rst_400_nco)
         phase_inc_dithered <= PHASE_INC_120MHZ;
     else
         phase_inc_dithered <= PHASE_INC_120MHZ + {24'b0, phase_dither_bits};
@@ -205,9 +219,9 @@ end
 // ============================================================================
 nco_400m_enhanced nco_core (
     .clk_400m(clk_400m),
-    .reset_n(reset_n_400m),
+    .reset_n(rst_n_400_nco),
     .frequency_tuning_word(phase_inc_dithered),
-    .phase_valid(mixers_enable),
+    .phase_valid(mixers_enable_sync),
     .phase_offset(16'h0000),
     .sin_out(sin_out),
     .cos_out(cos_out),
@@ -233,8 +247,8 @@ assign adc_signed_w = {1'b0, adc_data, {(MIXER_WIDTH-ADC_WIDTH-1){1'b0}}} -
                       {1'b0, {ADC_WIDTH{1'b1}}, {(MIXER_WIDTH-ADC_WIDTH-1){1'b0}}} / 2;
 
 // Valid pipeline: 5-stage shift register (1 NCO pipe + 3 DSP48E1 AREG+MREG+PREG + 1 retiming)
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         dsp_valid_pipe <= 5'b00000;
     end else begin
         dsp_valid_pipe <= {dsp_valid_pipe[3:0], (nco_ready && adc_data_valid_i && adc_data_valid_q)};
@@ -250,8 +264,8 @@ reg signed [MIXER_WIDTH+NCO_WIDTH-1:0] mult_i_internal, mult_q_internal;  // Mod
 reg signed [MIXER_WIDTH+NCO_WIDTH-1:0] mult_i_reg, mult_q_reg;            // Models PREG
 
 // Stage 0: NCO pipeline — breaks long NCO→DSP route (matches synthesis fabric registers)
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         cos_nco_pipe <= 0;
         sin_nco_pipe <= 0;
     end else begin
@@ -261,8 +275,8 @@ always @(posedge clk_400m or negedge reset_n_400m) begin
 end
 
 // Stage 1: AREG/BREG equivalent (uses pipelined NCO outputs)
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         adc_signed_reg <= 0;
         cos_pipe_reg <= 0;
         sin_pipe_reg <= 0;
@@ -274,8 +288,8 @@ always @(posedge clk_400m or negedge reset_n_400m) begin
 end
 
 // Stage 2: MREG equivalent
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         mult_i_internal <= 0;
         mult_q_internal <= 0;
     end else begin
@@ -285,8 +299,8 @@ always @(posedge clk_400m or negedge reset_n_400m) begin
 end
 
 // Stage 3: PREG equivalent
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         mult_i_reg <= 0;
         mult_q_reg <= 0;
     end else begin
@@ -296,8 +310,8 @@ always @(posedge clk_400m or negedge reset_n_400m) begin
 end
 
 // Stage 4: Post-DSP retiming register (matches synthesis path)
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         mult_i_retimed <= 0;
         mult_q_retimed <= 0;
     end else begin
@@ -315,8 +329,8 @@ wire [47:0] dsp_p_i, dsp_p_q;
 // (1.505ns routing observed in Build 26). These fabric registers are placed
 // near the DSP by the placer, splitting the route into two shorter segments.
 // DONT_TOUCH on the reg declaration (above) prevents absorption/retiming.
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         cos_nco_pipe <= 0;
         sin_nco_pipe <= 0;
     end else begin
@@ -442,10 +456,10 @@ DSP48E1 #(
     .USE_PATTERN_DETECT("NO_PATDET")
 ) dsp_mixer_q (
     .CLK(clk_400m),
-    .RSTA(reset_400m),
-    .RSTB(reset_400m),
-    .RSTM(reset_400m),
-    .RSTP(reset_400m),
+    .RSTA(reset_400m_q),
+    .RSTB(reset_400m_q),
+    .RSTM(reset_400m_q),
+    .RSTP(reset_400m_q),
     .RSTALLCARRYIN(1'b0),
     .RSTALUMODE(1'b0),
     .RSTCTRL(1'b0),
@@ -500,8 +514,8 @@ wire signed [MIXER_WIDTH+NCO_WIDTH-1:0] mult_q_reg = dsp_p_q[MIXER_WIDTH+NCO_WID
 // Stage 4: Post-DSP retiming register — breaks DSP48E1 CLK→P to fabric path
 // Without this, the DSP output prop delay (1.866ns) + routing (0.515ns) exceeds
 // the 2.500ns clock period at slow process corner
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         mult_i_retimed <= 0;
         mult_q_retimed <= 0;
     end else begin
@@ -517,8 +531,8 @@ end
 // force_saturation mux is intentionally AFTER the DSP48E1 output to avoid
 // polluting the critical input path with extra logic
 // ============================================================================
-always @(posedge clk_400m or negedge reset_n_400m) begin
-    if (!reset_n_400m) begin
+always @(posedge clk_400m) begin
+    if (rst_400_mix) begin
         mixed_i <= 0;
         mixed_q <= 0;
         mixed_valid <= 0;
@@ -569,7 +583,7 @@ wire cic_valid_i, cic_valid_q;
 
 cic_decimator_4x_enhanced cic_i_inst (
     .clk(clk_400m),
-    .reset_n(reset_n_400m),
+    .reset_n(rst_n_400_cici),
     .data_in(mixed_i[33:16]),
     .data_valid(mixed_valid),
     .data_out(cic_i_out),
@@ -581,7 +595,7 @@ cic_decimator_4x_enhanced cic_i_inst (
 
 cic_decimator_4x_enhanced cic_q_inst (
     .clk(clk_400m),
-    .reset_n(reset_n_400m),
+    .reset_n(rst_n_400_cicq),
     .data_in(mixed_q[33:16]),
     .data_valid(mixed_valid),
     .data_out(cic_q_out),
@@ -609,7 +623,7 @@ cdc_adc_to_processing #(
 )CDC_FIR_i(
     .src_clk(clk_400m),
     .dst_clk(clk_100m),
-    .src_reset_n(reset_n_400m),
+    .src_reset_n(rst_n_400_cici),
     .dst_reset_n(reset_n),
     .src_data(cic_i_out),
     .src_valid(cic_valid_i),
@@ -623,7 +637,7 @@ cdc_adc_to_processing #(
 )CDC_FIR_q(
     .src_clk(clk_400m),
     .dst_clk(clk_100m),
-    .src_reset_n(reset_n_400m),
+    .src_reset_n(rst_n_400_cicq),
     .dst_reset_n(reset_n),
     .src_data(cic_q_out),
     .src_valid(cic_valid_q),

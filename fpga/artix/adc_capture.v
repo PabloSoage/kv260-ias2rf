@@ -88,10 +88,11 @@ module adc_capture #(
     endgenerate
 
     // -------------------------------------------------------------------------
-    // DCO Clock Path: IBUFDS -> BUFIO (IDDR) + MMCME2_ADV (clk_400m/200m/100m)
+    // DCO Clock Path: IBUFDS -> BUFIO (IDDR) + BUFR (capture) + MMCME2_ADV
     // -------------------------------------------------------------------------
     wire dco_ibuf;
     wire dco_bufio;
+    wire dco_bufr;
 
     IBUFDS #(
         .DIFF_TERM  ("FALSE"),
@@ -105,6 +106,16 @@ module adc_capture #(
     BUFIO u_bufio_dco (
         .I (dco_ibuf),
         .O (dco_bufio)
+    );
+
+    BUFR #(
+        .BUFR_DIVIDE ("BYPASS"),
+        .SIM_DEVICE  ("7SERIES")
+    ) u_bufr_dco (
+        .O   (dco_bufr),
+        .CE  (1'b1),
+        .CLR (1'b0),
+        .I   (dco_ibuf)
     );
 
     wire clk_fb_unbuf, clk_fb_bufg;
@@ -251,18 +262,89 @@ module adc_capture #(
         end
     endgenerate
 
-    // Capture IDDR Q1/Q2 in clk_200m domain
+    // Synchronized reset in dco_bufr domain for IDDR -> FIFO write side
+    (* ASYNC_REG = "TRUE" *) reg [1:0] rst_sync_bufr;
+    always @(posedge dco_bufr or posedge rst_src) begin
+        if (rst_src)
+            rst_sync_bufr <= 2'b11;
+        else
+            rst_sync_bufr <= {rst_sync_bufr[0], 1'b0};
+    end
+    wire rst_bufr = rst_sync_bufr[1];
+
+    // Capture IDDR Q1/Q2 in matched dco_bufr domain -> 4-deep Gray FIFO -> clk_200m
+    // Absorbs static + PVT clock-tree skew between Bank 14 BUFIO/BUFR and MMCM BUFG.
+    reg [17:0] dco_fifo_mem [0:3];
+    reg [2:0]  wp_bufr_bin, wp_bufr_gray;
+    reg [2:0]  rp_200_bin, rp_200_gray;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] wp_gray_sync1, wp_gray_sync2;
+
+    function [2:0] b2g3;
+        input [2:0] b;
+        b2g3 = b ^ (b >> 1);
+    endfunction
+
+    always @(posedge dco_bufr) begin
+        if (rst_bufr) begin
+            wp_bufr_bin  <= 3'd0;
+            wp_bufr_gray <= 3'd0;
+        end else begin
+            dco_fifo_mem[wp_bufr_bin[1:0]] <= {q_fall, q_rise};
+            wp_bufr_bin  <= wp_bufr_bin + 3'd1;
+            wp_bufr_gray <= b2g3(wp_bufr_bin + 3'd1);
+        end
+    end
+
+    reg [2:0] wp_sync_bin;
+    always @* begin
+        wp_sync_bin[2] = wp_gray_sync2[2];
+        wp_sync_bin[1] = wp_sync_bin[2] ^ wp_gray_sync2[1];
+        wp_sync_bin[0] = wp_sync_bin[1] ^ wp_gray_sync2[0];
+    end
+    wire [2:0] dco_fifo_fill  = wp_sync_bin - rp_200_bin;
+    wire       dco_fifo_empty = (rp_200_gray == wp_gray_sync2);
+
+    reg       dco_rd_started;
     reg [8:0] q_rise_r, q_fall_r;
     reg       tog_200;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] tr_start_sync, tr_pat_sync;
+    wire train_start_200  = tr_start_sync[1];
+    wire train_pat_en_200 = tr_pat_sync[1];
+
     always @(posedge clk_200m) begin
         if (rst_200m) begin
-            q_rise_r <= 9'd0;
-            q_fall_r <= 9'd0;
-            tog_200  <= 1'b0;
+            wp_gray_sync1  <= 3'd0;
+            wp_gray_sync2  <= 3'd0;
+            rp_200_bin     <= 3'd0;
+            rp_200_gray    <= 3'd0;
+            dco_rd_started <= 1'b0;
+            q_rise_r       <= 9'd0;
+            q_fall_r       <= 9'd0;
+            tog_200        <= 1'b0;
+            tr_start_sync  <= 2'b00;
+            tr_pat_sync    <= 2'b00;
         end else begin
-            q_rise_r <= q_rise;
-            q_fall_r <= q_fall;
-            tog_200  <= ~tog_200;
+            wp_gray_sync1 <= wp_bufr_gray;
+            wp_gray_sync2 <= wp_gray_sync1;
+            tr_start_sync <= {tr_start_sync[0], train_start};
+            tr_pat_sync   <= {tr_pat_sync[0], train_pattern_en};
+
+            if (!dco_rd_started) begin
+                if (dco_fifo_fill >= 3'd2) begin
+                    dco_rd_started <= 1'b1;
+                    q_rise_r       <= dco_fifo_mem[rp_200_bin[1:0]][8:0];
+                    q_fall_r       <= dco_fifo_mem[rp_200_bin[1:0]][17:9];
+                    tog_200        <= ~tog_200;
+                    rp_200_bin     <= rp_200_bin + 3'd1;
+                    rp_200_gray    <= b2g3(rp_200_bin + 3'd1);
+                end
+            end else if (!dco_fifo_empty) begin
+                q_rise_r    <= dco_fifo_mem[rp_200_bin[1:0]][8:0];
+                q_fall_r    <= dco_fifo_mem[rp_200_bin[1:0]][17:9];
+                tog_200     <= ~tog_200;
+                rp_200_bin  <= rp_200_bin + 3'd1;
+                rp_200_gray <= b2g3(rp_200_bin + 3'd1);
+            end
         end
     end
 
@@ -292,20 +374,24 @@ module adc_capture #(
     reg [5:0]  best_len  [0:7];
     reg [4:0]  final_tap [0:7];
     reg [5:0]  min_eye_w;
+    reg        verify_pat_ok_r;
+    reg        verify_eye_ok_r;
 
     integer i;
     always @(posedge clk_200m) begin
         if (rst_200m) begin
-            tr_state      <= ST_IDLE;
-            scan_tap      <= 5'd0;
-            wait_cnt      <= 5'd0;
-            tap_ld        <= 9'd0;
-            adc_trained   <= 1'b0;
-            dco_phase_err <= 1'b0;
-            eye_width_min <= 6'd0;
-            find_k        <= 6'd0;
-            min_eye_w     <= 6'd0;
-            tap_ok_bits   <= 8'd0;
+            tr_state        <= ST_IDLE;
+            scan_tap        <= 5'd0;
+            wait_cnt        <= 5'd0;
+            tap_ld          <= 9'd0;
+            adc_trained     <= 1'b0;
+            dco_phase_err   <= 1'b0;
+            eye_width_min   <= 6'd0;
+            find_k          <= 6'd0;
+            min_eye_w       <= 6'd0;
+            verify_pat_ok_r <= 1'b0;
+            verify_eye_ok_r <= 1'b0;
+            tap_ok_bits     <= 8'd0;
             for (i = 0; i < 9; i = i + 1)
                 tap_val[i] <= 5'd0;
             for (i = 0; i < 8; i = i + 1) begin
@@ -323,7 +409,7 @@ module adc_capture #(
                 ST_IDLE: begin
                     adc_trained   <= 1'b0;
                     dco_phase_err <= 1'b0;
-                    if (train_start && train_pattern_en) begin
+                    if (train_start_200 && train_pat_en_200) begin
                         scan_tap <= 5'd0;
                         for (i = 0; i < 8; i = i + 1)
                             pass_mask[i] <= 32'd0;
@@ -381,7 +467,7 @@ module adc_capture #(
                         if (pass_mask[i][find_k[4:0]] && cur_len[i] < 6'd32) begin
                             if (cur_len[i] == 6'd0)
                                 cur_start[i] <= find_k;
-                            if (cur_len[i] + 6'd1 > best_len[i]) begin
+                            if (cur_len[i] >= best_len[i]) begin
                                 best_len[i]   <= cur_len[i] + 6'd1;
                                 best_start[i] <= (cur_len[i] == 6'd0) ? find_k : cur_start[i];
                             end
@@ -425,11 +511,14 @@ module adc_capture #(
                             min_eye_w <= best_len[i];
                     end
 
+                    // Pre-register pattern and width checks 1 cycle before decision
+                    verify_pat_ok_r <= (q_rise_r[7:0] == TRAIN_PAT_EVEN) &&
+                                       (q_fall_r[7:0] == TRAIN_PAT_ODD);
+                    verify_eye_ok_r <= (min_eye_w >= 6'd4);
+
                     if (wait_cnt == 5'd15) begin
                         eye_width_min <= min_eye_w;
-                        if (min_eye_w >= 6'd4 &&
-                            (q_rise_r[7:0] == TRAIN_PAT_EVEN) &&
-                            (q_fall_r[7:0] == TRAIN_PAT_ODD)) begin
+                        if (verify_pat_ok_r && verify_eye_ok_r) begin
                             adc_trained   <= 1'b1;
                             dco_phase_err <= 1'b0;
                             tr_state      <= ST_LOCKED;
@@ -444,7 +533,7 @@ module adc_capture #(
                 end
 
                 ST_LOCKED: begin
-                    if (train_start && train_pattern_en) begin
+                    if (train_start_200 && train_pat_en_200) begin
                         adc_trained   <= 1'b0;
                         dco_phase_err <= 1'b0;
                         scan_tap      <= 5'd0;
