@@ -35,9 +35,9 @@ signal chains:
 
 | | |
 |---|---|
-| Size | 119 × 132 mm. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
+| Size | 119 × 132 mm, 140 × 132 with the RJ45's tab. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 | Stackup | 8 layers, JLCPCB JLC08161H-2116C: signal, GND, signal, split power, GND, signal, GND, signal ([LAYOUT §3](docs/LAYOUT.md); 6 layers until 12 Nov, [compared in EIGHT_LAYERS](docs/EIGHT_LAYERS.md)) |
-| Parts | 499: the top face, plus 20 on the bottom face under the FPGA (LVDS terminations and VCCINT caps) |
+| Parts | 534 fitted: the top face, plus 20 on the bottom face under the FPGA (LVDS terminations and VCCINT caps); 4 DNP for the Ethernet option |
 | Front-end FPGA | Xilinx XC7A50T-2FTG256I (the same part as AERIS-10) with a 128 Mb QSPI flash, plus JTAG |
 | Radar ADC | AD9484, 8 bit, 400 MSPS, driven by two cascaded AD8352s |
 | SDR ADC | AD9253, 14 bit, two channels at 62.5 MSPS (one LVDS lane each) |
@@ -46,6 +46,7 @@ signal chains:
 | Clock | Si549 programmable XO (400 or 500 MHz, GPS-disciplinable) into an ADCLK948 LVPECL fan-out |
 | RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs |
 | Link to the Kria | IAS1 (Hirose BM20B), five LVDS pairs at up to 1 Gb/s each, AC-coupled; the Pmod J2 for control |
+| Ethernet (option) | Gigabit RJ45 through an RTL8211FSI SGMII PHY, which shares two of the link's pairs: fit C1218–C1221 and remove C101, C102, C107, C108 to use it ([CONTROL_SPEC §7](docs/CONTROL_SPEC.md)) |
 | To AERIS-10 | 2×20 IDC ribbon for eight ADAR1000s |
 | Power | 12 V in; buck and LDO tree for 5 V, 3.3 V, 2.5 V, 1.8 V and 1.0 V, plus −3.3 V for the switches |
 
@@ -196,7 +197,7 @@ global sourcing or consigned parts cover them.
 | [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md) | The 8-layer board against the 6-layer one: stacks, every check side by side, eyes, skew, PDN, SMA, and what the same corrections would give on 6 layers |
 | [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review (11 Nov) and the 8-layer re-run (12 Nov, §8): impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
-| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026, bare boards on 8 layers 12 Nov): boards, assembly fees and every part with its LCSC link and price. About $2,070 for two assembled boards, $4,240 for five |
+| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026, bare boards on 8 layers 12 Nov): boards, assembly fees and every part with its LCSC link and price. About $2,120 for two assembled boards, $4,300 for five (bare boards not yet re-quoted for the Ethernet tab) |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md), [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | What the inherited files contained, and the record of the earlier work |
 

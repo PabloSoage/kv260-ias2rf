@@ -78,6 +78,7 @@ RULES = {
     ("5p", "C_0402_1005Metric"): ("C", "5p", "0402", 25, C0G),
     ("22p", "C_0402_1005Metric"): ("C", "22p", "0402", 25, C0G),
     ("33p", "C_0402_1005Metric"): ("C", "33p", "0402", 25, C0G),
+    ("27p", "C_0402_1005Metric"): ("C", "27p", "0402", 25, C0G),       # Y1201 load
     ("106p", "C_0402_1005Metric"): ("C", "110p", "0402", 25, C0G),       # see NOTES
     ("22n", "C_0402_1005Metric"): ("C", "22n", "0402", 16, XR),
     ("47u 25V", "C_1210_3225Metric"): ("C", "47u", "1210", 25, XR),
@@ -132,6 +133,13 @@ RULES = {
     ("74LVC1G07", "SOT-23-5"): ("P", "SN74LVC1G07DBVR", r"^SN74LVC1G07DBV"),
     ("TMP1075DR", "SOIC-8_3.9x4.9mm_P1.27mm"): ("P", "TMP1075DR", r"^TMP1075DR"),
     ("M24C02-FMN6TP", "SOIC-8_3.9x4.9mm_P1.27mm"): ("P", "M24C02-FMN6TP", r"^M24C02-FMN6TP"),
+    # the Ethernet PHY (13 Nov 2026, CONTROL_SPEC section 7)
+    ("RTL8211FSI-CG", "QFN-48-1EP_6x6mm_P0.4mm_EP4.4x4.4mm"): ("P", "RTL8211FSI-CG", r"^RTL8211FSI-CG"),
+    ("HR911130C", "RJ45_Hanrun_HR911130C"): ("P", "HR911130C", r"^HR911130C"),
+    ("25MHz", "Crystal_SMD_3225-4Pin_3.2x2.5mm"): ("P", "X322525MOB4SI", r"^X322525MOB4SI"),
+    # the PHY's 1.0 V buck (< 0.3 A): a power inductor by name; the L rule picked a 50 mA signal part
+    ("2.2u", "L_0805_2012Metric"): ("P", "DFE201210U-2R2M", r"^DFE201210U-2R2M"),
+    ("4.7u", "C_0402_1005Metric"): ("C", "4.7u", "0402", 6.3, XR),    # PHYRSTB delay, +3V3_D
     ("Si549 LVPECL 3V3 pinout C", "Oscillator_SMD_SI570_SI571_Standard"): (
         "X", "Si549 ordering codes are built per configuration at Skyworks; not a catalogue part"),
 }
@@ -249,7 +257,8 @@ def pick(rule):
 
 def main():
     only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
-    bom = sorted(glob.glob(os.path.join(ROOT, "fab", "*", "*-BOM.csv")))[-1]
+    # the newest BOM by time: by name, DRAFT-... folders would sort after the real ones
+    bom = max(glob.glob(os.path.join(ROOT, "fab", "*", "*-BOM.csv")), key=os.path.getmtime)
     rows = list(csv.reader(open(bom, encoding="utf-8")))[1:]
     keep = {}
     if os.path.exists(OUT) and only:
@@ -260,7 +269,7 @@ def main():
     for comment, refs, fp, _, qty in rows:
         key = (comment, fp)
         if only and f"{comment}|{fp}" != only and key in keep:
-            out.append(keep[key])
+            out.append({**keep[key], "Qty": qty})        # the part kept, the count from this BOM
             continue
         rule = rule_for(comment, fp)
         if rule is None:

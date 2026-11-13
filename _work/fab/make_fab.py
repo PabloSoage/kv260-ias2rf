@@ -159,9 +159,10 @@ def main():
 
     pos = os.path.join(work, "pos.csv")
     run(["pcb", "export", "pos", "-o", pos, "--format", "csv", "--units", "mm", "--side", "both",
-         work_pcb])
+         "--exclude-dnp", work_pcb])
     comps = P.netlist()
-    # parts only: the fiducials and holes are board-only, nothing to place
+    # parts only: the fiducials and holes are board-only, nothing to place; the DNP parts (the
+    # Ethernet option's C1218-C1221) are left out of the CPL and so of the BOM
     rows = [r for r in cpl(pos) if r[0] in comps]
     with open(os.path.join(dest, f"{NAME}-CPL.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
