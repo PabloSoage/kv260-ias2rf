@@ -13,9 +13,17 @@
 `timescale 1ns/1ps
 
 module artix_top #(
-    parameter integer DDC_POST_DECIM = 4,      // 4 => 25 MSPS I/Q (0.8 Gb/s on 1.6 Gb/s link)
-    parameter integer LINK_AM_PERIOD = 16384,  // Alignment marker period (override to 64 in sim)
-    parameter [0:0]   ADC_AUTO_TRAIN = 1'b1    // Trigger AD9484 IDELAY scan automatically after lock
+    parameter integer DDC_POST_DECIM     = 4,           // 4 => 25 MSPS I/Q (0.8 Gb/s on 1.6 Gb/s link)
+    parameter integer LINK_AM_PERIOD     = 16384,       // Alignment marker period (override to 64 in sim)
+    parameter [0:0]   ADC_AUTO_TRAIN     = 1'b1,        // Trigger AD9484 IDELAY scan automatically after lock
+    parameter [0:0]   ENABLE_ETH         = 1'b1,        // Rev06: 1 = enable SGMII-over-LVDS Ethernet + dual-path mux
+    parameter [0:0]   ETH_BYPASS_AN      = 1'b0,        // 0 = full Clause 37 SGMII AN handshake
+    parameter integer ETH_ALIVE_TIMEOUT  = 125_000_000, // Keepalive timeout @ 125 MHz (override in sim)
+    parameter integer ETH_MDIO_RST_CYC   = 1_250_000,   // PHY hardware reset pulse width (10 ms @ 125 MHz)
+    parameter integer ETH_MDIO_POLL_DIV  = 125_000,     // BMSR poll period (1 ms @ 125 MHz)
+    parameter integer ETH_SDR_PKT_BYTES  = 1024,        // Stream 1 SDR telemetry UDP packet size
+    parameter integer ETH_SDR_GAP_CYC    = 64,          // Stream 1 inter-packet gap
+    parameter [1:0]   ETH_DEFAULT_POLICY = 2'd0         // 0=STREAM_SPLIT, 1=MIRROR_1P1, 2=IAS_ONLY, 3=ETH_ONLY
 ) (
     // System clock: 100 MHz LVDS via attenuator on Bank 14 MRCC (DIFF_TERM=FALSE)
     input  wire       fpga_clk_p,
@@ -57,7 +65,20 @@ module artix_top #(
     inout  wire       hk_scl,
     inout  wire       hk_sda,
     input  wire       hk_alert_n,
-    output wire       fpga_irq
+    output wire       fpga_irq,
+
+    // Rev06 Dedicated Ethernet SGMII PHY (U1201 RTL8211FSI-CG, Final Pins)
+    //   Bank 34 (2.5V): ETH_SGTX (R2/R1), ETH_SGRX (R3/T2, DIFF_TERM=TRUE + DC bias),
+    //                   ETH_MDC (P1 LVCMOS25), INTB unrouted (polled via MDIO)
+    //   Bank 14 (3.3V): ETH_MDIO (M15 LVCMOS33 open-drain only, 1.5k to 2.5V DVDDRG; EMCCLK disabled),
+    //                   ETH_RST_N (K13 LVCMOS33)
+    output wire       eth_sgtx_p,
+    output wire       eth_sgtx_n,
+    input  wire       eth_sgrx_p,
+    input  wire       eth_sgrx_n,
+    output wire       eth_mdc,
+    inout  wire       eth_mdio,
+    output wire       eth_rst_n
 );
 
     // -------------------------------------------------------------------------
@@ -709,8 +730,12 @@ module artix_top #(
     end
 
     wire [7:0] pcs_tx_byte_l0, pcs_tx_byte_l1;
+    wire       eth_link_up_stat;
+    wire       eth_remote_alive_stat;
+    wire       eth_copper_up_stat;
     wire [15:0] local_status_word = {
-        2'd0,
+        eth_remote_alive_stat,
+        eth_link_up_stat,
         hk_sda_sync_r[1],
         hk_scl_sync_r[1],
         spi_ctrl_loopback_en,
@@ -725,20 +750,363 @@ module artix_top #(
         dl_st_sync2[1:0]
     };
 
+    // -------------------------------------------------------------------------
+    // 5b. Rev06 SGMII-over-LVDS Ethernet + Dual-Path Mux (ENABLE_ETH)
+    // -------------------------------------------------------------------------
+    wire        ias_mux_valid, ias_mux_ready, ias_mux_sop, ias_mux_eop;
+    wire [7:0]  ias_mux_sid;
+    wire [15:0] ias_mux_len;
+    wire [31:0] ias_mux_seq;
+    wire [63:0] ias_mux_ts, ias_mux_data;
+
+    generate
+        if (ENABLE_ETH) begin : gen_rev06_eth
+            // Second MMCM (1250 MHz VCO) -> 625 MHz (0/90) & 312.5 MHz (0/45)
+            wire eth_mmcm_fb, eth_mmcm_locked;
+            wire clk_625_0_u, clk_625_90_u, clk_312p5_u, clk_312p5_45_u;
+            wire clk_625_0,   clk_625_90,   clk_312p5,   clk_312p5_45;
+
+            MMCME2_ADV #(
+                .BANDWIDTH         ("OPTIMIZED"),
+                .CLKIN1_PERIOD     (10.000),
+                .DIVCLK_DIVIDE     (1),
+                .CLKFBOUT_MULT_F   (12.500),
+                .CLKFBOUT_PHASE    (0.0),
+                .CLKOUT0_DIVIDE_F  (2.000),   // 625.0 MHz 0 deg
+                .CLKOUT0_PHASE     (0.0),
+                .CLKOUT1_DIVIDE    (2),       // 625.0 MHz 90 deg
+                .CLKOUT1_PHASE     (90.0),
+                .CLKOUT2_DIVIDE    (4),       // 312.5 MHz 0 deg
+                .CLKOUT2_PHASE     (0.0),
+                .CLKOUT3_DIVIDE    (4),       // 312.5 MHz 45 deg
+                .CLKOUT3_PHASE     (45.0),
+                .COMPENSATION      ("INTERNAL"),
+                .STARTUP_WAIT      ("FALSE")
+            ) u_mmcm_eth (
+                .CLKIN1       (fpga_clk_bufg),
+                .CLKIN2       (1'b0),
+                .CLKINSEL     (1'b1),
+                .CLKFBIN      (eth_mmcm_fb),
+                .CLKFBOUT     (eth_mmcm_fb),
+                .CLKFBOUTB    (),
+                .CLKOUT0      (clk_625_0_u),
+                .CLKOUT0B     (),
+                .CLKOUT1      (clk_625_90_u),
+                .CLKOUT1B     (),
+                .CLKOUT2      (clk_312p5_u),
+                .CLKOUT2B     (),
+                .CLKOUT3      (clk_312p5_45_u),
+                .CLKOUT3B     (),
+                .CLKOUT4      (),
+                .CLKOUT5      (),
+                .CLKOUT6      (),
+                .LOCKED       (eth_mmcm_locked),
+                .PWRDWN       (1'b0),
+                .RST          (1'b0),
+                .DADDR        (7'd0), .DCLK(1'b0), .DEN(1'b0), .DI(16'd0), .DWE(1'b0),
+                .DO           (), .DRDY(), .PSCLK(1'b0), .PSEN(1'b0), .PSINCDEC(1'b0), .PSDONE(),
+                .CLKFBSTOPPED (), .CLKINSTOPPED()
+            );
+
+            BUFG u_bufg_eth_625_0  (.I(clk_625_0_u),    .O(clk_625_0));
+            BUFG u_bufg_eth_625_90 (.I(clk_625_90_u),   .O(clk_625_90));
+            BUFG u_bufg_eth_312_0  (.I(clk_312p5_u),    .O(clk_312p5));
+            BUFG u_bufg_eth_312_45 (.I(clk_312p5_45_u), .O(clk_312p5_45));
+
+            // Bank 34 IDELAYCTRL (shares refclk_200m BUFG)
+            wire b34_idc_rdy;
+            (* IODELAY_GROUP = "bank34_idelay_grp" *)
+            IDELAYCTRL u_idelayctrl_b34 (
+                .RDY    (b34_idc_rdy),
+                .REFCLK (refclk_200m),
+                .RST    (ref_rst)
+            );
+
+            wire eth_rst_src = link_rst | ~eth_mmcm_locked | ~b34_idc_rdy;
+            (* ASYNC_REG = "TRUE" *) reg [2:0] eth_rst_312_s = 3'b111;
+            (* ASYNC_REG = "TRUE" *) reg [2:0] eth_rst_125_s = 3'b111;
+            always @(posedge clk_312p5 or posedge eth_rst_src) begin
+                if (eth_rst_src) eth_rst_312_s <= 3'b111;
+                else             eth_rst_312_s <= {eth_rst_312_s[1:0], 1'b0};
+            end
+            always @(posedge link_clk or posedge eth_rst_src) begin
+                if (eth_rst_src) eth_rst_125_s <= 3'b111;
+                else             eth_rst_125_s <= {eth_rst_125_s[1:0], 1'b0};
+            end
+            wire eth_rst_312 = eth_rst_312_s[2];
+            wire eth_rst_125 = eth_rst_125_s[2];
+
+            // SGMII PHY + Clause 36/37 PCS
+            wire       gmii_tx_en, gmii_tx_er, gmii_rx_dv, gmii_rx_er;
+            wire [7:0] gmii_txd, gmii_rxd;
+            wire       phy_an_complete, phy_comma_aligned;
+            reg        ctrl_an_restart;
+
+            eth_sgmii_phy #(
+                .DIFF_TERM_EN       (1'b1),
+                .IODELAY_GROUP_NAME ("bank34_idelay_grp"),
+                .BYPASS_AN          (ETH_BYPASS_AN)
+            ) u_eth_phy (
+                .sgmii_rx_p       (eth_sgrx_p),
+                .sgmii_rx_n       (eth_sgrx_n),
+                .sgmii_tx_p       (eth_sgtx_p),
+                .sgmii_tx_n       (eth_sgtx_n),
+                .clk_625_0        (clk_625_0),
+                .clk_625_90       (clk_625_90),
+                .clk_312p5        (clk_312p5),
+                .clk_312p5_45     (clk_312p5_45),
+                .clk_125          (link_clk),
+                .rst_312p5        (eth_rst_312),
+                .rst_125          (eth_rst_125),
+                .gmii_tx_en       (gmii_tx_en),
+                .gmii_tx_er       (gmii_tx_er),
+                .gmii_txd         (gmii_txd),
+                .gmii_rx_dv       (gmii_rx_dv),
+                .gmii_rx_er       (gmii_rx_er),
+                .gmii_rxd         (gmii_rxd),
+                .an_restart       (ctrl_an_restart),
+                .rx_comma_aligned (phy_comma_aligned),
+                .an_complete      (phy_an_complete),
+                .link_up          (eth_link_up_stat),
+                .an_lp_ability    (),
+                .phase_sel_mon    (),
+                .phase_switch_cnt (),
+                .code_err_cnt     (),
+                .disp_err_cnt     ()
+            );
+
+            // 1G MAC + UDP/IPv4 Framing + Control RX
+            wire        eth_mux_valid, eth_mux_ready, eth_mux_sop, eth_mux_eop;
+            wire [7:0]  eth_mux_sid;
+            wire [15:0] eth_mux_len;
+            wire [31:0] eth_mux_seq;
+            wire [63:0] eth_mux_ts, eth_mux_data;
+
+            wire        udp_ctrl_wr;
+            wire [15:0] udp_ctrl_addr;
+            wire [31:0] udp_ctrl_wdata;
+
+            eth_mac_udp #(
+                .ALIVE_TIMEOUT (ETH_ALIVE_TIMEOUT)
+            ) u_eth_mac (
+                .clk              (link_clk),
+                .rst              (eth_rst_125),
+                .link_up          (eth_link_up_stat),
+                .pkt_valid        (eth_mux_valid),
+                .pkt_ready        (eth_mux_ready),
+                .pkt_sop          (eth_mux_sop),
+                .pkt_eop          (eth_mux_eop),
+                .pkt_stream_id    (eth_mux_sid),
+                .pkt_len          (eth_mux_len),
+                .pkt_seq          (eth_mux_seq),
+                .pkt_timestamp    (eth_mux_ts),
+                .pkt_data         (eth_mux_data),
+                .gmii_tx_en       (gmii_tx_en),
+                .gmii_tx_er       (gmii_tx_er),
+                .gmii_txd         (gmii_txd),
+                .gmii_rx_dv       (gmii_rx_dv),
+                .gmii_rx_er       (gmii_rx_er),
+                .gmii_rxd         (gmii_rxd),
+                .ctrl_wr_en       (udp_ctrl_wr),
+                .ctrl_addr        (udp_ctrl_addr),
+                .ctrl_wdata       (udp_ctrl_wdata),
+                .ctrl_seq         (),
+                .eth_remote_alive (eth_remote_alive_stat),
+                .tx_pkt_cnt       (),
+                .rx_pkt_cnt       (),
+                .fcs_err_cnt      ()
+            );
+
+            // Clause 22 MDIO Management + PHY Reset
+            reg        mdio_req_vld;
+            reg        mdio_req_wr;
+            reg [4:0]  mdio_req_reg;
+            reg [15:0] mdio_req_wdata;
+            wire       mdio_req_ready;
+
+            eth_mdio #(
+                .PHY_ADDR (5'd1),
+                .MDC_DIV  (64),
+                .RST_CYC  (ETH_MDIO_RST_CYC),
+                .POLL_DIV (ETH_MDIO_POLL_DIV)
+            ) u_eth_mdio (
+                .clk            (link_clk),
+                .rst            (link_rst),
+                .req_valid      (mdio_req_vld),
+                .req_write      (mdio_req_wr),
+                .req_reg        (mdio_req_reg),
+                .req_wdata      (mdio_req_wdata),
+                .req_ready      (mdio_req_ready),
+                .resp_valid     (),
+                .resp_rdata     (),
+                .phy_rst_done   (),
+                .copper_link_up (eth_copper_up_stat),
+                .bmsr_val       (),
+                .int_pending    (),
+                .eth_mdc        (eth_mdc),
+                .eth_mdio       (eth_mdio),
+                .eth_rst_n      (eth_rst_n),
+                .eth_int_n      (1'b1)
+            );
+
+            // Runtime Redundancy Policy & Fault Injection Registers (written via UDP Control)
+            reg [1:0] eth_policy;
+            reg       eth_sdr_en;
+            reg       ctrl_force_ias_fault;
+            reg       ctrl_force_eth_fault;
+            reg       ias_seen_dl_up;
+
+            always @(posedge link_clk) begin
+                if (eth_rst_125) begin
+                    eth_policy           <= ETH_DEFAULT_POLICY;
+                    eth_sdr_en           <= 1'b1;
+                    ctrl_force_ias_fault <= 1'b0;
+                    ctrl_force_eth_fault <= 1'b0;
+                    ctrl_an_restart      <= 1'b0;
+                    mdio_req_vld         <= 1'b0;
+                    mdio_req_wr          <= 1'b0;
+                    mdio_req_reg         <= 5'd0;
+                    mdio_req_wdata       <= 16'd0;
+                    ias_seen_dl_up       <= 1'b0;
+                end else begin
+                    ctrl_an_restart <= 1'b0;
+                    if (mdio_req_vld && mdio_req_ready)
+                        mdio_req_vld <= 1'b0;
+                    if (dl_up_sync[1])
+                        ias_seen_dl_up <= 1'b1;
+
+                    if (udp_ctrl_wr) begin
+                        case (udp_ctrl_addr)
+                            16'h0000: begin
+                                eth_policy           <= udp_ctrl_wdata[1:0];
+                                eth_sdr_en           <= udp_ctrl_wdata[2];
+                                ctrl_force_ias_fault <= udp_ctrl_wdata[3];
+                                ctrl_force_eth_fault <= udp_ctrl_wdata[4];
+                                ctrl_an_restart      <= udp_ctrl_wdata[5];
+                            end
+                            16'h0004: begin
+                                mdio_req_vld   <= 1'b1;
+                                mdio_req_wr    <= udp_ctrl_wdata[21];
+                                mdio_req_reg   <= udp_ctrl_wdata[20:16];
+                                mdio_req_wdata <= udp_ctrl_wdata[15:0];
+                            end
+                            default: ;
+                        endcase
+                    end
+                end
+            end
+
+            // Stream 1 (SDR / Telemetry, stream_id=8'h02)
+            wire        sdr_pkt_valid, sdr_pkt_ready, sdr_pkt_sop, sdr_pkt_eop;
+            wire [7:0]  sdr_pkt_sid;
+            wire [15:0] sdr_pkt_len;
+            wire [31:0] sdr_pkt_seq;
+            wire [63:0] sdr_pkt_ts, sdr_pkt_data;
+
+            eth_sdr_pkt_gen #(
+                .STREAM_ID (8'h02),
+                .PKT_BYTES (ETH_SDR_PKT_BYTES),
+                .GAP_CYC   (ETH_SDR_GAP_CYC)
+            ) u_sdr_gen (
+                .clk           (link_clk),
+                .rst           (eth_rst_125),
+                .en            (eth_sdr_en & eth_link_up_stat),
+                .timestamp_cnt (timestamp_cnt),
+                .pkt_valid     (sdr_pkt_valid),
+                .pkt_ready     (sdr_pkt_ready),
+                .pkt_sop       (sdr_pkt_sop),
+                .pkt_eop       (sdr_pkt_eop),
+                .pkt_stream_id (sdr_pkt_sid),
+                .pkt_len       (sdr_pkt_len),
+                .pkt_seq       (sdr_pkt_seq),
+                .pkt_timestamp (sdr_pkt_ts),
+                .pkt_data      (sdr_pkt_data)
+            );
+
+            wire ias_path_ok = ~ctrl_force_ias_fault & (dl_up_sync[1] | ~ias_seen_dl_up);
+            wire eth_path_ok = eth_link_up_stat & ~ctrl_force_eth_fault;
+
+            dual_path_mux u_dual_mux (
+                .clk           (link_clk),
+                .rst           (eth_rst_125),
+                .policy        (eth_policy),
+                .ias_healthy   (ias_path_ok),
+                .eth_healthy   (eth_path_ok),
+                .s0_valid      (tx_pkt_valid),
+                .s0_ready      (tx_pkt_ready),
+                .s0_sop        (tx_pkt_sop),
+                .s0_eop        (tx_pkt_eop),
+                .s0_stream_id  (tx_pkt_stream_id),
+                .s0_len        (tx_pkt_len),
+                .s0_seq        (tx_pkt_seq),
+                .s0_timestamp  (tx_pkt_timestamp),
+                .s0_data       (tx_pkt_data),
+                .s1_valid      (sdr_pkt_valid),
+                .s1_ready      (sdr_pkt_ready),
+                .s1_sop        (sdr_pkt_sop),
+                .s1_eop        (sdr_pkt_eop),
+                .s1_stream_id  (sdr_pkt_sid),
+                .s1_len        (sdr_pkt_len),
+                .s1_seq        (sdr_pkt_seq),
+                .s1_timestamp  (sdr_pkt_ts),
+                .s1_data       (sdr_pkt_data),
+                .ias_valid     (ias_mux_valid),
+                .ias_ready     (ias_mux_ready),
+                .ias_sop       (ias_mux_sop),
+                .ias_eop       (ias_mux_eop),
+                .ias_stream_id (ias_mux_sid),
+                .ias_len       (ias_mux_len),
+                .ias_seq       (ias_mux_seq),
+                .ias_timestamp (ias_mux_ts),
+                .ias_data      (ias_mux_data),
+                .eth_valid     (eth_mux_valid),
+                .eth_ready     (eth_mux_ready),
+                .eth_sop       (eth_mux_sop),
+                .eth_eop       (eth_mux_eop),
+                .eth_stream_id (eth_mux_sid),
+                .eth_len       (eth_mux_len),
+                .eth_seq       (eth_mux_seq),
+                .eth_timestamp (eth_mux_ts),
+                .eth_data      (eth_mux_data),
+                .failover_cnt  ()
+            );
+        end else begin : gen_no_eth
+            assign eth_link_up_stat      = 1'b0;
+            assign eth_remote_alive_stat = 1'b0;
+            assign eth_copper_up_stat    = 1'b0;
+            assign ias_mux_valid         = tx_pkt_valid;
+            assign tx_pkt_ready          = ias_mux_ready;
+            assign ias_mux_sop           = tx_pkt_sop;
+            assign ias_mux_eop           = tx_pkt_eop;
+            assign ias_mux_sid           = tx_pkt_stream_id;
+            assign ias_mux_len           = tx_pkt_len;
+            assign ias_mux_seq           = tx_pkt_seq;
+            assign ias_mux_ts            = tx_pkt_timestamp;
+            assign ias_mux_data          = tx_pkt_data;
+
+            wire eth_sgrx_unused;
+            IBUFDS #(.DIFF_TERM("TRUE"), .IOSTANDARD("LVDS_25")) u_ibuf_eth_unused (.I(eth_sgrx_p), .IB(eth_sgrx_n), .O(eth_sgrx_unused));
+            OBUFDS #(.IOSTANDARD("LVDS_25")) u_obuf_eth_unused (.I(1'b0), .O(eth_sgtx_p), .OB(eth_sgtx_n));
+            assign eth_mdc   = 1'b0;
+            assign eth_mdio  = 1'bz;
+            assign eth_rst_n = 1'b0;
+        end
+    endgenerate
+
     link_pcs_tx #(
         .AM_PERIOD (LINK_AM_PERIOD)
     ) u_ul_pcs_tx (
         .clk           (link_clk),
         .rst           (link_rst),
-        .pkt_valid     (tx_pkt_valid),
-        .pkt_ready     (tx_pkt_ready),
-        .pkt_sop       (tx_pkt_sop),
-        .pkt_eop       (tx_pkt_eop),
-        .pkt_stream_id (tx_pkt_stream_id),
-        .pkt_len       (tx_pkt_len),
-        .pkt_seq       (tx_pkt_seq),
-        .pkt_timestamp (tx_pkt_timestamp),
-        .pkt_data      (tx_pkt_data),
+        .pkt_valid     (ias_mux_valid),
+        .pkt_ready     (ias_mux_ready),
+        .pkt_sop       (ias_mux_sop),
+        .pkt_eop       (ias_mux_eop),
+        .pkt_stream_id (ias_mux_sid),
+        .pkt_len       (ias_mux_len),
+        .pkt_seq       (ias_mux_seq),
+        .pkt_timestamp (ias_mux_ts),
+        .pkt_data      (ias_mux_data),
         .dropped_cnt   (tx_dropped_cnt),
         .local_status  (local_status_word),
         .tx_byte_l0    (pcs_tx_byte_l0),
@@ -849,7 +1217,7 @@ module artix_top #(
         .tx_dropped_cnt       (tx_dropped_cnt),
         .rx_drop_cnt          (dl_drop_sync2),
         .skew_blocks          (8'd0),
-        .am_seq               (16'd0),
+        .am_seq               ({15'd0, eth_copper_up_stat}),
         .prbs_err_cnt         (dl_prbs_sync2),
         .eye_left_l0          (dl_el_sync2),
         .eye_right_l0         (dl_er_sync2),

@@ -127,10 +127,15 @@ module tb_e2e;
     pullup(hk_sda);
     pulldown(u_artix.filter_overflow);
 
+    wire       eth_sgtx_p, eth_sgtx_n;
+    wire       eth_mdc, eth_mdio, eth_rst_n;
+    pullup(eth_mdio);
+
     artix_top #(
         .DDC_POST_DECIM (4),
         .LINK_AM_PERIOD (64),
-        .ADC_AUTO_TRAIN (1'b1)
+        .ADC_AUTO_TRAIN (1'b1),
+        .ENABLE_ETH     (1'b0)
     ) u_artix (
         .fpga_clk_p    (fpga_clk_100m),
         .fpga_clk_n    (~fpga_clk_100m),
@@ -161,7 +166,14 @@ module tb_e2e;
         .hk_scl        (hk_scl),
         .hk_sda        (hk_sda),
         .hk_alert_n    (1'b1),
-        .fpga_irq      (fpga_irq)
+        .fpga_irq      (fpga_irq),
+        .eth_sgtx_p    (eth_sgtx_p),
+        .eth_sgtx_n    (eth_sgtx_n),
+        .eth_sgrx_p    (1'b1),
+        .eth_sgrx_n    (1'b0),
+        .eth_mdc       (eth_mdc),
+        .eth_mdio      (eth_mdio),
+        .eth_rst_n     (eth_rst_n)
     );
 
     // -------------------------------------------------------------------------

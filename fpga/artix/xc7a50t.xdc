@@ -59,6 +59,26 @@ set_property PACKAGE_PIN M2  [get_ports link_rx_d1_p]
 set_property PACKAGE_PIN M1  [get_ports link_rx_d1_n]
 set_property IOSTANDARD  LVDS_25 [get_ports {link_rx_clk_p link_rx_clk_n link_rx_d0_p link_rx_d0_n link_rx_d1_p link_rx_d1_n}]
 
+# Rev06 Dedicated Ethernet SGMII PHY (Final Routed Pins)
+#   Bank 34 (VCCO = 2.5 V, CFG_LDO=01 -> DVDDRG = 2.5 V)
+set_property PACKAGE_PIN R2  [get_ports eth_sgtx_p]
+set_property PACKAGE_PIN R1  [get_ports eth_sgtx_n]
+set_property IOSTANDARD  LVDS_25 [get_ports {eth_sgtx_p eth_sgtx_n}]
+
+set_property PACKAGE_PIN R3  [get_ports eth_sgrx_p]
+set_property PACKAGE_PIN T2  [get_ports eth_sgrx_n]
+set_property IOSTANDARD  LVDS_25 [get_ports {eth_sgrx_p eth_sgrx_n}]
+set_property DIFF_TERM   TRUE    [get_ports {eth_sgrx_p eth_sgrx_n}]
+
+set_property PACKAGE_PIN P1  [get_ports eth_mdc]
+set_property IOSTANDARD  LVCMOS25 [get_ports eth_mdc]
+
+#   Bank 14 (VCCO = 3.3 V): MDIO open-drain (R1213 1.5k -> 2.5V DVDDRG, do not use EMCCLK), RST_N pulled up via R1214
+set_property PACKAGE_PIN M15 [get_ports eth_mdio]
+set_property PACKAGE_PIN K13 [get_ports eth_rst_n]
+set_property IOSTANDARD  LVCMOS33 [get_ports {eth_mdio eth_rst_n}]
+set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN DISABLE [current_design]
+
 # ------------------------------------------------------------------------------
 # Bank 15 (VCCO = 3.3 V): Adapter Pmod J1102
 # ------------------------------------------------------------------------------
@@ -102,9 +122,15 @@ set_false_path -from [get_ports {adcr_d_p[*] adcr_or_p}]
 set_false_path -from [get_ports link_tx_d0_p]
 set_false_path -to   [get_ports {link_rx_clk_p link_rx_d0_p link_rx_d1_p}]
 
+# Rev06 Ethernet SGMII / MDIO / PHY pins (asynchronous oversampled RX & slow MDIO)
+set_false_path -from [get_ports {eth_sgrx_p eth_sgrx_n eth_mdio}]
+set_false_path -to   [get_ports {eth_sgtx_p eth_sgtx_n eth_mdc eth_mdio eth_rst_n}]
+
 # Async-assert reset synchronizers and Gray-code / toggle CDC crossings
-set_false_path -to [get_pins -quiet -hier -filter {NAME =~ *rst_sync*/PRE || NAME =~ *rst_sync*/CLR || NAME =~ *reset_sync*/CLR}]
+set_false_path -to [get_pins -quiet -hier -filter {NAME =~ *rst*sync*/PRE || NAME =~ *rst*sync*/CLR}]
 set_max_delay -datapath_only 3.500 -from [get_clocks clk_adcr_dco] -to [get_clocks clk_200m_unbuf]
 set_max_delay -datapath_only 2.400 -from [get_clocks clk_100m_unbuf] -to [get_clocks clk_400m_unbuf]
 set_max_delay -datapath_only 2.400 -from [get_clocks clk_400m_unbuf] -to [get_clocks clk_100m_unbuf]
 set_max_delay -datapath_only 2.400 -to [get_cells -quiet -hier -filter {NAME =~ *tr_start_sync_reg[0]* || NAME =~ *tr_pat_sync_reg[0]* || NAME =~ *adc_tr_100_sync_reg[0]*}]
+set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]] -to [get_clocks link_clk_unbuf]
+set_max_delay -quiet -datapath_only 3.000 -from [get_clocks link_clk_unbuf] -to [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]]

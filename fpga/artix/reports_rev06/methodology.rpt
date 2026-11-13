@@ -1,0 +1,192 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Fri Nov 13 23:56:16 2026
+| Host         : Akasha running 64-bit major release  (build 9200)
+| Command      : report_methodology -file D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports_rev06/methodology.rpt
+| Design       : artix_top
+| Device       : xc7a50tftg256-2
+| Speed File   : -2
+| Design State : Fully Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Report Methodology
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: artix_top
+          Floorplan: design_1
+      Design limits: <entire design considered>
+             Max checks: <unlimited>
+             Checks found: 29
++-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
+| Rule      | Severity | Description                                                                                           | Checks |
++-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
+| LUTAR-1   | Warning  | LUT drives async reset alert                                                                          | 4      |
+| PDRC-190  | Warning  | Suboptimally placed synchronized register chain                                                       | 4      |
+| SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal                                                            | 8      |
+| TIMING-9  | Warning  | Unknown CDC Logic                                                                                     | 1      |
+| TIMING-28 | Warning  | Auto-derived clock referenced by a timing constraint                                                  | 7      |
+| TIMING-47 | Warning  | False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks | 5      |
++-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+LUTAR-1#1 Warning
+LUT drives async reset alert  
+LUT cell u_adc_cap/adc_rst_sync_100[1]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) adc_rst_sync_100_reg[0]/PRE, adc_rst_sync_100_reg[1]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
+Related violations: <none>
+
+LUTAR-1#2 Warning
+LUT drives async reset alert  
+LUT cell u_adc_cap/rst_sync_400[1]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) u_adc_cap/rst_sync_200_reg[0]/PRE, u_adc_cap/rst_sync_200_reg[1]/PRE,
+u_adc_cap/rst_sync_400_reg[0]/PRE, u_adc_cap/rst_sync_400_reg[1]/PRE,
+u_adc_cap/rst_sync_bufr_reg[0]/PRE, u_adc_cap/rst_sync_bufr_reg[1]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
+Related violations: <none>
+
+LUTAR-1#3 Warning
+LUT drives async reset alert  
+LUT cell u_pmod_spi/FSM_onehot_st[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) dl_rst_sync_reg[0]/PRE, dl_rst_sync_reg[1]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
+Related violations: <none>
+
+LUTAR-1#4 Warning
+LUT drives async reset alert  
+LUT cell u_pmod_spi/gen_rev06_eth.eth_rst_312_s[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) gen_rev06_eth.eth_rst_125_s_reg[0]/PRE,
+gen_rev06_eth.eth_rst_125_s_reg[1]/PRE,
+gen_rev06_eth.eth_rst_125_s_reg[2]/PRE,
+gen_rev06_eth.eth_rst_312_s_reg[0]/PRE,
+gen_rev06_eth.eth_rst_312_s_reg[1]/PRE
+gen_rev06_eth.eth_rst_312_s_reg[2]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
+Related violations: <none>
+
+PDRC-190#1 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X7Y31 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#2 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X6Y30 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#3 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X9Y32 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#4 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X30Y31 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+SYNTH-6#1 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#2 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#3 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#4 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#5 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#6 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_ias/meta_mem_reg_0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#7 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_dual_mux/u_fifo_ias/meta_mem_reg_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#8 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance gen_rev06_eth.u_eth_phy/u_dec/dout_reg, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+TIMING-9#1 Warning
+Unknown CDC Logic  
+One or more asynchronous Clock Domain Crossing has been detected between 2 clock domains through a set_false_path or a set_clock_groups or set_max_delay -datapath_only constraint but no double-registers logic synchronizer has been found on the side of the capture clock. It is recommended to run report_cdc for a complete and detailed CDC coverage. Please consider using XPM_CDC to avoid Critical severities
+Related violations: <none>
+
+TIMING-28#1 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock clk_100m_unbuf is referenced by name inside timing constraint (see constraint position 14 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT1]
+Related violations: <none>
+
+TIMING-28#2 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock clk_100m_unbuf is referenced by name inside timing constraint (see constraint position 15 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT1]
+Related violations: <none>
+
+TIMING-28#3 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock clk_200m_unbuf is referenced by name inside timing constraint (see constraint position 13 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT2]
+Related violations: <none>
+
+TIMING-28#4 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock clk_400m_unbuf is referenced by name inside timing constraint (see constraint position 14 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT0]
+Related violations: <none>
+
+TIMING-28#5 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock clk_400m_unbuf is referenced by name inside timing constraint (see constraint position 15 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT0]
+Related violations: <none>
+
+TIMING-28#6 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock link_clk_unbuf is referenced by name inside timing constraint (see constraint position 16 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]
+Related violations: <none>
+
+TIMING-28#7 Warning
+Auto-derived clock referenced by a timing constraint  
+The auto-derived clock link_clk_unbuf is referenced by name inside timing constraint (see constraint position 17 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]
+Related violations: <none>
+
+TIMING-47#1 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_100m_unbuf and clk_400m_unbuf (see constraint position 14 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+TIMING-47#2 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_400m_unbuf and clk_100m_unbuf (see constraint position 15 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+TIMING-47#3 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_adcr_dco and clk_200m_unbuf (see constraint position 13 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+TIMING-47#4 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks gen_rev06_eth.clk_312p5_u and link_clk_unbuf (see constraint position 16 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+TIMING-47#5 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and gen_rev06_eth.clk_312p5_u (see constraint position 17 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+
