@@ -1,0 +1,13 @@
+#VRML V2.0 utf8
+# simple model, kv260-ias2rf _work/layout/models3d.py
+Transform { scale 0.393701 0.393701 0.393701 children [
+Transform { translation 0.0000 0.0000 0.8000 children Shape { appearance Appearance { material Material { diffuseColor 0.900 0.890 0.840 specularColor 0.12 0.12 0.12 shininess 0.20 } } geometry Box { size 7.0000 7.6000 1.6000 } } }
+Transform { translation 0.0000 0.0000 2.2200 children Shape { appearance Appearance { material Material { diffuseColor 0.080 0.080 0.090 specularColor 0.18 0.18 0.18 shininess 0.30 } } geometry Box { size 6.2000 6.6000 1.2400 } } }
+Transform { translation -2.5400 3.6000 0.3000 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.0000 0.6000 0.6000 } } }
+Transform { translation -2.5400 -3.6000 0.3000 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.0000 0.6000 0.6000 } } }
+Transform { translation 0.0000 3.6000 0.3000 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.0000 0.6000 0.6000 } } }
+Transform { translation 0.0000 -3.6000 0.3000 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.0000 0.6000 0.6000 } } }
+Transform { translation 2.5400 3.6000 0.3000 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.0000 0.6000 0.6000 } } }
+Transform { translation 2.5400 -3.6000 0.3000 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.0000 0.6000 0.6000 } } }
+Transform { translation -2.4000 2.6000 2.8450 rotation 1 0 0 1.570796 children Shape { appearance Appearance { material Material { diffuseColor 0.550 0.550 0.550 specularColor 0.18 0.18 0.18 shininess 0.30 } } geometry Cylinder { radius 0.3000 height 0.0100 } } }
+] }

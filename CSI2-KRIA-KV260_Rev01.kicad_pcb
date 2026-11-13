@@ -3722,7 +3722,7 @@
 			(uuid "abaee473-67d8-4e2c-bd16-016218a42afa")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/HTSOP-8-1EP_3.9x4.9mm_Pitch1.27mm.step"
+		(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -4347,6 +4347,17 @@
 			(uuid "7a220454-74e9-483c-980c-c4f729f5751b")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/MiniCircuits_DQ3005.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Inductor_SMD:L_0603_1608Metric"
 		(layer "F.Cu")
@@ -22639,7 +22650,7 @@
 			(uuid "c1f42dd4-bddf-4343-8730-b2c919957550")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_BGA.3dshapes/Xilinx_FTG256.step"
+		(model "${KICAD10_3DMODEL_DIR}/Package_BGA.3dshapes/BGA-256_17.0x17.0mm_Layout16x16_P1.0mm_Ball0.5mm_Pad0.4mm_NSMD.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -24436,7 +24447,7 @@
 			(uuid "9979bd7a-33d3-4ede-9b68-b1ecf4995e3a")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/QFN-20-1EP_3.5x3.5mm_P0.5mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -24889,6 +24900,17 @@
 			(uuid "c2c1fe6d-a433-57f6-9971-27b3885422b6")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/RJ45_Hanrun_HR911130C.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0603_1608Metric"
 		(layer "F.Cu")
@@ -29393,7 +29415,7 @@
 			(uuid "563c4c5d-3ecc-4b64-940e-6938143820c1")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/RF_Mini-Circuits.3dshapes/Mini-Circuits_CD542_H2.84mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Mini-Circuits_CD542_H2.84mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -41901,7 +41923,7 @@
 			(uuid "f27c86b3-c38b-4cbb-a57b-32f93e1536f9")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Fuse.3dshapes/Fuse_1812_4532Metric.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Fuse_1812_4532Metric.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -46963,7 +46985,7 @@
 			(uuid "531f745c-e9e2-4dbd-8a24-cb6724c76a56")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm.step"
+		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-48-1EP_7x7mm_P0.5mm_EP5.15x5.15mm.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -51317,7 +51339,7 @@
 			(uuid "903eca80-90d7-4019-aa8e-fd52bbc00fc3")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/QFN-20-1EP_3.5x3.5mm_P0.5mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -52993,7 +53015,7 @@
 			(uuid "d1aa7676-21ff-452c-807e-a234cb7946a7")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-48-1EP_6x6mm_P0.4mm_EP4.4x4.4mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/QFN-48-1EP_6x6mm_P0.4mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -57349,7 +57371,7 @@
 			(uuid "59b96965-1ff4-41ce-bea1-15e8a2f0fae1")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_Bourns_SRP7028A_7.3x6.6mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/L_Bourns_SRP7028A.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -59812,7 +59834,7 @@
 			(uuid "067c58f4-582c-4923-9b3b-ad1f451b723d")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/QFN-20-1EP_3.5x3.5mm_P0.5mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -63195,7 +63217,7 @@
 			(uuid "74aaa4bf-fbcb-4ff9-869a-19f79656ed51")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/RF_Mini-Circuits.3dshapes/Mini-Circuits_CD542_H2.84mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Mini-Circuits_CD542_H2.84mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -64659,7 +64681,7 @@
 			(uuid "0e44316c-8911-42cb-bc20-ea130827a431")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Connector_BarrelJack.3dshapes/BarrelJack_CUI_PJ-102AH_Horizontal.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/BarrelJack_CUI_PJ-102AH.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -68829,6 +68851,17 @@
 			(uuid "b619ab26-d3b6-45e7-9511-bd638b2d5a99")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/MiniCircuits_DQ3005.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Package_SON:Diodes_PowerDI3333-8"
 		(layer "F.Cu")
@@ -69874,7 +69907,7 @@
 			(uuid "8d0aa017-a51a-4b30-b6fa-09a885ca2d04")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_CSP.3dshapes/LFCSP-32-1EP_5x5mm_P0.5mm_EP3.1x3.1mm.step"
+		(model "${KICAD10_3DMODEL_DIR}/Package_CSP.3dshapes/LFCSP-32-1EP_5x5mm_P0.5mm_EP3.6x3.6mm.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -71188,6 +71221,17 @@
 			(uuid "851032cd-84be-4376-8f30-c29065034b6f")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/MiniCircuits_DQ3005.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(layer "F.Cu")
@@ -77590,7 +77634,7 @@
 			(uuid "dd075d14-ec42-4040-a5bd-d5010c8d2e95")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_Bourns_SRP7028A_7.3x6.6mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/L_Bourns_SRP7028A.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -78216,6 +78260,17 @@
 			(uuid "430a6c18-83b9-4eb6-9033-e91aabf53033")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/MiniCircuits_DQ3005.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(layer "F.Cu")
@@ -83526,7 +83581,7 @@
 			(uuid "93b53c8a-5dc2-40ac-91f6-f6edae4c10ab")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Oscillator.3dshapes/Oscillator_SMD_SI570_SI571_Standard.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Oscillator_SI570_SI571.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -89188,7 +89243,7 @@
 			(uuid "ede27b48-ee74-4906-930a-25c2c8f5f1bc")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_Bourns_SRP7028A_7.3x6.6mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/L_Bourns_SRP7028A.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -89893,7 +89948,7 @@
 			(uuid "abd42baa-8485-48fb-989e-f3dd5146be9d")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_Bourns_SRP7028A_7.3x6.6mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/L_Bourns_SRP7028A.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -90479,7 +90534,7 @@
 			(uuid "0d4e37a4-7afa-47c0-91c3-bdc8f77df50f")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/RF_Mini-Circuits.3dshapes/Mini-Circuits_CD542_H2.84mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Mini-Circuits_CD542_H2.84mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -92401,7 +92456,7 @@
 			(uuid "95ca71e2-350e-4171-be5d-a29eb73addc3")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_CSP.3dshapes/LFCSP-56-1EP_8x8mm_P0.5mm_EP6.6x6.6mm.step"
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/LFCSP-56-1EP_8x8mm_P0.5mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -98647,6 +98702,17 @@
 			(uuid "e2352c9d-feec-57ea-9262-d59c7aa8dbeb")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Hirose_BM20B_0.8_34DP.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Fiducial:Fiducial_1mm_Mask2mm"
 		(layer "B.Cu")
@@ -101328,6 +101394,17 @@
 			(uuid "6f071d4e-9f08-5206-ad40-cf7faee077a6")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/Hirose_BM20B_0.8_34DP.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(layer "B.Cu")

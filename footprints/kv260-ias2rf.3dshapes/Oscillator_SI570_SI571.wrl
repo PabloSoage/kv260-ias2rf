@@ -1,0 +1,12 @@
+#VRML V2.0 utf8
+# simple model, kv260-ias2rf _work/layout/models3d.py
+Transform { scale 0.393701 0.393701 0.393701 children [
+Transform { translation 0.0000 0.0000 0.4000 children Shape { appearance Appearance { material Material { diffuseColor 0.900 0.890 0.840 specularColor 0.12 0.12 0.12 shininess 0.20 } } geometry Box { size 7.0000 5.0000 0.8000 } } }
+Transform { translation 0.0000 0.0000 1.2250 children Shape { appearance Appearance { material Material { diffuseColor 0.580 0.590 0.620 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 6.6000 4.6000 0.8500 } } }
+Transform { translation -2.5400 2.1000 0.0250 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.2000 0.9000 0.0500 } } }
+Transform { translation -2.5400 -2.1000 0.0250 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.2000 0.9000 0.0500 } } }
+Transform { translation 0.0000 2.1000 0.0250 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.2000 0.9000 0.0500 } } }
+Transform { translation 0.0000 -2.1000 0.0250 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.2000 0.9000 0.0500 } } }
+Transform { translation 2.5400 2.1000 0.0250 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.2000 0.9000 0.0500 } } }
+Transform { translation 2.5400 -2.1000 0.0250 children Shape { appearance Appearance { material Material { diffuseColor 0.850 0.680 0.300 specularColor 0.54 0.54 0.54 shininess 0.90 } } geometry Box { size 1.2000 0.9000 0.0500 } } }
+] }
