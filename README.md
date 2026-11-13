@@ -125,7 +125,7 @@ BGA, for one).
      middle node 51 → 3 mm, common mode 1–6 dB lower), the reference oscillator's pair was
      coupled and matched, and the SDR ADC's input network was simulated: its copper costs
      nothing in band, so it stays.
-   - **Thermal.** 6.9 W on 134 cm² in still air: +26 °C mean and +48 °C at the clock buffer. Fine
+   - **Thermal.** 7.5 W on 134 cm² in still air (with the Ethernet PHY): +27 °C mean and +51 °C at the clock buffer. Fine
      on the bench. A vehicle install needs airflow or a path to the enclosure.
 2. **Ten of the 19 LVDS pairs are not coupled** (11 of 22 counting U401's three clock pairs:
    `CLK_ADCS` and `CLK_FPGA` were re-routed as coupled pairs on 12 Nov, `CLK_FPGA` after its
@@ -165,9 +165,9 @@ BGA, for one).
      −3.0 dBm, NF 22 dB. On both, the ADC is 80–92 % of the noise.
    - **Transmit levels** and **the DAC filters with their copper.**
    - **The board's thermal map**, with junctions for every part that has data. At 25 °C in still
-     air, the hottest junction is the ADCLK948 at 82 °C and the FPGA is at 62 °C. A vehicle
+     air, the hottest junction is the ADCLK948 at 84 °C and the FPGA is at 63 °C. A vehicle
      needs airflow: a heatsink on the ICs and the regulators, with a fan, keeps every junction
-     under 90 °C at 70 °C ambient.
+     under 92 °C at 70 °C ambient.
 
    The first boards are for evaluation.
 7. **The AERIS-10 end of the ribbon does not exist yet.**
@@ -321,7 +321,7 @@ re-placement of 12 Nov ([SIGNAL_INTEGRITY §9.3](docs/SIGNAL_INTEGRITY.md)).
 ![DAC reconstruction filters](docs/sim/rev05_filters.png)
 
 **Board temperature** at 25 °C ambient in still air: a 2-D model with each layer's real copper,
-convection from both faces, and the power budget's 6.9 W
+convection from both faces, and the power budget's 7.5 W (re-run 13 Nov with the Ethernet PHY)
 ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
 
 ![Board temperature](docs/sim/rev05_thermal.png)
