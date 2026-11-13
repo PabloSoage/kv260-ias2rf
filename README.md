@@ -142,7 +142,7 @@ BGA, for one).
    `IS_CLK_INVERTED`, or capture on the other edge) ([CONTROL_SPEC §1](docs/CONTROL_SPEC.md)).
    The rest is inside IDELAYE2's range and calibrated per bit.
 4. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
-   ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $282.92 ($236.88 on 6 layers).
+   ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $287.96 at 140 × 132 mm with the Ethernet tab ($282.92 without it, $236.88 on 6 layers).
 5. **The Kria side of the link is `DIFF_SSTL12`, not `LVDS_12`** (UG571 read on 12 Nov,
    [INTERFACE_SPEC §6.3](docs/INTERFACE_SPEC.md)). No `LVDS_12` exists. `LVDS` at 1.2 V is
    input-only with no internal termination. `DIFF_SSTL12` has on-die split termination
@@ -197,7 +197,7 @@ global sourcing or consigned parts cover them.
 | [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md) | The 8-layer board against the 6-layer one: stacks, every check side by side, eyes, skew, PDN, SMA, and what the same corrections would give on 6 layers |
 | [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review (11 Nov) and the 8-layer re-run (12 Nov, §8): impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
 | [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
-| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026, bare boards on 8 layers 12 Nov): boards, assembly fees and every part with its LCSC link and price. About $2,120 for two assembled boards, $4,300 for five (bare boards not yet re-quoted for the Ethernet tab) |
+| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026, bare boards on 8 layers 12 Nov, re-quoted with the Ethernet tab 13 Nov): boards, assembly fees and every part with its LCSC link and price. About $2,125 for two assembled boards, $4,310 for five |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
 | [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md), [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | What the inherited files contained, and the record of the earlier work |
 
