@@ -13024,10 +13024,6 @@
 		(uuid "2e208ecf-283b-5200-b868-b84824bed797")
 	)
 	(no_connect
-		(at 177.8 187.96)
-		(uuid "1e45fa9c-fbbb-550d-89bb-b30cbfd3bbd4")
-	)
-	(no_connect
 		(at 177.8 236.22)
 		(uuid "3793b2da-9021-564f-b42c-9a37574ba5d2")
 	)
@@ -13084,14 +13080,6 @@
 		(uuid "36a773b4-9ab7-57fa-a608-925f3e9f64a8")
 	)
 	(no_connect
-		(at 513.08 129.54)
-		(uuid "494035ab-0e10-5b97-ba2d-c7fb08235da9")
-	)
-	(no_connect
-		(at 513.08 152.4)
-		(uuid "ed24541d-3324-5571-8e8c-0e850a70bca6")
-	)
-	(no_connect
 		(at 513.08 134.62)
 		(uuid "33a9cbe5-d77e-5f8d-a7e2-008931a388b4")
 	)
@@ -13114,14 +13102,6 @@
 	(no_connect
 		(at 513.08 149.86)
 		(uuid "22a619ef-7f50-5128-b29b-1d5174948322")
-	)
-	(no_connect
-		(at 513.08 154.94)
-		(uuid "f7c43587-2b10-5232-b8e1-1056dfb5933d")
-	)
-	(no_connect
-		(at 513.08 157.48)
-		(uuid "de079e1c-23b9-54a4-b3df-662510177a73")
 	)
 	(no_connect
 		(at 513.08 160.02)
@@ -39992,14 +39972,6 @@
 		)
 		(uuid "fb258c71-26fd-4c5b-b90e-fccdfd6ba6e6")
 	)
-	(no_connect
-		(at 513.08 132.08)
-		(uuid "4a8befcd-130b-4ca6-90fd-beadaca23e79")
-	)
-	(no_connect
-		(at 513.08 147.32)
-		(uuid "4935ccbc-dc86-4596-ae56-1462579a0918")
-	)
 	(symbol
 		(lib_id "kv260-ias2rf:RTL8211FSI-CG")
 		(at 640.08 487.68 0)
@@ -46441,7 +46413,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "eded78bc-f2cd-48b9-988b-edddac7f1ade")
 		(property "Reference" "C1218"
 			(at 772.16 509.27 0)
@@ -46477,7 +46449,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "SGMII PHY -> FPGA, AC coupling (Rev06: own pins N1/P1)"
 			(at 769.62 510.54 0)
 			(hide yes)
 			(effects
@@ -46511,7 +46483,7 @@
 		)
 		(uuid "cecc5bc7-48bf-401d-a894-e79fbbf204fc")
 	)
-	(label "LINK_TX_D0_P"
+	(label "ETH_SGRX_FPGA_P"
 		(at 769.62 514.35 0)
 		(effects
 			(font
@@ -46530,7 +46502,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "90bd2974-d18e-43ad-8e77-a27506f31826")
 		(property "Reference" "C1219"
 			(at 797.56 509.27 0)
@@ -46566,7 +46538,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "SGMII PHY -> FPGA, AC coupling (Rev06: own pins N1/P1)"
 			(at 795.02 510.54 0)
 			(hide yes)
 			(effects
@@ -46600,7 +46572,7 @@
 		)
 		(uuid "98389263-2baa-4bfb-b201-e93f7704e435")
 	)
-	(label "LINK_TX_D0_N"
+	(label "ETH_SGRX_FPGA_N"
 		(at 795.02 514.35 0)
 		(effects
 			(font
@@ -46619,7 +46591,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "bf953cac-bbcb-4c17-8803-b1fced08e5f5")
 		(property "Reference" "C1220"
 			(at 772.16 524.51 0)
@@ -46655,7 +46627,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "SGMII FPGA -> PHY, AC coupling (Rev06: own pins T4/T3)"
 			(at 769.62 525.78 0)
 			(hide yes)
 			(effects
@@ -46679,7 +46651,7 @@
 			)
 		)
 	)
-	(label "LINK_RX_D0_P"
+	(label "ETH_SGTX_FPGA_P"
 		(at 769.62 521.97 0)
 		(effects
 			(font
@@ -46708,7 +46680,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "9ce5ea87-a7ed-49da-9058-a3e4c066d45e")
 		(property "Reference" "C1221"
 			(at 797.56 524.51 0)
@@ -46744,7 +46716,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "SGMII FPGA -> PHY, AC coupling (Rev06: own pins T4/T3)"
 			(at 795.02 525.78 0)
 			(hide yes)
 			(effects
@@ -46768,7 +46740,7 @@
 			)
 		)
 	)
-	(label "LINK_RX_D0_N"
+	(label "ETH_SGTX_FPGA_N"
 		(at 795.02 521.97 0)
 		(effects
 			(font
@@ -46938,6 +46910,370 @@
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
 					(reference "#PWR1272")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "ETH_SGTX_FPGA_P"
+		(at 513.08 154.94 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "0b56dde6-ea50-4f51-8b9b-debf72226e21")
+	)
+	(label "ETH_SGTX_FPGA_N"
+		(at 513.08 157.48 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d109ea6c-5fdf-4ff5-b66f-6c75ba97e2f0")
+	)
+	(label "ETH_SGRX_FPGA_P"
+		(at 513.08 129.54 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b47fb618-db70-4ae6-bd52-8fb46de9f1bb")
+	)
+	(label "ETH_SGRX_FPGA_N"
+		(at 513.08 132.08 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "64e35c69-7b4e-49bf-88ce-2c32394cf369")
+	)
+	(label "ETH_MDC"
+		(at 513.08 147.32 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "fb84fc3f-6182-4192-ae36-22b841499153")
+	)
+	(label "ETH_MDIO"
+		(at 513.08 152.40 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "78ab3881-5eb7-490b-9782-d2b7cfc1aed8")
+	)
+	(label "ETH_RSTN"
+		(at 177.80 187.96 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5856b1fd-8ecc-4f30-b74b-80f642e0ee2a")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 810.26 535.94 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a6d804b2-b265-4f40-a042-6c8d2cb7d998")
+		(property "Reference" "R1215"
+			(at 812.80 534.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 812.80 537.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 810.26 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 810.26 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 810.26 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "944d395a-d501-41c4-aa22-f9aa101b8c0d")
+		)
+		(pin "2"
+			(uuid "a04fd39f-64a2-4a26-a897-d13f6599c9a9")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R1215")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "ETH_SGRX_FPGA_P"
+		(at 810.26 532.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "10d6b8a4-3862-49fd-bf66-f05f6e3f1afd")
+	)
+	(symbol
+		(lib_id "power:+1V2")
+		(at 810.26 539.75 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "eef5bdc5-8224-47b6-b975-1921cfae9e10")
+		(property "Reference" "#PWR1273"
+			(at 812.80 538.48 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+1V2"
+			(at 812.80 541.02 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 810.26 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 810.26 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 810.26 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d09890bb-ecd8-4f5a-930b-536b37bf4377")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1273")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 820.42 535.94 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "14eb6b83-2f4d-4338-83eb-dc19c91b9c7d")
+		(property "Reference" "R1216"
+			(at 822.96 534.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 822.96 537.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 820.42 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 820.42 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 820.42 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "23c3abc3-6cc9-4977-9341-4891fc4f3e9a")
+		)
+		(pin "2"
+			(uuid "9fa36749-f579-4c88-b205-ee1d5d62b633")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R1216")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "ETH_SGRX_FPGA_N"
+		(at 820.42 532.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0e7f23af-aced-44b3-831e-a73473790bad")
+	)
+	(symbol
+		(lib_id "power:+1V2")
+		(at 820.42 539.75 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "41dc9e28-9e10-41bd-86c1-8a7740854da6")
+		(property "Reference" "#PWR1274"
+			(at 822.96 538.48 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+1V2"
+			(at 822.96 541.02 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 820.42 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 820.42 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 820.42 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ab163cb1-d9a8-48f2-a000-0cf3b943cf1e")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1274")
 					(unit 1)
 				)
 			)
