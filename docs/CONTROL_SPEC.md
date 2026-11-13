@@ -1,6 +1,6 @@
 # CONTROL sheet — specification and review guide
 
-*25 September 2026, housekeeping devices added 2 October · `rev03/CONTROL.kicad_sch` (A1) · drawn by `_work/sheets/control.py` from the
+*25 September 2026, housekeeping devices added 2 October, Ethernet option 13 November · `rev03/CONTROL.kicad_sch` (A1) · drawn by `_work/sheets/control.py` from the
 connection list in `_work/sheets/control_spec.py`*
 
 The front-end FPGA, **U1101 XC7A50T-2FTG256I** (AERIS-10's own part), with everything it needs to
@@ -162,3 +162,88 @@ About 50 minutes.
 py _work/sheets/control_spec.py     # the pin table's self-check
 py _work/check_sheet.py control
 ```
+
+---
+
+## 7. Gigabit Ethernet, an assembly option (13 November 2026)
+
+*Added by `_work/add_ethernet.py`, a text edit of this sheet like the ESD arrays (`_work/add_esd.py`).
+`control_spec.py` and `check_sheet.py` do not know these parts: no FPGA ball changed.*
+
+**Why.** IAS1 is the board's only link to the Kria, and it is not proven until the first boards are
+up (IAS_LINK_SPEC §6). An Ethernet port lets a laptop, or the KV260's own port, reach the FPGA
+without it, fast enough to validate the radar or the SDR, one at a time. 100 Mb/s is not enough for
+either, so it is gigabit.
+
+**Why it shares the IAS1 pairs.** RGMII needs 14 FPGA balls and SGMII two LVDS pairs. The FPGA has
+39 free balls, but none of them can still be routed out on the signal layers. Every route that
+reached the edge balls (T2, P1, R1) did it through a GND plane, and bank 14's T12 and R12 are
+boxed in by the ADCR_D3 pair and the bank's +3V3_D feed. So the PHY's SGMII **shares two of the
+link's pairs, chosen by fitting parts**:
+
+| Mode | Fitted | Removed | What runs |
+|---|---|---|---|
+| IAS1 (as built) | C101, C102, C107, C108 | — | the link as before; C1218–C1221 are DNP |
+| Ethernet | C1218–C1221 (100 nF 0402) | C101, C102, C107, C108 | LINK_RX_D0 → PHY input, PHY output → LINK_TX_D0 |
+
+LINK_RX_D0 is an FPGA `LVDS_25` output: C1220/C1221 take it to HSIP/HSIN, which the PHY terminates
+and biases. The PHY's HSOP/HSON reach LINK_TX_D0 through C1218/C1219. That pair is an FPGA input,
+already terminated (R105) and biased to +1V2 (R101/R102). The other link pairs are not used in
+Ethernet mode: the gateware should hold LINK_RX_D1 static, since it runs beside the PHY's input pair
+for 5 mm (below).
+
+| Part | What | Source |
+|---|---|---|
+| **U1201** RTL8211FSI-CG | Copper (10/100/1000Base-T) ↔ SGMII PHY, −40 to 85 °C, QFN-48 6 × 6 mm. LCSC C2904132 | RTL8211FS(I)(-VS) datasheet Rev. 1.8 |
+| **J1201** HR911130C | RJ45 with gigabit magnetics and two LEDs, on a tab off the board's east edge (LAYOUT §1). **0–70 °C**: no industrial gigabit magjack had stock; the KV260 itself is a 0–70 °C kit. LCSC C50933 | HanRun drawing; footprint by `_work/make_rj45.py` |
+| Y1201 | 25 MHz crystal, 20 pF, ±20 ppm (X322525MOB4SI), with 2 × 27 pF | datasheet: ±50 ppm |
+| L1201 | 2.2 µH power inductor (Murata DFE201210U-2R2M, 1.2 A) for the PHY's 1.0 V switching regulator; its output feeds only DVDD10/AVDD10 | datasheet §6.8 |
+| R1201 | RSET 2.49 kΩ 1 % | Realtek's reference schematics |
+
+**Straps** (4.7 kΩ). `CFG_MODE` = 011 selects UTP ↔ SGMII: RXD1 and RXD2 high, RXD3 low. The PHY
+address is 1: LED0 is pulled high. RXC and RXCTL need no resistor for their 0, because both have an
+internal pull-down at power-on (datasheet table 6); nothing else drives them in SGMII mode. RXDLY
+is 0. `CFG_LDO` = 01, so the PHY's own LDO makes 2.5 V for its I/O pads, and DVDD_RG is that LDO's
+output (decoupled, not fed).
+
+The LEDs follow their straps. LED1 (strap 1) is active low and lights the green LED from +3V3_D.
+LED2 (strap 0) is active high and lights the yellow one.
+
+**Management: none from the FPGA.** MDC/MDIO could not be routed to any free ball either (above).
+The PHY does not need them: its straps set it up, and it auto-negotiates both its copper side and
+its SGMII side, which is what the SGMII core expects. MDC (pulled down by R1211) and MDIO (pulled
+up by R1213, 1.5 kΩ to DVDD_RG) end on test pads **TP14** and **TP15** beside the PHY. Use them to
+read its registers with a probe, or to wire them to a spare I/O for bring-up.
+
+**Reset and power.** PHYRSTB has a 10 kΩ / 4.7 µF power-on reset. VDD_REG, DVDD33 and AVDD33
+(the last behind a ferrite) take +3V3_D. The datasheet asks for a 3.3 V supply that can give 1 A
+with a rise time over 0.5 ms. U1002 is a 2 A part carrying 1.16 A, and the PHY adds about 0.15 A.
+
+**What the shared pairs cost the IAS1 link, measured.** All figures are from
+a lumped-line simulation like `lvds_eye.py`'s (SIGNAL_INTEGRITY §9.7) at 1.25 Gb/s, on the legs as routed. The eye is the vertical
+opening; jitter is the spread of the zero crossings.
+
+| Pair | Before | With the DNP branch | Branch |
+|---|---|---|---|
+| LINK_TX_D0 | 518 mV, 21 ps | 489–499 mV, 17 ps | P: C1218 sits on the bottom face, on the via of R101's pad, so its only stub is that pad. N: 1.0 mm from R102's bias branch. Both about 10 mm from the connector |
+| LINK_RX_D0 | 609 mV, 93 ps | 601–607 mV, 109 ps | 4.3 mm (P) and 5.2 mm (N, 2 vias) to C1220/C1221, near the connector |
+
+A first placement of C1218 left a 6.6 mm branch. That cut LINK_TX_D0's eye to 461 mV, which is why
+the part went to the bottom face. The RX_D0 branches could not be shortened: the space around
+C101/C102 and J101 is full.
+
+**Ethernet mode, measured the same way.** The path runs from the FPGA to the PHY's input, and from
+the PHY's output to the FPGA, branch and PHY run included:
+
+| Path | Eye | Jitter | PHY-side pair |
+|---|---|---|---|
+| LINK_RX_D0 → PHY | 350 mV | 50 ps | ETH_SGTX_PHY: 53.3 / 52.2 mm, 53 % coupled, P−N +6.5 ps; alone 640 mV |
+| PHY → LINK_TX_D0 | 647 mV | 86 ps | ETH_SGRX_PHY: 52.9 / 46.5 mm on different layers (P on L8, N on L6): P−N +2.9 ps; alone 647 mV |
+
+The PHY's SGRX legs are matched in **delay**, not length. A meander that matched their lengths
+left 41 ps of skew, because L8 microstrip is faster than L6 stripline, so it was taken out. The
+PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at 0.17 mm.
+
+**Gateware.** Xilinx's 1G/2.5G Ethernet PCS/PMA or SGMII core (PG047), in its "SGMII over LVDS,
+asynchronous oversampling" form (XAPP523), which supports 7-series −2 parts. 1.25 Gb/s is also
+the ceiling of these HR-bank pins (IAS_LINK_SPEC §7), so there is no margin in rate.

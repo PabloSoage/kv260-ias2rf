@@ -34,6 +34,7 @@ The original Allied Vision board is kept, untouched, as
 | **Changed** | The IAS0 tongue's right edge moves from x 144.9 to **142.4**, 1.5 mm clear of the carrier's J18 jumper. The original overlapped it by 1.0 mm (INTERFACE_SPEC §5.3) |
 | **Removed** | The slots for the cameras' flat cables along the old bottom edge |
 | **New** | Everything from y 127.25 to **y 214.75**, full width. Outward, off the carrier, where the KV260 has nothing at all |
+| **Tab (13 Nov 2026)** | x 208–229, y 117.5–136 on the east edge, for the Ethernet RJ45 J1201 (CONTROL_SPEC §7). It is off the carrier (y > 117.25) and past its front edge, where INTERFACE_SPEC §5.3 found 25+ mm free. The bounding box becomes **140 × 132 mm**. The GND planes follow the tab |
 
 **Why 120 mm and not the ~90 estimated before the schematic existed.** The parts' courtyards add up
 to **5,700 mm²**. At 119 × 90 mm they would cover 75 % of a board that is populated on one face

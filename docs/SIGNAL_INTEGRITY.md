@@ -990,6 +990,27 @@ The runs below are after those fixes; each energy trace decays to −40 dB.
    - Heat lost into the KV260.
    - A through-thickness model under the hottest parts.
 
+### 9.7 The Ethernet option's branches on two link pairs (13 November)
+
+The Ethernet PHY shares LINK_RX_D0 and LINK_TX_D0 by fitting parts (CONTROL_SPEC §7). As built, its
+four coupling capacitors C1218–C1221 are not fitted, so each leg of the two pairs carries an open
+branch ending on an empty 0402 pad. Each leg was simulated as routed, with the branch added
+(`lvds_eye.py`'s line model, LVDS driver, 100 Ω and 2 pF a leg at the receiver, PRBS7 at 1.25 Gb/s):
+
+| Pair | No branch | As built | Branch |
+|---|---|---|---|
+| LINK_TX_D0 | 518 mV, 21 ps | 489–499 mV, 17 ps | P: C1218 on the bottom face, on the via of R101's pad, so only its pad. N: 1.0 mm. About 10 mm from the connector |
+| LINK_RX_D0 | 609 mV, 93 ps | 601–607 mV, 109 ps | 4.3 mm (P) and 5.2 mm (N, 2 vias), near the connector |
+
+A 6.6 mm branch on LINK_TX_D0_P, the first placement, gave 461 mV. **C1218 sits on the bottom face
+over the carrier:** the clearance map (INTERFACE_SPEC §5.3) shows no carrier part rising through
+the board there, but it cannot show parts lower than 0.8 mm. That matters only if C1218 is fitted
+(Ethernet mode). Check under that spot before fitting it.
+
+In Ethernet mode the paths through the PHY's own pairs measure 350 mV / 50 ps (FPGA to PHY) and
+647 mV / 86 ps (PHY to FPGA). The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
+0.17 mm; the gateware should hold LINK_RX_D1 static in Ethernet mode.
+
 ## 10. How it was checked
 
 The checks were scripts run on the board file, none by hand: a KiCad-style plane fill, the
