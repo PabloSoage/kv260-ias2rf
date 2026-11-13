@@ -1,3 +1,6 @@
+// Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/nco_400m_enhanced.v)
+// Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
+// License: MIT (see fpga/third_party/aeris/README.md)
 `timescale 1ns / 1ps
 
 module nco_400m_enhanced (
@@ -99,8 +102,11 @@ initial begin
 end
 
 // Combinational: quadrant determination and LUT index (feeds Stage 3a registers)
+// Local fix (Task 4b): Q1/Q3 map phase 0->pi/2 (index k), Q2/Q4 mirror pi/2->0
+// (index ~k). Upstream used (quadrant_w[0] ^ quadrant_w[1]), which swapped sin/cos
+// magnitudes in Q3 and Q4 (e.g. 180 deg -> 270 deg) causing ~18 dB image leakage.
 wire [1:0] quadrant_w = lut_address[7:6];
-wire [5:0] lut_index = (quadrant_w[0] ^ quadrant_w[1]) ? ~lut_address[5:0] : lut_address[5:0];
+wire [5:0] lut_index = quadrant_w[0] ? ~lut_address[5:0] : lut_address[5:0];
 
 // Combinational LUT read using REGISTERED lut_index_pipe (feeds Stage 3b registers)
 // These wires are driven by lut_index_pipe (registered in Stage 3a), so the
