@@ -536,6 +536,13 @@ for sx, xc in (("L", XL), ("R", XR)):
         u = -1 if sx == "L" else 1                 # outwards in X
         v = -1 if sy == "front" else 1             # outwards in Y
         g, T, A, S = BUMP_GAP, BUMP, BUMP_ARM, side_lim[(sx, sy)]
+        # keep the arm along the front/rear wall 4 mm clear of that wall's connector openings (13 Nov: the
+        # right-rear bumper half covered the KV260's RJ45, seen in the new KV260-side render)
+        for x0, x1, _z0, _z1 in merged(rear if sy == "back" else front):
+            lim = (xc - x1 - 4.0) if sx == "R" else (x0 - xc - 4.0)
+            if lim < A:
+                A = lim
+        print(f"bumper {sx}{sy}: arm {A:.1f} mm")
         # L outline in local (outwards-x, outwards-y) coordinates, the outer corner chamfered
         loc = [(g, -S), (T, -S), (T, T - BUMP_CH), (T - BUMP_CH, T), (-A, T), (-A, g), (g, g)]
         ring = [(xc + u * a, yc + v * b) for a, b in loc]
