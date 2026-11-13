@@ -14,7 +14,7 @@ samples = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 256
 W, H = (int(v) for v in (argv[argv.index("--res") + 1] if "--res" in argv else "1920x1200").split("x"))
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 MM = 0.001
-MASK_ALPHA = float(argv[argv.index("--mask") + 1]) if "--mask" in argv else 0.72
+MASK_ALPHA = float(argv[argv.index("--mask") + 1]) if "--mask" in argv else 0.9
 sc = bpy.context.scene
 sc.render.engine = "CYCLES"
 prefs = bpy.context.preferences.addons["cycles"].preferences
@@ -53,9 +53,9 @@ for m in bpy.data.materials:
     col = tuple(round(x, 2) for x in b.inputs["Base Color"].default_value)[:3]
     if col == (0.08, 0.2, 0.14):
         # translucent like real LPI mask: the copper under it reads as lighter green, as in KiCad's raytracer
-        b.inputs["Base Color"].default_value = (0.010, 0.085, 0.030, 1)
+        b.inputs["Base Color"].default_value = (0.006, 0.07, 0.022, 1)
         b.inputs["Alpha"].default_value = MASK_ALPHA
-        b.inputs["Roughness"].default_value = 0.42
+        b.inputs["Roughness"].default_value = 0.62
         if "Specular IOR Level" in b.inputs:
             b.inputs["Specular IOR Level"].default_value = 0.3
     elif col == (1.0, 1.0, 1.0) and b.inputs["Alpha"].default_value < 1:
@@ -71,7 +71,7 @@ if rig:
             continue
         b = o.material_slots[0].material.node_tree.nodes.get("Principled BSDF")
         col = tuple(round(x, 2) for x in b.inputs["Base Color"].default_value)[:3]
-        if col in ((0.01, 0.09, 0.03), (0.9, 0.9, 0.88)) and o.dimensions.z < 1e-5:
+        if col in ((0.01, 0.07, 0.02), (0.9, 0.9, 0.88)) and o.dimensions.z < 1e-5:
             zc = (rig.matrix_world.inverted() @ o.matrix_world.translation).z + \
                  sum(v.co.z for v in o.data.vertices[:50]) / min(50, len(o.data.vertices)) * o.matrix_world.to_scale().z
             lift = (0.04 if col[0] < 0.5 else 0.06) * MM
