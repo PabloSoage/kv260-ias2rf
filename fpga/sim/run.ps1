@@ -37,7 +37,15 @@ if (-not (Test-Path $glblPath)) {
     throw "Vivado glbl.v not found: $glblPath"
 }
 
-$runName = if ($Mutate) { "$Bench-mutate-$Mutate" } else { $Bench }
+$defSuffix = ''
+if ($Define -and ($Define.Count -gt 0)) {
+    $cleanDefs = @($Define | Where-Object { $_ } | ForEach-Object { $_ -replace '[^A-Za-z0-9_]', '_' })
+    if ($cleanDefs.Count -gt 0) {
+        $defSuffix = '-def-' + ($cleanDefs -join '_')
+    }
+}
+$mutSuffix = if ($Mutate) { "-mutate-$Mutate" } else { '' }
+$runName = "$Bench$defSuffix$mutSuffix"
 $workDir = Join-Path $outDir "work_$runName"
 $logFile = Join-Path $outDir "$runName.log"
 
