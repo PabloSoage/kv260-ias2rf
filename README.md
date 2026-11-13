@@ -120,7 +120,10 @@ BGA, for one).
      0.3 mm, from 91. Most of what was left was where the SDR DAC's filters crossed the DAC bus.
      On 12 Nov DAC2's filter was re-placed next to its balun and DAC1's middle node re-routed as
      a pair: their digital neighbours went from 59 mm to 14 mm. DAC2's common mode at the balun
-     fell by 9–21 dB; DAC1's moved by a few dB either way.
+     fell by 9–21 dB. On 13 Nov DAC1's filter followed, onto the bottom face under T801 (its
+     middle node 51 → 3 mm, common mode 1–6 dB lower), the reference oscillator's pair was
+     coupled and matched, and the SDR ADC's input network was simulated: its copper costs
+     nothing in band, so it stays.
    - **Thermal.** 6.9 W on 134 cm² in still air: +26 °C mean and +48 °C at the clock buffer. Fine
      on the bench. A vehicle install needs airflow or a path to the enclosure.
 2. **Ten of the 19 LVDS pairs are not coupled** (11 of 22 counting U401's three clock pairs:

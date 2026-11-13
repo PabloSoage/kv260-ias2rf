@@ -559,21 +559,30 @@ are gone. Other nets within 0.3 mm of the DAC1/DAC2 filter nodes (each node's ow
 counted) went from 59 mm to 14 mm. What is left is `+5V0` beside T801's secondary (5.9 mm at
 0.15 mm, unchanged) and the DAC's own `FSADJ` pins next to its outputs.
 
-### 9.3 Long differential analogue paths (the SDR DAC filters re-placed 12 Nov)
+**The external reference input (13 Nov).** `Net-(U401-CLK0)`, from the CLK_REF_IN SMA to U401,
+ran 16 mm beside a 1.0 mm `+5V0` track on L3, 0.26 mm apart: the buck's ripple next to the clock
+reference. That stretch of `+5V0` feeds only FB601 (the SDR drivers), so it was narrowed to 0.4 mm
+there: 0.56 mm apart, and `audit.py` no longer lists the pair. The drop to FB601 goes from 3 to 4 mV.
+
+### 9.3 Long differential analogue paths (the SDR DAC filters re-placed 12-13 Nov)
 
 | Path | P / N | Vias |
 |---|---|---|
 | SDR DAC1 filter, between its two inductor sections (C814), before 12 Nov | 57 / 66 mm | 8 / 6 |
 | SDR DAC2 filter (C834), before 12 Nov | 39 / 62 mm | 4 / 6 |
-| SDR DAC1 filter (C814), now: re-routed as a pair | 51 / 47 mm | 3 / 3 |
+| SDR DAC1 filter (C814), 12 Nov: re-routed as a pair | 51 / 47 mm | 3 / 3 |
+| SDR DAC1 filter (C814), 13 Nov: re-placed on the bottom face | 3 / 1.5 mm | 2 / 1 |
 | SDR DAC2 filter (C834), now: re-placed | 4 / 4 mm | 0 / 0 |
-| SDR ADC driver → ADC (C605 / C606) | 45 / 32 mm | 4 / 4 |
-| Reference oscillator → U401 (Y401 CLK±) | 10.5 / 20.8 mm | 3 / 2 |
+| SDR ADC driver → ADC (C605 / C606), simulated 13 Nov, left as it is | 45 / 32 mm | 4 / 4 |
+| Reference oscillator → U401 (Y401 CLK±), before 13 Nov | 10.5 / 20.8 mm | 3 / 2 |
+| Reference oscillator → U401, 13 Nov: a coupled 100 Ω pair on L3, legs matched | 24 / 24 mm pad to cap | 2 / 2 |
 
 - **The DAC filters.** At 0.4 nH/mm, 60 mm of 0.1 mm track is about 25 nH: a quarter of the
   filter's own 107 nH coils. The legs also differ by 23 mm, about 160 ps, which unbalances the
   balun's input.
-- **Y401's outputs.** They differ by 10 mm, about 70 ps on the master reference.
+- **Y401's outputs.** They differed by 10 mm, about 70 ps on the master reference. Re-routed on
+  13 Nov as a coupled pair on L3 (KiCadRoutingTools' diff-pair router, the 130 Ω pull-downs joined
+  after), the shorter leg meandered by 3.1 mm: the legs now match within 0.3 mm.
 
 These were routed as unrelated nets. The fix is to place the filter parts in two rows beside the
 DAC and route each pair together.
@@ -621,8 +630,40 @@ The same simulation after the re-placement:
 - **DAC1 is a trade.** Under 50 MHz its common mode is 3–6 dB worse than before, still under
   −42 dB to 30 MHz. Above 50 MHz it is better, and the worst below 100 MHz goes from −11 to
   −18 dB. The corner moves up 1 %.
-- **Fewer vias and fewer digital neighbours on both.** A full re-placement of DAC1 would need
-  room near T801 that only moving other parts can give.
+- **Fewer vias and fewer digital neighbours on both.** A full re-placement of DAC1 needed room
+  near T801 that the top face does not have.
+
+**DAC1 re-placed on 13 Nov, on the bottom face.** Under T801 the bottom face was free. L811, L812
+and C814 now sit there, under L813/L814, so the filter's middle node is 3 / 1.5 mm with 2 / 1 vias
+(51 / 47 mm and 3 / 3 the day before). As for DAC2, the long copper moved to the DAC side: the
+outputs run from the AD9767's pins 45/46 (adjacent, 0.5 mm apart) as a pair, 46 / 50 % coupled,
+the shorter leg meandered so both are 56 mm. `ADAR5_CS` and `ADAR5_TX_LOAD` were re-routed in the
+box under the parts only. DRC 0/0/0 with parity.
+
+| AD9767 DAC1 → T801, as routed | −3 dB | At 100 MHz | Common mode below differential, 10 / 30 / 50 MHz | Worst below 100 MHz |
+|---|---|---|---|---|
+| 12 Nov (middle node as a pair) | 64.8 MHz | −28 dB | −53 / −42 / −35 dB | −18 dB |
+| 13 Nov (re-placed) | 64.0 MHz | −28 dB | **−54 / −43 / −37 dB** | **−24 dB** |
+
+- **Better at every frequency than the day before**, by 1–2 dB in the passband and 6 dB at its
+  worst. Against the board of 11 Nov (−59 / −45 / −35 dB) it is 5 dB worse at 10 MHz: what is left
+  is mostly T801's own pins, 5 mm apart, with C815 at one end (13.7 / 4.0 mm of copper on the two
+  secondary nets).
+- **Match the legs first.** Before the meander the legs were 56 / 49 mm and the common mode came
+  out 3–4 dB worse than the day before: in this model a leg mismatch costs more than the length.
+
+**The SDR ADC's input network, simulated (13 Nov), and left as it is.** `adcsim.py` runs the
+AD8352 → 100 nF → 200 Ω bias → 33 Ω → AD9253 network the same way, with the 45 / 32 mm nodes as
+routed:
+
+| SDR ADC input (U602 → U601 channel A) | 1 MHz | 10 MHz | 30 MHz | 62.5 MHz |
+|---|---|---|---|---|
+| Gain, routed against ideal | +0.00 dB | +0.01 dB | +0.08 dB | +0.31 dB |
+| Common mode below differential, routed | −90 dB | −70 dB | −58 dB | — |
+
+At HF the copper is a few nH and pF: it changes nothing the ADC could see. The nodes' only
+neighbours within 0.3 mm are 2 mm of `+1V8_A` on L3. A re-placement would mean moving parts
+round the ADC, where both faces are full, for no gain, so it was not done.
 
 ![DAC reconstruction filters, ideal and as routed, and their common mode before and after the re-placement](sim/rev05_filters.png)
 
@@ -927,6 +968,11 @@ The runs below are after those fixes; each energy trace decays to −40 dB.
 - **The fix would be the one noted in §9.4 for LINK.** Escape both legs the same way, with
   the AC capacitors placed together. Both runs (odd and even) give the same conversion, as
   reciprocity requires: a check on the model.
+- **Tried on 13 Nov and not kept.** C105 (`LINK_RX_D1_P`, 9 mm from C106) has a free spot 2.5 mm
+  from C106. Moved there and re-routed, its leg came out 96.3 mm with 8 vias against 95.8 mm and 7,
+  and still leaves the connector by a different path from N. A symmetric escape means redoing the
+  whole J101 escape, ten nets at 0.4 mm pitch, next to the link itself. Since J101 mates board to
+  board, the common mode it makes has no cable to radiate from, so the board was left as it was.
 
 ![The other 3-D sub-models: BGA escape, J101 to the AC capacitors, two pairs side by side, common mode through the layer change](sim/rev05_3d.png)
 
