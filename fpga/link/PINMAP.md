@@ -27,8 +27,8 @@ Primary sources inspected:
 ## 1. Five Differential `LINK_*` Pairs
 
 All five pairs are AC-coupled with 100 nF capacitors (`C101`–`C110`) on the adapter PCB near `J101`.
-- **Artix -> Kria pairs (`LINK_RX_*`):** Driven by Artix Bank 34 (`VCCO = 2.5 V`, `LVDS_25`), received by K26 Bank 66 HP (`VCCO = 1.8 V`, AC-coupled, internal `DIFF_TERM_ADV = TERM_100` + `EQUALIZATION = EQ_LEVEL2` biased to `VCCO/2 = 0.9 V`).
-- **Kria -> Artix pairs (`LINK_TX_*`):** Driven by K26 Bank 66 HP (`VCCO = 1.8 V`, `LVDS`), received by Artix Bank 14 HR (`VCCO = 3.3 V`) with external `100 ohm` differential termination (`R105`, `R106`) and `10k ohm` pull-ups to `+1V2` (`R101`–`R104`, `Vcm = 1.2 V`).
+- **Artix -> Kria pairs (`LINK_RX_*`):** Driven by Artix Bank 34 (`VCCO = 2.5 V`, `LVDS_25`), received by K26 Bank 66 HP (`VCCO = 1.2 V`, `PL_1V2`, AC-coupled `DIFF_SSTL12` with `ODT = RTT_48` and `EQUALIZATION` enabled per `link-decisions.md` #3).
+- **Kria -> Artix pairs (`LINK_TX_*`):** Driven by K26 Bank 66 HP (`VCCO = 1.2 V`, `DIFF_SSTL12` with `OUTPUT_IMPEDANCE = RDRV_60_60`), received by Artix Bank 14 HR (`VCCO = 3.3 V`) as `LVDS_25` inputs **without** `DIFF_TERM` (`DIFF_TERM = FALSE`, external `100 ohm` differential termination `R105`, `R106` and `10k ohm` pull-ups to `+1V2` `R101`–`R104`, `Vcm = 1.2 V`).
 
 > **Pin-ordering note on `J101` / `J8`:** On `LINK_RX_D1` (pins 29/30) and `LINK_TX_D0` (pins 26/27), the lower connector pin number carries `_N` (`29`, `26`) and the higher pin number carries `_P` (`30`, `27`) on **both** the adapter (`J101` in `CSI2-KRIA-KV260_Rev01.kicad_pcb`) and the KV260 carrier (`J8` in `XTP682` sh. 13). P still lands on P and N still lands on N.
 
