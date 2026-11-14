@@ -344,7 +344,7 @@ cut(hc, join(inserts, "inserts"), self_ix=True)
 union(bottom, hc)
 
 # ---- lugs: lid and tray close on them; vehicle ears ------------------------------------------------------
-LUG_X = {"front": [-95.0, 70.0, 127.0], "back": [-95.0, -40.0, 127.0]}   # clear of the I/O openings
+LUG_X = {"front": [-95.0, 70.0, 127.0], "back": [-95.0, -20.0, 127.0]}   # clear of the I/O openings and J1001
 Y_OUT = {"front": OUTER[0][1], "back": OUTER[6][1]}
 LUG_W, LUG_D = 14.0, 10.0
 LUG_HOLE = 4.4                        # M4 clearance; the snap pins are 4.1
@@ -540,17 +540,71 @@ def merged(spans, gap=4.0):
     return out
 
 
+def ribbed(spans, rib=1.6):
+    """(x0, x1, z0, z1) spans along a wall, one cut-out per connector: where two would come closer than
+    rib, both give way to a rib of that width centred in their gap (the wall stays closed between the
+    KV260's connectors instead of one long window). Overlapping spans are merged."""
+    out = []
+    for a in sorted(spans):
+        if out and a[0] < out[-1][1] - 2.0:          # true overlap (beyond the margins): one opening
+            b = out[-1]
+            out[-1] = (b[0], max(b[1], a[1]), min(b[2], a[2]), max(b[3], a[3]))
+            continue
+        if out and a[0] - out[-1][1] < rib:
+            mid = (a[0] + out[-1][1]) / 2
+            b = out[-1]
+            out[-1] = (b[0], mid - rib / 2, b[2], b[3])
+            a = (mid + rib / 2, a[1], a[2], a[3])
+        out.append(a)
+    return out
+
+
 rear, front = [], []
 for name, lo, hi in PARTS:
     if name in ("J10", "J5", "J6", "J12", "U44", "U46") and hi[1] > INNER[6][1] - 5.0:       # rear I/O
-        rear.append((lo[0] - 2.0, hi[0] + 2.0, max(lo[2], -0.5) - 1.0, hi[2] + 2.0))
+        # 1 mm round each connector's face for the plugs' overmoulds, from just under its body
+        rear.append((lo[0] - 1.0, hi[0] + 1.0, max(lo[2], -0.5) - 0.5, hi[2] + 1.0))
     if name in ("J4", "J11", "J2") and lo[1] < INNER[0][1] + 5.0:                              # front
         m = 2.5 if name == "J4" else 1.0
         front.append((lo[0] - m, hi[0] + m, max(lo[2], -0.5) - m * 0.6, hi[2] + m))
-openings = [box("op_rear", x0, x1, INNER[6][1] - 6, OUTER[6][1] + 1, z0, z1) for x0, x1, z0, z1 in merged(rear)]
+openings = [box("op_rear", x0, x1, INNER[6][1] - 6, OUTER[6][1] + 1, z0, z1) for x0, x1, z0, z1 in ribbed(rear)]
 openings += [box("op_front", x0, x1, OUTER[0][1] - 1, INNER[0][1] + 3, z0, z1) for x0, x1, z0, z1 in merged(front)]
-print("rear openings", merged(rear))
+print("rear openings", [tuple(round(v, 1) for v in s) for s in ribbed(rear)])
 openings.append(box("op_rj45", -27.9, -11.1, OUTER[2][1] - 1, INNER[2][1] + 1, 2.0, 16.3))     # the adapter's RJ45
+# the adapter's 12 V jack J1001 (PJ-102AH, barrel axis 6.5 mm over the board) faces the rear wall 3.5 mm inside
+# it: a 5.5/2.1 plug's 9.5 mm barrel would not reach through 7 mm of air and wall, so the plug's moulded body
+# goes in too, through a U from the shells' joint up round the axis (12 mm: moulded bodies are 8-11 mm)
+for name, lo, hi in PARTS:
+    if name == "J1001":
+        jx, jz = (lo[0] + hi[0]) / 2, ADAPTER_BOT + 1.6 + 6.5
+        print("DC jack opening at x", round(jx, 2), "axis z", round(jz, 2))
+        prof = [(jx - 6.0, Z_SPLIT - 0.6), (jx + 6.0, Z_SPLIT - 0.6)] + \
+               [(jx + 6.0 * math.cos(math.pi * k / 24), jz + 6.0 * math.sin(math.pi * k / 24)) for k in range(25)]
+        y0, y1 = INNER[6][1] - 4, OUTER[6][1] + 1
+        me = bpy.data.meshes.new("dc_u")
+        bm = bmesh.new()
+        a = [bm.verts.new((x * MM, y0 * MM, z * MM)) for x, z in prof]
+        b = [bm.verts.new((x * MM, y1 * MM, z * MM)) for x, z in prof]
+        bm.faces.new(a)
+        bm.faces.new(list(reversed(b)))
+        for i in range(len(prof)):
+            j = (i + 1) % len(prof)
+            bm.faces.new((a[j], a[i], b[i], b[j]))
+        bm.normal_update()
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        bm.to_mesh(me)
+        bm.free()
+        dco = bpy.data.objects.new("dc_u", me)
+        sc.collection.objects.link(dco)
+        openings.append(dco)
+# J1103, the 2 x 20 IDC header for the ribbon to AERIS-10's ADAR1000 boards, outside the case: the ribbon
+# (50.8 mm wide, about 1 mm thick) leaves through a 54 x 2.6 mm slot in the lid right above the header,
+# its plug fitted before the lid goes on
+for name, lo, hi in PARTS:
+    if name == "J1103":
+        xc, yc = (lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2
+        openings.append(box("op_ribbon", xc - 1.3, xc + 1.3, yc - 27.0, yc + 27.0, Z_TOP_IN - 6, Z_TOP + 1))
+        print("ribbon slot at x", round(xc, 2), "y", round(yc - 27, 1), "..", round(yc + 27, 1))
 sma = []
 for name, lo, hi in PARTS:
     if name.startswith(("J4", "J9")) and lo[0] < -110:
@@ -573,7 +627,8 @@ for group in (openings + notches, cbs):
     cut(lid, b)
 
 # label, debossed 0.6 mm in the lid
-bpy.ops.object.text_add(location=(-70 * MM, 52 * MM, (Z_TOP - 0.6) * MM))
+# clear of the ribbon slot over J1103 (x -75.7, y 26-80) and of v2's grille
+bpy.ops.object.text_add(location=(-70 * MM, 96 * MM, (Z_TOP - 0.6) * MM))
 tx = bpy.context.object
 tx.data.body = "KV260 · IAS2RF"
 tx.data.size = 9 * MM

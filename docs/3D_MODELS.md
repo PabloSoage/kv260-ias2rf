@@ -52,3 +52,36 @@ All placements, orientations (`rotate_deg`), offsets (`offset_mm`), pin-1 polari
 The models in `mech/models3d/` are copies of KiCad 10's official 3D library (KiCad libraries licence: CC-BY-SA 4.0 with the KiCad libraries exception), kept here because the installed KiCad on the build machine has no 3D-model package; attribution: the KiCad Library Team.
 
 **Applied (14 Nov 2026, Rev06):** all 26 mappings are written into `CSI2-KRIA-KV260_Rev01.kicad_pcb`. Models in the repo are referenced as `${KIPRJMOD}/mech/models3d/...`; the EasyEDA ones as `${KIPRJMOD}/_work/mech/cache/models3d/...` (git-ignored: a fresh clone renders those parts without a body until `easyeda2kicad` fetches them again).
+
+## Blender renders: STEP placement and colours (14 November)
+
+KiCad's own 3-D view and `kicad-cli pcb render` load the `.wrl` files above; `kicad-cli pcb export glb
+--subst-models` (the source of `board.glb` for the mount and enclosure renders) swaps in the `.step` of the same name.
+EasyEDA centres its `.step` on the part's bounding box but not its `.wrl`. As a result the Blender renders showed:
+
+- `J1001` 2.1 mm and 3.5 mm off its footprint;
+- `J1201` 2.2 mm off;
+- the SRP7028A inductors 0.5 mm deep in the board.
+
+[`_work/mech/step_align.py`](../_work/mech/step_align.py) re-places those `.step` files in their `.wrl`'s frame,
+keeping their colours (OCP/XDE, originals kept as `*.easyeda.step`). The `.wrl` and `.step` bounds now agree to
+0.02 mm.
+
+The stand-in box the mount used to draw for the RJ45 (`build_mount.py`, from when `J1201` had no model) is gone:
+the renders now show HR911130C's own model, with its opening.
+
+**White parts.** Some EasyEDA `.wrl` files use pure white (1, 1, 1), which KiCad's raytracer burns out:
+
+- in the five cached `.wrl` files, pure white is toned to grey;
+- the CD542 transformer cases (`T701`/`T801`/`T802`) are set to a warm grey (originals kept as `*.wrl.easyeda`).
+
+**Blender materials.** In the renders, [`_work/mech/matfix.py`](../_work/mech/matfix.py) replaces the STEP
+importer's every-material-is-metal defaults:
+
+- **Adapter:** the mask is the KV260 carrier's own green, translucent over an ENIG-toned copper, so tracks and pours
+  read through it.
+- **KV260:**
+  - its connector shells, which the STEP leaves without any material, are nickel;
+  - its laminate is satin.
+- **White plastics:** ivory.
+- **Reflections:** a soft-box world, so that metals reflect a horizon instead of a flat grey.
