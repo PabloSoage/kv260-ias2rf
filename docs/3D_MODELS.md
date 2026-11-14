@@ -1,7 +1,7 @@
 # 3D Model Audit & Mapping (`CSI2-KRIA-KV260_Rev01.kicad_pcb`)
 
 ## 1. Audit Summary
-An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](file:///D:/Repos/kv260-ias2rf-gemini/CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (`C:\Users\pablo\AppData\Local\Programs\KiCad\10.0\share\kicad\3dmodels`) identified:
+An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (`C:\Users\pablo\AppData\Local\Programs\KiCad\10.0\share\kicad\3dmodels`) identified:
 
 - **Total footprints:** 570
 - **Broken `${KICAD10_3DMODEL_DIR}` model references:** **19** footprint instances whose `.step` path does not exist in the KiCad 10 standard installation (`Xilinx_FTG256`, `Mini-Circuits_CD542_H2.84mm`, `Oscillator_SMD_SI570_SI571_Standard`, `L_Bourns_SRP7028A_7.3x6.6mm`, `BarrelJack_CUI_PJ-102AH_Horizontal`, `Fuse_1812_4532Metric`, `HTSOP-8-1EP_...`, `QFN-20-1EP_...`, `QFN-48-1EP_...`, `LFCSP-32-1EP_...`, `LFCSP-56-1EP_...`).
@@ -16,11 +16,11 @@ All **26** missing or broken functional component instances (across **14** uniqu
 
 | Bucket | Path | Contents / Licensing |
 | :--- | :--- | :--- |
-| **Redistributable (Git)** | [mech/models3d/](file:///D:/Repos/kv260-ias2rf-gemini/mech/models3d/) | 8 KiCad 10 official STEP models (CC-BY-SA 4.0 / CERN-OHL compatible) + machine-readable [mapping.json](file:///D:/Repos/kv260-ias2rf-gemini/mech/models3d/mapping.json) |
+| **Redistributable (Git)** | [mech/models3d/](../mech/models3d/) | 8 KiCad 10 official STEP models (CC-BY-SA 4.0 / CERN-OHL compatible) + machine-readable [mapping.json](../mech/models3d/mapping.json) |
 | **Third-Party Vendor Cache (outside Git)** | `../kv260-ias2rf/_work/mech/cache/models3d/` | 7 EasyEDA / LCSC fetched `.wrl` + `.step` pairs (`easyeda2kicad` v1.0.1) whose upstream license terms prevent direct repo redistribution |
 
 > [!NOTE]
-> For EasyEDA-sourced parts (`T701`/`T801`/`T802`, `Y401`, `F1001`, `L1001`–`L1030`, `J1001`, `J101`–`J102`, `J1201`), [mapping.json](file:///D:/Repos/kv260-ias2rf-gemini/mech/models3d/mapping.json) points to the `.wrl` file because `easyeda2kicad`'s raw `.step` exports retain an internal `AXIS2_PLACEMENT_3D` construction Z-offset, whereas the `.wrl` geometry is pre-normalized to `Z = 0.00 mm` at the board surface. Both `.wrl` and `.step` remain cached side-by-side in `_work/mech/cache/models3d/`.
+> For EasyEDA-sourced parts (`T701`/`T801`/`T802`, `Y401`, `F1001`, `L1001`–`L1030`, `J1001`, `J101`–`J102`, `J1201`), [mapping.json](../mech/models3d/mapping.json) points to the `.wrl` file because `easyeda2kicad`'s raw `.step` exports retain an internal `AXIS2_PLACEMENT_3D` construction Z-offset, whereas the `.wrl` geometry is pre-normalized to `Z = 0.00 mm` at the board surface. Both `.wrl` and `.step` remain cached side-by-side in `_work/mech/cache/models3d/`.
 
 ---
 
@@ -48,3 +48,5 @@ All **26** missing or broken functional component instances (across **14** uniqu
 
 ## 4. Verification Procedure
 All placements, orientations (`rotate_deg`), offsets (`offset_mm`), pin-1 polarity indicators, and board-edge connector protrusions were visually inspected by patching a temporary copy of `CSI2-KRIA-KV260_Rev01.kicad_pcb` outside the repository and running `kicad-cli pcb render` (top-down, bottom-side, isometric, and zoomed close-ups on `U1101`/`T701`/`Y401`/`U501`, `U1001`/`U1007`/`F1001`/`L1010–L1030`/`J1001`, `U1201`/`J1201`, `U901`–`U904`, and `J101`/`J102`). Real repository `*.kicad_pcb` files were left untouched.
+
+The models in `mech/models3d/` are copies of KiCad 10's official 3D library (KiCad libraries licence: CC-BY-SA 4.0 with the KiCad libraries exception), kept here because the installed KiCad on the build machine has no 3D-model package; attribution: the KiCad Library Team.
