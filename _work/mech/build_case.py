@@ -456,10 +456,14 @@ for j in range(-5, 6):
             grille.append(cyl("g", x, y, Z_TOP_IN - 1, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
 cut(lid, join(grille, "grille"))
 vents = []
-NR = 13 if V2 else 9                                           # v2: wider exhaust, the box runs at overpressure
+# v2: the box runs at overpressure, so the exhaust sets the fan's flow: 17 slots of 3.5 x 21 mm along the whole
+# right wall (the CFD of the built v2: 13 slots of 3 x 16 mm held the cavity at +9.7 Pa; these and the open intake
+# bring it to +6.0 Pa and the fan from 2.57 to 3.62 CFM). They start 1.5 mm above the tongue's groove.
+NR = 17 if V2 else 9
 for k in range(NR):                                            # right wall, beside the fan-sink
-    y = (10.0 if V2 else 22.0) + k * 6.0
-    vents.append(box("vr", INNER[5][0] - 1, OUTER[5][0] + 1, y, y + 3.0, 12.0 if not V2 else 10.0, 26.0))
+    y = (4.0 if V2 else 22.0) + k * 6.0
+    vents.append(box("vr", INNER[5][0] - 1, OUTER[5][0] + 1, y, y + (3.5 if V2 else 3.0),
+                     7.5 if V2 else 12.0, 28.5 if V2 else 26.0))
 if not V2:                                                     # v2 closes the SMA wall: dust stays out
     for k in range(14):                                        # SMA wall, above the SMAs: air across the adapter
         y = 4.0 + k * 7.0
@@ -493,30 +497,32 @@ if V2:
     cut(lid, box("frecess", fx - R2, fx + R2, fy - R2, fy + R2, Z_TOP - 1.2, Z_TOP + 1))
     fsp = [cyl("fs", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 6.0, Z_TOP, 2.1) for sx in (-1, 1) for sy in (-1, 1)]
     cut(lid, join(fsp, "frame_pilots"))
-    g2 = []
-    for j in range(-5, 6):
-        for i in range(-5, 6):
-            x = fx + i * gs + (gs / 2 if j % 2 else 0)
-            y = fy + j * gs * math.sqrt(3) / 2
-            if abs(x - fx) < h - 2.5 - grc and abs(y - fy) < h - 2.5 - grc:
-                g2.append(cyl("g2", x, y, Z_TOP_IN - 1, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
-    cut(lid, join(g2, "grille2"))
-    # the printed frame that holds the mesh: the same honeycomb, 1.2 mm, four countersunk-free M2.5 holes
+    # Intake: the fan's whole 47 mm bore, open but for six 1.6 mm spokes and a 10 mm hub (86 % open, 1550 mm2).
+    # A 7 mm honeycomb here (built first) left 39 cells, 985 mm2, and the CFD of the built v2 found the fan choked
+    # by it: 2.57 CFM against 3.62 with this ring and the wider exhaust below (ENCLOSURE_V2_THERMAL.md, built v2).
+    # The lid's spokes and the frame's, one above the other, clamp the mesh between them.
+    def spoke_ring(name, z0, z1, r_out=23.5, r_hub=5.0, spoke=1.6, n=6):
+        secs = []
+        for k in range(n):
+            a0, a1 = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
+            do, di = math.asin(spoke / 2 / r_out), math.asin(spoke / 2 / r_hub)
+            pts = [(fx + r_out * math.cos(a), fy + r_out * math.sin(a))
+                   for a in (a0 + do + (a1 - a0 - 2 * do) * t / 16 for t in range(17))]
+            pts += [(fx + r_hub * math.cos(a), fy + r_hub * math.sin(a))
+                    for a in (a1 - di - (a1 - a0 - 2 * di) * t / 6 for t in range(7))]
+            secs.append(prism(name, pts, z0, z1))
+        return join(secs, name)
+    cut(lid, spoke_ring("grille2", Z_TOP_IN - 1, Z_TOP + 1))
+    # the printed frame that holds the mesh: the same spoke ring, 1.2 mm, four countersunk-free M2.5 holes
     filter_frame = box("case_v2_filter_frame", fx - R2 + 0.2, fx + R2 - 0.2, fy - R2 + 0.2, fy + R2 - 0.2, Z_TOP - 1.2, Z_TOP, LID)
-    g3 = []
-    for j in range(-5, 6):
-        for i in range(-5, 6):
-            x = fx + i * gs + (gs / 2 if j % 2 else 0)
-            y = fy + j * gs * math.sqrt(3) / 2
-            if abs(x - fx) < h - 2.5 - grc and abs(y - fy) < h - 2.5 - grc:
-                g3.append(cyl("g3", x, y, Z_TOP - 2, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
-    g3 += [cyl("fh", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 2, Z_TOP + 1, 2.8) for sx in (-1, 1) for sy in (-1, 1)]
+    g3 = [spoke_ring("g3", Z_TOP - 2, Z_TOP + 1)]
+    g3 +=[cyl("fh", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 2, Z_TOP + 1, 2.8) for sx in (-1, 1) for sy in (-1, 1)]
     cut(filter_frame, join(g3, "frame_holes"))
     # the fan itself, for the renders only (not exported): a 5010 axial fan blowing down onto the adapter.
     # Frame with rounded corners, venturi bore and four 4.3 mm holes; seven swept, pitched blades on the rotor;
     # the motor hub with its label on the intake side; four struts holding the motor on the exhaust side.
     FANM = mat("fan PBT", (0.035, 0.035, 0.038), 0.55)
-    LABEL = mat("fan label", (0.30, 0.30, 0.32), 0.35, 0.6)
+    LABEL = mat("fan label", (0.07, 0.07, 0.075), 0.45)        # dark: through the open intake it is in plain view
     sq = [(fx - h, fy - h), (fx + h, fy - h), (fx + h, fy + h), (fx - h, fy + h)]
     frame = prism("fan2_vis", round_poly(sq, [3.5] * 4), ZF - 10.0, ZF, FANM)
     cut(frame, cyl("fan2_bore", fx, fy, ZF - 11, ZF + 1, 47.0, verts=96))

@@ -184,7 +184,7 @@ rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards them
 - **Bonding:** everything is united into one bonded body (fTetWild).
   - Each board is bonded where it rests on the honeycomb and the posts.
   - The TPU-padded clamp posts above the boards are left out, which is conservative for the boards.
-- **Mesh:** CalculiX, 10-node tetrahedra, about 205 k tets and 376 k nodes.
+- **Mesh:** CalculiX, 10-node tetrahedra, about 197 k tets and 362 k nodes (v2).
 - **Masses** ride on the boards: adapter 110 g, carrier 90 g plus the K26 SOM with its fan-sink 120 g.
 - **Loads:** 50 g quasi-static shocks down, sideways and fore-aft.
 - **Supports:** the four ears held at their M5 washers.
@@ -193,10 +193,10 @@ rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards them
 
 | Load case | Case, 99.7th pct / peak | Safety factor 23 °C / 70 °C | Adapter / carrier strain, 99.7th pct | At the BGAs (U1101, U501, U601) | Max displacement |
 |---|---|---|---|---|---|
-| v2, 50 g down | 3.6 / 9.3 MPa | 8.1 / 4.9 | 402 / 360 µε | 158 / 158 / 130 µε | 0.24 mm |
-| v2, 50 g sideways (X) | 2.3 / 5.9 MPa | 12.8 / 7.7 | 76 / 209 µε | 16 / 16 / 15 µε | 0.09 mm |
-| v2, 50 g fore-aft (Y) | 1.9 / 3.7 MPa | 15.3 / 9.2 | 83 / 120 µε | 8 / 7 / 9 µε | 0.08 mm |
-| v1, 50 g down | 3.6 / 9.1 MPa | 8.1 / 4.9 | 389 / 295 µε | 159 / 161 / 127 µε | 0.22 mm |
+| v2, 50 g down | 3.6 / 9.2 MPa | 8.2 / 4.9 | 399 / 302 µε | 158 / 162 / 126 µε | 0.23 mm |
+| v2, 50 g sideways (X) | 2.2 / 5.8 MPa | 13.2 / 7.9 | 92 / 193 µε | 15 / 15 / 13 µε | 0.09 mm |
+| v2, 50 g fore-aft (Y) | 1.9 / 3.2 MPa | 15.3 / 9.2 | 95 / 108 µε | 10 / 8 / 11 µε | 0.09 mm |
+| v1, 50 g down | 3.5 / 9.2 MPa | 8.3 / 5.0 | 417 / 326 µε | 159 / 159 / 130 µε | 0.22 mm |
 
 The two maps rendered on the parts themselves (Cycles; colours are the solver's, scale as in the plots below):
 
@@ -222,12 +222,12 @@ v1 for comparison: [down](sim/case3d_v1_Zm.png), [sideways](sim/case3d_v1_Xp.png
   - Its peak, about 9 MPa, is a sharp inside corner: the real corners are rounded and the value is
     mesh-dependent.
   - Even that peak leaves a safety factor of 3.2 at 23 °C and 1.9 at 70 °C. The 99.7th percentile leaves 8 and 5.
-  - The fan duct and grille of v2 change nothing measurable.
+  - The fan duct, the open spoke intake and the 17 exhaust slots of v2 change nothing measurable.
 - **The boards.**
   - Down is the worst direction.
   - Both boards bend over the honeycomb by 0.1–0.16 mm.
-  - The strain stays under 160 µε at every BGA, a third of the guide.
-  - Higher values, up to 720–980 µε, sit only where a board's bonded edge meets a honeycomb wall or a post (the
+  - The strain stays at or under 162 µε at every BGA, a third of the guide.
+  - Higher values, up to 770–1400 µε, sit only where a board's bonded edge meets a honeycomb wall or a post (the
     adapter's SMA corner, the carrier's rear edge). That is a modelling singularity of the bonded contact, away
     from any part. The real TPU-padded contact spreads it.
 - **The mesh.** fTetWild's 0.45 mm envelope smooths features finer than that, and the boards are one or two
@@ -263,24 +263,47 @@ the fan 5 V.
   Y401 (Si549), U501 (AD9484), U502/U503 (AD8352) and U1201 (the Ethernet PHY). It hangs from the lid in a 1.2 mm
   square duct whose top stands 4 mm below the ceiling, a plenum under the grille, so the fan can only draw through
   the grille. Four M3 self-tapping fan screws go from below into bosses in the duct's corners.
-- **A second hex grille** over the fan, the same 7 mm cells as the KV260's. Outside it, a 58 × 58 × 1.2 mm recess
-  holds a **100-mesh stainless filter**, under a printed frame with the same grille (`case_v2_filter_frame.stl`)
-  and four M2.5 × 6 screws: the filter comes out for cleaning without opening the case.
+- **An open intake** over the fan: its whole 47 mm bore, crossed only by six 1.6 mm spokes and a 10 mm hub
+  (86 % open). Outside it, a 58 × 58 × 1.2 mm recess holds a **100-mesh stainless filter**, clamped between the
+  lid's spokes and those of a printed frame (`case_v2_filter_frame.stl`) with four M2.5 × 6 screws: the filter
+  comes out for cleaning without opening the case. (The first build used a 7 mm honeycomb here, as over the
+  KV260's fan; the CFD of the built v2 found it choked the fan, below.)
 - **The SMA wall has no slots**: with the fan blowing in, the box runs at a slight overpressure (CFD: about
   +11 Pa), so air leaves through the vents and dust does not come in at the seams.
-- **Right-wall exhaust widened**: 13 slots of 3 × 16 mm instead of 9 of 3 × 14 mm.
+- **Right-wall exhaust along the whole wall**: 17 slots of 3.5 × 21 mm (y 4 to 103.5 mm, z 7.5 to 28.5 mm, 1.5 mm
+  above the tongue's groove) instead of v1's 9 of 3 × 14 mm.
 - **The "KV260 · IAS2RF" label** is kept, at its new place behind the ribbon slot (as v1).
 - **Stick-on aluminium heatsinks** in the fan's jet (bought parts, thermally conductive epoxy rather than tape for
-  vibration): 9 × 9 × 5 mm on U401 and on Y401, 14 × 14 × 6 mm on U501. They sit about 9 mm below the fan.
+  vibration): 14 × 14 × 6 mm on U501, and on U401 and Y401 a 9 × 9 × 5 mm sink **cut down to 9 × 7 mm**. U401 and
+  Y401 sit only 9 mm apart: two full 9 × 9 sinks touch, and U401's (0.95 W) then heats the Si549's instead of
+  cooling it. Fit each cut sink with its cut edge towards the other and 1 mm off its package's centre, away from
+  the other, for a 4 mm air gap between them. They sit about 9 mm below the fan.
 
 **Parts to buy.** A 50 × 50 × 10 mm 5 V fan with a 2-pin JST PH plug (the CFD used the Sunon MF50100V1-1000U-A99
 curve: 8.5 CFM free air, 22 Pa); a 100-mesh stainless sheet cut to 56 × 56 mm; the three heatsinks; 4 × M3 × 14
 self-tapping fan screws and 4 × M2.5 × 6.
 
-**Thermal result (CFD, task 21; the built geometry is being re-simulated).** At 25 °C and 45 °C ambient the fan
-keeps every IC at least 18 °C under its limit. At 70 °C (a vehicle parked in the sun) the study's fan position left
-the Si549 and the K26 SOM 2-3 °C over; v2 moves the fan right over the Si549's strip and adds the heatsinks, which
-the verification run will quantify.
+**Thermal result (3-D CFD of v2 as built, [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md#verification-of-the-built-v2)).**
+
+- **25 °C and 45 °C ambient:** every adapter IC and the K26 stay at least 21 °C under their limits, even with
+  the filter half clogged.
+- **70 °C ambient (a vehicle parked in the sun), as first built:**
+  - Without heatsinks, the Si549 would reach 113.8 °C, over its 105 °C limit.
+  - With the three heatsinks it is still 0.5 to 2 °C over. Two causes:
+    - U401's and Y401's sinks touched;
+    - the 39-cell honeycomb and the 13 exhaust slots held the fan to 2.57 CFM.
+- **70 °C, with the three changes above** (open intake, wide exhaust, cut sinks):
+  - the fan reaches 3.62 CFM and the cavity runs at +6 Pa, still overpressure against dust;
+  - the Si549 is at 101.7 °C (3.3 °C of margin);
+  - the XC7A50T is at 91.3 °C (8.7 °C of margin);
+  - every adapter IC passes.
+- **The K26 SOM** stays within about 1 °C of its 100 °C limit at 70 °C: 99 to 103 °C, depending on the mesh. Its
+  cooling is the KV260's own fan-sink, and the KV260 is a commercial-grade kit, not rated for that ambient. A
+  vehicle that soaks at 70 °C needs the K26 throttled or the case shaded.
+
+![Built v2 at 70 °C: no heatsinks, touching sinks, and the changes](sim/v2_thermal_3d_heatsinks_compare.png)
+
+![Built v2, 3-D thermal cut-away at 70 °C](sim/v2_thermal_3d_cutaway.png)
 
 ---
 

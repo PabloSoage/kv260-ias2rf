@@ -116,8 +116,11 @@ def inputs(info):
 
 def mesh(info):
     import pytetwild
-    cache = os.path.join(D, f"tetb_h{H}_e{EPS}.npz")
+    import hashlib
     v, f, boards = inputs(info)
+    # keyed on the surface itself, so an exported geometry change never reuses an old tet mesh
+    key = hashlib.sha1(np.ascontiguousarray(v, dtype=np.float64).tobytes() + f.tobytes()).hexdigest()[:12]
+    cache = os.path.join(D, f"tetb_h{H}_e{EPS}_{key}.npz")
     if os.path.exists(cache):
         z = np.load(cache)
         return z["v"], z["t"], boards

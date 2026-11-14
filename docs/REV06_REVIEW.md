@@ -100,7 +100,7 @@ The new parts sit away from the band:
 |---|---|---|
 | Ethernet PHY U1201 | 9 vias in its exposed pad (from 1, RF_REVIEW H6) | OK |
 | Enclosure v1 (no fan on the adapter) | as the 13 Nov study: fine on a desk, marginal in a hot car | Accepted, v2 for vehicles |
-| Enclosure v2 (fan over the adapter's hot strip) | CFD (ENCLOSURE_V2_THERMAL.md): every IC at least 18 °C under its limit at 25–45 °C ambient; at 70 °C the study's fan position left the Si549 and the K26 2–3 °C over | **Open**: the CFD of v2 as built (fan at the Si549's strip, heatsinks) is running (gateware/CFD task 23) |
+| Enclosure v2 (fan over the adapter's hot strip) | 3-D CFD of v2 as built (ENCLOSURE_V2_THERMAL.md, built v2): every IC at least 21 °C under its limit at 25–45 °C, with the filter half clogged too. At 70 °C as first built the Si549 was 0.5–2 °C over: U401's and Y401's 9 × 9 sinks touched, and the honeycomb intake and the 13 exhaust slots held the fan to 2.57 CFM | **Fixed** in the case (open spoke intake, 17 slots of 3.5 × 21 mm) and in the heatsink fitting (U401/Y401 sinks cut to 9 × 7 mm, 4 mm apart): 3.62 CFM; at 70 °C the Si549 reaches 101.7 °C and the XC7A50T 91.3 °C. The K26 stays within about 1 °C of 100 °C at 70 °C (the KV260's own cooling) |
 
 ## 6. Mechanical: the enclosure with the boards in it
 
@@ -110,8 +110,8 @@ they rest, under 50 g down, sideways and fore-aft.
 
 | Check | v2 result (v1 alike) | Verdict |
 |---|---|---|
-| Case, 50 g down (worst) | 99.7th pct 3.6 MPa, safety factor 8.1 at 23 °C and 4.9 at 70 °C. Peak 9.3 MPa on the rib between the KV260's RJ45 and USB cut-outs above the right-rear ear: factor 3.2 / 1.9 | OK |
-| Boards, at the BGAs | ≤ 160 µε at U1101, U501 and U601 (guide 500 µε) | OK |
+| Case, 50 g down (worst) | 99.7th pct 3.6 MPa, safety factor 8.2 at 23 °C and 4.9 at 70 °C. Peak 9.2 MPa on the rib between the KV260's RJ45 and USB cut-outs above the right-rear ear: factor 3.2 / 1.9 | OK |
+| Boards, at the BGAs | ≤ 162 µε at U1101, U501 and U601 (guide 500 µε) | OK |
 | Boards, bow | adapter 0.16 mm, carrier 0.10 mm under 50 g | OK |
 | Board strain peaks | 720–980 µε only at the bonded edges over the honeycomb (a modelling singularity, away from parts) | Accepted |
 
@@ -154,8 +154,15 @@ Every block bench passes (13 benches, with their mutations failing as they shoul
 
   Details are in fpga/SYSTEM_SIM.md.
 - **MDIO/MDC (§2):** SLEW SLOW, DRIVE 4, and MDC stopped between polls, as asked.
-- **Not yet done:** the Vivado implementation has not been re-run since these RTL changes. Its reports and
-  bitstreams are from before them (fpga/SYSTEM_SIM.md, limits).
+- **Vivado re-run after these RTL changes (Vivado 2026.1, 14 Nov):** both designs meet timing, with 0 DRC
+  errors. Reports are in `fpga/*/reports*`; details in fpga/README.md.
+
+  | Design | WNS | WHS | Resources |
+  |---|---|---|---|
+  | Artix-7 (`build_rev06.tcl`, Ethernet on) | 0.147 ns | 0.036 ns | 15.4 k LUTs, 17.4 k FFs, 13 RAMB36, 6 RAMB18, 110 DSPs |
+  | K26 PL block design | 1.291 ns | 0.010 ns | 11.0 k LUTs, 18.2 k FFs |
+
+  The K26 bitstream and `.xsa` were regenerated.
 
 ## 8. Summary
 
@@ -163,9 +170,11 @@ Every block bench passes (13 benches, with their mutations failing as they shoul
 - **Accepted:** the MDIO/MDC proximity to two fast legs, which is handled in the gateware (done, §7).
 - **Changed on 14 Nov:** FB401 is now a 2 A, 0.1 Ω bead (same footprint, a part already on the BOM), for the
   Si549's supply margin (§3).
-- **Open, on the bench or in the gateware:**
-  - the v2 CFD as built;
-  - re-running the Vivado implementation of both FPGAs after the §7 gateware fixes.
-- **Closed on 14 Nov:** the link-training fix; the system simulation of both FPGAs now passes (§7).
+- **Closed on 14 Nov:**
+  - the link-training fix; the system simulation of both FPGAs now passes (§7);
+  - both FPGAs re-implemented in Vivado after those fixes: timing met, 0 DRC errors (§7);
+  - the CFD of the built v2: its intake, exhaust and heatsink fitting were changed, and every adapter IC now
+    passes at 70 °C (§5).
 
-None of the open items needs a board change before ordering.
+Nothing is left open in this review: what remains is the bench (bring-up, real fan and heatsinks), and none
+of it needs a board change before ordering.
