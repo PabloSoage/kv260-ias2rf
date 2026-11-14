@@ -9,7 +9,7 @@ burn out under the key light. Each material is classed by its colour and by whic
   - KV260 connector shells (white or neutral grey in its STEP): nickel-plated steel;
   - gold / brass (pins, contacts): metal, ENIG/brass gold;
   - mid/light neutral grey (shields, tin): metal;
-  - white plastics on the adapter (JST housings, transformer cases): ivory, never above 0.8 albedo;
+  - white plastics on the adapter (JST housings, transformer cases): a dark ivory (0.20 linear, about 0.48 sRGB), so they never read white under the studio lights;
   - everything else: dielectric, its colour capped at 0.8 so nothing renders as pure white.
 """
 
@@ -123,6 +123,16 @@ def apply(materials, objects):
             b.inputs["Base Color"].default_value = (0.20, 0.21, 0.12, 1)   # the adapter's bare laminate
             count("fr4")
             continue
+        if "ad" in who and sat < 0.2 and L > 0.7:
+            # the adapter's light plastics as KiCad's glTF brings them in: the bodies its STEPs leave uncoloured
+            # (KiCad fills them pure white: the CD542 transformers, parts of the SRP7028A inductors) and the JST
+            # fan header's ivory. The tin terminations of the passives (L 0.64) stay as they are.
+            b.inputs["Base Color"].default_value = (0.20, 0.19, 0.15, 1)   # linear: about 0.48 sRGB
+            _set(b, "Metallic", 0.0)
+            _set(b, "Roughness", 0.5)
+            _set(b, "Specular IOR Level", 0.3)
+            count("ivory")
+            continue
         if met < 0.5 or (rough < 0.99 and not who & {"kv", "ad"}):
             continue                                                   # already tuned (our own materials)
         if rough < 0.99 and met > 0.5 and "ad" in who:
@@ -144,7 +154,7 @@ def apply(materials, objects):
             _set(b, "Roughness", 0.35)
             count("metal")
         elif L >= 0.9:
-            b.inputs["Base Color"].default_value = (0.66, 0.64, 0.58, 1)   # white plastic -> ivory
+            b.inputs["Base Color"].default_value = (0.20, 0.19, 0.15, 1)   # white plastic -> dark ivory (linear), never reads white
             _set(b, "Metallic", 0.0)
             _set(b, "Roughness", 0.5)
             _set(b, "Specular IOR Level", 0.3)

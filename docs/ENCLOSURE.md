@@ -198,6 +198,14 @@ rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards them
 | v2, 50 g fore-aft (Y) | 1.9 / 3.7 MPa | 15.3 / 9.2 | 83 / 120 µε | 8 / 7 / 9 µε | 0.08 mm |
 | v1, 50 g down | 3.6 / 9.1 MPa | 8.1 / 4.9 | 389 / 295 µε | 159 / 161 / 127 µε | 0.22 mm |
 
+The two maps rendered on the parts themselves (Cycles; colours are the solver's, scale as in the plots below):
+
+![v2, 50 g down: stress in the case](img/case3d_v2_stress.jpg)
+
+![v2, 50 g down: strain in the boards](img/case3d_v2_boards.jpg)
+
+Every load case, from six angles each:
+
 ![v2, 50 g down](sim/case3d_v2_Zm.png)
 ![v2, 50 g sideways](sim/case3d_v2_Xp.png)
 ![v2, 50 g fore-aft](sim/case3d_v2_Yp.png)
@@ -241,6 +249,8 @@ v1 stays as it is (above). **v2** is the same tray, lid and bumpers with active 
 CFD study in [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md). It needs the Rev06 adapter, whose J1002 header gives
 the fan 5 V.
 
+![v2, the lid lifted: the fan over the adapter's hot strip](img/case_v2_fan.jpg)
+
 | | |
 |---|---|
 | ![v2 closed](img/case_v2_closed.jpg) | ![v2 open](img/case_v2_open.jpg) |
@@ -281,11 +291,13 @@ blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- 
 blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- --v2 --stl mech      # v2
 blender -b _work/mech/cache/case.blend --python _work/mech/check_case.py
 blender -b _work/mech/cache/case.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria,power
-blender -b _work/mech/cache/case_v2.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria,power --prefix case_v2_
+blender -b _work/mech/cache/case_v2.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria,power,fan --prefix case_v2_
 blender -b _work/mech/cache/case_v2.blend --python _work/mech/fea3d_export.py -- v2                  # 3-D FEA, §5.3
 micromamba run -n fea python _work/mech/fea3d_case.py v2 --h 4 --eps 0.0015                         # WSL
 blender -b --python _work/mech/render_fea3d.py -- v2
 micromamba run -n fea python _work/mech/compose_fea3d.py v2
+blender -b --python _work/mech/render_fea3d_hero.py -- v2 Zm                                          # the two renders
+micromamba run -n fea python _work/mech/compose_fea3d_hero.py v2 Zm
 FEA_OUT=$HOME/fea micromamba run -n fea python _work/mech/fea_case.py --h 4      # WSL, about 3 min per material
 micromamba run -n fea python _work/mech/post_fea.py $HOME/fea
 ```
