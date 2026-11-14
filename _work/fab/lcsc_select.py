@@ -108,7 +108,7 @@ RULES = {
     ("PTC 1.5A hold", "Fuse_1812_4532Metric"): ("P", "1812 PTC 1.5A", r"(150|1\.5)"),
     ("PTC 0.5A hold", "Fuse_1206_3216Metric"): ("P", "SMD1206P050TF", r"^(SMD1206P050|1206L050|BSMD1206-050)"),
     ("FAN 5V", "JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical"): ("P", "B2B-PH-K-S", r"^B2B-PH-K-S"),
-    ("600R@100MHz >=1A", "L_0603_1608Metric"): ("FB", 600, "0603", 1.0),
+    # FB401 was "600R@100MHz >=1A" until 14 Nov; it now shares the 220R@100MHz line (2 A, 0.1 ohm)
     ("600R@100MHz", "L_0603_1608Metric"): ("FB", 600, "0603", 1.0),
     ("220R@100MHz", "L_0603_1608Metric"): ("FB", 220, "0603", 1.0),
     ("270n", "L_0603_1608Metric"): ("P", "LQW18ANR27G", r"^LQW18ANR27G"),  # DAC filters, 100 ohm Butterworth

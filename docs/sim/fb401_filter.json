@@ -1,0 +1,107 @@
+{
+ "buck": {
+  "fsw_Hz": 580000.0,
+  "ripple_App": 0.5862068965517242,
+  "v3v3d_580k_mVpp": 4.64754691073397
+ },
+ "v3v3d_min_V": 3.2250500000000004,
+ "si549_vdd_min_V": 3.135,
+ "beads": {
+  "600R, 1 A (as drawn)": {
+   "part": "Chilisin PBY160808T-601Y-N, C108301",
+   "dcr_max_ohm": 0.2,
+   "rated_A": 1.0,
+   "bias_fraction_of_rating": 0.483,
+   "L0_uH": 2.0,
+   "dc_drop_max_mV": 96.60000000000001,
+   "v3v3clk_min_V": 3.1284500000000004,
+   "si549_margin_mV": -6.54999999999939,
+   "cases": {
+    "100% of L left": {
+     "L_uH": 2.0,
+     "atten_580k_dB": -42.79582799971452,
+     "peak_gain_dB": 9.815055811154163,
+     "peak_Hz": 48511.30095027488,
+     "clk_ripple_580k_uVpp": 33.684676597414686,
+     "si549_spur_dBc": -145.43075244474247,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 2390.6044973980756
+    },
+    "30% of L left": {
+     "L_uH": 0.6,
+     "atten_580k_dB": -32.227909555396444,
+     "peak_gain_dB": 4.900328504366296,
+     "peak_Hz": 82405.83777782794,
+     "clk_ripple_580k_uVpp": 113.71776206788032,
+     "si549_spur_dBc": -134.86283400042439,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 708.1280699061886
+    },
+    "10% of L left": {
+     "L_uH": 0.19999999999999998,
+     "atten_580k_dB": -22.587425090158256,
+     "peak_gain_dB": 1.0750340806995489,
+     "peak_Hz": 107402.77629570839,
+     "clk_ripple_580k_uVpp": 345.02655953076936,
+     "si549_spur_dBc": -125.2223495351862,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 233.39287119430557
+    },
+    "5% of L left": {
+     "L_uH": 0.09999999999999999,
+     "atten_580k_dB": -17.034178311981233,
+     "peak_gain_dB": -1.0842660517010997e-05,
+     "peak_Hz": 1000.0,
+     "clk_ripple_580k_uVpp": 653.9053136820028,
+     "si549_spur_dBc": -119.66910275700917,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 123.14740021571349
+    }
+   }
+  },
+  "220R, 2 A (proposed)": {
+   "part": "TAI-TECH HCB1608KF-221T20, C304314, already on the BOM (FB502/503/602/603)",
+   "dcr_max_ohm": 0.1,
+   "rated_A": 2.0,
+   "bias_fraction_of_rating": 0.2415,
+   "L0_uH": 0.6,
+   "dc_drop_max_mV": 48.300000000000004,
+   "v3v3clk_min_V": 3.1767500000000006,
+   "si549_margin_mV": 41.75000000000084,
+   "cases": {
+    "100% of L left": {
+     "L_uH": 0.6,
+     "atten_580k_dB": -32.196467374176756,
+     "peak_gain_dB": 10.437245810201041,
+     "peak_Hz": 88812.52900748354,
+     "clk_ripple_580k_uVpp": 114.13015665418756,
+     "si549_spur_dBc": -134.8313918192047,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 705.5693405483873
+    },
+    "30% of L left": {
+     "L_uH": 0.18,
+     "atten_580k_dB": -21.34424298853116,
+     "peak_gain_dB": 5.4674543157593005,
+     "peak_Hz": 152613.09357583465,
+     "clk_ripple_580k_uVpp": 398.11783407054145,
+     "si549_spur_dBc": -123.9791674335591,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 202.2686061155224
+    },
+    "10% of L left": {
+     "L_uH": 0.06,
+     "atten_580k_dB": -11.454385955033901,
+     "peak_gain_dB": 1.4880843040353506,
+     "peak_Hz": 210698.68780979502,
+     "clk_ripple_580k_uVpp": 1243.0954714329293,
+     "si549_spur_dBc": -114.08931040006185,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 64.77920740420302
+    },
+    "5% of L left": {
+     "L_uH": 0.03,
+     "atten_580k_dB": -7.082763102042721,
+     "peak_gain_dB": 0.027992270264744785,
+     "peak_Hz": 114427.19831927815,
+     "clk_ripple_580k_uVpp": 2056.29598235405,
+     "si549_spur_dBc": -109.71768754707067,
+     "adclk948_ps_per_V_for_-90dBc_at_250MHz": 39.16106438869377
+    }
+   }
+  }
+ }
+}

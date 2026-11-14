@@ -3063,7 +3063,7 @@
 				)
 			)
 		)
-		(property "Value" "600R@100MHz >=1A"
+		(property "Value" "220R@100MHz"
 			(at 45.72 41.91 90)
 			(effects
 				(font

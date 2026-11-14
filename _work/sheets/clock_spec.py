@@ -32,9 +32,11 @@ PARTS = {
     "J402": ("Connector:Conn_Coaxial", "CLK_OUT",
              "Connector_Coaxial:SMA_Samtec_SMA-J-P-H-ST-EM1_EdgeMount",
              "Master clock out, for measurement or for synchronising another board"),
-    "FB401": ("Device:FerriteBead", "600R@100MHz >=1A", "Inductor_SMD:L_0603_1608Metric",
+    "FB401": ("Device:FerriteBead", "220R@100MHz", "Inductor_SMD:L_0603_1608Metric",
               "Judgement: isolates the clock supply from +3V3_D. Rail draws up to 483 mA "
-              "(330 + 153), so >= 1 A rating"),
+              "(330 + 153): a 2 A, 0.1 ohm bead (14 Nov, _work/power/fb401_filter.py) keeps its inductance "
+              "under that bias and drops 48 mV, where a 1 A, 0.2 ohm 600R bead dropped 97 mV and could leave "
+              "the Si549 under 3.135 V"),
     "C401": ("Device:C", "10u", "Capacitor_SMD:C_0805_2012Metric",
              "ADCLK948 p.10: bulk bypass 'within several inches'. Ceramic instead of the "
              "1 uF electrolytic it mentions"),

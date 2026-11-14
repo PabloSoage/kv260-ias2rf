@@ -72804,7 +72804,7 @@
 				)
 			)
 		)
-		(property "Value" "600R@100MHz >=1A"
+		(property "Value" "220R@100MHz"
 			(at 0 1.43 90)
 			(layer "F.Fab")
 			(uuid "a4cf6689-a30f-41aa-8d1a-991d4d9e59c2")
@@ -82361,7 +82361,7 @@
 			(uuid "33212d38-2d3d-476c-a8a8-71a2f55e9524")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Crystal.3dshapes/Crystal_SMD_3225-4Pin_3.2x2.5mm.step"
+		(model "${KIPRJMOD}/mech/models3d/Crystal_SMD_3225-4Pin_3.2x2.5mm.step"
 			(offset
 				(xyz 0 0 0)
 			)
