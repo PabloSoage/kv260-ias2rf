@@ -31,7 +31,8 @@ from shapely.ops import unary_union
 
 PS_MM = {"F.Cu": 6.0, "B.Cu": 6.0, "In2.Cu": 6.9, "In1.Cu": 6.9, "In3.Cu": 6.9, "In4.Cu": 6.9, "In5.Cu": 6.9, "In6.Cu": 6.9}
 CU = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu"]
-ALIAS = {"FPGA_CLK": "CLK_FPGA"}
+ALIAS = {"FPGA_CLK": "CLK_FPGA",          # Rev06 Ethernet: one leg either side of its AC cap
+         "ETH_SGTX_FPGA": "ETH_SGTX", "ETH_SGTX_PHY": "ETH_SGTX", "ETH_SGRX_FPGA": "ETH_SGRX", "ETH_SGRX_PHY": "ETH_SGRX"}
 GROUPS = {   # bus: (clock pair, data pairs), names as grouped (no sheet path, no J_)
     "LINK_RX (FPGA -> Kria, <=1 Gb/s)": ("LINK_RX_CLK", ["LINK_RX_D0", "LINK_RX_D1"]),
     "LINK_TX (Kria -> FPGA, <=1 Gb/s)": ("LINK_TX_CLK", ["LINK_TX_D0"]),
