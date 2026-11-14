@@ -4,26 +4,26 @@ Verilog-2001 gateware, Vivado build scripts, timing/utilization reports, and XSi
 
 ## Architecture & Directory Layout
 
-- [`artix/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix) — Front-end Artix-7 (`U1101`, `XC7A50T-FTG256-2`) RTL, XDC ([`xc7a50t.xdc`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/xc7a50t.xdc)), and build scripts:
-  - [`top.v`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/top.v) (`artix_top`): AD9484 400 MSPS radar ADC capture (`adc_capture.v`) -> AERIS 400->100 MSPS DDC + post-decimation (`ddc_wrapper.v`), AD9253 dual 14-bit SDR ADC capture (`adcs_capture.v`) + SDR DDC (`sdr_ddc.v`), AD9708 LFM radar DAC (`dac_radar.v`), AD9767 dual 14-bit SDR DAC (`dac_sdr.v`), 8x ADAR1000 SPI beamformer (`adar_ctrl.v`) + RF switches (`rf_switch.v`), shared converter SPI (`conv_spi.v`), housekeeping I2C/Si549 XO/XADC/PPS (`hk_i2c_master.v`, `hk_xo_ctrl.v`, `hk_xadc_pps.v`), Pmod J1102 SPI fallback (`pmod_spi.v`), 2-lane 64b/66b TX / 1-lane RX PCS, and Rev06 SGMII Ethernet + dual-path mux (`ENABLE_ETH`, default `1`).
-  - [`build.tcl`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/build.tcl) -> routed reports in [`artix/reports/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports).
-  - [`build_rev06.tcl`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/build_rev06.tcl) -> Rev06 Ethernet build reports in `artix/reports_rev06/`.
-- [`link/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/link) — Shared 64b/66b PCS, Clause 49 scrambler (`link_scrambler.v`), 66:8/8:66 gearboxes (`link_gearbox.v`), IEEE CRC-32 (`link_crc32.v`), packet framer/deframer (`link_framer.v`), 7-series/UltraScale+ SERDES wrappers (`link_lanes.v`), eye/bitslip/deskew training FSM (`link_rx_train_fsm.v`), top wrappers (`link_top.v`), [`LINK_PROTOCOL.md`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/link/LINK_PROTOCOL.md), and [`PINMAP.md`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/link/PINMAP.md).
-- [`kria/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria) — Kria K26 (`XCK26-SFVC784-2LV-c`) PL design and Vivado IPI Block Design:
-  - [`kria_pl_link.v`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/kria_pl_link.v) + [`link_axis.v`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/link_axis.v): AXI4-Lite CSRs (`0x00..0x34`), 64-bit AXI4-Stream RX/TX DMA interfaces, MMCM (`300 MHz` `IDELAYCTRL` refclk + `500 MHz` / `125 MHz` downlink TX clocks from `ps8/pl_clk0`), and 2-lane uplink RX SERDES/PCS.
-  - [`bd.tcl`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/bd.tcl) + [`xck26_bd.xdc`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/xck26_bd.xdc): Full Zynq UltraScale+ PS (`ps8`, `IOPLL` `pl_clk0 = 100 MHz`) + `axi_dma_0` (S2MM + MM2S, 64-bit) + `kria_pl_link_0` + `axi_smc_ctrl` + `axi_smc_hp0` + EMIO I2C0/SPI0/GPIO, generating `ias2rf_k26.bit` and `ias2rf_k26.xsa` in `fpga/kria/out/` and reports in [`kria/reports/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports).
-  - [`top.v`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/top.v) + [`build.tcl`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/build.tcl) + [`xck26.xdc`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/xck26.xdc): Standalone PL-only wrapper build (`kria_top`).
-- [`third_party/aeris/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/third_party/aeris) — MIT-licensed AERIS-10 DDC (`ddc_400m.v`, `cic_decimator_4x_enhanced.v`, `fir_lowpass.v`) adapted for Vivado 7-series timing closure at 400 MHz.
-- [`sim/`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/sim) — Vivado XSim batch runner ([`run.ps1`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/sim/run.ps1)) and unit/system/mutation testbenches.
-- [`../sw/`](file:///D:/Repos/kv260-ias2rf-gemini/sw) — KV260 Linux device-tree overlay ([`ias2rf_pl.dtsi`](file:///D:/Repos/kv260-ias2rf-gemini/sw/ias2rf_pl.dtsi)) and userspace CSR/DMA smoke test ([`ias2rf_dma_test.c`](file:///D:/Repos/kv260-ias2rf-gemini/sw/ias2rf_dma_test.c)).
+- [`artix/`](artix) — Front-end Artix-7 (`U1101`, `XC7A50T-FTG256-2`) RTL, XDC ([`xc7a50t.xdc`](artix/xc7a50t.xdc)), and build scripts:
+  - [`top.v`](artix/top.v) (`artix_top`): AD9484 400 MSPS radar ADC capture (`adc_capture.v`) -> AERIS 400->100 MSPS DDC + post-decimation (`ddc_wrapper.v`), AD9253 dual 14-bit SDR ADC capture (`adcs_capture.v`) + SDR DDC (`sdr_ddc.v`), AD9708 LFM radar DAC (`dac_radar.v`), AD9767 dual 14-bit SDR DAC (`dac_sdr.v`), 8x ADAR1000 SPI beamformer (`adar_ctrl.v`) + RF switches (`rf_switch.v`), shared converter SPI (`conv_spi.v`), housekeeping I2C/Si549 XO/XADC/PPS (`hk_i2c_master.v`, `hk_xo_ctrl.v`, `hk_xadc_pps.v`), Pmod J1102 SPI fallback (`pmod_spi.v`), 2-lane 64b/66b TX / 1-lane RX PCS, and Rev06 SGMII Ethernet + dual-path mux (`ENABLE_ETH`, default `1`).
+  - [`build.tcl`](artix/build.tcl) -> routed reports in [`artix/reports/`](artix/reports).
+  - [`build_rev06.tcl`](artix/build_rev06.tcl) -> Rev06 Ethernet build reports in `artix/reports_rev06/`.
+- [`link/`](link) — Shared 64b/66b PCS, Clause 49 scrambler (`link_scrambler.v`), 66:8/8:66 gearboxes (`link_gearbox.v`), IEEE CRC-32 (`link_crc32.v`), packet framer/deframer (`link_framer.v`), 7-series/UltraScale+ SERDES wrappers (`link_lanes.v`), eye/bitslip/deskew training FSM (`link_rx_train_fsm.v`), top wrappers (`link_top.v`), [`LINK_PROTOCOL.md`](link/LINK_PROTOCOL.md), and [`PINMAP.md`](link/PINMAP.md).
+- [`kria/`](kria) — Kria K26 (`XCK26-SFVC784-2LV-c`) PL design and Vivado IPI Block Design:
+  - [`kria_pl_link.v`](kria/kria_pl_link.v) + [`link_axis.v`](kria/link_axis.v): AXI4-Lite CSRs (`0x00..0x34`), 64-bit AXI4-Stream RX/TX DMA interfaces, MMCM (`300 MHz` `IDELAYCTRL` refclk + `500 MHz` / `125 MHz` downlink TX clocks from `ps8/pl_clk0`), and 2-lane uplink RX SERDES/PCS.
+  - [`bd.tcl`](kria/bd.tcl) + [`xck26_bd.xdc`](kria/xck26_bd.xdc): Full Zynq UltraScale+ PS (`ps8`, `IOPLL` `pl_clk0 = 100 MHz`) + `axi_dma_0` (S2MM + MM2S, 64-bit) + `kria_pl_link_0` + `axi_smc_ctrl` + `axi_smc_hp0` + EMIO I2C0/SPI0/GPIO, generating `ias2rf_k26.bit` and `ias2rf_k26.xsa` in `fpga/kria/out/` and reports in [`kria/reports/`](kria/reports).
+  - [`top.v`](kria/top.v) + [`build.tcl`](kria/build.tcl) + [`xck26.xdc`](kria/xck26.xdc): Standalone PL-only wrapper build (`kria_top`).
+- [`third_party/aeris/`](third_party/aeris) — MIT-licensed AERIS-10 DDC (`ddc_400m.v`, `cic_decimator_4x_enhanced.v`, `fir_lowpass.v`) adapted for Vivado 7-series timing closure at 400 MHz.
+- [`sim/`](sim) — Vivado XSim batch runner ([`run.ps1`](sim/run.ps1)), unit/system/mutation testbenches, and full-system co-simulation report ([`SYSTEM_SIM.md`](SYSTEM_SIM.md)).
+- [`../sw/`](../sw) — KV260 Linux device-tree overlay ([`ias2rf_pl.dtsi`](../sw/ias2rf_pl.dtsi)) and userspace CSR/DMA smoke test ([`ias2rf_dma_test.c`](../sw/ias2rf_dma_test.c)).
 
 ---
 
 ## Resource Utilization (Both FPGAs)
 
 All primitive counts below are taken directly from routed Vivado 2026.1 hierarchical utilization reports:
-- Artix-7: [`fpga/artix/reports/utilization.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/utilization.rpt) (`artix_top` on `xc7a50tftg256-2`, `ENABLE_ETH=1`)
-- Kria K26: [`fpga/kria/reports/utilization.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/utilization.rpt) (`ias2rf_k26_bd_wrapper` on `xck26-sfvc784-2LV-c`)
+- Artix-7: [`fpga/artix/reports/utilization.rpt`](artix/reports/utilization.rpt) (`artix_top` on `xc7a50tftg256-2`, `ENABLE_ETH=1`)
+- Kria K26: [`fpga/kria/reports/utilization.rpt`](kria/reports/utilization.rpt) (`ias2rf_k26_bd_wrapper` on `xck26-sfvc784-2LV-c`)
 
 ### Side-by-Side Total Utilization
 
@@ -66,7 +66,7 @@ All primitive counts below are taken directly from routed Vivado 2026.1 hierarch
 ## Timing & Signoff Summary
 
 ### Artix-7 (`artix_top`, Routed)
-Source: [`fpga/artix/reports/timing_summary.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/timing_summary.rpt), [`drc.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/drc.rpt), [`methodology.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/methodology.rpt), [`cdc.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/cdc.rpt).
+Source: [`fpga/artix/reports/timing_summary.rpt`](artix/reports/timing_summary.rpt), [`drc.rpt`](artix/reports/drc.rpt), [`methodology.rpt`](artix/reports/methodology.rpt), [`cdc.rpt`](artix/reports/cdc.rpt).
 - **Overall:** `WNS = 0.019 ns`, `TNS = 0.000 ns` (`0 / 56,401` endpoints), `WHS = 0.036 ns`, `THS = 0.000 ns` (`0 / 56,163` endpoints), `WPWS = 0.008 ns`, `TPWS = 0.000 ns` (`0 / 17,977` endpoints). **All constraints met.**
 - **Key Intra-Clock Slacks (WNS / WHS in ns):**
   - `clk_400m_unbuf` (400 MHz AD9484 DDC): `0.019 / 0.053`
@@ -80,7 +80,7 @@ Source: [`fpga/artix/reports/timing_summary.rpt`](file:///D:/Repos/kv260-ias2rf-
 - **DRC:** `0` Errors (`113` Warnings/Advisory: DSP pipeline/output advisories `DPIP-1`/`DPOP-1`/`DPOP-2`/`AVAL-4`/`AVAL-5`, BRAM reset advisories `REQP-1839`/`REQP-1840`, `BUFC-1`, `CHECK-3`, `RTSTAT-10`).
 
 ### Kria K26 BD (`ias2rf_k26_bd_wrapper`, Routed)
-Source: [`fpga/kria/reports/timing_summary.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/timing_summary.rpt), [`drc.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/drc.rpt), [`methodology.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/methodology.rpt), [`cdc.rpt`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/cdc.rpt).
+Source: [`fpga/kria/reports/timing_summary.rpt`](kria/reports/timing_summary.rpt), [`drc.rpt`](kria/reports/drc.rpt), [`methodology.rpt`](kria/reports/methodology.rpt), [`cdc.rpt`](kria/reports/cdc.rpt).
 - **Overall:** `WNS = 0.975 ns`, `TNS = 0.000 ns` (`0 / 42,544` endpoints), `WHS = 0.010 ns`, `THS = 0.000 ns` (`0 / 42,544` endpoints), `WPWS = 0.000 ns`, `TPWS = 0.000 ns` (`0 / 13,773` endpoints). **All constraints met.**
 - **Clock Summary & Intra-Clock Slacks (WNS / WHS in ns):**
   - `clk_pl_0` (`ps8/pl_clk0`, `IOPLL`, `100.000 MHz`): `5.704 / 0.010`
@@ -90,14 +90,14 @@ Source: [`fpga/kria/reports/timing_summary.rpt`](file:///D:/Repos/kv260-ias2rf-g
   - `link_rx_clk` (uplink RX HS, `500.000 MHz`): `WPWS = 0.280`
   - `rx_clkdiv` (uplink RX CLKDIV, `125.000 MHz`): `2.880 / 0.022`
 - **DRC:** `0` Errors (`5` Warnings: `PLCK-58` x1 from `LINK_RX_CLK` on QBC pin `C1/B1` with `CLOCK_DEDICATED_ROUTE = FALSE`, `REQP-1934` x2, `REQP-1935` x2 on Xilinx `axi_dma_0` SDP FIFOs).
-- **Generated Artifacts:** `fpga/kria/out/ias2rf_k26.bit` (7,797,912 B) and `fpga/kria/out/ias2rf_k26.xsa` (1,059,656 B), ignored from git via [`fpga/.gitignore`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/.gitignore).
+- **Generated Artifacts:** `fpga/kria/out/ias2rf_k26.bit` (7,797,912 B) and `fpga/kria/out/ias2rf_k26.xsa` (1,059,656 B), ignored from git via [`fpga/.gitignore`](.gitignore).
 
 ---
 
 ## Building & Running Simulations
 
 ### Vivado Batch Builds
-Always run outside simulation sessions (and remove `fpga/kria/.bd_proj/` before running [`run.ps1`](file:///D:/Repos/kv260-ias2rf-gemini/fpga/sim/run.ps1), since `run.ps1` globs `*.v` recursively under `fpga/kria/`):
+Always run outside simulation sessions (and remove `fpga/kria/.bd_proj/` before running [`run.ps1`](sim/run.ps1), since `run.ps1` globs `*.v` recursively under `fpga/kria/`):
 ```powershell
 # Artix-7 full build -> fpga/artix/reports/
 & "D:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat" -mode batch -nojournal -nolog -source fpga\artix\build.tcl
@@ -109,6 +109,7 @@ Always run outside simulation sessions (and remove `fpga/kria/.bd_proj/` before 
 ### XSim Testbenches (`fpga/sim/run.ps1`)
 Run individual benches from the repository root (`D:\Repos\kv260-ias2rf-gemini`):
 ```powershell
+.\fpga\sim\run.ps1 tb_system
 .\fpga\sim\run.ps1 tb_artix_top
 .\fpga\sim\run.ps1 tb_adc_ddc
 .\fpga\sim\run.ps1 tb_e2e
@@ -132,7 +133,7 @@ Each testbench supports `-Mutate <name>` negative checks (e.g., `tb_artix_top -M
 
 ## KV260 Linux Bring-Up (`sw/`)
 
-See [`sw/README.md`](file:///D:/Repos/kv260-ias2rf-gemini/sw/README.md) for devicetree overlay (`ias2rf_pl.dtsi`) and userspace CSR/DMA smoke test (`ias2rf_dma_test.c`) usage:
+See [`sw/README.md`](../sw/README.md) for devicetree overlay (`ias2rf_pl.dtsi`) and userspace CSR/DMA smoke test (`ias2rf_dma_test.c`) usage:
 - `0x80000000`: `kria_pl_link` AXI4-Lite CSRs (`0x00..0x34`), interrupts GIC `89` (`irq_fpga`), `90` (`irq_link_up`).
 - `0x80010000`: `axi_dma_0` 64-bit S2MM + MM2S DMA (`HP0`, `dma-coherent`), interrupts GIC `91` (`s2mm_introut`), `92` (`mm2s_introut`).
 - PS EMIO `i2c0` (`100 kHz` to `HK_SCL`/`HK_SDA`) and `spi0` (`Pmod J2`).

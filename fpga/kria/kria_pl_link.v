@@ -26,10 +26,14 @@ module kria_pl_async_fifo #(
     localparam integer DEPTH = (1 << AW);
     (* ram_style = "distributed" *) reg [DW-1:0] mem [0:DEPTH-1];
 
-    reg [AW:0] wr_bin, wr_gray;
-    reg [AW:0] rd_bin, rd_gray;
-    (* ASYNC_REG = "TRUE" *) reg [AW:0] rd_gray_meta, rd_gray_sync;
-    (* ASYNC_REG = "TRUE" *) reg [AW:0] wr_gray_meta, wr_gray_sync;
+    reg [AW:0] wr_bin       = {(AW+1){1'b0}};
+    reg [AW:0] wr_gray      = {(AW+1){1'b0}};
+    reg [AW:0] rd_bin       = {(AW+1){1'b0}};
+    reg [AW:0] rd_gray      = {(AW+1){1'b0}};
+    (* ASYNC_REG = "TRUE" *) reg [AW:0] rd_gray_meta = {(AW+1){1'b0}};
+    (* ASYNC_REG = "TRUE" *) reg [AW:0] rd_gray_sync = {(AW+1){1'b0}};
+    (* ASYNC_REG = "TRUE" *) reg [AW:0] wr_gray_meta = {(AW+1){1'b0}};
+    (* ASYNC_REG = "TRUE" *) reg [AW:0] wr_gray_sync = {(AW+1){1'b0}};
 
     function [AW:0] bin2gray;
         input [AW:0] b;
@@ -42,7 +46,7 @@ module kria_pl_async_fifo #(
     wire [AW:0] wr_gray_next = bin2gray(wr_bin_next);
     assign wr_full = (wr_gray == {~rd_gray_sync[AW:AW-1], rd_gray_sync[AW-2:0]});
 
-    always @(posedge wr_clk) begin
+    always @(posedge wr_clk or posedge wr_rst) begin
         if (wr_rst) begin
             wr_bin       <= {(AW+1){1'b0}};
             wr_gray      <= {(AW+1){1'b0}};
@@ -63,7 +67,7 @@ module kria_pl_async_fifo #(
     assign rd_empty = (rd_gray == wr_gray_sync);
     assign rd_data  = mem[rd_bin[AW-1:0]];
 
-    always @(posedge rd_clk) begin
+    always @(posedge rd_clk or posedge rd_rst) begin
         if (rd_rst) begin
             rd_bin       <= {(AW+1){1'b0}};
             rd_gray      <= {(AW+1){1'b0}};
@@ -289,7 +293,7 @@ module kria_pl_link (
     wire [8:0] train_cnt_l0, train_cnt_l1;
     wire [8:0] active_cnt_l0, active_cnt_l1;
     wire       rx_d0_idelay, rx_d1_idelay;
-    reg        pcs_rst_rx;
+    reg        pcs_rst_rx = 1'b1;
     wire       kria_link_up;
 
     reg idly_en_vtc_r;
@@ -664,7 +668,7 @@ module kria_pl_link (
     wire [31:0] dl_pkt_seq;
     wire [63:0] dl_pkt_data;
     wire        dl_fifo_full, dl_fifo_empty, dl_pkt_ready_tx;
-    wire [129:0] dl_fifo_rd_data;
+    wire [121:0] dl_fifo_rd_data;
 
     wire [31:0] last_rx_seq, last_rx_len_unused;
     wire [63:0] last_rx_ts;
@@ -790,7 +794,7 @@ module kria_pl_link (
     );
     assign s_axis_tx_tready = !tx_afifo_full;
 
-    kria_pl_async_fifo #(.DW(130), .AW(4)) u_fifo_dl (
+    kria_pl_async_fifo #(.DW(122), .AW(4)) u_fifo_dl (
         .wr_clk   (rx_clkdiv),
         .wr_rst   (rst_rx),
         .wr_en    (dl_pkt_valid && !dl_fifo_full),
@@ -826,11 +830,11 @@ module kria_pl_link (
         .rst           (rst_tx),
         .pkt_valid     (!dl_fifo_empty),
         .pkt_ready     (dl_pkt_ready_tx),
-        .pkt_sop       (dl_fifo_rd_data[129]),
-        .pkt_eop       (dl_fifo_rd_data[128]),
-        .pkt_stream_id (dl_fifo_rd_data[127:120]),
-        .pkt_len       (dl_fifo_rd_data[119:104]),
-        .pkt_seq       (dl_fifo_rd_data[103:72]),
+        .pkt_sop       (dl_fifo_rd_data[121]),
+        .pkt_eop       (dl_fifo_rd_data[120]),
+        .pkt_stream_id (dl_fifo_rd_data[119:112]),
+        .pkt_len       (dl_fifo_rd_data[111:96]),
+        .pkt_seq       (dl_fifo_rd_data[95:64]),
         .pkt_timestamp (ts_cnt_tx),
         .pkt_data      (dl_fifo_rd_data[63:0]),
         .dropped_cnt   (24'd0),
