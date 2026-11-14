@@ -306,11 +306,20 @@ VCCO balls keep their wide connection. DRC: 0 errors, 0 unconnected, schematic p
 
 | Path | Routed | Ideal 50 Ω legs | Jitter | Rev05 (shared pairs) |
 |---|---|---|---|---|
-| FPGA → PHY (SGTX) | **595 mV** | 616 mV | 50 ps | 350 mV |
-| PHY → FPGA (SGRX) | **518 mV** | 564 mV | 70 ps | 637 mV |
+| FPGA → PHY (SGTX) | **616 mV** | 616 mV | 52 ps | 350 mV |
+| PHY → FPGA (SGRX) | **521 mV** | 564 mV | 58 ps | 637 mV |
 
-Both are far above the 200 mV a receiver needs. Some short sections on L1/L8 are 0.1 mm wide (60–64 Ω) where
-the legs leave the balls and the capacitors; they cost 20–46 mV against ideal legs.
+Both are far above the 200 mV a receiver needs. The legs were widened to each layer's 50 Ω width (0.183 mm
+outside, 0.151 mm inside) wherever the clearances allow (widen.py); a few short sections where they leave the
+balls and the capacitors stay at 0.1–0.117 mm (57–64 Ω).
+
+**Supplies after the rework** (pbottle.py, current per bridging track): the bank-34 VCCO feed's drop to the FPGA
+went from 11 mV (Rev05) to 19 mV after widening the reworked corner, inside +2V5's ±5 % (125 mV). Two older necks
+were found on the way and checked: +1V8_A to the ADC drivers' ferrites had a 0.49 mm piece of 0.1 mm on L3
+carrying 0.5 A (IPC long-track chart: +242 °C, a short neck runs far cooler but it was still the worst spot on
+the board): replaced by a 1.0 mm L-shaped jog, the rail's drop is now 64 mV. The +3V3_D feed to FB401 (the clock
+section, 0.48 A) has four 0.1 mm necks, 0.2–0.5 mm long, between the PHY's pads, inherited from Rev05: 10 mV of
+drop; left as they are (no room, and short necks spread their heat into the planes).
 
 **Also on Rev06:** J1002, a 5 V fan header for enclosure v2 (POWER sheet; docs/ENCLOSURE.md section 6).
 
