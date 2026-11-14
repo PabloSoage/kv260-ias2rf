@@ -86,7 +86,7 @@ datasheet page 12.
 
 | Item | Choice | Reasoning |
 |---|---|---|
-| FB401 | ferrite, 600 Ω @ 100 MHz, ≥ 1 A | Keeps +3V3_D switching noise off the clock chips. The branch draws up to 483 mA |
+| FB401 | ferrite, 220 Ω @ 100 MHz, 2 A, ≤ 0.1 Ω (HCB1608KF-221T20) | Keeps +3V3_D switching noise off the clock chips. The branch draws up to 483 mA. Changed on 14 Nov from a 1 A, 0.2 Ω 600 Ω bead, which dropped up to 97 mV and could leave the Si549 under its 3.135 V minimum; the 2 A bead drops 48 mV and still takes the 580 kHz ripple to 0.1–0.4 mVpp (REV06_REVIEW §3, `docs/sim/fb401_filter.png`) |
 | C401 | 10 µF ceramic | The datasheet mentions a 1 µF electrolytic for bulk; a ceramic does the same job with lower ESR |
 | C422 | 100 nF at the Si549 | Its datasheet gives no decoupling recommendation |
 | R412 | 49.9 Ω on Q3-bar | Loads Q3-bar like the instrument loads Q3 on J402, so the pair stays balanced |

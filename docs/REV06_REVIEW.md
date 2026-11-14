@@ -31,7 +31,7 @@ It also covers the mechanical side. Each item has a verdict:
 |---|---|---|
 | KiCad DRC with zone refill and schematic parity | 0 errors, 0 unconnected items, parity 0. One warning, a footprint differing from its library copy (D1003) | OK |
 | Supply tracks on the ground planes L2/L5 | none (`_work/layout/planechk.py`) | OK |
-| Fabrication outputs | gerbers, BOM (130 lines, 551 parts) and CPL regenerated from the final board on 14 Nov, after the last routing change; DRC on the zone-filled copy 0 errors, 0 unrouted (FABRICATION.md) | OK |
+| Fabrication outputs | gerbers, BOM (129 lines, 551 parts) and CPL regenerated from the final board on 14 Nov, after the last routing change; DRC on the zone-filled copy 0 errors, 0 unrouted (FABRICATION.md) | OK |
 
 ## 2. High-speed and RF routing
 
@@ -81,7 +81,8 @@ The new parts sit away from the band:
 | +2V5 to bank 34's VCCO | 19 mV (Rev05: 11 mV): two VCCO balls on a 0.1 × 13.7 mm track after the corner rework | Accepted (CONTROL_SPEC §8) |
 | +3V3_D to FB401 (clock section, 0.48 A) | 10 mV, four 0.1 mm necks 0.2–0.5 mm long between the PHY's pads (from Rev05) | Accepted |
 | +1V8_A main run, 0.3 mm on L3 at the full 0.5 A budget | about +40 °C on IPC-2221's inner-layer chart (a conservative chart; IPC-2152 gives far less for inner layers in a plane stack) | Accepted, measure at bring-up |
-| FB401 as the clock section's only filter (RF_REVIEW H3) | a ferrite bead at 483 mA DC loses much of its inductance; with 10 µF it still makes an LC about 20 dB down at the 580 kHz switching frequency | **Open**, bring-up: measure +3V3_CLK ripple and the 580 kHz spurs on the ADC spectra; a shielded 1 µH + 22 µF is the fix if needed |
+| FB401 as the clock section's only filter (RF_REVIEW H3) | Modelled on 14 Nov (`_work/power/fb401_filter.py`, [plot](sim/fb401_filter.png)): +3V3_D carries 4.6 mVpp at 580 kHz. With the bead's inductance swept down to 5 % of its zero-bias value under the 483 mA DC, +3V3_CLK keeps ≤ 2.1 mVpp with the new bead (0.65 mVpp with the old), which puts the Si549's supply spur under −110 dBc (its datasheet: −82 dBc for 50 mVpp). The ADCLK948 would need its delay to move by more than 40 ps per volt of supply to make a −90 dBc spur on a 250 MHz input | OK; measure +3V3_CLK ripple at bring-up |
+| FB401's DC drop | The drawn bead (600 Ω, 1 A, 0.2 Ω max) dropped up to 97 mV: with +3V3_D at its low tolerance (3.235 V) and 10 mV of copper, +3V3_CLK could reach 3.128 V, 7 mV under the Si549's 3.135 V minimum | **Fixed**: FB401 is now the 220 Ω, 2 A, 0.1 Ω bead already on the BOM (C304314, same 0603 footprint). Drop 48 mV, +3V3_CLK ≥ 3.177 V; the bead runs at 24 % of its rating, so it keeps most of its inductance |
 | Fan header J1002 | 5 V through a 0.5 A PTC (F1002) and 10 µF; the fan draws ~0.1 A | OK |
 | Ethernet PHY bias ETH_VCM | 1.18 V from +3V3_D (10 k / 5.6 k, 100 nF), inside LVDS_25's 0.3–1.5 V | OK |
 
@@ -147,8 +148,9 @@ Every block bench passes (13 benches, with their mutations failing as they shoul
 
 - **Ready to order:** the board (DRC/parity clean, no new SI or power issue, all rules met).
 - **Accepted:** the MDIO/MDC proximity to two fast legs, which is handled in the gateware.
+- **Changed on 14 Nov:** FB401 is now a 2 A, 0.1 Ω bead (same footprint, a part already on the BOM), for the
+  Si549's supply margin (§3).
 - **Open, on the bench or in the gateware:**
-  - FB401's ripple, measured at bring-up;
   - the v2 CFD as built;
   - the link-training fix and its passing system simulation.
 
