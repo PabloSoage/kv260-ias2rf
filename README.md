@@ -4,6 +4,12 @@
 DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
 been validated.** A few review items remain before an order (see [Status](#status)).
 
+> **Branch `rev06` (14 November 2026).** Rev06 gives Gigabit Ethernet its own FPGA pins, so the IAS1 link keeps
+> both uplink lanes and its downlink and Ethernet adds about 1 Gb/s on top: either path works alone, both
+> together carry about 3 Gb/s, with failover in the gateware ([CONTROL_SPEC §8](docs/CONTROL_SPEC.md),
+> [fpga/eth/REV06.md](fpga/eth/REV06.md)). It also adds a 5 V fan header for enclosure v2
+> ([ENCLOSURE §6](docs/ENCLOSURE.md)). Routed with zero DRC errors and zero parity problems; `main` stays Rev05.
+
 ![The board, 3D render](docs/img/board_iso.png)
 
 An adapter board for the **AMD Kria KV260 Vision AI Starter Kit**. It plugs into the KV260's IAS1
