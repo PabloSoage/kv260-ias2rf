@@ -204,3 +204,14 @@ Even though built v2 passes `25–45 °C` with `> 21 °C` margin on all silicon,
 1. **Thermally decouple `hs_U401` and `hs_Y401` (`0` CAD changes — immediate fix):** Trim `1.5–2.0 mm` off the facing edges of the two `9 × 9 mm` heatsinks (or fit **`7 × 9 mm` / `7 × 7 mm`** blocks) so a `>= 2–3 mm` air gap separates `hs_U401` from `hs_Y401`. Even with the stock lid and clogged-margin grille untouched (`v2_built_decoupled_hs_70C`), `hs_Y401` base drops **`-5.02 °C`** (`105.47 -> 100.45 °C`), `Y401` top heat rejection jumps **`2.8×`** (`0.051 -> 0.142 W`), and **`Y401_Si549` falls `-2.19 °C` to `104.86 °C`** (`< 105 °C`), at a negligible `+0.99 °C` penalty to `U401` (`108.98 °C`, `+41.0 °C` margin).
 2. **Open the `39`-cell double hex lid grille (`v2_built_widegrille_hs_70C`):** Replace the thick `1.6 mm`-wall `39`-cell hex grid (`54.4%` open bore) with a single recessed `Ø48 mm` coarse spoke ring supporting the filter mesh (`~85–90%` open bore). This raises 50 mm fan airflow **`+12.8%`** (`2.57 -> 2.90 CFM @ 14.99 Pa`).
 3. **Expand right-wall exhaust slots + combine Fixes #1–#3 (`v2_built_proposed_70C`):** Extending right-wall slots from `13` slots (`y = 10..85 mm, z = 10..26 mm`) to `17+` taller slots (`y = 4..106 mm, z = 6..28 mm`, or adding rear-right perforations near `K26`) cuts positive internal backpressure **`-38%`** (`+9.68 -> +6.01 Pa`), boosting 50 mm intake **`+40.9%` (`3.62 CFM @ 13.16 Pa`)** and KV260 blower throughput to **`10.96 CFM`**. Together, **all 16 adapter ICs pass `70 °C` cleanly**, pulling **`Y401_Si549` down `-5.37 °C` vs. built v2 (`-12.10 °C` vs. no heatsinks) to `101.68 °C` (`+3.32 °C` margin)**, `U1101_XC7A50T` to **`91.32 °C` (`+8.68 °C` margin)**, `U1201_RTL8211FSI` to `97.59 °C`, and lowering `K26 SOM` by `-1.17 °C` (`103.96 -> 102.79 °C` med, projecting `~99.1 °C` on fine mesh).
+
+### 6. Adopted (14 Nov)
+
+All three changes are in the v2 that `_work/mech/build_case.py --v2` now builds (docs/ENCLOSURE.md §6):
+
+- **The intake:** the fan's whole 47 mm bore, crossed by six 1.6 mm spokes and a 10 mm hub, about 1550 mm² open.
+  The lid and the filter frame use the same ring, so the mesh is clamped between their spokes.
+- **The exhaust:** 17 right-wall slots of 3.5 × 21 mm, over y 4 to 103.5 mm and z 7.5 to 28.5 mm. The bottom
+  edge sits 1.5 mm above the tongue's groove, so the slots are 1.5 mm shorter than the simulated 6–28 mm.
+- **The heatsinks:** U401's and Y401's are cut to 9 × 7 mm, each set 1 mm off its package's centre, leaving a
+  4 mm gap between them, as `decouple_hs` modelled.
