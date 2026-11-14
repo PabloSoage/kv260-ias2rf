@@ -8,7 +8,6 @@ file mkdir $rpt_dir
 
 set_part xc7a50t-ftg256-2
 
-# Read RTL (AERIS DDC + link PCS + Artix integration)
 read_verilog [glob [file join $fpga_dir "third_party" "aeris" "*.v"]]
 read_verilog [glob [file join $fpga_dir "link" "*.v"]]
 read_verilog [glob [file join $script_dir "*.v"]]
@@ -20,9 +19,14 @@ place_design
 phys_opt_design
 route_design
 
-report_timing_summary -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -file [file join $rpt_dir "timing_summary.rpt"]
-report_utilization    -hierarchical -file [file join $rpt_dir "utilization.rpt"]
-report_drc            -file [file join $rpt_dir "drc.rpt"]
+report_timing_summary    -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -file [file join $rpt_dir "timing_summary.rpt"]
+report_pulse_width       -all_violators -file [file join $rpt_dir "pulse_width.rpt"]
+report_utilization       -hierarchical -file [file join $rpt_dir "utilization.rpt"]
+report_clock_utilization -file [file join $rpt_dir "clock_utilization.rpt"]
+report_drc               -file [file join $rpt_dir "drc.rpt"]
+report_methodology       -file [file join $rpt_dir "methodology.rpt"]
+report_cdc               -details -file [file join $rpt_dir "cdc.rpt"]
 
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
-puts [format "ARTIX_BUILD_DONE WNS=%s ns" $wns]
+set whs [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -hold]]
+puts [format "ARTIX_BUILD_DONE WNS=%s ns WHS=%s ns" $wns $whs]

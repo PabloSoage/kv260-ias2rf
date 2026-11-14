@@ -68,7 +68,17 @@ wire [47:0] comb_0_p_out;
 // ============================================================================
 (* keep = "true", dont_touch = "true" *) reg signed [COMB_WIDTH-1:0] integrator_sampled;
 (* keep = "true", dont_touch = "true", max_fanout = 1 *) reg signed [COMB_WIDTH-1:0] integrator_sampled_comb;
-(* use_dsp = "yes" *) reg signed [COMB_WIDTH-1:0] comb [0:STAGES-1];
+(* use_dsp = "no" *) reg signed [COMB_WIDTH-1:0] comb [0:STAGES-1];
+(* use_dsp = "no" *) reg [10:0] comb_s0     [1:STAGES-1];
+(* use_dsp = "no" *) reg [9:0]  comb_s1_lo  [1:STAGES-1];
+(* use_dsp = "no" *) reg [9:0]  comb_s1_mid [1:STAGES-1];
+(* use_dsp = "no" *) reg [8:0]  comb_m_a    [1:STAGES-1];
+(* use_dsp = "no" *) reg [8:0]  comb_m_b    [1:STAGES-1];
+(* use_dsp = "no" *) reg [8:0]  comb_h1_a   [1:STAGES-1];
+(* use_dsp = "no" *) reg [8:0]  comb_h1_b   [1:STAGES-1];
+(* use_dsp = "no" *) reg [8:0]  comb_h2_a   [1:STAGES-1];
+(* use_dsp = "no" *) reg [8:0]  comb_h2_b   [1:STAGES-1];
+reg [3*STAGES-1:0] comb_dv_pipe;
 reg signed [COMB_WIDTH-1:0] comb_delay [0:STAGES-1][0:COMB_DELAY-1];
 
 // Pipeline valid for comb stages 1-4: delayed by 1 cycle vs comb_pipe to
@@ -801,11 +811,23 @@ end
 
 always @(posedge clk) begin
     if (reset_h) begin
+        comb_dv_pipe <= 0;
         for (i = 0; i < STAGES; i = i + 1) begin
             comb[i] <= 0;
             for (j = 0; j < COMB_DELAY; j = j + 1) begin
                 comb_delay[i][j] <= 0;
             end
+        end
+        for (i = 1; i < STAGES; i = i + 1) begin
+            comb_s0[i]     <= 0;
+            comb_s1_lo[i]  <= 0;
+            comb_s1_mid[i] <= 0;
+            comb_m_a[i]    <= 0;
+            comb_m_b[i]    <= 0;
+            comb_h1_a[i]   <= 0;
+            comb_h1_b[i]   <= 0;
+            comb_h2_a[i]   <= 0;
+            comb_h2_b[i]   <= 0;
         end
         data_out <= 0;
         data_out_valid <= 0;
@@ -819,6 +841,8 @@ always @(posedge clk) begin
         comb_saturation_detected <= 0;
         comb_saturation_event_count <= 0;
     end else begin
+        comb_dv_pipe <= {comb_dv_pipe[3*STAGES-2:0], data_valid_comb_0_out};
+
         if (reset_monitors) begin
             comb_overflow_latched <= 0;
             comb_saturation_detected <= 0;
@@ -837,32 +861,46 @@ always @(posedge clk) begin
         end
 
         // ---- Comb Stage 0 result: from explicit DSP48E1 ----
-        // comb_0_dsp PREG output is valid 1 cycle after data_valid_comb_pipe.
-        // We capture it into comb[0] on data_valid_comb_0_out so comb stages
-        // 1-4 can read it.
         if (data_valid_comb_0_out) begin
             comb[0] <= comb_0_p_out[COMB_WIDTH-1:0];
         end
 
-        // ---- Comb Stages 1-4: inferred DSP48E1 subtracts ----
-        // These fire on data_valid_comb_0_out (when comb[0] is valid).
-        if (data_valid_comb_0_out) begin
-            for (i = 1; i < STAGES; i = i + 1) begin
-                comb[i] <= comb[i-1] - comb_delay[i][COMB_DELAY-1];
+        // ---- Comb Stages 1-4: staggered 3-cycle 10+9+9-bit split fabric subtracts ----
+        // One sample arrives per 4 cycles (DECIMATION=4); 3 cycles/stage keeps
+        // every adder <= 10 bits (max 3 CARRY4s at 400 MHz) with zero DSP C-port overhead.
+        for (i = 1; i < STAGES; i = i + 1) begin
+            if (comb_dv_pipe[3*(i-1)]) begin
+                comb_s0[i]   <= {1'b0, comb[i-1][9:0]} + {1'b0, ~comb_delay[i][COMB_DELAY-1][9:0]} + 11'd1;
+                comb_m_a[i]  <= comb[i-1][18:10];
+                comb_m_b[i]  <= comb_delay[i][COMB_DELAY-1][18:10];
+                comb_h1_a[i] <= comb[i-1][27:19];
+                comb_h1_b[i] <= comb_delay[i][COMB_DELAY-1][27:19];
                 for (j = COMB_DELAY-1; j > 0; j = j - 1) begin
                     comb_delay[i][j] <= comb_delay[i][j-1];
                 end
                 comb_delay[i][0] <= comb[i-1];
             end
+            if (comb_dv_pipe[3*(i-1)+1]) begin
+                comb_s1_lo[i]  <= comb_s0[i][9:0];
+                comb_s1_mid[i] <= {1'b0, comb_m_a[i]} + {1'b0, ~comb_m_b[i]} + {9'd0, comb_s0[i][10]};
+                comb_h2_a[i]   <= comb_h1_a[i];
+                comb_h2_b[i]   <= comb_h1_b[i];
+            end
+            if (comb_dv_pipe[3*(i-1)+2]) begin
+                comb[i] <= { (comb_h2_a[i] + (~comb_h2_b[i]) + {8'd0, comb_s1_mid[i][9]}), comb_s1_mid[i][8:0], comb_s1_lo[i] };
+            end
+        end
 
-            // Gain = (4^5) = 1024 = 2^10, scale by 2^10 to normalize
+        // Gain = (4^5) = 1024 = 2^10, scale by 2^10 to normalize
+        if (comb_dv_pipe[3*(STAGES-1)]) begin
             temp_scaled_output <= comb[STAGES-1] >>> 10;
-            temp_output <= temp_scaled_output[17:0];
+        end
 
-            // Pipeline Stage 2: Register saturation comparison flags
-            sat_pos <= (temp_scaled_output > 131071);
-            sat_neg <= (temp_scaled_output < -131072);
-            temp_output_pipe <= temp_scaled_output[17:0];
+        if (comb_dv_pipe[3*(STAGES-1)+1]) begin
+            temp_output         <= temp_scaled_output[17:0];
+            sat_pos             <= (temp_scaled_output > 131071);
+            sat_neg             <= (temp_scaled_output < -131072);
+            temp_output_pipe    <= temp_scaled_output[17:0];
             data_out_valid_pipe <= 1;
         end else begin
             data_out_valid_pipe <= 0;

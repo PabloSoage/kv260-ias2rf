@@ -23,7 +23,17 @@ module artix_top #(
     parameter integer ETH_MDIO_POLL_DIV  = 125_000,     // BMSR poll period (1 ms @ 125 MHz)
     parameter integer ETH_SDR_PKT_BYTES  = 1024,        // Stream 1 SDR telemetry UDP packet size
     parameter integer ETH_SDR_GAP_CYC    = 64,          // Stream 1 inter-packet gap
-    parameter [1:0]   ETH_DEFAULT_POLICY = 2'd0         // 0=STREAM_SPLIT, 1=MIRROR_1P1, 2=IAS_ONLY, 3=ETH_ONLY
+    parameter [1:0]   ETH_DEFAULT_POLICY = 2'd0,        // 0=STREAM_SPLIT, 1=MIRROR_1P1, 2=IAS_ONLY, 3=ETH_ONLY
+    parameter integer CONV_SPI_CLK_DIV   = 8,           // Half-SCLK in 125 MHz cycles (7.81 MHz SCLK)
+    parameter integer CONV_SPI_RST_CYC   = 7_500_000,   // 60 ms @ 125 MHz for AD9253 post-reset wake
+    parameter [0:0]   CONV_SPI_AUTO_INIT = 1'b1,        // Auto-init AD9253 + read AD9484/AD9253 IDs at boot
+    parameter integer ADAR_CLK_DIV       = 8,           // Half-SCLK in 125 MHz cycles
+    parameter [0:0]   ADAR_AUTO_INIT     = 1'b1,        // Auto-init all 8 ADAR1000 chips at boot
+    parameter integer HK_CLK_DIV         = 312,         // ~100 kHz I2C @ 125 MHz (4*312 = 1248)
+    parameter integer HK_POLL_DIV        = 12_500_000,  // 100 ms TMP1075 background poll interval
+    parameter integer XO_FCAL_WAIT_CYC   = 1_250_000,   // 10 ms Si549 FCAL settle wait @ 125 MHz
+    parameter integer XADC_POLL_DIV_P    = 125_000,     // 1 ms XADC poll @ 125 MHz
+    parameter [31:0]  PPS_DEFAULT_NOM_CYC= 32'd125_000_000
 ) (
     // System clock: 100 MHz LVDS via attenuator on Bank 14 MRCC (DIFF_TERM=FALSE)
     input  wire       fpga_clk_p,
@@ -36,6 +46,16 @@ module artix_top #(
     input  wire       adcr_or_n,
     input  wire       adcr_dco_n,   // Ball N14 (MRCC_P wired to ADCR_DCO_N on PCB)
     input  wire       adcr_dco_p,   // Ball P14 (MRCC_N wired to ADCR_DCO_P on PCB)
+
+    // AD9253 Dual 14-bit SDR ADC on Bank 14 (LVDS_25, DIFF_TERM=FALSE, ext 100 ohm)
+    input  wire       adcs_dco_p,
+    input  wire       adcs_dco_n,
+    input  wire       adcs_fco_p,
+    input  wire       adcs_fco_n,
+    input  wire       adcs_d0_p,
+    input  wire       adcs_d0_n,
+    input  wire       adcs_d1_p,
+    input  wire       adcs_d1_n,
 
     // IAS1 Uplink TX (Artix -> Kria) on Bank 34 (VCCO = 2.5V, LVDS_25 outputs)
     output wire       link_rx_clk_p,
@@ -61,11 +81,39 @@ module artix_top #(
     input  wire       pmod_spare1,
     output wire       pmod_spare2,
 
-    // Housekeeping & Interrupt on Bank 35 (VCCO = 1.8V, LVCMOS18)
+    // AD9708 8-bit Radar DAC on Bank 15 (LVCMOS33)
+    output wire       dacr_clk,
+    output wire [7:0] dacr_d,
+
+    // AD9767 Dual 14-bit Interleaved SDR DAC on Bank 15 (LVCMOS33)
+    output wire [13:0] dacs_d,
+    output wire        dacs_iqclk,
+    output wire        dacs_iqreset,
+    output wire        dacs_iqsel,
+    output wire        dacs_iqwrt,
+
+    // RF Switches & Si549 Clock Mux/I2C on Bank 15 (LVCMOS33)
+    output wire [3:0] sw_ctrl,
+    inout  wire       xo_scl,
+    inout  wire       xo_sda,
+    output wire       clk_sel,
+
+    // Housekeeping, Shared Converter SPI & 8x ADAR1000 Ribbon on Bank 35 (VCCO = 1.8V, LVCMOS18)
     inout  wire       hk_scl,
     inout  wire       hk_sda,
     input  wire       hk_alert_n,
     output wire       fpga_irq,
+    output wire       conv_spi_csb_r,
+    output wire       conv_spi_csb_s,
+    output wire       conv_spi_sclk,
+    inout  wire       conv_spi_sdio,
+    output wire       adar_sclk,
+    inout  wire       adar_sdio,
+    input  wire       adar_sdo,
+    output wire [7:0] adar_csb,
+    output wire [7:0] adar_rx_load,
+    output wire [7:0] adar_tx_load,
+    output wire [7:0] adar_tr,
 
     // Rev06 Dedicated Ethernet SGMII PHY (U1201 RTL8211FSI-CG, Final Pins)
     //   Bank 34 (2.5V): ETH_SGTX (R2/R1), ETH_SGRX (R3/T2, DIFF_TERM=TRUE + DC bias),
@@ -103,8 +151,8 @@ module artix_top #(
     );
 
     wire sys_fb;
-    wire link_clk_unbuf, tx_clk_ddr_unbuf, refclk_200m_unbuf;
-    wire link_clk, tx_clk_ddr, refclk_200m;
+    wire link_clk_unbuf, tx_clk_ddr_unbuf, refclk_200m_unbuf, adcs_ddc_clk_unbuf;
+    wire link_clk, tx_clk_ddr, refclk_200m, adcs_ddc_clk;
     wire sys_mmcm_locked;
 
     MMCME2_ADV #(
@@ -118,6 +166,8 @@ module artix_top #(
         .CLKOUT1_PHASE      (0.0),
         .CLKOUT2_DIVIDE     (5),        // 200 MHz IDELAYCTRL REFCLK
         .CLKOUT2_PHASE      (0.0),
+        .CLKOUT3_DIVIDE     (12),       // 83.333 MHz AD9253 SDR DDC fabric clock
+        .CLKOUT3_PHASE      (0.0),
         .DIVCLK_DIVIDE      (1),
         .COMPENSATION       ("INTERNAL"),
         .STARTUP_WAIT       ("FALSE")
@@ -134,7 +184,7 @@ module artix_top #(
         .CLKOUT1B     (),
         .CLKOUT2      (refclk_200m_unbuf),
         .CLKOUT2B     (),
-        .CLKOUT3      (),
+        .CLKOUT3      (adcs_ddc_clk_unbuf),
         .CLKOUT3B     (),
         .CLKOUT4      (),
         .CLKOUT5      (),
@@ -157,9 +207,10 @@ module artix_top #(
         .CLKINSTOPPED ()
     );
 
-    BUFG u_bufg_link_clk   (.I(link_clk_unbuf),    .O(link_clk));
-    BUFG u_bufg_tx_ddr     (.I(tx_clk_ddr_unbuf),  .O(tx_clk_ddr));
-    BUFG u_bufg_refclk_200 (.I(refclk_200m_unbuf), .O(refclk_200m));
+    BUFG u_bufg_link_clk   (.I(link_clk_unbuf),     .O(link_clk));
+    BUFG u_bufg_tx_ddr     (.I(tx_clk_ddr_unbuf),   .O(tx_clk_ddr));
+    BUFG u_bufg_refclk_200 (.I(refclk_200m_unbuf),  .O(refclk_200m));
+    BUFG u_bufg_adcs_ddc   (.I(adcs_ddc_clk_unbuf), .O(adcs_ddc_clk));
 
     // Power-on reset held until MMCM locks plus 64 link_clk cycles
     reg [5:0] por_cnt = 6'd0;
@@ -611,6 +662,8 @@ module artix_top #(
         .eye_right_l1     ()
     );
 
+    wire [15:0] dl_out_len;
+
     link_pcs_single_rx #(
         .SKIP_CRC (0)
     ) u_dl_pcs_rx (
@@ -622,7 +675,7 @@ module artix_top #(
         .out_sop            (dl_out_sop),
         .out_eop            (dl_out_eop),
         .out_stream_id      (dl_out_sid),
-        .out_len            (),
+        .out_len            (dl_out_len),
         .out_seq            (),
         .out_timestamp      (),
         .out_data           (dl_out_data),
@@ -753,6 +806,16 @@ module artix_top #(
     // -------------------------------------------------------------------------
     // 5b. Rev06 SGMII-over-LVDS Ethernet + Dual-Path Mux (ENABLE_ETH)
     // -------------------------------------------------------------------------
+    wire        s0_arb_valid, s0_arb_ready, s0_arb_sop, s0_arb_eop;
+    wire [7:0]  s0_arb_sid;
+    wire [15:0] s0_arb_len;
+    wire [31:0] s0_arb_seq;
+    wire [63:0] s0_arb_ts, s0_arb_data;
+
+    wire        eth_ctrl_wr;
+    wire [15:0] eth_ctrl_addr;
+    wire [31:0] eth_ctrl_wdata;
+
     wire        ias_mux_valid, ias_mux_ready, ias_mux_sop, ias_mux_eop;
     wire [7:0]  ias_mux_sid;
     wire [15:0] ias_mux_len;
@@ -1023,6 +1086,10 @@ module artix_top #(
                 .pkt_data      (sdr_pkt_data)
             );
 
+            assign eth_ctrl_wr    = udp_ctrl_wr;
+            assign eth_ctrl_addr  = udp_ctrl_addr;
+            assign eth_ctrl_wdata = udp_ctrl_wdata;
+
             wire ias_path_ok = ~ctrl_force_ias_fault & (dl_up_sync[1] | ~ias_seen_dl_up);
             wire eth_path_ok = eth_link_up_stat & ~ctrl_force_eth_fault;
 
@@ -1032,15 +1099,15 @@ module artix_top #(
                 .policy        (eth_policy),
                 .ias_healthy   (ias_path_ok),
                 .eth_healthy   (eth_path_ok),
-                .s0_valid      (tx_pkt_valid),
-                .s0_ready      (tx_pkt_ready),
-                .s0_sop        (tx_pkt_sop),
-                .s0_eop        (tx_pkt_eop),
-                .s0_stream_id  (tx_pkt_stream_id),
-                .s0_len        (tx_pkt_len),
-                .s0_seq        (tx_pkt_seq),
-                .s0_timestamp  (tx_pkt_timestamp),
-                .s0_data       (tx_pkt_data),
+                .s0_valid      (s0_arb_valid),
+                .s0_ready      (s0_arb_ready),
+                .s0_sop        (s0_arb_sop),
+                .s0_eop        (s0_arb_eop),
+                .s0_stream_id  (s0_arb_sid),
+                .s0_len        (s0_arb_len),
+                .s0_seq        (s0_arb_seq),
+                .s0_timestamp  (s0_arb_ts),
+                .s0_data       (s0_arb_data),
                 .s1_valid      (sdr_pkt_valid),
                 .s1_ready      (sdr_pkt_ready),
                 .s1_sop        (sdr_pkt_sop),
@@ -1071,18 +1138,21 @@ module artix_top #(
                 .failover_cnt  ()
             );
         end else begin : gen_no_eth
+            assign eth_ctrl_wr           = 1'b0;
+            assign eth_ctrl_addr         = 16'd0;
+            assign eth_ctrl_wdata        = 32'd0;
             assign eth_link_up_stat      = 1'b0;
             assign eth_remote_alive_stat = 1'b0;
             assign eth_copper_up_stat    = 1'b0;
-            assign ias_mux_valid         = tx_pkt_valid;
-            assign tx_pkt_ready          = ias_mux_ready;
-            assign ias_mux_sop           = tx_pkt_sop;
-            assign ias_mux_eop           = tx_pkt_eop;
-            assign ias_mux_sid           = tx_pkt_stream_id;
-            assign ias_mux_len           = tx_pkt_len;
-            assign ias_mux_seq           = tx_pkt_seq;
-            assign ias_mux_ts            = tx_pkt_timestamp;
-            assign ias_mux_data          = tx_pkt_data;
+            assign ias_mux_valid         = s0_arb_valid;
+            assign s0_arb_ready          = ias_mux_ready;
+            assign ias_mux_sop           = s0_arb_sop;
+            assign ias_mux_eop           = s0_arb_eop;
+            assign ias_mux_sid           = s0_arb_sid;
+            assign ias_mux_len           = s0_arb_len;
+            assign ias_mux_seq           = s0_arb_seq;
+            assign ias_mux_ts            = s0_arb_ts;
+            assign ias_mux_data          = s0_arb_data;
 
             wire eth_sgrx_unused;
             IBUFDS #(.DIFF_TERM("TRUE"), .IOSTANDARD("LVDS_25")) u_ibuf_eth_unused (.I(eth_sgrx_p), .IB(eth_sgrx_n), .O(eth_sgrx_unused));
@@ -1231,11 +1301,919 @@ module artix_top #(
     assign pmod_miso   = pmod_miso_oe ? pmod_miso_int : 1'bz;
     assign pmod_spare2 = dl_up_sync[1] & adc_tr_sync[1];
 
-    // Active-high interrupt to KV260 carrier (Bank 35, LVCMOS18)
-    assign fpga_irq = ~alert_sync_r[1] | adc_err_sync[1] | (dl_crc_sync2 != 32'd0);
+    // -------------------------------------------------------------------------
+    // 7. Tasks 13-16: AD9253 + SDR DDC, DACs, 8x ADAR1000 + RF SW, HK + XO + XADC + PPS
+    //    Register map 0x34..0xE0 (LINK_PROTOCOL.md Section 7.2) via Downlink 0x10 or UDP 0x10
+    // -------------------------------------------------------------------------
+    reg  [31:0] reg_adcs_ctrl;
+    reg  [31:0] reg_conv_spi_cmd;
+    reg         reg_conv_spi_start_p;
+    reg         reg_adcs_init_p;
+    reg         conv_resp_valid_sticky;
+    reg  [7:0]  conv_resp_rdata_hold;
 
-    // Passive open-drain observation on HK I2C (KV260 PS I2C master talks to TMP1075/M24C02 directly)
-    IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_hk_scl (.I(1'b0), .T(1'b1), .O(hk_scl_in), .IO(hk_scl));
-    IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_hk_sda (.I(1'b0), .T(1'b1), .O(hk_sda_in), .IO(hk_sda));
+    reg  [31:0] reg_sdr_nco_a;
+    reg  [31:0] reg_sdr_nco_b;
+    reg  [15:0] reg_sdr_decim;
+    reg  [9:0]  reg_sdr_words_per_pkt;
+    reg         sdr_cfg_tog_link;
+
+    reg  [31:0] reg_dacr_ctrl;
+    reg         reg_dacr_trig_p;
+    reg  [31:0] reg_dacr_f0;
+    reg  [31:0] reg_dacr_df;
+    reg  [31:0] reg_dacr_plen;
+    reg  [31:0] reg_dacr_pri;
+    reg  [31:0] reg_dacs_ctrl;
+
+    reg  [31:0] reg_adar_ctrl;
+    reg         reg_adar_load_p;
+    reg         reg_adar_init_p;
+    reg         reg_adar_sw_p;
+    reg  [31:0] reg_adar_guard;
+    reg  [15:0] reg_adar_sw_settle;
+    reg  [31:0] reg_adar_tbl_wr;
+    reg         reg_adar_tbl_p;
+    reg  [31:0] reg_adar_spi_cmd;
+    reg         reg_adar_spi_p;
+
+    reg  [31:0] reg_hk_i2c_ctrl;
+    reg  [31:0] reg_hk_i2c_cmd;
+    reg         reg_hk_i2c_p;
+    reg  [31:0] reg_hk_i2c_wdata;
+
+    reg  [31:0] reg_xo_ctrl;
+    reg         reg_xo_prog_p;
+    reg         reg_xo_delta_p;
+    reg  [23:0] reg_xo_delta_m;
+    reg  [31:0] reg_xo_raw_cmd;
+    reg         reg_xo_raw_p;
+    reg         xo_raw_valid_sticky;
+    reg  [7:0]  xo_raw_rdata_hold;
+    reg         xo_raw_err_hold;
+
+    reg  [15:0] reg_pps_step_q8;
+    reg         reg_pps_disc_en;
+    reg         reg_pps_clear_p;
+    reg  [31:0] reg_pps_nom_cyc;
+
+    // Cross DACS_CTRL[0] cleanly into dl_rx_clk to gate long 0x10 vs command 0x10
+    (* ASYNC_REG = "TRUE" *) reg [1:0] reg_dacs_ctrl_dl;
+    always @(posedge dl_rx_clk or posedge dl_rx_rst) begin
+        if (dl_rx_rst) reg_dacs_ctrl_dl <= 2'b00;
+        else           reg_dacs_ctrl_dl <= {reg_dacs_ctrl_dl[0], reg_dacs_ctrl[0]};
+    end
+
+    wire dl_is_iq_pkt = dl_out_valid &&
+                        ((dl_out_sid == 8'h12) ||
+                         ((dl_out_sid == 8'h10) && reg_dacs_ctrl_dl[1] && (dl_out_len >= 16'd24)));
+    wire dl_cmd_push  = dl_out_valid && (dl_out_sid == 8'h10) && dl_out_sop && !dl_is_iq_pkt;
+
+    // Gray-coded 16-entry async FIFO: downlink 8'h10 commands (dl_rx_clk -> link_clk)
+    (* ram_style = "distributed" *) reg [63:0] dl_cmd_mem [0:15];
+    reg  [4:0] dl_cmd_wbin, dl_cmd_wgray;
+    reg  [4:0] dl_cmd_rbin, dl_cmd_rgray;
+    (* ASYNC_REG = "TRUE" *) reg [4:0] dl_cmd_wgray_s1, dl_cmd_wgray_s2;
+    (* ASYNC_REG = "TRUE" *) reg [4:0] dl_cmd_rgray_s1, dl_cmd_rgray_s2;
+
+    function [4:0] gray5(input [4:0] b);
+        begin
+            gray5 = (b >> 1) ^ b;
+        end
+    endfunction
+
+    wire dl_cmd_full  = (dl_cmd_wgray == {~dl_cmd_rgray_s2[4:3], dl_cmd_rgray_s2[2:0]});
+    wire dl_cmd_empty = (dl_cmd_rgray == dl_cmd_wgray_s2);
+
+    always @(posedge dl_rx_clk or posedge dl_rx_rst) begin
+        if (dl_rx_rst) begin
+            dl_cmd_wbin     <= 5'd0;
+            dl_cmd_wgray    <= 5'd0;
+            dl_cmd_rgray_s1 <= 5'd0;
+            dl_cmd_rgray_s2 <= 5'd0;
+        end else begin
+            dl_cmd_rgray_s1 <= dl_cmd_rgray;
+            dl_cmd_rgray_s2 <= dl_cmd_rgray_s1;
+            if (dl_cmd_push && !dl_cmd_full) begin
+                dl_cmd_mem[dl_cmd_wbin[3:0]] <= dl_out_data;
+                dl_cmd_wbin  <= dl_cmd_wbin + 5'd1;
+                dl_cmd_wgray <= gray5(dl_cmd_wbin + 5'd1);
+            end
+        end
+    end
+
+    reg  [63:0] dl_cmd_word;
+    reg         dl_cmd_pop_r;
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            dl_cmd_rbin     <= 5'd0;
+            dl_cmd_rgray    <= 5'd0;
+            dl_cmd_wgray_s1 <= 5'd0;
+            dl_cmd_wgray_s2 <= 5'd0;
+            dl_cmd_pop_r    <= 1'b0;
+            dl_cmd_word     <= 64'd0;
+        end else begin
+            dl_cmd_wgray_s1 <= dl_cmd_wgray;
+            dl_cmd_wgray_s2 <= dl_cmd_wgray_s1;
+            dl_cmd_pop_r    <= 1'b0;
+            if (!dl_cmd_empty && !dl_cmd_pop_r) begin
+                dl_cmd_word  <= dl_cmd_mem[dl_cmd_rbin[3:0]];
+                dl_cmd_rbin  <= dl_cmd_rbin + 5'd1;
+                dl_cmd_rgray <= gray5(dl_cmd_rbin + 5'd1);
+                dl_cmd_pop_r <= 1'b1;
+            end
+        end
+    end
+
+    // AD9253 Capture (shares Bank 14 IDELAYCTRL with u_adc_cap -> INST_IDELAYCTRL = 0)
+    wire        adcs_clk_div;
+    wire        adcs_sample_valid;
+    wire signed [13:0] adcs_sample_a, adcs_sample_b;
+    wire        adcs_aligned, adcs_idelay_done, adcs_idelay_err, adcs_bitslip_err;
+    wire [4:0]  adcs_best_tap;
+
+    adcs_capture #(
+        .INST_IDELAYCTRL (1'b0)
+    ) u_adcs_cap (
+        .rst          (ref_rst),
+        .refclk_200m  (refclk_200m),
+        .enable       (reg_adcs_ctrl[0]),
+        .adcs_dco_p   (adcs_dco_p),
+        .adcs_dco_n   (adcs_dco_n),
+        .adcs_fco_p   (adcs_fco_p),
+        .adcs_fco_n   (adcs_fco_n),
+        .adcs_d0_p    (adcs_d0_p),
+        .adcs_d0_n    (adcs_d0_n),
+        .adcs_d1_p    (adcs_d1_p),
+        .adcs_d1_n    (adcs_d1_n),
+        .clk_div      (adcs_clk_div),
+        .sample_valid (adcs_sample_valid),
+        .sample_a     (adcs_sample_a),
+        .sample_b     (adcs_sample_b),
+        .aligned      (adcs_aligned),
+        .idelay_done  (adcs_idelay_done),
+        .idelay_err   (adcs_idelay_err),
+        .bitslip_err  (adcs_bitslip_err),
+        .best_tap     (adcs_best_tap),
+        .bitslip_cnt  (),
+        .idelay_rdy   ()
+    );
+
+    // Sync adcs_capture status into link_clk + reset & 16-entry Gray-coded async
+    // sample FIFO from u_adcs_cap BUFR (adcs_clk_div) into global BUFG adcs_ddc_clk
+    // so SDR DDC DSP48 slices can span all clock regions of XC7A50T.
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adcs_rst_sync = 2'b11;
+    wire adcs_rst_src = link_rst;
+    always @(posedge adcs_clk_div or posedge adcs_rst_src) begin
+        if (adcs_rst_src) adcs_rst_sync <= 2'b11;
+        else              adcs_rst_sync <= {adcs_rst_sync[0], 1'b0};
+    end
+    wire adcs_rst_div = adcs_rst_sync[1];
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adcs_ddc_rst_sync = 2'b11;
+    always @(posedge adcs_ddc_clk or posedge adcs_rst_src) begin
+        if (adcs_rst_src) adcs_ddc_rst_sync <= 2'b11;
+        else              adcs_ddc_rst_sync <= {adcs_ddc_rst_sync[0], 1'b0};
+    end
+    wire adcs_ddc_rst = adcs_ddc_rst_sync[1];
+
+    function automatic [4:0] adcs_gray5;
+        input [4:0] b;
+        begin
+            adcs_gray5 = b ^ (b >> 1);
+        end
+    endfunction
+
+    (* ram_style = "distributed" *)
+    reg [27:0] adcs_samp_mem [0:15];
+    reg [4:0]  adcs_samp_wbin, adcs_samp_wgray;
+    (* ASYNC_REG = "TRUE" *) reg [4:0] adcs_samp_rgray_s1, adcs_samp_rgray_s2;
+    reg [4:0]  adcs_samp_rbin, adcs_samp_rgray;
+    (* ASYNC_REG = "TRUE" *) reg [4:0] adcs_samp_wgray_s1, adcs_samp_wgray_s2;
+
+    wire adcs_samp_full  = (adcs_samp_wgray == {~adcs_samp_rgray_s2[4:3], adcs_samp_rgray_s2[2:0]});
+    wire adcs_samp_empty = (adcs_samp_rgray == adcs_samp_wgray_s2);
+
+    always @(posedge adcs_clk_div) begin
+        if (adcs_rst_div) begin
+            adcs_samp_wbin     <= 5'd0;
+            adcs_samp_wgray    <= 5'd0;
+            adcs_samp_rgray_s1 <= 5'd0;
+            adcs_samp_rgray_s2 <= 5'd0;
+        end else begin
+            adcs_samp_rgray_s1 <= adcs_samp_rgray;
+            adcs_samp_rgray_s2 <= adcs_samp_rgray_s1;
+            if (adcs_sample_valid && !adcs_samp_full) begin
+                adcs_samp_mem[adcs_samp_wbin[3:0]] <= {adcs_sample_b, adcs_sample_a};
+                adcs_samp_wbin                     <= adcs_samp_wbin + 5'd1;
+                adcs_samp_wgray                    <= adcs_gray5(adcs_samp_wbin + 5'd1);
+            end
+        end
+    end
+
+    reg        sdr_in_valid;
+    reg signed [13:0] sdr_in_a, sdr_in_b;
+    always @(posedge adcs_ddc_clk) begin
+        if (adcs_ddc_rst) begin
+            adcs_samp_rbin     <= 5'd0;
+            adcs_samp_rgray    <= 5'd0;
+            adcs_samp_wgray_s1 <= 5'd0;
+            adcs_samp_wgray_s2 <= 5'd0;
+            sdr_in_valid       <= 1'b0;
+            sdr_in_a           <= 14'sd0;
+            sdr_in_b           <= 14'sd0;
+        end else begin
+            adcs_samp_wgray_s1 <= adcs_samp_wgray;
+            adcs_samp_wgray_s2 <= adcs_samp_wgray_s1;
+            sdr_in_valid       <= 1'b0;
+            if (!adcs_samp_empty) begin
+                {sdr_in_b, sdr_in_a} <= adcs_samp_mem[adcs_samp_rbin[3:0]];
+                sdr_in_valid         <= 1'b1;
+                adcs_samp_rbin       <= adcs_samp_rbin + 5'd1;
+                adcs_samp_rgray      <= adcs_gray5(adcs_samp_rbin + 5'd1);
+            end
+        end
+    end
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adcs_ch_en_s1, adcs_ch_en_s2;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] sdr_cfg_tog_sync;
+    reg [31:0] sdr_nco_a_adcs, sdr_nco_b_adcs;
+    reg [15:0] sdr_decim_adcs;
+    always @(posedge adcs_ddc_clk) begin
+        if (adcs_ddc_rst) begin
+            adcs_ch_en_s1    <= 2'b00;
+            adcs_ch_en_s2    <= 2'b00;
+            sdr_cfg_tog_sync <= 3'd0;
+            sdr_nco_a_adcs   <= 32'd0;
+            sdr_nco_b_adcs   <= 32'd0;
+            sdr_decim_adcs   <= 16'd4;
+        end else begin
+            adcs_ch_en_s1    <= reg_adcs_ctrl[3:2];
+            adcs_ch_en_s2    <= adcs_ch_en_s1;
+            sdr_cfg_tog_sync <= {sdr_cfg_tog_sync[1:0], sdr_cfg_tog_link};
+            if (sdr_cfg_tog_sync[2] ^ sdr_cfg_tog_sync[1]) begin
+                sdr_nco_a_adcs <= reg_sdr_nco_a;
+                sdr_nco_b_adcs <= reg_sdr_nco_b;
+                sdr_decim_adcs <= reg_sdr_decim;
+            end
+        end
+    end
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adcs_al_s, adcs_id_s, adcs_ie_s, adcs_be_s;
+    (* ASYNC_REG = "TRUE" *) reg [4:0] adcs_tap_s1, adcs_tap_s2;
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            adcs_al_s   <= 2'b00; adcs_id_s <= 2'b00;
+            adcs_ie_s   <= 2'b00; adcs_be_s <= 2'b00;
+            adcs_tap_s1 <= 5'd0;  adcs_tap_s2 <= 5'd0;
+        end else begin
+            adcs_al_s   <= {adcs_al_s[0], adcs_aligned};
+            adcs_id_s   <= {adcs_id_s[0], adcs_idelay_done};
+            adcs_ie_s   <= {adcs_ie_s[0], adcs_idelay_err};
+            adcs_be_s   <= {adcs_be_s[0], adcs_bitslip_err};
+            adcs_tap_s1 <= adcs_best_tap;
+            adcs_tap_s2 <= adcs_tap_s1;
+        end
+    end
+
+    // Converter Shared 3-wire SPI (AD9484 + AD9253, Bank 35 LVCMOS18)
+    wire       conv_req_ready, conv_resp_valid;
+    wire [7:0] conv_resp_rdata, ad9253_chip_id;
+    wire       conv_init_done, conv_init_err;
+    wire       conv_sdio_o, conv_sdio_t, conv_sdio_i;
+
+    conv_spi #(
+        .CLK_DIV           (CONV_SPI_CLK_DIV),
+        .RESET_WAIT_CYCLES (CONV_SPI_RST_CYC),
+        .AUTO_INIT         (CONV_SPI_AUTO_INIT),
+        .CHECK_AD9484      (1'b1)
+    ) u_conv_spi (
+        .clk        (link_clk),
+        .rst        (link_rst),
+        .start_init (reg_adcs_init_p),
+        .req_valid  (reg_conv_spi_start_p),
+        .req_ready  (conv_req_ready),
+        .req_target (reg_conv_spi_cmd[22]),
+        .req_rw     (reg_conv_spi_cmd[21]),
+        .req_addr   (reg_conv_spi_cmd[20:8]),
+        .req_wdata  (reg_conv_spi_cmd[7:0]),
+        .resp_valid (conv_resp_valid),
+        .resp_rdata (conv_resp_rdata),
+        .init_done  (conv_init_done),
+        .init_err   (conv_init_err),
+        .ad9253_id  (ad9253_chip_id),
+        .ad9484_id  (),
+        .spi_sclk   (conv_spi_sclk),
+        .spi_csb_r  (conv_spi_csb_r),
+        .spi_csb_s  (conv_spi_csb_s),
+        .spi_sdio_o (conv_sdio_o),
+        .spi_sdio_t (conv_sdio_t),
+        .spi_sdio_i (conv_sdio_i)
+    );
+    IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_conv_sdio (
+        .I(conv_sdio_o), .T(conv_sdio_t), .O(conv_sdio_i), .IO(conv_spi_sdio)
+    );
+
+    // XADC + PPS Discipline (also feeds monotonic timestamp_ns_sys to SDR DDC & 0xC0..0xE0)
+    wire [11:0] xadc_temp_raw, xadc_vccint_raw, xadc_vccaux_raw;
+    wire        xadc_valid, xadc_overtemp;
+    wire [63:0] xadc_ts_sys, pps_latch_ts;
+    wire [31:0] pps_period_cyc, pps_meas_cnt;
+    wire signed [31:0] pps_ppm_err;
+    wire        pps_locked;
+
+    hk_xadc_pps #(
+        .DEFAULT_NOM_CYC (PPS_DEFAULT_NOM_CYC),
+        .DEFAULT_STEP_Q8 (16'h0800),
+        .XADC_POLL_DIV   (XADC_POLL_DIV_P)
+    ) u_xadc_pps (
+        .sys_clk            (link_clk),
+        .sys_rst            (link_rst),
+        .adc_clk            (link_clk),
+        .adc_rst            (link_rst),
+        .pps_sync           (pps_sync),
+        .cfg_nom_period_cyc (reg_pps_nom_cyc),
+        .cfg_ts_step_q8     (reg_pps_step_q8),
+        .cfg_pps_disc_en    (reg_pps_disc_en),
+        .cfg_ts_clear       (reg_pps_clear_p),
+        .xadc_temp_raw      (xadc_temp_raw),
+        .xadc_vccint_raw    (xadc_vccint_raw),
+        .xadc_vccaux_raw    (xadc_vccaux_raw),
+        .xadc_valid         (xadc_valid),
+        .xadc_overtemp      (xadc_overtemp),
+        .timestamp_ns_adc   (),
+        .timestamp_ns_sys   (xadc_ts_sys),
+        .pps_latch_ts       (pps_latch_ts),
+        .pps_period_cyc     (pps_period_cyc),
+        .pps_ppm_err        (pps_ppm_err),
+        .pps_cnt            (pps_meas_cnt),
+        .pps_locked         (pps_locked)
+    );
+
+    // AD9253 Dual-Channel SDR DDC (Streams 8'h04 Ch A, 8'h05 Ch B)
+    wire        sdr_adc_pkt_valid, sdr_adc_pkt_ready, sdr_adc_pkt_sop, sdr_adc_pkt_eop;
+    wire [7:0]  sdr_adc_pkt_sid;
+    wire [15:0] sdr_adc_pkt_len;
+    wire [31:0] sdr_adc_pkt_seq;
+    wire [63:0] sdr_adc_pkt_ts, sdr_adc_pkt_data;
+    wire [23:0] sdr_adc_dropped_cnt;
+
+    sdr_ddc #(
+        .STREAM_ID_A (8'h04),
+        .STREAM_ID_B (8'h05),
+        .FIFO_AW     (9)
+    ) u_sdr_ddc (
+        .adc_clk       (adcs_ddc_clk),
+        .adc_rst       (adcs_ddc_rst),
+        .sample_valid  (sdr_in_valid),
+        .sample_a      (sdr_in_a),
+        .sample_b      (sdr_in_b),
+        .ch_enable     (adcs_ch_en_s2),
+        .nco_ftw_a     (sdr_nco_a_adcs),
+        .nco_ftw_b     (sdr_nco_b_adcs),
+        .decim_ratio   (sdr_decim_adcs),
+        .words_per_pkt (reg_sdr_words_per_pkt),
+        .link_clk      (link_clk),
+        .link_rst      (link_rst),
+        .timestamp_cnt (xadc_ts_sys),
+        .pkt_valid     (sdr_adc_pkt_valid),
+        .pkt_ready     (sdr_adc_pkt_ready),
+        .pkt_sop       (sdr_adc_pkt_sop),
+        .pkt_eop       (sdr_adc_pkt_eop),
+        .pkt_stream_id (sdr_adc_pkt_sid),
+        .pkt_len       (sdr_adc_pkt_len),
+        .pkt_seq       (sdr_adc_pkt_seq),
+        .pkt_timestamp (sdr_adc_pkt_ts),
+        .pkt_data      (sdr_adc_pkt_data),
+        .dropped_cnt   (sdr_adc_dropped_cnt)
+    );
+
+    // AD9708 Radar Chirp DAC + AD9767 Interleaved SDR DAC
+    wire        dacr_chirp_active;
+    wire [31:0] dacr_pulse_cnt;
+    dac_radar u_dac_radar (
+        .dac_clk      (link_clk),
+        .dac_rst      (link_rst),
+        .chirp_enable (reg_dacr_ctrl[0]),
+        .chirp_trig   (reg_dacr_trig_p),
+        .f0_ftw       (reg_dacr_f0),
+        .df_ftw       (reg_dacr_df),
+        .pulse_len    (reg_dacr_plen),
+        .pri_len      (reg_dacr_pri),
+        .amp_scale    (reg_dacr_ctrl[23:16]),
+        .chirp_active (dacr_chirp_active),
+        .pulse_cnt    (dacr_pulse_cnt),
+        .dacr_clk     (dacr_clk),
+        .dacr_d       (dacr_d)
+    );
+
+    wire [31:0] dacs_underflow_cnt;
+    wire [9:0]  dacs_fifo_lvl_dl;
+    dac_sdr #(
+        .FIFO_AW (9)
+    ) u_dac_sdr (
+        .link_clk        (dl_rx_clk),
+        .link_rst        (dl_rx_rst),
+        .s_valid         (dl_is_iq_pkt),
+        .s_ready         (),
+        .s_data          (dl_out_data),
+        .dac_clk         (link_clk),
+        .dac_rst         (link_rst),
+        .tx_enable       (reg_dacs_ctrl[0]),
+        .underflow_cnt   (dacs_underflow_cnt),
+        .fifo_level_link (dacs_fifo_lvl_dl),
+        .dacs_d          (dacs_d),
+        .dacs_iqclk      (dacs_iqclk),
+        .dacs_iqwrt      (dacs_iqwrt),
+        .dacs_iqsel      (dacs_iqsel),
+        .dacs_iqreset    (dacs_iqreset)
+    );
+
+    // Toggle-sampled CDC for dacs_fifo_lvl_dl (dl_rx_clk -> link_clk)
+    reg [9:0] dacs_lvl_hold_dl;
+    reg       dacs_lvl_tog_dl;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] dacs_lvl_tog_s;
+    (* ASYNC_REG = "TRUE" *) reg       dacs_lvl_ack_s1, dacs_lvl_ack_s2;
+    reg       dacs_lvl_ack_link;
+    reg [9:0] dacs_fifo_lvl_link;
+
+    always @(posedge dl_rx_clk or posedge dl_rx_rst) begin
+        if (dl_rx_rst) begin
+            dacs_lvl_hold_dl <= 10'd0;
+            dacs_lvl_tog_dl  <= 1'b0;
+            dacs_lvl_ack_s1  <= 1'b0;
+            dacs_lvl_ack_s2  <= 1'b0;
+        end else begin
+            dacs_lvl_ack_s1 <= dacs_lvl_ack_link;
+            dacs_lvl_ack_s2 <= dacs_lvl_ack_s1;
+            if (dacs_lvl_tog_dl == dacs_lvl_ack_s2) begin
+                dacs_lvl_hold_dl <= dacs_fifo_lvl_dl;
+                dacs_lvl_tog_dl  <= ~dacs_lvl_tog_dl;
+            end
+        end
+    end
+
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            dacs_lvl_tog_s     <= 3'd0;
+            dacs_lvl_ack_link  <= 1'b0;
+            dacs_fifo_lvl_link <= 10'd0;
+        end else begin
+            dacs_lvl_tog_s <= {dacs_lvl_tog_s[1:0], dacs_lvl_tog_dl};
+            if (dacs_lvl_tog_s[2] ^ dacs_lvl_tog_s[1]) begin
+                dacs_fifo_lvl_link <= dacs_lvl_hold_dl;
+                dacs_lvl_ack_link  <= dacs_lvl_tog_s[1];
+            end
+        end
+    end
+
+    // 8x ADAR1000 Beamformer Ribbon Controller & RF Switch Matrix
+    wire       adar_spi_req_ready, adar_spi_resp_valid;
+    wire [7:0] adar_spi_resp_rdata;
+    wire       adar_init_done, adar_init_err, adar_load_busy, adar_tr_ready;
+    wire [4:0] adar_cur_beam_id;
+    wire       adar_sdio_o, adar_sdio_t, adar_sdio_i;
+    wire       adar_tr_eff = reg_adar_ctrl[12] ? dacr_chirp_active : reg_adar_ctrl[5];
+
+    adar_ctrl #(
+        .CLK_DIV   (ADAR_CLK_DIV),
+        .NUM_CHIPS (8),
+        .NUM_BEAMS (32),
+        .AUTO_INIT (ADAR_AUTO_INIT)
+    ) u_adar_ctrl (
+        .clk             (link_clk),
+        .rst             (link_rst),
+        .tbl_wr_en       (reg_adar_tbl_p),
+        .tbl_beam_id     (reg_adar_tbl_wr[20:16]),
+        .tbl_chip_id     (reg_adar_tbl_wr[15:13]),
+        .tbl_byte_idx    (reg_adar_tbl_wr[12:8]),
+        .tbl_wdata       (reg_adar_tbl_wr[7:0]),
+        .start_init      (reg_adar_init_p),
+        .beam_strobe     (beam_strobe),
+        .soft_load       (reg_adar_load_p),
+        .active_beam_id  (reg_adar_ctrl[4:0]),
+        .tr_req          (adar_tr_eff),
+        .guard_pre       (reg_adar_guard[15:0]),
+        .guard_post      (reg_adar_guard[31:16]),
+        .spi_req_valid   (reg_adar_spi_p),
+        .spi_req_ready   (adar_spi_req_ready),
+        .spi_req_chip    (reg_adar_spi_cmd[26:24]),
+        .spi_req_rw      (reg_adar_spi_cmd[23]),
+        .spi_req_addr    (reg_adar_spi_cmd[22:8]),
+        .spi_req_wdata   (reg_adar_spi_cmd[7:0]),
+        .spi_resp_valid  (adar_spi_resp_valid),
+        .spi_resp_rdata  (adar_spi_resp_rdata),
+        .init_done       (adar_init_done),
+        .init_err        (adar_init_err),
+        .load_busy       (adar_load_busy),
+        .tr_ready        (adar_tr_ready),
+        .current_beam_id (adar_cur_beam_id),
+        .adar_sclk       (adar_sclk),
+        .adar_sdio_o     (adar_sdio_o),
+        .adar_sdio_t     (adar_sdio_t),
+        .adar_sdo        (adar_sdo),
+        .adar_csb        (adar_csb),
+        .adar_tx_load    (adar_tx_load),
+        .adar_rx_load    (adar_rx_load),
+        .adar_tr         (adar_tr)
+    );
+    IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_adar_sdio (
+        .I(adar_sdio_o), .T(adar_sdio_t), .O(adar_sdio_i), .IO(adar_sdio)
+    );
+
+    reg [7:0] adar_spi_rdata_hold;
+    always @(posedge link_clk) begin
+        if (link_rst)               adar_spi_rdata_hold <= 8'd0;
+        else if (adar_spi_resp_valid) adar_spi_rdata_hold <= adar_spi_resp_rdata;
+    end
+
+    wire rf_sw_ready;
+    rf_switch #(
+        .DEFAULT_SETTLE (16'd125)
+    ) u_rf_switch (
+        .clk           (link_clk),
+        .rst           (link_rst),
+        .sw_req        (reg_adar_ctrl[11:8]),
+        .settle_cycles (reg_adar_sw_settle),
+        .sw_ready      (rf_sw_ready),
+        .sw_ctrl       (sw_ctrl)
+    );
+
+    // Housekeeping I2C Master (TMP1075 0x48 + M24C02 0x50, Bank 35 LVCMOS18 open-drain)
+    wire        hk_req_ready, hk_req_done, hk_req_ack_err;
+    wire [15:0] hk_req_rdata, hk_tmp_raw, hk_ack_err_cnt;
+    wire        hk_tmp_valid, hk_alert_active, hk_last_ack_err, hk_busy;
+    wire        hk_scl_t, hk_sda_t;
+
+    hk_i2c_master #(
+        .CLK_DIV  (HK_CLK_DIV),
+        .POLL_DIV (HK_POLL_DIV)
+    ) u_hk_i2c (
+        .clk          (link_clk),
+        .rst          (link_rst),
+        .poll_en      (reg_hk_i2c_ctrl[0]),
+        .req_valid    (reg_hk_i2c_p),
+        .req_ready    (hk_req_ready),
+        .req_dev_addr (reg_hk_i2c_cmd[6:0]),
+        .req_wr_len   (reg_hk_i2c_cmd[9:7]),
+        .req_wdata    (reg_hk_i2c_wdata),
+        .req_rd_len   (reg_hk_i2c_cmd[11:10]),
+        .req_done     (hk_req_done),
+        .req_ack_err  (hk_req_ack_err),
+        .req_rdata    (hk_req_rdata),
+        .tmp_raw      (hk_tmp_raw),
+        .tmp_valid    (hk_tmp_valid),
+        .alert_active (hk_alert_active),
+        .last_ack_err (hk_last_ack_err),
+        .ack_err_cnt  (hk_ack_err_cnt),
+        .busy         (hk_busy),
+        .hk_scl_t     (hk_scl_t),
+        .hk_scl_in    (hk_scl_in),
+        .hk_sda_t     (hk_sda_t),
+        .hk_sda_in    (hk_sda_in),
+        .hk_alert_n   (hk_alert_n)
+    );
+    IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_hk_scl (.I(1'b0), .T(hk_scl_t), .O(hk_scl_in), .IO(hk_scl));
+    IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_hk_sda (.I(1'b0), .T(hk_sda_t), .O(hk_sda_in), .IO(hk_sda));
+
+    // Si549 XO I2C + CLK_SEL Mux (Bank 15 LVCMOS33)
+    wire        xo_raw_req_ready, xo_raw_resp_valid, xo_raw_resp_err;
+    wire [7:0]  xo_raw_resp_rdata;
+    wire        xo_busy, xo_prog_done, xo_active_500m, xo_ack_err;
+    wire [15:0] xo_ack_err_cnt;
+    wire        clk_sel_t, xo_scl_t, xo_scl_in, xo_sda_t, xo_sda_in;
+
+    hk_xo_ctrl #(
+        .SI549_ADDR    (7'h55),
+        .CLK_DIV       (HK_CLK_DIV),
+        .FCAL_WAIT_CYC (XO_FCAL_WAIT_CYC)
+    ) u_hk_xo (
+        .clk              (link_clk),
+        .rst              (link_rst),
+        .use_ext_clk      (reg_xo_ctrl[0]),
+        .clk_sel_t        (clk_sel_t),
+        .prog_start       (reg_xo_prog_p),
+        .prog_freq_500m   (reg_xo_ctrl[1]),
+        .delta_start      (reg_xo_delta_p),
+        .delta_m          (reg_xo_delta_m),
+        .raw_req_valid    (reg_xo_raw_p),
+        .raw_req_ready    (xo_raw_req_ready),
+        .raw_req_rw       (reg_xo_raw_cmd[16]),
+        .raw_req_reg      (reg_xo_raw_cmd[7:0]),
+        .raw_req_wdata    (reg_xo_raw_cmd[15:8]),
+        .raw_resp_valid   (xo_raw_resp_valid),
+        .raw_resp_rdata   (xo_raw_resp_rdata),
+        .raw_resp_err     (xo_raw_resp_err),
+        .busy             (xo_busy),
+        .prog_done        (xo_prog_done),
+        .active_freq_500m (xo_active_500m),
+        .ack_err          (xo_ack_err),
+        .ack_err_cnt      (xo_ack_err_cnt),
+        .xo_scl_t         (xo_scl_t),
+        .xo_scl_in        (xo_scl_in),
+        .xo_sda_t         (xo_sda_t),
+        .xo_sda_in        (xo_sda_in)
+    );
+    OBUFT #(.IOSTANDARD("LVCMOS33")) u_obuft_clk_sel (.I(1'b0), .T(clk_sel_t), .O(clk_sel));
+    IOBUF #(.IOSTANDARD("LVCMOS33")) u_iobuf_xo_scl  (.I(1'b0), .T(xo_scl_t),  .O(xo_scl_in), .IO(xo_scl));
+    IOBUF #(.IOSTANDARD("LVCMOS33")) u_iobuf_xo_sda  (.I(1'b0), .T(xo_sda_t),  .O(xo_sda_in), .IO(xo_sda));
+
+    // Register File 0x34..0xE0 Read Mux
+    function [31:0] reg_rd_word;
+        input [15:0] addr;
+        begin
+            case (addr[7:2])
+                6'h0D: reg_rd_word = {28'd0, reg_adcs_ctrl[3:2], 1'b0, reg_adcs_ctrl[0]}; // 0x34
+                6'h0E: reg_rd_word = {ad9253_chip_id, 6'd0, conv_init_err, conv_init_done,
+                                      7'd0, adcs_tap_s2, adcs_be_s[1], adcs_ie_s[1], adcs_id_s[1], adcs_al_s[1]}; // 0x38
+                6'h0F: reg_rd_word = reg_conv_spi_cmd;                                      // 0x3C
+                6'h10: reg_rd_word = {22'd0, conv_req_ready, conv_resp_valid_sticky, conv_resp_rdata_hold}; // 0x40
+                6'h11: reg_rd_word = reg_sdr_nco_a;                                         // 0x44
+                6'h12: reg_rd_word = reg_sdr_nco_b;                                         // 0x48
+                6'h13: reg_rd_word = {6'd0, reg_sdr_words_per_pkt, reg_sdr_decim};          // 0x4C
+                6'h14: reg_rd_word = {8'd0, sdr_adc_dropped_cnt};                           // 0x50
+                6'h15: reg_rd_word = {8'd0, reg_dacr_ctrl[23:16], 15'd0, reg_dacr_ctrl[0]}; // 0x54
+                6'h16: reg_rd_word = reg_dacr_f0;                                           // 0x58
+                6'h17: reg_rd_word = reg_dacr_df;                                           // 0x5C
+                6'h18: reg_rd_word = reg_dacr_plen;                                         // 0x60
+                6'h19: reg_rd_word = reg_dacr_pri;                                          // 0x64
+                6'h1A: reg_rd_word = {31'd0, dacr_chirp_active};                            // 0x68
+                6'h1B: reg_rd_word = dacr_pulse_cnt;                                        // 0x6C
+                6'h1C: reg_rd_word = {31'd0, reg_dacs_ctrl[0]};                             // 0x70
+                6'h1D: reg_rd_word = dacs_underflow_cnt;                                    // 0x74
+                6'h1E: reg_rd_word = {22'd0, dacs_fifo_lvl_link};                           // 0x78
+                6'h1F: reg_rd_word = {19'd0, reg_adar_ctrl[12:8], 2'd0, reg_adar_ctrl[5:0]}; // 0x7C
+                6'h20: reg_rd_word = reg_adar_guard;                                        // 0x80
+                6'h21: reg_rd_word = {16'd0, reg_adar_sw_settle};                           // 0x84
+                6'h22: reg_rd_word = 32'd0;                                                 // 0x88 WO
+                6'h23: reg_rd_word = reg_adar_spi_cmd;                                      // 0x8C
+                6'h24: reg_rd_word = {9'd0, sw_ctrl, adar_spi_req_ready, adar_spi_rdata_hold,
+                                      adar_cur_beam_id, rf_sw_ready, adar_tr_ready,
+                                      adar_load_busy, adar_init_err, adar_init_done};       // 0x90
+                6'h25: reg_rd_word = {31'd0, reg_hk_i2c_ctrl[0]};                           // 0x94
+                6'h26: reg_rd_word = reg_hk_i2c_cmd;                                        // 0x98
+                6'h27: reg_rd_word = reg_hk_i2c_wdata;                                      // 0x9C
+                6'h28: reg_rd_word = {11'd0, hk_tmp_valid, hk_alert_active, hk_busy,
+                                      hk_last_ack_err, hk_req_ready, hk_req_rdata};         // 0xA0
+                6'h29: reg_rd_word = {hk_ack_err_cnt, hk_tmp_raw};                          // 0xA4
+                6'h2A: reg_rd_word = {xo_ack_err_cnt, 4'd0, xo_ack_err, xo_active_500m,
+                                      xo_prog_done, xo_busy, 6'd0, reg_xo_ctrl[1:0]};       // 0xA8
+                6'h2B: reg_rd_word = {8'd0, reg_xo_delta_m};                                // 0xAC
+                6'h2C: reg_rd_word = reg_xo_raw_cmd;                                        // 0xB0
+                6'h2D: reg_rd_word = {21'd0, xo_raw_err_hold, xo_raw_req_ready,
+                                      xo_raw_valid_sticky, xo_raw_rdata_hold};              // 0xB4
+                6'h2E: reg_rd_word = {6'd0, xadc_overtemp, xadc_valid, xadc_vccint_raw, xadc_temp_raw}; // 0xB8
+                6'h2F: reg_rd_word = {20'd0, xadc_vccaux_raw};                              // 0xBC
+                6'h30: reg_rd_word = {7'd0, pps_locked, 7'd0, reg_pps_disc_en, reg_pps_step_q8}; // 0xC0
+                6'h31: reg_rd_word = reg_pps_nom_cyc;                                       // 0xC4
+                6'h32: reg_rd_word = pps_period_cyc;                                        // 0xC8
+                6'h33: reg_rd_word = pps_ppm_err;                                           // 0xCC
+                6'h34: reg_rd_word = pps_meas_cnt;                                          // 0xD0
+                6'h35: reg_rd_word = xadc_ts_sys[31:0];                                     // 0xD4
+                6'h36: reg_rd_word = xadc_ts_sys[63:32];                                    // 0xD8
+                6'h37: reg_rd_word = pps_latch_ts[31:0];                                    // 0xDC
+                6'h38: reg_rd_word = pps_latch_ts[63:32];                                   // 0xE0
+                default: reg_rd_word = 32'hDEAD_BEEF;
+            endcase
+        end
+    endfunction
+
+    // Write & Downlink 8'h11 Readback Response Engine (link_clk)
+    reg         resp_pkt_pend;
+    reg  [31:0] resp_pkt_seq;
+    reg  [63:0] resp_pkt_data;
+    wire        resp_pkt_ready;
+
+    wire        reg_wr_en    = (dl_cmd_pop_r && (dl_cmd_word[63:56] == 8'h01)) ||
+                               (eth_ctrl_wr && (eth_ctrl_addr >= 16'h0034));
+    wire [15:0] reg_wr_addr  = dl_cmd_pop_r ? dl_cmd_word[47:32] : eth_ctrl_addr;
+    wire [31:0] reg_wr_wdata = dl_cmd_pop_r ? dl_cmd_word[31:0]  : eth_ctrl_wdata;
+`ifdef MUTATE_NO_REG_RESP
+    wire        reg_rd_req   = 1'b0;
+`else
+    wire        reg_rd_req   = dl_cmd_pop_r && (dl_cmd_word[63:56] == 8'h02);
+`endif
+
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            reg_adcs_ctrl          <= 32'h0000_0001;
+            reg_conv_spi_cmd       <= 32'd0;
+            reg_conv_spi_start_p   <= 1'b0;
+            reg_adcs_init_p        <= 1'b0;
+            conv_resp_valid_sticky <= 1'b0;
+            conv_resp_rdata_hold   <= 8'd0;
+            reg_sdr_nco_a          <= 32'd0;
+            reg_sdr_nco_b          <= 32'd0;
+            reg_sdr_decim          <= 16'd4;
+            reg_sdr_words_per_pkt  <= 10'd64;
+            sdr_cfg_tog_link       <= 1'b0;
+            reg_dacr_ctrl          <= 32'h00FF_0000;
+            reg_dacr_trig_p        <= 1'b0;
+            reg_dacr_f0            <= 32'd0;
+            reg_dacr_df            <= 32'd0;
+            reg_dacr_plen          <= 32'h0000_0400;
+            reg_dacr_pri           <= 32'h0000_2000;
+            reg_dacs_ctrl          <= 32'd0;
+            reg_adar_ctrl          <= 32'd0;
+            reg_adar_load_p        <= 1'b0;
+            reg_adar_init_p        <= 1'b0;
+            reg_adar_sw_p          <= 1'b0;
+            reg_adar_guard         <= 32'h000C_000A;
+            reg_adar_sw_settle     <= 16'd125;
+            reg_adar_tbl_wr        <= 32'd0;
+            reg_adar_tbl_p         <= 1'b0;
+            reg_adar_spi_cmd       <= 32'd0;
+            reg_adar_spi_p         <= 1'b0;
+            reg_hk_i2c_ctrl        <= 32'h0000_0001;
+            reg_hk_i2c_cmd         <= 32'd0;
+            reg_hk_i2c_p           <= 1'b0;
+            reg_hk_i2c_wdata       <= 32'd0;
+            reg_xo_ctrl            <= 32'd0;
+            reg_xo_prog_p          <= 1'b0;
+            reg_xo_delta_p         <= 1'b0;
+            reg_xo_delta_m         <= 24'd0;
+            reg_xo_raw_cmd         <= 32'd0;
+            reg_xo_raw_p           <= 1'b0;
+            xo_raw_valid_sticky    <= 1'b0;
+            xo_raw_rdata_hold      <= 8'd0;
+            xo_raw_err_hold        <= 1'b0;
+            reg_pps_step_q8        <= 16'h0800;
+            reg_pps_disc_en        <= 1'b0;
+            reg_pps_clear_p        <= 1'b0;
+            reg_pps_nom_cyc        <= PPS_DEFAULT_NOM_CYC;
+            resp_pkt_pend          <= 1'b0;
+            resp_pkt_seq           <= 32'd0;
+            resp_pkt_data          <= 64'd0;
+        end else begin
+            // 1-cycle W1P pulse clears
+            reg_adcs_init_p      <= 1'b0;
+            reg_conv_spi_start_p <= 1'b0;
+            reg_dacr_trig_p      <= 1'b0;
+            reg_adar_load_p      <= 1'b0;
+            reg_adar_init_p      <= 1'b0;
+            reg_adar_sw_p        <= 1'b0;
+            reg_adar_tbl_p       <= 1'b0;
+            reg_adar_spi_p       <= 1'b0;
+            reg_hk_i2c_p         <= 1'b0;
+            reg_xo_prog_p        <= 1'b0;
+            reg_xo_delta_p       <= 1'b0;
+            reg_xo_raw_p         <= 1'b0;
+            reg_pps_clear_p      <= 1'b0;
+
+            if (conv_resp_valid) begin
+                conv_resp_valid_sticky <= 1'b1;
+                conv_resp_rdata_hold   <= conv_resp_rdata;
+            end
+            if (xo_raw_resp_valid) begin
+                xo_raw_valid_sticky <= 1'b1;
+                xo_raw_rdata_hold   <= xo_raw_resp_rdata;
+                xo_raw_err_hold     <= xo_raw_resp_err;
+            end
+            if (resp_pkt_pend && resp_pkt_ready) begin
+                resp_pkt_pend <= 1'b0;
+                resp_pkt_seq  <= resp_pkt_seq + 32'd1;
+            end
+
+            if (reg_wr_en) begin
+                case (reg_wr_addr[7:2])
+                    6'h0D: begin // 0x34 ADCS_CTRL
+                        reg_adcs_ctrl   <= reg_wr_wdata;
+                        reg_adcs_init_p <= reg_wr_wdata[1];
+                    end
+                    6'h0F: begin // 0x3C CONV_SPI_CMD
+                        reg_conv_spi_cmd     <= reg_wr_wdata;
+                        reg_conv_spi_start_p <= reg_wr_wdata[31];
+                        if (reg_wr_wdata[31]) conv_resp_valid_sticky <= 1'b0;
+                    end
+                    6'h11: begin // 0x44 SDR_DDC_NCO_A
+                        reg_sdr_nco_a    <= reg_wr_wdata;
+                        sdr_cfg_tog_link <= ~sdr_cfg_tog_link;
+                    end
+                    6'h12: begin // 0x48 SDR_DDC_NCO_B
+                        reg_sdr_nco_b    <= reg_wr_wdata;
+                        sdr_cfg_tog_link <= ~sdr_cfg_tog_link;
+                    end
+                    6'h13: begin // 0x4C SDR_DDC_DECIM
+                        reg_sdr_decim         <= (reg_wr_wdata[15:0] < 16'd2) ? 16'd2 : reg_wr_wdata[15:0];
+                        reg_sdr_words_per_pkt <= (reg_wr_wdata[25:16] == 10'd0) ? 10'd64 : reg_wr_wdata[25:16];
+                        sdr_cfg_tog_link      <= ~sdr_cfg_tog_link;
+                    end
+                    6'h15: begin // 0x54 DACR_CTRL
+                        reg_dacr_ctrl   <= reg_wr_wdata;
+                        reg_dacr_trig_p <= reg_wr_wdata[1];
+                    end
+                    6'h16: reg_dacr_f0   <= reg_wr_wdata; // 0x58
+                    6'h17: reg_dacr_df   <= reg_wr_wdata; // 0x5C
+                    6'h18: reg_dacr_plen <= reg_wr_wdata; // 0x60
+                    6'h19: reg_dacr_pri  <= reg_wr_wdata; // 0x64
+                    6'h1C: reg_dacs_ctrl <= reg_wr_wdata; // 0x70
+                    6'h1F: begin // 0x7C ADAR_CTRL
+                        reg_adar_ctrl   <= reg_wr_wdata;
+                        reg_adar_load_p <= reg_wr_wdata[6];
+                        reg_adar_init_p <= reg_wr_wdata[7];
+                        reg_adar_sw_p   <= 1'b1;
+                    end
+                    6'h20: reg_adar_guard     <= reg_wr_wdata;       // 0x80
+                    6'h21: reg_adar_sw_settle <= reg_wr_wdata[15:0]; // 0x84
+                    6'h22: begin // 0x88 ADAR_TBL_WR
+                        reg_adar_tbl_wr <= reg_wr_wdata;
+                        reg_adar_tbl_p  <= reg_wr_wdata[31];
+                    end
+                    6'h23: begin // 0x8C ADAR_SPI_CMD
+                        reg_adar_spi_cmd <= reg_wr_wdata;
+                        reg_adar_spi_p   <= reg_wr_wdata[31];
+                    end
+                    6'h25: reg_hk_i2c_ctrl <= reg_wr_wdata; // 0x94
+                    6'h26: begin // 0x98 HK_I2C_CMD
+                        reg_hk_i2c_cmd <= reg_wr_wdata;
+                        reg_hk_i2c_p   <= reg_wr_wdata[31];
+                    end
+                    6'h27: reg_hk_i2c_wdata <= reg_wr_wdata; // 0x9C
+                    6'h2A: begin // 0xA8 XO_CTRL
+                        reg_xo_ctrl    <= reg_wr_wdata;
+                        reg_xo_prog_p  <= reg_wr_wdata[2];
+                        reg_xo_delta_p <= reg_wr_wdata[3];
+                    end
+                    6'h2B: reg_xo_delta_m <= reg_wr_wdata[23:0]; // 0xAC
+                    6'h2C: begin // 0xB0 XO_RAW_CMD
+                        reg_xo_raw_cmd <= reg_wr_wdata;
+                        reg_xo_raw_p   <= reg_wr_wdata[31];
+                        if (reg_wr_wdata[31]) xo_raw_valid_sticky <= 1'b0;
+                    end
+                    6'h30: begin // 0xC0 PPS_CTRL
+                        reg_pps_step_q8 <= reg_wr_wdata[15:0];
+                        reg_pps_disc_en <= reg_wr_wdata[16];
+                        reg_pps_clear_p <= reg_wr_wdata[17];
+                    end
+                    6'h31: reg_pps_nom_cyc <= reg_wr_wdata; // 0xC4
+                    default: ;
+                endcase
+            end else if (reg_rd_req) begin
+                resp_pkt_pend <= 1'b1;
+                resp_pkt_data <= {16'h0002, dl_cmd_word[47:32], reg_rd_word(dl_cmd_word[47:32])};
+            end
+        end
+    end
+
+    // Packet-atomic 3-way Arbiter into s0_arb_* (0x11 Reg Readback > 0x01 Radar DDC <-> 0x04/05 SDR DDC)
+    reg [1:0] arb_owner; // 0=IDLE, 1=RESP, 2=RAD, 3=SDR
+    reg       arb_rr_sdr;
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            arb_owner  <= 2'd0;
+            arb_rr_sdr <= 1'b0;
+        end else begin
+            if (arb_owner == 2'd0) begin
+                if (resp_pkt_pend) begin
+                    arb_owner <= 2'd1;
+                end else if (tx_pkt_valid && sdr_adc_pkt_valid) begin
+                    arb_owner  <= arb_rr_sdr ? 2'd3 : 2'd2;
+                    arb_rr_sdr <= ~arb_rr_sdr;
+                end else if (tx_pkt_valid) begin
+                    arb_owner  <= 2'd2;
+                    arb_rr_sdr <= 1'b1;
+                end else if (sdr_adc_pkt_valid) begin
+                    arb_owner  <= 2'd3;
+                    arb_rr_sdr <= 1'b0;
+                end
+            end else if (s0_arb_valid && s0_arb_ready && s0_arb_eop) begin
+                arb_owner <= 2'd0;
+            end
+        end
+    end
+
+    assign s0_arb_valid    = (arb_owner == 2'd1) ? resp_pkt_pend :
+                             (arb_owner == 2'd2) ? tx_pkt_valid  :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_valid : 1'b0;
+    assign s0_arb_sop      = (arb_owner == 2'd1) ? 1'b1 :
+                             (arb_owner == 2'd2) ? tx_pkt_sop :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_sop : 1'b0;
+    assign s0_arb_eop      = (arb_owner == 2'd1) ? 1'b1 :
+                             (arb_owner == 2'd2) ? tx_pkt_eop :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_eop : 1'b0;
+    assign s0_arb_sid      = (arb_owner == 2'd1) ? 8'h11 :
+                             (arb_owner == 2'd2) ? tx_pkt_stream_id :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_sid : 8'd0;
+    assign s0_arb_len      = (arb_owner == 2'd1) ? 16'd8 :
+                             (arb_owner == 2'd2) ? tx_pkt_len :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_len : 16'd0;
+    assign s0_arb_seq      = (arb_owner == 2'd1) ? resp_pkt_seq :
+                             (arb_owner == 2'd2) ? tx_pkt_seq :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_seq : 32'd0;
+    assign s0_arb_ts       = (arb_owner == 2'd1) ? xadc_ts_sys :
+                             (arb_owner == 2'd2) ? tx_pkt_timestamp :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_ts : 64'd0;
+    assign s0_arb_data     = (arb_owner == 2'd1) ? resp_pkt_data :
+                             (arb_owner == 2'd2) ? tx_pkt_data :
+                             (arb_owner == 2'd3) ? sdr_adc_pkt_data : 64'd0;
+
+    assign resp_pkt_ready    = (arb_owner == 2'd1) && s0_arb_ready;
+    assign tx_pkt_ready      = (arb_owner == 2'd2) && s0_arb_ready;
+    assign sdr_adc_pkt_ready = (arb_owner == 2'd3) && s0_arb_ready;
+
+    // Active-high interrupt to KV260 carrier (Bank 35, LVCMOS18)
+    assign fpga_irq = ~alert_sync_r[1] | hk_alert_active | xadc_overtemp |
+                      adc_err_sync[1] | adcs_ie_s[1] | adcs_be_s[1] |
+                      (dl_crc_sync2 != 32'd0);
 
 endmodule

@@ -134,6 +134,12 @@ endgenerate
 
 integer i;
 
+// Local reset buffer to break cross-chip reset routing on 100 MHz FIR tree
+(* keep = "true", max_fanout = 16 *) reg reset_n_loc = 1'b0;
+always @(posedge clk) begin
+    reset_n_loc <= reset_n;
+end
+
 // ============================================================================
 // Pipeline Stage 0: Shift delay line on data_valid
 // Sync reset: enables DSP48E1 AREG/BREG absorption for delay_line registers
@@ -143,7 +149,7 @@ integer i;
 // Vivado to absorb these into DSP48E1 AREG/BREG, further reducing LUT count.
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         for (i = 0; i < TAPS; i = i + 1) begin
             delay_line[i] <= 0;
         end
@@ -161,7 +167,7 @@ end
 // Vivado absorbs into DSP48E1 B-port pipeline register (BREG=1).
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         for (i = 0; i < TAPS; i = i + 1) begin
             coeff_reg[i] <= 0;
         end
@@ -178,7 +184,7 @@ end
 // Vivado absorbs into DSP48E1 M-register (MREG=1).
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         for (i = 0; i < TAPS; i = i + 1) begin
             mult_reg[i] <= 0;
         end
@@ -196,7 +202,7 @@ end
 // Now uses mult_result (from mult_reg/MREG stage) instead of combinatorial multiply.
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         for (i = 0; i < 16; i = i + 1) begin
             add_l0[i] <= 0;
         end
@@ -216,7 +222,7 @@ end
 // Sync reset enables DSP48E1 absorption (fixes DPOR-1 warnings)
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         for (i = 0; i < 8; i = i + 1) begin
             add_l1[i] <= 0;
         end
@@ -232,7 +238,7 @@ end
 // Sync reset enables DSP48E1 absorption (fixes DPOR-1 warnings)
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         for (i = 0; i < 4; i = i + 1) begin
             add_l2[i] <= 0;
         end
@@ -248,7 +254,7 @@ end
 // Sync reset enables DSP48E1 absorption (fixes DPOR-1 warnings)
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         add_l3[0] <= 0;
         add_l3[1] <= 0;
     end else if (valid_pipe[4]) begin
@@ -262,7 +268,7 @@ end
 // Sync reset enables DSP48E1 absorption (fixes DPOR-1 warnings)
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         accumulator_reg <= 0;
     end else if (valid_pipe[5]) begin
         accumulator_reg <= add_l3[0] + add_l3[1];
@@ -274,7 +280,7 @@ end
 // Sync reset enables DSP48E1 absorption (fixes DPOR-1 warnings)
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         data_out <= 0;
         data_out_valid <= 0;
     end else begin
@@ -299,7 +305,7 @@ end
 // Sync reset — no DSP48 involvement but keeps reset style consistent with datapath
 // ============================================================================
 always @(posedge clk) begin
-    if (!reset_n) begin
+    if (!reset_n_loc) begin
         valid_pipe <= 9'b000000000;
     end else begin
         valid_pipe <= {valid_pipe[7:0], data_valid};

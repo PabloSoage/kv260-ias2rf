@@ -132,10 +132,13 @@ module tb_e2e;
     pullup(eth_mdio);
 
     artix_top #(
-        .DDC_POST_DECIM (4),
-        .LINK_AM_PERIOD (64),
-        .ADC_AUTO_TRAIN (1'b1),
-        .ENABLE_ETH     (1'b0)
+        .DDC_POST_DECIM     (4),
+        .LINK_AM_PERIOD     (64),
+        .ADC_AUTO_TRAIN     (1'b1),
+        .ENABLE_ETH         (1'b0),
+        .CONV_SPI_AUTO_INIT (1'b0),
+        .ADAR_AUTO_INIT     (1'b0),
+        .HK_POLL_DIV        (12500000)
     ) u_artix (
         .fpga_clk_p    (fpga_clk_100m),
         .fpga_clk_n    (~fpga_clk_100m),
@@ -145,6 +148,15 @@ module tb_e2e;
         .adcr_or_n     (adcr_or_n),
         .adcr_dco_n    (adcr_dco_n_pin),
         .adcr_dco_p    (adcr_dco_p_pin),
+        .adcs_dco_p    (fpga_clk_100m),
+        .adcs_dco_n    (~fpga_clk_100m),
+        .adcs_fco_p    (1'b0),
+        .adcs_fco_n    (1'b1),
+        .adcs_d0_p     (1'b0),
+        .adcs_d0_n     (1'b1),
+        .adcs_d1_p     (1'b0),
+        .adcs_d1_n     (1'b1),
+        .adar_sdo      (1'b0),
         .link_rx_clk_p (ul_tx_clk_p),
         .link_rx_clk_n (ul_tx_clk_n),
         .link_rx_d0_p  (ul_tx_d0_p),

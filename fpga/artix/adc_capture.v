@@ -275,6 +275,8 @@ module adc_capture #(
     // Capture IDDR Q1/Q2 in matched dco_bufr domain -> 4-deep Gray FIFO -> clk_200m
     // Absorbs static + PVT clock-tree skew between Bank 14 BUFIO/BUFR and MMCM BUFG.
     reg [17:0] dco_fifo_mem [0:3];
+    reg [8:0]  q_rise_pipe, q_fall_pipe;
+    reg        q_pipe_valid;
     reg [2:0]  wp_bufr_bin, wp_bufr_gray;
     reg [2:0]  rp_200_bin, rp_200_gray;
     (* ASYNC_REG = "TRUE" *) reg [2:0] wp_gray_sync1, wp_gray_sync2;
@@ -286,12 +288,20 @@ module adc_capture #(
 
     always @(posedge dco_bufr) begin
         if (rst_bufr) begin
+            q_rise_pipe  <= 9'd0;
+            q_fall_pipe  <= 9'd0;
+            q_pipe_valid <= 1'b0;
             wp_bufr_bin  <= 3'd0;
             wp_bufr_gray <= 3'd0;
         end else begin
-            dco_fifo_mem[wp_bufr_bin[1:0]] <= {q_fall, q_rise};
-            wp_bufr_bin  <= wp_bufr_bin + 3'd1;
-            wp_bufr_gray <= b2g3(wp_bufr_bin + 3'd1);
+            q_rise_pipe  <= q_rise;
+            q_fall_pipe  <= q_fall;
+            q_pipe_valid <= 1'b1;
+            if (q_pipe_valid) begin
+                dco_fifo_mem[wp_bufr_bin[1:0]] <= {q_fall_pipe, q_rise_pipe};
+                wp_bufr_bin  <= wp_bufr_bin + 3'd1;
+                wp_bufr_gray <= b2g3(wp_bufr_bin + 3'd1);
+            end
         end
     end
 
@@ -558,14 +568,18 @@ module adc_capture #(
     end
     wire rst_400m = rst_sync_400[1];
 
-    reg       tog_400_d1, tog_400_d2;
+    (* ASYNC_REG = "TRUE" *) reg [8:0] q_rise_cap, q_fall_cap;
+    reg       tog_400_d1, tog_400_d2, tog_400_d3;
     reg [8:0] fall_hold;
     reg       trained_400_d1, trained_400_d2;
 
     always @(posedge clk_400m) begin
         if (rst_400m) begin
+            q_rise_cap     <= 9'd0;
+            q_fall_cap     <= 9'd0;
             tog_400_d1     <= 1'b0;
             tog_400_d2     <= 1'b0;
+            tog_400_d3     <= 1'b0;
             fall_hold      <= 9'd0;
             adc_data       <= 8'd0;
             adc_or         <= 1'b0;
@@ -573,15 +587,18 @@ module adc_capture #(
             trained_400_d1 <= 1'b0;
             trained_400_d2 <= 1'b0;
         end else begin
+            q_rise_cap     <= q_rise_r;
+            q_fall_cap     <= q_fall_r;
             tog_400_d1     <= tog_200;
             tog_400_d2     <= tog_400_d1;
+            tog_400_d3     <= tog_400_d2;
             trained_400_d1 <= adc_trained;
             trained_400_d2 <= trained_400_d1;
 
-            if (tog_400_d1 != tog_400_d2) begin
-                adc_data  <= q_rise_r[7:0];
-                adc_or    <= q_rise_r[8];
-                fall_hold <= q_fall_r;
+            if (tog_400_d2 != tog_400_d3) begin
+                adc_data  <= q_rise_cap[7:0];
+                adc_or    <= q_rise_cap[8];
+                fall_hold <= q_fall_cap;
                 adc_valid <= trained_400_d2;
             end else begin
                 adc_data  <= fall_hold[7:0];

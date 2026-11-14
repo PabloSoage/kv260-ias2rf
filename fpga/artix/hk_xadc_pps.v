@@ -243,6 +243,7 @@ module hk_xadc_pps #(
     reg        snap_tog_adc;
 
     // Iterative unsigned restoring divider: num[55:0] / den[31:0] -> quotient for |diff|*1e6 / nom
+    reg        div_prep;
     reg        div_busy;
     reg        div_neg;
     reg [5:0]  div_bit;
@@ -250,13 +251,14 @@ module hk_xadc_pps #(
     reg [55:0] div_num;
     reg [31:0] div_den;
     reg [31:0] div_quot;
+    reg [31:0] abs_diff_r;
+    reg [63:0] next_sec_ns_r;
 
     wire [55:0] rem_shift = {div_rem[54:0], div_num[55]};
     wire [55:0] den_ext   = {24'd0, div_den};
 
     reg signed [32:0] diff_cyc;
     reg [31:0] abs_diff;
-    reg [63:0] next_sec_ns;
 
     always @(posedge pps_meas_clk) begin
         if (pps_meas_rst || ts_clr_s[1]) begin
@@ -270,6 +272,7 @@ module hk_xadc_pps #(
             meas_locked_adc   <= 1'b0;
             meas_ppm_adc      <= 32'sd0;
             snap_tog_adc      <= 1'b0;
+            div_prep          <= 1'b0;
             div_busy          <= 1'b0;
             div_neg           <= 1'b0;
             div_bit           <= 6'd0;
@@ -277,6 +280,8 @@ module hk_xadc_pps #(
             div_num           <= 56'd0;
             div_den           <= 32'd1;
             div_quot          <= 32'd0;
+            abs_diff_r        <= 32'd0;
+            next_sec_ns_r     <= 64'd1_000_000_000;
         end else begin
             pps_in_sync  <= {pps_in_sync[1:0], pps_sync};
             ts_q8        <= ts_q8 + {{56{1'b0}}, step_q8_adc};
@@ -289,12 +294,12 @@ module hk_xadc_pps #(
                 cur_period_cyc    <= 32'd1;
                 meas_pps_cnt_adc  <= meas_pps_cnt_adc + 32'd1;
                 meas_latch_ts_adc <= ts_q8[71:8];
+                next_sec_ns_r     <= next_sec_ns_r + 64'd1_000_000_000;
 
                 if (disc_en_s[1] && pps_seen_adc) begin
                     // Monotonic PPS discipline: snap ahead cleanly if slower than nominal
-                    next_sec_ns = (meas_pps_cnt_adc + 32'd1) * 64'd1_000_000_000;
-                    if (ts_q8[71:8] < next_sec_ns)
-                        ts_q8 <= {next_sec_ns, 8'd0};
+                    if (ts_q8[71:8] < next_sec_ns_r)
+                        ts_q8 <= {next_sec_ns_r, 8'd0};
                 end
 
                 if (pps_seen_adc) begin
@@ -302,18 +307,27 @@ module hk_xadc_pps #(
                     meas_locked_adc <= 1'b1;
 
                     // Start |cur_period_cyc - nom_cyc_adc| * 1_000_000 / nom_cyc_adc
-                    diff_cyc = $signed({1'b0, cur_period_cyc}) - $signed({1'b0, nom_cyc_adc});
-                    div_neg  <= diff_cyc[32];
-                    abs_diff = diff_cyc[32] ? (~diff_cyc[31:0] + 32'd1) : diff_cyc[31:0];
-                    div_num  <= abs_diff * 56'd1_000_000;
-                    div_den  <= (nom_cyc_adc == 32'd0) ? 32'd1 : nom_cyc_adc;
-                    div_rem  <= 56'd0;
-                    div_quot <= 32'd0;
-                    div_bit  <= 6'd55;
-                    div_busy <= 1'b1;
+                    diff_cyc   = $signed({1'b0, cur_period_cyc}) - $signed({1'b0, nom_cyc_adc});
+                    div_neg    <= diff_cyc[32];
+                    abs_diff   = diff_cyc[32] ? (~diff_cyc[31:0] + 32'd1) : diff_cyc[31:0];
+                    abs_diff_r <= abs_diff;
+                    div_den    <= (nom_cyc_adc == 32'd0) ? 32'd1 : nom_cyc_adc;
+                    div_rem    <= 56'd0;
+                    div_quot   <= 32'd0;
+                    div_bit    <= 6'd55;
+                    div_prep   <= 1'b1;
+                    div_busy   <= 1'b0;
                 end else begin
                     snap_tog_adc <= ~snap_tog_adc;
                 end
+            end else if (div_prep) begin
+                // 1_000_000 = 2^19 + 2^18 + 2^17 + 2^16 + 2^14 + 2^9 + 2^6 (0 DSPs)
+                div_num  <= ({24'd0, abs_diff_r} << 19) + ({24'd0, abs_diff_r} << 18) +
+                            ({24'd0, abs_diff_r} << 17) + ({24'd0, abs_diff_r} << 16) +
+                            ({24'd0, abs_diff_r} << 14) + ({24'd0, abs_diff_r} << 9)  +
+                            ({24'd0, abs_diff_r} << 6);
+                div_prep <= 1'b0;
+                div_busy <= 1'b1;
             end else if (div_busy) begin
                 if (rem_shift >= den_ext) begin
                     div_rem  <= rem_shift - den_ext;

@@ -48,9 +48,9 @@ module link_rx_train_fsm #(
     output reg         load_l1,
     output reg  [8:0]  cntval_l1,
 
-    // Status & measured eye bounds
-    output reg  [2:0]  train_state,
-    output reg         link_up,
+    // Status & measured eye bounds (power-on 0 matches FPGA GSR for safe CDC before first clk)
+    output reg  [2:0]  train_state = 3'd0,
+    output reg         link_up = 1'b0,
     output reg  [8:0]  eye_left_l0,
     output reg  [8:0]  eye_right_l0,
     output reg  [8:0]  eye_left_l1,

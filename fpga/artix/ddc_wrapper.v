@@ -188,15 +188,16 @@ module ddc_wrapper #(
 
     // Read side in link_clk domain + store-and-forward packet framing toward link_pcs_tx
     reg  [ADDR_W:0] wr_ptr_bin_sync;
+    reg  [ADDR_W:0] wr_ptr_bin_sync_r;
     integer g;
     always @* begin
         wr_ptr_bin_sync[ADDR_W] = wr_gray_sync2[ADDR_W];
         for (g = ADDR_W - 1; g >= 0; g = g - 1)
             wr_ptr_bin_sync[g] = wr_ptr_bin_sync[g + 1] ^ wr_gray_sync2[g];
     end
-    wire [ADDR_W:0] fifo_fill = wr_ptr_bin_sync - rd_ptr_bin;
-    wire fifo_empty = (rd_ptr_gray == wr_gray_sync2);
-    wire pkt_avail  = (fifo_fill >= PKT_WORDS);
+    wire [ADDR_W:0] fifo_fill  = wr_ptr_bin_sync_r - rd_ptr_bin;
+    wire            fifo_empty = (rd_ptr_bin == wr_ptr_bin_sync_r);
+    wire            pkt_avail  = (fifo_fill >= PKT_WORDS);
 
     (* ASYNC_REG = "TRUE" *) reg [23:0] drop_sync1, drop_sync2;
 
@@ -215,20 +216,22 @@ module ddc_wrapper #(
 
     always @(posedge link_clk) begin
         if (link_rst) begin
-            rd_ptr_bin    <= {(ADDR_W+1){1'b0}};
-            rd_ptr_gray   <= {(ADDR_W+1){1'b0}};
-            wr_gray_sync1 <= {(ADDR_W+1){1'b0}};
-            wr_gray_sync2 <= {(ADDR_W+1){1'b0}};
-            drop_sync1    <= 24'd0;
-            drop_sync2    <= 24'd0;
-            dropped_cnt   <= 24'd0;
-            word_idx      <= 16'd0;
-            pkt_active    <= 1'b0;
-            pkt_seq       <= 32'd0;
-            pkt_timestamp <= 64'd0;
+            rd_ptr_bin        <= {(ADDR_W+1){1'b0}};
+            rd_ptr_gray       <= {(ADDR_W+1){1'b0}};
+            wr_gray_sync1     <= {(ADDR_W+1){1'b0}};
+            wr_gray_sync2     <= {(ADDR_W+1){1'b0}};
+            wr_ptr_bin_sync_r <= {(ADDR_W+1){1'b0}};
+            drop_sync1        <= 24'd0;
+            drop_sync2        <= 24'd0;
+            dropped_cnt       <= 24'd0;
+            word_idx          <= 16'd0;
+            pkt_active        <= 1'b0;
+            pkt_seq           <= 32'd0;
+            pkt_timestamp     <= 64'd0;
         end else begin
-            wr_gray_sync1 <= wr_ptr_gray;
-            wr_gray_sync2 <= wr_gray_sync1;
+            wr_gray_sync1     <= wr_ptr_gray;
+            wr_gray_sync2     <= wr_gray_sync1;
+            wr_ptr_bin_sync_r <= wr_ptr_bin_sync;
             drop_sync1    <= drop_100;
             drop_sync2    <= drop_sync1;
             dropped_cnt   <= drop_sync2;

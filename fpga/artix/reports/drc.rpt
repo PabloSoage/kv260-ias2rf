@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Fri Nov 13 19:45:09 2026
+| Date         : Sat Nov 14 01:25:15 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_drc -file D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/drc.rpt
 | Design       : artix_top
@@ -24,10 +24,17 @@ Table of Contents
       Design limits: <entire design considered>
            Ruledeck: default
              Max checks: <unlimited>
-             Checks found: 29
+             Checks found: 113
 +-----------+----------+-------------------------------------------------------------------+--------+
 | Rule      | Severity | Description                                                       | Checks |
 +-----------+----------+-------------------------------------------------------------------+--------+
+| BUFC-1    | Warning  | Input Buffer Connections                                          | 1      |
+| CHECK-3   | Warning  | Report rule limit reached                                         | 1      |
+| DPIP-1    | Warning  | Input pipelining                                                  | 19     |
+| DPOP-1    | Warning  | PREG Output pipelining                                            | 10     |
+| DPOP-2    | Warning  | MREG Output pipelining                                            | 15     |
+| REQP-1839 | Warning  | RAMB36 async control check                                        | 20     |
+| REQP-1840 | Warning  | RAMB18 async control check                                        | 18     |
 | RTSTAT-10 | Warning  | No routable loads                                                 | 1      |
 | AVAL-4    | Advisory | enum_USE_DPORT_FALSE_enum_DREG_ADREG_0_connects_CED_CEAD_RSTD_GND | 15     |
 | AVAL-5    | Advisory | enum_USE_MULT_NONE_enum_DREG_ADREG_0_connects_CED_CEAD_RSTD_GND   | 13     |
@@ -35,6 +42,426 @@ Table of Contents
 
 2. REPORT DETAILS
 -----------------
+BUFC-1#1 Warning
+Input Buffer Connections  
+Input buffer u_iobuf_adar_sdio/IBUF (in u_iobuf_adar_sdio macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+CHECK-3#1 Warning
+Report rule limit reached  
+REQP-1839 rule limit reached: 20 violations have been found.
+Related violations: <none>
+
+DPIP-1#1 Warning
+Input pipelining  
+DSP u_dac_radar/s1b_prod_reg input u_dac_radar/s1b_prod_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#2 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r_reg input u_sdr_ddc/u_ch_a/hb_acc_i_r_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#3 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r_reg input u_sdr_ddc/u_ch_a/hb_acc_i_r_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#4 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r_reg input u_sdr_ddc/u_ch_a/hb_acc_i_r_reg/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#5 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r_reg input u_sdr_ddc/u_ch_a/hb_acc_q_r_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#6 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r_reg input u_sdr_ddc/u_ch_a/hb_acc_q_r_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#7 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r_reg input u_sdr_ddc/u_ch_a/hb_acc_q_r_reg/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#8 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_i_reg input u_sdr_ddc/u_ch_a/mix_i_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#9 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_q1 input u_sdr_ddc/u_ch_a/mix_q1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#10 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_q_reg input u_sdr_ddc/u_ch_a/mix_q_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#11 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r_reg input u_sdr_ddc/u_ch_b/hb_acc_i_r_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#12 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r_reg input u_sdr_ddc/u_ch_b/hb_acc_i_r_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#13 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r_reg input u_sdr_ddc/u_ch_b/hb_acc_i_r_reg/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#14 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r_reg input u_sdr_ddc/u_ch_b/hb_acc_q_r_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#15 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r_reg input u_sdr_ddc/u_ch_b/hb_acc_q_r_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#16 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r_reg input u_sdr_ddc/u_ch_b/hb_acc_q_r_reg/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#17 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_i_reg input u_sdr_ddc/u_ch_b/mix_i_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#18 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_q1 input u_sdr_ddc/u_ch_b/mix_q1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#19 Warning
+Input pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_q_reg input u_sdr_ddc/u_ch_b/mix_q_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPOP-1#1 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r2 output u_sdr_ddc/u_ch_a/hb_acc_i_r2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#2 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r4 output u_sdr_ddc/u_ch_a/hb_acc_i_r4/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#3 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r2 output u_sdr_ddc/u_ch_a/hb_acc_q_r2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#4 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r4 output u_sdr_ddc/u_ch_a/hb_acc_q_r4/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#5 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_q1 output u_sdr_ddc/u_ch_a/mix_q1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#6 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r2 output u_sdr_ddc/u_ch_b/hb_acc_i_r2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#7 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r4 output u_sdr_ddc/u_ch_b/hb_acc_i_r4/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#8 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r2 output u_sdr_ddc/u_ch_b/hb_acc_q_r2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#9 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r4 output u_sdr_ddc/u_ch_b/hb_acc_q_r4/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#10 Warning
+PREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_q1 output u_sdr_ddc/u_ch_b/mix_q1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-2#1 Warning
+MREG Output pipelining  
+DSP u_dac_radar/s1b_prod_reg multiplier stage u_dac_radar/s1b_prod_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#2 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r2 multiplier stage u_sdr_ddc/u_ch_a/hb_acc_i_r2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#3 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_i_r4 multiplier stage u_sdr_ddc/u_ch_a/hb_acc_i_r4/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#4 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r2 multiplier stage u_sdr_ddc/u_ch_a/hb_acc_q_r2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#5 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/hb_acc_q_r4 multiplier stage u_sdr_ddc/u_ch_a/hb_acc_q_r4/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#6 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_i_reg multiplier stage u_sdr_ddc/u_ch_a/mix_i_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#7 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_q1 multiplier stage u_sdr_ddc/u_ch_a/mix_q1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#8 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_a/mix_q_reg multiplier stage u_sdr_ddc/u_ch_a/mix_q_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#9 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r2 multiplier stage u_sdr_ddc/u_ch_b/hb_acc_i_r2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#10 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_i_r4 multiplier stage u_sdr_ddc/u_ch_b/hb_acc_i_r4/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#11 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r2 multiplier stage u_sdr_ddc/u_ch_b/hb_acc_q_r2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#12 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/hb_acc_q_r4 multiplier stage u_sdr_ddc/u_ch_b/hb_acc_q_r4/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#13 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_i_reg multiplier stage u_sdr_ddc/u_ch_b/mix_i_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#14 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_q1 multiplier stage u_sdr_ddc/u_ch_b/mix_q1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#15 Warning
+MREG Output pipelining  
+DSP u_sdr_ddc/u_ch_b/mix_q_reg multiplier stage u_sdr_ddc/u_ch_b/mix_q_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+REQP-1839#1 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/ENBWREN (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_2__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#2 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/RSTRAMB (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/out[0]) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#3 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/WEA[0] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#4 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/WEA[1] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#5 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/WEA[2] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#6 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/WEA[3] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#7 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/ENBWREN (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_2__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#8 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/RSTRAMB (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/out[0]) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#9 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/WEA[0] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#10 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/WEA[1] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#11 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/WEA[2] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#12 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/WEA[3] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0_i_39__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#13 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/ENARDEN (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_1__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#14 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/RSTRAMARSTRAM (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/out[0]) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#15 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/RSTREGARSTREG (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/out[0]) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#16 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/WEBWE[3] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_76__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#17 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/WEBWE[4] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_76__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#18 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/WEBWE[5] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_76__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#19 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/WEBWE[6] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_76__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1839#20 Warning
+RAMB36 async control check  
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/WEBWE[7] (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_76__0_n_0) which is driven by a register (gen_rev06_eth.eth_rst_125_s_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#1 Warning
+RAMB18 async control check  
+The RAMB18E1 u_dac_radar/s1_vb_reg has an input control pin u_dac_radar/s1_vb_reg/RSTRAMARSTRAM (net: u_dac_radar/trig_d0) which is driven by a register (sys_rst_reg) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#2 Warning
+RAMB18 async control check  
+The RAMB18E1 u_dac_radar/s1_vb_reg has an input control pin u_dac_radar/s1_vb_reg/RSTRAMB (net: u_dac_radar/trig_d0) which is driven by a register (sys_rst_reg) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#3 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg/ENARDEN (net: u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#4 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg/ENBWREN (net: u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#5 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg/RSTRAMARSTRAM (net: u_sdr_ddc/u_ch_a/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#6 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/cos_va_r_reg/RSTRAMB (net: u_sdr_ddc/u_ch_a/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#7 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg/ENARDEN (net: u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#8 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg/ENBWREN (net: u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#9 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg/RSTRAMARSTRAM (net: u_sdr_ddc/u_ch_a/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#10 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_a/u_nco/sin_va_r_reg/RSTRAMB (net: u_sdr_ddc/u_ch_a/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#11 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg/ENARDEN (net: u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#12 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg/ENBWREN (net: u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#13 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg/RSTRAMARSTRAM (net: u_sdr_ddc/u_ch_b/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#14 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/cos_va_r_reg/RSTRAMB (net: u_sdr_ddc/u_ch_b/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#15 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg/ENARDEN (net: u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#16 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg/ENBWREN (net: u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg_3) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#17 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg/RSTRAMARSTRAM (net: u_sdr_ddc/u_ch_b/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#18 Warning
+RAMB18 async control check  
+The RAMB18E1 u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg has an input control pin u_sdr_ddc/u_ch_b/u_nco/sin_va_r_reg/RSTRAMB (net: u_sdr_ddc/u_ch_b/u_nco/out[0]) which is driven by a register (adcs_ddc_rst_sync_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
 RTSTAT-10#1 Warning
 No routable loads  
 32 net(s) have no routable loads. The problem bus(es) and/or net(s) are u_ddc/u_ddc/mult_i_retimed[0], u_ddc/u_ddc/mult_i_retimed[10],
