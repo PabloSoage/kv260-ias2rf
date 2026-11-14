@@ -136,3 +136,17 @@ See [`sw/README.md`](file:///D:/Repos/kv260-ias2rf-gemini/sw/README.md) for devi
 - `0x80000000`: `kria_pl_link` AXI4-Lite CSRs (`0x00..0x34`), interrupts GIC `89` (`irq_fpga`), `90` (`irq_link_up`).
 - `0x80010000`: `axi_dma_0` 64-bit S2MM + MM2S DMA (`HP0`, `dma-coherent`), interrupts GIC `91` (`s2mm_introut`), `92` (`mm2s_introut`).
 - PS EMIO `i2c0` (`100 kHz` to `HK_SCL`/`HK_SDA`) and `spi0` (`Pmod J2`).
+
+## Known issue (14 Nov 2026): Kria uplink eye training
+
+A whole-system simulation (`tb_system`, real Artix top + real Kria PL link joined by board-channel models;
+Gemini task 22, in progress) found that `link_rx_train_fsm` on the Kria side does not train the uplink:
+
+- with the board's realistic channels (1.17-1.36 ns delay, 14-77 ps jitter) the eye scan finds a ~16-tap window
+  on lane 1 only, at a different place on each retry, and nothing on lane 0, so the link never comes up;
+- with ideal 100 ps channels it reaches LINK_UP, but still sees only 16 taps on lane 1 and none on lane 0;
+- the bench's TAP_DWELL_CYCLES=160 speed-up made it worse (block lock needs longer per tap).
+
+The good-tap criterion or the per-lane eye bookkeeping is wrong: most of the 1 ns UI should read as good, per
+lane, and a channel delay longer than one UI must not matter. The per-block benches (`tb_link_a2k`, `tb_e2e`)
+pass because they use fixed taps. **To fix before the boards are ordered.**
