@@ -1,0 +1,1323 @@
+[
+  {
+    "name": "v2_built_hs_clean_25C",
+    "ambient_c": 25.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 141726,
+    "cells_solid": 8872,
+    "T_air_mean_C": 28.62,
+    "T_air_max_C": 51.2,
+    "U_air_max_mps": 8.3,
+    "p_cav_mean_Pa": 9.75,
+    "fan50_flow_cfm": 2.47,
+    "fan50_curve_dp_Pa": 16.03,
+    "K26_sink_C": 45.77,
+    "K26_Tj_C": 58.37,
+    "K26_margin_C": 41.63,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 68.46,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.00297,
+        "cfm": -6.29,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001167,
+        "cfm": -2.47,
+        "dp_Pa": 16.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004138,
+        "cfm": 8.77,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 54.93,
+        "T_j_C": 62.02,
+        "margin_C": 87.98,
+        "T_hs_base_C": 59.56,
+        "T_hs_mean_C": 59.53,
+        "Q_to_hs_W": 0.145
+      },
+      "Y401_Si549": {
+        "T_board_C": 52.13,
+        "T_j_C": 61.09,
+        "margin_C": 43.91,
+        "T_hs_base_C": 59.47,
+        "T_hs_mean_C": 59.45,
+        "Q_to_hs_W": 0.052
+      },
+      "U501_AD9484": {
+        "T_board_C": 49.03,
+        "T_j_C": 53.12,
+        "margin_C": 71.88,
+        "T_hs_base_C": 51.04,
+        "T_hs_mean_C": 51.03,
+        "Q_to_hs_W": 0.569
+      },
+      "U502_AD8352": {
+        "T_board_C": 49.59,
+        "T_j_C": 52.39,
+        "margin_C": 72.61
+      },
+      "U503_AD8352": {
+        "T_board_C": 46.94,
+        "T_j_C": 49.74,
+        "margin_C": 75.26
+      },
+      "U601_AD9253": {
+        "T_board_C": 42.12,
+        "T_j_C": 47.64,
+        "margin_C": 77.36
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 42.2,
+        "T_j_C": 48.33,
+        "margin_C": 51.67
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 54.45,
+        "T_j_C": 68.46,
+        "margin_C": 81.54
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 46.32,
+        "T_j_C": 52.47,
+        "margin_C": 72.53
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 45.24,
+        "T_j_C": 48.24,
+        "margin_C": 76.76
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 43.59,
+        "T_j_C": 45.09,
+        "margin_C": 79.91
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 49.25,
+        "T_j_C": 55.4,
+        "margin_C": 69.6
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 49.64,
+        "T_j_C": 53.94,
+        "margin_C": 71.06
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 46.98,
+        "T_j_C": 49.07,
+        "margin_C": 75.93
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 52.39,
+        "T_j_C": 54.89,
+        "margin_C": 70.11
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 43.63,
+        "T_j_C": 49.03,
+        "margin_C": 75.97
+      }
+    },
+    "final_h_res": 0.000113324,
+    "elapsed_s": 44.1
+  },
+  {
+    "name": "v2_built_hs_clean_45C",
+    "ambient_c": 45.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 141726,
+    "cells_solid": 8872,
+    "T_air_mean_C": 48.75,
+    "T_air_max_C": 72.16,
+    "U_air_max_mps": 8.56,
+    "p_cav_mean_Pa": 9.74,
+    "fan50_flow_cfm": 2.52,
+    "fan50_curve_dp_Pa": 15.93,
+    "K26_sink_C": 66.05,
+    "K26_Tj_C": 78.65,
+    "K26_margin_C": 21.35,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 88.84,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.003085,
+        "cfm": -6.54,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001187,
+        "cfm": -2.52,
+        "dp_Pa": 16.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004273,
+        "cfm": 9.05,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 75.36,
+        "T_j_C": 82.46,
+        "margin_C": 67.54,
+        "T_hs_base_C": 80.04,
+        "T_hs_mean_C": 80.01,
+        "Q_to_hs_W": 0.143
+      },
+      "Y401_Si549": {
+        "T_board_C": 72.55,
+        "T_j_C": 81.53,
+        "margin_C": 23.47,
+        "T_hs_base_C": 79.95,
+        "T_hs_mean_C": 79.94,
+        "Q_to_hs_W": 0.051
+      },
+      "U501_AD9484": {
+        "T_board_C": 69.41,
+        "T_j_C": 73.5,
+        "margin_C": 51.5,
+        "T_hs_base_C": 71.43,
+        "T_hs_mean_C": 71.42,
+        "Q_to_hs_W": 0.568
+      },
+      "U502_AD8352": {
+        "T_board_C": 69.95,
+        "T_j_C": 72.75,
+        "margin_C": 52.25
+      },
+      "U503_AD8352": {
+        "T_board_C": 67.28,
+        "T_j_C": 70.08,
+        "margin_C": 54.92
+      },
+      "U601_AD9253": {
+        "T_board_C": 62.42,
+        "T_j_C": 67.94,
+        "margin_C": 57.06
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 62.55,
+        "T_j_C": 68.68,
+        "margin_C": 31.32
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 74.83,
+        "T_j_C": 88.84,
+        "margin_C": 61.16
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 66.65,
+        "T_j_C": 72.8,
+        "margin_C": 52.2
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 65.58,
+        "T_j_C": 68.58,
+        "margin_C": 56.42
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 63.93,
+        "T_j_C": 65.43,
+        "margin_C": 59.57
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 69.6,
+        "T_j_C": 75.75,
+        "margin_C": 49.25
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 69.99,
+        "T_j_C": 74.29,
+        "margin_C": 50.71
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 67.33,
+        "T_j_C": 69.42,
+        "margin_C": 55.58
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 72.81,
+        "T_j_C": 75.31,
+        "margin_C": 49.69
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 63.97,
+        "T_j_C": 69.37,
+        "margin_C": 55.63
+      }
+    },
+    "final_h_res": 0.000186553,
+    "elapsed_s": 42.7
+  },
+  {
+    "name": "v2_built_hs_clean_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 141726,
+    "cells_solid": 8872,
+    "T_air_mean_C": 73.91,
+    "T_air_max_C": 97.8,
+    "U_air_max_mps": 8.9,
+    "p_cav_mean_Pa": 9.68,
+    "fan50_flow_cfm": 2.57,
+    "fan50_curve_dp_Pa": 15.81,
+    "K26_sink_C": 91.36,
+    "K26_Tj_C": 103.96,
+    "K26_margin_C": -3.96,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 114.29,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.003217,
+        "cfm": -6.82,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001211,
+        "cfm": -2.57,
+        "dp_Pa": 16.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004428,
+        "cfm": 9.38,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 100.88,
+        "T_j_C": 107.99,
+        "margin_C": 42.01,
+        "T_hs_base_C": 105.56,
+        "T_hs_mean_C": 105.53,
+        "Q_to_hs_W": 0.143
+      },
+      "Y401_Si549": {
+        "T_board_C": 98.06,
+        "T_j_C": 107.05,
+        "margin_C": -2.05,
+        "T_hs_base_C": 105.47,
+        "T_hs_mean_C": 105.46,
+        "Q_to_hs_W": 0.051
+      },
+      "U501_AD9484": {
+        "T_board_C": 94.88,
+        "T_j_C": 98.97,
+        "margin_C": 26.03,
+        "T_hs_base_C": 96.89,
+        "T_hs_mean_C": 96.88,
+        "Q_to_hs_W": 0.569
+      },
+      "U502_AD8352": {
+        "T_board_C": 95.44,
+        "T_j_C": 98.24,
+        "margin_C": 26.76
+      },
+      "U503_AD8352": {
+        "T_board_C": 92.74,
+        "T_j_C": 95.54,
+        "margin_C": 29.46
+      },
+      "U601_AD9253": {
+        "T_board_C": 87.88,
+        "T_j_C": 93.4,
+        "margin_C": 31.6
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 87.97,
+        "T_j_C": 94.11,
+        "margin_C": 5.89
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 100.28,
+        "T_j_C": 114.29,
+        "margin_C": 35.71
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 92.03,
+        "T_j_C": 98.18,
+        "margin_C": 26.82
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 90.97,
+        "T_j_C": 93.97,
+        "margin_C": 31.03
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 89.31,
+        "T_j_C": 90.81,
+        "margin_C": 34.19
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 95.0,
+        "T_j_C": 101.15,
+        "margin_C": 23.85
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 95.4,
+        "T_j_C": 99.71,
+        "margin_C": 25.29
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 92.75,
+        "T_j_C": 94.84,
+        "margin_C": 30.16
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 98.32,
+        "T_j_C": 100.82,
+        "margin_C": 24.18
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 89.35,
+        "T_j_C": 94.75,
+        "margin_C": 30.25
+      }
+    },
+    "final_h_res": 0.000197768,
+    "elapsed_s": 44.4
+  },
+  {
+    "name": "v2_built_hs_clogged_45C",
+    "ambient_c": 45.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 2.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 141726,
+    "cells_solid": 8872,
+    "T_air_mean_C": 48.86,
+    "T_air_max_C": 72.15,
+    "U_air_max_mps": 8.59,
+    "p_cav_mean_Pa": 9.42,
+    "fan50_flow_cfm": 2.17,
+    "fan50_curve_dp_Pa": 16.76,
+    "K26_sink_C": 66.16,
+    "K26_Tj_C": 78.76,
+    "K26_margin_C": 21.24,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 88.89,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.003216,
+        "cfm": -6.81,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001025,
+        "cfm": -2.17,
+        "dp_Pa": 17.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004241,
+        "cfm": 8.99,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 75.52,
+        "T_j_C": 82.65,
+        "margin_C": 67.35,
+        "T_hs_base_C": 80.27,
+        "T_hs_mean_C": 80.24,
+        "Q_to_hs_W": 0.14
+      },
+      "Y401_Si549": {
+        "T_board_C": 72.73,
+        "T_j_C": 81.73,
+        "margin_C": 23.27,
+        "T_hs_base_C": 80.18,
+        "T_hs_mean_C": 80.16,
+        "Q_to_hs_W": 0.05
+      },
+      "U501_AD9484": {
+        "T_board_C": 69.54,
+        "T_j_C": 73.59,
+        "margin_C": 51.41,
+        "T_hs_base_C": 71.5,
+        "T_hs_mean_C": 71.48,
+        "Q_to_hs_W": 0.574
+      },
+      "U502_AD8352": {
+        "T_board_C": 70.07,
+        "T_j_C": 72.87,
+        "margin_C": 52.13
+      },
+      "U503_AD8352": {
+        "T_board_C": 67.41,
+        "T_j_C": 70.21,
+        "margin_C": 54.79
+      },
+      "U601_AD9253": {
+        "T_board_C": 62.71,
+        "T_j_C": 68.23,
+        "margin_C": 56.77
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 62.78,
+        "T_j_C": 68.92,
+        "margin_C": 31.08
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 74.88,
+        "T_j_C": 88.89,
+        "margin_C": 61.11
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 66.63,
+        "T_j_C": 72.78,
+        "margin_C": 52.22
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 65.58,
+        "T_j_C": 68.58,
+        "margin_C": 56.42
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 64.01,
+        "T_j_C": 65.51,
+        "margin_C": 59.49
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 69.71,
+        "T_j_C": 75.86,
+        "margin_C": 49.14
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 70.1,
+        "T_j_C": 74.4,
+        "margin_C": 50.6
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 67.44,
+        "T_j_C": 69.53,
+        "margin_C": 55.47
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 72.98,
+        "T_j_C": 75.48,
+        "margin_C": 49.52
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 64.1,
+        "T_j_C": 69.5,
+        "margin_C": 55.5
+      }
+    },
+    "final_h_res": 0.000131595,
+    "elapsed_s": 43.5
+  },
+  {
+    "name": "v2_built_hs_clogged_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 2.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 141726,
+    "cells_solid": 8872,
+    "T_air_mean_C": 74.0,
+    "T_air_max_C": 97.82,
+    "U_air_max_mps": 8.91,
+    "p_cav_mean_Pa": 9.38,
+    "fan50_flow_cfm": 2.22,
+    "fan50_curve_dp_Pa": 16.65,
+    "K26_sink_C": 91.48,
+    "K26_Tj_C": 104.08,
+    "K26_margin_C": -4.08,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 114.31,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.003352,
+        "cfm": -7.1,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001047,
+        "cfm": -2.22,
+        "dp_Pa": 16.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004399,
+        "cfm": 9.32,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 101.01,
+        "T_j_C": 108.15,
+        "margin_C": 41.85,
+        "T_hs_base_C": 105.8,
+        "T_hs_mean_C": 105.78,
+        "Q_to_hs_W": 0.138
+      },
+      "Y401_Si549": {
+        "T_board_C": 98.21,
+        "T_j_C": 107.23,
+        "margin_C": -2.23,
+        "T_hs_base_C": 105.71,
+        "T_hs_mean_C": 105.7,
+        "Q_to_hs_W": 0.049
+      },
+      "U501_AD9484": {
+        "T_board_C": 94.97,
+        "T_j_C": 99.03,
+        "margin_C": 25.97,
+        "T_hs_base_C": 96.93,
+        "T_hs_mean_C": 96.92,
+        "Q_to_hs_W": 0.573
+      },
+      "U502_AD8352": {
+        "T_board_C": 95.5,
+        "T_j_C": 98.3,
+        "margin_C": 26.7
+      },
+      "U503_AD8352": {
+        "T_board_C": 92.8,
+        "T_j_C": 95.6,
+        "margin_C": 29.4
+      },
+      "U601_AD9253": {
+        "T_board_C": 88.04,
+        "T_j_C": 93.56,
+        "margin_C": 31.44
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 88.18,
+        "T_j_C": 94.31,
+        "margin_C": 5.69
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 100.3,
+        "T_j_C": 114.31,
+        "margin_C": 35.69
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 91.99,
+        "T_j_C": 98.14,
+        "margin_C": 26.86
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 90.95,
+        "T_j_C": 93.95,
+        "margin_C": 31.05
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 89.41,
+        "T_j_C": 90.91,
+        "margin_C": 34.09
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 95.13,
+        "T_j_C": 101.28,
+        "margin_C": 23.72
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 95.51,
+        "T_j_C": 99.82,
+        "margin_C": 25.18
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 92.85,
+        "T_j_C": 94.95,
+        "margin_C": 30.05
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 98.43,
+        "T_j_C": 100.93,
+        "margin_C": 24.07
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 89.5,
+        "T_j_C": 94.9,
+        "margin_C": 30.1
+      }
+    },
+    "final_h_res": 0.000117107,
+    "elapsed_s": 45.6
+  },
+  {
+    "name": "v2_built_nohs_clean_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "medium",
+    "with_heatsinks": false,
+    "filter_clog_factor": 1.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 142024,
+    "cells_solid": 8872,
+    "T_air_mean_C": 73.94,
+    "T_air_max_C": 92.87,
+    "U_air_max_mps": 8.89,
+    "p_cav_mean_Pa": 9.68,
+    "fan50_flow_cfm": 2.59,
+    "fan50_curve_dp_Pa": 15.75,
+    "K26_sink_C": 91.37,
+    "K26_Tj_C": 103.97,
+    "K26_margin_C": -3.97,
+    "hottest_ic": "U401_ADCLK948",
+    "hottest_Tj_C": 116.32,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.003207,
+        "cfm": -6.8,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001222,
+        "cfm": -2.59,
+        "dp_Pa": 16.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.00443,
+        "cfm": 9.39,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 107.96,
+        "T_j_C": 116.32,
+        "margin_C": 33.68
+      },
+      "Y401_Si549": {
+        "T_board_C": 103.78,
+        "T_j_C": 113.78,
+        "margin_C": -8.78
+      },
+      "U501_AD9484": {
+        "T_board_C": 99.59,
+        "T_j_C": 108.52,
+        "margin_C": 16.48
+      },
+      "U502_AD8352": {
+        "T_board_C": 99.55,
+        "T_j_C": 102.35,
+        "margin_C": 22.65
+      },
+      "U503_AD8352": {
+        "T_board_C": 96.04,
+        "T_j_C": 98.84,
+        "margin_C": 26.16
+      },
+      "U601_AD9253": {
+        "T_board_C": 89.36,
+        "T_j_C": 94.88,
+        "margin_C": 30.12
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 89.08,
+        "T_j_C": 95.21,
+        "margin_C": 4.79
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 100.5,
+        "T_j_C": 114.51,
+        "margin_C": 35.49
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 92.24,
+        "T_j_C": 98.39,
+        "margin_C": 26.61
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 91.19,
+        "T_j_C": 94.19,
+        "margin_C": 30.81
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 89.53,
+        "T_j_C": 91.03,
+        "margin_C": 33.97
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 95.23,
+        "T_j_C": 101.38,
+        "margin_C": 23.62
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 95.63,
+        "T_j_C": 99.93,
+        "margin_C": 25.07
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 92.97,
+        "T_j_C": 95.06,
+        "margin_C": 29.94
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 101.62,
+        "T_j_C": 104.12,
+        "margin_C": 20.88
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 89.68,
+        "T_j_C": 95.08,
+        "margin_C": 29.92
+      }
+    },
+    "final_h_res": 0.000588749,
+    "elapsed_s": 43.1
+  },
+  {
+    "name": "v2_built_widegrille_hs_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": true,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 141726,
+    "cells_solid": 8872,
+    "T_air_mean_C": 73.83,
+    "T_air_max_C": 97.82,
+    "U_air_max_mps": 8.87,
+    "p_cav_mean_Pa": 9.99,
+    "fan50_flow_cfm": 2.9,
+    "fan50_curve_dp_Pa": 14.99,
+    "K26_sink_C": 91.33,
+    "K26_Tj_C": 103.93,
+    "K26_margin_C": -3.93,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 114.4,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.003101,
+        "cfm": -6.57,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001369,
+        "cfm": -2.9,
+        "dp_Pa": 15.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.00447,
+        "cfm": 9.47,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 100.66,
+        "T_j_C": 107.74,
+        "margin_C": 42.26,
+        "T_hs_base_C": 105.26,
+        "T_hs_mean_C": 105.23,
+        "Q_to_hs_W": 0.146
+      },
+      "Y401_Si549": {
+        "T_board_C": 97.87,
+        "T_j_C": 106.81,
+        "margin_C": -1.81,
+        "T_hs_base_C": 105.18,
+        "T_hs_mean_C": 105.16,
+        "Q_to_hs_W": 0.053
+      },
+      "U501_AD9484": {
+        "T_board_C": 94.9,
+        "T_j_C": 99.02,
+        "margin_C": 25.98,
+        "T_hs_base_C": 96.96,
+        "T_hs_mean_C": 96.94,
+        "Q_to_hs_W": 0.565
+      },
+      "U502_AD8352": {
+        "T_board_C": 95.37,
+        "T_j_C": 98.17,
+        "margin_C": 26.83
+      },
+      "U503_AD8352": {
+        "T_board_C": 92.81,
+        "T_j_C": 95.61,
+        "margin_C": 29.39
+      },
+      "U601_AD9253": {
+        "T_board_C": 87.94,
+        "T_j_C": 93.46,
+        "margin_C": 31.54
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 87.83,
+        "T_j_C": 93.96,
+        "margin_C": 6.04
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 100.39,
+        "T_j_C": 114.4,
+        "margin_C": 35.6
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 92.12,
+        "T_j_C": 98.27,
+        "margin_C": 26.73
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 91.04,
+        "T_j_C": 94.04,
+        "margin_C": 30.96
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 89.32,
+        "T_j_C": 90.82,
+        "margin_C": 34.18
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 95.02,
+        "T_j_C": 101.17,
+        "margin_C": 23.83
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 95.42,
+        "T_j_C": 99.73,
+        "margin_C": 25.27
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 92.78,
+        "T_j_C": 94.87,
+        "margin_C": 30.13
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 98.03,
+        "T_j_C": 100.53,
+        "margin_C": 24.47
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 89.34,
+        "T_j_C": 94.74,
+        "margin_C": 30.26
+      }
+    },
+    "final_h_res": 0.000164905,
+    "elapsed_s": 44.1
+  },
+  {
+    "name": "v2_built_decoupled_hs_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": false,
+    "decouple_hs": true,
+    "expand_exhaust": false,
+    "cells_air": 141758,
+    "cells_solid": 8872,
+    "T_air_mean_C": 73.91,
+    "T_air_max_C": 96.31,
+    "U_air_max_mps": 8.89,
+    "p_cav_mean_Pa": 9.7,
+    "fan50_flow_cfm": 2.57,
+    "fan50_curve_dp_Pa": 15.81,
+    "K26_sink_C": 91.38,
+    "K26_Tj_C": 103.98,
+    "K26_margin_C": -3.98,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 114.34,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.00322,
+        "cfm": -6.82,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001211,
+        "cfm": -2.57,
+        "dp_Pa": 16.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004431,
+        "cfm": 9.39,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 101.68,
+        "T_j_C": 108.98,
+        "margin_C": 41.02,
+        "T_hs_base_C": 106.94,
+        "T_hs_mean_C": 106.91,
+        "Q_to_hs_W": 0.12
+      },
+      "Y401_Si549": {
+        "T_board_C": 97.71,
+        "T_j_C": 104.86,
+        "margin_C": 0.14,
+        "T_hs_base_C": 100.45,
+        "T_hs_mean_C": 100.42,
+        "Q_to_hs_W": 0.142
+      },
+      "U501_AD9484": {
+        "T_board_C": 94.84,
+        "T_j_C": 98.91,
+        "margin_C": 26.09,
+        "T_hs_base_C": 96.82,
+        "T_hs_mean_C": 96.8,
+        "Q_to_hs_W": 0.572
+      },
+      "U502_AD8352": {
+        "T_board_C": 95.5,
+        "T_j_C": 98.3,
+        "margin_C": 26.7
+      },
+      "U503_AD8352": {
+        "T_board_C": 92.74,
+        "T_j_C": 95.54,
+        "margin_C": 29.46
+      },
+      "U601_AD9253": {
+        "T_board_C": 87.83,
+        "T_j_C": 93.35,
+        "margin_C": 31.65
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 87.99,
+        "T_j_C": 94.12,
+        "margin_C": 5.88
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 100.33,
+        "T_j_C": 114.34,
+        "margin_C": 35.66
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 92.08,
+        "T_j_C": 98.23,
+        "margin_C": 26.77
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 91.02,
+        "T_j_C": 94.02,
+        "margin_C": 30.98
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 89.36,
+        "T_j_C": 90.86,
+        "margin_C": 34.14
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 95.05,
+        "T_j_C": 101.2,
+        "margin_C": 23.8
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 95.45,
+        "T_j_C": 99.76,
+        "margin_C": 25.24
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 92.79,
+        "T_j_C": 94.88,
+        "margin_C": 30.12
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 98.57,
+        "T_j_C": 101.07,
+        "margin_C": 23.93
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 89.41,
+        "T_j_C": 94.81,
+        "margin_C": 30.19
+      }
+    },
+    "final_h_res": 0.000217679,
+    "elapsed_s": 44.1
+  },
+  {
+    "name": "v2_built_proposed_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "medium",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": true,
+    "decouple_hs": true,
+    "expand_exhaust": true,
+    "cells_air": 141758,
+    "cells_solid": 8872,
+    "T_air_mean_C": 72.52,
+    "T_air_max_C": 92.64,
+    "U_air_max_mps": 9.4,
+    "p_cav_mean_Pa": 6.01,
+    "fan50_flow_cfm": 3.62,
+    "fan50_curve_dp_Pa": 13.16,
+    "K26_sink_C": 90.19,
+    "K26_Tj_C": 102.79,
+    "K26_margin_C": -2.79,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 112.42,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.005175,
+        "cfm": -10.96,
+        "dp_Pa": -4.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001709,
+        "cfm": -3.62,
+        "dp_Pa": 13.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.006884,
+        "cfm": 14.59,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 98.21,
+        "T_j_C": 105.37,
+        "margin_C": 44.63,
+        "T_hs_base_C": 103.05,
+        "T_hs_mean_C": 103.02,
+        "Q_to_hs_W": 0.137
+      },
+      "Y401_Si549": {
+        "T_board_C": 94.45,
+        "T_j_C": 101.68,
+        "margin_C": 3.32,
+        "T_hs_base_C": 97.39,
+        "T_hs_mean_C": 97.37,
+        "Q_to_hs_W": 0.138
+      },
+      "U501_AD9484": {
+        "T_board_C": 92.2,
+        "T_j_C": 96.35,
+        "margin_C": 28.65,
+        "T_hs_base_C": 94.31,
+        "T_hs_mean_C": 94.29,
+        "Q_to_hs_W": 0.561
+      },
+      "U502_AD8352": {
+        "T_board_C": 92.71,
+        "T_j_C": 95.51,
+        "margin_C": 29.49
+      },
+      "U503_AD8352": {
+        "T_board_C": 90.35,
+        "T_j_C": 93.15,
+        "margin_C": 31.85
+      },
+      "U601_AD9253": {
+        "T_board_C": 85.7,
+        "T_j_C": 91.22,
+        "margin_C": 33.78
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 85.19,
+        "T_j_C": 91.32,
+        "margin_C": 8.68
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 98.41,
+        "T_j_C": 112.42,
+        "margin_C": 37.58
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 89.94,
+        "T_j_C": 96.09,
+        "margin_C": 28.91
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 88.72,
+        "T_j_C": 91.72,
+        "margin_C": 33.28
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 86.88,
+        "T_j_C": 88.38,
+        "margin_C": 36.62
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 92.62,
+        "T_j_C": 98.77,
+        "margin_C": 26.23
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 93.11,
+        "T_j_C": 97.41,
+        "margin_C": 27.59
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 90.57,
+        "T_j_C": 92.67,
+        "margin_C": 32.33
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 95.09,
+        "T_j_C": 97.59,
+        "margin_C": 27.41
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 86.99,
+        "T_j_C": 92.39,
+        "margin_C": 32.61
+      }
+    },
+    "final_h_res": 0.000118222,
+    "elapsed_s": 44.2
+  },
+  {
+    "name": "v2_built_hs_clean_fine_70C",
+    "ambient_c": 70.0,
+    "mesh_level": "fine",
+    "with_heatsinks": true,
+    "filter_clog_factor": 1.0,
+    "wide_grille": false,
+    "decouple_hs": false,
+    "expand_exhaust": false,
+    "cells_air": 431751,
+    "cells_solid": 22080,
+    "T_air_mean_C": 74.1,
+    "T_air_max_C": 101.8,
+    "U_air_max_mps": 8.79,
+    "p_cav_mean_Pa": 8.99,
+    "fan50_flow_cfm": 2.72,
+    "fan50_curve_dp_Pa": 15.44,
+    "K26_sink_C": 87.63,
+    "K26_Tj_C": 100.23,
+    "K26_margin_C": -0.23,
+    "hottest_ic": "U1001_LMR33630",
+    "hottest_Tj_C": 114.91,
+    "patch_flows": {
+      "kv_grille": {
+        "vol_m3_s": -0.00278,
+        "cfm": -5.89,
+        "dp_Pa": -1.0
+      },
+      "adapter_opening": {
+        "vol_m3_s": -0.001284,
+        "cfm": -2.72,
+        "dp_Pa": 15.0
+      },
+      "right_vents": {
+        "vol_m3_s": 0.004064,
+        "cfm": 8.61,
+        "dp_Pa": 0.0
+      }
+    },
+    "components": {
+      "U401_ADCLK948": {
+        "T_board_C": 99.98,
+        "T_j_C": 106.68,
+        "margin_C": 43.32,
+        "T_hs_base_C": 103.48,
+        "T_hs_mean_C": 103.45,
+        "Q_to_hs_W": 0.188
+      },
+      "Y401_Si549": {
+        "T_board_C": 96.96,
+        "T_j_C": 105.53,
+        "margin_C": -0.53,
+        "T_hs_base_C": 103.32,
+        "T_hs_mean_C": 103.31,
+        "Q_to_hs_W": 0.071
+      },
+      "U501_AD9484": {
+        "T_board_C": 95.35,
+        "T_j_C": 99.22,
+        "margin_C": 25.78,
+        "T_hs_base_C": 97.05,
+        "T_hs_mean_C": 97.02,
+        "Q_to_hs_W": 0.595
+      },
+      "U502_AD8352": {
+        "T_board_C": 95.84,
+        "T_j_C": 98.64,
+        "margin_C": 26.36
+      },
+      "U503_AD8352": {
+        "T_board_C": 92.23,
+        "T_j_C": 95.03,
+        "margin_C": 29.97
+      },
+      "U601_AD9253": {
+        "T_board_C": 88.44,
+        "T_j_C": 93.96,
+        "margin_C": 31.04
+      },
+      "U1101_XC7A50T": {
+        "T_board_C": 86.81,
+        "T_j_C": 92.94,
+        "margin_C": 7.06
+      },
+      "U1001_LMR33630": {
+        "T_board_C": 100.9,
+        "T_j_C": 114.91,
+        "margin_C": 35.09
+      },
+      "U1002_TPS562201": {
+        "T_board_C": 92.57,
+        "T_j_C": 98.72,
+        "margin_C": 26.28
+      },
+      "U1003_TPS562201": {
+        "T_board_C": 90.57,
+        "T_j_C": 93.57,
+        "margin_C": 31.43
+      },
+      "U1004_TPS562201": {
+        "T_board_C": 88.78,
+        "T_j_C": 90.28,
+        "margin_C": 34.72
+      },
+      "U1005_TPS7A8300": {
+        "T_board_C": 94.94,
+        "T_j_C": 101.09,
+        "margin_C": 23.91
+      },
+      "U1006_TPS7A8300": {
+        "T_board_C": 95.4,
+        "T_j_C": 99.71,
+        "margin_C": 25.29
+      },
+      "U1007_TPS7A8300": {
+        "T_board_C": 93.03,
+        "T_j_C": 95.12,
+        "margin_C": 29.88
+      },
+      "U1201_RTL8211FSI": {
+        "T_board_C": 96.96,
+        "T_j_C": 99.46,
+        "margin_C": 25.54
+      },
+      "AD9708_AD9767": {
+        "T_board_C": 88.38,
+        "T_j_C": 93.78,
+        "margin_C": 31.22
+      }
+    },
+    "final_h_res": 0.000601817,
+    "elapsed_s": 188.3
+  }
+]
