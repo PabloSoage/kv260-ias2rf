@@ -47065,74 +47065,6 @@
 		(uuid "0134e0da-abfa-448f-b0b6-c9b4780d2492")
 	)
 	(symbol
-		(lib_id "power:+1V2")
-		(at 810.26 539.75 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "1c28940b-cddc-4212-971e-3af1a21cddd8")
-		(property "Reference" "#PWR1278"
-			(at 812.80 538.48 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+1V2"
-			(at 812.80 541.02 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 810.26 539.75 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 810.26 539.75 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 810.26 539.75 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "b6c487ba-c6d3-442e-8f2e-dbb457e3ab43")
-		)
-		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
-				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1278")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 820.42 535.94 0)
 		(unit 1)
@@ -47211,37 +47143,55 @@
 		)
 		(uuid "22e416e9-ce69-49b1-a504-c81924ec486f")
 	)
-	(symbol
-		(lib_id "power:+1V2")
+	(label "ETH_VCM"
+		(at 810.26 539.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8c05076b-24ec-4bca-bc4f-3f52bb9d45a1")
+	)
+	(label "ETH_VCM"
 		(at 820.42 539.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e0920821-948f-4cd2-9c92-700c47e532ef")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 830.58 535.94 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
 		(dnp no)
-		(uuid "9042bf3d-b9ca-443d-8edc-94310376ae58")
-		(property "Reference" "#PWR1279"
-			(at 822.96 538.48 0)
-			(hide yes)
+		(uuid "8c71e471-30ff-4608-a4f2-8db277e646ee")
+		(property "Reference" "R1212"
+			(at 833.12 534.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "+1V2"
-			(at 822.96 541.02 0)
-			(hide yes)
+		(property "Value" "10k"
+			(at 833.12 537.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" ""
-			(at 820.42 539.75 0)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 830.58 535.94 0)
 			(hide yes)
 			(effects
 				(font
@@ -47250,7 +47200,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 820.42 539.75 0)
+			(at 830.58 535.94 0)
 			(hide yes)
 			(effects
 				(font
@@ -47259,7 +47209,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 820.42 539.75 0)
+			(at 830.58 535.94 0)
 			(hide yes)
 			(effects
 				(font
@@ -47268,12 +47218,387 @@
 			)
 		)
 		(pin "1"
-			(uuid "7d58c3e3-0626-4c0c-bbba-1dfe9d0b7f88")
+			(uuid "1dfaea9c-68e6-4ceb-8944-8c661dc23922")
+		)
+		(pin "2"
+			(uuid "cddb66c3-431f-44a7-b5d6-2f2add143e9f")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
-					(reference "#PWR1279")
+					(reference "R1212")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 830.58 532.13 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "358f45da-1fe1-4327-9095-fc806d17d84b")
+		(property "Reference" "#PWR1280"
+			(at 833.12 530.86 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3V3_D"
+			(at 833.12 533.40 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 830.58 532.13 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 830.58 532.13 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 830.58 532.13 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5466817e-aa1e-471a-8bc6-9100a0885d82")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1280")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "ETH_VCM"
+		(at 830.58 539.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "83684f47-a26d-45d1-9f32-a0bee006c59c")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 840.74 535.94 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "778cdf54-586c-4bdf-9074-7cfc5353714e")
+		(property "Reference" "R1217"
+			(at 843.28 534.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "5.6k"
+			(at 843.28 537.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 840.74 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 840.74 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 840.74 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "475811d0-8fa5-4d0d-9d31-25dab617b3d9")
+		)
+		(pin "2"
+			(uuid "75429019-a8de-4d82-86ec-ee3ac29fc616")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "R1217")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "ETH_VCM"
+		(at 840.74 532.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8a98b6b3-7d88-4166-9687-ad88e526dd8f")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 840.74 539.75 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "92433f0c-07e9-4331-b67a-a6d0c2103a9b")
+		(property "Reference" "#PWR1281"
+			(at 843.28 538.48 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 843.28 541.02 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 840.74 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 840.74 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 840.74 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e549c98e-ed38-48ae-8000-f07d034ba4c5")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1281")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 850.90 535.94 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a7339f6e-0bc1-4cc5-9665-4d0ef4d197f2")
+		(property "Reference" "C1222"
+			(at 853.44 534.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100n"
+			(at 853.44 537.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 850.90 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 850.90 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 850.90 535.94 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "cfe011da-e1b5-4584-8a92-242f33ef3339")
+		)
+		(pin "2"
+			(uuid "ee0577cb-0d9d-4eb9-8773-77931bceb10f")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "C1222")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "ETH_VCM"
+		(at 850.90 532.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cbdd4ba7-798f-4ed8-abff-dacd085871f9")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 850.90 539.75 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "9b5c8965-c280-4c8b-aad3-a2c70799ebc6")
+		(property "Reference" "#PWR1282"
+			(at 853.44 538.48 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 853.44 541.02 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 850.90 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 850.90 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 850.90 539.75 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a410c649-f9ea-4f19-a3b1-c1e1f7285a3f")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/bc106418-3615-506a-a32b-ff6e1a94f8d2"
+					(reference "#PWR1282")
 					(unit 1)
 				)
 			)
