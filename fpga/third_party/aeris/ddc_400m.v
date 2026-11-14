@@ -649,6 +649,8 @@ cdc_adc_to_processing #(
 // FIR Filter Instances
 // ============================================================================
 
+wire fir_i_overflow, fir_q_overflow;
+
 // FIR I channel
 fir_lowpass_parallel_enhanced fir_i_inst (
     .clk(clk_100m),
@@ -658,7 +660,7 @@ fir_lowpass_parallel_enhanced fir_i_inst (
     .data_out(fir_i_out),
     .data_out_valid(fir_valid_i),
     .fir_ready(fir_i_ready),
-    .filter_overflow()
+    .filter_overflow(fir_i_overflow)
 );
 
 // FIR Q channel  
@@ -670,7 +672,7 @@ fir_lowpass_parallel_enhanced fir_q_inst (
     .data_out(fir_q_out),
     .data_out_valid(fir_valid_q),
     .fir_ready(fir_q_ready),
-    .filter_overflow()
+    .filter_overflow(fir_q_overflow)
 );
 
 assign fir_valid = fir_valid_i & fir_valid_q;
@@ -702,6 +704,7 @@ assign baseband_valid_i = baseband_valid_reg;
 assign baseband_valid_q = baseband_valid_reg;
 assign ddc_status = {mixer_overflow_i | mixer_overflow_q, nco_ready};
 assign mixer_saturation = overflow_detected;
+assign filter_overflow = fir_i_overflow | fir_q_overflow;
 assign ddc_diagnostics = {saturation_count, error_counter[4:0]};
 
 // ============================================================================

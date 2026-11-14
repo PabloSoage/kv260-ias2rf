@@ -155,44 +155,80 @@ module sdr_ddc_nco (
         end
     endfunction
 
-    function automatic signed [15:0] eval_sin;
-        input [31:0] ph;
-        reg   [1:0]  quad;
-        reg   [6:0]  idx;
-        reg   [5:0]  frac;
-        reg   [7:0]  idx_a, idx_b;
-        reg signed [15:0] va, vb;
-        reg signed [23:0] interp;
-        begin
-            quad = ph[31:30];
-            idx  = ph[29:23];
-            frac = ph[22:17];
-            if (quad[0] == 1'b0) begin
-                idx_a = {1'b0, idx};
-                idx_b = {1'b0, idx} + 8'd1;
-            end else begin
-                idx_a = 8'd128 - {1'b0, idx};
-                idx_b = 8'd127 - {1'b0, idx};
-            end
-            va     = sin_qwave(idx_a);
-            vb     = sin_qwave(idx_b);
-            interp = va + (((vb - va) * $signed({1'b0, frac})) >>> 6);
-            eval_sin = quad[1] ? -interp[15:0] : interp[15:0];
-        end
-    endfunction
+    reg        ce_d1, ce_d2;
+    reg signed [15:0] cos_va_r, cos_vb_r, sin_va_r, sin_vb_r;
+    reg signed [15:0] cos_va_d2, sin_va_d2;
+    (* use_dsp = "no" *) reg signed [23:0] cos_prod_r, sin_prod_r;
+    reg        [5:0]  cos_frac_r, sin_frac_r;
+    reg               cos_q1_r, sin_q1_r;
+    reg               cos_q1_d2, sin_q1_d2;
+
+    wire [31:0] ph_cos    = phase + 32'h4000_0000;
+    wire [1:0]  cos_quad  = ph_cos[31:30];
+    wire [6:0]  cos_idx   = ph_cos[29:23];
+    wire [5:0]  cos_frac  = ph_cos[22:17];
+    wire [7:0]  cos_ia    = (cos_quad[0] == 1'b0) ? {1'b0, cos_idx} : (8'd128 - {1'b0, cos_idx});
+    wire [7:0]  cos_ib    = (cos_quad[0] == 1'b0) ? ({1'b0, cos_idx} + 8'd1) : (8'd127 - {1'b0, cos_idx});
+
+    wire [1:0]  sin_quad  = phase[31:30];
+    wire [6:0]  sin_idx   = phase[29:23];
+    wire [5:0]  sin_frac  = phase[22:17];
+    wire [7:0]  sin_ia    = (sin_quad[0] == 1'b0) ? {1'b0, sin_idx} : (8'd128 - {1'b0, sin_idx});
+    wire [7:0]  sin_ib    = (sin_quad[0] == 1'b0) ? ({1'b0, sin_idx} + 8'd1) : (8'd127 - {1'b0, sin_idx});
+
+    wire signed [16:0] cos_diff   = $signed(cos_vb_r) - $signed(cos_va_r);
+    wire signed [16:0] sin_diff   = $signed(sin_vb_r) - $signed(sin_va_r);
+    wire signed [23:0] cos_interp = $signed(cos_va_d2) + (cos_prod_r >>> 6);
+    wire signed [23:0] sin_interp = $signed(sin_va_d2) + (sin_prod_r >>> 6);
 
     always @(posedge clk) begin
         if (rst) begin
-            phase     <= 32'd0;
-            out_valid <= 1'b0;
-            cos_o     <= 16'sd32767;
-            sin_o     <= 16'sd0;
+            phase      <= 32'd0;
+            ce_d1      <= 1'b0;
+            ce_d2      <= 1'b0;
+            cos_va_r   <= 16'sd0;
+            cos_vb_r   <= 16'sd0;
+            cos_va_d2  <= 16'sd0;
+            cos_prod_r <= 24'sd0;
+            cos_frac_r <= 6'd0;
+            cos_q1_r   <= 1'b0;
+            cos_q1_d2  <= 1'b0;
+            sin_va_r   <= 16'sd0;
+            sin_vb_r   <= 16'sd0;
+            sin_va_d2  <= 16'sd0;
+            sin_prod_r <= 24'sd0;
+            sin_frac_r <= 6'd0;
+            sin_q1_r   <= 1'b0;
+            sin_q1_d2  <= 1'b0;
+            out_valid  <= 1'b0;
+            cos_o      <= 16'sd32767;
+            sin_o      <= 16'sd0;
         end else begin
-            out_valid <= ce;
+            ce_d1     <= ce;
+            ce_d2     <= ce_d1;
+            out_valid <= ce_d2;
             if (ce) begin
-                cos_o <= eval_sin(phase + 32'h4000_0000);
-                sin_o <= eval_sin(phase);
-                phase <= phase + ftw;
+                cos_va_r   <= sin_qwave(cos_ia);
+                cos_vb_r   <= sin_qwave(cos_ib);
+                cos_frac_r <= cos_frac;
+                cos_q1_r   <= cos_quad[1];
+                sin_va_r   <= sin_qwave(sin_ia);
+                sin_vb_r   <= sin_qwave(sin_ib);
+                sin_frac_r <= sin_frac;
+                sin_q1_r   <= sin_quad[1];
+                phase      <= phase + ftw;
+            end
+            if (ce_d1) begin
+                cos_prod_r <= cos_diff * $signed({1'b0, cos_frac_r});
+                sin_prod_r <= sin_diff * $signed({1'b0, sin_frac_r});
+                cos_va_d2  <= cos_va_r;
+                sin_va_d2  <= sin_va_r;
+                cos_q1_d2  <= cos_q1_r;
+                sin_q1_d2  <= sin_q1_r;
+            end
+            if (ce_d2) begin
+                cos_o <= cos_q1_d2 ? -cos_interp[15:0] : cos_interp[15:0];
+                sin_o <= sin_q1_d2 ? -sin_interp[15:0] : sin_interp[15:0];
             end
         end
     end
@@ -227,12 +263,14 @@ module sdr_ddc_ch #(
     wire [15:0] r_cic  = use_hb ? (decim_ratio >> 1) :
                          ((decim_ratio < 16'd2) ? 16'd2 : decim_ratio);
 
-    reg [47:0] r_cic_cube;
+    (* use_dsp = "no" *) reg [31:0] r_cic_sq;
+    (* use_dsp = "no" *) reg [47:0] r_cic_cube;
     reg [5:0]  norm_shift;
     integer    b;
 
     always @(posedge adc_clk) begin
-        r_cic_cube <= r_cic * r_cic * r_cic;
+        r_cic_sq   <= r_cic * r_cic;
+        r_cic_cube <= r_cic_sq * r_cic;
         norm_shift <= 6'd3;
         for (b = 3; b <= 36; b = b + 1) begin
             if (r_cic_cube > (48'd1 << (b - 1)))
@@ -245,16 +283,29 @@ module sdr_ddc_ch #(
     // -------------------------------------------------------------------------
     wire               nco_valid;
     wire signed [15:0] nco_cos, nco_sin;
-    reg  signed [13:0] sample_d1;
+    reg  signed [13:0] sample_d1, sample_d2, sample_d3;
+    reg                nco_ce_d1, nco_ce_d2;
     reg                mix_valid;
     reg  signed [15:0] mix_i, mix_q;
     reg  signed [31:0] mult_i, mult_q;
 
     always @(posedge adc_clk) begin
-        if (adc_rst)
+        if (adc_rst) begin
             sample_d1 <= 14'sd0;
-        else if (sample_valid && ch_en)
-            sample_d1 <= sample_in;
+            sample_d2 <= 14'sd0;
+            sample_d3 <= 14'sd0;
+            nco_ce_d1 <= 1'b0;
+            nco_ce_d2 <= 1'b0;
+        end else begin
+            nco_ce_d1 <= sample_valid && ch_en;
+            nco_ce_d2 <= nco_ce_d1;
+            if (sample_valid && ch_en)
+                sample_d1 <= sample_in;
+            if (nco_ce_d1)
+                sample_d2 <= sample_d1;
+            if (nco_ce_d2)
+                sample_d3 <= sample_d2;
+        end
     end
 
     sdr_ddc_nco u_nco (
@@ -275,8 +326,8 @@ module sdr_ddc_ch #(
         end else begin
             mix_valid <= nco_valid;
             if (nco_valid) begin
-                mult_i = $signed({sample_d1, 2'b00}) * nco_cos;
-                mult_q = -$signed({sample_d1, 2'b00}) * nco_sin;
+                mult_i = $signed({sample_d3, 2'b00}) * nco_cos;
+                mult_q = -$signed({sample_d3, 2'b00}) * nco_sin;
                 mix_i  <= mult_i >>> 15;
                 mix_q  <= mult_q >>> 15;
             end
@@ -372,11 +423,11 @@ module sdr_ddc_ch #(
     reg signed [17:0] hb_i [0:14];
     reg signed [17:0] hb_q [0:14];
     reg               hb_phase;
+    reg               hb_p1_valid;
+    reg signed [35:0] hb_acc_i_r, hb_acc_q_r;
     reg               iq_valid;
     reg signed [15:0] iq_i, iq_q;
     integer           k;
-
-    reg signed [35:0] hb_acc_i, hb_acc_q;
 
     always @(posedge adc_clk) begin
         if (adc_rst) begin
@@ -384,12 +435,23 @@ module sdr_ddc_ch #(
                 hb_i[k] <= 18'sd0;
                 hb_q[k] <= 18'sd0;
             end
-            hb_phase <= 1'b0;
-            iq_valid <= 1'b0;
-            iq_i     <= 16'sd0;
-            iq_q     <= 16'sd0;
+            hb_phase    <= 1'b0;
+            hb_p1_valid <= 1'b0;
+            hb_acc_i_r  <= 36'sd0;
+            hb_acc_q_r  <= 36'sd0;
+            iq_valid    <= 1'b0;
+            iq_i        <= 16'sd0;
+            iq_q        <= 16'sd0;
         end else begin
-            iq_valid <= 1'b0;
+            hb_p1_valid <= 1'b0;
+            iq_valid    <= 1'b0;
+
+            if (hb_p1_valid) begin
+                iq_valid <= 1'b1;
+                iq_i     <= sat16(hb_acc_i_r[35:15]);
+                iq_q     <= sat16(hb_acc_q_r[35:15]);
+            end
+
             if (cic_out_valid) begin
                 if (!use_hb) begin
                     iq_valid <= 1'b1;
@@ -405,22 +467,21 @@ module sdr_ddc_ch #(
                     hb_phase <= ~hb_phase;
 
                     if (hb_phase == 1'b1) begin
-                        // Compute using current incoming sample as index 0 and shifted delay line
-                        hb_acc_i = ($signed(hb_i[6]) <<< 14) +
-                                   $signed(18'sd10532) * ($signed(hb_i[5]) + $signed(hb_i[7])) -
-                                   $signed(18'sd3240)  * ($signed(hb_i[3]) + $signed(hb_i[9])) +
-                                   $signed(18'sd1220)  * ($signed(hb_i[1]) + $signed(hb_i[11])) -
-                                   $signed(18'sd320)   * ($signed(cic_out_i) + $signed(hb_i[13])) +
-                                   36'sd16384;
-                        hb_acc_q = ($signed(hb_q[6]) <<< 14) +
-                                   $signed(18'sd10532) * ($signed(hb_q[5]) + $signed(hb_q[7])) -
-                                   $signed(18'sd3240)  * ($signed(hb_q[3]) + $signed(hb_q[9])) +
-                                   $signed(18'sd1220)  * ($signed(hb_q[1]) + $signed(hb_q[11])) -
-                                   $signed(18'sd320)   * ($signed(cic_out_q) + $signed(hb_q[13])) +
-                                   36'sd16384;
-                        iq_valid <= 1'b1;
-                        iq_i     <= sat16(hb_acc_i[35:15]);
-                        iq_q     <= sat16(hb_acc_q[35:15]);
+                        // Compute using current incoming sample as index 0 and shifted delay line;
+                        // register raw MAC sum before sat16() to keep DSP chain off the critical path.
+                        hb_acc_i_r <= ($signed(hb_i[6]) <<< 14) +
+                                      $signed(18'sd10532) * ($signed(hb_i[5]) + $signed(hb_i[7])) -
+                                      $signed(18'sd3240)  * ($signed(hb_i[3]) + $signed(hb_i[9])) +
+                                      $signed(18'sd1220)  * ($signed(hb_i[1]) + $signed(hb_i[11])) -
+                                      $signed(18'sd320)   * ($signed(cic_out_i) + $signed(hb_i[13])) +
+                                      36'sd16384;
+                        hb_acc_q_r <= ($signed(hb_q[6]) <<< 14) +
+                                      $signed(18'sd10532) * ($signed(hb_q[5]) + $signed(hb_q[7])) -
+                                      $signed(18'sd3240)  * ($signed(hb_q[3]) + $signed(hb_q[9])) +
+                                      $signed(18'sd1220)  * ($signed(hb_q[1]) + $signed(hb_q[11])) -
+                                      $signed(18'sd320)   * ($signed(cic_out_q) + $signed(hb_q[13])) +
+                                      36'sd16384;
+                        hb_p1_valid <= 1'b1;
                     end
                 end
             end

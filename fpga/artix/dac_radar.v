@@ -207,7 +207,7 @@ module dac_radar (
     endfunction
 
     // -------------------------------------------------------------------------
-    // LFM Chirp Generator
+    // LFM Chirp Generator (3-stage pipelined NCO + amp scaling for 125+ MHz)
     // -------------------------------------------------------------------------
     reg        trig_d;
     wire       trig_rise = chirp_trig && !trig_d;
@@ -215,6 +215,7 @@ module dac_radar (
     reg [31:0] sample_cnt;
     reg [31:0] freq_acc;
     reg [31:0] phase_acc;
+    reg        gen_active;
 
 `ifdef MUTATE_CHIRP_SLOPE_SIGN
     wire signed [31:0] eff_df_ftw = -df_ftw;
@@ -222,50 +223,110 @@ module dac_radar (
     wire signed [31:0] eff_df_ftw = df_ftw;
 `endif
 
-    wire signed [15:0] cos_raw    = eval_cos(phase_acc);
-    wire signed [24:0] scaled_val = cos_raw * $signed({1'b0, amp_scale});
-    // Map Q23 signed sample [-127..+127] to 8-bit unsigned straight binary [1..255] centered at 128
-    wire signed [7:0]  s8_val     = scaled_val[23:16];
-    wire [7:0]         u8_val     = {~s8_val[7], s8_val[6:0]};
+    // Stage 1: quarter-wave table lookup
+    wire [31:0] ph_off   = phase_acc + 32'h4000_0000;
+    wire [1:0]  st0_quad = ph_off[31:30];
+    wire [6:0]  st0_idx  = ph_off[29:23];
+    wire [5:0]  st0_frac = ph_off[22:17];
+    wire [7:0]  st0_ia   = (st0_quad[0] == 1'b0) ? {1'b0, st0_idx} : (8'd128 - {1'b0, st0_idx});
+    wire [7:0]  st0_ib   = (st0_quad[0] == 1'b0) ? ({1'b0, st0_idx} + 8'd1) : (8'd127 - {1'b0, st0_idx});
+
+    reg signed [15:0] s1_va, s1_vb;
+    reg        [5:0]  s1_frac;
+    reg               s1_quad1;
+    reg        [7:0]  s1_amp;
+    reg               s1_active;
+
+    // Stage 2a: signed delta-lookup multiply (absorbed cleanly into DSP48E1 D-A*B + PREG=1)
+    reg signed [22:0] s1b_prod;
+    reg signed [15:0] s1b_va;
+    reg               s1b_quad1;
+    reg        [7:0]  s1b_amp;
+    reg               s1b_active;
+
+    // Stage 2b: add base sample + apply quadrant sign -> signed cos
+    wire signed [16:0] s1b_sum = s1b_va + $signed(s1b_prod[22:6]);
+    reg  signed [15:0] s2_cos;
+    reg         [7:0]  s2_amp;
+    reg                s2_active;
+
+    // Stage 3: amplitude scaling -> unsigned 8-bit DAC code aligned with chirp_active
+    (* use_dsp = "no" *) wire signed [24:0] s2_scaled = s2_cos * $signed({1'b0, s2_amp});
+    wire signed [7:0]  s2_s8     = s2_scaled[23:16];
+    wire        [7:0]  s2_u8     = {~s2_s8[7], s2_s8[6:0]};
 
     always @(posedge dac_clk) begin
         if (dac_rst || !chirp_enable) begin
             trig_d       <= 1'b0;
+            gen_active   <= 1'b0;
             chirp_active <= 1'b0;
             pri_cnt      <= 32'd0;
             sample_cnt   <= 32'd0;
             pulse_cnt    <= 32'd0;
             freq_acc     <= 32'd0;
             phase_acc    <= 32'd0;
+            s1_va        <= 16'sd0;
+            s1_vb        <= 16'sd0;
+            s1_frac      <= 6'd0;
+            s1_quad1     <= 1'b0;
+            s1_amp       <= 8'd0;
+            s1_active    <= 1'b0;
+            s1b_prod     <= 23'sd0;
+            s1b_va       <= 16'sd0;
+            s1b_quad1    <= 1'b0;
+            s1b_amp      <= 8'd0;
+            s1b_active   <= 1'b0;
+            s2_cos       <= 16'sd0;
+            s2_amp       <= 8'd0;
+            s2_active    <= 1'b0;
             dacr_d       <= 8'h80;
         end else begin
             trig_d <= chirp_trig;
 
-            if (!chirp_active) begin
-                dacr_d <= 8'h80;
+            if (!gen_active) begin
                 if (trig_rise || ((pri_len != 32'd0) && (pri_cnt == 32'd0))) begin
-                    chirp_active <= (pulse_len != 32'd0);
-                    sample_cnt   <= 32'd0;
-                    freq_acc     <= f0_ftw;
-                    phase_acc    <= 32'd0;
-                    pri_cnt      <= (pri_len > 32'd1) ? (pri_len - 32'd1) : 32'd0;
-                    pulse_cnt    <= pulse_cnt + 32'd1;
+                    gen_active <= (pulse_len != 32'd0);
+                    sample_cnt <= 32'd0;
+                    freq_acc   <= f0_ftw;
+                    phase_acc  <= 32'd0;
+                    pri_cnt    <= (pri_len > 32'd1) ? (pri_len - 32'd1) : 32'd0;
+                    pulse_cnt  <= pulse_cnt + 32'd1;
                 end else if (pri_cnt != 32'd0) begin
                     pri_cnt <= pri_cnt - 32'd1;
                 end
             end else begin
-                dacr_d <= u8_val;
                 if (pri_cnt != 32'd0)
                     pri_cnt <= pri_cnt - 32'd1;
 
                 if ((sample_cnt + 32'd1) >= pulse_len) begin
-                    chirp_active <= 1'b0;
+                    gen_active <= 1'b0;
                 end else begin
                     sample_cnt <= sample_cnt + 32'd1;
                     freq_acc   <= $signed(freq_acc) + eff_df_ftw;
                     phase_acc  <= phase_acc + freq_acc;
                 end
             end
+
+            // Pipeline advance
+            s1_va      <= sin_qwave(st0_ia);
+            s1_vb      <= sin_qwave(st0_ib);
+            s1_frac    <= st0_frac;
+            s1_quad1   <= st0_quad[1];
+            s1_amp     <= amp_scale;
+            s1_active  <= gen_active;
+
+            s1b_prod   <= (s1_vb - s1_va) * $signed({1'b0, s1_frac});
+            s1b_va     <= s1_va;
+            s1b_quad1  <= s1_quad1;
+            s1b_amp    <= s1_amp;
+            s1b_active <= s1_active;
+
+            s2_cos     <= s1b_quad1 ? -s1b_sum[15:0] : s1b_sum[15:0];
+            s2_amp     <= s1b_amp;
+            s2_active  <= s1b_active;
+
+            chirp_active <= s2_active;
+            dacr_d       <= s2_active ? s2_u8 : 8'h80;
         end
     end
 
