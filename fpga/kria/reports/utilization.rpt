@@ -1,10 +1,10 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Fri Nov 13 20:51:22 2026
+| Date         : Sat Nov 14 01:47:58 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
-| Command      : report_utilization -file D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/utilization.rpt
-| Design       : kria_top
+| Command      : report_utilization -hierarchical -file D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/utilization.rpt
+| Design       : ias2rf_k26_bd_wrapper
 | Device       : xck26-sfvc784-2LV-c
 | Speed File   : -2LV
 | Design State : Routed
@@ -14,256 +14,183 @@ Utilization Design Information
 
 Table of Contents
 -----------------
-1. CLB Logic
-1.1 Summary of Registers by Type
-2. CLB Logic Distribution
-3. BLOCKRAM
-4. ARITHMETIC
-5. I/O
-6. CLOCK
-7. ADVANCED
-8. CONFIGURATION
-9. Primitives
-10. Black Boxes
-11. Instantiated Netlists
+1. Utilization by Hierarchy
 
-1. CLB Logic
-------------
+1. Utilization by Hierarchy
+---------------------------
 
-+----------------------------+------+-------+------------+-----------+-------+
-|          Site Type         | Used | Fixed | Prohibited | Available | Util% |
-+----------------------------+------+-------+------------+-----------+-------+
-| CLB LUTs                   | 4278 |     0 |          0 |    117120 |  3.65 |
-|   LUT as Logic             | 3890 |     0 |          0 |    117120 |  3.32 |
-|   LUT as Memory            |  388 |     0 |          0 |     57600 |  0.67 |
-|     LUT as Distributed RAM |  388 |     0 |            |           |       |
-|     LUT as Shift Register  |    0 |     0 |            |           |       |
-| CLB Registers              | 6817 |     0 |          0 |    234240 |  2.91 |
-|   Register as Flip Flop    | 6817 |     0 |          0 |    234240 |  2.91 |
-|   Register as Latch        |    0 |     0 |          0 |    234240 |  0.00 |
-| CARRY8                     |   57 |     0 |          0 |     14640 |  0.39 |
-| F7 Muxes                   |  349 |     0 |          0 |     58560 |  0.60 |
-| F8 Muxes                   |   32 |     0 |          0 |     29280 |  0.11 |
-| F9 Muxes                   |    0 |     0 |          0 |     14640 |  0.00 |
-| Unique Control Sets        |  162 |       |          0 |     29280 |  0.55 |
-+----------------------------+------+-------+------------+-----------+-------+
-* Warning! LUT value is adjusted to account for LUT combining.
-** Note: Available Control Sets calculated as Slices * 2, Review the Control Sets Report for more information regarding control sets.
-
-
-1.1 Summary of Registers by Type
---------------------------------
-
-+-------+--------------+-------------+--------------+
-| Total | Clock Enable | Synchronous | Asynchronous |
-+-------+--------------+-------------+--------------+
-| 0     |            _ |           - |            - |
-| 0     |            _ |           - |          Set |
-| 0     |            _ |           - |        Reset |
-| 0     |            _ |         Set |            - |
-| 0     |            _ |       Reset |            - |
-| 0     |          Yes |           - |            - |
-| 9     |          Yes |           - |          Set |
-| 0     |          Yes |           - |        Reset |
-| 249   |          Yes |         Set |            - |
-| 6559  |          Yes |       Reset |            - |
-+-------+--------------+-------------+--------------+
-
-
-2. CLB Logic Distribution
--------------------------
-
-+--------------------------------------------+------+-------+------------+-----------+-------+
-|                  Site Type                 | Used | Fixed | Prohibited | Available | Util% |
-+--------------------------------------------+------+-------+------------+-----------+-------+
-| CLB                                        | 1289 |     0 |          0 |     14640 |  8.80 |
-|   CLBL                                     |  558 |     0 |            |           |       |
-|   CLBM                                     |  731 |     0 |            |           |       |
-| LUT as Logic                               | 3890 |     0 |          0 |    117120 |  3.32 |
-|   using O5 output only                     |   47 |       |            |           |       |
-|   using O6 output only                     | 3104 |       |            |           |       |
-|   using O5 and O6                          |  739 |       |            |           |       |
-| LUT as Memory                              |  388 |     0 |          0 |     57600 |  0.67 |
-|   LUT as Distributed RAM                   |  388 |     0 |            |           |       |
-|     using O5 output only                   |    0 |       |            |           |       |
-|     using O6 output only                   |  344 |       |            |           |       |
-|     using O5 and O6                        |   44 |       |            |           |       |
-|   LUT as Shift Register                    |    0 |     0 |            |           |       |
-|     using O5 output only                   |    0 |       |            |           |       |
-|     using O6 output only                   |    0 |       |            |           |       |
-|     using O5 and O6                        |    0 |       |            |           |       |
-| CLB Registers                              | 6817 |     0 |          0 |    234240 |  2.91 |
-|   Register driven from within the CLB      | 1431 |       |            |           |       |
-|   Register driven from outside the CLB     | 5386 |       |            |           |       |
-|     LUT in front of the register is unused | 3109 |       |            |           |       |
-|     LUT in front of the register is used   | 2277 |       |            |           |       |
-+--------------------------------------------+------+-------+------------+-----------+-------+
-
-
-3. BLOCKRAM
------------
-
-+----------------+------+-------+------------+-----------+-------+
-|    Site Type   | Used | Fixed | Prohibited | Available | Util% |
-+----------------+------+-------+------------+-----------+-------+
-| Block RAM Tile |    0 |     0 |          0 |       144 |  0.00 |
-|   RAMB36/FIFO* |    0 |     0 |          0 |       144 |  0.00 |
-|   RAMB18       |    0 |     0 |          0 |       288 |  0.00 |
-| URAM           |    0 |     0 |          0 |        64 |  0.00 |
-+----------------+------+-------+------------+-----------+-------+
-* Note: Each Block RAM Tile only has one FIFO logic available and therefore can accommodate only one FIFO36E2 or one FIFO18E2. However, if a FIFO18E2 occupies a Block RAM Tile, that tile can still accommodate a RAMB18E2
-
-
-4. ARITHMETIC
--------------
-
-+-----------+------+-------+------------+-----------+-------+
-| Site Type | Used | Fixed | Prohibited | Available | Util% |
-+-----------+------+-------+------------+-----------+-------+
-| DSPs      |    0 |     0 |          0 |      1248 |  0.00 |
-+-----------+------+-------+------------+-----------+-------+
-
-
-5. I/O
-------
-
-+------------------+------+-------+------------+-----------+-------+
-|     Site Type    | Used | Fixed | Prohibited | Available | Util% |
-+------------------+------+-------+------------+-----------+-------+
-| Bonded IOB       |   22 |    22 |          0 |       189 | 11.64 |
-|   HPIOB_M        |    6 |     6 |          0 |        58 | 10.34 |
-|     INPUT        |    4 |       |            |           |       |
-|     OUTPUT       |    2 |       |            |           |       |
-|     BIDIR        |    0 |       |            |           |       |
-|   HPIOB_S        |    5 |     5 |          0 |        58 |  8.62 |
-|     INPUT        |    3 |       |            |           |       |
-|     OUTPUT       |    2 |       |            |           |       |
-|     BIDIR        |    0 |       |            |           |       |
-|   HDIOB_M        |    6 |     6 |          0 |        35 | 17.14 |
-|     INPUT        |    1 |       |            |           |       |
-|     OUTPUT       |    4 |       |            |           |       |
-|     BIDIR        |    1 |       |            |           |       |
-|   HDIOB_S        |    5 |     5 |          0 |        35 | 14.29 |
-|     INPUT        |    1 |       |            |           |       |
-|     OUTPUT       |    3 |       |            |           |       |
-|     BIDIR        |    1 |       |            |           |       |
-|   HPIOB_SNGL     |    0 |     0 |          0 |         3 |  0.00 |
-| HPIOBDIFFINBUF   |    3 |     3 |          0 |        82 |  3.66 |
-|   DIFFINBUF      |    3 |     3 |            |           |       |
-| HPIOBDIFFOUTBUF  |    0 |     0 |          0 |        82 |  0.00 |
-| HDIOBDIFFINBUF   |    0 |     0 |          0 |        35 |  0.00 |
-| BITSLICE_CONTROL |    1 |     0 |          0 |        32 |  3.13 |
-| BITSLICE_RX_TX   |    6 |     6 |          0 |      1248 |  0.48 |
-|   IDELAY         |    2 |     2 |            |           |       |
-|   ISERDES        |    2 |     2 |            |           |       |
-|   OSERDES        |    2 |     2 |            |           |       |
-| BITSLICE_TX      |    0 |     0 |          0 |        32 |  0.00 |
-| RIU_OR           |    0 |     0 |          0 |        16 |  0.00 |
-+------------------+------+-------+------------+-----------+-------+
-
-
-6. CLOCK
---------
-
-+------------+------+-------+------------+-----------+-------+
-|  Site Type | Used | Fixed | Prohibited | Available | Util% |
-+------------+------+-------+------------+-----------+-------+
-| BUFGCE     |    5 |     0 |          0 |       112 |  4.46 |
-| BUFGCE_DIV |    2 |     0 |          0 |        16 | 12.50 |
-| BUFG_GT    |    0 |     0 |          0 |        96 |  0.00 |
-| BUFG_PS    |    1 |     0 |          0 |        96 |  1.04 |
-| BUFGCTRL*  |    0 |     0 |          0 |        32 |  0.00 |
-| PLL        |    0 |     0 |          0 |         8 |  0.00 |
-| MMCM       |    1 |     0 |          0 |         4 | 25.00 |
-+------------+------+-------+------------+-----------+-------+
-* Note: Each used BUFGCTRL counts as two GLOBAL CLOCK BUFFERs. This table does not include global clocking resources, only buffer cell usage. See the Clock Utilization Report (report_clock_utilization) for detailed accounting of global clocking resource availability.
-
-
-7. ADVANCED
------------
-
-+-----------------+------+-------+------------+-----------+--------+
-|    Site Type    | Used | Fixed | Prohibited | Available |  Util% |
-+-----------------+------+-------+------------+-----------+--------+
-| GTHE4_CHANNEL   |    0 |     0 |          0 |         4 |   0.00 |
-| GTHE4_COMMON    |    0 |     0 |          0 |         1 |   0.00 |
-| OBUFDS_GTE4     |    0 |     0 |          0 |         2 |   0.00 |
-| OBUFDS_GTE4_ADV |    0 |     0 |          0 |         2 |   0.00 |
-| PCIE40E4        |    0 |     0 |          0 |         2 |   0.00 |
-| PS8             |    1 |     0 |          0 |         1 | 100.00 |
-| SYSMONE4        |    0 |     0 |          0 |         1 |   0.00 |
-| VCU             |    0 |     0 |          0 |         1 |   0.00 |
-+-----------------+------+-------+------------+-----------+--------+
-
-
-8. CONFIGURATION
-----------------
-
-+-------------+------+-------+------------+-----------+-------+
-|  Site Type  | Used | Fixed | Prohibited | Available | Util% |
-+-------------+------+-------+------------+-----------+-------+
-| BSCANE2     |    0 |     0 |          0 |         4 |  0.00 |
-| DNA_PORTE2  |    0 |     0 |          0 |         1 |  0.00 |
-| EFUSE_USR   |    0 |     0 |          0 |         1 |  0.00 |
-| FRAME_ECCE4 |    0 |     0 |          0 |         1 |  0.00 |
-| ICAPE3      |    0 |     0 |          0 |         2 |  0.00 |
-| MASTER_JTAG |    0 |     0 |          0 |         1 |  0.00 |
-| STARTUPE3   |    0 |     0 |          0 |         1 |  0.00 |
-+-------------+------+-------+------------+-----------+-------+
-
-
-9. Primitives
--------------
-
-+------------+------+---------------------+
-|  Ref Name  | Used | Functional Category |
-+------------+------+---------------------+
-| FDRE       | 6559 |            Register |
-| LUT6       | 2402 |                 CLB |
-| LUT4       |  850 |                 CLB |
-| LUT5       |  564 |                 CLB |
-| LUT3       |  454 |                 CLB |
-| MUXF7      |  349 |                 CLB |
-| RAMD64E    |  344 |                 CLB |
-| LUT2       |  336 |                 CLB |
-| FDSE       |  249 |            Register |
-| RAMD32     |   76 |                 CLB |
-| CARRY8     |   57 |                 CLB |
-| MUXF8      |   32 |                 CLB |
-| LUT1       |   23 |                 CLB |
-| RAMS32     |   12 |                 CLB |
-| OBUF       |   11 |                 I/O |
-| FDPE       |    9 |            Register |
-| IBUFCTRL   |    8 |                 I/O |
-| INBUF      |    5 |                 I/O |
-| BUFGCE     |    5 |               Clock |
-| DIFFINBUF  |    3 |                 I/O |
-| OSERDESE3  |    2 |                 I/O |
-| OBUFT      |    2 |                 I/O |
-| ISERDESE3  |    2 |                 I/O |
-| INV        |    2 |                 CLB |
-| IDELAYE3   |    2 |                 I/O |
-| BUFGCE_DIV |    2 |               Clock |
-| PS8        |    1 |            Advanced |
-| MMCME4_ADV |    1 |               Clock |
-| IDELAYCTRL |    1 |                 I/O |
-| BUFG_PS    |    1 |               Clock |
-+------------+------+---------------------+
-
-
-10. Black Boxes
----------------
-
-+----------+------+
-| Ref Name | Used |
-+----------+------+
-
-
-11. Instantiated Netlists
--------------------------
-
-+----------+------+
-| Ref Name | Used |
-+----------+------+
++-------------------------------------------------------------------+-------------------------------------------------------------------------------+------------+------------+---------+------+-------+--------+--------+------+------------+
+|                              Instance                             |                                     Module                                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | URAM | DSP Blocks |
++-------------------------------------------------------------------+-------------------------------------------------------------------------------+------------+------------+---------+------+-------+--------+--------+------+------------+
+| ias2rf_k26_bd_wrapper                                             |                                                                         (top) |       8533 |       7606 |     790 |  137 | 12327 |      2 |      2 |    0 |          0 |
+|   (ias2rf_k26_bd_wrapper)                                         |                                                                         (top) |          0 |          0 |       0 |    0 |     0 |      0 |      0 |    0 |          0 |
+|   ias2rf_k26_bd_i                                                 |                                                                 ias2rf_k26_bd |       8533 |       7606 |     790 |  137 | 12327 |      2 |      2 |    0 |          0 |
+|     kria_pl_link_0                                                |                                                ias2rf_k26_bd_kria_pl_link_0_0 |       4426 |       4018 |     408 |    0 |  6555 |      0 |      0 |    0 |          0 |
+|       inst                                                        |                                   ias2rf_k26_bd_kria_pl_link_0_0_kria_pl_link |       4424 |       4016 |     408 |    0 |  6555 |      0 |      0 |    0 |          0 |
+|         (inst)                                                    |                                   ias2rf_k26_bd_kria_pl_link_0_0_kria_pl_link |        107 |        107 |       0 |    0 |   267 |      0 |      0 |    0 |          0 |
+|         u_fifo_rx2pl                                              |                             ias2rf_k26_bd_kria_pl_link_0_0_kria_pl_async_fifo |         65 |         21 |      44 |    0 |    46 |      0 |      0 |    0 |          0 |
+|         u_link_axis                                               |                                      ias2rf_k26_bd_kria_pl_link_0_0_link_axis |        807 |        447 |     360 |    0 |   396 |      0 |      0 |    0 |          0 |
+|         u_pcs_dl_tx                                               |                             ias2rf_k26_bd_kria_pl_link_0_0_link_pcs_single_tx |        387 |        387 |       0 |    0 |   260 |      0 |      0 |    0 |          0 |
+|           u_gb_tx_l0                                              |                                ias2rf_k26_bd_kria_pl_link_0_0_link_gearbox_tx |        205 |        205 |       0 |    0 |   136 |      0 |      0 |    0 |          0 |
+|           u_enc_l0                                                |                                ias2rf_k26_bd_kria_pl_link_0_0_link_64b66b_enc |        177 |        177 |       0 |    0 |   124 |      0 |      0 |    0 |          0 |
+|         u_pcs_rx                                                  |                                    ias2rf_k26_bd_kria_pl_link_0_0_link_pcs_rx |       2820 |       2820 |       0 |    0 |  5345 |      0 |      0 |    0 |          0 |
+|           u_bl_l0                                                 |                                ias2rf_k26_bd_kria_pl_link_0_0_link_block_lock |        155 |        155 |       0 |    0 |    53 |      0 |      0 |    0 |          0 |
+|           u_bl_l1                                                 |                              ias2rf_k26_bd_kria_pl_link_0_0_link_block_lock_0 |        118 |        118 |       0 |    0 |    53 |      0 |      0 |    0 |          0 |
+|           u_dec_l0                                                |                                ias2rf_k26_bd_kria_pl_link_0_0_link_64b66b_dec |         57 |         57 |       0 |    0 |   126 |      0 |      0 |    0 |          0 |
+|           u_dec_l1                                                |                              ias2rf_k26_bd_kria_pl_link_0_0_link_64b66b_dec_1 |         56 |         56 |       0 |    0 |   126 |      0 |      0 |    0 |          0 |
+|           u_deframer                                              |                                  ias2rf_k26_bd_kria_pl_link_0_0_link_deframer |        293 |        293 |       0 |    0 |   174 |      0 |      0 |    0 |          0 |
+|             (u_deframer)                                          |                                  ias2rf_k26_bd_kria_pl_link_0_0_link_deframer |        129 |        129 |       0 |    0 |   174 |      0 |      0 |    0 |          0 |
+|             u_crc                                                 |                                     ias2rf_k26_bd_kria_pl_link_0_0_link_crc32 |        164 |        164 |       0 |    0 |     0 |      0 |      0 |    0 |          0 |
+|           u_gb_rx_l0                                              |                                ias2rf_k26_bd_kria_pl_link_0_0_link_gearbox_rx |        330 |        330 |       0 |    0 |   215 |      0 |      0 |    0 |          0 |
+|           u_gb_rx_l1                                              |                              ias2rf_k26_bd_kria_pl_link_0_0_link_gearbox_rx_2 |        330 |        330 |       0 |    0 |   215 |      0 |      0 |    0 |          0 |
+|           u_rx_lanes                                              |                                  ias2rf_k26_bd_kria_pl_link_0_0_link_rx_lanes |       1482 |       1482 |       0 |    0 |  4383 |      0 |      0 |    0 |          0 |
+|         u_train_fsm                                               |                              ias2rf_k26_bd_kria_pl_link_0_0_link_rx_train_fsm |        242 |        242 |       0 |    0 |   184 |      0 |      0 |    0 |          0 |
+|     axi_dma_0                                                     |                                                     ias2rf_k26_bd_axi_dma_0_0 |       1935 |       1800 |       8 |  127 |  2539 |      2 |      2 |    0 |          0 |
+|       U0                                                          |                                             ias2rf_k26_bd_axi_dma_0_0_axi_dma |       1935 |       1800 |       8 |  127 |  2539 |      2 |      2 |    0 |          0 |
+|         INCLUDE_MM2S_SOF_EOF_GENERATOR.I_MM2S_DMA_MNGR            |                                   ias2rf_k26_bd_axi_dma_0_0_axi_dma_mm2s_mngr |         14 |         14 |       0 |    0 |    73 |      0 |      0 |    0 |          0 |
+|           GEN_MM2S_DMA_CONTROL.GEN_SIMPLE_DMA_MODE.I_MM2S_SMPL_SM |                                 ias2rf_k26_bd_axi_dma_0_0_axi_dma_smple_sm_20 |          9 |          9 |       0 |    0 |    62 |      0 |      0 |    0 |          0 |
+|         INCLUDE_S2MM_SOF_EOF_GENERATOR.I_S2MM_DMA_MNGR            |                                   ias2rf_k26_bd_axi_dma_0_0_axi_dma_s2mm_mngr |         27 |         27 |       0 |    0 |    98 |      0 |      0 |    0 |          0 |
+|           GEN_S2MM_DMA_CONTROL.GEN_SIMPLE_DMA_MODE.I_S2MM_SMPL_SM |                                    ias2rf_k26_bd_axi_dma_0_0_axi_dma_smple_sm |          9 |          9 |       0 |    0 |    62 |      0 |      0 |    0 |          0 |
+|         I_AXI_DMA_REG_MODULE                                      |                                  ias2rf_k26_bd_axi_dma_0_0_axi_dma_reg_module |        135 |        135 |       0 |    0 |   261 |      0 |      0 |    0 |          0 |
+|           GEN_AXI_LITE_IF.AXI_LITE_IF_I                           |                                     ias2rf_k26_bd_axi_dma_0_0_axi_dma_lite_if |        103 |        103 |       0 |    0 |    85 |      0 |      0 |    0 |          0 |
+|           GEN_MM2S_REGISTERS.I_MM2S_DMA_REGISTER                  |                                    ias2rf_k26_bd_axi_dma_0_0_axi_dma_register |         20 |         20 |       0 |    0 |    88 |      0 |      0 |    0 |          0 |
+|           GEN_S2MM_REGISTERS.I_S2MM_DMA_REGISTER                  |                               ias2rf_k26_bd_axi_dma_0_0_axi_dma_register_s2mm |         13 |         13 |       0 |    0 |    88 |      0 |      0 |    0 |          0 |
+|         I_PRMRY_DATAMOVER                                         |                                       ias2rf_k26_bd_axi_dma_0_0_axi_datamover |       1742 |       1607 |       8 |  127 |  2069 |      2 |      2 |    0 |          0 |
+|           GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER                       |                        ias2rf_k26_bd_axi_dma_0_0_axi_datamover_s2mm_full_wrap |       1247 |       1156 |       8 |   83 |  1588 |      1 |      1 |    0 |          0 |
+|             ENABLE_AXIS_SKID.I_S2MM_STRM_SKID_BUF                 |                              ias2rf_k26_bd_axi_dma_0_0_axi_datamover_skid_buf |         78 |         78 |       0 |    0 |   152 |      0 |      0 |    0 |          0 |
+|             GEN_ENABLE_INDET_BTT_SF.I_INDET_BTT                   |                             ias2rf_k26_bd_axi_dma_0_0_axi_datamover_indet_btt |        212 |        204 |       8 |    0 |   270 |      1 |      1 |    0 |          0 |
+|               I_XD_FIFO                                           |          ias2rf_k26_bd_axi_dma_0_0_axi_datamover_sfifo_autord__parameterized0 |         69 |         61 |       8 |    0 |    56 |      0 |      0 |    0 |          0 |
+|                 NON_BLK_MEM.I_SYNC_FIFOGEN_FIFO                   |                       ias2rf_k26_bd_axi_dma_0_0_xpm_fifo_sync__parameterized1 |         43 |         35 |       8 |    0 |    56 |      0 |      0 |    0 |          0 |
+|                   xpm_fifo_base_inst                              |                       ias2rf_k26_bd_axi_dma_0_0_xpm_fifo_base__parameterized0 |         43 |         35 |       8 |    0 |    56 |      0 |      0 |    0 |          0 |
+|               ENABLE_AXIS_SKID.I_INDET_BTT_SKID_BUF               |              ias2rf_k26_bd_axi_dma_0_0_axi_datamover_skid_buf__parameterized0 |         86 |         86 |       0 |    0 |   160 |      0 |      0 |    0 |          0 |
+|             GEN_INCLUDE_IBTTCC.I_S2MM_MSTR_IBTTCC                 |                                ias2rf_k26_bd_axi_dma_0_0_axi_datamover_ibttcc |        156 |        156 |       0 |    0 |   246 |      0 |      0 |    0 |          0 |
+|             GEN_INCLUDE_REALIGNER.I_S2MM_REALIGNER                |                          ias2rf_k26_bd_axi_dma_0_0_axi_datamover_s2mm_realign |        555 |        525 |       0 |   30 |   498 |      0 |      0 |    0 |          0 |
+|               GEN_INCLUDE_SCATTER.I_S2MM_SCATTER                  |                          ias2rf_k26_bd_axi_dma_0_0_axi_datamover_s2mm_scatter |        249 |        239 |       0 |   10 |   252 |      0 |      0 |    0 |          0 |
+|                 (GEN_INCLUDE_SCATTER.I_S2MM_SCATTER)              |                          ias2rf_k26_bd_axi_dma_0_0_axi_datamover_s2mm_scatter |         69 |         69 |       0 |    0 |    69 |      0 |      0 |    0 |          0 |
+|                 I_MSSAI_SKID_BUF                                  |                        ias2rf_k26_bd_axi_dma_0_0_axi_datamover_mssai_skid_buf |        114 |        114 |       0 |    0 |   156 |      0 |      0 |    0 |          0 |
+|               GEN_INCLUDE_DRE.I_S2MM_DRE_BLOCK                    |                              ias2rf_k26_bd_axi_dma_0_0_axi_datamover_s2mm_dre |        271 |        271 |       0 |    0 |   232 |      0 |      0 |    0 |          0 |
+|             I_CMD_STATUS                                          |            ias2rf_k26_bd_axi_dma_0_0_axi_datamover_cmd_status__parameterized0 |         18 |         18 |       0 |    0 |    93 |      0 |      0 |    0 |          0 |
+|               I_CMD_FIFO                                          |                                  ias2rf_k26_bd_axi_dma_0_0_axi_datamover_fifo |          2 |          2 |       0 |    0 |    62 |      0 |      0 |    0 |          0 |
+|             I_S2MM_MMAP_SKID_BUF                                  |                           ias2rf_k26_bd_axi_dma_0_0_axi_datamover_skid2mm_buf |         68 |         68 |       0 |    0 |   151 |      0 |      0 |    0 |          0 |
+|             I_WR_DATA_CNTL                                        |                           ias2rf_k26_bd_axi_dma_0_0_axi_datamover_wrdata_cntl |         90 |         79 |       0 |   11 |    63 |      0 |      0 |    0 |          0 |
+|               (I_WR_DATA_CNTL)                                    |                           ias2rf_k26_bd_axi_dma_0_0_axi_datamover_wrdata_cntl |         54 |         54 |       0 |    0 |    57 |      0 |      0 |    0 |          0 |
+|           GEN_MM2S_FULL.I_MM2S_FULL_WRAPPER                       |                        ias2rf_k26_bd_axi_dma_0_0_axi_datamover_mm2s_full_wrap |        477 |        433 |       0 |   44 |   481 |      1 |      1 |    0 |          0 |
+|             GEN_INCLUDE_MM2S_DRE.I_DRE_16_to_64                   |                              ias2rf_k26_bd_axi_dma_0_0_axi_datamover_mm2s_dre |         89 |         89 |       0 |    0 |    48 |      0 |      0 |    0 |          0 |
+|             GEN_INCLUDE_MM2S_SF.I_RD_SF                           |                                 ias2rf_k26_bd_axi_dma_0_0_axi_datamover_rd_sf |         86 |         82 |       0 |    4 |    64 |      1 |      1 |    0 |          0 |
+|               I_DATA_FIFO                                         |                          ias2rf_k26_bd_axi_dma_0_0_axi_datamover_sfifo_autord |         66 |         66 |       0 |    0 |    47 |      1 |      1 |    0 |          0 |
+|                 BLK_MEM.I_SYNC_FIFOGEN_FIFO                       |                                       ias2rf_k26_bd_axi_dma_0_0_xpm_fifo_sync |         54 |         54 |       0 |    0 |    47 |      1 |      1 |    0 |          0 |
+|                   xpm_fifo_base_inst                              |                                       ias2rf_k26_bd_axi_dma_0_0_xpm_fifo_base |         54 |         54 |       0 |    0 |    47 |      1 |      1 |    0 |          0 |
+|             I_CMD_STATUS                                          |                            ias2rf_k26_bd_axi_dma_0_0_axi_datamover_cmd_status |          6 |          6 |       0 |    0 |    68 |      0 |      0 |    0 |          0 |
+|               I_CMD_FIFO                                          |                               ias2rf_k26_bd_axi_dma_0_0_axi_datamover_fifo_10 |          2 |          2 |       0 |    0 |    62 |      0 |      0 |    0 |          0 |
+|             I_MSTR_PCC                                            |                                   ias2rf_k26_bd_axi_dma_0_0_axi_datamover_pcc |        187 |        187 |       0 |    0 |   179 |      0 |      0 |    0 |          0 |
+|     axi_smc_ctrl                                                  |                                                  ias2rf_k26_bd_axi_smc_ctrl_0 |        489 |        489 |       0 |    0 |   491 |      0 |      0 |    0 |          0 |
+|       inst                                                        |                                          ias2rf_k26_bd_axi_smc_ctrl_0_bd_60e4 |        489 |        489 |       0 |    0 |   491 |      0 |      0 |    0 |          0 |
+|         sc_ul                                                     |                                  ias2rf_k26_bd_axi_smc_ctrl_0_bd_60e4_sc_ul_0 |        489 |        489 |       0 |    0 |   491 |      0 |      0 |    0 |          0 |
+|           inst                                                    |                          ias2rf_k26_bd_axi_smc_ctrl_0_sc_ultralite_v1_0_1_top |        489 |        489 |       0 |    0 |   491 |      0 |      0 |    0 |          0 |
+|             gen_axi_full_nxm.sasd_inst                            |                    ias2rf_k26_bd_axi_smc_ctrl_0_sc_ultralite_v1_0_1_sasd_lite |        489 |        489 |       0 |    0 |   489 |      0 |      0 |    0 |          0 |
+|               (gen_axi_full_nxm.sasd_inst)                        |                    ias2rf_k26_bd_axi_smc_ctrl_0_sc_ultralite_v1_0_1_sasd_lite |        147 |        147 |       0 |    0 |   284 |      0 |      0 |    0 |          0 |
+|               gen_read.arctrl_mux                                 |      ias2rf_k26_bd_axi_smc_ctrl_0_sc_ultralite_v1_0_1_mux_hot__parameterized5 |        135 |        135 |       0 |    0 |    13 |      0 |      0 |    0 |          0 |
+|               gen_read.rdata_mux                                  |     ias2rf_k26_bd_axi_smc_ctrl_0_sc_ultralite_v1_0_1_mux_hot__parameterized10 |         58 |         58 |       0 |    0 |    32 |      0 |      0 |    0 |          0 |
+|               gen_write.awctrl_mux                                |    ias2rf_k26_bd_axi_smc_ctrl_0_sc_ultralite_v1_0_1_mux_hot__parameterized5_2 |         57 |         57 |       0 |    0 |    13 |      0 |      0 |    0 |          0 |
+|     axi_smc_hp0                                                   |                                                   ias2rf_k26_bd_axi_smc_hp0_0 |       1669 |       1286 |     374 |    9 |  2709 |      0 |      0 |    0 |          0 |
+|       inst                                                        |                                           ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1 |       1669 |       1286 |     374 |    9 |  2709 |      0 |      0 |    0 |          0 |
+|         m00_exit_pipeline                                         |                     ias2rf_k26_bd_axi_smc_hp0_0_m00_exit_pipeline_imp_17KA62P |        208 |        202 |       0 |    6 |   543 |      0 |      0 |    0 |          0 |
+|           m00_exit                                                |                                    ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_m00e_0 |        208 |        202 |       0 |    6 |   543 |      0 |      0 |    0 |          0 |
+|             inst                                                  |                               ias2rf_k26_bd_axi_smc_hp0_0_sc_exit_v1_0_19_top |        208 |        202 |       0 |    6 |   543 |      0 |      0 |    0 |          0 |
+|               w_reg                                               |                  ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_104 |         41 |         41 |       0 |    0 |   150 |      0 |      0 |    0 |          0 |
+|               ar_reg                                              |                  ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_100 |         41 |         41 |       0 |    0 |   110 |      0 |      0 |    0 |          0 |
+|               aw_reg                                              |                  ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_101 |         40 |         40 |       0 |    0 |   110 |      0 |      0 |    0 |          0 |
+|               r_reg                                               |                  ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_103 |         39 |         39 |       0 |    0 |   138 |      0 |      0 |    0 |          0 |
+|         m00_nodes                                                 |                             ias2rf_k26_bd_axi_smc_hp0_0_m00_nodes_imp_1KXQ44T |        565 |        376 |     188 |    1 |   573 |      0 |      0 |    0 |          0 |
+|           m00_ar_node                                             |                                  ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_m00arn_0 |        117 |         69 |      48 |    0 |   122 |      0 |      0 |    0 |          0 |
+|             inst                                                  |                               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top |        117 |         69 |      48 |    0 |   122 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |                        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler |        109 |         61 |      48 |    0 |   111 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |           ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized0_90 |         74 |         26 |      48 |    0 |    87 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   | ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized0_92 |         74 |         26 |      48 |    0 |    87 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |                 ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized0 |         48 |          0 |      48 |    0 |    66 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                   ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized0 |         48 |          0 |      48 |    0 |    66 |      0 |      0 |    0 |          0 |
+|           m00_aw_node                                             |                                  ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_m00awn_0 |        128 |         87 |      40 |    1 |   128 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized0 |        128 |         87 |      40 |    1 |   128 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized0 |        102 |         62 |      40 |    0 |   109 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |              ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized0 |         66 |         26 |      40 |    0 |    85 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   |    ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized0 |         66 |         26 |      40 |    0 |    85 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |              ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized0__1 |         40 |          0 |      40 |    0 |    64 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized0__1 |         40 |          0 |      40 |    0 |    64 |      0 |      0 |    0 |          0 |
+|           m00_b_node                                              |                                   ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_m00bn_0 |         84 |         74 |      10 |    0 |    62 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized1 |         84 |         74 |      10 |    0 |    62 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized1 |         80 |         70 |      10 |    0 |    57 |      0 |      0 |    0 |          0 |
+|           m00_r_node                                              |                                   ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_m00rn_0 |        118 |         74 |      44 |    0 |   126 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized2 |        118 |         74 |      44 |    0 |   126 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized2 |        114 |         70 |      44 |    0 |   121 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |              ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized3 |         79 |         37 |      42 |    0 |    89 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   |    ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized3 |         79 |         37 |      42 |    0 |    89 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |                 ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized3 |         42 |          0 |      42 |    0 |    67 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                   ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized3 |         42 |          0 |      42 |    0 |    67 |      0 |      0 |    0 |          0 |
+|           m00_w_node                                              |                                   ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_m00wn_0 |        118 |         72 |      46 |    0 |   135 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized3 |        118 |         72 |      46 |    0 |   135 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized3 |        100 |         56 |      44 |    0 |   118 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |              ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized5 |         69 |         25 |      44 |    0 |    94 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   |    ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized5 |         69 |         25 |      44 |    0 |    94 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |                 ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized5 |         44 |          0 |      44 |    0 |    73 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                   ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized5 |         44 |          0 |      44 |    0 |    73 |      0 |      0 |    0 |          0 |
+|         s00_entry_pipeline                                        |                     ias2rf_k26_bd_axi_smc_hp0_0_s00_entry_pipeline_imp_8D91KY |        182 |        182 |       0 |    0 |   338 |      0 |      0 |    0 |          0 |
+|           s00_mmu                                                 |                                  ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_s00mmu_0 |        168 |        168 |       0 |    0 |   334 |      0 |      0 |    0 |          0 |
+|             inst                                                  |                                ias2rf_k26_bd_axi_smc_hp0_0_sc_mmu_v1_0_16_top |        168 |        168 |       0 |    0 |   334 |      0 |      0 |    0 |          0 |
+|               r_sreg                                              |                   ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_46 |         75 |         75 |       0 |    0 |   138 |      0 |      0 |    0 |          0 |
+|               ar_reg_stall                                        |                   ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_43 |         35 |         35 |       0 |    0 |    84 |      0 |      0 |    0 |          0 |
+|               ar_sreg                                             |                   ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_44 |         38 |         38 |       0 |    0 |    86 |      0 |      0 |    0 |          0 |
+|         s00_nodes                                                 |                              ias2rf_k26_bd_axi_smc_hp0_0_s00_nodes_imp_37KJ14 |        222 |        134 |      88 |    0 |   253 |      0 |      0 |    0 |          0 |
+|           s00_ar_node                                             |                                    ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_sarn_0 |        119 |         71 |      48 |    0 |   136 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized4 |        119 |         71 |      48 |    0 |   136 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized4 |        116 |         68 |      48 |    0 |   131 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |           ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized7_33 |         85 |         37 |      48 |    0 |   105 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   | ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized7_35 |         85 |         37 |      48 |    0 |   105 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |                 ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized7 |         48 |          0 |      48 |    0 |    83 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                   ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized7 |         48 |          0 |      48 |    0 |    83 |      0 |      0 |    0 |          0 |
+|           s00_r_node                                              |                                     ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_srn_0 |        103 |         63 |      40 |    0 |   117 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized5 |        103 |         63 |      40 |    0 |   117 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized5 |        100 |         60 |      40 |    0 |   112 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |              ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized8 |         65 |         25 |      40 |    0 |    88 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   |    ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized8 |         65 |         25 |      40 |    0 |    88 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |                 ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized8 |         40 |          0 |      40 |    0 |    67 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                   ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized8 |         40 |          0 |      40 |    0 |    67 |      0 |      0 |    0 |          0 |
+|         s01_entry_pipeline                                        |                    ias2rf_k26_bd_axi_smc_hp0_0_s01_entry_pipeline_imp_1102AVQ |        181 |        180 |       0 |    1 |   373 |      0 |      0 |    0 |          0 |
+|           s01_mmu                                                 |                                  ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_s01mmu_0 |        147 |        147 |       0 |    0 |   360 |      0 |      0 |    0 |          0 |
+|             inst                                                  |                ias2rf_k26_bd_axi_smc_hp0_0_sc_mmu_v1_0_16_top__parameterized0 |        147 |        147 |       0 |    0 |   360 |      0 |      0 |    0 |          0 |
+|               w_sreg                                              |                   ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_22 |         46 |         46 |       0 |    0 |   150 |      0 |      0 |    0 |          0 |
+|               aw_reg_stall                                        |                      ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall |         36 |         36 |       0 |    0 |    86 |      0 |      0 |    0 |          0 |
+|               aw_sreg                                             |                   ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_axi_reg_stall_20 |         43 |         43 |       0 |    0 |    88 |      0 |      0 |    0 |          0 |
+|         s01_nodes                                                 |                             ias2rf_k26_bd_axi_smc_hp0_0_s01_nodes_imp_15SH4J2 |        303 |        205 |      98 |    0 |   303 |      0 |      0 |    0 |          0 |
+|           s01_aw_node                                             |                                    ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_sawn_0 |        119 |         71 |      48 |    0 |   122 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized6 |        119 |         71 |      48 |    0 |   122 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized6 |        116 |         68 |      48 |    0 |   117 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |              ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized7 |         85 |         37 |      48 |    0 |    91 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   |    ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized7 |         85 |         37 |      48 |    0 |    91 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |              ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized7__1 |         48 |          0 |      48 |    0 |    69 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized7__1 |         48 |          0 |      48 |    0 |    69 |      0 |      0 |    0 |          0 |
+|           s01_b_node                                              |                                     ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_sbn_0 |         67 |         63 |       4 |    0 |    52 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized7 |         67 |         63 |       4 |    0 |    52 |      0 |      0 |    0 |          0 |
+|           s01_w_node                                              |                                     ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_swn_0 |        117 |         71 |      46 |    0 |   129 |      0 |      0 |    0 |          0 |
+|             inst                                                  |               ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_top__parameterized8 |        117 |         71 |      46 |    0 |   129 |      0 |      0 |    0 |          0 |
+|               inst_mi_handler                                     |        ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_mi_handler__parameterized8 |        113 |         67 |      46 |    0 |   124 |      0 |      0 |    0 |          0 |
+|                 gen_normal_area.inst_fifo_node_payld              |             ias2rf_k26_bd_axi_smc_hp0_0_sc_node_v1_0_19_fifo__parameterized10 |         79 |         35 |      44 |    0 |    96 |      0 |      0 |    0 |          0 |
+|                   gen_xpm_memory_fifo.inst_fifo                   |   ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_xpm_memory_fifo__parameterized10 |         79 |         35 |      44 |    0 |    96 |      0 |      0 |    0 |          0 |
+|                     gen_mem_rep[0].inst_xpm_memory                |                ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_sdpram__parameterized10 |         44 |          0 |      44 |    0 |    74 |      0 |      0 |    0 |          0 |
+|                       xpm_memory_base_inst                        |                  ias2rf_k26_bd_axi_smc_hp0_0_xpm_memory_base__parameterized10 |         44 |          0 |      44 |    0 |    74 |      0 |      0 |    0 |          0 |
+|         switchboards                                              |                           ias2rf_k26_bd_axi_smc_hp0_0_switchboards_imp_QQWZF0 |          0 |          0 |       0 |    0 |   296 |      0 |      0 |    0 |          0 |
+|           ar_switchboard                                          |                                    ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_arsw_0 |          0 |          0 |       0 |    0 |    83 |      0 |      0 |    0 |          0 |
+|             inst                                                  |                         ias2rf_k26_bd_axi_smc_hp0_0_sc_switchboard_v1_0_9_top |          0 |          0 |       0 |    0 |    83 |      0 |      0 |    0 |          0 |
+|               gen_mi[0].inst_opipe_payld                          |         ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_pipeline__parameterized8_0 |          0 |          0 |       0 |    0 |    83 |      0 |      0 |    0 |          0 |
+|           aw_switchboard                                          |                                    ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_awsw_0 |          0 |          0 |       0 |    0 |    69 |      0 |      0 |    0 |          0 |
+|             inst                                                  |                      ias2rf_k26_bd_axi_smc_hp0_0_sc_switchboard_v1_0_9_top__1 |          0 |          0 |       0 |    0 |    69 |      0 |      0 |    0 |          0 |
+|               gen_mi[0].inst_opipe_payld                          |           ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_pipeline__parameterized8 |          0 |          0 |       0 |    0 |    69 |      0 |      0 |    0 |          0 |
+|           r_switchboard                                           |                                     ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_rsw_0 |          0 |          0 |       0 |    0 |    67 |      0 |      0 |    0 |          0 |
+|             inst                                                  |         ias2rf_k26_bd_axi_smc_hp0_0_sc_switchboard_v1_0_9_top__parameterized1 |          0 |          0 |       0 |    0 |    67 |      0 |      0 |    0 |          0 |
+|               gen_mi[0].inst_opipe_payld                          |          ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_pipeline__parameterized10 |          0 |          0 |       0 |    0 |    67 |      0 |      0 |    0 |          0 |
+|           w_switchboard                                           |                                     ias2rf_k26_bd_axi_smc_hp0_0_bd_1de1_wsw_0 |          0 |          0 |       0 |    0 |    74 |      0 |      0 |    0 |          0 |
+|             inst                                                  |         ias2rf_k26_bd_axi_smc_hp0_0_sc_switchboard_v1_0_9_top__parameterized2 |          0 |          0 |       0 |    0 |    74 |      0 |      0 |    0 |          0 |
+|               gen_mi[0].inst_opipe_payld                          |          ias2rf_k26_bd_axi_smc_hp0_0_sc_util_v1_0_4_pipeline__parameterized11 |          0 |          0 |       0 |    0 |    74 |      0 |      0 |    0 |          0 |
++-------------------------------------------------------------------+-------------------------------------------------------------------------------+------------+------------+---------+------+-------+--------+--------+------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
 
 

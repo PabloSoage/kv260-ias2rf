@@ -1,0 +1,77 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Sat Nov 14 01:48:07 2026
+| Host         : Akasha running 64-bit major release  (build 9200)
+| Command      : report_methodology -file D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/methodology.rpt
+| Design       : ias2rf_k26_bd_wrapper
+| Device       : xck26-sfvc784-2LV-c
+| Speed File   : -2LV
+| Design State : Fully Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Report Methodology
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: impl_1
+      Design limits: <entire design considered>
+             Max checks: <unlimited>
+             Checks found: 6
++-----------+----------+---------------------------------------------------+--------+
+| Rule      | Severity | Description                                       | Checks |
++-----------+----------+---------------------------------------------------+--------+
+| LUTAR-1   | Warning  | LUT drives async reset alert                      | 1      |
+| TIMING-9  | Warning  | Unknown CDC Logic                                 | 1      |
+| TIMING-18 | Warning  | Missing input or output delay                     | 2      |
+| CLKC-30   | Advisory | MMCME4 not driven by IO has BUFG in feedback loop | 1      |
+| CLKC-56   | Advisory | MMCME4 with global clock driver has no LOC        | 1      |
++-----------+----------+---------------------------------------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+LUTAR-1#1 Warning
+LUT drives async reset alert  
+LUT cell ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_rx_sync[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[0]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[1]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[2]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_rx_sync_reg[0]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_rx_sync_reg[1]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_rx_sync_reg[2]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_tx_sync_reg[0]/PRE,
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_tx_sync_reg[1]/PRE
+ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_tx_sync_reg[2]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
+Related violations: <none>
+
+TIMING-9#1 Warning
+Unknown CDC Logic  
+One or more asynchronous Clock Domain Crossing has been detected between 2 clock domains through a set_false_path or a set_clock_groups or set_max_delay -datapath_only constraint but no double-registers logic synchronizer has been found on the side of the capture clock. It is recommended to run report_cdc for a complete and detailed CDC coverage. Please consider using XPM_CDC to avoid Critical severities
+Related violations: <none>
+
+TIMING-18#1 Warning
+Missing input or output delay  
+An input delay is missing on link_rx_d0_p relative to the rising and/or falling clock edge(s) of link_rx_clk.
+Related violations: <none>
+
+TIMING-18#2 Warning
+Missing input or output delay  
+An input delay is missing on link_rx_d1_p relative to the rising and/or falling clock edge(s) of link_rx_clk.
+Related violations: <none>
+
+CLKC-30#1 Advisory
+MMCME4 not driven by IO has BUFG in feedback loop  
+The MMCME4 cell ias2rf_k26_bd_i/kria_pl_link_0/inst/u_mmcm has a BUFGCE ias2rf_k26_bd_i/kria_pl_link_0/inst/u_bufg_mmcm_fb clock buffer in the feedback loop, but the clock input is not directly driven by an I/O to create a Zero Delay Buffer Clock (a common use for having a buffer in the feedback loop). If there is no specific need for this buffer in the feedback loop (e.g. no timing paths between CLKINx/CLKOUTx domains or low latency requirement), then it is suggested to remove that BUFG* from the feedback path. This will allow for a lower power solution and free the clock resource for other purposes.
+Related violations: <none>
+
+CLKC-56#1 Advisory
+MMCME4 with global clock driver has no LOC  
+The MMCME4_ADV cell ias2rf_k26_bd_i/kria_pl_link_0/inst/u_mmcm CLKIN1 or CLKIN2 pin is driven by global Clock buffer(s) ias2rf_k26_bd_i/ps8/inst/buffer_pl_clk_0.PL_CLK_0_BUFG and does not have a LOC constraint. It is recommended to LOC the MMCM and use the CLOCK_DEDICATED_ROUTE constraint on the net(s) driven by the global Clock buffer(s).
+Related violations: <none>
+
+

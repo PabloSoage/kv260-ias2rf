@@ -1,5 +1,7 @@
 sim/out/
 sim/work/
+kria/.bd_proj/
+kria/out/
 xsim.dir/
 *.jou
 *.log

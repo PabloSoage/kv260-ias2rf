@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: BSD-2-Clause
+// Devicetree overlay fragment for KV260 IAS1 PL Bitstream (Task 18)
+// Exposes kria_pl_link CSRs via UIO, AXI DMA S2MM/MM2S via u-dma-buf / UIO,
+// and PS EMIO I2C0 / SPI0 / GPIO0 buses routed to the IAS2RF adapter & Pmod J2.
+
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "xlnx,zynqmp-kv260-revB", "xlnx,zynqmp-kv260", "xlnx,zynqmp";
+
+    fragment@0 {
+        target = <&amba_pl>;
+        __overlay__ {
+            #address-cells = <2>;
+            #size-cells = <2>;
+
+            ias2rf_link: ias2rf_link@80000000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80000000 0x0 0x10000>;
+                interrupt-parent = <&gic>;
+                interrupts = <0 89 4>, <0 90 4>;
+                interrupt-names = "irq_fpga", "irq_link_up";
+                status = "okay";
+            };
+
+            axi_dma_0: dma@80010000 {
+                compatible = "generic-uio", "xlnx,axi-dma-7.1";
+                #dma-cells = <1>;
+                reg = <0x0 0x80010000 0x0 0x10000>;
+                interrupt-parent = <&gic>;
+                interrupts = <0 91 4>, <0 92 4>;
+                interrupt-names = "s2mm_introut", "mm2s_introut";
+                xlnx,addrwidth = /bits/ 8 <32>;
+                dma-coherent;
+                status = "okay";
+
+                dma-channel@80010000 {
+                    compatible = "xlnx,axi-dma-mm2s-channel";
+                    xlnx,datawidth = <64>;
+                    xlnx,device-id = <0x0>;
+                };
+                dma-channel@80010030 {
+                    compatible = "xlnx,axi-dma-s2mm-channel";
+                    xlnx,datawidth = <64>;
+                    xlnx,device-id = <0x0>;
+                };
+            };
+        };
+    };
+
+    /* EMIO I2C0 -> HK_SCL / HK_SDA (M24C02 EEPROM @ 0x50, TMP1075 / LM75) */
+    fragment@1 {
+        target = <&i2c0>;
+        __overlay__ {
+            status = "okay";
+            clock-frequency = <100000>;
+        };
+    };
+
+    /* EMIO SPI0 -> KV260 Pmod J2 (Artix secondary command SPI port) */
+    fragment@2 {
+        target = <&spi0>;
+        __overlay__ {
+            status = "okay";
+            num-cs = <1>;
+            spidev@0 {
+                compatible = "rohm,dh2228fv";
+                reg = <0>;
+                spi-max-frequency = <10000000>;
+            };
+        };
+    };
+};
