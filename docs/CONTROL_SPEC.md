@@ -301,5 +301,16 @@ housekeeping I²C, ADAR SPI) and part of bank 34's VCCO feed were ripped and re-
 bank 34's VCCO balls (R4, M3) are now fed through a 0.1 mm × 13.7 mm +2V5 track (about 0.15 Ω); the bank's other
 VCCO balls keep their wide connection. DRC: 0 errors, 0 unconnected, schematic parity 0.
 
+**Eyes at 1.25 Gb/s** (lvds_eye.py's model, both legs end to end across the AC capacitors, PRBS7, LVDS driver
+3.5 mA / 300 ps, 100 Ω and 2 pF at the receiver; the capacitors and the 10 k bias are not modelled):
+
+| Path | Routed | Ideal 50 Ω legs | Jitter | Rev05 (shared pairs) |
+|---|---|---|---|---|
+| FPGA → PHY (SGTX) | **595 mV** | 616 mV | 50 ps | 350 mV |
+| PHY → FPGA (SGRX) | **518 mV** | 564 mV | 70 ps | 637 mV |
+
+Both are far above the 200 mV a receiver needs. Some short sections on L1/L8 are 0.1 mm wide (60–64 Ω) where
+the legs leave the balls and the capacitors; they cost 20–46 mV against ideal legs.
+
 **Also on Rev06:** J1002, a 5 V fan header for enclosure v2 (POWER sheet; docs/ENCLOSURE.md section 6).
 
