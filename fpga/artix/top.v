@@ -1018,6 +1018,7 @@ module artix_top #(
             reg       ctrl_force_ias_fault;
             reg       ctrl_force_eth_fault;
             reg       ias_seen_dl_up;
+            reg       eth_seen_remote_alive;
 
             always @(posedge link_clk) begin
                 if (eth_rst_125) begin
@@ -1031,12 +1032,15 @@ module artix_top #(
                     mdio_req_reg         <= 5'd0;
                     mdio_req_wdata       <= 16'd0;
                     ias_seen_dl_up       <= 1'b0;
+                    eth_seen_remote_alive <= 1'b0;
                 end else begin
                     ctrl_an_restart <= 1'b0;
                     if (mdio_req_vld && mdio_req_ready)
                         mdio_req_vld <= 1'b0;
                     if (dl_up_sync[1])
                         ias_seen_dl_up <= 1'b1;
+                    if (eth_remote_alive_stat)
+                        eth_seen_remote_alive <= 1'b1;
 
                     if (udp_ctrl_wr) begin
                         case (udp_ctrl_addr)
@@ -1091,7 +1095,8 @@ module artix_top #(
             assign eth_ctrl_wdata = udp_ctrl_wdata;
 
             wire ias_path_ok = ~ctrl_force_ias_fault & (dl_up_sync[1] | ~ias_seen_dl_up);
-            wire eth_path_ok = eth_link_up_stat & ~ctrl_force_eth_fault;
+            wire eth_path_ok = eth_link_up_stat & ~ctrl_force_eth_fault &
+                               (eth_remote_alive_stat | ~eth_seen_remote_alive);
 
             dual_path_mux u_dual_mux (
                 .clk           (link_clk),

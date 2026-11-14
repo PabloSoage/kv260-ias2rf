@@ -181,6 +181,7 @@ module dual_path_mux (
     reg       mir_lock_ias, mir_lock_eth;
     reg       rr_ias, rr_eth, rr_mir;
     reg       prev_failover;
+    reg       drop_s0, drop_s1;
 
     wire failover_active = (policy == POL_SPLIT) && (!ias_healthy || !eth_healthy);
 
@@ -200,6 +201,14 @@ module dual_path_mux (
     wire want_s1_ias = allow_new_split && (
                            (policy == POL_SPLIT && !eth_healthy && ias_healthy) ||
                            (policy == POL_IAS));
+
+    // Only begin a new packet on SOP when the source is not locked to another port or draining
+    wire s0_avail_ias = want_s0_ias && !drop_s0 && s0_valid && s0_sop && (eth_in_lock != 2'd1);
+    wire s1_avail_ias = want_s1_ias && !drop_s1 && s1_valid && s1_sop && (eth_in_lock != 2'd2);
+    wire s0_avail_eth = want_s0_eth && !drop_s0 && s0_valid && s0_sop && (ias_in_lock != 2'd1);
+    wire s1_avail_eth = want_s1_eth && !drop_s1 && s1_valid && s1_sop && (ias_in_lock != 2'd2);
+    wire s0_avail_mir = !drop_s0 && s0_valid && s0_sop;
+    wire s1_avail_mir = !drop_s1 && s1_valid && s1_sop;
 
     reg [1:0] ias_in_sel, eth_in_sel, mir_sel;
     reg       mir_en_ias, mir_en_eth, mir_targets_ok, mir_xfer;
@@ -280,11 +289,11 @@ module dual_path_mux (
                 if (mir_lock_ias && !ias_healthy && !ias_fifo_push_ready) ias_fifo_abort = 1'b1;
                 if (mir_lock_eth && !eth_healthy && !eth_fifo_push_ready) eth_fifo_abort = 1'b1;
             end else begin
-                if (s0_valid && s1_valid)
+                if (s0_avail_mir && s1_avail_mir)
                     mir_sel = rr_mir ? 2'd2 : 2'd1;
-                else if (s0_valid)
+                else if (s0_avail_mir)
                     mir_sel = 2'd1;
-                else if (s1_valid)
+                else if (s1_avail_mir)
                     mir_sel = 2'd2;
                 else
                     mir_sel = 2'd0;
@@ -335,33 +344,27 @@ module dual_path_mux (
             eth_fifo_push_timestamp = mir_timestamp;
             eth_fifo_push_data      = mir_data;
 
-            s0_ready = (mir_sel == 2'd1) && mir_targets_ok;
-            s1_ready = (mir_sel == 2'd2) && mir_targets_ok;
+            s0_ready = drop_s0 || ((mir_sel == 2'd1) && mir_targets_ok);
+            s1_ready = drop_s1 || ((mir_sel == 2'd2) && mir_targets_ok);
         end else begin
             // Split / IAS-only / ETH-only independent ingress arbitration
             if (ias_in_lock != 2'd0) begin
                 ias_in_sel = ias_in_lock;
-            end else if (want_s0_ias && want_s1_ias) begin
-                if (!rr_ias)
-                    ias_in_sel = s0_valid ? 2'd1 : (s1_valid ? 2'd2 : 2'd0);
-                else
-                    ias_in_sel = s1_valid ? 2'd2 : (s0_valid ? 2'd1 : 2'd0);
-            end else if (want_s0_ias && s0_valid) begin
+            end else if (s0_avail_ias && s1_avail_ias) begin
+                ias_in_sel = rr_ias ? 2'd2 : 2'd1;
+            end else if (s0_avail_ias) begin
                 ias_in_sel = 2'd1;
-            end else if (want_s1_ias && s1_valid) begin
+            end else if (s1_avail_ias) begin
                 ias_in_sel = 2'd2;
             end
 
             if (eth_in_lock != 2'd0) begin
                 eth_in_sel = eth_in_lock;
-            end else if (want_s0_eth && want_s1_eth) begin
-                if (!rr_eth)
-                    eth_in_sel = s0_valid ? 2'd1 : (s1_valid ? 2'd2 : 2'd0);
-                else
-                    eth_in_sel = s1_valid ? 2'd2 : (s0_valid ? 2'd1 : 2'd0);
-            end else if (want_s0_eth && s0_valid) begin
+            end else if (s0_avail_eth && s1_avail_eth) begin
+                eth_in_sel = rr_eth ? 2'd2 : 2'd1;
+            end else if (s0_avail_eth) begin
                 eth_in_sel = 2'd1;
-            end else if (want_s1_eth && s1_valid) begin
+            end else if (s1_avail_eth) begin
                 eth_in_sel = 2'd2;
             end
 
@@ -396,9 +399,11 @@ module dual_path_mux (
             eth_fifo_push_timestamp = (eth_in_sel == 2'd1) ? s0_timestamp : s1_timestamp;
             eth_fifo_push_data      = (eth_in_sel == 2'd1) ? s0_data      : s1_data;
 
-            s0_ready = ((ias_in_sel == 2'd1) && ias_fifo_push_ready) ||
+            s0_ready = drop_s0 ||
+                       ((ias_in_sel == 2'd1) && ias_fifo_push_ready) ||
                        ((eth_in_sel == 2'd1) && eth_fifo_push_ready);
-            s1_ready = ((ias_in_sel == 2'd2) && ias_fifo_push_ready) ||
+            s1_ready = drop_s1 ||
+                       ((ias_in_sel == 2'd2) && ias_fifo_push_ready) ||
                        ((eth_in_sel == 2'd2) && eth_fifo_push_ready);
         end
     end
@@ -415,10 +420,17 @@ module dual_path_mux (
             rr_mir        <= 1'b0;
             failover_cnt  <= 32'd0;
             prev_failover <= 1'b0;
+            drop_s0       <= 1'b0;
+            drop_s1       <= 1'b0;
         end else begin
             prev_failover <= failover_active;
             if (failover_active && !prev_failover)
                 failover_cnt <= failover_cnt + 32'd1;
+
+            if (drop_s0 && s0_valid && s0_eop)
+                drop_s0 <= 1'b0;
+            if (drop_s1 && s1_valid && s1_eop)
+                drop_s1 <= 1'b0;
 
             if (mir_mode) begin
                 if (mir_xfer) begin
@@ -435,10 +447,16 @@ module dual_path_mux (
                 end else if (mir_lock != 2'd0) begin
                     if (mir_lock_ias && !ias_healthy && !ias_fifo_push_ready) mir_lock_ias <= 1'b0;
                     if (mir_lock_eth && !eth_healthy && !eth_fifo_push_ready) mir_lock_eth <= 1'b0;
-                    if (!mir_en_ias && !mir_en_eth)   mir_lock     <= 2'd0;
+                    if (!mir_en_ias && !mir_en_eth) begin
+                        if (mir_lock == 2'd1) drop_s0 <= 1'b1;
+                        if (mir_lock == 2'd2) drop_s1 <= 1'b1;
+                        mir_lock <= 2'd0;
+                    end
                 end
             end else begin
                 if (ias_fifo_abort) begin
+                    if (ias_in_lock == 2'd1) drop_s0 <= 1'b1;
+                    if (ias_in_lock == 2'd2) drop_s1 <= 1'b1;
                     ias_in_lock <= 2'd0;
                 end else if (ias_fifo_push_valid) begin
                     if (ias_fifo_push_eop) begin
@@ -450,6 +468,8 @@ module dual_path_mux (
                 end
 
                 if (eth_fifo_abort) begin
+                    if (eth_in_lock == 2'd1) drop_s0 <= 1'b1;
+                    if (eth_in_lock == 2'd2) drop_s1 <= 1'b1;
                     eth_in_lock <= 2'd0;
                 end else if (eth_fifo_push_valid) begin
                     if (eth_fifo_push_eop) begin

@@ -59,6 +59,10 @@ if (Test-Path $workDir) {
     Remove-Item -Recurse -Force $workDir
 }
 New-Item -ItemType Directory -Force $outDir, $workDir | Out-Null
+$designTxt = Join-Path $simDir 'design.txt'
+if (Test-Path $designTxt) {
+    Copy-Item $designTxt (Join-Path $workDir 'design.txt') -Force
+}
 
 $xvlogArgs = @('--incr')
 foreach ($d in $Define) {
@@ -80,6 +84,10 @@ if ($Bench -eq 'tb_sgmii_lvds') {
         if (Test-Path $dir) {
             $rtlFiles += Get-ChildItem $dir -Recurse -Include *.v, *.sv | ForEach-Object { $_.FullName }
         }
+    }
+    $modelsDir = Join-Path $simDir 'models'
+    if (($Bench -like 'tb_system*') -and (Test-Path $modelsDir)) {
+        $rtlFiles += Get-ChildItem $modelsDir -Recurse -Include *.v, *.sv | ForEach-Object { $_.FullName }
     }
 }
 
