@@ -84,11 +84,15 @@ set_property DIFF_TERM   TRUE    [get_ports {eth_sgrx_p eth_sgrx_n}]
 
 set_property PACKAGE_PIN P1  [get_ports eth_mdc]
 set_property IOSTANDARD  LVCMOS25 [get_ports eth_mdc]
+set_property SLEW        SLOW     [get_ports eth_mdc]
+set_property DRIVE       4        [get_ports eth_mdc]
 
 #   Bank 14 (VCCO = 3.3 V): MDIO open-drain (R1213 1.5k -> 2.5V DVDDRG, do not use EMCCLK), RST_N pulled up via R1214
 set_property PACKAGE_PIN M15 [get_ports eth_mdio]
 set_property PACKAGE_PIN K13 [get_ports eth_rst_n]
 set_property IOSTANDARD  LVCMOS33 [get_ports {eth_mdio eth_rst_n}]
+set_property SLEW        SLOW     [get_ports eth_mdio]
+set_property DRIVE       4        [get_ports eth_mdio]
 set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN DISABLE [current_design]
 
 # ------------------------------------------------------------------------------

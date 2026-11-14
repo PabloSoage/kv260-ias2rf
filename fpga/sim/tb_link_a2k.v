@@ -19,6 +19,8 @@
 //   MUTATE_BAD_SCRAMBLER             : wrong scrambler polynomial tap in TX encoder (FAIL)
 //   MUTATE_SKIP_CRC                  : bypass CRC-32 validation in RX deframer (FAIL)
 //   MUTATE_BAD_IDELAY                : pin IDELAYE3 D0 onto the clock transition edge (FAIL)
+//   STREAM_FROM_T0                   : attempt packet TX from t=0 with idle/AM training gate (PASS)
+//   MUTATE_NO_TRAIN_GATE             : stream packets from t=0 without idle/AM gate (FAIL)
 
 `timescale 1ns/1ps
 
@@ -37,6 +39,16 @@ module tb_link_a2k;
     localparam integer BAD_IDELAY = 1;
 `else
     localparam integer BAD_IDELAY = 0;
+`endif
+`ifdef MUTATE_NO_TRAIN_GATE
+    localparam integer STREAM_T0     = 1;
+    localparam integer NO_TRAIN_GATE = 1;
+`elsif STREAM_FROM_T0
+    localparam integer STREAM_T0     = 1;
+    localparam integer NO_TRAIN_GATE = 0;
+`else
+    localparam integer STREAM_T0     = 0;
+    localparam integer NO_TRAIN_GATE = 0;
 `endif
 
 `ifdef RATE_800M
@@ -99,14 +111,36 @@ module tb_link_a2k;
     wire [7:0]  tx_byte_l0, tx_byte_l1;
     reg         inject_tx_err = 1'b0;
 
+    // Mirror artix/top.v bidirectional training idle-gate for STREAM_T0 regression
+    wire link_up;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] link_up_tx_sync = 2'b00;
+    always @(posedge tx_clkdiv) begin
+        if (tx_rst) link_up_tx_sync <= 2'b00;
+        else        link_up_tx_sync <= {link_up_tx_sync[0], link_up};
+    end
+    reg  gate_in_pkt = 1'b0;
+    wire pcs_pkt_ready;
+    wire pcs_pkt_gate  = (STREAM_T0 == 0 || NO_TRAIN_GATE != 0) ? 1'b1 : (link_up_tx_sync[1] | gate_in_pkt);
+    wire pcs_pkt_valid = tx_pkt_valid & pcs_pkt_gate;
+    assign tx_pkt_ready = pcs_pkt_ready & pcs_pkt_gate;
+
+    always @(posedge tx_clkdiv) begin
+        if (tx_rst)
+            gate_in_pkt <= 1'b0;
+        else if (pcs_pkt_valid && pcs_pkt_ready && tx_pkt_eop)
+            gate_in_pkt <= 1'b0;
+        else if (pcs_pkt_valid && tx_pkt_sop && !gate_in_pkt)
+            gate_in_pkt <= 1'b1;
+    end
+
     link_pcs_tx #(
         .AM_PERIOD     (64),
         .BAD_SCRAMBLER (BAD_SCR)
     ) u_pcs_tx (
         .clk           (tx_clkdiv),
         .rst           (tx_rst),
-        .pkt_valid     (tx_pkt_valid),
-        .pkt_ready     (tx_pkt_ready),
+        .pkt_valid     (pcs_pkt_valid),
+        .pkt_ready     (pcs_pkt_ready),
         .pkt_sop       (tx_pkt_sop),
         .pkt_eop       (tx_pkt_eop),
         .pkt_stream_id (tx_pkt_sid),
@@ -320,7 +354,7 @@ module tb_link_a2k;
     wire [31:0] rx_out_seq;
     wire [63:0] rx_out_ts, rx_out_data;
     wire        rx_done_v, rx_done_ok, rx_done_err;
-    wire        l0_lock, l1_lock, d_lock, link_up;
+    wire        l0_lock, l1_lock, d_lock;
     wire signed [7:0] skew_blk;
     wire [15:0] rem_stat;
     wire [23:0] rem_drop;
@@ -471,10 +505,66 @@ module tb_link_a2k;
     integer w1_width, w1_center, w1_err;
     integer skew_ps;
 
+    task send_all_packets;
+        begin
+            for (p = 0; p < TOTAL_PKTS; p = p + 1) begin
+                nw = (exp_len[p] + 7) >> 3;
+                tx_pkt_sid   <= exp_sid[p];
+                tx_pkt_len   <= exp_len[p];
+                tx_pkt_seq   <= exp_seq[p];
+                tx_pkt_ts    <= exp_ts[p];
+                tx_pkt_valid <= 1'b1;
+                tx_pkt_sop   <= 1'b1;
+                w = 0;
+                while (w < nw) begin
+                    tx_pkt_data <= exp_pay[p][w];
+                    tx_pkt_eop  <= (w == nw - 1);
+                    @(posedge tx_clkdiv);
+                    if (tx_pkt_valid && tx_pkt_ready) begin
+                        // Inject 1 SERDES byte bit error mid-packet for p==7
+                        inject_tx_err <= (exp_err[p] && (w == 16));
+                        w = w + 1;
+                        tx_pkt_sop <= 1'b0;
+                    end else begin
+                        inject_tx_err <= 1'b0;
+                    end
+                end
+                inject_tx_err <= 1'b0;
+                tx_pkt_valid  <= 1'b0;
+                tx_pkt_eop    <= 1'b0;
+                repeat (6) @(posedge tx_clkdiv);
+            end
+        end
+    endtask
+
     initial begin
         fail_cnt = 0;
         tx_rst <= 1'b1;
         rx_rst <= 1'b1;
+
+        // Pre-generate TOTAL_PKTS packets (1..1024 B)
+        for (p = 0; p < TOTAL_PKTS; p = p + 1) begin
+            prng = next_rand(prng);
+            exp_sid[p] = 8'h01 + p[1:0];
+            exp_err[p] = (p == 7); // Inject 1 deliberate error packet to verify end-to-end CRC rejection
+            if (exp_err[p])
+                exp_len[p] = 16'd256 + {8'd0, prng[7:0]};
+            else
+                exp_len[p] = 16'd16 + {7'd0, prng[8:0]};
+            exp_seq[p] = p;
+            prng = next_rand(prng);
+            exp_ts[p]  = 64'h0000_0002_0000_0000 + {32'd0, prng[31:0]};
+            nw = (exp_len[p] + 7) >> 3;
+            for (w = 0; w < nw; w = w + 1) begin
+                prng = next_rand(prng);
+                exp_pay[p][w] = prng;
+                if (w == nw - 1) begin
+                    for (b = 0; b < 8; b = b + 1)
+                        if ((w * 8 + b) >= exp_len[p])
+                            exp_pay[p][w][b*8 +: 8] = 8'h00;
+                end
+            end
+        end
 
         // Wait past glbl.GSR (100 ns) before releasing TX reset
         #150;
@@ -486,19 +576,38 @@ module tb_link_a2k;
         @(posedge rx_clkdiv);
         rx_rst <= 1'b0;
 
-        // Wait for link_up (eye scan -> IDELAY load -> block lock -> deskew)
-        cyc = 0;
-        while ((!link_up) && (cyc < 60000)) begin
-            @(posedge rx_clkdiv);
-            cyc = cyc + 1;
-        end
-        $display("tb_link_a2k (%0d Mb/s, skew_d1_300=%0d): train_cyc=%0d link_up=%b l0=%b l1=%b d_lock=%b tap0=%0d (%0d ps) tap1=%0d (%0d ps) skew_blocks=%0d",
-                 RATE_MBPS, SKEW_D1_300_EN, cyc, link_up, l0_lock, l1_lock, d_lock,
-                 cntval_l0, cntval_l0 * 4, cntval_l1, cntval_l1 * 4, skew_blk);
+        if (STREAM_T0 != 0) begin
+            fork
+                send_all_packets;
+                begin
+                    cyc = 0;
+                    while ((!link_up) && (cyc < 160000)) begin
+                        @(posedge rx_clkdiv);
+                        cyc = cyc + 1;
+                    end
+                    $display("tb_link_a2k (STREAM_T0 no_gate=%0d %0d Mb/s): train_cyc=%0d link_up=%b l0=%b l1=%b d_lock=%b tap0=%0d tap1=%0d",
+                             NO_TRAIN_GATE, RATE_MBPS, cyc, link_up, l0_lock, l1_lock, d_lock, cntval_l0, cntval_l1);
+                    if (!link_up) begin
+                        $display("FAIL: tb_link_a2k link_up failed under t=0 streaming (state=%0d l0=%b l1=%b d_lock=%b)", train_state, l0_lock, l1_lock, d_lock);
+                        $finish;
+                    end
+                end
+            join
+        end else begin
+            // Wait for link_up (eye scan -> IDELAY load -> block lock -> deskew)
+            cyc = 0;
+            while ((!link_up) && (cyc < 160000)) begin
+                @(posedge rx_clkdiv);
+                cyc = cyc + 1;
+            end
+            $display("tb_link_a2k (%0d Mb/s, skew_d1_300=%0d): train_cyc=%0d link_up=%b l0=%b l1=%b d_lock=%b tap0=%0d (%0d ps) tap1=%0d (%0d ps) skew_blocks=%0d",
+                     RATE_MBPS, SKEW_D1_300_EN, cyc, link_up, l0_lock, l1_lock, d_lock,
+                     cntval_l0, cntval_l0 * 4, cntval_l1, cntval_l1 * 4, skew_blk);
 
-        if (!link_up) begin
-            $display("FAIL: tb_link_a2k link_up failed (state=%0d l0=%b l1=%b d_lock=%b)", train_state, l0_lock, l1_lock, d_lock);
-            $finish;
+            if (!link_up) begin
+                $display("FAIL: tb_link_a2k link_up failed (state=%0d l0=%b l1=%b d_lock=%b)", train_state, l0_lock, l1_lock, d_lock);
+                $finish;
+            end
         end
 
         w0_width  = eye_r0 - eye_l0;
@@ -525,57 +634,8 @@ module tb_link_a2k;
             if (skew_ps > -190 || skew_ps < -300) fail_cnt = fail_cnt + 1;
         end
 
-        // Pre-generate TOTAL_PKTS packets (1..1024 B)
-        for (p = 0; p < TOTAL_PKTS; p = p + 1) begin
-            prng = next_rand(prng);
-            exp_sid[p] = 8'h01 + p[1:0];
-            exp_err[p] = (p == 7); // Inject 1 deliberate error packet to verify end-to-end CRC rejection
-            if (exp_err[p])
-                exp_len[p] = 16'd256 + {8'd0, prng[7:0]};
-            else
-                exp_len[p] = 16'd16 + {7'd0, prng[8:0]};
-            exp_seq[p] = p;
-            prng = next_rand(prng);
-            exp_ts[p]  = 64'h0000_0002_0000_0000 + {32'd0, prng[31:0]};
-            nw = (exp_len[p] + 7) >> 3;
-            for (w = 0; w < nw; w = w + 1) begin
-                prng = next_rand(prng);
-                exp_pay[p][w] = prng;
-                if (w == nw - 1) begin
-                    for (b = 0; b < 8; b = b + 1)
-                        if ((w * 8 + b) >= exp_len[p])
-                            exp_pay[p][w][b*8 +: 8] = 8'h00;
-                end
-            end
-        end
-
-        // Send all TOTAL_PKTS packets on Artix side
-        for (p = 0; p < TOTAL_PKTS; p = p + 1) begin
-            nw = (exp_len[p] + 7) >> 3;
-            tx_pkt_sid   <= exp_sid[p];
-            tx_pkt_len   <= exp_len[p];
-            tx_pkt_seq   <= exp_seq[p];
-            tx_pkt_ts    <= exp_ts[p];
-            tx_pkt_valid <= 1'b1;
-            tx_pkt_sop   <= 1'b1;
-            w = 0;
-            while (w < nw) begin
-                tx_pkt_data <= exp_pay[p][w];
-                tx_pkt_eop  <= (w == nw - 1);
-                @(posedge tx_clkdiv);
-                if (tx_pkt_valid && tx_pkt_ready) begin
-                    // Inject 1 SERDES byte bit error mid-packet for p==7
-                    inject_tx_err <= (exp_err[p] && (w == 16));
-                    w = w + 1;
-                    tx_pkt_sop <= 1'b0;
-                end else begin
-                    inject_tx_err <= 1'b0;
-                end
-            end
-            inject_tx_err <= 1'b0;
-            tx_pkt_valid  <= 1'b0;
-            tx_pkt_eop    <= 1'b0;
-            repeat (6) @(posedge tx_clkdiv);
+        if (STREAM_T0 == 0) begin
+            send_all_packets;
         end
 
         for (cyc = 0; cyc < 4000 && ((rx_good_pkts + rx_drop_pkts) < TOTAL_PKTS); cyc = cyc + 1)

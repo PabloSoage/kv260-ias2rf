@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // Full-System Co-Simulation Testbench (Task 22 Part A):
 //   Real artix_top (ENABLE_ETH=1) <-> Real kria_pl_link (K26 PL wrapper)
-//   Connected through Rev05 PCB/package/SOM LVDS channel models with exact
+//   Connected through Rev06 PCB/package/SOM LVDS channel models with exact
 //   lvds_skew.py delays, SIGNAL_INTEGRITY.md jitter budgets, +/-100 ppm clock
 //   skews, behavioral AD9484/AD9253/AD9708/AD9767/8xADAR1000/TMP1075/CAT24C02/
 //   Si549/PPS peripherals, and behavioral RTL8211FSI + PS GEM3 SGMII/UDP peer.
 //
 // Simulation speed scaling:
-//   - TAP_DWELL_CYCLES overridden to 768 (vs 1800 hw) on both train FSMs
+//   - Hardware-default TAP_DWELL_CYCLES = 1800 on both train FSMs (no dwell defparam)
 //   - ETH_ALIVE_TIMEOUT = 25000 (200 us vs 1 s hw), HK_POLL_DIV = 16000
 //   - XO_FCAL_WAIT_CYC = 150, ETH_MDIO_POLL_DIV = 1200
 
@@ -77,7 +77,7 @@ module tb_system;
 
     wire        emio_i2c_scl_i, emio_i2c_sda_i;
     wire        emio_spi_mi;
-    reg  [7:0]  emio_gpio_o = 8'h08; // Bit 3 (pmod_spare1)=1 pauses DDC during link eye training
+    reg  [7:0]  emio_gpio_o = 8'h00; // Do not pause DDC/generators at t=0; RTL idle-gate handles training
     reg  [7:0]  emio_gpio_t = 8'h00;
     wire [7:0]  emio_gpio_i;
 
@@ -143,16 +143,16 @@ module tb_system;
         .rx_p(a_dl_d0_p), .rx_n(a_dl_d0_n)
     );
 
-    // Rev06 SGMII differential channels (SI §9.7: 50 ps TX / 53 ps RX spread, 1.25 Gbps = 800 ps UI)
+    // Rev06 SGMII differential channels (lvds_skew.py: ETH_SGTX 404/402 ps, ETH_SGRX 464/468 ps; SI §9.7 spread)
     sim_board_lvds_channel #(
-        .DLY_P_PS(360.0), .DLY_N_PS(360.0), .JITTER_SPREAD_PS(50.0), .SEED(32'h3300_0001)
+        .DLY_P_PS(404.0), .DLY_N_PS(402.0), .JITTER_SPREAD_PS(50.0), .SEED(32'h3300_0001)
     ) u_ch_eth_sgtx (
         .tx_p(a_sgtx_p), .tx_n(a_sgtx_n), .cut_fault(cut_eth_sgtx), .glitch_inj(1'b0),
         .rx_p(p_sgtx_p), .rx_n(p_sgtx_n)
     );
 
     sim_board_lvds_channel #(
-        .DLY_P_PS(380.0), .DLY_N_PS(380.0), .JITTER_SPREAD_PS(53.0), .SEED(32'h3300_0002)
+        .DLY_P_PS(464.0), .DLY_N_PS(468.0), .JITTER_SPREAD_PS(53.0), .SEED(32'h3300_0002)
     ) u_ch_eth_sgrx (
         .tx_p(p_sgrx_p), .tx_n(p_sgrx_n), .cut_fault(cut_eth_sgrx), .glitch_inj(1'b0),
         .rx_p(a_sgrx_p), .rx_n(a_sgrx_n)
@@ -360,9 +360,7 @@ module tb_system;
         .pmod_spare2      (kria_spare2)
     );
 
-    // Simulation speed-up for both real eye-scan FSMs (768 cyc covers 64-block Clause 49 lock)
-    defparam u_kria.u_train_fsm.TAP_DWELL_CYCLES   = 16'd768;
-    defparam u_artix.u_dl_train_fsm.TAP_DWELL_CYCLES = 16'd768;
+    // Use hardware-default TAP_DWELL_CYCLES = 1800 on both eye-scan FSMs (no dwell defparam)
 
     // -------------------------------------------------------------------------
     // 5. Peripheral, Converter, RF & SGMII PHY Behavioral Models
@@ -795,8 +793,8 @@ module tb_system;
         tmo_cnt = 0;
         csr_r   = 32'd0;
         while (((!csr_r[6]) || (!csr_r[21]) || (!u_artix.dl_up_sync[1]) ||
-                (!u_artix.eth_link_up_stat) || (mdio_poll_reads == 32'd0)) && (tmo_cnt < 1500)) begin
-            #1_000_000; // 1 us polling interval -> up to 1.5 ms timeout
+                (!u_artix.eth_link_up_stat) || (mdio_poll_reads == 32'd0)) && (tmo_cnt < 2500)) begin
+            #1_000_000; // 1 us polling interval -> up to 2.5 ms timeout
             axil_rd(8'h04, csr_r);
             tmo_cnt = tmo_cnt + 1;
         end
@@ -808,8 +806,13 @@ module tb_system;
             fail_msg("S1: SGMII AN or MDIO poll did not complete");
         if (!irq_link_up)
             fail_msg("S1: irq_link_up not asserted");
-        $display("[S1] PASS REG_LINK_STATUS=0x%08h mdio_polls=%0d dl_up=%b eth_up=%b",
-                 csr_r, mdio_poll_reads, u_artix.dl_up_sync[1], u_artix.eth_link_up_stat);
+        if ((u_kria.eye_r0 <= u_kria.eye_l0) || (u_kria.eye_r1 <= u_kria.eye_l1) ||
+            (u_kria.train_cnt_l0 > 9'd511) || (u_kria.train_cnt_l1 > 9'd511))
+            fail_msg("S1: Kria eye bounds invalid or outside 0..511 taps");
+        $display("[S1] PASS REG_LINK_STATUS=0x%08h mdio_polls=%0d dl_up=%b eth_up=%b eye0=[%0d..%0d]@%0d eye1=[%0d..%0d]@%0d",
+                 csr_r, mdio_poll_reads, u_artix.dl_up_sync[1], u_artix.eth_link_up_stat,
+                 u_kria.eye_l0, u_kria.eye_r0, u_kria.train_cnt_l0,
+                 u_kria.eye_l1, u_kria.eye_r1, u_kria.train_cnt_l1);
         if (fails > 0) begin
             $display("FAIL: tb_system aborting early after S1 failure");
             $fatal(1, "tb_system S1 failed");
@@ -1051,8 +1054,14 @@ module tb_system;
         s0_rx01   = rx01_pkts;
         s0_eth_s2 = eth_s2_cnt;
         #25_000_000; // 25 us concurrent traffic
-        if (rx01_pkts <= s0_rx01 || eth_s2_cnt <= s0_eth_s2)
+        if (rx01_pkts <= s0_rx01 || eth_s2_cnt <= s0_eth_s2) begin
+            $display("[DBG5a] rx01=%0d(was %0d) eth_s2=%0d(was %0d) ias_ok=%b eth_ok=%b pol=%0d cdr=%b ul_allow=%b in_pkt=%b ias_v=%b ias_r=%b",
+                     rx01_pkts, s0_rx01, eth_s2_cnt, s0_eth_s2,
+                     u_artix.gen_rev06_eth.ias_path_ok, u_artix.gen_rev06_eth.eth_path_ok,
+                     u_artix.gen_rev06_eth.eth_policy, u_phy_peer.cdr_aligned,
+                     u_artix.ul_tx_allow, u_artix.ul_in_pkt, u_artix.ias_mux_valid, u_artix.ias_mux_ready);
             fail_msg("S5: Concurrent SPLIT missing 0x01 IAS1 or 0x02 ETH traffic");
+        end
 
         // 5b. Poisoned FCS rejection + ETH cut failover (ETH_ALIVE_TIMEOUT = 200 us)
         pre_fcs = u_artix.gen_rev06_eth.u_eth_mac.fcs_err_cnt;
@@ -1198,9 +1207,7 @@ module tb_system;
             fail_msg("S6: REG_ERR_CRC did not clear to 0");
 
         // Trigger AXI-Lite LINK_CTRL[2] retrain pulse and confirm full unlock -> lock recovery
-        // Pause DDC during manual retrain so Artix sends clean /I/+/A/ idle blocks
-        emio_gpio_o[3] <= 1'b1;
-        #2_000_000;
+        // Traffic remains enabled; artix/top ul_tx_allow gates u_ul_pcs_tx back to /I/+/A/ on retrain
 `ifdef MUTATE_NO_RETRAIN
         force u_kria.u_link_axis.ctrl_retrain_pulse = 1'b0;
 `endif
@@ -1215,8 +1222,8 @@ module tb_system;
         end
         tmo_cnt = 0;
         csr_r   = 32'd0;
-        while (!csr_r[6] && tmo_cnt < 2500) begin
-            #100_000;
+        while (!csr_r[6] && tmo_cnt < 2000) begin
+            #1_000_000;
             axil_rd(8'h04, csr_r);
             tmo_cnt = tmo_cnt + 1;
         end
@@ -1224,7 +1231,6 @@ module tb_system;
             fail_msg("S6: LINK_CTRL[2] retrain did not execute and recover link_up");
 
         axil_wr(8'h00, 32'h0000_0040);
-        emio_gpio_o[3] <= 1'b0;
         #2_000_000;
         s0_rx01 = rx01_pkts;
         #15_000_000; // 15 us post-retrain clean verification

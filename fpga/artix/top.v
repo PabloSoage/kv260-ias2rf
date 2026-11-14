@@ -1168,13 +1168,33 @@ module artix_top #(
         end
     endgenerate
 
+    // Hold uplink traffic at idles+AM until both downlink (dl_up_sync[1]) and
+    // Kria uplink (dl_rem_sync2[0] = kria link_up) are up; finish any single
+    // in-flight packet cleanly before returning to idles on retrain.
+    wire ul_tx_allow = dl_up_sync[1] & dl_rem_sync2[0];
+    wire ul_tx_ready;
+    reg  ul_in_pkt;
+    wire ul_tx_gate  = ul_tx_allow | ul_in_pkt;
+    wire ul_tx_valid = ias_mux_valid & ul_tx_gate;
+    assign ias_mux_ready = ul_tx_ready & ul_tx_gate;
+
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            ul_in_pkt <= 1'b0;
+        end else if (ul_tx_valid && ul_tx_ready && ias_mux_eop) begin
+            ul_in_pkt <= 1'b0;
+        end else if (ul_tx_valid && ias_mux_sop && !ul_in_pkt) begin
+            ul_in_pkt <= 1'b1;
+        end
+    end
+
     link_pcs_tx #(
         .AM_PERIOD (LINK_AM_PERIOD)
     ) u_ul_pcs_tx (
         .clk           (link_clk),
         .rst           (link_rst),
-        .pkt_valid     (ias_mux_valid),
-        .pkt_ready     (ias_mux_ready),
+        .pkt_valid     (ul_tx_valid),
+        .pkt_ready     (ul_tx_ready),
         .pkt_sop       (ias_mux_sop),
         .pkt_eop       (ias_mux_eop),
         .pkt_stream_id (ias_mux_sid),

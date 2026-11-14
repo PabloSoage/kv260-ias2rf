@@ -46,7 +46,7 @@ module eth_mdio #(
     // Open-drain driver for Bank 14 LVCMOS33 M15 pulled up externally to PHY 2.5V DVDDRG via R1213:
     // Drive LOW only (I=0, T=0 when mdio_oe && !mdio_out); Hi-Z (T=1) otherwise.
     IOBUF #(
-        .DRIVE      (8),
+        .DRIVE      (4),
         .IOSTANDARD ("LVCMOS33"),
         .SLEW       ("SLOW")
     ) u_iobuf_mdio (
@@ -114,8 +114,11 @@ module eth_mdio #(
                 phy_rst_done <= 1'b1;
             end
 
-            // MDC divider
-            if (mdc_fall_tick) begin
+            // MDC divider: run only during active MDIO transactions (no free-running MDC crosstalk)
+            if (st == ST_IDLE) begin
+                div_cnt <= 8'd0;
+                eth_mdc <= 1'b0;
+            end else if (mdc_fall_tick) begin
                 div_cnt <= 8'd0;
                 eth_mdc <= 1'b0;
             end else begin
@@ -137,6 +140,7 @@ module eth_mdio #(
                             cur_is_poll <= 1'b0;
                             tx_frame    <= {2'b01, (req_write ? 2'b01 : 2'b10), PHY_ADDR, req_reg, 2'b10, req_wdata};
                             bit_idx     <= 6'd0;
+                            div_cnt     <= (2 * HALF_DIV) - 1;
                             st          <= ST_SHIFT;
                         end else if (poll_cnt == 24'd0) begin
                             cur_write   <= 1'b0;
@@ -144,6 +148,7 @@ module eth_mdio #(
                             tx_frame    <= {2'b01, 2'b10, PHY_ADDR, 5'd1, 2'b10, 16'h0000}; // BMSR Reg 1
                             bit_idx     <= 6'd0;
                             poll_cnt    <= POLL_DIV;
+                            div_cnt     <= (2 * HALF_DIV) - 1;
                             st          <= ST_SHIFT;
                         end
                     end

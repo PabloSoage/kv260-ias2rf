@@ -138,16 +138,8 @@ See [`sw/README.md`](../sw/README.md) for devicetree overlay (`ias2rf_pl.dtsi`) 
 - `0x80010000`: `axi_dma_0` 64-bit S2MM + MM2S DMA (`HP0`, `dma-coherent`), interrupts GIC `91` (`s2mm_introut`), `92` (`mm2s_introut`).
 - PS EMIO `i2c0` (`100 kHz` to `HK_SCL`/`HK_SDA`) and `spi0` (`Pmod J2`).
 
-## Known issue (14 Nov 2026): Kria uplink eye training
+## Resolved issue (14 Nov 2026): Kria uplink eye training
 
-A whole-system simulation (`tb_system`, real Artix top + real Kria PL link joined by board-channel models;
-Gemini task 22, in progress) found that `link_rx_train_fsm` on the Kria side does not train the uplink:
-
-- with the board's realistic channels (1.17-1.36 ns delay, 14-77 ps jitter) the eye scan finds a ~16-tap window
-  on lane 1 only, at a different place on each retry, and nothing on lane 0, so the link never comes up;
-- with ideal 100 ps channels it reaches LINK_UP, but still sees only 16 taps on lane 1 and none on lane 0;
-- the bench's TAP_DWELL_CYCLES=160 speed-up made it worse (block lock needs longer per tap).
-
-The good-tap criterion or the per-lane eye bookkeeping is wrong: most of the 1 ns UI should read as good, per
-lane, and a channel delay longer than one UI must not matter. The per-block benches (`tb_link_a2k`, `tb_e2e`)
-pass because they use fixed taps. **To fix before the boards are ordered.**
+System co-simulation (`tb_system`) identified why `link_rx_train_fsm` failed to converge under live uplink traffic:
+- **Root cause:** `link_rx_train_fsm` requires 6 consecutive descrambled `/I/` (`8'h1E`) or `/A/` (`8'h4B`) blocks (`l*_rx_blk_ok`) to qualify each `IDELAY` tap, whereas `artix_top` previously forwarded `ias_mux_valid` straight into `u_ul_pcs_tx.pkt_valid` from `t = 0` before Kria had trained.
+- **Fix:** [`artix/top.v`](artix/top.v) now gates `u_ul_pcs_tx` on packet boundaries with `ul_tx_allow = dl_up_sync[1] & dl_rem_sync2[0]` (`dl_link_up` and synchronized Kria `link_up`), sending continuous `/I/` + `/A/` until both directions lock and dropping back to idles cleanly during retrain. Verified in [`tb_system`](SYSTEM_SIM.md) with realistic board/SOM skew + jitter channels, zero `TAP_DWELL_CYCLES` overrides (`1800` default), and live `t = 0` traffic, plus [`tb_link_a2k`](sim/tb_link_a2k.v) (`-Define STREAM_FROM_T0` pass / `-Mutate no_train_gate` fail).

@@ -360,7 +360,7 @@ module sim_sgmii_phy_peer (
             end
             if (eth_sgtx_p !== prev_sgtx) begin
                 prev_sgtx <= eth_sgtx_p;
-                ui_tick   <= 2'd2; // sample ~400..500 ps later (center of 800 ps UI)
+                ui_tick   <= 2'd3; // sample 2 ticks (400 ps) after detect (~400..600 ps into 800 ps UI)
             end else begin
                 ui_tick <= ui_tick + 2'd1;
             end

@@ -138,6 +138,9 @@ The receiver training FSM (`link_rx_train_fsm`) supports both receivers via para
 | `ST_DESKEW` | `3'd4` | Enable `link_rx_lanes` AM deskew across Lane 0 and Lane 1 (bypassed when `SINGLE_LANE == 1`) | `deskew_lock == 1` (or timeout -> restart) |
 | `ST_LINK_UP` | `3'd5` | Assert `link_up = 1` (optional `en_vtc = 1` once BISC/VTC policy allows); monitor loss of `block_lock` or `deskew_lock` | Drops to `ST_BLOCK_LOCK` / `ST_DESKEW` if lock lost |
 
+**Bidirectional Idle/AM Training Gate (`artix/top.v`):**
+Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h1E`) or `/A/` (`8'h4B`) training blocks per `IDELAY` tap, [`artix_top`](../artix/top.v) holds `u_ul_pcs_tx.pkt_valid` low (transmitting continuous scrambled `/I/` + `/A/` markers only) until both directions are synchronized (`ul_tx_allow = dl_up_sync[1] & dl_rem_sync2[0]`, where `dl_rem_sync2[0]` reflects Kria's `link_up` fed back via downlink `/I/` `remote_status[0]`). On link drop or manual retrain (`ul_tx_allow -> 0`), `artix_top` lets any single in-flight packet finish cleanly on `ias_mux_eop` (`ul_in_pkt`) before stalling further `/S/` starts and returning the uplink to continuous `/I/` + `/A/` until `link_up` recovers.
+
 ### 7.2 Control & Diagnostic Register Map (Both Ends)
 
 | Offset | Register | Access | Reset | Fields & Description |
