@@ -58,7 +58,7 @@ Compared against Rev05, with the same checks run on both board files. Rev05 had 
 - **Mitigation (gateware):**
   - SLEW SLOW, DRIVE 4 on both lines;
   - MDIO polled, never free-running.
-  - Asked of the gateware with task 22.
+  - Done in the gateware on 14 Nov (§7).
 
 **RF front end and UHF.** Rev06 does not touch the RF band. These are unchanged from Rev05 and reviewed there:
 
@@ -133,25 +133,39 @@ jitter) runs both FPGAs' gateware together:
 
 Every block bench passes (13 benches, with their mutations failing as they should).
 
-**Open: the system bench fails at link training.**
+**Link training: found by the system bench, fixed and verified (14 Nov).**
 
-- **Symptom:** the Kria's uplink eye scan finds almost no good taps.
-- **Root cause, found on 14 Nov:** the Artix streams ADC packets on the uplink before the Kria has trained it. The
-  scan only counts a tap as good after six consecutive idle or alignment blocks, so with a full data stream no tap
-  qualifies.
-- **Why the block benches pass:** they start sending packets only after link-up.
-- **The fix, in the gateware:** hold the Artix's packets until the Kria reports its uplink trained, which it
-  already sends back on the downlink. The board is not involved.
-- **Owner:** gateware task 22. This review will be updated with the passing run.
+- **Symptom:** the Kria's uplink eye scan found almost no good taps.
+- **Root cause:** the Artix streamed ADC packets on the uplink before the Kria had trained it. The scan counts a
+  tap as good only after six consecutive idle or alignment blocks, so a full data stream starved it.
+- **Fix (gateware, no board change):** the Artix holds the uplink at idles and alignment markers until both its
+  downlink is up and the Kria reports its uplink trained, which the Kria sends back on the downlink. It finishes any
+  packet already started first (`fpga/artix/top.v`, `ul_tx_allow`; LINK_PROTOCOL.md).
+- **Verification, re-run here after integration:**
+  - `tb_system` passes all six scenarios with the hardware's full tap dwell and traffic from t = 0. The scenarios
+    cover ±100 ppm clocks, the board's channel models, IAS1 and Ethernet cuts with fail-over, and a glitch with
+    retraining. Kria eyes 200 taps wide, centred at 316/324 of 0–511.
+  - `tb_link_a2k` passes with the stream on from t = 0, and fails as it should with the gate removed
+    (`-Mutate no_train_gate`).
+- **Three more gateware bugs the bench caught and Gemini fixed:**
+  - a width mismatch in the Kria's downlink FIFO;
+  - the Ethernet path never failing over when the peer went silent;
+  - a mid-packet hand-over in the dual-path multiplexer.
+
+  Details are in fpga/SYSTEM_SIM.md.
+- **MDIO/MDC (§2):** SLEW SLOW, DRIVE 4, and MDC stopped between polls, as asked.
+- **Not yet done:** the Vivado implementation has not been re-run since these RTL changes. Its reports and
+  bitstreams are from before them (fpga/SYSTEM_SIM.md, limits).
 
 ## 8. Summary
 
 - **Ready to order:** the board (DRC/parity clean, no new SI or power issue, all rules met).
-- **Accepted:** the MDIO/MDC proximity to two fast legs, which is handled in the gateware.
+- **Accepted:** the MDIO/MDC proximity to two fast legs, which is handled in the gateware (done, §7).
 - **Changed on 14 Nov:** FB401 is now a 2 A, 0.1 Ω bead (same footprint, a part already on the BOM), for the
   Si549's supply margin (§3).
 - **Open, on the bench or in the gateware:**
   - the v2 CFD as built;
-  - the link-training fix and its passing system simulation.
+  - re-running the Vivado implementation of both FPGAs after the §7 gateware fixes.
+- **Closed on 14 Nov:** the link-training fix; the system simulation of both FPGAs now passes (§7).
 
 None of the open items needs a board change before ordering.

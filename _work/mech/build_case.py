@@ -512,20 +512,67 @@ if V2:
                 g3.append(cyl("g3", x, y, Z_TOP - 2, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
     g3 += [cyl("fh", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 2, Z_TOP + 1, 2.8) for sx in (-1, 1) for sy in (-1, 1)]
     cut(filter_frame, join(g3, "frame_holes"))
-    # the fan itself, for the renders only (not exported): frame, hub, seven blades
-    FANM = mat("fan PBT", (0.20, 0.20, 0.22), 0.45)
-    fan_vis = box("fan2_vis", fx - h, fx + h, fy - h, fy + h, ZF - 10.0, ZF, FANM)
-    cut(fan_vis, cyl("fan2_bore", fx, fy, ZF - 11, ZF + 1, 48.0))
-    parts_v = [cyl("fan2_hub", fx, fy, ZF - 9.5, ZF - 0.5, 20.0, FANM)]
+    # the fan itself, for the renders only (not exported): a 5010 axial fan blowing down onto the adapter.
+    # Frame with rounded corners, venturi bore and four 4.3 mm holes; seven swept, pitched blades on the rotor;
+    # the motor hub with its label on the intake side; four struts holding the motor on the exhaust side.
+    FANM = mat("fan PBT", (0.035, 0.035, 0.038), 0.55)
+    LABEL = mat("fan label", (0.30, 0.30, 0.32), 0.35, 0.6)
+    sq = [(fx - h, fy - h), (fx + h, fy - h), (fx + h, fy + h), (fx - h, fy + h)]
+    frame = prism("fan2_vis", round_poly(sq, [3.5] * 4), ZF - 10.0, ZF, FANM)
+    cut(frame, cyl("fan2_bore", fx, fy, ZF - 11, ZF + 1, 47.0, verts=96))
+    cut(frame, join([cyl("fan2_hole", fx + sx * 20, fy + sy * 20, ZF - 11, ZF + 1, 4.3, verts=24)
+                     for sx in (-1, 1) for sy in (-1, 1)], "fan2_holes"))
+    parts_v = [cyl("fan2_hub", fx, fy, ZF - 9.0, ZF - 0.6, 21.0, FANM, verts=64),
+               cyl("fan2_label", fx, fy, ZF - 0.6, ZF - 0.5, 15.0, LABEL, verts=64),
+               cyl("fan2_motor", fx, fy, ZF - 10.0, ZF - 9.0, 23.0, FANM, verts=64)]
+    for k in range(4):                                        # motor struts, exhaust side
+        a = math.pi / 4 + k * math.pi / 2
+        st = box("strut", 11.0, 33.0, -1.0, 1.0, ZF - 10.0, ZF - 8.8, FANM)
+        st.rotation_euler = (0, 0, a)
+        st.location = (fx * MM, fy * MM, 0)
+        parts_v.append(st)
+    # blades: a ruled surface swept 50 degrees round the hub, leading edge 6 mm above the trailing edge,
+    # more twist at the root than at the tip, 0.9 mm thick
+    NR, NS = 8, 14
     for k in range(7):
         a0 = k * 2 * math.pi / 7
-        bl = box("blade", 9.0, 23.5, -3.0, 3.0, ZF - 8.5, ZF - 1.5, FANM)
-        bl.rotation_euler = (0, 0, a0)
-        bl.location = (fx * MM, fy * MM, 0)
-        parts_v.append(bl)
+        bm = bmesh.new()
+        grid = []
+        for i in range(NR + 1):
+            r = 10.2 + (23.0 - 10.2) * i / NR
+            row = []
+            for j in range(NS + 1):
+                s = j / NS
+                th = a0 + s * math.radians(50) + (r - 10.2) * 0.018
+                pitch = 6.4 - 1.6 * (r - 10.2) / 12.8
+                z = ZF - 5.0 + (0.5 - s) * pitch
+                row.append(bm.verts.new((fx + r * math.cos(th), fy + r * math.sin(th), z)))
+            grid.append(row)
+        for i in range(NR):
+            for j in range(NS):
+                bm.faces.new((grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]))
+        me = bpy.data.meshes.new("blade")
+        bm.to_mesh(me)
+        bm.free()
+        for v in me.vertices:
+            v.co *= MM
+        ob = bpy.data.objects.new("blade", me)
+        bpy.context.scene.collection.objects.link(ob)
+        me.materials.append(FANM)
+        sol = ob.modifiers.new("t", "SOLIDIFY")
+        sol.thickness, sol.offset = 0.9 * MM, 0.0
+        bpy.context.view_layer.objects.active = ob
+        bpy.ops.object.select_all(action="DESELECT")
+        ob.select_set(True)
+        bpy.ops.object.modifier_apply(modifier="t")
+        parts_v.append(ob)
     for o in parts_v:
-        o.data.materials.clear(); o.data.materials.append(FANM)
-    fan_vis_all = join([fan_vis] + parts_v, "fan2_vis")
+        if not o.data.materials:
+            o.data.materials.append(FANM)
+    fan_vis_all = join([frame] + parts_v, "fan2_vis")
+    for p in fan_vis_all.data.polygons:
+        p.use_smooth = True
+    fan_vis_all.data.set_sharp_from_angle(angle=0.6)
 
 # ---- openings: every connector that faces a wall, through both shells -------------------------------------
 def merged(spans, gap=4.0):

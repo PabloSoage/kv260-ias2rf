@@ -207,6 +207,7 @@ VIEWS = {   # name: (target mm, camera mm, lens mm)
     "sma":         ((-112, 50, 3), (-260, -60, 70), 55),
     "kria":        ((55, 118, 4), (170, 400, 95), 50),
     "power":       ((-43, 116, 8), (-160, 330, 110), 55),
+    "fan":         ((-10, 78, 48), (150, -350, 240), 37),     # v2: the lid hinged open at the back, fan facing us
 }
 PREFIX = argv[argv.index("--prefix") + 1] if "--prefix" in argv else "case_"
 LIDX = [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame"))]
@@ -238,6 +239,13 @@ for v in views:
             p.hide_render = True
         lid.rotation_euler = (math.pi, 0, 0)
         lid.location = Vector((0, 90, 25)) * MM
+    elif v == "fan":                           # opened like a clamshell about the back edge of the split line
+        from mathutils import Matrix
+        piv = Vector((0, 125.0, 2.84)) * MM
+        lid.matrix_world = (Matrix.Translation(piv) @ Matrix.Rotation(math.radians(-112), 4, "X")
+                            @ Matrix.Translation(-piv) @ lid.matrix_world)
+        for p in pins + bumpers:
+            p.hide_render = True
     elif v == "section":
         for b in bumpers:
             b.hide_render = True

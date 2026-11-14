@@ -390,10 +390,34 @@ play. Optional TPU 95A corner bumpers are for handling. It prints on a Bambu A1 
 | ![Open](docs/img/case_open.jpg) | ![Section](docs/img/case_section.jpg) |
 | **The tray: honeycomb, posts, pockets** | **The lid from inside: clamp posts and pads** |
 | ![Tray](docs/img/case_tray.jpg) | ![Lid](docs/img/case_lid.jpg) |
-| **The KV260 side: its connectors through the rear opening** | **The SMA side** |
+| **The KV260 side: one cut-out per connector** | **The SMA side** |
 | ![KV260 side](docs/img/case_kria.jpg) | ![SMA side](docs/img/case_sma.jpg) |
 
-CalculiX FEA of the case with the boards in it, per material, at 23 °C and 70 °C:
+### Version 2: with a fan, for hot vehicles
+
+Version 2 adds a 50 × 50 × 10 mm 5 V fan in the lid. It blows through a filtered honeycomb grille onto the adapter's
+hot strip, where the clock, the converters and the Ethernet PHY sit. The board's fan header J1002 powers it. The
+SMA-side vents are closed, so the fan pressurises the case and the air leaves through the side vents
+([ENCLOSURE §7](docs/ENCLOSURE.md), [thermal study](docs/ENCLOSURE_V2_THERMAL.md)).
+
+![Version 2, the lid lifted: the fan over the adapter](docs/img/case_v2_fan.jpg)
+
+| Closed: the filtered fan grille on the lid | The lid from inside: fan, duct and screw bosses |
+|---|---|
+| ![v2 closed](docs/img/case_v2_closed.jpg) | ![v2 lid](docs/img/case_v2_lid.jpg) |
+
+### Strength: 3-D finite elements, case and boards together
+
+The printed case with both boards inside, meshed in 3-D (205 k tetrahedra) and loaded with 50 g, held at its four
+ears ([ENCLOSURE §5.3](docs/ENCLOSURE.md)). The case stays below 3.6 MPa nearly everywhere. Its peak is 9.3 MPa, on
+the rib above the right rear ear, still a factor 1.9 under the material's strength at 70 °C. The boards bow by
+0.16 mm and see at most 160 µε at the BGAs, against a 500 µε guide for solder joints under shock.
+
+![Stress in the case, 50 g](docs/img/case3d_v2_stress.jpg)
+
+![Strain in the boards, 50 g](docs/img/case3d_v2_boards.jpg)
+
+Earlier beam-and-plate FEA of the case with the boards in it, per material, at 23 °C and 70 °C:
 - first mode;
 - a 50 g shock;
 - a 1 m corner drop, bare and with the bumpers;

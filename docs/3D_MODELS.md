@@ -74,6 +74,15 @@ the renders now show HR911130C's own model, with its opening.
 
 - in the five cached `.wrl` files, pure white is toned to grey;
 - the CD542 transformer cases (`T701`/`T801`/`T802`) are set to a warm grey (originals kept as `*.wrl.easyeda`).
+- metal parts that the raytracer still rendered near-white are set to a nickel grey (0.40–0.50) in both the `.wrl`
+  and the `.step`: the Si549's lid (`Y401`, `OSC-SMD_8P-L7.0-W5.0-BL`) and the RJ45's shell (`J1201`). Its amber
+  LED, pale yellow in the model, is amber.
+- the PHY's crystal `Y1201` uses a copy of KiCad's `Crystal_SMD_3225-4Pin_3.2x2.5mm.step` in `mech/models3d/` with
+  its lid at the same nickel grey (KiCad's own is 0.82, near-white in the renders).
+
+**RJ45 orientation.** `J1201`'s latch faces the board (tab down). That is the HR911130C itself, not the model: it
+is a tab-down part, unlike the KV260's tab-up jack. The plug's latch end sits about 4 mm outside the enclosure wall,
+so it can be pressed from below.
 
 **Blender materials.** In the renders, [`_work/mech/matfix.py`](../_work/mech/matfix.py) replaces the STEP
 importer's every-material-is-metal defaults:
@@ -83,5 +92,5 @@ importer's every-material-is-metal defaults:
 - **KV260:**
   - its connector shells, which the STEP leaves without any material, are nickel;
   - its laminate is satin.
-- **White plastics:** ivory.
+- **White plastics:** a dark ivory, so that they never read white.
 - **Reflections:** a soft-box world, so that metals reflect a horizon instead of a flat grey.
