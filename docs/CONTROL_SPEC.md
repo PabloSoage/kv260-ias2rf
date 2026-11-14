@@ -310,10 +310,10 @@ VCCO balls keep their wide connection. DRC: 0 errors, 0 unconnected, schematic p
 | PHY → FPGA (SGRX) | **521 mV** | 564 mV | 58 ps | 637 mV |
 
 Both are far above the 200 mV a receiver needs. The legs were widened to each layer's 50 Ω width (0.183 mm
-outside, 0.151 mm inside) wherever the clearances allow (widen.py); a few short sections where they leave the
+outside, 0.151 mm inside) wherever the clearances allow; a few short sections where they leave the
 balls and the capacitors stay at 0.1–0.117 mm (57–64 Ω).
 
-**Supplies after the rework** (pbottle.py, current per bridging track): the bank-34 VCCO feed's drop to the FPGA
+**Supplies after the rework** (current through each track every path to the loads must cross): the bank-34 VCCO feed's drop to the FPGA
 went from 11 mV (Rev05) to 19 mV after widening the reworked corner, inside +2V5's ±5 % (125 mV). Two older necks
 were found on the way and checked: +1V8_A to the ADC drivers' ferrites had a 0.49 mm piece of 0.1 mm on L3
 carrying 0.5 A (IPC long-track chart: +242 °C, a short neck runs far cooler but it was still the worst spot on
@@ -321,7 +321,7 @@ the board): replaced by a 1.0 mm L-shaped jog, the rail's drop is now 64 mV. The
 section, 0.48 A) has four 0.1 mm necks, 0.2–0.5 mm long, between the PHY's pads, inherited from Rev05: 10 mV of
 drop; left as they are (no room, and short necks spread their heat into the planes).
 
-**Analogue neighbours** (avictims.py, analogue and clock nets within 0.3 mm for more than 2 mm, against Rev05):
+**Analogue neighbours** (analogue and clock nets within 0.3 mm for more than 2 mm, against Rev05):
 two new pairings. ETH_MDIO beside CLK_FPGA_P on L3 for 2.3 mm at 0.17 mm (MDIO is a 2.5 MHz line: harmless).
 ETH_SGTX_FPGA_N beside CLK_ADCS_P on L6 for 2.2 mm at 0.17 mm: by SIGNAL_INTEGRITY §3.5's stripline figures
 (14.5 % 2D NEXT saturated at 25 mm, about 3.5 × less in 3D) that is about 0.4 % of a 175 mV leg, 0.3 mV on the

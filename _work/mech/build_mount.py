@@ -73,8 +73,6 @@ def mat(name, rgb, rough=0.45, metal=0.0):
 
 PETG = mat("PETG", (0.045, 0.05, 0.06), 0.55)
 ALU = mat("Alu", (0.80, 0.80, 0.82), 0.3, 1.0)
-RJ = mat("RJ45 shield", (0.70, 0.71, 0.73), 0.25, 1.0)
-RJB = mat("RJ45 opening", (0.02, 0.02, 0.02), 0.6)
 
 
 def box(name, x0, x1, y0, y1, z0, z1, m=PETG, bevel=0.0):
@@ -164,13 +162,9 @@ print("SMAs", [(round(y, 2), round(z, 2), r) for y, z, r in sorted(sma)])
 for y, z, r in sma:
     cut(base, box(f"slot_{r}", WALL_X0 - 1, WALL_X1 + 1, y - 3.35, y + 3.35, z - 3.35, 20))
 
-# ---- the RJ45 (its footprint has no 3D model): HR911130C, 15.9 x 21.3 x 13.5, opening at the tab's end
+# ---- the RJ45 (HR911130C, 15.9 x 21.3 x 13.5, opening at the tab's end) comes with board.glb: its
+# EasyEDA STEP, re-placed in its VRML's frame (docs/3D_MODELS.md), so no stand-in box here any more
 top = BOARD_Z + PCB_T
-rj_x0, rj_x1 = -19.5 - 7.95, -19.5 + 7.95
-box("RJ45", rj_x0, rj_x1, -31.9, -10.6, top, top + 13.5, RJ, bevel=0.3)
-box("RJ45_opening", rj_x0 + 2.1, rj_x1 - 2.1, -31.95, -31.0, top + 1.5, top + 9.5, RJB)
-for x, c in ((rj_x0 + 1.2, (0.1, 0.9, 0.2)), (rj_x1 - 2.8, (1.0, 0.6, 0.05))):
-    box("led", x, x + 1.6, -31.96, -31.85, top + 11.0, top + 12.4, mat("led", c, 0.3))
 
 # RJ45 strap: a bridge over the jack, screwed into the pedestal either side of the tab
 strap = box("rj45_strap", -32.4, -6.6, -23.0, -18.0, top + 13.5, top + 16.5, PETG, bevel=0.8)

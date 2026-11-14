@@ -61,7 +61,7 @@ for m in bpy.data.materials:
     elif col == (1.0, 1.0, 1.0) and b.inputs["Alpha"].default_value < 1:
         b.inputs["Alpha"].default_value = 1.0
         b.inputs["Base Color"].default_value = (0.9, 0.9, 0.88, 1)
-rig = bpy.data.objects.get("ADAPTER")
+rig =bpy.data.objects.get("ADAPTER")
 if rig:
     stack = list(rig.children)
     while stack:
@@ -76,6 +76,11 @@ if rig:
                  sum(v.co.z for v in o.data.vertices[:50]) / min(50, len(o.data.vertices)) * o.matrix_world.to_scale().z
             lift = (0.04 if col[0] < 0.5 else 0.06) * MM
             o.location.z += lift if zc > 0.8 * MM else -lift
+# every other material from the STEP/VRML models, and the mask's final colour (matfix.py)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import matfix
+matfix.apply(bpy.data.materials, bpy.data.objects)
+matfix.studio_world(w)
 
 # the case: charcoal PETG-CF, matte with a little sheen
 for name in ("case PETG-CF", "lid PETG-CF"):
@@ -201,6 +206,7 @@ VIEWS = {   # name: (target mm, camera mm, lens mm)
     "section":     ((5, 47, -2), (110, -300, 75), 40),
     "sma":         ((-112, 50, 3), (-260, -60, 70), 55),
     "kria":        ((55, 118, 4), (170, 400, 95), 50),
+    "power":       ((-43, 116, 8), (-160, 330, 110), 55),
 }
 PREFIX = argv[argv.index("--prefix") + 1] if "--prefix" in argv else "case_"
 LIDX = [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame"))]

@@ -16,6 +16,7 @@ protect the corners. Every board rests on a honeycomb or on a clamp post with a 
 | | |
 |---|---|
 | ![KV260 side: its connectors](img/case_kria.jpg) | ![SMA side](img/case_sma.jpg) |
+| ![adapter's 12 V jack J1001](img/case_power.jpg) | |
 
 ---
 
@@ -44,8 +45,20 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
   half in the tray, half in the lid, so closing the lid clamps them.
   - A 1 mm recess band along the SMA row lets the plugs' coupling nuts seat on the connectors, not on the wall.
   - A 1.6 × 3 mm tongue with a 0.2 mm gap seals the split line against dust and splashes.
-- **Openings.** The rear I/O band, J4 / J11 / J2 on the front, the RJ45 window, and the twelve SMA notches.
-  Openings closer than 4 mm along a wall are merged, so no thin slivers are left between connectors.
+- **Openings.**
+  - **KV260 rear I/O.** One cut-out per connector: the DC jack, DisplayPort, HDMI, the two USB stacks and the RJ45.
+    Each is 1 mm larger than its connector's face, for the plugs' moulded bodies. Between neighbours the wall stays
+    closed with a rib of at least 1.6 mm (14 Nov; the first version left one long window).
+  - **Front:** J4, J11 and J2.
+  - **Adapter's RJ45:** its window.
+  - **Adapter's 12 V jack J1001:** a 12 mm round-topped U up from the shells' joint, centred on the barrel.
+    The jack sits 3.5 mm inside the wall, so a 5.5/2.1 plug's moulded body has to go into the wall for the
+    barrel to seat.
+  - **Ribbon to AERIS-10's ADAR1000 boards:** a 54 × 2.6 mm slot in the lid right above the IDC header J1103, for
+    the 40-way ribbon. The plug is fitted before the lid goes on.
+  - **The twelve SMA notches.**
+  - **Left inside:** JTAG, Pmod and the fan header, which are reached with the lid off.
+  - The rear lug beside J1001 moved from X −40 to −20 to clear it.
 - **Cooling.**
   - A hex grille over the KV260's fan (r 27 mm).
   - 9 vent slots in the right wall beside the fan-sink.
@@ -58,7 +71,7 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     over the mounting holes H1–H5, the carrier's corners and the RJ45.
   - Each clamp is notched around taller parts. `_work/mech/check_case.py` checks the shells against every
     board mesh: the only contacts left are the intended honeycomb-to-board ones.
-- **Label.** "KV260 · IAS2RF" debossed 0.6 mm in the lid.
+- **Label.** "KV260 · IAS2RF" debossed 0.6 mm in the lid, behind the ribbon slot (Y 96).
 
 ---
 
@@ -180,6 +193,8 @@ the fan 5 V.
 |---|---|
 | ![v2 closed](img/case_v2_closed.jpg) | ![v2 open](img/case_v2_open.jpg) |
 | ![v2 lid, inside: the fan in its duct](img/case_v2_lid.jpg) | ![v2, KV260 side](img/case_v2_kria.jpg) |
+| ![v2, back](img/case_v2_closed_back.jpg) | ![v2, the 12 V jack J1001](img/case_v2_power.jpg) |
+| ![v2 section](img/case_v2_section.jpg) | ![v2, SMA side](img/case_v2_sma.jpg) |
 
 **What changes from v1.**
 - **A 50 × 50 × 10 mm 5 V fan** blowing down onto the adapter's hot strip along its front edge: U401 (ADCLK948),
@@ -192,7 +207,7 @@ the fan 5 V.
 - **The SMA wall has no slots**: with the fan blowing in, the box runs at a slight overpressure (CFD: about
   +11 Pa), so air leaves through the vents and dust does not come in at the seams.
 - **Right-wall exhaust widened**: 13 slots of 3 × 16 mm instead of 9 of 3 × 14 mm.
-- **The "KV260 · IAS2RF" label** stays where it was.
+- **The "KV260 · IAS2RF" label** is kept, at its new place behind the ribbon slot (as v1).
 - **Stick-on aluminium heatsinks** in the fan's jet (bought parts, thermally conductive epoxy rather than tape for
   vibration): 9 × 9 × 5 mm on U401 and on Y401, 14 × 14 × 6 mm on U501. They sit about 9 mm below the fan.
 
@@ -213,8 +228,12 @@ the verification run will quantify.
 blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- --stl mech           # v1
 blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- --v2 --stl mech      # v2
 blender -b _work/mech/cache/case.blend --python _work/mech/check_case.py
-blender -b _work/mech/cache/case.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria
-blender -b _work/mech/cache/case_v2.blend --python _work/mech/render_case.py -- closed,open,lid,kria --prefix case_v2_
+blender -b _work/mech/cache/case.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria,power
+blender -b _work/mech/cache/case_v2.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria,power --prefix case_v2_
+blender -b _work/mech/cache/case_v2.blend --python _work/mech/fea3d_export.py -- v2                  # 3-D FEA, §5.3
+micromamba run -n fea python _work/mech/fea3d_case.py v2 --h 4 --eps 0.0015                         # WSL
+blender -b --python _work/mech/render_fea3d.py -- v2
+micromamba run -n fea python _work/mech/compose_fea3d.py v2
 FEA_OUT=$HOME/fea micromamba run -n fea python _work/mech/fea_case.py --h 4      # WSL, about 3 min per material
 micromamba run -n fea python _work/mech/post_fea.py $HOME/fea
 ```

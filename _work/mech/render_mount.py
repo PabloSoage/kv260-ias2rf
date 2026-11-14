@@ -78,8 +78,13 @@ if rig:
                  sum(v.co.z for v in o.data.vertices[:50]) / min(50, len(o.data.vertices)) * o.matrix_world.to_scale().z
             lift = (0.04 if col[0] < 0.5 else 0.06) * MM
             o.location.z += lift if zc > 0.8 * MM else -lift
+# every other material from the STEP/VRML models, and the mask's final colour (matfix.py)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import matfix
+matfix.apply(bpy.data.materials, bpy.data.objects)
+matfix.studio_world(w)
 
-tgt = bpy.data.objects.new("tgt", None)
+tgt =bpy.data.objects.new("tgt", None)
 sc.collection.objects.link(tgt)
 cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam"))
 sc.collection.objects.link(cam)
