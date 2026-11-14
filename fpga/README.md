@@ -29,35 +29,35 @@ All primitive counts below are taken directly from routed Vivado 2026.1 hierarch
 
 | Device & Design | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | URAM | DSP Blocks |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **Artix-7 `XC7A50T-FTG256-2`** (`artix_top`, routed) | **15,576** | 15,410 | 166 | 0 | **17,449** | **13** | **6** | — | **110** |
-| **Kria K26 `XCK26-SFVC784-2LV-c`** (`ias2rf_k26_bd_wrapper`, routed) | **8,533** | 7,606 | 790 | 137 | **12,327** | **2** | **2** | **0** | **0** |
+| **Artix-7 `XC7A50T-FTG256-2`** (`artix_top`, routed) | **15,416** | 15,250 | 166 | 0 | **17,445** | **13** | **6** | — | **110** |
+| **Kria K26 `XCK26-SFVC784-2LV-c`** (`ias2rf_k26_bd_wrapper`, routed) | **11,034** | 9,843 | 1,054 | 137 | **18,212** | **2** | **2** | **0** | **0** |
 
 ### Artix-7 Hierarchical Breakdown (`artix_top`)
 
 | Subsystem (`artix_top` instance) | Total LUTs | Logic LUTs | LUTRAMs | FFs | RAMB36 | RAMB18 | DSP Blocks |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `u_sdr_ddc` (AD9253 dual SDR DDC) | 5,672 | 5,672 | 0 | 3,754 | 2 | 4 | 30 |
-| `u_ddc` (AERIS 400->100 MSPS radar DDC) | 1,827 | 1,827 | 0 | 4,602 | 0 | 0 | 79 |
-| `u_ul_pcs_tx` (2-lane 64b/66b TX PCS + framer) | 1,232 | 1,232 | 0 | 958 | 0 | 0 | 0 |
-| `u_xadc_pps` (XADC + 64-bit PPS timestamp) | 949 | 949 | 0 | 1,015 | 0 | 0 | 0 |
-| `gen_rev06_eth.u_eth_mac` (UDP/IPv4/ARP MAC) | 870 | 870 | 0 | 888 | 0 | 0 | 0 |
-| `u_dl_pcs_rx` (1-lane 64b/66b RX PCS + deframer) | 721 | 721 | 0 | 621 | 0 | 0 | 0 |
-| `gen_rev06_eth.u_eth_phy` (SGMII 8b/10b PHY + AN) | 551 | 551 | 0 | 349 | 0 | 1 | 0 |
-| `gen_rev06_eth.u_dual_mux` (IAS1/ETH dual-path mux) | 518 | 518 | 0 | 326 | 8 | 0 | 0 |
-| `u_adc_cap` (AD9484 400 MSPS LVDS capture) | 482 | 482 | 0 | 622 | 0 | 0 | 0 |
-| `u_dac_radar` (AD9708 LFM chirp generator) | 466 | 466 | 0 | 238 | 0 | 1 | 1 |
-| `u_adar_ctrl` (8x ADAR1000 SPI + beam BRAM) | 310 | 310 | 0 | 197 | 2 | 0 | 0 |
-| `u_dac_sdr` (AD9767 dual 14-bit SDR DAC) | 172 | 172 | 0 | 146 | 1 | 0 | 0 |
+| `u_sdr_ddc` (AD9253 dual SDR DDC) | 5,720 | 5,720 | 0 | 3,754 | 2 | 4 | 30 |
+| `u_ddc` (AERIS 400->100 MSPS radar DDC) | 1,834 | 1,790 | 44 | 4,597 | 0 | 0 | 79 |
+| `u_ul_pcs_tx` (2-lane 64b/66b TX PCS + framer) | 1,149 | 1,149 | 0 | 957 | 0 | 0 | 0 |
+| `u_xadc_pps` (XADC + 64-bit PPS timestamp) | 924 | 924 | 0 | 1,015 | 0 | 0 | 0 |
+| `gen_rev06_eth.u_eth_mac` (UDP/IPv4/ARP MAC) | 869 | 869 | 0 | 888 | 0 | 0 | 0 |
+| `u_dl_pcs_rx` (1-lane 64b/66b RX PCS + deframer) | 628 | 628 | 0 | 619 | 0 | 0 | 0 |
+| `gen_rev06_eth.u_dual_mux` (IAS1/ETH dual-path mux) | 570 | 570 | 0 | 327 | 8 | 0 | 0 |
+| `gen_rev06_eth.u_eth_phy` (SGMII 8b/10b PHY + AN) | 549 | 503 | 46 | 349 | 0 | 1 | 0 |
+| `u_adc_cap` (AD9484 400 MSPS LVDS capture) | 484 | 472 | 12 | 622 | 0 | 0 | 0 |
+| `u_dac_radar` (AD9708 LFM chirp generator) | 454 | 454 | 0 | 238 | 0 | 1 | 1 |
+| `u_adar_ctrl` (8x ADAR1000 SPI + beam BRAM) | 314 | 314 | 0 | 197 | 2 | 0 | 0 |
+| `u_dac_sdr` (AD9767 dual 14-bit SDR DAC) | 145 | 145 | 0 | 146 | 1 | 0 | 0 |
 | `u_adcs_cap` (AD9253 serial LVDS capture) | 110 | 110 | 0 | 151 | 0 | 0 | 0 |
-| *(Remaining glue: regfile, SPI/I2C, train, SERDES, async FIFOs)* | 1,696 | 1,530 | 166 | 3,582 | 0 | 0 | 0 |
+| *(Remaining glue: regfile, SPI/I2C, train FSM, MDIO, pkt gen)* | 1,666 | 1,602 | 64 | 3,584 | 0 | 0 | 0 |
 
 ### Kria K26 BD Hierarchical Breakdown (`ias2rf_k26_bd_wrapper`)
 
 | Subsystem (`ias2rf_k26_bd_i` instance) | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `kria_pl_link_0` (`u_pcs_rx`, `u_pcs_dl_tx`, `u_link_axis`, `u_train_fsm`, `u_fifo_rx2pl`, CSRs) | 4,426 | 4,018 | 408 | 0 | 6,555 | 0 | 0 | 0 |
-| `axi_dma_0` (AXI DMA 64-bit S2MM + MM2S) | 1,935 | 1,800 | 8 | 127 | 2,539 | 2 | 2 | 0 |
-| `axi_smc_hp0` (HP0 SmartConnect 64-bit memory path) | 1,669 | 1,286 | 374 | 9 | 2,709 | 0 | 0 | 0 |
+| `kria_pl_link_0` (`u_pcs_rx`, `u_pcs_dl_tx`, `u_link_axis`, `u_train_fsm`, `u_fifo_rx2pl`, CSRs) | 6,662 | 5,990 | 672 | 0 | 12,126 | 0 | 0 | 0 |
+| `axi_dma_0` (AXI DMA 64-bit S2MM + MM2S) | 2,192 | 2,057 | 8 | 127 | 2,853 | 2 | 2 | 0 |
+| `axi_smc_hp0` (HP0 SmartConnect 64-bit memory path) | 1,677 | 1,294 | 374 | 9 | 2,709 | 0 | 0 | 0 |
 | `axi_smc_ctrl` (HPM0_LPD SmartConnect AXI-Lite control) | 489 | 489 | 0 | 0 | 491 | 0 | 0 | 0 |
 | *(BD glue: `rst_ps8_100M`, etc.)* | 14 | 13 | 0 | 1 | 33 | 0 | 0 | 0 |
 
@@ -66,31 +66,31 @@ All primitive counts below are taken directly from routed Vivado 2026.1 hierarch
 ## Timing & Signoff Summary
 
 ### Artix-7 (`artix_top`, Routed)
-Source: [`fpga/artix/reports/timing_summary.rpt`](artix/reports/timing_summary.rpt), [`drc.rpt`](artix/reports/drc.rpt), [`methodology.rpt`](artix/reports/methodology.rpt), [`cdc.rpt`](artix/reports/cdc.rpt).
-- **Overall:** `WNS = 0.019 ns`, `TNS = 0.000 ns` (`0 / 56,401` endpoints), `WHS = 0.036 ns`, `THS = 0.000 ns` (`0 / 56,163` endpoints), `WPWS = 0.008 ns`, `TPWS = 0.000 ns` (`0 / 17,977` endpoints). **All constraints met.**
+Source: [`fpga/artix/reports/timing_summary.rpt`](artix/reports/timing_summary.rpt), [`drc.rpt`](artix/reports/drc.rpt), [`methodology.rpt`](artix/reports/methodology.rpt), [`cdc.rpt`](artix/reports/cdc.rpt) (identical metrics in [`fpga/artix/reports_rev06/`](artix/reports_rev06)).
+- **Overall:** `WNS = 0.147 ns`, `TNS = 0.000 ns` (`0 / 56,388` endpoints), `WHS = 0.036 ns`, `THS = 0.000 ns` (`0 / 56,150` endpoints), `WPWS = 0.008 ns`, `TPWS = 0.000 ns` (`0 / 17,973` endpoints). **All constraints met.**
 - **Key Intra-Clock Slacks (WNS / WHS in ns):**
-  - `clk_400m_unbuf` (400 MHz AD9484 DDC): `0.019 / 0.053`
-  - `clk_200m_unbuf` (200 MHz): `0.281 / 0.121`
-  - `clk_100m_unbuf` (100 MHz DDC / SPI): `1.823 / 0.036`
-  - `link_clk_unbuf` (125 MHz link TX CLKDIV): `0.279 / 0.058`
-  - `dl_rx_clk` (125 MHz downlink BUFR): `1.104 / 0.118`
-  - `adcs_ddc_clk_unbuf` (64 MHz AD9253 DDC): `0.831 / 0.061`
-  - `gen_rev06_eth.clk_312p5_u` (312.5 MHz SGMII): `0.179 / 0.120`
-  - `clk_adcr_dco` (400 MHz DDR DCO): `0.371 / 0.082`
+  - `clk_400m_unbuf` (400 MHz AD9484 DDC): `0.147 / 0.075`
+  - `clk_200m_unbuf` (200 MHz): `0.344 / 0.121`
+  - `clk_100m_unbuf` (100 MHz DDC / SPI): `1.759 / 0.080`
+  - `link_clk_unbuf` (125 MHz link TX CLKDIV): `0.255 / 0.061`
+  - `dl_rx_clk` (125 MHz downlink BUFR): `1.437 / 0.084`
+  - `adcs_ddc_clk_unbuf` (83.333 MHz AD9253 DDC): `0.807 / 0.044`
+  - `gen_rev06_eth.clk_312p5_u` (312.5 MHz SGMII): `0.238 / 0.090`
+  - `clk_adcr_dco` (200 MHz DDR DCO): `0.505 / 0.090`
 - **DRC:** `0` Errors (`113` Warnings/Advisory: DSP pipeline/output advisories `DPIP-1`/`DPOP-1`/`DPOP-2`/`AVAL-4`/`AVAL-5`, BRAM reset advisories `REQP-1839`/`REQP-1840`, `BUFC-1`, `CHECK-3`, `RTSTAT-10`).
 
 ### Kria K26 BD (`ias2rf_k26_bd_wrapper`, Routed)
 Source: [`fpga/kria/reports/timing_summary.rpt`](kria/reports/timing_summary.rpt), [`drc.rpt`](kria/reports/drc.rpt), [`methodology.rpt`](kria/reports/methodology.rpt), [`cdc.rpt`](kria/reports/cdc.rpt).
-- **Overall:** `WNS = 0.975 ns`, `TNS = 0.000 ns` (`0 / 42,544` endpoints), `WHS = 0.010 ns`, `THS = 0.000 ns` (`0 / 42,544` endpoints), `WPWS = 0.000 ns`, `TPWS = 0.000 ns` (`0 / 13,773` endpoints). **All constraints met.**
+- **Overall:** `WNS = 1.291 ns`, `TNS = 0.000 ns` (`0 / 58,834` endpoints), `WHS = 0.010 ns`, `THS = 0.000 ns` (`0 / 58,834` endpoints), `WPWS = 0.000 ns`, `TPWS = 0.000 ns` (`0 / 19,890` endpoints). **All constraints met.** (`**async_default** clk_300_u -> clk_300_u` holds the critical setup path at `1.291 ns`.)
 - **Clock Summary & Intra-Clock Slacks (WNS / WHS in ns):**
-  - `clk_pl_0` (`ps8/pl_clk0`, `IOPLL`, `100.000 MHz`): `5.704 / 0.010`
-  - `clk_300_u` (MMCM `IDELAYCTRL` refclk, `300.000 MHz`): `2.853 / 0.144`
-  - `clk_500_u` (MMCM downlink HS TX, `500.000 MHz`): `WPWS = 0.147`
-  - `tx_clk_div` (MMCM downlink CLKDIV, `125.000 MHz`): `4.804 / 0.050`
+  - `clk_pl_0` (`ps8/pl_clk0`, `IOPLL`, `100.000 MHz`): `4.157 / 0.011` (`WPWS = 2.000`)
+  - `clk_300_u` (MMCM `IDELAYCTRL` refclk, `300.000 MHz`): `2.853 / 0.119` (`WPWS = 0.000`)
+  - `clk_500_u` (MMCM downlink HS TX, `500.000 MHz`): `WPWS = 0.143`
+  - `tx_clk_div` (MMCM downlink CLKDIV, `125.000 MHz`): `3.498 / 0.041` (`WPWS = 0.907`)
   - `link_rx_clk` (uplink RX HS, `500.000 MHz`): `WPWS = 0.280`
-  - `rx_clkdiv` (uplink RX CLKDIV, `125.000 MHz`): `2.880 / 0.022`
+  - `rx_clkdiv` (uplink RX CLKDIV, `125.000 MHz`): `2.310 / 0.010` (`WPWS = 2.560`)
 - **DRC:** `0` Errors (`5` Warnings: `PLCK-58` x1 from `LINK_RX_CLK` on QBC pin `C1/B1` with `CLOCK_DEDICATED_ROUTE = FALSE`, `REQP-1934` x2, `REQP-1935` x2 on Xilinx `axi_dma_0` SDP FIFOs).
-- **Generated Artifacts:** `fpga/kria/out/ias2rf_k26.bit` (7,797,912 B) and `fpga/kria/out/ias2rf_k26.xsa` (1,059,656 B), ignored from git via [`fpga/.gitignore`](.gitignore).
+- **Generated Artifacts:** `fpga/kria/out/ias2rf_k26.bit` (7,797,912 B) and `fpga/kria/out/ias2rf_k26.xsa` (1,230,195 B), ignored from git via [`fpga/.gitignore`](.gitignore).
 
 ---
 

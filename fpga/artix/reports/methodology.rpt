@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Sat Nov 14 01:25:21 2026
+| Date         : Sat Nov 14 17:37:07 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_methodology -file D:/Repos/kv260-ias2rf-gemini/fpga/artix/reports/methodology.rpt
 | Design       : artix_top
@@ -70,22 +70,22 @@ Related violations: <none>
 
 PDRC-190#1 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X47Y27 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X36Y20 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#2 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X45Y28 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X38Y20 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#3 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X44Y28 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X29Y32 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#4 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X46Y29 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X35Y34 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 SYNTH-6#1 Warning
@@ -270,7 +270,7 @@ Related violations: <none>
 
 ULMTCS-1#1 Warning
 Control Sets use limits recommend reduction  
-This design uses 919 control sets (vs. available limit of 8150, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
+This design uses 914 control sets (vs. available limit of 8150, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
 Related violations: <none>
 
 

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Sat Nov 14 01:48:03 2026
+| Date         : Sat Nov 14 17:39:49 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_drc -file D:/Repos/kv260-ias2rf-gemini/fpga/kria/reports/drc.rpt
 | Design       : ias2rf_k26_bd_wrapper
