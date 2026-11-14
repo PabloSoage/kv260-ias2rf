@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Si549 I2C Programmable Oscillator + CLK_SEL Open-Drain Multiplexer Controller
 //
 // Physical pins (Bank 15, LVCMOS33):

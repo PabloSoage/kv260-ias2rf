@@ -425,7 +425,7 @@ k.notes([
     "CONTROL - how this sheet works",
     "1. Every FPGA ball has a stub and a name. Hierarchical label = the net leaves the sheet; plain label = it stays here.",
     "2. Bank voltages: 14 and 15 at 3.3 V, 34 at 2.5 V (link outputs only), 35 at 1.8 V. See docs/CONTROL_SPEC.md.",
-    "3. Pin table: _work/sheets/control_spec.py, checked against the symbol's ball names (bank, pair, clock capable).",
+    "3. Pin table: docs/CONTROL_SPEC.md, checked against the symbol's ball names (bank, pair, clock capable).",
     "4. Boot: master SPI x4 from U1102 (UG470 Figure 2-14). Reset: SW1101 or the Kria's FPGA_PROG_B via U1103.",
-], (525.78, 508.0))
+], (254.0, 520.7))
 k.write()

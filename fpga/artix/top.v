@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Artix-7 Front-End Top-Level Module for XC7A50T-FTG256-2 (U1101)
 //
 // Integrates:

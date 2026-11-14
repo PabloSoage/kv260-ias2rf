@@ -1,8 +1,8 @@
 # Full-System Co-Simulation (`tb_system`)
 
-End-to-end mixed-signal/digital XSim co-simulation connecting the real front-end Artix-7 RTL ([`artix_top`](artix/top.v), `ENABLE_ETH = 1`) and the real Kria K26 PL wrapper ([`kria_pl_link`](kria/kria_pl_link.v)) across Rev05 LVDS and Rev06 SGMII (`ETH_SGTX 404/402 ps`, `ETH_SGRX 464/468 ps`) channel models, behavioral converter/RF/housekeeping peripherals, and a behavioral RTL8211FSI + PS GEM3 SGMII/UDP peer. Both eye-scan FSMs (`u_kria.u_train_fsm`, `u_artix.u_dl_train_fsm`) run at their hardware-default `TAP_DWELL_CYCLES = 1800` with live front-end streaming enabled from `t = 0` (`emio_gpio_o = 8'h00`).
+End-to-end mixed-signal/digital XSim co-simulation connecting the real front-end Artix-7 RTL ([`artix_top`](artix/top.v), `ENABLE_ETH = 1`) and the real Kria K26 PL wrapper ([`kria_pl_link`](kria/kria_pl_link.v)) across 8-layer LVDS IAS1 and dedicated-pin 1000BASE-T SGMII (`ETH_SGTX 404/402 ps`, `ETH_SGRX 464/468 ps`) channel models, behavioral converter/RF/housekeeping peripherals, and a behavioral RTL8211FSI + PS GEM3 SGMII/UDP peer. Both eye-scan FSMs (`u_kria.u_train_fsm`, `u_artix.u_dl_train_fsm`) run at their hardware-default `TAP_DWELL_CYCLES = 1800` with live front-end streaming enabled from `t = 0` (`emio_gpio_o = 8'h00`).
 
-Run from the repository root (`D:\Repos\kv260-ias2rf`):
+Run from the repository root:
 
 ```powershell
 .\fpga\sim\run.ps1 tb_system
@@ -73,7 +73,7 @@ To complete all six multi-domain scenarios in ~6 minutes of batch XSim while run
 
 ## Verification Results (Vivado XSim 2026.1)
 
-Post-fold checks below ran directly after all Rev06 / training-gate / MDIO / `t=0` edits on the work branch:
+Post-fold checks below ran directly after all Rev06 / training-gate / MDIO / `t=0` edits on the gateware branch:
 
 ### Baseline Full-System Pass (`tb_system`, Hardware `TAP_DWELL_CYCLES = 1800`, `t = 0` Live Streaming)
 
@@ -108,4 +108,4 @@ Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `n
 2. **PS firmware & Linux stack excluded:** `tb_system` drives `kria_pl_link` AXI4-Lite/AXIS ports directly via testbench BFMs rather than executing ARM Zynq PS C code, Linux DMA drivers, or GEM3 MAC microcode.
 3. **Scaled timers & watchdog intervals:** Simulation speed-up overrides compress housekeeping polling, Si549 FCAL wait, MDIO polling, and `ETH_ALIVE_TIMEOUT` (`200 us` vs `1 s` hardware); `TAP_DWELL_CYCLES` runs at hardware default (`1800`).
 4. **XSim UltraScale+ primitive advisory:** Vivado XSim 2026.1 emits `[Unisim IDELAYE3-1]` advisories on `u_kria.u_idelay_d0`/`d1` noting behavioral reset limitations when `DELAY_FORMAT = TIME`.
-5. **Vivado 2026.1 implementation signoff refreshed:** Both [`artix/build.tcl`](artix/build.tcl) / [`artix/build_rev06.tcl`](artix/build_rev06.tcl) (`ENABLE_ETH=1`) and [`kria/bd.tcl`](kria/bd.tcl) were re-synthesized, placed, routed, and exported in Vivado 2026.1 against the updated RTL, refreshing [`artix/reports/`](artix/reports), [`artix/reports_rev06/`](artix/reports_rev06), [`kria/reports/`](kria/reports), and [`kria/out/`](kria/out) (`ias2rf_k26.bit`, `ias2rf_k26.xsa`). Both designs meet all user timing constraints with 0 DRC errors (`artix_top`: `WNS = 0.147 ns`, `WHS = 0.036 ns`, `WPWS = 0.008 ns`; `ias2rf_k26_bd_wrapper`: `WNS = 1.291 ns`, `WHS = 0.010 ns`, `WPWS = 0.000 ns`).
+5. **Vivado 2026.1 implementation signoff refreshed:** Both [`artix/build.tcl`](artix/build.tcl) / [`artix/build_rev06.tcl`](artix/build_rev06.tcl) (`ENABLE_ETH=1`) and [`kria/bd.tcl`](kria/bd.tcl) were re-synthesized, placed, routed, and exported in Vivado 2026.1 against the updated RTL, refreshing [`artix/reports/`](artix/reports), [`artix/reports_rev06/`](artix/reports_rev06), [`kria/reports/`](kria/reports), and [`kria/out/`](kria/reports) (`ias2rf_k26.bit`, `ias2rf_k26.xsa`). Both designs meet all user timing constraints with 0 DRC errors (`artix_top`: `WNS = 0.147 ns`, `WHS = 0.036 ns`, `WPWS = 0.008 ns`; `ias2rf_k26_bd_wrapper`: `WNS = 1.291 ns`, `WHS = 0.010 ns`, `WPWS = 0.000 ns`).

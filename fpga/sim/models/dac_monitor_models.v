@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral AD9708 Radar DAC & AD9767 Dual 14-bit SDR DAC Monitors
 //
 // Checks:

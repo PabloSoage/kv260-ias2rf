@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Full Artix-7 -> Kria K26 Primitive Loopback Testbench (Verilog-2001):
 //   - TX (Artix Bank 34): OSERDESE2 (8:1 DDR) + OBUFDS on LINK_RX_CLK, LINK_RX_D0, LINK_RX_D1
 //   - Channel:

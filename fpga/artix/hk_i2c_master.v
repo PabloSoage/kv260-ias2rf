@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Generic Open-Drain I2C Master Core + HK Bus Controller (TMP1075 + M24C02 EEPROM)
 //
 // Target Devices on HK_SCL (K5) / HK_SDA (J5) / HK_ALERT_N (K2), Bank 35 LVCMOS18 (shared with KV260 PS):

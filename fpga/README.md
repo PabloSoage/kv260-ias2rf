@@ -1,145 +1,48 @@
-# KV260-IAS2RF Gateware (`fpga/`)
+# FPGA Gateware — Dual-FPGA RTL, Vivado Builds & XSim Verification
 
-Verilog-2001 gateware, Vivado build scripts, timing/utilization reports, and XSim verification benches for the bidirectional AC-coupled LVDS IAS1-to-RF bridge connecting the front-end Artix-7 (`XC7A50T-FTG256-2`) and the KV260 Kria K26 Zynq UltraScale+ SOM (`XCK26-SFVC784-2LV-c`).
+This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 constraints/build scripts, and full-system XSim co-simulation testbenches for both FPGAs in the **KV260-IAS2RF** platform (**Apache License 2.0**, with `third_party/aeris/` under MIT).
 
-## Architecture & Directory Layout
-
-- [`artix/`](artix) — Front-end Artix-7 (`U1101`, `XC7A50T-FTG256-2`) RTL, XDC ([`xc7a50t.xdc`](artix/xc7a50t.xdc)), and build scripts:
-  - [`top.v`](artix/top.v) (`artix_top`): AD9484 400 MSPS radar ADC capture (`adc_capture.v`) -> AERIS 400->100 MSPS DDC + post-decimation (`ddc_wrapper.v`), AD9253 dual 14-bit SDR ADC capture (`adcs_capture.v`) + SDR DDC (`sdr_ddc.v`), AD9708 LFM radar DAC (`dac_radar.v`), AD9767 dual 14-bit SDR DAC (`dac_sdr.v`), 8x ADAR1000 SPI beamformer (`adar_ctrl.v`) + RF switches (`rf_switch.v`), shared converter SPI (`conv_spi.v`), housekeeping I2C/Si549 XO/XADC/PPS (`hk_i2c_master.v`, `hk_xo_ctrl.v`, `hk_xadc_pps.v`), Pmod J1102 SPI fallback (`pmod_spi.v`), 2-lane 64b/66b TX / 1-lane RX PCS, and Rev06 SGMII Ethernet + dual-path mux (`ENABLE_ETH`, default `1`).
-  - [`build.tcl`](artix/build.tcl) -> routed reports in [`artix/reports/`](artix/reports).
-  - [`build_rev06.tcl`](artix/build_rev06.tcl) -> Rev06 Ethernet build reports in `artix/reports_rev06/`.
-- [`link/`](link) — Shared 64b/66b PCS, Clause 49 scrambler (`link_scrambler.v`), 66:8/8:66 gearboxes (`link_gearbox.v`), IEEE CRC-32 (`link_crc32.v`), packet framer/deframer (`link_framer.v`), 7-series/UltraScale+ SERDES wrappers (`link_lanes.v`), eye/bitslip/deskew training FSM (`link_rx_train_fsm.v`), top wrappers (`link_top.v`), [`LINK_PROTOCOL.md`](link/LINK_PROTOCOL.md), and [`PINMAP.md`](link/PINMAP.md).
-- [`kria/`](kria) — Kria K26 (`XCK26-SFVC784-2LV-c`) PL design and Vivado IPI Block Design:
-  - [`kria_pl_link.v`](kria/kria_pl_link.v) + [`link_axis.v`](kria/link_axis.v): AXI4-Lite CSRs (`0x00..0x34`), 64-bit AXI4-Stream RX/TX DMA interfaces, MMCM (`300 MHz` `IDELAYCTRL` refclk + `500 MHz` / `125 MHz` downlink TX clocks from `ps8/pl_clk0`), and 2-lane uplink RX SERDES/PCS.
-  - [`bd.tcl`](kria/bd.tcl) + [`xck26_bd.xdc`](kria/xck26_bd.xdc): Full Zynq UltraScale+ PS (`ps8`, `IOPLL` `pl_clk0 = 100 MHz`) + `axi_dma_0` (S2MM + MM2S, 64-bit) + `kria_pl_link_0` + `axi_smc_ctrl` + `axi_smc_hp0` + EMIO I2C0/SPI0/GPIO, generating `ias2rf_k26.bit` and `ias2rf_k26.xsa` in `fpga/kria/out/` and reports in [`kria/reports/`](kria/reports).
-  - [`top.v`](kria/top.v) + [`build.tcl`](kria/build.tcl) + [`xck26.xdc`](kria/xck26.xdc): Standalone PL-only wrapper build (`kria_top`).
-- [`third_party/aeris/`](third_party/aeris) — MIT-licensed AERIS-10 DDC (`ddc_400m.v`, `cic_decimator_4x_enhanced.v`, `fir_lowpass.v`) adapted for Vivado 7-series timing closure at 400 MHz.
-- [`sim/`](sim) — Vivado XSim batch runner ([`run.ps1`](sim/run.ps1)), unit/system/mutation testbenches, and full-system co-simulation report ([`SYSTEM_SIM.md`](SYSTEM_SIM.md)).
-- [`../sw/`](../sw) — KV260 Linux device-tree overlay ([`ias2rf_pl.dtsi`](../sw/ias2rf_pl.dtsi)) and userspace CSR/DMA smoke test ([`ias2rf_dma_test.c`](../sw/ias2rf_dma_test.c)).
+> **Comprehensive Documentation & Vivado Silicon Renders:** See [`docs/FPGA_GATEWARE.md`](../docs/FPGA_GATEWARE.md) for complete post-route Vivado silicon die floorplans (`XC7A50T` & `XCK26`), hierarchical circuit schematics, complete SDR (`HF`/`CB`/`VHF`/`FM`/`Walkie`/`UHF`) & `AERIS-10` (`10.5 GHz` / `20 km` / `8x ADAR1000`) signal chains, and the full `0x00..0xE0` register map.
 
 ---
 
-## Resource Utilization (Both FPGAs)
+## Layout
 
-All primitive counts below are taken directly from routed Vivado 2026.1 hierarchical utilization reports:
-- Artix-7: [`fpga/artix/reports/utilization.rpt`](artix/reports/utilization.rpt) (`artix_top` on `xc7a50tftg256-2`, `ENABLE_ETH=1`)
-- Kria K26: [`fpga/kria/reports/utilization.rpt`](kria/reports/utilization.rpt) (`ias2rf_k26_bd_wrapper` on `xck26-sfvc784-2LV-c`)
-
-### Side-by-Side Total Utilization
-
-| Device & Design | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | URAM | DSP Blocks |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **Artix-7 `XC7A50T-FTG256-2`** (`artix_top`, routed) | **15,416** | 15,250 | 166 | 0 | **17,445** | **13** | **6** | — | **110** |
-| **Kria K26 `XCK26-SFVC784-2LV-c`** (`ias2rf_k26_bd_wrapper`, routed) | **11,034** | 9,843 | 1,054 | 137 | **18,212** | **2** | **2** | **0** | **0** |
-
-### Artix-7 Hierarchical Breakdown (`artix_top`)
-
-| Subsystem (`artix_top` instance) | Total LUTs | Logic LUTs | LUTRAMs | FFs | RAMB36 | RAMB18 | DSP Blocks |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `u_sdr_ddc` (AD9253 dual SDR DDC) | 5,720 | 5,720 | 0 | 3,754 | 2 | 4 | 30 |
-| `u_ddc` (AERIS 400->100 MSPS radar DDC) | 1,834 | 1,790 | 44 | 4,597 | 0 | 0 | 79 |
-| `u_ul_pcs_tx` (2-lane 64b/66b TX PCS + framer) | 1,149 | 1,149 | 0 | 957 | 0 | 0 | 0 |
-| `u_xadc_pps` (XADC + 64-bit PPS timestamp) | 924 | 924 | 0 | 1,015 | 0 | 0 | 0 |
-| `gen_rev06_eth.u_eth_mac` (UDP/IPv4/ARP MAC) | 869 | 869 | 0 | 888 | 0 | 0 | 0 |
-| `u_dl_pcs_rx` (1-lane 64b/66b RX PCS + deframer) | 628 | 628 | 0 | 619 | 0 | 0 | 0 |
-| `gen_rev06_eth.u_dual_mux` (IAS1/ETH dual-path mux) | 570 | 570 | 0 | 327 | 8 | 0 | 0 |
-| `gen_rev06_eth.u_eth_phy` (SGMII 8b/10b PHY + AN) | 549 | 503 | 46 | 349 | 0 | 1 | 0 |
-| `u_adc_cap` (AD9484 400 MSPS LVDS capture) | 484 | 472 | 12 | 622 | 0 | 0 | 0 |
-| `u_dac_radar` (AD9708 LFM chirp generator) | 454 | 454 | 0 | 238 | 0 | 1 | 1 |
-| `u_adar_ctrl` (8x ADAR1000 SPI + beam BRAM) | 314 | 314 | 0 | 197 | 2 | 0 | 0 |
-| `u_dac_sdr` (AD9767 dual 14-bit SDR DAC) | 145 | 145 | 0 | 146 | 1 | 0 | 0 |
-| `u_adcs_cap` (AD9253 serial LVDS capture) | 110 | 110 | 0 | 151 | 0 | 0 | 0 |
-| *(Remaining glue: regfile, SPI/I2C, train FSM, MDIO, pkt gen)* | 1,666 | 1,602 | 64 | 3,584 | 0 | 0 | 0 |
-
-### Kria K26 BD Hierarchical Breakdown (`ias2rf_k26_bd_wrapper`)
-
-| Subsystem (`ias2rf_k26_bd_i` instance) | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `kria_pl_link_0` (`u_pcs_rx`, `u_pcs_dl_tx`, `u_link_axis`, `u_train_fsm`, `u_fifo_rx2pl`, CSRs) | 6,662 | 5,990 | 672 | 0 | 12,126 | 0 | 0 | 0 |
-| `axi_dma_0` (AXI DMA 64-bit S2MM + MM2S) | 2,192 | 2,057 | 8 | 127 | 2,853 | 2 | 2 | 0 |
-| `axi_smc_hp0` (HP0 SmartConnect 64-bit memory path) | 1,677 | 1,294 | 374 | 9 | 2,709 | 0 | 0 | 0 |
-| `axi_smc_ctrl` (HPM0_LPD SmartConnect AXI-Lite control) | 489 | 489 | 0 | 0 | 491 | 0 | 0 | 0 |
-| *(BD glue: `rst_ps8_100M`, etc.)* | 14 | 13 | 0 | 1 | 33 | 0 | 0 | 0 |
+| Folder / File | Purpose |
+|---|---|
+| `artix/` | Front-end `XC7A50T-FTG256-2` RTL (`top.v` with integrated Radar DDC, Dual-Ch SDR DDC, `dac_radar`, `dac_sdr`, `adar_ctrl`, `rf_switch`, `eth_sgmii_phy`, `eth_mac_udp`, `dual_path_mux`, `hk_*`, `pmod_spi`), `xc7a50t.xdc`, `build_rev06.tcl`, and routed reports (`reports_rev06/`) |
+| `kria/` | Kria KV260 `XCK26-SFVC784-2LV-c` PL core (`top.v`, `kria_pl_link.v`, `link_axis.v`), Vivado IPI block design (`bd.tcl`), `xck26.xdc`, `build.tcl`, and routed reports (`reports/`) |
+| `link/` | Shared bidirectional `64b/66b` IAS1 PCS (`link_crc32`, `link_scrambler`, `link_gearbox`, `link_framer`, `link_lanes`, `link_rx_train_fsm`, `link_top`) + [`LINK_PROTOCOL.md`](link/LINK_PROTOCOL.md) & [`PINMAP.md`](link/PINMAP.md) |
+| `third_party/aeris/` | Verbatim `PLFM_RADAR` (`62d4c55`, MIT) 400 -> 100 MSPS radar DDC modules (`ddc_400m.v`, `nco_400m_enhanced.v`, `cic_decimator_4x_enhanced.v`, `fir_lowpass.v`, `ddc_input_interface.v`, `cdc_modules.v`) |
+| `eth/` | `1000BASE-T` SGMII feasibility, pin-dedicated implementation notes ([`REV06.md`](eth/REV06.md)), failover architecture ([`REDUNDANCY.md`](eth/REDUNDANCY.md)), and standalone SGMII XSim bench |
+| `sim/` | Vivado `xsim` runner (`run.ps1`), behavioral RF/IC/PCB board models (`sim/models/`), unit benches (`tb_*`), and full-system dual-FPGA co-simulation (`tb_system.v`) |
+| `export_vivado_views.tcl` | Batch TCL extractor dumping placed cells, clock regions, architectural columns, and module statistics from post-route Artix-7 and Kria K26 checkpoints |
 
 ---
 
-## Timing & Signoff Summary
+## Vivado 2026.1 Post-Route Implementation Status
 
-### Artix-7 (`artix_top`, Routed)
-Source: [`fpga/artix/reports/timing_summary.rpt`](artix/reports/timing_summary.rpt), [`drc.rpt`](artix/reports/drc.rpt), [`methodology.rpt`](artix/reports/methodology.rpt), [`cdc.rpt`](artix/reports/cdc.rpt) (identical metrics in [`fpga/artix/reports_rev06/`](artix/reports_rev06)).
-- **Overall:** `WNS = 0.147 ns`, `TNS = 0.000 ns` (`0 / 56,388` endpoints), `WHS = 0.036 ns`, `THS = 0.000 ns` (`0 / 56,150` endpoints), `WPWS = 0.008 ns`, `TPWS = 0.000 ns` (`0 / 17,973` endpoints). **All constraints met.**
-- **Key Intra-Clock Slacks (WNS / WHS in ns):**
-  - `clk_400m_unbuf` (400 MHz AD9484 DDC): `0.147 / 0.075`
-  - `clk_200m_unbuf` (200 MHz): `0.344 / 0.121`
-  - `clk_100m_unbuf` (100 MHz DDC / SPI): `1.759 / 0.080`
-  - `link_clk_unbuf` (125 MHz link TX CLKDIV): `0.255 / 0.061`
-  - `dl_rx_clk` (125 MHz downlink BUFR): `1.437 / 0.084`
-  - `adcs_ddc_clk_unbuf` (83.333 MHz AD9253 DDC): `0.807 / 0.044`
-  - `gen_rev06_eth.clk_312p5_u` (312.5 MHz SGMII): `0.238 / 0.090`
-  - `clk_adcr_dco` (200 MHz DDR DCO): `0.505 / 0.090`
-- **DRC:** `0` Errors (`113` Warnings/Advisory: DSP pipeline/output advisories `DPIP-1`/`DPOP-1`/`DPOP-2`/`AVAL-4`/`AVAL-5`, BRAM reset advisories `REQP-1839`/`REQP-1840`, `BUFC-1`, `CHECK-3`, `RTSTAT-10`).
-
-### Kria K26 BD (`ias2rf_k26_bd_wrapper`, Routed)
-Source: [`fpga/kria/reports/timing_summary.rpt`](kria/reports/timing_summary.rpt), [`drc.rpt`](kria/reports/drc.rpt), [`methodology.rpt`](kria/reports/methodology.rpt), [`cdc.rpt`](kria/reports/cdc.rpt).
-- **Overall:** `WNS = 1.291 ns`, `TNS = 0.000 ns` (`0 / 58,834` endpoints), `WHS = 0.010 ns`, `THS = 0.000 ns` (`0 / 58,834` endpoints), `WPWS = 0.000 ns`, `TPWS = 0.000 ns` (`0 / 19,890` endpoints). **All constraints met.** (`**async_default** clk_300_u -> clk_300_u` holds the critical setup path at `1.291 ns`.)
-- **Clock Summary & Intra-Clock Slacks (WNS / WHS in ns):**
-  - `clk_pl_0` (`ps8/pl_clk0`, `IOPLL`, `100.000 MHz`): `4.157 / 0.011` (`WPWS = 2.000`)
-  - `clk_300_u` (MMCM `IDELAYCTRL` refclk, `300.000 MHz`): `2.853 / 0.119` (`WPWS = 0.000`)
-  - `clk_500_u` (MMCM downlink HS TX, `500.000 MHz`): `WPWS = 0.143`
-  - `tx_clk_div` (MMCM downlink CLKDIV, `125.000 MHz`): `3.498 / 0.041` (`WPWS = 0.907`)
-  - `link_rx_clk` (uplink RX HS, `500.000 MHz`): `WPWS = 0.280`
-  - `rx_clkdiv` (uplink RX CLKDIV, `125.000 MHz`): `2.310 / 0.010` (`WPWS = 2.560`)
-- **DRC:** `0` Errors (`5` Warnings: `PLCK-58` x1 from `LINK_RX_CLK` on QBC pin `C1/B1` with `CLOCK_DEDICATED_ROUTE = FALSE`, `REQP-1934` x2, `REQP-1935` x2 on Xilinx `axi_dma_0` SDP FIFOs).
-- **Generated Artifacts:** `fpga/kria/out/ias2rf_k26.bit` (7,797,912 B) and `fpga/kria/out/ias2rf_k26.xsa` (1,230,195 B), ignored from git via [`fpga/.gitignore`](.gitignore).
+| Target Device | Top / Wrapper | Slice LUTs | FFs | BRAM36 eq. | DSP | WNS | WHS | DRC |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `15,416 / 32,600` (`47.3%`) | `17,445 / 65,200` (`26.8%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | `+0.147 ns` | `+0.036 ns` | `0` Err |
+| **`XCK26-SFVC784-2LV-c`** | `ias2rf_k26_bd_wrapper` (BD) | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` (`0.0%`) | `+1.291 ns` | MET | `0` Err |
+| **`XCK26-SFVC784-2LV-c`** | `kria_top` (PL link core) | `4,629` LUT prims | `6,817` | `0` | `0` | `+1.008 ns` | `+0.017 ns` | `0` Err |
 
 ---
 
-## Building & Running Simulations
+## Batch Build & Simulation Commands (Vivado 2026.1)
 
-### Vivado Batch Builds
-Always run outside simulation sessions (and remove `fpga/kria/.bd_proj/` before running [`run.ps1`](sim/run.ps1), since `run.ps1` globs `*.v` recursively under `fpga/kria/`):
 ```powershell
-# Artix-7 full build -> fpga/artix/reports/
-& "D:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat" -mode batch -nojournal -nolog -source fpga\artix\build.tcl
+# Build Artix-7 bitstream & post-route reports
+<Vivado 2026.1 install>\bin\vivado.bat -mode batch -nojournal -nolog -source fpga/artix/build_rev06.tcl
 
-# Kria K26 full PS+PL Block Design + .bit + .xsa -> fpga/kria/out/ & fpga/kria/reports/
-& "D:\AMDDesignTools\2026.1\Vivado\bin\vivado.bat" -mode batch -nojournal -nolog -source fpga\kria\bd.tcl
-```
+# Build Kria K26 Vivado Block Design + XSA + bitstream
+<Vivado 2026.1 install>\bin\vivado.bat -mode batch -nojournal -nolog -source fpga/kria/build.tcl -tclargs bd
 
-### XSim Testbenches (`fpga/sim/run.ps1`)
-Run individual benches from the repository root (`D:\Repos\kv260-ias2rf`):
-```powershell
+# Run XSim unit, E2E, SGMII & full-system dual-FPGA co-simulations
 .\fpga\sim\run.ps1 tb_system
-.\fpga\sim\run.ps1 tb_artix_top
-.\fpga\sim\run.ps1 tb_adc_ddc
-.\fpga\sim\run.ps1 tb_e2e
 .\fpga\sim\run.ps1 tb_rev06
-.\fpga\sim\run.ps1 tb_adcs_capture
-.\fpga\sim\run.ps1 tb_dac_tx
-.\fpga\sim\run.ps1 tb_adar_ctrl
-.\fpga\sim\run.ps1 tb_hk
-.\fpga\sim\run.ps1 tb_link_axis
-.\fpga\sim\run.ps1 tb_link_k2a
-.\fpga\sim\run.ps1 tb_link_a2k
-.\fpga\sim\run.ps1 tb_pcs_loop
-.\fpga\sim\run.ps1 tb_pcs_unit
-.\fpga\sim\run.ps1 tb_pmod_spi
-.\fpga\sim\run.ps1 tb_serdes7
-.\fpga\sim\run.ps1 tb_serdes_us
+.\fpga\sim\run.ps1 tb_e2e
 ```
-Each testbench supports `-Mutate <name>` negative checks (e.g., `tb_artix_top -Mutate no_reg_resp` and `tb_artix_top -Mutate missing_ack`).
 
----
-
-## KV260 Linux Bring-Up (`sw/`)
-
-See [`sw/README.md`](../sw/README.md) for devicetree overlay (`ias2rf_pl.dtsi`) and userspace CSR/DMA smoke test (`ias2rf_dma_test.c`) usage:
-- `0x80000000`: `kria_pl_link` AXI4-Lite CSRs (`0x00..0x34`), interrupts GIC `89` (`irq_fpga`), `90` (`irq_link_up`).
-- `0x80010000`: `axi_dma_0` 64-bit S2MM + MM2S DMA (`HP0`, `dma-coherent`), interrupts GIC `91` (`s2mm_introut`), `92` (`mm2s_introut`).
-- PS EMIO `i2c0` (`100 kHz` to `HK_SCL`/`HK_SDA`) and `spi0` (`Pmod J2`).
-
-## Resolved issue (14 Nov 2026): Kria uplink eye training
-
-System co-simulation (`tb_system`) identified why `link_rx_train_fsm` failed to converge under live uplink traffic:
-- **Root cause:** `link_rx_train_fsm` requires 6 consecutive descrambled `/I/` (`8'h1E`) or `/A/` (`8'h4B`) blocks (`l*_rx_blk_ok`) to qualify each `IDELAY` tap, whereas `artix_top` previously forwarded `ias_mux_valid` straight into `u_ul_pcs_tx.pkt_valid` from `t = 0` before Kria had trained.
-- **Fix:** [`artix/top.v`](artix/top.v) now gates `u_ul_pcs_tx` on packet boundaries with `ul_tx_allow = dl_up_sync[1] & dl_rem_sync2[0]` (`dl_link_up` and synchronized Kria `link_up`), sending continuous `/I/` + `/A/` until both directions lock and dropping back to idles cleanly during retrain. Verified in [`tb_system`](SYSTEM_SIM.md) with realistic board/SOM skew + jitter channels, zero `TAP_DWELL_CYCLES` overrides (`1800` default), and live `t = 0` traffic, plus [`tb_link_a2k`](sim/tb_link_a2k.v) (`-Define STREAM_FROM_T0` pass / `-Mutate no_train_gate` fail).
+For detailed simulation results across every testbench, see [`SYSTEM_SIM.md`](SYSTEM_SIM.md). For PetaLinux / user-space software bring-up on the K26 PS, see [`sw/README.md`](../sw/README.md).

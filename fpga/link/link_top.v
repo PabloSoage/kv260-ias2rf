@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 2-Lane PCS TX & RX Top-Level Wrappers (Plain Verilog-2001, no vendor primitives)
 // Connects Packet Framer -> 2-Lane Striping -> 64b/66b Scrambler -> 66:8 Gearbox,
 // and 8:66 Gearbox + Block Lock -> 64b/66b Descrambler -> AM Deskew -> Packet Deframer.

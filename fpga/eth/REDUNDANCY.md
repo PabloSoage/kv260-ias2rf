@@ -1,4 +1,6 @@
-# Ethernet Load-Balancing & Link Redundancy Architecture (`Rev05` & `Rev06`)
+# Ethernet Load-Balancing & Link Redundancy Architecture
+
+> **Production `main` Baseline (`ENABLE_ETH = 1`):** `U1201` (`RTL8211FSI-CG`) is wired to **dedicated Bank 34 `LVDS_25` pins** (`R2/R1` `ETH_SGTX`, `R3/T2` `ETH_SGRX`, with `ETH_MDIO/MDC/RST_N` on Bank 14 `P1/M15/K13`), keeping **both** `IAS1` data lanes (`LINK_RX_D0` + `LINK_RX_D1`) and `1000BASE-T` Ethernet active simultaneously (`~2.94 Gb/s` combined uplink + `~1.48 Gb/s` combined downlink, Mode 6 below). Earlier shared-pair trade-off modes (`1`–`5`) are retained below for reference.
 
 Analysis of pairing Gigabit Ethernet (`U1201 RTL8211FSI-CG` + `J1201 HR911130C`) with the existing `IAS1` LVDS link (`J8`) as a load-balanced second transport or redundant failover channel between the `XC7A50T-2FTG256I` front-end FPGA and the AMD Kria `KV260` (`XCK26-SFVC784-2LV-C`).
 

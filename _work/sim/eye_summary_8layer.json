@@ -1,0 +1,54 @@
+{
+  "LINK_RX_D0_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 646.7
+  },
+  "LINK_RX_D1_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 424.8
+  },
+  "LINK_RX_CLK_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 421.2
+  },
+  "LINK_TX_D0_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 677.2
+  },
+  "LINK_TX_CLK_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 662.6
+  },
+  "ADCS_FCO_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 633.6
+  },
+  "ADCS_DCO_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 658.6
+  },
+  "ADCS_D0_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 639.0
+  },
+  "ADCR_DCO_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 620.8
+  },
+  "ADCR_D0_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 643.2
+  },
+  "CLK_ADCS_1G": {
+    "n_traces": 125,
+    "eye_height_mV": 633.4
+  },
+  "ETH_SGTX_1P25G": {
+    "n_traces": 125,
+    "eye_height_mV": 644.4
+  },
+  "ETH_SGRX_1P25G": {
+    "n_traces": 125,
+    "eye_height_mV": 656.6
+  }
+}

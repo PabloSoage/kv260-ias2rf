@@ -1,7 +1,7 @@
 # 3D Model Audit & Mapping (`CSI2-KRIA-KV260_Rev01.kicad_pcb`)
 
 ## 1. Audit Summary
-An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (`C:\Users\pablo\AppData\Local\Programs\KiCad\10.0\share\kicad\3dmodels`) identified:
+An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (KiCad's stock `share/kicad/3dmodels` library) identified:
 
 - **Total footprints:** 570
 - **Broken `${KICAD10_3DMODEL_DIR}` model references:** **19** footprint instances whose `.step` path does not exist in the KiCad 10 standard installation (`Xilinx_FTG256`, `Mini-Circuits_CD542_H2.84mm`, `Oscillator_SMD_SI570_SI571_Standard`, `L_Bourns_SRP7028A_7.3x6.6mm`, `BarrelJack_CUI_PJ-102AH_Horizontal`, `Fuse_1812_4532Metric`, `HTSOP-8-1EP_...`, `QFN-20-1EP_...`, `QFN-48-1EP_...`, `LFCSP-32-1EP_...`, `LFCSP-56-1EP_...`).

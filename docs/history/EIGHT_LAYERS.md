@@ -8,8 +8,8 @@ balls, and LINK_TX is terminated at its receiver. Both boards were measured and 
 same scripts. The plots add two more cases: an ideal line, and the 6-layer board with the same
 corrections applied.
 
-The method behind each number is in [SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY.md) (§1–7 for the
-6-layer review, §8 for this comparison). How the board changed is in [LAYOUT.md §6.5](LAYOUT.md).
+The method behind each number is in [SIGNAL_INTEGRITY.md](../SIGNAL_INTEGRITY.md) (§1–7 for the
+6-layer review, §8 for this comparison). How the board changed is in [LAYOUT.md §6.5](../LAYOUT.md).
 
 ## The two stacks
 
@@ -131,7 +131,7 @@ stacks, and so is the launch.*
   corner had no room for the vias. Coupling LINK_RX would need its AC capacitors, now 9 mm apart,
   moved together at J101 first.
 - **Price.** Five 8-layer bare boards cost $282.92 on JLCPCB's quote page, against $236.88 on
-  6 layers: $46 more, mostly the engineering fee ([JLCPCB_QUOTE.md §2](JLCPCB_QUOTE.md)).
+  6 layers: $46 more, mostly the engineering fee ([JLCPCB_QUOTE.md §2](../JLCPCB_QUOTE.md)).
 
 ## The same corrections on 6 layers
 

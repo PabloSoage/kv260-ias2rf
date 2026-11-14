@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 64b/66b Scrambler / Encoder and Self-Synchronous Descrambler / Decoder
 // IEEE 802.3 Clause 49 polynomial: G(x) = 1 + x^39 + x^58
 // Sync header sync[1:0] is never scrambled; payload[63:0] is processed LSB-first.

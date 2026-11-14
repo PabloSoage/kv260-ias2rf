@@ -50,5 +50,5 @@ at zero.
 | `FRONTEND-erc.rpt` | ERC report for the sheet at the time it was removed (660 violations) |
 | `PHASED_ARRAY-erc.rpt` | ERC report for the sheet at the time it was removed (312 violations) |
 
-See [../docs/HISTORY_Rev01.md](../docs/HISTORY_Rev01.md) for how they came to exist, and
-[../docs/AUDIT_Rev01.md](../docs/AUDIT_Rev01.md) for the full audit.
+See [../docs/history/HISTORY_Rev01.md](../docs/history/HISTORY_Rev01.md) for how they came to exist, and
+[../docs/history/AUDIT_Rev01.md](../docs/history/AUDIT_Rev01.md) for the full audit.

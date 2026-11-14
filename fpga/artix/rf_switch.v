@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Front-End IF RF Switch Matrix Control (SW_CTRL0..3, Bank 35 LVCMOS18)
 //   sw_ctrl[0] (SW1: IF_RX_A) : 0 = RF1 (default), 1 = RF2
 //   sw_ctrl[1] (SW2: IF_RX_B) : 0 = RF1 (default), 1 = RF2

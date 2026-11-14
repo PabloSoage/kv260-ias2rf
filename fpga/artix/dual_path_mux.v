@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Dual-Path Stream Router & Redundancy Failover Arbiter (Rev06)
 //
 // Connects two sensor packet streams:

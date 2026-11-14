@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Integrated Top-Level Verification Testbench for artix_top:
 //   Tests Tasks 13-16 wired into artix_top over the live IAS1 2-lane Uplink + 1-lane Downlink:
 //     - adcs_capture + conv_spi (3-wire AD9253/AD9484 SPI) + sdr_ddc (Streams 0x04/0x05)

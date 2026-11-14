@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Simulation Testbench: 8x ADAR1000 Beamformer Controller & RF Switch Matrix
 // Verifies:
 //   1) Mode-0 SPI initialization of all 8 ADAR1000 chips (Reg 0x000=0x3C auto-increment + SDOACTIVE,

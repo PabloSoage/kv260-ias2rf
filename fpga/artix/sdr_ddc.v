@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Dual-Channel AD9253 SDR Digital Down-Converter (NCO + CIC3 + Halfband FIR + Async FIFO + Packetizer)
 // Consumes 14-bit dual-channel ADC samples in adc_clk (= adcs_clkdiv) domain, performs
 // independent 32-bit complex NCO tuning, 3-stage CIC + 15-tap Halfband decimation (programmable ratio),

@@ -17,10 +17,10 @@ Primary sources inspected:
 2. Artix-7 package pins & delays: `_work/layout/xc7a50t_ftg256_pkg_delays.csv`, `_work/layout/lvds_skew.py`
 3. KV260 carrier schematic: AMD `XTP682` (`KV260_v2/038-05058-03-A1.pdf`, sheets 6, 8, 13, 17)
 4. Vivado Board Store & K26 package definitions (`Vivado 2026.1`):
-   - `D:\AMDDesignTools\2026.1\Vivado\data\xhub\boards\XilinxBoardStore\boards\Xilinx\kv260_carrier\2.0\board.xml`
-   - `D:\AMDDesignTools\2026.1\Vivado\data\xhub\boards\XilinxBoardStore\boards\Xilinx\kv260_som\2.0\part0_pins.xml`
-   - `D:\AMDDesignTools\2026.1\Vivado\data\xhub\boards\XilinxBoardStore\boards\Xilinx\k26c\2.0\part0_pins.xml`
-   - `D:\AMDDesignTools\2026.1\Vivado\data\parts\xilinx\zynquplus\public\ibis\pkg\xck26_sfvc784.pkg`
+   - `<Vivado 2026.1 install>\data\xhub\boards\XilinxBoardStore\boards\Xilinx\kv260_carrier\2.0\board.xml`
+   - `<Vivado 2026.1 install>\data\xhub\boards\XilinxBoardStore\boards\Xilinx\kv260_som\2.0\part0_pins.xml`
+   - `<Vivado 2026.1 install>\data\xhub\boards\XilinxBoardStore\boards\Xilinx\k26c\2.0\part0_pins.xml`
+   - `<Vivado 2026.1 install>\data\parts\xilinx\zynquplus\public\ibis\pkg\xck26_sfvc784.pkg`
 
 ---
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // SGMII 1.25 Gb/s Over LVDS PHY + IEEE 802.3 Clause 36/37 PCS (Rev06)
 //
 // Architecture:

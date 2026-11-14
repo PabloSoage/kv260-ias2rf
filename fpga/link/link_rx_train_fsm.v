@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // RX Eye-Centering & Link Training FSM (Plain Verilog-2001)
 // Supports both Kria UltraScale+ IDELAYE3 (0..511, 2 lanes) and Artix-7 IDELAYE2
 // (0..31, 1 lane). Sweeps IDELAY taps while monitoring per-lane descrambled

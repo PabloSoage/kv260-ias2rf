@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Unit Testbench for PCS Submodules (Verilog-2001):
 //   1. link_crc32 (IEEE 802.3 CRC-32 vectors)
 //   2. link_64b66b_enc + link_64b66b_dec (Clause 49 self-sync round-trip)

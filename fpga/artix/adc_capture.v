@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // AD9484 8-bit LVDS DDR capture with per-bit IDELAYE2 and DCO eye-scan training.
 //
 // PINMAP: AD9484 (U501) -> XC7A50T-2FTG256I (U1101) Bank 14 (VCCO = 3.3 V)

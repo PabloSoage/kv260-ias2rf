@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // IEEE 802.3 Clause 36 8b/10b Encoder and Decoder
 // code[9:0] = {j, h, g, f, i, e, d, c, b, a}, transmitted LSB-first (bit[0]=a).
 

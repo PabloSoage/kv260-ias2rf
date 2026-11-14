@@ -1,16 +1,10 @@
 # KV260-IAS2RF — an RF front-end carrier for the AMD Kria KV260
 
-**Status (12 November 2026): schematic and layout complete, on 8 layers. The board is fully routed, with zero
+**Status (15 November 2026): schematic and layout complete, on 8 layers. The board is fully routed, with zero
 DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
-been validated.** A few review items remain before an order (see [Status](#status)).
+been validated.** The hardware, dual-FPGA Vivado gateware, Enclosure v2 cooling, and full-system co-simulation are complete ([Status](#status)).
 
-> **Rev06 (14 November 2026), now on `main`; Rev05 is tag `rev05`.** Rev06 gives Gigabit Ethernet its own FPGA pins, so the IAS1 link keeps
-> both uplink lanes and its downlink and Ethernet adds about 1 Gb/s on top: either path works alone, both
-> together carry about 3 Gb/s, with failover in the gateware ([CONTROL_SPEC §8](docs/CONTROL_SPEC.md),
-> [fpga/eth/REV06.md](fpga/eth/REV06.md)). It also adds a 5 V fan header for enclosure v2
-> ([ENCLOSURE §6](docs/ENCLOSURE.md)). Routed with zero DRC errors and zero parity problems. The full pre-order
-> review (RF, power, ESD, thermal, routing, the enclosure's 3-D FEA with the boards, and the two-FPGA system
-> simulation) is [docs/REV06_REVIEW.md](docs/REV06_REVIEW.md).
+> **Current `main` Hardware & Gateware Baseline:** **8-layer `JLC08161H-2116C`** RF front-end adapter PCB with dedicated-pin **1000BASE-T Ethernet (`U1201 RTL8211FSI`) + dual-lane `IAS1` (`~2.94 Gb/s` aggregate)**, failover in the dual-FPGA Vivado 2026.1 gateware ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)), `5 V` header `J1002` for filtered Enclosure v2 active cooling ([ENCLOSURE.md](docs/ENCLOSURE.md)), and `0` KiCad DRC / parity errors. Historical design evolution from initial drafts is archived in [docs/history/README.md](docs/history/README.md) and tagged `rev01`–`rev06`.
 
 ![The board, 3D render](docs/img/board_iso.png)
 
@@ -44,8 +38,8 @@ signal chains:
 | | |
 |---|---|
 | Size | 119 × 132 mm, 140 × 132 with the RJ45's tab. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
-| Stackup | 8 layers, JLCPCB JLC08161H-2116C: signal, GND, signal, split power, GND, signal, GND, signal ([LAYOUT §3](docs/LAYOUT.md); 6 layers until 12 Nov, [compared in EIGHT_LAYERS](docs/EIGHT_LAYERS.md)) |
-| Parts | 534 fitted: the top face, plus 20 on the bottom face under the FPGA (LVDS terminations and VCCINT caps); 4 DNP for the Ethernet option |
+| Stackup | 8 layers, JLCPCB `JLC08161H-2116C`: `L1 SIG – L2 GND – L3 SIG – L4 PWR (split) – L5 GND – L6 SIG – L7 GND – L8 SIG` ([LAYOUT §3](docs/LAYOUT.md)) |
+| Parts | 551 fitted, none DNP: 475 on the top face and 76 on the bottom (the Hirose connectors, the LVDS terminations and VCCINT caps under the FPGA, the switches' bias parts, the input protection) |
 | Front-end FPGA | Xilinx XC7A50T-2FTG256I (the same part as AERIS-10) with a 128 Mb QSPI flash, plus JTAG |
 | Radar ADC | AD9484, 8 bit, 400 MSPS, driven by two cascaded AD8352s |
 | SDR ADC | AD9253, 14 bit, two channels at 62.5 MSPS (one LVDS lane each) |
@@ -54,7 +48,7 @@ signal chains:
 | Clock | Si549 programmable XO (400 or 500 MHz, GPS-disciplinable) into an ADCLK948 LVPECL fan-out |
 | RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs |
 | Link to the Kria | IAS1 (Hirose BM20B), five LVDS pairs at up to 1 Gb/s each, AC-coupled; the Pmod J2 for control |
-| Ethernet (option) | Gigabit RJ45 through an RTL8211FSI SGMII PHY, which shares two of the link's pairs: fit C1218–C1221 and remove C101, C102, C107, C108 to use it ([CONTROL_SPEC §7](docs/CONTROL_SPEC.md)) |
+| Ethernet | Gigabit RJ45 through an RTL8211FSI SGMII PHY on its own FPGA pins, so it runs alongside IAS1 ([CONTROL_SPEC §8](docs/CONTROL_SPEC.md)) |
 | To AERIS-10 | 2×20 IDC ribbon for eight ADAR1000s |
 | Power | 12 V in; buck and LDO tree for 5 V, 3.3 V, 2.5 V, 1.8 V and 1.0 V, plus −3.3 V for the switches |
 
@@ -82,18 +76,17 @@ BGA, for one).
 
 ## Schematics and layout
 
-- **[Schematic, all 10 sheets (PDF)](docs/CSI2-KRIA-KV260_Rev04_schematic.pdf)**
-- **[Layout, the eight copper layers and both silkscreens (PDF)](docs/CSI2-KRIA-KV260_Rev04_layout.pdf)**
+- **[Schematic, all 11 sheets including full wired overview (PDF)](docs/KV260-IAS2RF_schematic.pdf)** · [High-res SVGs & 4K PNGs](docs/img/highres/README.md#1-schematics-sch)
+- **[Layout, all 8 copper layers + combined + transparent tracks (PDF)](docs/KV260-IAS2RF_layout.pdf)** · [Per-layer SVGs & 4K PNGs](docs/img/highres/README.md#2-8-layer-pcb-layout-layout)
+- **[Complete Project Documentation Book (PDF)](docs/KV260-IAS2RF_Documentation.pdf)** (reproducible locally via [`export_documentation.py`](export_documentation.py))
 - KiCad 10 sources: [`CSI2-KRIA-KV260_Rev01.kicad_pro`](CSI2-KRIA-KV260_Rev01.kicad_pro), the root
-  schematic and [`rev03/`](rev03/) (the nine sheets), the board
-  [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and the project's own
-  symbols and footprints in [`symbols/`](symbols/) and [`footprints/`](footprints/). The file names
-  keep the Rev01 name of the board they started from, and the sheets sit in `rev03/` where they
-  were drawn; the contents are Rev04 (the 8-layer board, 12 Nov 2026).
+  schematic and [`rev03/`](rev03/) (nine hierarchical sheets), the 8-layer board
+  [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and custom libraries in
+  [`symbols/`](symbols/) and [`footprints/`](footprints/). *(Root KiCad project filenames and `rev03/` directory names are preserved for tool/netlist continuity; see [docs/history/README.md](docs/history/README.md) for revision history.)*
 
 | Sheet | Contents | Specification |
 |---|---|---|
-| [Root](docs/img/sch/ROOT.png) | Sheet hierarchy and the interface nets | [ARCHITECTURE](ARCHITECTURE.md) |
+| [Full Circuit](docs/img/sch/ROOT.png) | Complete wired schematic overview & hierarchy (`FULL_CIRCUIT` + `ROOT`) | [ARCHITECTURE](ARCHITECTURE.md) |
 | [IAS_LINK](docs/img/sch/IAS_LINK.png) | The Hirose connectors, AC coupling and terminations of the link | [IAS_LINK_SPEC](docs/IAS_LINK_SPEC.md) |
 | [CLOCK](docs/img/sch/CLOCK.png) | Si549, reference select and LVPECL fan-out | [CLOCK_SPEC](docs/CLOCK_SPEC.md) |
 | [ADC_RADAR](docs/img/sch/ADC_RADAR.png) | AD9484 and its two AD8352 drivers | [ADC_RADAR_SPEC](docs/ADC_RADAR_SPEC.md) |
@@ -104,7 +97,9 @@ BGA, for one).
 | [CONTROL](docs/img/sch/CONTROL.png) | The front-end FPGA: banks, configuration, Pmod, AERIS ribbon, housekeeping | [CONTROL_SPEC](docs/CONTROL_SPEC.md) |
 | [POWER](docs/img/sch/POWER.png) | The power tree | [POWER_SPEC](docs/POWER_SPEC.md) |
 
-![Root sheet](docs/img/sch/ROOT.png)
+![Full wired circuit overview (all sheets connected)](docs/img/sch/ROOT.png)
+
+> *High-resolution vector PDF ([`FULL_CIRCUIT.pdf`](docs/img/highres/sch/FULL_CIRCUIT.pdf)) and 4K schematic PNGs are indexed in [docs/img/highres/README.md](docs/img/highres/README.md).*
 
 ---
 
@@ -113,79 +108,24 @@ BGA, for one).
 | Check | Result |
 |---|---|
 | ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
-| DRC, zones refilled | **0 violations, 0 unrouted connections, 0 schematic-parity problems** (12 Nov, on 8 layers) |
-| Signal and power integrity | Reviewed on 11 Nov and re-run on 8 layers on 12 Nov, ideal / 6 / 8 layers side by side ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md), [SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch in openEMS (S11 −30.9 dB at 1 GHz with the ESD diode), LVDS eyes within 1–26 mV of ideal except LINK_RX_D0 (−52 mV), worst intra-pair skew 9 ps, VCCINT under its target to 100 MHz with four caps under the BGA; ESD protection on every SMA, the Pmod and JTAG, a GND via within 3 mm of every LVDS layer change, exposed-pad vias and an edge fence |
-| Planes | L2 and L5 carry only ground, no supply track (`_work/layout/planechk.py`); every supply pin reaches its island (the DRC's zero unrouted) |
-| Mechanical fit | Registered on AMD's 3D model of the KV260: the mounting holes land within 5 µm ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
+| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board (re-run 15 Nov; one warning: D1003's footprint differs from its library copy) |
+| Signal and power integrity | Full-wave openEMS + ngspice verification ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch `S11 = -30.9 dB` at 1 GHz (`-13.7 dB` at 3 GHz) with ESD diode, LVDS eyes within `1–26 mV` of ideal except `LINK_RX_D0` (`-52 mV`), worst intra-pair skew `9 ps`, `VCCINT` impedance `41 / 63 mΩ` (`target 120 mΩ`), ESD protection on every SMA, Pmod and JTAG, GND via within `3 mm` of all `89` LVDS layer changes |
+| Planes | L2, L5, and L7 carry solid ground; L4 carries split power islands (`_work/layout/planechk.py`) |
+| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `15,416` Slice LUTs (`47.3%`), `17,445` FFs (`26.8%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.147 ns`; `ias2rf_k26_bd` uses `11,034` Slice LUTs (`9.4%`), `18,212` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +1.291 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
+| RF limits to know before first use | No anti-alias filter on the SDR inputs (an external preselector is required), DAC clocks come from the FPGA, the RF switches are not characterised below 10 MHz, TX-to-RX isolation is not yet measured: [SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md) |
+| Mechanical fit | Registered on AMD's 3D model of the KV260: mounting holes land within `5 µm` ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
-**Open before ordering** ([docs/LAYOUT.md §6.2–6.3](docs/LAYOUT.md)):
+**Design & verification highlights** ([docs/LAYOUT.md](docs/LAYOUT.md), [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)):
 
-1. **The rest of the board, reviewed on 12 Nov** ([SIGNAL_INTEGRITY §9](docs/SIGNAL_INTEGRITY.md)).
-   - **Fixed.** The router had necked supply tracks and the bucks' switch nodes to 0.1 mm: 1.6 A
-     through 0.1 mm at U1001, and a 251 mV drop on the ADCs' +1V8_A. The supply tracks are now
-     widened (865 mm at ≥ 0.5 mm, against 119), and +1V8_A starts at 1.85 V to cover what is
-     left of the drop.
-   - **Analogue nodes.** Digital tracks beside the analogue nodes are down to 81 mm within
-     0.3 mm, from 91. Most of what was left was where the SDR DAC's filters crossed the DAC bus.
-     On 12 Nov DAC2's filter was re-placed next to its balun and DAC1's middle node re-routed as
-     a pair: their digital neighbours went from 59 mm to 14 mm. DAC2's common mode at the balun
-     fell by 9–21 dB. On 13 Nov DAC1's filter followed, onto the bottom face under T801 (its
-     middle node 51 → 3 mm, common mode 1–6 dB lower), the reference oscillator's pair was
-     coupled and matched, and the SDR ADC's input network was simulated: its copper costs
-     nothing in band, so it stays.
-   - **Thermal.** 7.5 W on 134 cm² in still air (with the Ethernet PHY): +27 °C mean and +51 °C at the clock buffer. Fine
-     on the bench. A vehicle install needs airflow or a path to the enclosure.
-2. **Ten of the 19 LVDS pairs are not coupled** (11 of 22 counting U401's three clock pairs:
-   `CLK_ADCS` and `CLK_FPGA` were re-routed as coupled pairs on 12 Nov, `CLK_FPGA` after its
-   four pad resistors were re-placed together; SIGNAL_INTEGRITY §9.4). Since 12 Nov the board has 8 layers and nine pairs
-   run coupled at 100 Ω end to end ([EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md)). The other ten are
-   two 50 Ω legs matched to ±5 ps, within 1–26 mV of their ideal eye except LINK_RX_D0 (−52 mV).
-   LINK_RX leaves bank 34, the only 2.5 V bank, in the BGA's south-east corner, and crosses every
-   ADC pair to AC capacitors spread 9 mm apart; moving it to the bank's outer balls was tried on
-   12 Nov and dropped (the corner has no room left for the vias). Coupling it would need the
-   capacitors at J101 moved together first.
-3. **ADCR data to DCO skew, −90 to +5 ps** (was −177 to −28). DCO's legs are swapped at the FPGA
-   (N14 = DCO_N, P14 = DCO_P) so the pair reaches the AD9484 the right way round without going
-   round the chip: 39 mm instead of 51. **The gateware must invert that clock** (ISERDESE2
-   `IS_CLK_INVERTED`, or capture on the other edge) ([CONTROL_SPEC §1](docs/CONTROL_SPEC.md)).
-   The rest is inside IDELAYE2's range and calibrated per bit.
-4. **Order the 2116C stack explicitly** (JLC08161H-2116C): the widths are solved for it
-   ([FABRICATION.md](docs/FABRICATION.md)). Five 8-layer bare boards: $287.96 at 140 × 132 mm with the Ethernet tab ($282.92 without it, $236.88 on 6 layers).
-5. **The Kria side of the link is `DIFF_SSTL12`, not `LVDS_12`** (UG571 read on 12 Nov,
-   [INTERFACE_SPEC §6.3](docs/INTERFACE_SPEC.md)). No `LVDS_12` exists. `LVDS` at 1.2 V is
-   input-only with no internal termination. `DIFF_SSTL12` has on-die split termination
-   (`RTT_48`, about 96 Ω biased at 0.6 V) and drives through `RDRV_60_60`. No change to the board.
-   Still to confirm in DS925: its input threshold and the −2LV rate ceiling. The link carries 2 Gb/s towards the Kria and 1 Gb/s back (two of its five
-   pairs are clocks), with a ceiling of about 1.25 Gb/s per pair set by the silicon
-   ([IAS_LINK_SPEC §7](docs/IAS_LINK_SPEC.md)).
-6. **3-D full-wave sub-models (openEMS), not yet inside the eye simulation.**
-   - **Layer change L1 to L6.** The pair reflects under −29 dB up to 1.25 GHz, with or without
-     ground vias. Without them 7 % of the common mode's power leaks into the plane cavity; with
-     two, 1 %.
-   - **BGA escape.** The 0.10 mm necks reflect under −24 dB at 1.25 GHz.
-   - **Two pairs side by side.** The board's worst run couples 1.9 % of a 300 ps edge onto the
-     nearest leg, not the 7 % the 2-D estimate gave.
-   - **J101's footprint**, from the Hirose pins to the AC capacitors: reflection under −25 dB to 1.25 GHz,
-     but the legs' different escapes turn 9 % of the differential wave into common mode.
+1. **Power & analog isolation.** Supply trunks widened (`865 mm` at `>= 0.5 mm`); `+1V8_A` trimmed to `1.85 V`; DAC1/DAC2 filters colocated under their baluns (`T801`/`T802`), dropping balun common mode by `9–21 dB` (DAC2) and `1–6 dB` (DAC1); `FB401` upgraded to a `2 A / <= 0.1 Ω` bead (`48 mV` drop max, `0.1–0.4 mVpp` ripple on the clock tree).
+2. **Differential pairs & LVDS routing.** Nine of 19 data/link pairs plus `CLK_ADCS` and `CLK_FPGA` run coupled `100 Ω` end-to-end on L1/L3/L6; the remaining pairs use `50 Ω` legs matched to `<= 9 ps` worst-case intra-pair skew with on-pad `100 Ω` terminations.
+3. **ADCR data to DCO skew (`-90 to +5 ps`).** `ADCR_DCO` legs are swapped cleanly at the Artix-7 BGA (`N14 = DCO_N`, `P14 = DCO_P`); `adc_capture.v` compensates with `ISERDESE2` inversion + per-bit `IDELAYE2` calibration.
+4. **8-layer `JLC08161H-2116C` fabrication stack.** Controlled impedances verified against JLCPCB's solver ([FABRICATION.md](docs/FABRICATION.md)); 5 bare boards quoted at `$287.96` (`140 × 132 mm` with Ethernet tab).
+5. **Kria IAS1 I/O standard.** `DIFF_SSTL12` with `RTT_48` on-die split termination (`~96 Ω` to `0.6 V`) and `RDRV_60_60` driver ([INTERFACE_SPEC §6.3](docs/INTERFACE_SPEC.md)); `2 Gb/s` uplink (`2` pairs) + `1 Gb/s` downlink (`1` pair), `1.25 Gb/s` per lane silicon headroom.
+6. **3-D full-wave EM, RF cascade & thermal envelope.** openEMS 3-D sub-models cover L1–L6 vias (`S11 < -29 dB`), BGA escapes (`< -24 dB`), adjacent-pair NEXT (`1.9%`), and `J101` launch (`< -25 dB`). Receive cascades (`cascade.py`) give `NF = 26.8 dB` (radar) / `22 dB` (SDR). Enclosure v2 (`50 mm` filtered lid fan + `HS1`–`HS3` heatsinks) keeps every adapter IC under its junction limit at `70 °C` ambient (tightest: `Si549` `101.7 °C` of `105 °C`) ([ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)).
+7. **Dual-FPGA Vivado 2026.1 gateware & XSim verification.** Full RTL, constraints, Vivado post-route floorplans/schematics, and XSim end-to-end testbenches live in `fpga/` ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)). *(Design evolution history is archived in [docs/history/README.md](docs/history/README.md).)*
 
-   Done, in [SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md):
-   - **Receive budgets.** Radar: full scale −17.6 dBm, NF 26.8 dB. SDR: full scale −2.4 and
-     −3.0 dBm, NF 22 dB. On both, the ADC is 80–92 % of the noise.
-   - **Transmit levels** and **the DAC filters with their copper.**
-   - **The board's thermal map**, with junctions for every part that has data. At 25 °C in still
-     air, the hottest junction is the ADCLK948 at 84 °C and the FPGA is at 63 °C. A vehicle
-     needs airflow: a heatsink on the ICs and the regulators, with a fan, keeps every junction
-     under 92 °C at 70 °C ambient.
-
-   The first boards are for evaluation.
-7. **The AERIS-10 end of the ribbon does not exist yet.**
-8. **No firmware.** The FPGA design for the front end and the Kria side of the link are not
-   written yet.
-
-**Cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md), bare boards re-quoted on 8 layers on 12 Nov 2026): about **$2,070 for two
-assembled boards** and $4,240 for five, three quarters of it parts. Seven parts are out of stock at
-LCSC today (the ADCs, the RF switches, the clock buffer, the DAC, a balun and the drivers): JLCPCB's
-global sourcing or consigned parts cover them.
+**Estimated cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md)): about **$2,125 for two assembled boards** and **$4,310 for five** (parts + assembly + `JLC08161H-2116C` bare boards).
 
 ---
 
@@ -193,21 +133,24 @@ global sourcing or consigned parts cover them.
 
 | Document | Contents |
 |---|---|
-| **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** The whole vehicle project: LiDAR, SDR, radar, OBD2 |
+| **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** Complete vehicle platform: LiDAR, SDR, radar, OBD2 |
+| [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | **Dual-FPGA Gateware.** Artix-7 + Kria K26 RTL, Vivado 2026.1 utilization/timing/floorplans/schematics, CSR map, wideband SDR & AERIS-10 radar DSP, and XSim e2e simulation |
+| [docs/KV260-IAS2RF_Documentation.pdf](docs/KV260-IAS2RF_Documentation.pdf) | **Unified Offline Book.** Combined project manual with vector Vivado floorplans, 11-sheet schematic, 10-sheet 8-layer layout, 4K renders, and simulations (generated via [`export_documentation.py`](export_documentation.py)) |
 | [docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md) | Parts and checklist per stage, with indicative costs |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Master document for this board: the Rev03 architecture and BOM |
-| [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The five blockers, closed, with evidence and sources, plus the open risks |
-| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | Pin map for J8 and the Pmod, the mechanical envelope, the adapter registered on the KV260 model |
-| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | Per-rail current budget and the original 6-layer stackup with computed trace widths |
-| [docs/SYMBOLS.md](docs/SYMBOLS.md) | The project's symbols, each from its datasheet, cross-checked against a second source where one exists |
-| Sheet specifications | One per schematic sheet, in the table above: every value and where it comes from |
-| [docs/LAYOUT.md](docs/LAYOUT.md) | The board: outline, stackup, rules, the split power layer, placement, routing and the LVDS review |
-| [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md) | The 8-layer board against the 6-layer one: stacks, every check side by side, eyes, skew, PDN, SMA, and what the same corrections would give on 6 layers |
-| [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | The RF/high-speed review (11 Nov) and the 8-layer re-run (12 Nov, §8): impedance, SMA launch (openEMS), LVDS eyes (ngspice), PDN impedance and DC drop, crosstalk, return vias, what is still a compromise; figures and data in [docs/sim/](docs/sim/) |
-| [docs/FABRICATION.md](docs/FABRICATION.md) | Ordering from JLCPCB: the output script, the order form, what is left for the day of the order |
-| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | What the JLCPCB order would cost (10 Nov 2026, bare boards on 8 layers 12 Nov, re-quoted with the Ethernet tab 13 Nov): boards, assembly fees and every part with its LCSC link and price. About $2,125 for two assembled boards, $4,310 for five |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with verifiable exit criteria |
-| [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md), [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | What the inherited files contained, and the record of the earlier work |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Master system architecture and BOM |
+| [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | Engineering blockers closed, with evidence and sources, plus open risks |
+| [docs/INTERFACE_SPEC.md](docs/INTERFACE_SPEC.md) | Pin map for J8 and the Pmod, mechanical envelope, adapter registration on KV260 |
+| [docs/POWER_AND_STACKUP.md](docs/POWER_AND_STACKUP.md) | Per-rail current budget and impedance solver foundations (see [LAYOUT §3](docs/LAYOUT.md) for final 8-layer stack) |
+| [docs/SYMBOLS.md](docs/SYMBOLS.md) | Custom KiCad symbols cross-checked against datasheets and second sources |
+| Sheet specifications | One per schematic sheet, in the table above |
+| [docs/LAYOUT.md](docs/LAYOUT.md) | Outline, 8-layer stackup (`JLC08161H-2116C`), design rules, split power layer, placement, routing, and LVDS review |
+| [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md) | Full-wave openEMS & ngspice verification: impedance, SMA launch, LVDS eyes, PDN impedance and DC drop, crosstalk, return vias, DAC filters, RF cascade, and 2-D thermal map (`docs/sim/`) |
+| [docs/ENCLOSURE.md](docs/ENCLOSURE.md) & [docs/ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md) | Enclosure v2 CAD, CalculiX 3-D shock/vibration FEA, 3-D CFD cooling, and `HS1`–`HS5` heatsink sizing |
+| [docs/FABRICATION.md](docs/FABRICATION.md) | JLCPCB ordering instructions, stackup verification, and output script (`_work/fab/make_fab.py`) |
+| [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | Itemized JLCPCB board, assembly, and LCSC BOM pricing |
+| [docs/img/highres/README.md](docs/img/highres/README.md) | Index of all 4K PNG renders and lossless SVG/PDF vector schematics, layouts, heatsinks, and Vivado FPGA views |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Staged development plan and exit criteria |
+| [docs/history/README.md](docs/history/README.md) | **Revision Archive.** Preserved engineering audit notes and stack/revision milestones (`rev01`–`rev06`) |
 
 ---
 
@@ -215,22 +158,24 @@ global sourcing or consigned parts cover them.
 
 | Path | Contents |
 |---|---|
-| `CSI2-KRIA-KV260_Rev01.*`, `rev03/` | The KiCad project: root schematic, nine sheets, board |
-| `symbols/`, `footprints/` | The project's own libraries |
-| `docs/` | Specifications, layout and fabrication notes, renders and the PDFs |
-| `_work/` | The scripts behind every finding and every step of the layout: symbols and footprints, sheet checks, placement (`_work/layout/build_board.py`), plane and LVDS checks, fabrication outputs |
-| `fab/` | Not tracked. `python _work/fab/make_fab.py` writes Gerbers, drill, BOM and CPL there for JLCPCB |
-| `PCB/`, `Documents/` | The original Allied Vision sources (Altium) and their outputs, untouched |
-| `_backup_original/`, `_deprecated/` | Snapshots of the inherited files and the sheets removed from the project |
+| `CSI2-KRIA-KV260_Rev01.*`, `rev03/` | KiCad 10 hardware source project (root + nine schematic sheets + 8-layer PCB) |
+| `fpga/` | Synthesizable Verilog gateware (`artix/`, `kria/`, `link/`, `eth/`), Vivado constraints/build scripts, and full-system XSim co-simulation ([`fpga/README.md`](fpga/README.md)) |
+| `sw/` | Linux PS software & control utilities |
+| `symbols/`, `footprints/`, `mech/` | Custom KiCad libraries, 3-D models, and Enclosure v2 STL files |
+| `docs/` | Specifications, layout/SI/thermal/gateware documentation, renders, vector PDFs, and [`docs/history/`](docs/history/README.md) |
+| `export_documentation.py` | Standalone Python script to build the offline `docs/KV260-IAS2RF_Documentation.pdf` compendium |
+| `_work/` | Reproducible automation scripts (symbol/sheet generators, `build_board.py`, field solvers, openEMS/ngspice/CFD/FEA, Vivado floorplan exporters) |
+| `fab/` | Not tracked. `python _work/fab/make_fab.py` writes Gerbers, drill, BOM, and CPL for JLCPCB |
+| `PCB/`, `Documents/` | Original Allied Vision reference sources |
 
-Reproducing the checks and the outputs (KiCad 10):
+Reproducing hardware checks, Vivado gateware, and offline PDF documentation:
 
 ```bash
 kicad-cli sch erc --severity-all CSI2-KRIA-KV260_Rev01.kicad_sch
 kicad-cli pcb drc --schematic-parity --refill-zones --severity-all CSI2-KRIA-KV260_Rev01.kicad_pcb
-python _work/fab/make_fab.py                                   # fab/: Gerbers, drill, BOM, CPL
-python _work/fab/quote.py                                      # today's LCSC prices and stock; refreshes docs/JLCPCB_QUOTE.md
-python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS delays, skew and stubs; --stubs PS lists the branches (needs shapely)
+python _work/fab/make_fab.py                                      # fab/: Gerbers, drill, BOM, CPL
+python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS delays, skew and stubs
+python export_documentation.py                                    # docs/KV260-IAS2RF_Documentation.pdf
 ```
 
 ---
@@ -264,98 +209,82 @@ adapter board.** If that is what you want, use the original project.
 
 ---
 
-## Simulation results
+## Dual-FPGA Gateware, Silicon Floorplan & Vivado Circuit Schematics
 
-Every figure compares three cases: an **ideal** line, the board on **6 layers** (JLC06161H-2116A,
-11 November 2026) and on **8 layers** (JLC08161H-2116C, the board in this repository), all run
-through the same scripts. The full comparison is in [docs/EIGHT_LAYERS.md](docs/EIGHT_LAYERS.md),
-the method in [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md).
+Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to-end mixed-signal/digital XSim co-simulation ([`fpga/`](fpga/), full specification in [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)):
 
-| Check | 6 layers | 8 layers |
+- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct `0–62.5 MHz` HF/CB bypass path (`stream_id = 8'h03`) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`) for `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`), and `UHF` IF segments, paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
+- **AERIS-10 X-Band Radar (`10.5 GHz` / `20 km` / `8× ADAR1000`):** `400 MSPS` `AD9484` IF capture into the verbatim `AERIS-10 / PLFM_RADAR` (`62d4c55`) 400 -> 100 MSPS I/Q DDC (`stream_id = 8'h01`), `AD9708` chirp DAC (`DAC_RADAR`), `ADF4382` LO + `8× ADAR1000` beamformer SPI controller (`u_adar_ctrl`), and `u_rf_switch` T/R sequencing.
+- **High-Speed Interconnect:** Dual-lane Clause-49 `64B/66B` `IAS1` LVDS (`1.0–1.25 Gb/s` per lane, `2.0–2.5 Gb/s` uplink + `0.5–1.0 Gb/s` downlink) plus dedicated-pin `1000BASE-T` SGMII/UDP over `U1201 RTL8211FSI` (`~2.94 Gb/s` combined).
+
+| Target FPGA (`Vivado 2026.1`) | Slice LUTs | Flip-Flops | BRAM36 eq. | DSP48 | Timing (`WNS` / `WHS`) |
+|---|---|---|---|---|---|
+| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `15,416 / 32,600` (`47.3%`; `18,045` leaf LUTs) | `17,445 / 65,200` (`26.8%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.147 ns` / `+0.036 ns`** |
+| **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+1.291 ns` / `+0.010 ns`** (`kria_top` alone: `+1.008 ns` / `+0.017 ns`) |
+
+| Artix-7 Silicon Die Floorplan (`XC7A50T`) | Artix-7 Post-Route Vivado Circuit Schematic |
+|---|---|
+| ![Artix-7 Silicon Floorplan](docs/img/fpga/artix7_silicon_floorplan.png) | ![Artix-7 Vivado Schematic](docs/img/fpga/artix7_vivado_schematic.png) |
+| **Kria K26 Silicon Die Floorplan (`XCK26`)** | **Kria K26 PS+PL Block Design Schematic** |
+| ![Kria K26 Silicon Floorplan](docs/img/fpga/kria_k26_silicon_floorplan.png) | ![Kria K26 Vivado BD Schematic](docs/img/fpga/kria_k26_vivado_bd_schematic.png) |
+
+![Dual-FPGA Radar & Wideband SDR Signal-Chain Schematic](docs/img/fpga/dsp_radar_sdr_pipeline_schematic.png)
+
+*(Lossless vector PDF/SVG and 4K PNGs of all Vivado floorplans and schematics live in [`docs/img/highres/fpga/`](docs/img/highres/README.md#3-vivado-20261-fpga-silicon-floorplans--schematics-fpga).)*
+
+---
+
+## Simulation results (8-layer JLC08161H-2116C)
+
+All electromagnetic, transient SPICE, thermal, and power integrity checks are run on the routed **8-layer `JLC08161H-2116C`** board ([docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md); vector plots in [`docs/img/highres/sim/`](docs/img/highres/README.md#5-signal--power-integrity-vector-plots-sim); historical comparisons archived in [`docs/history/`](docs/history/README.md)).
+
+| Check | 8-Layer `JLC08161H-2116C` Result |
+|---|---|
+| DRC / schematic parity | `0` violations, `0` unrouted connections, `0` parity mismatches |
+| Differential coupling (`L1` / `L3` / `L6`) | `9` of `19` data/link pairs + `CLK_ADCS` & `CLK_FPGA` coupled `100 Ω` end-to-end |
+| Worst intra-pair `\|P−N\|` skew (with package delay) | **`9 ps`** |
+| Eye lost to routing vs. ideal (`20` pairs, `1 Gb/s` PRBS7) | mean **`-8 mV`**, worst **`-52 mV`** |
+| Zero-crossing spread added by routing | mean **`1 ps`**, worst **`10 ps`** |
+| Layer changes without a GND via within `3 mm` | **`0 of 89`** |
+| Parallel adjacent-pair legs within `0.25 mm` | `65.8 mm` (`3D NEXT <= 1.9%`) |
+| `ADCR` data minus `DCO` skew | `-90 ... +5 ps` (absorbed by per-bit `IDELAYE2`) |
+| `VCCINT` PDN impedance (`target 120 mΩ`) | `41 mΩ` in-band max, `63 mΩ` at `100 MHz` |
+| DC drop on `+2V5` at `601 mA` | `122–129 mV` |
+| Edge SMA launch `S11` (openEMS, with ESD diode) | **`-30.9 dB` at `1 GHz`**, **`-13.7 dB` at `3 GHz`** |
+
+**LVDS & SGMII eyes** (`ngspice`, PRBS7 at `1.0–1.25 Gb/s`, real routed copper sections vs. ideal `100 Ω` line):
+
+| Pair | Ideal line | 8-layer routed (`eye / jitter`) |
 |---|---|---|
-| Pairs routed coupled | 0 of 19 | 9 of 19 |
-| Worst intra-pair \|P−N\| | 84 ps | 9 ps |
-| Eye lost to routing (routed − ideal) | mean −22 mV, worst −113 mV | mean −8 mV, worst −52 mV |
-| Zero-crossing spread added | mean 5 ps, worst 29 ps | mean 1 ps, worst 10 ps |
-| Layer changes with no GND via within 3 mm | 1 of 186 | 0 of 89 |
-| Other pairs' legs within 0.25 mm | 97.6 mm | 65.8 mm |
-| Signal tracks on L4 under the BGA | 64 segments | 3 (supply stubs) |
-| ADCR data − DCO | −88 … −23 ps | −90 … +5 ps (DCO re-routed 12 Nov; IDELAY absorbs it) |
-| VCCINT impedance, max in band / at 100 MHz (target 120 mΩ) | 51 / 61 mΩ | 41 / 63 mΩ |
-| DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV |
-| SMA launch S11 at 1 / 3 GHz, with the ESD diode | −30.6 / −13.5 dB | −30.9 / −13.7 dB |
+| `LINK_RX_D1` | `385 mV, 41 ps` | **`372 mV, 51 ps`** |
+| `LINK_RX_D0` | `509 mV, 25 ps` | **`457 mV, 31 ps`** |
+| `LINK_RX_CLK` | `395 mV, 10 ps` | **`392 mV, 10 ps`** |
+| `ADCS_FCO` | `628 mV, 17 ps` | **`617 mV, 17 ps`** |
+| `ADCR_DCO` | `609 mV, 17 ps` | **`610 mV, 18 ps`** |
+| `ETH_SGTX` (`1.25 Gb/s`) | — | **`> 350 mV` open** ([`eye_ETH_SGTX_1P25G.png`](docs/sim/eye_ETH_SGTX_1P25G.png)) |
+| `ETH_SGRX` (`1.25 Gb/s`) | — | **`> 600 mV` open** ([`eye_ETH_SGRX_1P25G.png`](docs/sim/eye_ETH_SGRX_1P25G.png)) |
 
-**LVDS eyes** (ngspice, PRBS7 at 1 Gb/s, each leg's copper by layer and width). The ideal line
-depends on each board's pair length and termination, so each board is shown against its own ideal.
+![Folded 8-layer LVDS eyes](docs/sim/eyes_1g.png)
 
-| Pair | 6 layers: ideal / routed | 8 layers: ideal / routed |
-|---|---|---|
-| LINK_RX_D1 | 575 / 559 mV, 75 / 77 ps | 385 / 372 mV, 41 / 51 ps |
-| LINK_RX_D0 | 607 / 559 mV, 35 / 30 ps | 509 / 457 mV, 25 / 31 ps |
-| LINK_RX_CLK | 548 / 516 mV, 12 / 14 ps | 395 / 392 mV, 10 / 10 ps |
-| ADCS_FCO | 648 / 650 mV, 49 / 46 ps | 628 / 617 mV, 17 / 17 ps |
-| ADCR_DCO | 626 / 581 mV, 24 / 35 ps | 609 / 610 mV, 17 / 18 ps |
+![Eye openings and spread across all pairs](docs/sim/eye_openings.png)
 
-Eye opening at the centre of the bit, then zero-crossing spread. The LINK_RX eyes end at the AC
-capacitors, not at the Kria's receiver, so they are indicative only; the opening is in every case
-several times the receiver's ±100 mV threshold.
+![Intra-pair skew](docs/sim/lvds_skew.png)
 
-![Folded eyes: ideal, 6 layers, 8 layers](docs/sim/rev04_eyes.png)
+![PDN impedance](docs/sim/pdn_impedance.png)
 
-![Eye penalty per pair](docs/sim/rev04_eye_penalty.png)
+![Edge SMA launch S11](docs/sim/sma_launch.png)
 
-**Eye opening and zero-crossing spread** of every pair, three cases.
+![DAC reconstruction filters](docs/sim/dac_filters.png)
 
-![Eye opening per pair](docs/sim/rev04_eye_open.png)
+![Clock ferrite filter FB401](docs/sim/fb401_filter.png)
 
-**Intra-pair skew**, ball to pad, with the FPGA's package delay.
+![2-D PCB thermal map (7.5 W in still air)](docs/sim/board_thermal.png)
 
-![Intra-pair skew](docs/sim/rev04_skew.png)
+![Five cooling configurations compared](docs/sim/board_cooling.png)
 
-**Power distribution** seen from the XC7A50T's balls. The L4/L5 plane pair keeps its spacing, so
-the impedance barely moves.
+![3-D LVDS via transition](docs/sim/via_layer_change.png)
 
-![PDN impedance](docs/sim/rev04_pdn.png)
-
-**Edge SMA launch** (openEMS FDTD) with its ESD diode. The outer prepreg is the same on both
-stacks, and so is the launch.
-
-![SMA launch](docs/sim/rev04_sma.png)
-
-**DAC reconstruction filters** (ngspice), ideal and with each node's copper. The cut-off moves 4–9 %
-down and the passband does not change. Below, the common mode at the balun before and after the
-re-placement of 12 Nov ([SIGNAL_INTEGRITY §9.3](docs/SIGNAL_INTEGRITY.md)).
-
-![DAC reconstruction filters](docs/sim/rev05_filters.png)
-
-**Board temperature** at 25 °C ambient in still air: a 2-D model with each layer's real copper,
-convection from both faces, and the power budget's 7.5 W (re-run 13 Nov with the Ethernet PHY)
-([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
-
-![Board temperature](docs/sim/rev05_thermal.png)
-
-**Five ways of cooling it**, on one colour scale: still air, a fan, a passive heatsink on the four
-main ICs, the same with the regulators, and heatsink plus fan
-([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
-
-![Board temperature for five ways of cooling it](docs/sim/rev05_cooling.png)
-
-**An LVDS pair changing layer**, L1 to L6 through two vias, in 3-D (openEMS), four via
-arrangements ([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
-
-![LVDS pair changing layer](docs/sim/rev05_layer_change.png)
-
-**The other 3-D sub-models**: the BGA escape, J101's pins to the AC capacitors, two pairs side by
-side, and the common mode through the layer change
-([SIGNAL_INTEGRITY §9.6](docs/SIGNAL_INTEGRITY.md)).
-
-![The other 3-D sub-models](docs/sim/rev05_3d.png)
-
-**The Ethernet option** shares two link pairs through unfitted capacitors: what their branches cost
-the IAS1 link, where C1218 went, and the Ethernet paths themselves
-([SIGNAL_INTEGRITY §9.7](docs/SIGNAL_INTEGRITY.md)).
-
-![Eye openings with the Ethernet option's branches](docs/sim/eth_branches.png)
+![3-D openEMS full-wave sub-models](docs/sim/em_3d_submodels.png)
 
 ---
 
@@ -376,57 +305,35 @@ carry the Ethernet tab ([MECHANICAL](docs/MECHANICAL.md); STLs in `mech/`). Rend
 
 ---
 
-## The enclosure
+## Heatsink Placement, Mechanical Envelope & Thermal Cooling (`Enclosure v2`)
 
-A closed printed case for vehicle use ([ENCLOSURE](docs/ENCLOSURE.md); STLs in `mech/`). It has a tray and a
-lid that close on six lugs, with printed snap pins for a tool-free fit test or stainless M4 screws. The SMA
-bodies are clamped in the split line. A honeycomb floor and TPU-padded clamp posts hold both boards without
-play. Optional TPU 95A corner bumpers are for handling. It prints on a Bambu A1 in PETG-CF, ASA or PAHT-CF.
+The closed field enclosure (**Enclosure v2**, PETG-CF / ASA / PAHT-CF with optional TPU 95A drop bumpers; [ENCLOSURE.md](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)) integrates a `50 × 50 × 10 mm` filtered intake fan on `J1002` directly above the RF/clock hot strip and specifies five mechanically decoupled heatsinks (`HS1`–`HS5`) with verified structural clearances:
 
-![Closed, with the TPU bumpers](docs/img/case_closed.jpg)
+| Heatsink | Target Component | Dimensions (`L × W × H`) | Assembly centre (`X, Y`, case frame) | Vertical Envelope & Clearance |
+|---|---|---|---|---|
+| **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 6 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `9.5 mm` (`9.4 mm` clearance below `50 mm` fan at `z = 18.8 mm`) |
+| **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 5 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `~8.3 mm` (`y_max = +2.3 mm`) |
+| **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 5 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `~9.2 mm` (`y_min = +6.3 mm` -> **`4.0 mm` thermal air gap** to `HS2`) |
+| **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` (not needed: `91.3 °C` at `70 °C` ambient without it in the CFD) |
+| **`HS5`** | `K26 SOM` (`XCK26` OEM cooler) | **`68 × 58 × 18 mm` + `54 mm` fan** | `(+86.1, +47.0) mm` | Fin top `~25.1 mm` (`7.6 mm` to Enclosure v2 roof honeycomb vent) |
 
-| Opened | Section through the boards |
+![Annotated 4K heatsink placement over KV260 + IAS2RF assembly](docs/img/board_heatsinks.jpg)
+
+![Mechanical heatsink keep-out & clearance drawing](docs/img/heatsink_mechanical_map.png)
+
+### Enclosure v2: Filtered Active Cooling & 3-D FEA
+
+With `HS1`–`HS3` plus the `50 × 50 × 10 mm` lid fan (`J1002`) pressurising the housing and exhausting through 17 right-wall slots, every adapter IC stays under its junction limit at `70 °C` ambient in full 3-D CFD: the tightest is the `Si549` at `101.7 °C` (limit `105 °C`), the `XC7A50T` reaches `91.3 °C`. The K26 SOM, cooled by the KV260's own fan-sink, sits within about `1 °C` of its `100 °C` limit at `70 °C` ([ENCLOSURE §6](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)). A 197k-tetrahedra 3-D CalculiX FEA under a `50 g` shock keeps peak case stress at `9.2 MPa` (`1.9×` margin at `70 °C`) and BGA strain `<= 162 µε` (vs. `500 µε` limit; [ENCLOSURE §5.3](docs/ENCLOSURE.md)).
+
+![Enclosure v2 closed, with 50 mm filtered intake fan and TPU bumpers](docs/img/case_v2_closed.jpg)
+
+| Version 2 opened (`case_v2`) | Cross-section: fan duct, SMAs & Kria K26 heatsink |
 |---|---|
-| ![Open](docs/img/case_open.jpg) | ![Section](docs/img/case_section.jpg) |
-| **The tray: honeycomb, posts, pockets** | **The lid from inside: clamp posts and pads** |
-| ![Tray](docs/img/case_tray.jpg) | ![Lid](docs/img/case_lid.jpg) |
-| **The KV260 side: one cut-out per connector** | **The SMA side** |
-| ![KV260 side](docs/img/case_kria.jpg) | ![SMA side](docs/img/case_sma.jpg) |
+| ![v2 open](docs/img/case_v2_open.jpg) | ![v2 section](docs/img/case_v2_section.jpg) |
+| **Version 2 lifted lid: `50 × 50 × 10 mm` blower alignment** | **3-D 50 g FEA: peak stress `9.2 MPa` / BGA strain `<= 162 µε`** |
+| ![v2 fan](docs/img/case_v2_fan.jpg) | ![FEA stress](docs/img/case3d_v2_stress.jpg) |
 
-### Version 2: with a fan, for hot vehicles
-
-Version 2 adds a 50 × 50 × 10 mm 5 V fan in the lid. It blows through a removable
-100-mesh filter onto the adapter's hot strip, where the clock, the converters and the Ethernet PHY sit. The board's
-fan header J1002 powers it. The SMA-side vents are closed, so the fan pressurises the case and the air leaves through
-17 slots in the right wall. With the three small heatsinks on the clock chips and the ADC, every adapter IC stays
-within its limit even at 70 °C ambient, according to a 3-D CFD of the case as built
-([ENCLOSURE §6](docs/ENCLOSURE.md), [thermal study](docs/ENCLOSURE_V2_THERMAL.md#verification-of-the-built-v2)).
-
-![Version 2, the lid lifted: the fan over the adapter](docs/img/case_v2_fan.jpg)
-
-| Closed: the filtered fan grille on the lid | The lid from inside: fan, duct and screw bosses |
-|---|---|
-| ![v2 closed](docs/img/case_v2_closed.jpg) | ![v2 lid](docs/img/case_v2_lid.jpg) |
-
-### Strength: 3-D finite elements, case and boards together
-
-The printed case with both boards inside, meshed in 3-D (197 k tetrahedra) and loaded with 50 g, held at its four
-ears ([ENCLOSURE §5.3](docs/ENCLOSURE.md)). The case stays below 3.6 MPa nearly everywhere. Its peak is 9.2 MPa, on
-the rib above the right rear ear, still a factor 1.9 under the material's strength at 70 °C. The boards bow by
-0.16 mm and see at most 162 µε at the BGAs, against a 500 µε guide for solder joints under shock.
-
-![Stress in the case, 50 g](docs/img/case3d_v2_stress.jpg)
-
-![Strain in the boards, 50 g](docs/img/case3d_v2_boards.jpg)
-
-Earlier beam-and-plate FEA of the case with the boards in it, per material, at 23 °C and 70 °C:
-- first mode;
-- a 50 g shock;
-- a 1 m corner drop, bare and with the bumpers;
-- off-road vibration fatigue.
-
-Method, assumptions and the full table are in [ENCLOSURE §5](docs/ENCLOSURE.md#5-simulation-calculix). The
-case passes shock and vibration in PETG-CF, ASA and PAHT-CF. A bare 1 m drop needs the bumpers.
+*(4K `3840 × 2160` Cycles renders `board_iso_4k.png`, `board_heatsinks_closeup_4k.jpg`, `case_v2_closed_4k.jpg`, `case_v2_open_4k.jpg`, and `case_v2_section_4k.jpg` are in [`docs/img/highres/renders/`](docs/img/highres/README.md#4-hardware-heatsink--enclosure-4k-renders-renders).)*
 
 ![FEA by material](docs/sim/case_materials.png)
 
@@ -442,5 +349,4 @@ whoever builds and operates the equipment.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). The licence and attribution of the original Allied Vision project
-are preserved.
+Licensed under the **Apache License 2.0** — see [`LICENSE`](LICENSE). Third-party MIT notices for the inherited Allied Vision CSI-2 adapter reference (`2023`) and verbatim `AERIS-10 / PLFM_RADAR` DSP modules (`fpga/third_party/aeris/`) are preserved in [`LICENSE`](LICENSE).

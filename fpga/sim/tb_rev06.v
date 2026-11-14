@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Concurrent Rev06 Dual-Path Testbench:
 //   - Full artix_top (ENABLE_ETH=1, BYPASS_AN=0, 2-lane IAS1 + 1.25 Gb/s SGMII ETH)
 //   - Behavioral Kria IAS1 RX/TX (IDELAYE3 + ISERDESE3 + link_rx_train_fsm + link_pcs_rx)

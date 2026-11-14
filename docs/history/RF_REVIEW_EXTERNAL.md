@@ -3,8 +3,8 @@
 **Reviewer:** independent review (gateware and hardware verification audit)  
 **Target:** `CSI2-KRIA-KV260_Rev01.kicad_pcb`, `CSI2-KRIA-KV260_Rev01.kicad_sch`, `rev03/*.kicad_sch`, `CSI2-KRIA-KV260_Rev01.kicad_dru`, `CSI2-KRIA-KV260_Rev01-erc.rpt`, and `docs/*.md`  
 **Verification Scripts:**
-- [`fpga/review/parse_pcb_rf_audit.py`](../fpga/review/parse_pcb_rf_audit.py) — deterministic S-expression extraction of stackup, zone boundaries, via fences, exposed-pad thermal vias, SMA launch order, differential pair lengths/skews/split-plane crossings, and schematic netlists across all 9 sheets.
-- [`fpga/review/calc_rf_si_margins.py`](../fpga/review/calc_rf_si_margins.py) — closed-form analytical EM (Hammerstad-Jensen microstrip, Wadell CBCPW, Cohn/Wheeler conformal asymmetric stripline), 2-port ABCD ladder filter analysis, Friis/IIP3 RF cascades, aperture-jitter SNR, automotive ISO pulse withstand, and thermal junction estimates.
+- [`fpga/review/parse_pcb_rf_audit.py`](../../fpga/review/parse_pcb_rf_audit.py) — deterministic S-expression extraction of stackup, zone boundaries, via fences, exposed-pad thermal vias, SMA launch order, differential pair lengths/skews/split-plane crossings, and schematic netlists across all 9 sheets.
+- [`fpga/review/calc_rf_si_margins.py`](../../fpga/review/calc_rf_si_margins.py) — closed-form analytical EM (Hammerstad-Jensen microstrip, Wadell CBCPW, Cohn/Wheeler conformal asymmetric stripline), 2-port ABCD ladder filter analysis, Friis/IIP3 RF cascades, aperture-jitter SNR, automotive ISO pulse withstand, and thermal junction estimates.
 
 ---
 
@@ -183,7 +183,7 @@ python fpga/review/calc_rf_si_margins.py
 2. **IBIS / IBIS-AMI Time-Domain Eye Margins (`1 Gbps` `IAS_LINK`, `1.25 Gbps` `ETH_SG*`):** Without Artix-7, RTL8211FSI, and KV260 SOM internal package flight-time models + IBIS-AMI transmitter/receiver equalization models, static PCB length skew alone cannot certify closed vs open eye height/width across PVT corners. *(Gateware dynamic IDELAYE3 training recovers static skew cleanly, provided channel jitter and ISI remain within the ~2 ns / 1 ns UI eye.)*
 3. **PDN Target Impedance `Z(f)` & Measured Transient Load Step:** Verified rail topology, buck switching frequencies, and bypass capacitance counts from schematics, but did not simulate frequency-domain PDN impedance poles/anti-resonances with vendor MLCC ESL/ESR DC-bias derating models (`0402/0603/1210`).
 4. **3D Structural Modal / Shock-Response FEA & Thermal CFD:** The bare FR4 fundamental plate frequency (`~258 Hz`) highlights mechanical risk, but exact resonant shift under the bolted Kria KV260 SOM + heatsink (center-of-mass eccentricity, standoffs, connector stiffness) and forced convection / solar enclosure temperatures require SolidWorks/ANSYS FEA + CFD.
-5. **Internal KV260 SOM Carrier Stackup & Connector Routing:** Evaluated carrier pins (`J101/J102`) strictly against [`fpga/kria/xck26.xdc`](../fpga/kria/xck26.xdc) and [`docs/PINMAP.md`](PINMAP.md) without Xilinx internal K26 SOM KiCad/Allegro CAD sources.
+5. **Internal KV260 SOM Carrier Stackup & Connector Routing:** Evaluated carrier pins (`J101/J102`) strictly against [`fpga/kria/xck26.xdc`](../../fpga/kria/xck26.xdc) and [`fpga/link/PINMAP.md`](../../fpga/link/PINMAP.md) without Xilinx internal K26 SOM KiCad/Allegro CAD sources.
 
 ---
 

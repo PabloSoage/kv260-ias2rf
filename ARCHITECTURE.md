@@ -1,4 +1,6 @@
-# KV260-IAS2RF — Architecture, Rev03
+# KV260-IAS2RF — System Architecture
+
+> **Current Hardware & Gateware Baseline (`main`):** **8-layer `JLC08161H-2116C`** RF front-end adapter PCB, **dedicated-pin `RTL8211FSI` 1000BASE-T Ethernet + dual-lane `IAS1` (`2.94 Gb/s` aggregate)**, active **Enclosure v2** with filtered thermal management (`HS1`–`HS5`), and **complete dual-FPGA Vivado 2026.1 gateware** ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)). Earlier architectural decisions and revision milestones (`rev01`–`rev06`) are archived in [`docs/history/README.md`](docs/history/README.md).
 
 **Adapter board for the AMD Kria KV260, with a front-end FPGA**
 **SDR chain (HF / VHF / UHF) plus a 10.5 GHz radar chain on AERIS-10**
@@ -556,11 +558,11 @@ without depending on a licence.
 |---|---|
 | [docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md) | The system this board belongs to |
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | The 5 blockers closed, with evidence and sources, plus open risks |
-| [docs/AUDIT_Rev01.md](docs/AUDIT_Rev01.md) | What the repository files actually contain |
+| [docs/AUDIT_Rev01 (Archive)](docs/history/AUDIT_Rev01.md) | Historical audit of inherited v1 files |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged plan with exit criteria |
-| [docs/HISTORY_Rev01.md](docs/HISTORY_Rev01.md) | Record of earlier work and its assessment |
+| [docs/HISTORY_Rev01 (Archive)](docs/history/HISTORY_Rev01.md) | Record of earlier work and its assessment |
+| [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | Complete dual-FPGA gateware, Vivado silicon floorplans & XSim verification |
 
 ---
 
-*Rev03 · 21 September 2026. The open decision is §2.3: whether the front-end FPGA is accepted. The
-whole schematic depends on that answer.*
+*Active `main` platform documentation (`8-layer JLC08161H-2116C`, dedicated-pin `1000BASE-T` + `IAS1`, Enclosure v2, dual-FPGA gateware). Section history preserved for design rationale; see [`docs/history/README.md`](docs/history/README.md) for prior revisions.*

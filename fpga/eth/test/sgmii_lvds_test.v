@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // SGMII 1.25 Gb/s Over LVDS Feasibility Proof on XC7A50T-FTG256-2
 //
 // Implements:

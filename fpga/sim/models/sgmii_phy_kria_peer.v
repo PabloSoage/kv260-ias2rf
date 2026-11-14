@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral RTL8211FSI SGMII PHY + KV260 PS GEM3 UDP Peer Model
 //
 // Models:

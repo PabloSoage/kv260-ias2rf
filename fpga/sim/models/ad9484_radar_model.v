@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral AD9484 8-bit 400 MSPS DDR LVDS ADC + 3-Wire SPI + RF Echo Target
 //
 // Models:

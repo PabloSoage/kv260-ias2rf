@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Artix-7 Pmod J1102 SPI Slave & Fallback DDC Readout (XC7A50T-FTG256-2)
 //
 // Implements a 40-bit SPI Mode 0 (CPOL=0, CPHA=0) register + FIFO bridge on

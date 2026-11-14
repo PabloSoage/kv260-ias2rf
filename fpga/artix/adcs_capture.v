@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // AD9253 Serial LVDS Capture (One-Lane 16-bit DDR Wordwise Mode, Bank 14)
 //   ADCS_DCO_P/N (P10/P11, SRCC) : IBUFDS -> BUFIO (bit clock) + BUFR(DIV4) (clk_div = 2*f_S)
 //   ADCS_FCO_P/N (N9/P9)         : IBUFDS -> IDELAYE2 (VAR_LOAD) -> ISERDESE2 (1:8 DDR NETWORKING)

@@ -110,6 +110,6 @@ k.notes([
     "1. The FPGA sends 8-bit samples and their clock (3.3 V CMOS); series 22 ohm sit at the FPGA end, on CONTROL.",
     "2. Internal 1.2 V reference (REFLO to ACOM), RSET 1.91 kohm: 20 mA full scale. AERIS-10 differs here, see the spec.",
     "3. 50 ohm loads, then AERIS-10's differential LC reconstruction filter, then a 2:1 balun to 50 ohm single-ended.",
-    "4. Every value is justified in _work/sheets/dac_radar_spec.py and docs/DAC_RADAR_SPEC.md.",
+    "4. Every value is justified in docs/DAC_RADAR_SPEC.md.",
 ], (38.1, 190.5))
 k.write()

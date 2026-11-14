@@ -86,6 +86,6 @@ k.notes([
     "1. Interleaved mode (MODE low): the FPGA writes I and Q alternately on one 14-bit port; IQSEL steers each word.",
     "2. IQCLK is divided by 2 inside; IQRESET aligns the pair. Series 22 ohm on the data sit at the FPGA, on CONTROL.",
     "3. Internal 1.2 V reference; RSET 3.83 kohm per DAC = 10 mA, 0.5 V on 49.9 ohm: best distortion (p.24).",
-    "4. Every value is justified in _work/sheets/dac_sdr_spec.py and docs/DAC_SDR_SPEC.md.",
+    "4. Every value is justified in docs/DAC_SDR_SPEC.md.",
 ], (139.7, 200.66))
 k.write()

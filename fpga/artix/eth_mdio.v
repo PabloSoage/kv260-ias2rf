@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // IEEE 802.3 Clause 22 MDIO/MDC Master + RTL8211FSI Reset/Status Controller (Rev06)
 //
 // Periodically polls BMSR (Reg 0x01) for copper link status, handles on-demand

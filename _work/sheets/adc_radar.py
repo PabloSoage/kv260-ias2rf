@@ -258,7 +258,7 @@ notes = [
     "2. Two AD8352s give 25 dB, as AERIS-10's two cascaded stages; the first also converts to differential.",
     "3. U501 samples at 400 MSPS (radar) or 500 MSPS (SDR plan): the clock comes from CLOCK, Q0.",
     "4. CONV_SPI_* are 1.8 V signals: AD9484 abs. max DRVDD + 0.2 V. The FPGA must drive them from a 1.8 V bank.",
-    "5. Every value on this sheet is justified in _work/sheets/adc_radar_spec.py and docs/ADC_RADAR_SPEC.md.",
+    "5. Every value on this sheet is justified in docs/ADC_RADAR_SPEC.md.",
 ]
 for i, t in enumerate(notes):
     s.text(t, (25.4, 190.5 + 3.81 * i), size=1.524 if i == 0 else 1.27)

@@ -179,7 +179,7 @@ The model above simplifies the shells to check every material. This one meshes t
 rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards themselves.
 
 **Model.**
-- **Boards:** the adapter's FR-4 body (from KiCad's 3-D export of the Rev06 board) and the KV260 carrier's PCB.
+- **Boards:** the adapter's FR-4 body (from KiCad's 3-D export of the final 8-layer board) and the KV260 carrier's PCB.
 - **Joints between the boards:** the two 0.8 mm spacers at H1/H2 and the mated Hirose pair.
 - **Bonding:** everything is united into one bonded body (fTetWild).
   - Each board is bonded where it rests on the honeycomb and the posts.
@@ -243,10 +243,30 @@ v1 for comparison: [down](sim/case3d_v1_Zm.png), [sideways](sim/case3d_v1_Xp.png
 
 ---
 
+### Heatsink Placement & Mechanical Sizing (`HS1`–`HS5`)
+
+To keep every IC within junction limits at `70 °C` ambient without shorting or blocking airflow from the lid-mounted `50 × 50 × 10 mm` intake fan (`fan2_vis` at `z = 18.8–28.8 mm`), five heatsinks are specified across the assembly:
+
+| Heatsink | Target Component | Dimensions (`L × W × H`) | Assembly centre (`X, Y`, case frame) | Vertical Envelope & Clearance |
+|---|---|---|---|---|
+| **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 6 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `9.5 mm` (`9.4 mm` clearance below `50 mm` fan at `z = 18.8 mm`) |
+| **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 5 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `~8.3 mm` (`y_max = +2.3 mm`) |
+| **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 5 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `~9.2 mm` (`y_min = +6.3 mm` -> **`4.0 mm` thermal gap** to `HS2`) |
+| **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` |
+| **`HS5`** | `K26 SOM` (`XCK26` OEM cooler) | **`68 × 58 × 18 mm` + `54 mm` fan** | `(+86.1, +47.0) mm` | Fin top `~25.1 mm` (`7.6 mm` to Enclosure v2 roof) |
+
+![Annotated heatsink placement over KV260 + IAS2RF](img/board_heatsinks.jpg)
+
+![Mechanical heatsink keep-out & clearance drawing](img/heatsink_mechanical_map.png)
+
+High-resolution 4K views (`board_heatsinks_4k.jpg`, `board_heatsinks_closeup_4k.jpg`, `case_v2_closed_4k.jpg`, `case_v2_open_4k.jpg`, `case_v2_section_4k.jpg`) are stored in [`docs/img/highres/renders/`](img/highres/README.md#4-hardware-heatsink--enclosure-4k-renders-renders).
+
+---
+
 ## 6. Version 2: a fan for the adapter, for dusty roads
 
 v1 stays as it is (above). **v2** is the same tray, lid and bumpers with active cooling for the adapter, from the
-CFD study in [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md). It needs the Rev06 adapter, whose J1002 header gives
+CFD study in [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md). It uses the adapter's `J1002` header to give
 the fan 5 V.
 
 ![v2, the lid lifted: the fan over the adapter's hot strip](img/case_v2_fan.jpg)

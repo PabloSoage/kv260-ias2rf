@@ -200,7 +200,7 @@ notes = [
     "1. One master clock, 400 or 500 MHz, from the Si549 (CLK1, default) or from AERIS-10 via J401 (CLK0).",
     "2. U401 copies it to the AD9484, the AD9253 and the FPGA. The AD9253 divides it internally (1..8).",
     "3. The DAC clocks are NOT here: both DACs take CMOS clocks, which the FPGA generates with their data.",
-    "4. Every value on this sheet is justified in _work/sheets/clock_spec.py and docs/CLOCK_SPEC.md.",
+    "4. Every value on this sheet is justified in docs/CLOCK_SPEC.md.",
 ]
 for i, t in enumerate(notes):
     s.text(t, (38.1, 215.9 + 3.81 * i), size=1.524 if i == 0 else 1.27)

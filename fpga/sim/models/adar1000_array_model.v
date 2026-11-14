@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral 8-Chip ADAR1000 SPI Slave Array Model
 //
 // Models:

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Full-System Co-Simulation Testbench:
 //   Real artix_top (ENABLE_ETH=1) <-> Real kria_pl_link (K26 PL wrapper)
 //   Connected through Rev06 PCB/package/SOM LVDS channel models with exact

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral PCB + Package + Carrier Differential LVDS Channel Model
 //
 // Models:

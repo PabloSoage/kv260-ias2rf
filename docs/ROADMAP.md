@@ -184,7 +184,7 @@ Start from `CSI2-KRIA-KV260_Rev01-2.kicad_sch` (the purge, which is valid work).
 script-generated sheets have already been **removed** from the project and moved to
 `_deprecated/`.
 
-> **No unreviewable generated circuits.** See the [method note](AUDIT_Rev01.md#8-method-note).
+> **No unreviewable generated circuits.** See the [method note](history/AUDIT_Rev01.md#8-method-note).
 > What the note rules out is Rev01's kind: untyped symbols joined by auto-generated labels. The
 > sheets now drawn by script use typed symbols and real wires, are verified against a separate
 > connection list, and are reviewed by a person before they are accepted (§ *How the sheets are

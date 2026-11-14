@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // AD9708 8-bit Radar LFM Chirp Transmit Path with ODDR Center-Aligned Clock Forwarding
 //
 // AD9708 Rev. B Timing & Dynamic Specifications Quoted Verbatim (p. 3, Table "DIGITAL SPECIFICATIONS" & Fig. 1):

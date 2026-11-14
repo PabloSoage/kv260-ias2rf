@@ -46,8 +46,10 @@ The script flagged both:
 +3V3_A   3.3V   840mA   ldo     +5V0   1.43W   <-- too hot for an LDO, use a buck
 ```
 
-**This is the same class of mistake the Rev01 design made** with its ADP151 dropping 5 V to 1.8 V
-at 1.6 W in a TSOT-23-5 (see [AUDIT_Rev01.md](AUDIT_Rev01.md) §3). Worth noting that it is an easy
+> **Note on current stackup:** The production board uses the **8-layer `JLC08161H-2116C`** stackup documented in [LAYOUT.md §3](LAYOUT.md) (historical 6-layer vs. 8-layer comparison archived in [history/EIGHT_LAYERS.md](history/EIGHT_LAYERS.md)).
+
+**This is the same class of mistake the original draft made** with its ADP151 dropping 5 V to 1.8 V
+at 1.6 W in a TSOT-23-5 (see [history/AUDIT_Rev01.md](history/AUDIT_Rev01.md) §3). Worth noting that it is an easy
 mistake to repeat: the tree looks perfectly reasonable until you multiply the drop by the current.
 
 The fix is a pre-regulating buck in front of each analogue LDO. The LDO keeps its noise rejection

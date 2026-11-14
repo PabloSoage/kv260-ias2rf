@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Testbench: HK I2C (TMP1075 + M24C02), XO I2C (Si549 + CLK_SEL), XADC & PPS_SYNC
 //
 // Mutations checked via run.ps1 -Mutate:

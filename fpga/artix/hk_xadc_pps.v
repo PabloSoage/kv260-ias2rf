@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // XADC Environmental Monitor (DRP Poll: Die Temp, VCCINT, VCCAUX) + PPS Timestamp/PPM Unit
 //
 // 1) XADC (Artix-7 UG480 internal reference, VP/VN & VREFP/VREFN grounded on PCB):

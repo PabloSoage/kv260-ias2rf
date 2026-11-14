@@ -114,6 +114,6 @@ k.notes([
     "2. Supply and control networks: M3SWA2 datasheet Figure 2, per switch.",
     "3. Every SMA is DC-blocked: 'All RF-ports must be DC blocked or held at 0 V DC'.",
     "4. The switches need VDD +3.3 V and VEE -3.3 V (B-03).",
-    "5. Values and sources: _work/sheets/routing_spec.py, docs/ROUTING_SPEC.md.",
+    "5. Values and sources: docs/ROUTING_SPEC.md.",
 ], (289.56, 139.7))
 k.write()

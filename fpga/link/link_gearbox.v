@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 66:8 TX Gearbox, 8:66 RX Gearbox with unified 1-UI bit slip,
 // and IEEE 802.3 Clause 49.2.13 Block Lock FSM (64 good -> lock, 16/64 bad -> unlock).
 

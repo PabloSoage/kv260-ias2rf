@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Testbench: Kria K26 AXI4-Stream & AXI4-Lite Wrapper (link_axis)
 //
 // Checks:

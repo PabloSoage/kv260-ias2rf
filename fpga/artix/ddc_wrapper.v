@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // DDC Wrapper & Link Packetizer for the XC7A50T Front-End
 // Connects adc_capture (400 MSPS AD9484) -> AERIS ddc_400m_enhanced (400->100 MSPS)
 // -> ddc_input_interface (18b->16b I/Q) -> optional post-decimation -> async dual-clock

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Stream 1 SDR / Telemetry Packet Generator for Dual-Path Uplinks (Rev06)
 //
 // Emits 64-bit LINK_PROTOCOL packets (stream_id = 8'h01) with deterministic

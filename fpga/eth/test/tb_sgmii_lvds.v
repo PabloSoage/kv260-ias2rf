@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // tb_sgmii_lvds.v - XSim testbench for XAPP523-style 1.25 Gb/s asynchronous SGMII
 // oversampling receiver (sgmii_lvds_rx) against +/-100 ppm PRBS-7 streams.
 //

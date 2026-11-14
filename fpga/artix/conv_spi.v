@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 3-wire 1.8 V SPI Master for Converter Configuration (Bank 35: AD9253 + AD9484)
 // Shared bus: CONV_SPI_SCLK, CONV_SPI_SDIO (bidirectional), CONV_SPI_CSB_R (AD9484), CONV_SPI_CSB_S (AD9253).
 //

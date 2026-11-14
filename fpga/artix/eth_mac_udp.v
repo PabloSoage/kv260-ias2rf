@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 1G Ethernet MAC + ARP Responder + UDP/IPv4 Framing & Control Engine (Rev06)
 //
 // Operates at clk_125 (125 MHz GMII):

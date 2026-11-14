@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Simulation Testbench: AD9708 Radar LFM Chirp (dac_radar) & AD9767 Interleaved SDR TX (dac_sdr)
 // Verifies:
 //   1) AD9708 digital setup/hold/pulsewidth timing (t_S >= 2.0 ns, t_H >= 1.5 ns, t_LPW >= 3.5 ns).

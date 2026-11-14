@@ -4,7 +4,7 @@
 
 A symbol whose pins are all `unspecified` makes ERC blind. That is exactly what produced the 48
 uninterpretable `pin_to_pin` conflicts in the Rev01 work
-([AUDIT_Rev01.md](AUDIT_Rev01.md) §2.2), and it is why this work exists: **every pin the design
+([history/AUDIT_Rev01.md](history/AUDIT_Rev01.md) §2.2), and it is why this work exists: **every pin the design
 uses has to carry a real electrical type**, or the verification story is theatre.
 
 ## 1. KiCad official libraries — used as-is

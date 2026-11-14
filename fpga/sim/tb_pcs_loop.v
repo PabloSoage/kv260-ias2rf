@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 2-Lane PCS Loopback Testbench (Plain Verilog-2001):
 //   link_pcs_tx (AM_PERIOD=64) -> bit-level 2-lane channel (1.0 Gb/s DDR,
 //   random per-lane bit phase + integer-UI skew + 56 ps sub-UI skew per

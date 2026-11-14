@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Simulation Testbench: AD9253 One-Lane DDR Capture + 3-Wire SPI + SDR DDC + Link TX/RX
 // Tests:
 //   1) conv_spi power-up sequence against behavioral AD9253 (ID 0x8F) and AD9484 (ID 0x6C) SPI slaves.

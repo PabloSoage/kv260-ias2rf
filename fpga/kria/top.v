@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Kria K26 (XCK26-SFVC784-2LV-C) Top-Level Gateware on KV260 Carrier
 //
 // Pinout verified against fpga/link/PINMAP.md and Vivado xck26-sfvc784-2LV-c:

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // AD9767 Dual 14-bit Interleaved SDR Transmit Path (FIFO + Underrun Counter + Interleaver)
 //
 // AD9767 Interleaved Mode (MODE pin = 0 on PCB, 3.3 V LVCMOS Bank 34):

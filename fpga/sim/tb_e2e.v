@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // End-to-End Integration Testbench:
 //   AD9484 Behavioral Model (inverted DCO + skew + +/-80 ps eye edge)
 //   -> artix_top (adc_capture -> AERIS DDC -> link_pcs_tx -> OSERDESE2)

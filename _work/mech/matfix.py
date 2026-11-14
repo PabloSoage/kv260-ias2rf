@@ -138,6 +138,10 @@ def apply(materials, objects):
         if rough < 0.99 and met > 0.5 and "ad" in who:
             continue                                                   # the adapter's tuned glTF metals
         goldish = r > 0.45 and r > g > bl and bl < 0.45 * r and sat > 0.25
+        if goldish and "ad" in who and bl < 0.2 * r:
+            # KiCad's gold plating is (0.71, 0.50, 0.21); yellow/orange bodies with almost no blue (tantalum
+            # caps, LEDs, orange plastics) are dielectrics: as metals they mirror the soft-box and read white.
+            goldish = False
         if goldish:
             b.inputs["Base Color"].default_value = (0.86, 0.68, 0.36, 1)
             _set(b, "Metallic", 1.0)
@@ -159,6 +163,14 @@ def apply(materials, objects):
             _set(b, "Roughness", 0.5)
             _set(b, "Specular IOR Level", 0.3)
             count("ivory")
+        elif "ad" in who and sat < 0.2 and L > 0.3:
+            # the adapter's beige bodies (linear 0.44, 0.40, 0.32: U1101's marking block, SOIC/SOT pin-1 marks):
+            # tan from a distance, but near-white in close-ups under the key light. Halve them, keeping the hue.
+            b.inputs["Base Color"].default_value = (r * 0.5, g * 0.5, bl * 0.5, 1)
+            _set(b, "Metallic", 0.0)
+            _set(b, "Roughness", 0.55)
+            _set(b, "Specular IOR Level", 0.3)
+            count("beige")
         else:
             k = min(1.0, 0.8 / max(max(c), 1e-6))
             b.inputs["Base Color"].default_value = (r * k, g * k, bl * k, 1)

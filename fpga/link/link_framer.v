@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Packet Framer & Deframer with 64-bit PPS Timestamp, Sequence Counter,
 // Dropped-Packet Counter, and IEEE 802.3 CRC-32 Trailer.
 

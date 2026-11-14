@@ -1,11 +1,8 @@
-# Signal and power integrity — review of 11 November 2026
+# Signal and power integrity — 8-layer JLC08161H-2116C review
 
-*Board `CSI2-KRIA-KV260_Rev01.kicad_pcb` as committed on 11 Nov · stack JLC06161H-2116A · figures
-and their data in [`docs/sim/`](sim/)*
+*Current `main` baseline: `CSI2-KRIA-KV260_Rev01.kicad_pcb` (8-layer `JLC08161H-2116C` stackup) · figures and their data in [`docs/sim/`](sim/)*
 
-> **12 November 2026: the board is now 8 layers (JLC08161H-2116C).** Sections 1–7 are the record of
-> the 6-layer review. §8 is the 8-layer board, measured with the same scripts and compared with the
-> 6-layer one and with an ideal line; where it changes a statement above, §8 says so.
+> **Current 8-layer `JLC08161H-2116C` board (see §8+):** Sections 1–7 document the baseline SI checks and item-by-item copper audit (historical 6-layer comparison snapshots are archived in [`docs/history/README.md`](history/README.md)). Section 8 onwards measures the 8-layer routed board with the same full-wave scripts and governs wherever an earlier number changed.
 
 An RF/high-speed engineer looked at the board of 10 November and raised the points below. Every one
 was checked against the board's own copper, fixed where it was right, and measured or simulated
@@ -130,7 +127,7 @@ run are within 15 mV and 10 ps.
 Three cases per pair: an ideal 100 Ω pair of the same length and termination, the board on 6 layers
 (11 Nov) and on 8 layers (12 Nov, §8).
 
-![LVDS eyes: ideal, 6 and 8 layers](sim/rev04_eyes.png)
+![LVDS eyes on the 8-layer board](sim/eyes_1g.png)
 
 | Pair | 6 layers: ideal / routed | 8 layers: ideal / routed |
 |---|---|---|
@@ -422,18 +419,18 @@ the connector left the FPGA's receiver at the end of a 45 mm open line.
 | DC drop +2V5 at 601 mA | 173–185 mV | 122–129 mV (trunk widened to 0.5 mm) |
 | SMA launch S11 at 1 / 3 GHz, with the ESD diode | −30.6 / −13.5 dB | −30.9 / −13.7 dB |
 
-![LVDS eyes: ideal, 6 and 8 layers](sim/rev04_eyes.png)
+![LVDS eyes on the 8-layer board](sim/eyes_1g.png)
 
 The eye model drives each leg from a current source into the routed sections and a 100 Ω, 2 pF
 receiver. The receiver's capacitance reflects and the driver re-reflects, so even the ideal line
 has some ISI and it depends on length: the "ideal" of a pair differs between the two boards. The
 fair comparison is each board against its own ideal line:
 
-![Eye lost to the routing](sim/rev04_eye_penalty.png)
-![Eye opening and spread, every pair](sim/rev04_eye_open.png)
-![Intra-pair skew](sim/rev04_skew.png)
-![PDN impedance](sim/rev04_pdn.png)
-![SMA launch](sim/rev04_sma.png)
+![Eye lost to the routing](sim/eye_openings.png)
+![Eye opening and spread, every pair](sim/eye_openings.png)
+![Intra-pair skew](sim/lvds_skew.png)
+![PDN impedance](sim/pdn_impedance.png)
+![SMA launch](sim/sma_launch.png)
 
 The third series in the eye and skew plots is the 6-layer board with the same corrections
 (terminations at the balls, coupled pairs, LINK_TX at its receiver), routed the same way: only 8
@@ -665,7 +662,7 @@ At HF the copper is a few nH and pF: it changes nothing the ADC could see. The n
 neighbours within 0.3 mm are 2 mm of `+1V8_A` on L3. A re-placement would mean moving parts
 round the ADC, where both faces are full, for no gain, so it was not done.
 
-![DAC reconstruction filters, ideal and as routed, and their common mode before and after the re-placement](sim/rev05_filters.png)
+![DAC reconstruction filters, ideal and as routed, and their common mode before and after the re-placement](sim/dac_filters.png)
 
 The DAC buses are not matched either:
 - `DACS` data bits run 37–84 mm, with `IQSEL` at 104 mm;
@@ -794,7 +791,7 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
 - **Not modelled.** Heat flowing into the KV260 through the connector and the standoffs, and any
   airflow.
 
-![Board temperature](sim/rev05_thermal.png)
+![Board temperature](sim/board_thermal.png)
 
 **With cooling (12 Nov).** `thermal2d.py --sink` adds one heatsink, a node of Rsa °C/W to ambient,
 pressed onto each listed part's top through θJC(top) and a gap pad (3 W/m·K, 0.5 mm). Each of
@@ -816,7 +813,7 @@ solved, not estimated.
 | LMR33630 | 82 (127) | 63 (108) | 78 (123) | 54 (99) | 45 (90) |
 | RTL8211FSI (not under the sink) | 70 (115) | 50 (95) | 54 (99) | 55 (100) | 45 (90) |
 
-![Board temperature for five ways of cooling it](sim/rev05_cooling.png)
+![Board temperature for five ways of cooling it](sim/board_cooling.png)
 
 - **Airflow alone halves every rise.** At 70 °C it brings the FPGA to 91 °C, inside its limit.
   The board under the clock buffer still reaches about 100 °C.
@@ -899,7 +896,7 @@ Both ports are driven in odd mode, so the result is the differential S-parameter
 - **The 0.3 mm stub below L6 is negligible** at these rates: under 1 dB of Sdd11 either way, up to
   4 GHz.
 
-![LVDS pair changing layer, four via arrangements](sim/rev05_layer_change.png)
+![LVDS pair changing layer, four via arrangements](sim/via_layer_change.png)
 
 **3-D full-wave: the other sub-models (12 Nov).** Same stack, loss and odd-mode ports; each also
 run in even mode, which gives the mode conversion. They share `stack3d.py`.
@@ -979,7 +976,7 @@ The runs below are after those fixes; each energy trace decays to −40 dB.
   whole J101 escape, ten nets at 0.4 mm pitch, next to the link itself. Since J101 mates board to
   board, the common mode it makes has no cable to radiate from, so the board was left as it was.
 
-![The other 3-D sub-models: BGA escape, J101 to the AC capacitors, two pairs side by side, common mode through the layer change](sim/rev05_3d.png)
+![The other 3-D sub-models: BGA escape, J101 to the AC capacitors, two pairs side by side, common mode through the layer change](sim/em_3d_submodels.png)
 
 **What is still not simulated:**
 
@@ -1022,8 +1019,29 @@ end to end, PHY to FPGA, the legs match within 1 ps in this model (vias not coun
 In Ethernet mode the paths through the PHY's own pairs measure 350 mV / 50 ps (FPGA to PHY) and
 637 mV / 53 ps (PHY to FPGA).
 
-![Eye openings with the Ethernet option's branches](sim/eth_branches.png) The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
+*(Individual 1.25 Gb/s SGMII eye plots: [`sim/eye_ETH_SGTX_1P25G.png`](sim/eye_ETH_SGTX_1P25G.png), [`sim/eye_ETH_SGRX_1P25G.png`](sim/eye_ETH_SGRX_1P25G.png); all 8-layer eyes in [`sim/eyes_1g.png`](sim/eyes_1g.png).)* On final `main`, `U1201` (`RTL8211FSI`) moves onto dedicated Bank 34 pins (`R2/R1`, `R3/T2`), eliminating the `C1218–C1221` assembly stubs so both `IAS1` lanes (`LINK_RX_D0/D1`) and `1000BASE-T` operate simultaneously. The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at
 0.17 mm; the gateware should hold LINK_RX_D1 static in Ethernet mode.
+
+### 9.8 Final RF review: limits to know, and what to measure first (15 November)
+
+A last pass over the analogue chains, against the data sheets and the gateware. Nothing here blocks
+fabrication of the evaluation boards. These are limits of the design as drawn, stated so nobody
+finds them on the bench.
+
+| Point | What it is | Consequence | What to do |
+|---|---|---|---|
+| **No anti-alias filter on the SDR inputs** | Between the SMA and the AD9253 there is the AD8352 (flat past 1 GHz) and 2 × 33 Ω with 5 pF, a corner near 480 MHz. The ADC samples at 62.5 MSPS (50 MSPS with the 400 MHz master) | Everything up to several hundred MHz folds into 0–31 MHz at full strength. The FM broadcast band, 88–108 MHz, lands on 17–31 MHz. The wideband path (AD9484, 2 × 24 Ω with 2.7 pF) is the same above its 200 or 250 MHz Nyquist | An external preselector on every receive input: a 30 MHz low-pass for HF, a band-pass for any band taken by undersampling (PMR446 in the second zone of 500 MSPS). It belongs with the LNA the noise budget already asks for (§9.6) |
+| **The DAC clocks come from the FPGA** | `DACR_CLK` and `DACS_IQCLK` are ODDR outputs of an MMCM clock, as on AERIS-10. The ADCs take the Si549 through the ADCLK948 | The clock, not the DAC, sets the transmit noise. The ceiling is −20 log(2π f σ): at 30 MHz, 55 dB for 10 ps rms and 49 dB for 20 ps. That is at the 8-bit AD9708's level and far under the 14-bit AD9767's 86 dB. Close-in, the MMCM's phase noise is the transmitter's | Read the clock's jitter from Vivado's report and measure the SDR output's phase noise. For the radar it is AERIS-10's own arrangement. If a cleaner SDR transmitter is ever wanted, the ADCLK948 has four free outputs (Q4–Q7): an LVPECL-to-CMOS buffer on one of them is a board change |
+| **The RF switches below 10 MHz** | The M3SWA2-34DR+ (GaAs) is specified from DC, but its data sheet's lowest point is 10 MHz, where P0.1dB is +17.7 dBm and input IP3 +46 dBm (+23.4 and +52 dBm at 1 GHz). Compression falls with frequency | At 1–5 MHz the switch, not the AD8352, may set the receive linearity. The board's levels (−2.4 dBm full scale in, 0 dBm out at most) are 17 dB under the 10 MHz figure, so compression itself is not expected | A two-tone test at 1–5 MHz through SW1 and SW3. `IF_RX_C` and `IF_TX_C` do not pass through a switch and are the reference to compare against |
+| **Transmit to receive, on the board** | The radar transmits 0 dBm at `IF_TX_B` and its receiver's full scale is −17.6 dBm, with a floor of −147 dBm/Hz. The switches isolate 73 dB or more at 100 MHz; the coupling between the SMA lines and through the supplies was not simulated | Unknown until measured. A leak above −60 dBc would show in the radar's dynamic range | S21 between every transmit and receive SMA on the first board, converters off, then the ADC's spectrum with the DAC running |
+| **The transmit outputs are exciter outputs** | −6 to 0 dBm after a filter that is −3 dB at 50 MHz and −31 dB at 100 MHz. The image of a 40 MHz tone clocked at 125 MSPS, at 85 MHz, is about 23 dB down in the filter plus the DAC's sinc | Not for an antenna as it is | A power amplifier and a band low-pass filter between the board and any antenna, as the legal notice requires |
+| **Switcher harmonics in the receive band** | 400 kHz and 580 kHz (POWER_SPEC §2), so harmonics all through MF and HF. The ADC rails are LDO and ferrite filtered | Spurs at those multiples are to be expected at some level | A spectrum of each ADC with its input terminated, as the first receive measurement |
+| **Thermal margin at 70 °C** | The CFD puts the Si549 at 101.7 °C against 105 °C, and the K26 about 1 °C from its limit (ENCLOSURE_V2_THERMAL) | 3 °C is inside the model's error. 70 °C ambient is a target, not a demonstrated rating | Take 60 °C as the working limit until a thermocouple on Y401 says otherwise |
+
+What stands without reservation: the converters' networks follow their data sheets part for part,
+the clock tree (Si549 into the ADCLK948) is far better than either ADC needs (about 80 dB at the
+120 MHz IF for the 120 fs of the Si549 and the buffer together), the SMA launches and the 50 Ω lines are right for the band, every external
+connector is protected, and ERC, DRC and schematic parity are clean on the board as committed.
 
 ## 10. How it was checked
 

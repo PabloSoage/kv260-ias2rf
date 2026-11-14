@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // 2-Lane Striping TX and Elastic-Buffer AM Deskew RX
 // Interleaves even/odd 66-bit blocks across Lane 0 and Lane 1, and inserts
 // periodic Alignment Markers (BTYPE_ALIGN = 8'h4B) every AM_PERIOD block pairs.

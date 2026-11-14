@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Beamforming Controller for 8x ADAR1000 (Bank 35, LVCMOS18)
 //
 // Features:

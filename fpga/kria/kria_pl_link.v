@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Kria K26 (XCK26-SFVC784-2LV-C) Block-Design PL Link Wrapper
 //
 // Exposes standard AXI4-Lite CSR (s_axi_*), AXI4-Stream RX (m_axis_rx_* -> axi_dma S2MM),

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Testbench: AD9484 Capture (adc_capture) + AERIS DDC (ddc_wrapper) + Packetizer
 //
 // Checks:

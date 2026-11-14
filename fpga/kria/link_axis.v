@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Kria K26 AXI4-Stream & AXI4-Lite Link Wrapper (XCK26-SFVC784-2LV-C)
 //
 // Bridges the 64b/66b PCS (link_pcs_rx + link_pcs_tx + link_rx_train_fsm) to:

@@ -68,3 +68,19 @@ Key clock domains closed: `clk_adcr_dco` (`200 MHz`, `WNS=0.076 ns`), `clk_100m_
 | `gen_rev06_eth.u_sdr_gen` | `eth_sdr_pkt_gen` | `20` (`20` / `0`) | `132` | `0` | `0` | `0` |
 | **Rev06 Ethernet Subtotal** | — | **`1,983`** (`1,937` / `46`) | **`1,747`** | **`8`** | **`1`** | **`0`** |
 | `u_adc_cap` + `u_ddc` + `u_ul_pcs_tx` + `u_dl_*` + `u_pmod_spi` | Core + `IAS1` | `4,386` | `6,341` | `0` | `0` | `87` |
+
+---
+
+## Final Post-Route Implementation on `main` (`fpga/artix/reports_rev06/`)
+
+With wideband SDR DDC (`u_sdr_ddc`), AERIS-10 Radar DDC (`u_ddc`), dedicated-pin 1000BASE-T SGMII/UDP (`gen_rev06_eth`), 2-lane `IAS1`, XADC/PPS, DACs, and housekeeping enabled (`ENABLE_ETH = 1`):
+
+| Resource (`XC7A50T-FTG256-2`) | Used | Available | Utilization |
+|---|---|---|---|
+| **Slice LUTs** (`15,250` Logic + `166` LUTRAM; `18,045` packed LUT primitives) | **15,416** | 32,600 | **47.3%** |
+| **Flip-Flops** (`Slice Registers`) | **17,445** | 65,200 | **26.8%** |
+| **Block RAM (`RAMB36` eq.)** (`13 RAMB36` + `6 RAMB18`) | **16.0** | 75 | **21.3%** |
+| **DSP48E1** | **110** | 120 | **91.7%** |
+| **Timing (`report_timing_summary`)** | `WNS = +0.147 ns`, `WHS = +0.036 ns`, `WPWS = +0.008 ns` | — | **0 failing endpoints** (`0` DRC errors) |
+
+Full dual-FPGA documentation and Vivado 2026.1 silicon floorplans/schematics: [`docs/FPGA_GATEWARE.md`](../../docs/FPGA_GATEWARE.md).

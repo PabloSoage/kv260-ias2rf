@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Parallel 64-bit IEEE 802.3 CRC-32 Step (Poly 0xEDB88320, LSB-first)
 
 `timescale 1ns/1ps

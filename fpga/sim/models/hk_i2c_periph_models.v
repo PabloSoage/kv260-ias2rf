@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral Open-Drain I2C Slave Model for Housekeeping & Si549 XO
 // Used for TMP1075 (0x48), CAT24C02 EEPROM (0x50), and Si549 XO (0x55).
 

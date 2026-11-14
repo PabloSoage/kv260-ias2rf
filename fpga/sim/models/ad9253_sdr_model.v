@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Behavioral AD9253 Dual 14-bit Serial LVDS SDR ADC + 3-Wire SPI Model
 //
 // Models:

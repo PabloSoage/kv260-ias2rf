@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-2-Clause
+// SPDX-License-Identifier: Apache-2.0
 // Testbench: Artix-7 J1102 Pmod SPI Slave & Fallback DDC FIFO (pmod_spi)
 //
 // Checks:
