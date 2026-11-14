@@ -173,6 +173,58 @@ What this says:
   - PETG-CF passes cold and falls just short (0.9) hot.
   - A drop is a handling event, normally not at 70 °C.
 
+### 5.3 3-D model of the case as built, with both boards in it (14 Nov)
+
+The model above simplifies the shells to check every material. This one meshes the printed geometry, with every
+rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards themselves.
+
+**Model.**
+- **Boards:** the adapter's FR-4 body (from KiCad's 3-D export of the Rev06 board) and the KV260 carrier's PCB.
+- **Joints between the boards:** the two 0.8 mm spacers at H1/H2 and the mated Hirose pair.
+- **Bonding:** everything is united into one bonded body (fTetWild).
+  - Each board is bonded where it rests on the honeycomb and the posts.
+  - The TPU-padded clamp posts above the boards are left out, which is conservative for the boards.
+- **Mesh:** CalculiX, 10-node tetrahedra, about 205 k tets and 376 k nodes.
+- **Masses** ride on the boards: adapter 110 g, carrier 90 g plus the K26 SOM with its fan-sink 120 g.
+- **Loads:** 50 g quasi-static shocks down, sideways and fore-aft.
+- **Supports:** the four ears held at their M5 washers.
+- **Case:** von Mises stress, against PETG-CF's across-layer strength: 29 MPa at 23 °C, 17.4 MPa at 70 °C.
+- **Boards:** the largest principal strain, against the usual 500 µε guide for BGA solder joints under shock.
+
+| Load case | Case, 99.7th pct / peak | Safety factor 23 °C / 70 °C | Adapter / carrier strain, 99.7th pct | At the BGAs (U1101, U501, U601) | Max displacement |
+|---|---|---|---|---|---|
+| v2, 50 g down | 3.6 / 9.3 MPa | 8.1 / 4.9 | 402 / 360 µε | 158 / 158 / 130 µε | 0.24 mm |
+| v2, 50 g sideways (X) | 2.3 / 5.9 MPa | 12.8 / 7.7 | 76 / 209 µε | 16 / 16 / 15 µε | 0.09 mm |
+| v2, 50 g fore-aft (Y) | 1.9 / 3.7 MPa | 15.3 / 9.2 | 83 / 120 µε | 8 / 7 / 9 µε | 0.08 mm |
+| v1, 50 g down | 3.6 / 9.1 MPa | 8.1 / 4.9 | 389 / 295 µε | 159 / 161 / 127 µε | 0.22 mm |
+
+![v2, 50 g down](sim/case3d_v2_Zm.png)
+![v2, 50 g sideways](sim/case3d_v2_Xp.png)
+![v2, 50 g fore-aft](sim/case3d_v2_Yp.png)
+
+v1 for comparison: [down](sim/case3d_v1_Zm.png), [sideways](sim/case3d_v1_Xp.png),
+[fore-aft](sim/case3d_v1_Yp.png). Raw numbers: [`sim/case3d_v2.json`](sim/case3d_v2.json),
+[`sim/case3d_v1.json`](sim/case3d_v1.json).
+
+**What it shows.**
+- **The case.**
+  - The load goes into the vehicle through the four ears.
+  - The part that works hardest is the rear wall above the right-rear ear: the ribs between the KV260's RJ45 and
+    USB cut-outs carry the load into the ear.
+  - Its peak, about 9 MPa, is a sharp inside corner: the real corners are rounded and the value is
+    mesh-dependent.
+  - Even that peak leaves a safety factor of 3.2 at 23 °C and 1.9 at 70 °C. The 99.7th percentile leaves 8 and 5.
+  - The fan duct and grille of v2 change nothing measurable.
+- **The boards.**
+  - Down is the worst direction.
+  - Both boards bend over the honeycomb by 0.1–0.16 mm.
+  - The strain stays under 160 µε at every BGA, a third of the guide.
+  - Higher values, up to 720–980 µε, sit only where a board's bonded edge meets a honeycomb wall or a post (the
+    adapter's SMA corner, the carrier's rear edge). That is a modelling singularity of the bonded contact, away
+    from any part. The real TPU-padded contact spreads it.
+- **The mesh.** fTetWild's 0.45 mm envelope smooths features finer than that, and the boards are one or two
+  elements thick. This model ranks and locates; §5's material table remains the reference for fatigue and drop.
+
 **What is not established.**
 - **Material data.** Every value marked [I] in `fea_case.py` (for example the 70 °C strengths and the resin
   data) is inferred, not measured.
