@@ -78,6 +78,15 @@ D1002's and R1001's place on the top. DRC with zones refilled and schematic pari
 
 ---
 
+### 1.2 Fan header for enclosure v2 (Rev06, 14 Nov)
+
+`_work/rev06_fan.py`. **J1002** (JST PH 2-pin, vertical, LCSC C131337): pin 1 FAN_5V, pin 2 GND, for a 50 × 50 ×
+10 mm 5 V fan (docs/ENCLOSURE.md section 6). **F1002**, a 0.5 A-hold 1206 PTC (SMD1206P050TF, C43379), keeps a
+shorted fan lead from pulling +5V0, and the whole board, down; **C1092** 10 µF holds the motor's commutation current
+at the header. Always on: the FPGA has no escapable ball left for PWM or tach, and HK_ALERT (TMP1075) would leave the
+fan off at power-up, the wrong failure. Placed near the input section, through-hole, outside the carrier's
+footprint (LAYOUT §1). The fan's ~0.1 A adds about 2 % to +5V0's load (LMR33630, 3 A).
+
 ## 2. Decisions this sheet makes, for your approval
 
 | Decision | Evidence | Alternative |
