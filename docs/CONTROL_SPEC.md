@@ -167,6 +167,8 @@ py _work/check_sheet.py control
 
 ## 7. Gigabit Ethernet, an assembly option (13 November 2026)
 
+> **Rev05.** On Rev06 Ethernet has its own FPGA pins and IAS1 keeps all its lanes: section 8.
+
 *Added by `_work/add_ethernet.py`, a text edit of this sheet like the ESD arrays (`_work/add_esd.py`).
 `control_spec.py` and `check_sheet.py` do not know these parts: no FPGA ball changed.*
 
@@ -249,3 +251,55 @@ The PHY's input pair runs beside LINK_RX_D1_N on L1 for 5.2 mm at 0.17 mm.
 **Gateware.** Xilinx's 1G/2.5G Ethernet PCS/PMA or SGMII core (PG047), in its "SGMII over LVDS,
 asynchronous oversampling" form (XAPP523), which supports 7-series −2 parts. 1.25 Gb/s is also
 the ceiling of these HR-bank pins (IAS_LINK_SPEC §7), so there is no margin in rate.
+
+---
+
+## 8. Rev06: Ethernet on its own pins, IAS1 complete (14 November 2026)
+
+*`_work/rev06_eth.py` and `_work/rev06_vcm.py` (text edits of this sheet), branch `rev06`.*
+
+**Why.** In Rev05 the PHY borrowed two IAS1 pairs, so Ethernet and the full link excluded each other. The owner
+wanted both: IAS1 with its two uplink lanes and its downlink, and Ethernet on top, so that either path works
+alone and both together carry about 3 Gb/s (fpga/eth/REDUNDANCY.md, mode 6). C1218–C1221 become in-line AC
+capacitors on the PHY's own pairs; C101/C102/C107/C108 stay fitted.
+
+**Pins, chosen by what the board can escape.** Section 7 found no free ball that could still be routed out.
+Re-checking every free bank-14/15/34 ball for a via in its pad: R2/R1 were clear; R3 was blocked only by a
+skew meander of LINK_RX_D0_N under the corner, which moved out of the BGA (that leg was re-matched: the pair
+is back to 0 ps P−N); T4/T3 and N1 are walled in by matched LVDS legs; P5 sits on a +3V3_D run that feeds
+ball L6 where the L4 plane has a void.
+
+| Signal | Ball | Standard | Notes |
+|---|---|---|---|
+| ETH_SGTX_FPGA_P/N | R2 / R1 (IO_L7P/N_T1_34) | LVDS_25 | → C1220/C1221 (bottom, by the PHY) → HSIP/HSIN |
+| ETH_SGRX_FPGA_P/N | R3 / T2 (IO_L8P/N_T1_34) | LVDS_25, DIFF_TERM | ← R1215/R1216 ← C1218/C1219 ← HSOP/HSON |
+| ETH_MDC | P1 (IO_L4N_T0_34) | LVCMOS25 | the PHY's I/O run at 2.5 V (CFG_LDO = 01); R1211 holds it low during configuration |
+| ETH_MDIO | M15 (IO_L3N_T0_DQS_EMCCLK_14) | LVCMOS33, **open-drain** | the gateware only pulls it low; R1213 (1.5 k) pulls it up to the PHY's 2.5 V, which bank 14 reads as high (V_IH 2.0 V). The bitstream must not use EMCCLK |
+| ETH_RSTN | K13 (IO_L5P_T0_D06_14) | LVCMOS33 | R1214/C1216 power-on reset stays; the FPGA can hold the PHY in reset |
+| INTB | — | — | open, as before: the gateware polls MDIO |
+
+Vivado place-and-route of the full Artix top with these pins closes timing (WNS +0.039 ns, gateware task 19).
+
+**Receiver bias, made at the PHY.** The FPGA's DIFF_TERM terminates but does not bias an AC-coupled input.
+R1215/R1216 (10 k) give each SGRX leg a common mode. They first went to +1V2, which exists only near J101 and on
+a few vias 30 mm from the PHY: placed by those vias they hung off the legs as 23 / 11 mm branches (157 / 75 ps
+stubs), which resonate near 1.6 GHz. Now they sit **on** the legs, in series with the trace between each
+capacitor and the line, and their common node ETH_VCM is made locally: R1212 10 k from +3V3_D, R1217 5.6 k to
+ground, C1222 100 nF → **1.18 V** (LVDS_25 input common mode 0.3–1.5 V).
+
+**Routing (lvds_skew.py, end to end across the capacitors).**
+
+| Pair | P / N delay | P − N | Stubs | Notes |
+|---|---|---|---|---|
+| ETH_SGTX (FPGA → PHY) | 404 / 402 ps | +2 ps | 9 / 9 ps | 51 / 49 mm, two 50 Ω legs, vias in the balls |
+| ETH_SGRX (PHY → FPGA) | 464 / 468 ps | −4 ps | 7 / 6 ps | a 3.9 mm meander on P |
+| LINK_RX_D0 | 773 / 773 ps | +0 ps | 3 / 3 ps | as Rev05 |
+
+The legs are uncoupled, like ten of the board's LVDS pairs, because the BGA's south-east corner leaves no room
+for a coupled pair to leave it. To make room, the slow nets in the corner (JTAG, flash, XADC, converter SPI,
+housekeeping I²C, ADAR SPI) and part of bank 34's VCCO feed were ripped and re-routed. **Known compromise:** two of
+bank 34's VCCO balls (R4, M3) are now fed through a 0.1 mm × 13.7 mm +2V5 track (about 0.15 Ω); the bank's other
+VCCO balls keep their wide connection. DRC: 0 errors, 0 unconnected, schematic parity 0.
+
+**Also on Rev06:** J1002, a 5 V fan header for enclosure v2 (POWER sheet; docs/ENCLOSURE.md section 6).
+

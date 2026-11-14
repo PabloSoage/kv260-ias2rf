@@ -106,6 +106,8 @@ RULES = {
     ("100n 100V", "C_0603_1608Metric"): ("C", "100n", "0603", 100, XR),
     ("green", "LED_0603_1608Metric"): ("P", "KT-0603G", r"^KT-0603G$"),
     ("PTC 1.5A hold", "Fuse_1812_4532Metric"): ("P", "1812 PTC 1.5A", r"(150|1\.5)"),
+    ("PTC 0.5A hold", "Fuse_1206_3216Metric"): ("P", "SMD1206P050TF", r"^(SMD1206P050|1206L050|BSMD1206-050)"),
+    ("FAN 5V", "JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical"): ("P", "B2B-PH-K-S", r"^B2B-PH-K-S"),
     ("600R@100MHz >=1A", "L_0603_1608Metric"): ("FB", 600, "0603", 1.0),
     ("600R@100MHz", "L_0603_1608Metric"): ("FB", 600, "0603", 1.0),
     ("220R@100MHz", "L_0603_1608Metric"): ("FB", 220, "0603", 1.0),
