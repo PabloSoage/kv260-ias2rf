@@ -170,12 +170,51 @@ What this says:
 
 ---
 
-## 6. Rebuilding
+## 6. Version 2: a fan for the adapter, for dusty roads
+
+v1 stays as it is (above). **v2** is the same tray, lid and bumpers with active cooling for the adapter, from the
+CFD study in [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md). It needs the Rev06 adapter, whose J1002 header gives
+the fan 5 V.
+
+| | |
+|---|---|
+| ![v2 closed](img/case_v2_closed.jpg) | ![v2 open](img/case_v2_open.jpg) |
+| ![v2 lid, inside: the fan in its duct](img/case_v2_lid.jpg) | ![v2, KV260 side](img/case_v2_kria.jpg) |
+
+**What changes from v1.**
+- **A 50 × 50 × 10 mm 5 V fan** blowing down onto the adapter's hot strip along its front edge: U401 (ADCLK948),
+  Y401 (Si549), U501 (AD9484), U502/U503 (AD8352) and U1201 (the Ethernet PHY). It hangs from the lid in a 1.2 mm
+  square duct whose top stands 4 mm below the ceiling, a plenum under the grille, so the fan can only draw through
+  the grille. Four M3 self-tapping fan screws go from below into bosses in the duct's corners.
+- **A second hex grille** over the fan, the same 7 mm cells as the KV260's. Outside it, a 58 × 58 × 1.2 mm recess
+  holds a **100-mesh stainless filter**, under a printed frame with the same grille (`case_v2_filter_frame.stl`)
+  and four M2.5 × 6 screws: the filter comes out for cleaning without opening the case.
+- **The SMA wall has no slots**: with the fan blowing in, the box runs at a slight overpressure (CFD: about
+  +11 Pa), so air leaves through the vents and dust does not come in at the seams.
+- **Right-wall exhaust widened**: 13 slots of 3 × 16 mm instead of 9 of 3 × 14 mm.
+- **The "KV260 · IAS2RF" label** stays where it was.
+- **Stick-on aluminium heatsinks** in the fan's jet (bought parts, thermally conductive epoxy rather than tape for
+  vibration): 9 × 9 × 5 mm on U401 and on Y401, 14 × 14 × 6 mm on U501. They sit about 9 mm below the fan.
+
+**Parts to buy.** A 50 × 50 × 10 mm 5 V fan with a 2-pin JST PH plug (the CFD used the Sunon MF50100V1-1000U-A99
+curve: 8.5 CFM free air, 22 Pa); a 100-mesh stainless sheet cut to 56 × 56 mm; the three heatsinks; 4 × M3 × 14
+self-tapping fan screws and 4 × M2.5 × 6.
+
+**Thermal result (CFD, task 21; the built geometry is being re-simulated).** At 25 °C and 45 °C ambient the fan
+keeps every IC at least 18 °C under its limit. At 70 °C (a vehicle parked in the sun) the study's fan position left
+the Si549 and the K26 SOM 2-3 °C over; v2 moves the fan right over the Si549's strip and adds the heatsinks, which
+the verification run will quantify.
+
+---
+
+## 7. Rebuilding
 
 ```
-blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- --stl mech
+blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- --stl mech           # v1
+blender -b _work/mech/cache/assembly.blend --python _work/mech/build_case.py -- --v2 --stl mech      # v2
 blender -b _work/mech/cache/case.blend --python _work/mech/check_case.py
-blender -b _work/mech/cache/case.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma
+blender -b _work/mech/cache/case.blend --python _work/mech/render_case.py -- closed,closed_back,open,tray,lid,section,sma,kria
+blender -b _work/mech/cache/case_v2.blend --python _work/mech/render_case.py -- closed,open,lid,kria --prefix case_v2_
 FEA_OUT=$HOME/fea micromamba run -n fea python _work/mech/fea_case.py --h 4      # WSL, about 3 min per material
 micromamba run -n fea python _work/mech/post_fea.py $HOME/fea
 ```

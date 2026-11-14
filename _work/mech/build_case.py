@@ -14,6 +14,7 @@ from mathutils import Vector
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 D = os.path.join(ROOT, "_work", "mech", "cache")
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+V2 = "--v2" in argv        # enclosure v2: adapter fan + filtered grille, SMA vents closed (docs/ENCLOSURE.md section 7)
 MM = 0.001
 sc = bpy.context.scene
 
@@ -455,13 +456,76 @@ for j in range(-5, 6):
             grille.append(cyl("g", x, y, Z_TOP_IN - 1, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
 cut(lid, join(grille, "grille"))
 vents = []
-for k in range(9):                                             # right wall, beside the fan-sink
-    y = 22.0 + k * 6.0
-    vents.append(box("vr", INNER[5][0] - 1, OUTER[5][0] + 1, y, y + 3.0, 12.0, 26.0))
-for k in range(14):                                            # SMA wall, above the SMAs: air across the adapter
-    y = 4.0 + k * 7.0
-    vents.append(box("vl", OUTER[7][0] - 1, INNER[7][0] + 1, y, y + 3.0, 12.0, 26.0))
+NR = 13 if V2 else 9                                           # v2: wider exhaust, the box runs at overpressure
+for k in range(NR):                                            # right wall, beside the fan-sink
+    y = (10.0 if V2 else 22.0) + k * 6.0
+    vents.append(box("vr", INNER[5][0] - 1, OUTER[5][0] + 1, y, y + 3.0, 12.0 if not V2 else 10.0, 26.0))
+if not V2:                                                     # v2 closes the SMA wall: dust stays out
+    for k in range(14):                                        # SMA wall, above the SMAs: air across the adapter
+        y = 4.0 + k * 7.0
+        vents.append(box("vl", OUTER[7][0] - 1, INNER[7][0] + 1, y, y + 3.0, 12.0, 26.0))
 cut(lid, join(vents, "vents"))
+
+# ---- v2: a 50 x 50 x 10 mm 5 V fan blowing onto the adapter's hot strip, under a filtered grille ----------
+# Over U401 / Y401 / U501 / U502-U503 / U1201 (the strip along the adapter's front edge; ENCLOSURE_V2_THERMAL.md).
+# Inside: a 4 mm square duct from the ceiling to the fan, so it can only draw through the grille; four bosses with
+# 2.5 mm pilots for M3 self-tapping fan screws from below. Outside: a 58 x 58 x 1.2 mm recess for a 100-mesh
+# stainless filter, held by a printed grille frame (case_v2_filter_frame.stl) with four M2.5 x 6 screws.
+FAN2_C, FAN2, FAN2_P = (-40.0, 14.0), 50.0, 40.0
+filter_frame = None
+if V2:
+    fx, fy = FAN2_C
+    h = FAN2 / 2
+    ZF = Z_TOP_IN - 4.0                                        # fan top: 4 mm plenum under the grille
+    cut(lid, box("fan2_clear", fx - h - 1.5, fx + h + 1.5, fy - h - 1.5, fy + h + 1.5, ZF - 0.5, Z_TOP_IN + 0.01))
+    duct = [box("d1", fx - h - 1.2, fx + h + 1.2, fy - h - 1.2, fy - h, ZF, Z_TOP_IN + 0.2),
+            box("d2", fx - h - 1.2, fx + h + 1.2, fy + h, fy + h + 1.2, ZF, Z_TOP_IN + 0.2),
+            box("d3", fx - h - 1.2, fx - h, fy - h, fy + h, ZF, Z_TOP_IN + 0.2),
+            box("d4", fx + h, fx + h + 1.2, fy - h, fy + h, ZF, Z_TOP_IN + 0.2)]
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            duct.append(cyl("fb", fx + sx * FAN2_P / 2, fy + sy * FAN2_P / 2, ZF, Z_TOP_IN + 0.2, 7.0))
+    union(lid, join(duct, "fan2_duct"), self_ix=True)
+    pil = [cyl("fp", fx + sx * FAN2_P / 2, fy + sy * FAN2_P / 2, ZF - 1, Z_TOP_IN - 0.8, 2.5) for sx in (-1, 1) for sy in (-1, 1)]
+    cut(lid, join(pil, "fan2_pilots"))
+    # the filter recess and the frame's screw pilots, outside the duct
+    R2 = 29.0
+    cut(lid, box("frecess", fx - R2, fx + R2, fy - R2, fy + R2, Z_TOP - 1.2, Z_TOP + 1))
+    fsp = [cyl("fs", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 6.0, Z_TOP, 2.1) for sx in (-1, 1) for sy in (-1, 1)]
+    cut(lid, join(fsp, "frame_pilots"))
+    g2 = []
+    for j in range(-5, 6):
+        for i in range(-5, 6):
+            x = fx + i * gs + (gs / 2 if j % 2 else 0)
+            y = fy + j * gs * math.sqrt(3) / 2
+            if abs(x - fx) < h - 2.5 - grc and abs(y - fy) < h - 2.5 - grc:
+                g2.append(cyl("g2", x, y, Z_TOP_IN - 1, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
+    cut(lid, join(g2, "grille2"))
+    # the printed frame that holds the mesh: the same honeycomb, 1.2 mm, four countersunk-free M2.5 holes
+    filter_frame = box("case_v2_filter_frame", fx - R2 + 0.2, fx + R2 - 0.2, fy - R2 + 0.2, fy + R2 - 0.2, Z_TOP - 1.2, Z_TOP, LID)
+    g3 = []
+    for j in range(-5, 6):
+        for i in range(-5, 6):
+            x = fx + i * gs + (gs / 2 if j % 2 else 0)
+            y = fy + j * gs * math.sqrt(3) / 2
+            if abs(x - fx) < h - 2.5 - grc and abs(y - fy) < h - 2.5 - grc:
+                g3.append(cyl("g3", x, y, Z_TOP - 2, Z_TOP + 1, 2 * grc, verts=6, rot=math.pi / 6))
+    g3 += [cyl("fh", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 2, Z_TOP + 1, 2.8) for sx in (-1, 1) for sy in (-1, 1)]
+    cut(filter_frame, join(g3, "frame_holes"))
+    # the fan itself, for the renders only (not exported): frame, hub, seven blades
+    FANM = mat("fan PBT", (0.20, 0.20, 0.22), 0.45)
+    fan_vis = box("fan2_vis", fx - h, fx + h, fy - h, fy + h, ZF - 10.0, ZF, FANM)
+    cut(fan_vis, cyl("fan2_bore", fx, fy, ZF - 11, ZF + 1, 48.0))
+    parts_v = [cyl("fan2_hub", fx, fy, ZF - 9.5, ZF - 0.5, 20.0, FANM)]
+    for k in range(7):
+        a0 = k * 2 * math.pi / 7
+        bl = box("blade", 9.0, 23.5, -3.0, 3.0, ZF - 8.5, ZF - 1.5, FANM)
+        bl.rotation_euler = (0, 0, a0)
+        bl.location = (fx * MM, fy * MM, 0)
+        parts_v.append(bl)
+    for o in parts_v:
+        o.data.materials.clear(); o.data.materials.append(FANM)
+    fan_vis_all = join([fan_vis] + parts_v, "fan2_vis")
 
 # ---- openings: every connector that faces a wall, through both shells -------------------------------------
 def merged(spans, gap=4.0):
@@ -639,10 +703,13 @@ def stl(objs, fn, loc0=None):
 if "--stl" in argv:
     out = os.path.join(ROOT, argv[argv.index("--stl") + 1])
     os.makedirs(out, exist_ok=True)
-    stl([bottom], os.path.join(out, "case_bottom.stl"))
+    PRE = "case_v2_" if V2 else "case_"
+    stl([bottom], os.path.join(out, PRE + "bottom.stl"))
     # the lid prints upside down: export it flipped, its top on the bed
     lid.rotation_euler = (math.pi, 0, 0)
-    stl([lid], os.path.join(out, "case_lid.stl"))
+    stl([lid], os.path.join(out, PRE + "lid.stl"))
+    if filter_frame:
+        stl([filter_frame], os.path.join(out, "case_v2_filter_frame.stl"))
     lid.rotation_euler = (0, 0, 0)
     p0 = pins[0]
     loc = p0.location.copy()
@@ -657,5 +724,6 @@ if "--stl" in argv:
     for o in (bottom, lid):
         d = o.dimensions
         print(f"{o.name}: {d.x / MM:.1f} x {d.y / MM:.1f} x {d.z / MM:.1f} mm")
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(D, "case.blend"))
-print("saved", os.path.join(D, "case.blend"))
+BL = os.path.join(D, "case_v2.blend" if V2 else "case.blend")
+bpy.ops.wm.save_as_mainfile(filepath=BL)
+print("saved", BL)

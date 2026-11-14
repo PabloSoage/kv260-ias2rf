@@ -124,7 +124,7 @@ pins = [o for o in bpy.data.objects if re.fullmatch(r"pin\d+", o.name)]     # no
 pads = [o for o in bpy.data.objects if o.name.startswith("pad")]
 bumpers = [o for o in bpy.data.objects if o.name.startswith("bumper")]
 boards = [o for o in bpy.data.objects if o.parent is None and o.name not in
-          ("case_lid", "case_bottom", "floor", "tgt", "cam", "key", "fill", "rim") and not o.name.startswith(("pin", "pad", "bumper"))]
+          ("case_lid", "case_bottom", "floor", "tgt", "cam", "key", "fill", "rim") and not o.name.startswith(("pin", "pad", "bumper", "fan2_vis", "case_v2_filter_frame"))]
 home = {o.name: (o.location.copy(), o.rotation_euler.copy()) for o in [lid] + pins + pads + bumpers}
 
 
@@ -202,6 +202,12 @@ VIEWS = {   # name: (target mm, camera mm, lens mm)
     "sma":         ((-112, 50, 3), (-260, -60, 70), 55),
     "kria":        ((55, 118, 4), (170, 400, 95), 50),
 }
+PREFIX = argv[argv.index("--prefix") + 1] if "--prefix" in argv else "case_"
+LIDX = [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame"))]
+for o in LIDX:                                 # v2: the fan and the filter frame move with the lid
+    mw = o.matrix_world.copy()
+    o.parent = lid
+    o.matrix_world = mw
 os.makedirs(os.path.join(ROOT, "docs", "img"), exist_ok=True)
 for v in views:
     reset()
@@ -215,6 +221,8 @@ for v in views:
     elif v == "tray":
         tree_hide(boards, True)
         lid.hide_render = True
+        for o in LIDX:
+            o.hide_render = True
         for p in pins + pads + bumpers:
             p.hide_render = True
     elif v == "lid":                           # the lid upside down beside nothing: its inside
@@ -231,7 +239,7 @@ for v in views:
     tgt.location = Vector(t) * MM
     cam.location = Vector(c) * MM
     cam.data.lens = lens
-    sc.render.filepath = os.path.join(ROOT, "docs", "img", f"case_{v}.png")
+    sc.render.filepath = os.path.join(ROOT, "docs", "img", f"{PREFIX}{v}.png")
     bpy.ops.render.render(write_still=True)
     sc.render.resolution_y = H
     print("rendered", sc.render.filepath)
