@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-Enclosure v1 wraps the KV260 Starter Kit (K26 SOM + OEM carrier/finned heatsink) and the IAS2RF Rev01/v2 adapter PCB inside an inner cavity of **240.6 × 124.2 × 40.75 mm** (`x ∈ [-109.6, +131.0] mm`, `y ∈ [-12.2, +112.0] mm`, `z ∈ [-8.0, +32.75] mm`), printed in PETG-CF (`k = 0.25 W/m·K`). Open SMA-side slots and unbaffled top/side openings admit road dust in automotive/field operation (`T_amb = 25 °C / 45 °C / 70 °C`), while closing the openings without thermal management risks over-temperature on tight-limit silicon—most notably **`U402` Si549 (`Tj,max = 105 °C`)** and **`U1101` XC7A50T / K26 SOM (`Tj,max = 100 °C`)**.
+Enclosure v1 wraps the KV260 Starter Kit (K26 SOM + OEM carrier/finned heatsink) and the IAS2RF Rev01/v2 adapter PCB inside an inner cavity of **240.6 × 124.2 × 40.75 mm** (`x ∈ [-109.6, +131.0] mm`, `y ∈ [-12.2, +112.0] mm`, `z ∈ [-8.0, +32.75] mm`), printed in PETG-CF (`k = 0.25 W/m·K`). Open SMA-side slots and unbaffled top/side openings admit road dust in automotive/field operation (`T_amb = 25 °C / 45 °C / 70 °C`), while closing the openings without thermal management risks over-temperature on tight-limit silicon—most notably **`Y401` Si549 (`Tj,max = 105 °C`)** and **`U1101` XC7A50T / K26 SOM (`Tj,max = 100 °C`)**.
 
 This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-fan and conductive-spreader configurations against dust ingress protection and junction-temperature limits up to `T_amb = 70 °C`.
 
@@ -37,7 +37,7 @@ This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-
 | `U401` ADCLK948 | 0.95 | 8.8 | 12.0 | 150.0 | Clock fanout buffer |
 | `U1001` LMR33630 | 0.88 | 13.6 | 22.0 | 150.0 | 12V→5V buck regulator |
 | `U1101` XC7A50T-FTG256 | 0.73 | 8.4 | 4.24 | 100.0 | Front-end FPGA |
-| `U402` Si549 | 0.50 | 20.0 | 25.0 | **105.0** | Tightest adapter IC limit |
+| `Y401` Si549 | 0.50 | 20.0 | 25.0 | **105.0** | Tightest adapter IC limit |
 | `U1201` RTL8211FSI | 0.50 | 12.0 | 18.0 | 125.0 | Gigabit Ethernet PHY |
 | `U1005..U1007` TPS7A8300 | 0.50 / 0.35 / 0.17 | 12.3 | 25.0 | 125.0 | Low-noise analog LDOs |
 | `U601` AD9253 | 0.46 | 12.0 | 7.1 | 125.0 | Quad 125 MSPS ADC |
@@ -101,7 +101,7 @@ This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-
 
 ![Adapter PCB Temperature Maps](sim/v2_cfd_adapter_maps.png)
 
-- Notice the localized heat concentration around `(x ≈ -45..-25 mm, y ≈ +10..+90 mm)` (`U401`, `U402`, `U501`, `U1001`) in air-cooled cases vs. the nearly isothermal `86–92 °C` adapter plateau achieved by the Option 3 conductive aluminum spreader (`sealed_alu_70C`).
+- Notice the localized heat concentration around `(x ≈ -45..-25 mm, y ≈ +10..+90 mm)` (`U401`, `Y401`, `U501`, `U1001`) in air-cooled cases vs. the nearly isothermal `86–92 °C` adapter plateau achieved by the Option 3 conductive aluminum spreader (`sealed_alu_70C`).
 
 ---
 
@@ -122,4 +122,85 @@ This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-
 
 ## 7. Design Recommendation
 
-No single passive or single-fan polymer change closes all junction limits simultaneously at `T_amb = 70 °C`: unspreaderized airflow (`fan50_imp_filt` fine mesh) keeps `XC7A50T` safe (`93.73 °C`, `+6.27 °C` margin) but leaves `Si549` (`107.66 °C > 105 °C`) and `K26` (`102.05 °C > 100 °C`) slightly over-limit, while conduction alone (`sealed_alu_70C`) cools every adapter IC below `96.2 °C` (`+8.85 °C` on `Si549`) but starves the `9 W` K26 SOM (`119.05 °C`). **We therefore recommend a hybrid v2 enclosure combining Option 4b and Option 3**: keep the **50×50×10 mm 5 V impinging lid fan** (`Sunon MF50100V1-1000U` class) with **removable 100-mesh dust filters**, **seal the SMA-side slots** (`+10.8 Pa` positive internal pressure prevents dust ingress, with widened right exhaust slots), and add a **low-profile aluminum local heat-spreader / gap-pad assembly** bridging `U401`/`U402`/`U501`/`U1001` into the fan airstream (rather than sealing the box); for continuous `25–45 °C` operation without `70 °C` soak, Option 4b alone already passes all ICs with `>= 18 °C` margin.
+No single passive or single-fan polymer change closes all junction limits simultaneously at `T_amb = 70 °C`: unspreaderized airflow (`fan50_imp_filt` fine mesh) keeps `XC7A50T` safe (`93.73 °C`, `+6.27 °C` margin) but leaves `Si549` (`107.66 °C > 105 °C`) and `K26` (`102.05 °C > 100 °C`) slightly over-limit, while conduction alone (`sealed_alu_70C`) cools every adapter IC below `96.2 °C` (`+8.85 °C` on `Si549`) but starves the `9 W` K26 SOM (`119.05 °C`). **We therefore recommend a hybrid v2 enclosure combining Option 4b and Option 3**: keep the **50×50×10 mm 5 V impinging lid fan** (`Sunon MF50100V1-1000U` class) with **removable 100-mesh dust filters**, **seal the SMA-side slots** (`+10.8 Pa` positive internal pressure prevents dust ingress, with widened right exhaust slots), and add a **low-profile aluminum local heat-spreader / gap-pad assembly** bridging `U401`/`Y401`/`U501`/`U1001` into the fan airstream (rather than sealing the box); for continuous `25–45 °C` operation without `70 °C` soak, Option 4b alone already passes all ICs with `>= 18 °C` margin.
+
+---
+
+## Verification of the built v2
+
+This section audits the **actual fabricated Enclosure v2 + Rev06 adapter hardware** (`mech/case_v2_bottom.stl`, `mech/case_v2_lid.stl`, `mech/case_v2_filter_frame.stl`, `_work/mech/build_case.py --v2`, and `mech/v2_cfd/run_built_v2_cfd.py`) via a dedicated 10-case 3D CHT OpenFOAM sweep (`results_built_v2.json`), plus offscreen 3D VTK/PyVista thermal and streamline renders registered against the printed STLs.
+
+### 1. Built Geometry & Rev06 Deltas vs. Initial Option 4b Assumptions
+
+1. **Relocated `50×50×10 mm` impinging fan (`(-40.0, +14.0) mm`):** Centered directly over the front hot strip (`U401` at `(-34.9, -0.2)`, `Y401` at `(-35.0, +8.8)`, `U501` at `(-51.8, +10.6)`), rather than `(-45, +45) mm`. A `1.2 mm` PETG-CF square shroud (`x ∈ [-66.2, -13.8]`, `y ∈ [-12.2, +40.2]`, `z = 18.75..28.75 mm`, `Ø48 mm` bore, `Ø20 mm` hub) sits beneath a `4.0 mm` ceiling plenum (`z = 28.75..32.75 mm`), leaving `U1001..U1007` (`y = 81..104.5 mm`) and `U1101` (`(-42.75, 40.0)`) outside the direct jet column until air spreads laterally.
+2. **Double `7 mm` hex grille constriction (`984.9 mm²`):** Stacking `g2` (lid hex) and `g3` (removable `case_v2_filter_frame.stl` clamping the `100`-mesh filter) with `1.6 mm` walls leaves **`39` open hex cells (`984.9 mm²`)** inside the `~41 × 41 mm` inner recess—only **`54.4%`** of the `Ø48 mm` (`1809.6 mm²`) fan bore (`3.38×` higher local dynamic pressure drop through the filter than an unobstructed bore).
+3. **Closed SMA wall & `13` right-wall exhaust slots:** Zero SMA-wall openings (`x = -109.6 mm` sealed); exhaust relies exclusively on `13` right-wall slots (`3 × 16 mm`, `6 mm` pitch over `y = 10..85 mm, z = 10..26 mm` at `x = +131.0 mm`).
+4. **Stick-on aluminum heatsinks & Rev06 PCB updates:**
+   - `U401_ADCLK948`: `9 × 9 × 5 mm`; **`Y401_Si549`** (updated Rev06 designator, formerly `U402` in legacy `results.json`): `9 × 9 × 5 mm`; `U501_AD9484`: `14 × 14 × 6 mm`.
+   - `U1201_RTL8211FSI` (`-18.2, -1.0`): upgraded to **`10` thermal vias** in its exposed pad (`theta_JB` reduced from `12.0` to `5.0 °C/W`).
+   - `J1002` fan header relocated to `(-15.3, 103.5) mm`; PCB lateral conductance normalized across meshes to exact `1.60 mm` thickness (`k·t = 18.0 W/(m·K) × 1.60 mm`), with fine mesh (`128 × 72 × 51`, `431,751` fluid cells) resolving `1.60 mm` natively (`nz = 51`, `dz = 0.799 mm`).
+
+![Built Enclosure v2 3D CHT Thermal Cutaway at Ta = 70 C](sim/v2_thermal_3d_cutaway.png)
+
+### 2. Full-Board Thermal Results Across All 16 Adapter ICs + K26 SOM
+
+| Component | `25 °C` Clean `Tj` (Margin) | `45 °C` Clean `Tj` (Margin) | `70 °C` Clean Med `Tb / Tj` (Margin) | `70 °C` Clean Fine `Tb / Tj` (Margin) | `70 °C` No Heatsinks `Tj` (Margin) | `70 °C` Proposed `Tj` (Margin) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `U401_ADCLK948` | 62.02 (+87.98) | 82.46 (+67.54) | 100.88 / 107.99 (+42.01) | 99.98 / 106.68 (+43.32) | 116.32 (+33.68) | 105.37 (+44.63) |
+| `Y401_Si549` | 61.09 (+43.91) | 81.53 (+23.47) | 98.06 / 107.05 (-2.05) | 96.96 / 105.53 (-0.53) | 113.78 (-8.78) | **101.68 (+3.32)** |
+| `U501_AD9484` | 53.12 (+71.88) | 73.50 (+51.50) | 94.88 / 98.97 (+26.03) | 95.35 / 99.22 (+25.78) | 108.52 (+16.48) | 96.35 (+28.65) |
+| `U502_AD8352` | 52.39 (+72.61) | 72.75 (+52.25) | 95.44 / 98.24 (+26.76) | 95.84 / 98.64 (+26.36) | 102.35 (+22.65) | 95.51 (+29.49) |
+| `U503_AD8352` | 49.74 (+75.26) | 70.08 (+54.92) | 92.74 / 95.54 (+29.46) | 92.23 / 95.03 (+29.97) | 98.84 (+26.16) | 93.15 (+31.85) |
+| `U601_AD9253` | 47.64 (+77.36) | 67.94 (+57.06) | 87.88 / 93.40 (+31.60) | 88.44 / 93.96 (+31.04) | 94.88 (+30.12) | 91.22 (+33.78) |
+| `U1101_XC7A50T` | 48.33 (+51.67) | 68.68 (+31.32) | 87.97 / 94.11 (+5.89) | 86.81 / 92.94 (+7.06) | 95.21 (+4.79) | 91.32 (+8.68) |
+| `U1001_LMR33630` | 68.46 (+81.54) | 88.84 (+61.16) | 100.28 / 114.29 (+35.71) | 100.90 / 114.91 (+35.09) | 114.51 (+35.49) | 112.42 (+37.58) |
+| `U1002_TPS562201` | 52.47 (+72.53) | 72.80 (+52.20) | 92.03 / 98.18 (+26.82) | 92.57 / 98.72 (+26.28) | 98.39 (+26.61) | 96.09 (+28.91) |
+| `U1003_TPS562201` | 48.24 (+76.76) | 68.58 (+56.42) | 90.97 / 93.97 (+31.03) | 90.57 / 93.57 (+31.43) | 94.19 (+30.81) | 91.72 (+33.28) |
+| `U1004_TPS562201` | 45.09 (+79.91) | 65.43 (+59.57) | 89.31 / 90.81 (+34.19) | 88.78 / 90.28 (+34.72) | 91.03 (+33.97) | 88.38 (+36.62) |
+| `U1005_TPS7A8300` | 55.40 (+69.60) | 75.75 (+49.25) | 95.00 / 101.15 (+23.85) | 94.94 / 101.09 (+23.91) | 101.38 (+23.62) | 98.77 (+26.23) |
+| `U1006_TPS7A8300` | 53.94 (+71.06) | 74.29 (+50.71) | 95.40 / 99.71 (+25.29) | 95.40 / 99.71 (+25.29) | 99.93 (+25.07) | 97.41 (+27.59) |
+| `U1007_TPS7A8300` | 49.07 (+75.93) | 69.42 (+55.58) | 92.75 / 94.84 (+30.16) | 93.03 / 95.12 (+29.88) | 95.06 (+29.94) | 92.67 (+32.33) |
+| `U1201_RTL8211FSI` | 54.89 (+70.11) | 75.31 (+49.69) | 98.32 / 100.82 (+24.18) | 96.96 / 99.46 (+25.54) | 104.12 (+20.88) | 97.59 (+27.41) |
+| `AD9708_AD9767` | 49.03 (+75.97) | 69.37 (+55.63) | 89.35 / 94.75 (+30.25) | 88.38 / 93.78 (+31.22) | 95.08 (+29.92) | 92.39 (+32.61) |
+| **`K26_SOM`** (`sink / Tj`) | 58.37 (+41.63) | 78.65 (+21.35) | 91.36 / 103.96 (-3.96) | 87.63 / 100.23 (-0.23) | 91.37 / 103.97 (-3.97) | 90.19 / 102.79 (-2.79) |
+
+Key takeaways across ambient temperatures:
+- **Continuous `25 °C` and `45 °C` operation passes every device cleanly**, even with a **`2×` clogged dust filter**: at `45 °C` clogged (`v2_built_hs_clogged_45C`), worst margins remain **`+21.24 °C` on `K26 SOM` (`78.76 °C`)**, **`+23.27 °C` on `Y401_Si549` (`81.73 °C`)**, and **`+31.08 °C` on `U1101_XC7A50T` (`68.92 °C`)**.
+- **At `70 °C` ambient (`clean` vs. `2×` clogged):** Doubling filter resistance (`v2_built_hs_clogged_70C`) drops 50 mm fan airflow from `2.57 -> 2.22 CFM` (`-13.6%`) but shifts peak silicon temperatures by less than `+0.18 °C` (`Y401`: `107.05 -> 107.23 °C`), because the grille/plenum and right-wall backpressure already dominate the system curve. Mesh refinement (`141,726 -> 431,751` cells) agrees within `0.25–1.52 °C` on all adapter ICs (`LMR33630` `114.29 -> 114.91 °C`, `U501` `98.97 -> 99.22 °C`, `Y401` `107.05 -> 105.53 °C`) while reducing `K26 SOM` boundary-layer resistance (`103.96 -> 100.23 °C`, essentially right at the `100 °C` limit).
+- **Rev06 `U1201` 10-via upgrade impact:** Together with front-strip heatsink heat sinking, `U1201_RTL8211FSI` drops from `104.29 °C` (`fan50_imp_filt_70C` in Section 6) to **`99.46 °C`** (`fine`), gaining `+4.83 °C` margin (`+25.54 °C` total below `125 °C`).
+
+![Built Enclosure v2 All-IC Junction Temperatures and Margins at Ta = 70 C](sim/v2_built_margins_70c.png)
+
+### 3. Stick-On Heatsink Effectiveness & Flush-Contact Thermal Bridging
+
+Comparing `v2_built_nohs_clean_70C` vs. `v2_built_hs_clean_70C` quantifies what the three stick-on aluminum heatsinks buy—and reveals a critical geometric coupling bug:
+
+1. **Direct cooling benefit:** Adding the three heatsinks cuts **`U501_AD9484` by `-9.55 °C`** (`108.52 -> 98.97 °C`, rejecting `0.569 W` out the top of its low-`theta_jc_top = 1.7 °C/W` package), **`U401_ADCLK948` by `-8.33 °C`** (`116.32 -> 107.99 °C`), and **`Y401_Si549` by `-6.73 °C`** (`113.78 -> 107.05 °C`). Collateral PCB unloading also cools **`U502_AD8352` (`-4.11 °C`)**, **`U503_AD8352` (`-3.30 °C`)**, and **`U1201_RTL8211FSI` (`-3.30 °C`)**. Without heatsinks at `70 °C`, `Y401_Si549` fails its `105 °C` rating by **`-8.78 °C` (`113.78 °C`)**.
+2. **Hidden flaw — `U401`/`Y401` heatsink bridging (`0.0 mm` gap):** `U401 (-34.9, -0.2)` and `Y401 (-35.0, +8.8)` are only **`9.0 mm` center-to-center**. Two centered `9 × 9 × 5 mm` heatsinks touch **flush at `y = +4.3 mm`**. Because `U401` dissipates nearly twice the power (`0.95 W` vs. `0.50 W`), `hs_U401` (`105.56 °C` base) conducts lateral heat straight into `hs_Y401` (`105.47 °C` base—**`7.4 °C` hotter than `Y401`'s underlying `98.06 °C` PCB pad!**). As a result, `Y401` only rejects `Q_to_hs = 0.051 W` (`0.071 W` fine) through its top heatsink and remains **`+0.53 °C` (fine) to `+2.05 °C` (med) above `105 °C`**.
+
+![3D Heatsink Comparison: No Heatsinks vs Built Touching 9x9 vs Proposed Fix](sim/v2_thermal_3d_heatsinks_compare.png)
+
+### 4. Fan P-Q Operating Point, Airflow Budget & Hardware Critiques
+
+| Case (`Ta = 70 °C`) | 50 mm Fan Flow (CFM) | Static Pressure (Pa) | KV260 Intake (CFM) | Cavity `p_mean` (Pa) | `Y401 Tj` (`°C`) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `v2_built_hs_clogged_70C` (`2×` filter) | **2.22** | 16.65 | 7.10 | +9.38 | 107.23 |
+| `v2_built_hs_clean_70C` (medium) | **2.57** | 15.81 | 6.82 | +9.68 | 107.05 |
+| `v2_built_hs_clean_fine_70C` (`432k` cells) | **2.72** | 15.44 | 5.89 | +8.99 | 105.53 |
+| `v2_built_widegrille_hs_70C` (Fix #1 alone) | **2.90** | 14.99 | 6.57 | +9.99 | 106.81 |
+| `v2_built_decoupled_hs_70C` (Fix #2 alone) | **2.57** | 15.81 | 6.82 | +9.70 | **104.86** |
+| `v2_built_proposed_70C` (Fixes #1+#2+#3) | **3.62** | **13.16** | **10.96** | **+6.01** | **101.68** |
+
+![Built Enclosure v2 Fan P-Q Curve and Ambient Temperature Sweep](sim/v2_built_fan_pq_and_ambient.png)
+
+![Built Enclosure v2 3D Internal Airflow Streamlines at Ta = 70 C](sim/v2_thermal_3d_streamlines.png)
+
+![Built Enclosure v2 vs Proposed Flow Slices and PCB Map](sim/v2_built_flow_and_pcb.png)
+
+### 5. Concrete Engineering Recommendations (Measured CFD Deltas)
+
+Even though built v2 passes `25–45 °C` with `> 21 °C` margin on all silicon, three low-effort changes close the remaining `70 °C` soak bottlenecks completely:
+
+1. **Thermally decouple `hs_U401` and `hs_Y401` (`0` CAD changes — immediate fix):** Trim `1.5–2.0 mm` off the facing edges of the two `9 × 9 mm` heatsinks (or fit **`7 × 9 mm` / `7 × 7 mm`** blocks) so a `>= 2–3 mm` air gap separates `hs_U401` from `hs_Y401`. Even with the stock lid and clogged-margin grille untouched (`v2_built_decoupled_hs_70C`), `hs_Y401` base drops **`-5.02 °C`** (`105.47 -> 100.45 °C`), `Y401` top heat rejection jumps **`2.8×`** (`0.051 -> 0.142 W`), and **`Y401_Si549` falls `-2.19 °C` to `104.86 °C`** (`< 105 °C`), at a negligible `+0.99 °C` penalty to `U401` (`108.98 °C`, `+41.0 °C` margin).
+2. **Open the `39`-cell double hex lid grille (`v2_built_widegrille_hs_70C`):** Replace the thick `1.6 mm`-wall `39`-cell hex grid (`54.4%` open bore) with a single recessed `Ø48 mm` coarse spoke ring supporting the filter mesh (`~85–90%` open bore). This raises 50 mm fan airflow **`+12.8%`** (`2.57 -> 2.90 CFM @ 14.99 Pa`).
+3. **Expand right-wall exhaust slots + combine Fixes #1–#3 (`v2_built_proposed_70C`):** Extending right-wall slots from `13` slots (`y = 10..85 mm, z = 10..26 mm`) to `17+` taller slots (`y = 4..106 mm, z = 6..28 mm`, or adding rear-right perforations near `K26`) cuts positive internal backpressure **`-38%`** (`+9.68 -> +6.01 Pa`), boosting 50 mm intake **`+40.9%` (`3.62 CFM @ 13.16 Pa`)** and KV260 blower throughput to **`10.96 CFM`**. Together, **all 16 adapter ICs pass `70 °C` cleanly**, pulling **`Y401_Si549` down `-5.37 °C` vs. built v2 (`-12.10 °C` vs. no heatsinks) to `101.68 °C` (`+3.32 °C` margin)**, `U1101_XC7A50T` to **`91.32 °C` (`+8.68 °C` margin)**, `U1201_RTL8211FSI` to `97.59 °C`, and lowering `K26 SOM` by `-1.17 °C` (`103.96 -> 102.79 °C` med, projecting `~99.1 °C` on fine mesh).

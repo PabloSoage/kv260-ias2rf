@@ -52,7 +52,7 @@ def plot_options_70c(by_name: Dict[str, dict]) -> None:
     fig, ax = plt.subplots(figsize=(13.5, 6.2), dpi=160)
     w = 0.16
     ax.bar(x - 2 * w, xc7a, width=w, label="XC7A50T (limit 100 C)", color="#1f77b4")
-    ax.bar(x - 1 * w, si549, width=w, label="U402 Si549 (limit 105 C)", color="#d62728")
+    ax.bar(x - 1 * w, si549, width=w, label="Y401 Si549 (limit 105 C)", color="#d62728")
     ax.bar(x + 0 * w, adclk, width=w, label="U401 ADCLK948 (limit 150 C)", color="#ff7f0e")
     ax.bar(x + 1 * w, k26, width=w, label="K26 SOM (est. 100 C)", color="#2ca02c")
     ax.bar(x + 2 * w, tair, width=w, label="Max cavity air", color="#7f7f7f", alpha=0.8)
