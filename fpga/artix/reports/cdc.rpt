@@ -1,30 +1,30 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Sat Nov 14 17:37:10 2026
+| Date         : Sun Nov 15 03:19:46 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_cdc -details -file D:/Repos/kv260-ias2rf/fpga/artix/reports/cdc.rpt
 | Design       : artix_top
 | Device       : 7a50t-ftg256
 | Speed File   : -2  PRODUCTION 1.23 2018-06-13
-| Design State : Routed
+| Design State : Physopt postRoute
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
 CDC Report
 
 ID      Severity  Count  Description
 ------  --------  -----  ---------------------------------------------------------------
-CDC-1   Critical    166  1-bit unknown CDC circuitry
-CDC-2   Warning       6  1-bit synchronized with missing ASYNC_REG property
-CDC-3   Info         34  1-bit synchronized with ASYNC_REG property
-CDC-5   Warning       8  Multi-bit synchronized with missing ASYNC_REG property
-CDC-6   Warning      24  Multi-bit synchronized with ASYNC_REG property
+CDC-1   Critical    169  1-bit unknown CDC circuitry
+CDC-2   Warning       8  1-bit synchronized with missing ASYNC_REG property
+CDC-3   Info         51  1-bit synchronized with ASYNC_REG property
+CDC-5   Warning      11  Multi-bit synchronized with missing ASYNC_REG property
+CDC-6   Warning      25  Multi-bit synchronized with ASYNC_REG property
 CDC-8   Warning       1  Asynchronous reset synchronized with missing ASYNC_REG property
 CDC-9   Info          3  Asynchronous reset synchronized with ASYNC_REG property
-CDC-10  Critical     18  Combinational logic detected before a synchronizer
+CDC-10  Critical     24  Combinational logic detected before a synchronizer
 CDC-13  Critical    143  1-bit CDC path on a non-FD primitive
 CDC-14  Critical      1  Multi-bit CDC path on a non-FD primitive
-CDC-15  Warning     281  Clock enable controlled CDC structure detected
+CDC-15  Warning     532  Clock enable controlled CDC structure detected
 
 Source Clock: adcs_ddc_clk_unbuf
 Destination Clock: adcs_clk_div
@@ -265,7 +265,7 @@ CDC Type: Safely Timed
 
 Row  ID      Severity  Description                                              Depth  Exception                Source (From)              Destination (To)
 ---  ------  --------  -------------------------------------------------------  -----  -----------------------  -------------------------  ---------------------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer           2  Max Delay Datapath Only  adc_tr_100_sync_reg[1]/C   u_ddc/u_ddc/mixers_enable_sync_chain_reg[0]/D
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer           2  Max Delay Datapath Only  spare1_100_sync_reg[1]/C   u_ddc/u_ddc/mixers_enable_sync_chain_reg[0]/D
   2  CDC-9   Info      Asynchronous reset synchronized with ASYNC_REG property      2  Max Delay Datapath Only  adc_rst_sync_100_reg[1]/C  u_ddc/u_ddc/reset_sync_400m_reg[0]/CLR
 
 Source Clock: refclk_200m_unbuf
@@ -311,6 +311,326 @@ Row  ID      Severity  Description                           Depth  Exception   
   3  CDC-13  Critical  1-bit CDC path on a non-FD primitive      0  False Path  adcs_fco_n     u_adcs_cap/u_iserdes_fco/DDLY
 
 Source Clock: input port clock
+Destination Clock: clk_cfgmclk
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                  Depth  Exception   Source (From)  Destination (To)
+---  -----  --------  ---------------------------  -----  ----------  -------------  ---------------------------------------------------------------
+  1  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[0]/CE
+  2  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[1]/CE
+  3  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[2]/CE
+  4  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[3]/CE
+  5  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/ack_err_reg/D
+  6  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/bit_idx_reg[0]/D
+  7  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/bit_idx_reg[1]/D
+  8  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/bit_idx_reg[2]/D
+  9  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/byte_idx_reg[0]/D
+ 10  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/byte_idx_reg[1]/D
+ 11  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/byte_idx_reg[2]/D
+ 12  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[0]/CE
+ 13  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[0]/D
+ 14  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[1]/CE
+ 15  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[1]/R
+ 16  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[2]/CE
+ 17  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[2]/R
+ 18  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[3]/CE
+ 19  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[3]/D
+ 20  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[4]/CE
+ 21  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[4]/D
+ 22  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[5]/CE
+ 23  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[5]/D
+ 24  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[6]/CE
+ 25  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[6]/D
+ 26  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[7]/CE
+ 27  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[7]/D
+ 28  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[8]/CE
+ 29  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[8]/R
+ 30  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[9]/CE
+ 31  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[9]/R
+ 32  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[10]/CE
+ 33  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[10]/R
+ 34  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[11]/CE
+ 35  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[11]/R
+ 36  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[12]/CE
+ 37  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[12]/R
+ 38  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[13]/CE
+ 39  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[13]/R
+ 40  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[14]/CE
+ 41  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[14]/R
+ 42  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[15]/CE
+ 43  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/div_cnt_reg[15]/R
+ 44  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/in_addr_phase_reg/D
+ 45  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/in_rd_phase_reg/D
+ 46  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/phase_reg[0]/D
+ 47  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/phase_reg[1]/D
+ 48  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[0]/CE
+ 49  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[1]/CE
+ 50  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[2]/CE
+ 51  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[3]/CE
+ 52  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[4]/CE
+ 53  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[5]/CE
+ 54  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[6]/CE
+ 55  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/rd_accum_reg[7]/CE
+ 56  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_ack_err_reg/CE
+ 57  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[0]/CE
+ 58  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[1]/CE
+ 59  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[2]/CE
+ 60  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[3]/CE
+ 61  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[4]/CE
+ 62  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[5]/CE
+ 63  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[6]/CE
+ 64  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_rdata_reg[7]/CE
+ 65  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/resp_valid_reg/D
+ 66  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/scl_t_reg/D
+ 67  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/sda_t_reg/CE
+ 68  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[0]/D
+ 69  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[1]/D
+ 70  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[2]/D
+ 71  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[3]/D
+ 72  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[4]/D
+ 73  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[5]/D
+ 74  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[6]/D
+ 75  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[7]/D
+
+Source Clock: link_clk_unbuf
+Destination Clock: clk_cfgmclk
+CDC Type: No Common Primary Clock
+
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                                 Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  --------------------------------------------  -----------------------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_pmod_spi/ctrl_soft_rst_reg/C                u_clk_mode_ctrl/link_rst_cfg_s_reg[0]/D
+  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_cfg_tog_link_reg/C        u_clk_mode_ctrl/req_cfg_tog_s_reg[0]/D
+  3  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_tog_link_reg/C      u_clk_mode_ctrl/req_delta_tog_s_reg[0]/D
+  4  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_tog_link_reg/C       u_clk_mode_ctrl/req_prog_tog_s_reg[0]/D
+  5  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_tog_link_reg/C        u_clk_mode_ctrl/req_raw_tog_s_reg[0]/D
+  6  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[0]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[0]/D
+  7  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[1]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[1]/D
+  8  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[2]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[2]/D
+  9  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[3]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[3]/D
+ 10  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[4]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[4]/D
+ 11  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[5]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[5]/D
+ 12  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[6]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[6]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[7]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[7]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[8]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[8]/D
+ 15  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[9]/C   u_clk_mode_ctrl/xo_delta_m_cfg_reg[9]/D
+ 16  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[10]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[10]/D
+ 17  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[11]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[11]/D
+ 18  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[12]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[12]/D
+ 19  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[13]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[13]/D
+ 20  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[14]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[14]/D
+ 21  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[15]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[15]/D
+ 22  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[16]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[16]/D
+ 23  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[17]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[17]/D
+ 24  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[18]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[18]/D
+ 25  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[19]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[19]/D
+ 26  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[20]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[20]/D
+ 27  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[21]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[21]/D
+ 28  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[22]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[22]/D
+ 29  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[23]/C  u_clk_mode_ctrl/xo_delta_m_cfg_reg[23]/D
+ 30  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_lat_link_reg[1]/C    u_clk_mode_ctrl/xo_prog_500m_cfg_reg/D
+ 31  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[0]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[0]/D
+ 32  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[1]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[1]/D
+ 33  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[2]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[2]/D
+ 34  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[3]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[3]/D
+ 35  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[4]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[4]/D
+ 36  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[5]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[5]/D
+ 37  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[6]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[6]/D
+ 38  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_reg_link_reg[7]/C     u_clk_mode_ctrl/xo_raw_reg_cfg_reg[7]/D
+ 39  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_rw_link_reg/C         u_clk_mode_ctrl/xo_raw_rw_cfg_reg/D
+ 40  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[0]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[0]/D
+ 41  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[1]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[1]/D
+ 42  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[2]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[2]/D
+ 43  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[3]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[3]/D
+ 44  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[4]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[4]/D
+ 45  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[5]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[5]/D
+ 46  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[6]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[6]/D
+ 47  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[7]/C   u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[7]/D
+ 48  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_lat_link_reg[1]/C    u_clk_mode_ctrl/xo_req_500m_cfg_reg/D
+ 49  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_lat_link_reg[0]/C    u_clk_mode_ctrl/xo_use_ext_clk_cfg_reg/D
+
+Source Clock: clk_cfgmclk
+Destination Clock: clk_dac_400
+CDC Type: No Common Primary Clock
+
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                   Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  ------------------------------  ---------------------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      4  Asynch Clock Groups  u_clk_mode_ctrl/mmcm_rst_reg/C  u_clk_mode_ctrl/dac_rst_sync_reg[0]/PRE
+
+Source Clock: dl_rx_clk
+Destination Clock: clk_dac_400
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                             Depth  Exception            Source (From)                     Destination (To)
+---  -----  --------  ------------------------------------------------------  -----  -------------------  --------------------------------  --------------------------------------
+  1  CDC-5  Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_dac_sdr/wr_ptr_gray_reg[8:0]/C  u_dac_sdr/wr_ptr_gray_sync1_reg[8:0]/D
+  2  CDC-2  Warning   1-bit synchronized with missing ASYNC_REG property          2  Asynch Clock Groups  u_dac_sdr/wr_ptr_bin_reg[9]/C     u_dac_sdr/wr_ptr_gray_sync1_reg[9]/D
+
+Source Clock: clk_cfgmclk
+Destination Clock: clk_dac_500
+CDC Type: No Common Primary Clock
+
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                   Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  ------------------------------  ---------------------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      4  Asynch Clock Groups  u_clk_mode_ctrl/mmcm_rst_reg/C  u_clk_mode_ctrl/dac_rst_sync_reg[0]/PRE
+
+Source Clock: dl_rx_clk
+Destination Clock: clk_dac_500
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                             Depth  Exception            Source (From)                     Destination (To)
+---  -----  --------  ------------------------------------------------------  -----  -------------------  --------------------------------  --------------------------------------
+  1  CDC-5  Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_dac_sdr/wr_ptr_gray_reg[8:0]/C  u_dac_sdr/wr_ptr_gray_sync1_reg[8:0]/D
+  2  CDC-2  Warning   1-bit synchronized with missing ASYNC_REG property          2  Asynch Clock Groups  u_dac_sdr/wr_ptr_bin_reg[9]/C     u_dac_sdr/wr_ptr_gray_sync1_reg[9]/D
+
+Source Clock: link_clk_unbuf
+Destination Clock: clk_dac_500
+CDC Type: No Common Phase
+
+Row  ID      Severity  Description                                     Depth  Exception                Source (From)             Destination (To)
+---  ------  --------  ----------------------------------------------  -----  -----------------------  ------------------------  ------------------------
+  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  dac_stat_ack_link_reg/C   dac_stat_ack_s_reg[0]/D
+  2  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[16]/C   dacr_amp_dac_reg[0]/D
+  3  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[17]/C   dacr_amp_dac_reg[1]/D
+  4  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[18]/C   dacr_amp_dac_reg[2]/D
+  5  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[19]/C   dacr_amp_dac_reg[3]/D
+  6  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[20]/C   dacr_amp_dac_reg[4]/D
+  7  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[21]/C   dacr_amp_dac_reg[5]/D
+  8  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[22]/C   dacr_amp_dac_reg[6]/D
+  9  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[23]/C   dacr_amp_dac_reg[7]/D
+ 10  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  dacr_cfg_tog_link_reg/C   dacr_cfg_tog_s_reg[0]/D
+ 11  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[0]/C      dacr_df_dac_reg[0]/D
+ 12  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[1]/C      dacr_df_dac_reg[1]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[2]/C      dacr_df_dac_reg[2]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[3]/C      dacr_df_dac_reg[3]/D
+ 15  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[4]/C      dacr_df_dac_reg[4]/D
+ 16  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[5]/C      dacr_df_dac_reg[5]/D
+ 17  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[6]/C      dacr_df_dac_reg[6]/D
+ 18  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[7]/C      dacr_df_dac_reg[7]/D
+ 19  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[8]/C      dacr_df_dac_reg[8]/D
+ 20  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[9]/C      dacr_df_dac_reg[9]/D
+ 21  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[10]/C     dacr_df_dac_reg[10]/D
+ 22  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[11]/C     dacr_df_dac_reg[11]/D
+ 23  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[12]/C     dacr_df_dac_reg[12]/D
+ 24  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[13]/C     dacr_df_dac_reg[13]/D
+ 25  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[14]/C     dacr_df_dac_reg[14]/D
+ 26  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[15]/C     dacr_df_dac_reg[15]/D
+ 27  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[16]/C     dacr_df_dac_reg[16]/D
+ 28  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[17]/C     dacr_df_dac_reg[17]/D
+ 29  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[18]/C     dacr_df_dac_reg[18]/D
+ 30  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[19]/C     dacr_df_dac_reg[19]/D
+ 31  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[20]/C     dacr_df_dac_reg[20]/D
+ 32  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[21]/C     dacr_df_dac_reg[21]/D
+ 33  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[22]/C     dacr_df_dac_reg[22]/D
+ 34  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[23]/C     dacr_df_dac_reg[23]/D
+ 35  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[24]/C     dacr_df_dac_reg[24]/D
+ 36  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[25]/C     dacr_df_dac_reg[25]/D
+ 37  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[26]/C     dacr_df_dac_reg[26]/D
+ 38  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[27]/C     dacr_df_dac_reg[27]/D
+ 39  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[28]/C     dacr_df_dac_reg[28]/D
+ 40  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[29]/C     dacr_df_dac_reg[29]/D
+ 41  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[30]/C     dacr_df_dac_reg[30]/D
+ 42  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_df_reg[31]/C     dacr_df_dac_reg[31]/D
+ 43  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_ctrl_reg[0]/C    dacr_en_dac_reg/D
+ 44  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[0]/C      dacr_f0_dac_reg[0]/D
+ 45  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[1]/C      dacr_f0_dac_reg[1]/D
+ 46  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[2]/C      dacr_f0_dac_reg[2]/D
+ 47  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[3]/C      dacr_f0_dac_reg[3]/D
+ 48  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[4]/C      dacr_f0_dac_reg[4]/D
+ 49  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[5]/C      dacr_f0_dac_reg[5]/D
+ 50  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[6]/C      dacr_f0_dac_reg[6]/D
+ 51  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[7]/C      dacr_f0_dac_reg[7]/D
+ 52  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[8]/C      dacr_f0_dac_reg[8]/D
+ 53  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[9]/C      dacr_f0_dac_reg[9]/D
+ 54  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[10]/C     dacr_f0_dac_reg[10]/D
+ 55  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[11]/C     dacr_f0_dac_reg[11]/D
+ 56  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[12]/C     dacr_f0_dac_reg[12]/D
+ 57  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[13]/C     dacr_f0_dac_reg[13]/D
+ 58  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[14]/C     dacr_f0_dac_reg[14]/D
+ 59  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[15]/C     dacr_f0_dac_reg[15]/D
+ 60  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[16]/C     dacr_f0_dac_reg[16]/D
+ 61  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[17]/C     dacr_f0_dac_reg[17]/D
+ 62  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[18]/C     dacr_f0_dac_reg[18]/D
+ 63  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[19]/C     dacr_f0_dac_reg[19]/D
+ 64  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[20]/C     dacr_f0_dac_reg[20]/D
+ 65  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[21]/C     dacr_f0_dac_reg[21]/D
+ 66  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[22]/C     dacr_f0_dac_reg[22]/D
+ 67  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[23]/C     dacr_f0_dac_reg[23]/D
+ 68  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[24]/C     dacr_f0_dac_reg[24]/D
+ 69  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[25]/C     dacr_f0_dac_reg[25]/D
+ 70  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[26]/C     dacr_f0_dac_reg[26]/D
+ 71  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[27]/C     dacr_f0_dac_reg[27]/D
+ 72  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[28]/C     dacr_f0_dac_reg[28]/D
+ 73  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[29]/C     dacr_f0_dac_reg[29]/D
+ 74  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[30]/C     dacr_f0_dac_reg[30]/D
+ 75  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_f0_reg[31]/C     dacr_f0_dac_reg[31]/D
+ 76  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[0]/C    dacr_plen_dac_reg[0]/D
+ 77  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[1]/C    dacr_plen_dac_reg[1]/D
+ 78  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[2]/C    dacr_plen_dac_reg[2]/D
+ 79  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[3]/C    dacr_plen_dac_reg[3]/D
+ 80  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[4]/C    dacr_plen_dac_reg[4]/D
+ 81  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[5]/C    dacr_plen_dac_reg[5]/D
+ 82  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[6]/C    dacr_plen_dac_reg[6]/D
+ 83  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[7]/C    dacr_plen_dac_reg[7]/D
+ 84  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[8]/C    dacr_plen_dac_reg[8]/D
+ 85  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[9]/C    dacr_plen_dac_reg[9]/D
+ 86  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[10]/C   dacr_plen_dac_reg[10]/D
+ 87  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[11]/C   dacr_plen_dac_reg[11]/D
+ 88  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[12]/C   dacr_plen_dac_reg[12]/D
+ 89  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[13]/C   dacr_plen_dac_reg[13]/D
+ 90  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[14]/C   dacr_plen_dac_reg[14]/D
+ 91  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[15]/C   dacr_plen_dac_reg[15]/D
+ 92  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[16]/C   dacr_plen_dac_reg[16]/D
+ 93  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[17]/C   dacr_plen_dac_reg[17]/D
+ 94  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[18]/C   dacr_plen_dac_reg[18]/D
+ 95  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[19]/C   dacr_plen_dac_reg[19]/D
+ 96  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[20]/C   dacr_plen_dac_reg[20]/D
+ 97  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[21]/C   dacr_plen_dac_reg[21]/D
+ 98  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[22]/C   dacr_plen_dac_reg[22]/D
+ 99  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[23]/C   dacr_plen_dac_reg[23]/D
+100  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[24]/C   dacr_plen_dac_reg[24]/D
+101  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[25]/C   dacr_plen_dac_reg[25]/D
+102  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[26]/C   dacr_plen_dac_reg[26]/D
+103  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[27]/C   dacr_plen_dac_reg[27]/D
+104  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[28]/C   dacr_plen_dac_reg[28]/D
+105  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[29]/C   dacr_plen_dac_reg[29]/D
+106  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[30]/C   dacr_plen_dac_reg[30]/D
+107  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_plen_reg[31]/C   dacr_plen_dac_reg[31]/D
+108  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[0]/C     dacr_pri_dac_reg[0]/D
+109  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[1]/C     dacr_pri_dac_reg[1]/D
+110  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[2]/C     dacr_pri_dac_reg[2]/D
+111  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[3]/C     dacr_pri_dac_reg[3]/D
+112  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[4]/C     dacr_pri_dac_reg[4]/D
+113  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[5]/C     dacr_pri_dac_reg[5]/D
+114  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[6]/C     dacr_pri_dac_reg[6]/D
+115  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[7]/C     dacr_pri_dac_reg[7]/D
+116  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[8]/C     dacr_pri_dac_reg[8]/D
+117  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[9]/C     dacr_pri_dac_reg[9]/D
+118  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[10]/C    dacr_pri_dac_reg[10]/D
+119  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[11]/C    dacr_pri_dac_reg[11]/D
+120  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[12]/C    dacr_pri_dac_reg[12]/D
+121  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[13]/C    dacr_pri_dac_reg[13]/D
+122  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[14]/C    dacr_pri_dac_reg[14]/D
+123  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[15]/C    dacr_pri_dac_reg[15]/D
+124  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[16]/C    dacr_pri_dac_reg[16]/D
+125  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[17]/C    dacr_pri_dac_reg[17]/D
+126  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[18]/C    dacr_pri_dac_reg[18]/D
+127  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[19]/C    dacr_pri_dac_reg[19]/D
+128  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[20]/C    dacr_pri_dac_reg[20]/D
+129  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[21]/C    dacr_pri_dac_reg[21]/D
+130  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[22]/C    dacr_pri_dac_reg[22]/D
+131  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[23]/C    dacr_pri_dac_reg[23]/D
+132  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[24]/C    dacr_pri_dac_reg[24]/D
+133  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[25]/C    dacr_pri_dac_reg[25]/D
+134  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[26]/C    dacr_pri_dac_reg[26]/D
+135  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[27]/C    dacr_pri_dac_reg[27]/D
+136  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[28]/C    dacr_pri_dac_reg[28]/D
+137  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[29]/C    dacr_pri_dac_reg[29]/D
+138  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[30]/C    dacr_pri_dac_reg[30]/D
+139  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  reg_dacr_pri_reg[31]/C    dacr_pri_dac_reg[31]/D
+140  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  dacr_trig_tog_link_reg/C  dacr_trig_tog_s_reg[0]/D
+141  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property      2  Max Delay Datapath Only  reg_dacs_ctrl_reg[2:0]/C  dacs_ctrl_s1_reg[2:0]/D
+
+Source Clock: input port clock
 Destination Clock: clk_link_tx
 CDC Type: No Common Primary Clock
 
@@ -318,29 +638,45 @@ Row  ID      Severity  Description                           Depth  Exception   
 ---  ------  --------  ------------------------------------  -----  ----------  -------------  --------------------
   1  CDC-13  Critical  1-bit CDC path on a non-FD primitive      0  False Path  link_tx_d0_p   u_dl_iserdes_d0/DDLY
 
+Source Clock: clk_dac_400
+Destination Clock: dl_rx_clk
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                             Depth  Exception            Source (From)                     Destination (To)
+---  -----  --------  ------------------------------------------------------  -----  -------------------  --------------------------------  --------------------------------------
+  1  CDC-5  Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_dac_sdr/rd_ptr_gray_reg[8:0]/C  u_dac_sdr/rd_ptr_gray_sync1_reg[8:0]/D
+  2  CDC-2  Warning   1-bit synchronized with missing ASYNC_REG property          2  Asynch Clock Groups  u_dac_sdr/rd_ptr_bin_reg[9]/C     u_dac_sdr/rd_ptr_gray_sync1_reg[9]/D
+
+Source Clock: clk_dac_500
+Destination Clock: dl_rx_clk
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                             Depth  Exception            Source (From)                     Destination (To)
+---  -----  --------  ------------------------------------------------------  -----  -------------------  --------------------------------  --------------------------------------
+  1  CDC-5  Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_dac_sdr/rd_ptr_gray_reg[8:0]/C  u_dac_sdr/rd_ptr_gray_sync1_reg[8:0]/D
+  2  CDC-2  Warning   1-bit synchronized with missing ASYNC_REG property          2  Asynch Clock Groups  u_dac_sdr/rd_ptr_bin_reg[9]/C     u_dac_sdr/rd_ptr_gray_sync1_reg[9]/D
+
 Source Clock: link_clk_unbuf
 Destination Clock: dl_rx_clk
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                             Depth  Exception            Source (From)                          Destination (To)
----  ------  --------  ------------------------------------------------------  -----  -------------------  -------------------------------------  --------------------------------------
-  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  dacs_lvl_ack_link_reg/C                dacs_lvl_ack_s1_reg/D
-  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  dl_clr_tog_reg/C                       dl_clr_sync_reg[0]/D
-  3  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dl_cmd_rgray_reg[4:0]/C                dl_cmd_rgray_s1_reg[4:0]/D
-  4  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  dl_load_tog_reg/C                      dl_load_sync_reg[0]/D
-  5  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_pmod_spi/ctrl_tap_override_en_reg/C  dl_ov_sync_reg[0]/D
-  6  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_pmod_spi/ctrl_prbs7_rx_chk_en_reg/C  dl_prbs_en_sync_reg[0]/D
-  7  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  retrain_tog_link_reg/C                 dl_retrain_sync_reg[0]/D
-  8  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  sys_rst_reg/C                          dl_rst_sync_reg[0]/PRE
-  9  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  reg_dacs_ctrl_reg[0]/C                 reg_dacs_ctrl_dl_reg[0]/D
- 10  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_dac_sdr/rd_ptr_gray_reg[8:0]/C       u_dac_sdr/rd_ptr_gray_sync1_reg[8:0]/D
- 11  CDC-2   Warning   1-bit synchronized with missing ASYNC_REG property          2  Asynch Clock Groups  u_dac_sdr/rd_ptr_bin_reg[9]/C          u_dac_sdr/rd_ptr_gray_sync1_reg[9]/D
- 12  CDC-14  Critical  Multi-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  dl_cfg_tap_hold_reg[4:0]/C             u_dl_idelay_d0/CNTVALUEIN[4:0]
- 13  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cfg_tap_hold_reg[0]/C               u_dl_train_fsm/cntval_l0_reg[0]/D
- 14  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cfg_tap_hold_reg[1]/C               u_dl_train_fsm/cntval_l0_reg[1]/D
- 15  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cfg_tap_hold_reg[2]/C               u_dl_train_fsm/cntval_l0_reg[2]/D
- 16  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cfg_tap_hold_reg[3]/C               u_dl_train_fsm/cntval_l0_reg[3]/D
- 17  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cfg_tap_hold_reg[4]/C               u_dl_train_fsm/cntval_l0_reg[4]/D
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                          Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  -------------------------------------  ---------------------------------
+  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dacs_lvl_ack_link_reg/C                dacs_lvl_ack_s1_reg/D
+  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dl_clr_tog_reg/C                       dl_clr_sync_reg[0]/D
+  3  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_cmd_rgray_reg[4:0]/C                dl_cmd_rgray_s1_reg[4:0]/D
+  4  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dl_load_tog_reg/C                      dl_load_sync_reg[0]/D
+  5  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_pmod_spi/ctrl_tap_override_en_reg/C  dl_ov_sync_reg[0]/D
+  6  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_pmod_spi/ctrl_prbs7_rx_chk_en_reg/C  dl_prbs_en_sync_reg[0]/D
+  7  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  retrain_tog_link_reg/C                 dl_retrain_sync_reg[0]/D
+  8  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  sys_rst_reg/C                          dl_rst_sync_reg[0]/PRE
+  9  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  reg_dacs_ctrl_reg[0]/C                 reg_dacs_ctrl_dl_reg[0]/D
+ 10  CDC-14  Critical  Multi-bit CDC path on a non-FD primitive                0  Asynch Clock Groups  dl_cfg_tap_hold_reg[4:0]/C             u_dl_idelay_d0/CNTVALUEIN[4:0]
+ 11  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cfg_tap_hold_reg[0]/C               u_dl_train_fsm/cntval_l0_reg[0]/D
+ 12  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cfg_tap_hold_reg[1]/C               u_dl_train_fsm/cntval_l0_reg[1]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cfg_tap_hold_reg[2]/C               u_dl_train_fsm/cntval_l0_reg[2]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cfg_tap_hold_reg[3]/C               u_dl_train_fsm/cntval_l0_reg[3]/D
+ 15  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cfg_tap_hold_reg[4]/C               u_dl_train_fsm/cntval_l0_reg[4]/D
 
 Source Clock: gen_rev06_eth.clk_312p5_u
 Destination Clock: gen_rev06_eth.clk_312p5_45_u
@@ -352,11 +688,11 @@ Row  ID     Severity  Description                                              D
 
 Source Clock: link_clk_unbuf
 Destination Clock: gen_rev06_eth.clk_312p5_u
-CDC Type: Safely Timed
+CDC Type: No Common Phase
 
 Row  ID      Severity  Description                                         Depth  Exception                Source (From)                                                   Destination (To)
 ---  ------  --------  --------------------------------------------------  -----  -----------------------  --------------------------------------------------------------  ---------------------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      3  Max Delay Datapath Only  sys_rst_reg/C                                                   gen_rev06_eth.eth_rst_312_s_reg[0]/PRE
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      3  Max Delay Datapath Only  u_pmod_spi/ctrl_soft_rst_reg/C                                  gen_rev06_eth.eth_rst_312_s_reg[0]/PRE
   2  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  gen_rev06_eth.u_eth_phy/rx_rd_gray_reg[5:0]/C                   gen_rev06_eth.u_eth_phy/rx_rd_g1_reg[5:0]/D
   3  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Max Delay Datapath Only  gen_rev06_eth.u_eth_phy/tx_fifo_mem_reg_0_15_0_5/RAMA/CLK       gen_rev06_eth.u_eth_phy/tx_pair_312_reg[0]/D
   4  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Max Delay Datapath Only  gen_rev06_eth.u_eth_phy/tx_fifo_mem_reg_0_15_0_5/RAMA_D1/CLK    gen_rev06_eth.u_eth_phy/tx_pair_312_reg[1]/D
@@ -416,7 +752,7 @@ Row  ID      Severity  Description                                             D
 ---  ------  --------  ------------------------------------------------------  -----  -----------------------  ----------------------------------------------  ---------------------------------------------
   1  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/FSM_sequential_tx_state_reg/D
   2  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/cur_ch_reg/CE
-  3  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/cur_ch_reg/D
+  3  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/cur_ch_reg/D
   4  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[0]/CE
   5  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[1]/CE
   6  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[2]/CE
@@ -711,112 +1047,211 @@ Row  ID      Severity  Description                                     Depth  Ex
   4  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Asynch Clock Groups  u_ddc/u_ddc/nco_core/dds_ready_reg/C  u_ul_pcs_tx/u_tx_lanes/blk_1_reg[12]/D
   5  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Asynch Clock Groups  u_ddc/u_ddc/mixer_overflow_q_reg/C    u_ul_pcs_tx/u_tx_lanes/blk_1_reg[13]/D
 
+Source Clock: clk_cfgmclk
+Destination Clock: link_clk_unbuf
+CDC Type: No Common Primary Clock
+
+Row  ID      Severity  Description                                             Depth  Exception            Source (From)                                                   Destination (To)
+---  ------  --------  ------------------------------------------------------  -----  -------------------  --------------------------------------------------------------  ---------------------------------------------
+  1  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/ack_err_cnt_reg[15:0]/C                 u_clk_mode_ctrl/ack_err_cnt_sync1_reg[15:0]/D
+  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/ack_err_reg/C                           u_clk_mode_ctrl/ack_err_s_reg[0]/D
+  3  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/active_500m_cfg_reg/C                           u_clk_mode_ctrl/active_500m_s_reg[0]/D
+  4  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/boot_done_cfg_reg/C                             u_clk_mode_ctrl/boot_done_s_reg[0]/D
+  5  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/boot_err_cfg_reg/C                              u_clk_mode_ctrl/boot_err_s_reg[0]/D
+  6  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/busy_reg/C                              u_clk_mode_ctrl/busy_s_reg[0]/D
+  7  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/delta_clamped_reg/C                     u_clk_mode_ctrl/clamped_s_reg[0]/D
+  8  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/switch_done_cfg_reg/C                           u_clk_mode_ctrl/prog_done_s_reg[0]/D
+  9  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[2]/C  u_clk_mode_ctrl/raw_ready_s_reg[0]/D
+ 10  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_err_cfg_reg/C                          u_clk_mode_ctrl/raw_resp_err_link_reg/D
+ 11  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[0]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[0]/D
+ 12  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[1]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[1]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[2]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[2]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[3]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[3]/D
+ 15  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[4]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[4]/D
+ 16  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[5]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[5]/D
+ 17  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[6]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[6]/D
+ 18  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[7]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[7]/D
+ 19  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_tog_cfg_reg/C                          u_clk_mode_ctrl/raw_resp_tog_s_reg[0]/D
+ 20  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/xo_req_500m_cfg_reg/C                           u_clk_mode_ctrl/req_500m_s_reg[0]/D
+ 21  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/xo_use_ext_clk_cfg_reg/C                        u_clk_mode_ctrl/use_ext_s_reg[0]/D
+
+Source Clock: clk_dac_500
+Destination Clock: link_clk_unbuf
+CDC Type: No Common Phase
+
+Row  ID      Severity  Description                                     Depth  Exception                Source (From)                   Destination (To)
+---  ------  --------  ----------------------------------------------  -----  -----------------------  ------------------------------  ----------------------------
+  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  dac_stat_tog_dac_reg/C          dac_stat_tog_s_reg[0]/D
+  2  CDC-3   Info      1-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  u_dac_radar/chirp_active_reg/C  dacr_active_s_reg[0]/D
+  3  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[0]/C     dacr_pulse_cnt_reg[0]/D
+  4  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[1]/C     dacr_pulse_cnt_reg[1]/D
+  5  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[2]/C     dacr_pulse_cnt_reg[2]/D
+  6  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[3]/C     dacr_pulse_cnt_reg[3]/D
+  7  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[4]/C     dacr_pulse_cnt_reg[4]/D
+  8  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[5]/C     dacr_pulse_cnt_reg[5]/D
+  9  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[6]/C     dacr_pulse_cnt_reg[6]/D
+ 10  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[7]/C     dacr_pulse_cnt_reg[7]/D
+ 11  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[8]/C     dacr_pulse_cnt_reg[8]/D
+ 12  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[9]/C     dacr_pulse_cnt_reg[9]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[10]/C    dacr_pulse_cnt_reg[10]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[11]/C    dacr_pulse_cnt_reg[11]/D
+ 15  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[12]/C    dacr_pulse_cnt_reg[12]/D
+ 16  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[13]/C    dacr_pulse_cnt_reg[13]/D
+ 17  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[14]/C    dacr_pulse_cnt_reg[14]/D
+ 18  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[15]/C    dacr_pulse_cnt_reg[15]/D
+ 19  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[16]/C    dacr_pulse_cnt_reg[16]/D
+ 20  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[17]/C    dacr_pulse_cnt_reg[17]/D
+ 21  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[18]/C    dacr_pulse_cnt_reg[18]/D
+ 22  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[19]/C    dacr_pulse_cnt_reg[19]/D
+ 23  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[20]/C    dacr_pulse_cnt_reg[20]/D
+ 24  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[21]/C    dacr_pulse_cnt_reg[21]/D
+ 25  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[22]/C    dacr_pulse_cnt_reg[22]/D
+ 26  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[23]/C    dacr_pulse_cnt_reg[23]/D
+ 27  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[24]/C    dacr_pulse_cnt_reg[24]/D
+ 28  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[25]/C    dacr_pulse_cnt_reg[25]/D
+ 29  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[26]/C    dacr_pulse_cnt_reg[26]/D
+ 30  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[27]/C    dacr_pulse_cnt_reg[27]/D
+ 31  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[28]/C    dacr_pulse_cnt_reg[28]/D
+ 32  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[29]/C    dacr_pulse_cnt_reg[29]/D
+ 33  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[30]/C    dacr_pulse_cnt_reg[30]/D
+ 34  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacr_pcnt_hold_dac_reg[31]/C    dacr_pulse_cnt_reg[31]/D
+ 35  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[0]/C    dacs_underflow_cnt_reg[0]/D
+ 36  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[1]/C    dacs_underflow_cnt_reg[1]/D
+ 37  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[2]/C    dacs_underflow_cnt_reg[2]/D
+ 38  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[3]/C    dacs_underflow_cnt_reg[3]/D
+ 39  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[4]/C    dacs_underflow_cnt_reg[4]/D
+ 40  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[5]/C    dacs_underflow_cnt_reg[5]/D
+ 41  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[6]/C    dacs_underflow_cnt_reg[6]/D
+ 42  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[7]/C    dacs_underflow_cnt_reg[7]/D
+ 43  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[8]/C    dacs_underflow_cnt_reg[8]/D
+ 44  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[9]/C    dacs_underflow_cnt_reg[9]/D
+ 45  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[10]/C   dacs_underflow_cnt_reg[10]/D
+ 46  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[11]/C   dacs_underflow_cnt_reg[11]/D
+ 47  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[12]/C   dacs_underflow_cnt_reg[12]/D
+ 48  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[13]/C   dacs_underflow_cnt_reg[13]/D
+ 49  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[14]/C   dacs_underflow_cnt_reg[14]/D
+ 50  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[15]/C   dacs_underflow_cnt_reg[15]/D
+ 51  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[16]/C   dacs_underflow_cnt_reg[16]/D
+ 52  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[17]/C   dacs_underflow_cnt_reg[17]/D
+ 53  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[18]/C   dacs_underflow_cnt_reg[18]/D
+ 54  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[19]/C   dacs_underflow_cnt_reg[19]/D
+ 55  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[20]/C   dacs_underflow_cnt_reg[20]/D
+ 56  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[21]/C   dacs_underflow_cnt_reg[21]/D
+ 57  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[22]/C   dacs_underflow_cnt_reg[22]/D
+ 58  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[23]/C   dacs_underflow_cnt_reg[23]/D
+ 59  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[24]/C   dacs_underflow_cnt_reg[24]/D
+ 60  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[25]/C   dacs_underflow_cnt_reg[25]/D
+ 61  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[26]/C   dacs_underflow_cnt_reg[26]/D
+ 62  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[27]/C   dacs_underflow_cnt_reg[27]/D
+ 63  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[28]/C   dacs_underflow_cnt_reg[28]/D
+ 64  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[29]/C   dacs_underflow_cnt_reg[29]/D
+ 65  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[30]/C   dacs_underflow_cnt_reg[30]/D
+ 66  CDC-15  Warning   Clock enable controlled CDC structure detected      0  Max Delay Datapath Only  dacs_uflow_hold_dac_reg[31]/C   dacs_underflow_cnt_reg[31]/D
+
 Source Clock: dl_rx_clk
 Destination Clock: link_clk_unbuf
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                             Depth  Exception            Source (From)                                       Destination (To)
----  ------  --------  ------------------------------------------------------  -----  -------------------  --------------------------------------------------  --------------------------------------
-  1  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[0]/C                           dacs_fifo_lvl_link_reg[0]/D
-  2  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[1]/C                           dacs_fifo_lvl_link_reg[1]/D
-  3  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[2]/C                           dacs_fifo_lvl_link_reg[2]/D
-  4  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[3]/C                           dacs_fifo_lvl_link_reg[3]/D
-  5  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[4]/C                           dacs_fifo_lvl_link_reg[4]/D
-  6  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[5]/C                           dacs_fifo_lvl_link_reg[5]/D
-  7  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[6]/C                           dacs_fifo_lvl_link_reg[6]/D
-  8  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[7]/C                           dacs_fifo_lvl_link_reg[7]/D
-  9  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[8]/C                           dacs_fifo_lvl_link_reg[8]/D
- 10  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[9]/C                           dacs_fifo_lvl_link_reg[9]/D
- 11  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  dacs_lvl_tog_dl_reg/C                               dacs_lvl_tog_s_reg[0]/D
- 12  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dl_cmd_wgray_reg[4:0]/C                             dl_cmd_wgray_s1_reg[4:0]/D
- 13  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[14][0]/C                             dl_cmd_word_reg[0]/D
- 14  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[8][1]/C                              dl_cmd_word_reg[1]/D
- 15  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][2]/C                              dl_cmd_word_reg[2]/D
- 16  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[12][3]/C                             dl_cmd_word_reg[3]/D
- 17  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[6][4]/C                              dl_cmd_word_reg[4]/D
- 18  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[2][5]/C                              dl_cmd_word_reg[5]/D
- 19  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[12][6]/C                             dl_cmd_word_reg[6]/D
- 20  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[4][7]/C                              dl_cmd_word_reg[7]/D
- 21  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[14][8]/C                             dl_cmd_word_reg[8]/D
- 22  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][9]/C                              dl_cmd_word_reg[9]/D
- 23  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[9][10]/C                             dl_cmd_word_reg[10]/D
- 24  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[1][11]/C                             dl_cmd_word_reg[11]/D
- 25  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[14][12]/C                            dl_cmd_word_reg[12]/D
- 26  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[4][13]/C                             dl_cmd_word_reg[13]/D
- 27  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[11][14]/C                            dl_cmd_word_reg[14]/D
- 28  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[11][15]/C                            dl_cmd_word_reg[15]/D
- 29  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[5][16]/C                             dl_cmd_word_reg[16]/D
- 30  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][17]/C                             dl_cmd_word_reg[17]/D
- 31  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[2][18]/C                             dl_cmd_word_reg[18]/D
- 32  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[6][19]/C                             dl_cmd_word_reg[19]/D
- 33  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[6][20]/C                             dl_cmd_word_reg[20]/D
- 34  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][21]/C                             dl_cmd_word_reg[21]/D
- 35  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][22]/C                             dl_cmd_word_reg[22]/D
- 36  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][23]/C                             dl_cmd_word_reg[23]/D
- 37  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[10][24]/C                            dl_cmd_word_reg[24]/D
- 38  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[9][25]/C                             dl_cmd_word_reg[25]/D
- 39  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[12][26]/C                            dl_cmd_word_reg[26]/D
- 40  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[15][27]/C                            dl_cmd_word_reg[27]/D
- 41  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[14][28]/C                            dl_cmd_word_reg[28]/D
- 42  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[4][29]/C                             dl_cmd_word_reg[29]/D
- 43  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[3][30]/C                             dl_cmd_word_reg[30]/D
- 44  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[10][31]/C                            dl_cmd_word_reg[31]/D
- 45  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[4][32]/C                             dl_cmd_word_reg[32]/D
- 46  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][33]/C                            dl_cmd_word_reg[33]/D
- 47  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[0][34]/C                             dl_cmd_word_reg[34]/D
- 48  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[0][34]/C                             dl_cmd_word_reg[34]_rep/D
- 49  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[0][34]/C                             dl_cmd_word_reg[34]_rep__0/D
- 50  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[0][34]/C                             dl_cmd_word_reg[34]_rep__1/D
- 51  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][35]/C                            dl_cmd_word_reg[35]/D
- 52  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][35]/C                            dl_cmd_word_reg[35]_rep/D
- 53  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][35]/C                            dl_cmd_word_reg[35]_rep__0/D
- 54  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][35]/C                            dl_cmd_word_reg[35]_rep__1/D
- 55  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][35]/C                            dl_cmd_word_reg[35]_rep__2/D
- 56  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[3][36]/C                             dl_cmd_word_reg[36]/D
- 57  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[3][36]/C                             dl_cmd_word_reg[36]_rep/D
- 58  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[6][37]/C                             dl_cmd_word_reg[37]/D
- 59  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[1][38]/C                             dl_cmd_word_reg[38]/D
- 60  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[6][39]/C                             dl_cmd_word_reg[39]/D
- 61  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[15][40]/C                            dl_cmd_word_reg[40]/D
- 62  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[11][41]/C                            dl_cmd_word_reg[41]/D
- 63  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[11][42]/C                            dl_cmd_word_reg[42]/D
- 64  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[11][43]/C                            dl_cmd_word_reg[43]/D
- 65  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[12][44]/C                            dl_cmd_word_reg[44]/D
- 66  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[0][45]/C                             dl_cmd_word_reg[45]/D
- 67  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][46]/C                             dl_cmd_word_reg[46]/D
- 68  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[14][47]/C                            dl_cmd_word_reg[47]/D
- 69  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[0][56]/C                             dl_cmd_word_reg[56]/D
- 70  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[13][57]/C                            dl_cmd_word_reg[57]/D
- 71  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[7][58]/C                             dl_cmd_word_reg[58]/D
- 72  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[9][59]/C                             dl_cmd_word_reg[59]/D
- 73  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[3][60]/C                             dl_cmd_word_reg[60]/D
- 74  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[3][61]/C                             dl_cmd_word_reg[61]/D
- 75  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[1][62]/C                             dl_cmd_word_reg[62]/D
- 76  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  dl_cmd_mem_reg[15][63]/C                            dl_cmd_word_reg[63]/D
- 77  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/crc_err_cnt_reg[31:0]/C      dl_crc_sync1_reg[31:0]/D
- 78  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dl_rx_drop_cnt_reg[7:0]/C                           dl_drop_sync1_reg[7:0]/D
- 79  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_train_fsm/eye_left_l0_reg[8:0]/C               dl_el_sync1_reg[8:0]/D
- 80  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_train_fsm/eye_right_l0_reg[8:0]/C              dl_er_sync1_reg[8:0]/D
- 81  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/block_lock_reg/C                dl_lock_sync_reg[0]/D
- 82  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/pkt_rx_cnt_reg[31:0]/C       dl_pkt_sync1_reg[31:0]/D
- 83  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dl_prbs_err_cnt_reg[31:0]/C                         dl_prbs_sync1_reg[31:0]/D
- 84  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/remote_status_reg[7:0]/C     dl_rem_sync1_reg[7:0]/D
- 85  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/sh_err_cnt_reg[31:0]/C          dl_sh_sync1_reg[31:0]/D
- 86  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[1]/C  dl_st_sync1_reg[0]/D
- 87  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[1]/C  dl_st_sync1_reg[1]/D
- 88  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[0]/C  dl_st_sync1_reg[2]/D
- 89  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[0]/D
- 90  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[1]/D
- 91  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[2]/D
- 92  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[3]/D
- 93  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[4]/D
- 94  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_dl_train_fsm/link_up_reg/C                        dl_up_sync_reg[0]/D
- 95  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  u_dac_sdr/wr_ptr_gray_reg[8:0]/C                    u_dac_sdr/wr_ptr_gray_sync1_reg[8:0]/D
- 96  CDC-2   Warning   1-bit synchronized with missing ASYNC_REG property          2  Asynch Clock Groups  u_dac_sdr/wr_ptr_bin_reg[9]/C                       u_dac_sdr/wr_ptr_gray_sync1_reg[9]/D
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                                       Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  --------------------------------------------------  ----------------------------
+  1  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[0]/C                           dacs_fifo_lvl_link_reg[0]/D
+  2  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[1]/C                           dacs_fifo_lvl_link_reg[1]/D
+  3  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[2]/C                           dacs_fifo_lvl_link_reg[2]/D
+  4  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[3]/C                           dacs_fifo_lvl_link_reg[3]/D
+  5  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[4]/C                           dacs_fifo_lvl_link_reg[4]/D
+  6  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[5]/C                           dacs_fifo_lvl_link_reg[5]/D
+  7  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[6]/C                           dacs_fifo_lvl_link_reg[6]/D
+  8  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[7]/C                           dacs_fifo_lvl_link_reg[7]/D
+  9  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[8]/C                           dacs_fifo_lvl_link_reg[8]/D
+ 10  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[9]/C                           dacs_fifo_lvl_link_reg[9]/D
+ 11  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dacs_lvl_tog_dl_reg/C                               dacs_lvl_tog_s_reg[0]/D
+ 12  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_cmd_wgray_reg[4:0]/C                             dl_cmd_wgray_s1_reg[4:0]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][0]/C                              dl_cmd_word_reg[0]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][1]/C                              dl_cmd_word_reg[1]/D
+ 15  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][2]/C                             dl_cmd_word_reg[2]/D
+ 16  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][3]/C                             dl_cmd_word_reg[3]/D
+ 17  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][4]/C                              dl_cmd_word_reg[4]/D
+ 18  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][5]/C                             dl_cmd_word_reg[5]/D
+ 19  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][6]/C                             dl_cmd_word_reg[6]/D
+ 20  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][7]/C                              dl_cmd_word_reg[7]/D
+ 21  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][8]/C                              dl_cmd_word_reg[8]/D
+ 22  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][9]/C                             dl_cmd_word_reg[9]/D
+ 23  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][10]/C                            dl_cmd_word_reg[10]/D
+ 24  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][11]/C                            dl_cmd_word_reg[11]/D
+ 25  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][12]/C                             dl_cmd_word_reg[12]/D
+ 26  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][13]/C                             dl_cmd_word_reg[13]/D
+ 27  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][14]/C                            dl_cmd_word_reg[14]/D
+ 28  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][15]/C                            dl_cmd_word_reg[15]/D
+ 29  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][16]/C                             dl_cmd_word_reg[16]/D
+ 30  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][17]/C                             dl_cmd_word_reg[17]/D
+ 31  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][18]/C                             dl_cmd_word_reg[18]/D
+ 32  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][19]/C                             dl_cmd_word_reg[19]/D
+ 33  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][20]/C                            dl_cmd_word_reg[20]/D
+ 34  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][21]/C                             dl_cmd_word_reg[21]/D
+ 35  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][22]/C                             dl_cmd_word_reg[22]/D
+ 36  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][23]/C                            dl_cmd_word_reg[23]/D
+ 37  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][24]/C                            dl_cmd_word_reg[24]/D
+ 38  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][25]/C                             dl_cmd_word_reg[25]/D
+ 39  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][26]/C                             dl_cmd_word_reg[26]/D
+ 40  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][27]/C                            dl_cmd_word_reg[27]/D
+ 41  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][28]/C                             dl_cmd_word_reg[28]/D
+ 42  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][29]/C                            dl_cmd_word_reg[29]/D
+ 43  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][30]/C                             dl_cmd_word_reg[30]/D
+ 44  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][31]/C                            dl_cmd_word_reg[31]/D
+ 45  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][32]/C                            dl_cmd_word_reg[32]/D
+ 46  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][33]/C                            dl_cmd_word_reg[33]/D
+ 47  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][34]/C                            dl_cmd_word_reg[34]/D
+ 48  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][34]/C                            dl_cmd_word_reg[34]_rep/D
+ 49  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][34]/C                            dl_cmd_word_reg[34]_rep__0/D
+ 50  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][34]/C                            dl_cmd_word_reg[34]_rep__1/D
+ 51  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][34]/C                            dl_cmd_word_reg[34]_rep__2/D
+ 52  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][35]/C                             dl_cmd_word_reg[35]/D
+ 53  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][35]/C                             dl_cmd_word_reg[35]_rep/D
+ 54  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][35]/C                             dl_cmd_word_reg[35]_rep__0/D
+ 55  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][35]/C                             dl_cmd_word_reg[35]_rep__1/D
+ 56  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][36]/C                             dl_cmd_word_reg[36]/D
+ 57  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][36]/C                             dl_cmd_word_reg[36]_rep/D
+ 58  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][37]/C                             dl_cmd_word_reg[37]/D
+ 59  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][38]/C                            dl_cmd_word_reg[38]/D
+ 60  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][39]/C                             dl_cmd_word_reg[39]/D
+ 61  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][40]/C                             dl_cmd_word_reg[40]/D
+ 62  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][41]/C                             dl_cmd_word_reg[41]/D
+ 63  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][42]/C                             dl_cmd_word_reg[42]/D
+ 64  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][43]/C                            dl_cmd_word_reg[43]/D
+ 65  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][44]/C                             dl_cmd_word_reg[44]/D
+ 66  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[12][45]/C                            dl_cmd_word_reg[45]/D
+ 67  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][46]/C                            dl_cmd_word_reg[46]/D
+ 68  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][47]/C                            dl_cmd_word_reg[47]/D
+ 69  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][56]/C                             dl_cmd_word_reg[56]/D
+ 70  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][57]/C                             dl_cmd_word_reg[57]/D
+ 71  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][58]/C                            dl_cmd_word_reg[58]/D
+ 72  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][59]/C                             dl_cmd_word_reg[59]/D
+ 73  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][60]/C                            dl_cmd_word_reg[60]/D
+ 74  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][61]/C                            dl_cmd_word_reg[61]/D
+ 75  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][62]/C                            dl_cmd_word_reg[62]/D
+ 76  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][63]/C                             dl_cmd_word_reg[63]/D
+ 77  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/crc_err_cnt_reg[31:0]/C      dl_crc_sync1_reg[31:0]/D
+ 78  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_rx_drop_cnt_reg[7:0]/C                           dl_drop_sync1_reg[7:0]/D
+ 79  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_train_fsm/eye_left_l0_reg[8:0]/C               dl_el_sync1_reg[8:0]/D
+ 80  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_train_fsm/eye_right_l0_reg[8:0]/C              dl_er_sync1_reg[8:0]/D
+ 81  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/block_lock_reg/C                dl_lock_sync_reg[0]/D
+ 82  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/pkt_rx_cnt_reg[31:0]/C       dl_pkt_sync1_reg[31:0]/D
+ 83  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_prbs_err_cnt_reg[31:0]/C                         dl_prbs_sync1_reg[31:0]/D
+ 84  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/remote_status_reg[7:0]/C     dl_rem_sync1_reg[7:0]/D
+ 85  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/sh_err_cnt_reg[31:0]/C          dl_sh_sync1_reg[31:0]/D
+ 86  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[2]/C  dl_st_sync1_reg[0]/D
+ 87  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[2]/C  dl_st_sync1_reg[1]/D
+ 88  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[2]/C  dl_st_sync1_reg[2]/D
+ 89  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[0]/D
+ 90  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[1]/D
+ 91  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[2]/D
+ 92  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[3]/D
+ 93  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[4]/D
+ 94  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_train_fsm/link_up_reg/C                        dl_up_sync_reg[0]/D
 
 Source Clock: gen_rev06_eth.clk_312p5_u
 Destination Clock: link_clk_unbuf
-CDC Type: Safely Timed
+CDC Type: No Common Phase
 
 Row  ID      Severity  Description                                     Depth  Exception                Source (From)                                                 Destination (To)
 ---  ------  --------  ----------------------------------------------  -----  -----------------------  ------------------------------------------------------------  --------------------------------------------
@@ -838,7 +1273,7 @@ Destination Clock: link_clk_unbuf
 CDC Type: No Common Primary Clock
 
 Row  ID     Severity  Description                                         Depth  Exception   Source (From)  Destination (To)
----  -----  --------  --------------------------------------------------  -----  ----------  -------------  -----------------------------------------------
+---  -----  --------  --------------------------------------------------  -----  ----------  -------------  ------------------------------------------
   1  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  hk_alert_n     alert_sync_r_reg[0]/D
   2  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  beam_strobe    beam_sync_r_reg[0]/D
   3  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  eth_mdio       gen_rev06_eth.u_eth_mdio/rx_shift_reg[0]/D
@@ -847,85 +1282,10 @@ Row  ID     Severity  Description                                         Depth 
   6  CDC-2  Warning   1-bit synchronized with missing ASYNC_REG property      2  False Path  beam_strobe    u_adar_ctrl/strobe_sync_reg[0]/D
   7  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  conv_spi_sdio  u_conv_spi/shift_rx_reg[0]/D
   8  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  hk_alert_n     u_hk_i2c/alert_sync_reg[0]/D
-  9  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[0]/CE
- 10  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[1]/CE
- 11  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[2]/CE
- 12  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[3]/CE
- 13  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/ack_err_reg/D
- 14  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/bit_idx_reg[0]/D
- 15  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/bit_idx_reg[1]/D
- 16  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/bit_idx_reg[2]/D
- 17  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/byte_idx_reg[0]/D
- 18  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/byte_idx_reg[1]/D
- 19  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/byte_idx_reg[2]/D
- 20  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[0]/CE
- 21  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[0]/D
- 22  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[1]/CE
- 23  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[1]/D
- 24  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[2]/CE
- 25  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[2]/D
- 26  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[3]/CE
- 27  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[3]/R
- 28  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[4]/CE
- 29  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[4]/D
- 30  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[5]/CE
- 31  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[5]/D
- 32  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[6]/CE
- 33  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[6]/R
- 34  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[7]/CE
- 35  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[7]/R
- 36  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[8]/CE
- 37  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[8]/D
- 38  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[9]/CE
- 39  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[9]/R
- 40  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[10]/CE
- 41  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[10]/R
- 42  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[11]/CE
- 43  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[11]/R
- 44  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[12]/CE
- 45  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[12]/R
- 46  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[13]/CE
- 47  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[13]/R
- 48  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[14]/CE
- 49  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[14]/R
- 50  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[15]/CE
- 51  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/div_cnt_reg[15]/R
- 52  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/in_addr_phase_reg/D
- 53  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/in_rd_phase_reg/D
- 54  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/phase_reg[0]/D
- 55  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/phase_reg[1]/D
- 56  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[0]/CE
- 57  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[1]/CE
- 58  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[2]/CE
- 59  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[3]/CE
- 60  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[4]/CE
- 61  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[5]/CE
- 62  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[6]/CE
- 63  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/rd_accum_reg[7]/CE
- 64  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_ack_err_reg/CE
- 65  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[0]/CE
- 66  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[1]/CE
- 67  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[2]/CE
- 68  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[3]/CE
- 69  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[4]/CE
- 70  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[5]/CE
- 71  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[6]/CE
- 72  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_rdata_reg[7]/CE
- 73  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/resp_valid_reg/D
- 74  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/scl_t_reg/D
- 75  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/sda_t_reg/CE
- 76  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/shreg_reg[0]/D
- 77  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/shreg_reg[1]/D
- 78  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/shreg_reg[2]/D
- 79  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_sda         u_hk_xo/u_xo_i2c/shreg_reg[3]/D
- 80  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_sda         u_hk_xo/u_xo_i2c/shreg_reg[4]/D
- 81  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/shreg_reg[5]/D
- 82  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/shreg_reg[6]/D
- 83  CDC-1  Critical  1-bit unknown CDC circuitry                             0  False Path  xo_scl         u_hk_xo/u_xo_i2c/shreg_reg[7]/D
- 84  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pmod_cs_n      u_pmod_spi/cs_n_sync_reg[0]/D
- 85  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pmod_mosi      u_pmod_spi/mosi_sync_reg[0]/D
- 86  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pmod_sclk      u_pmod_spi/sclk_sync_reg[0]/D
- 87  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pps_sync       u_xadc_pps/pps_in_sync_reg[0]/D
+  9  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pmod_cs_n      u_pmod_spi/cs_n_sync_reg[0]/D
+ 10  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pmod_mosi      u_pmod_spi/mosi_sync_reg[0]/D
+ 11  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pmod_sclk      u_pmod_spi/sclk_sync_reg[0]/D
+ 12  CDC-3  Info      1-bit synchronized with ASYNC_REG property              2  False Path  pps_sync       u_xadc_pps/pps_in_sync_reg[0]/D
 
 Source Clock: link_clk_unbuf
 Destination Clock: refclk_200m_unbuf

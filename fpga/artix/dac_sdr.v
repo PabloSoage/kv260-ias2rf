@@ -25,10 +25,12 @@ module dac_sdr #(
     output wire        s_ready,
     input  wire [63:0] s_data,        // {Q1[15:0], I1[15:0], Q0[15:0], I0[15:0]}
 
-    // DAC transmit clock domain (e.g. 125 MHz -> 31.25 MSPS complex IQ / 62.5 MHz IQCLK)
+    // DAC transmit clock domain (100 MHz @ 400M mode or 125 MHz @ 500M mode, non-MMCM)
     input  wire        dac_clk,
     input  wire        dac_rst,
     input  wire        tx_enable,
+    input  wire        hf_dac2_mode,  // 1 = switch-free HF default: primary I -> DAC2 (IF_TX_C), Q -> DAC1 (IF_TX_A)
+    input  wire        dac1_mute,     // 1 = park DAC1 (IF_TX_A) at midscale (single-channel HF on DAC2)
 
     // Status & diagnostics
     output reg  [31:0] underflow_cnt, // Counts IQ sample intervals where tx_enable=1 & FIFO empty
@@ -163,9 +165,12 @@ module dac_sdr #(
                             cur_i_s <= $signed(active_pair[15:2]);
                             cur_q_s <= $signed(active_pair[31:18]);
 `ifdef MUTATE_IQ_SWAP
-                            dacs_d  <= to_offset14($signed(active_pair[31:18]));
+                            dacs_d  <= to_offset14(hf_dac2_mode ? $signed(active_pair[15:2]) : $signed(active_pair[31:18]));
 `else
-                            dacs_d  <= to_offset14($signed(active_pair[15:2]));
+                            if (dac1_mute && hf_dac2_mode)
+                                dacs_d <= 14'h2000;
+                            else
+                                dacs_d <= to_offset14(hf_dac2_mode ? $signed(active_pair[31:18]) : $signed(active_pair[15:2]));
 `endif
                         end else begin
                             cur_i_s       <= 14'sd0;
@@ -216,13 +221,13 @@ module dac_sdr #(
                 end
 
                 2'd2: begin
-                    // ph=2 (at t=2T): launch Q & IQSEL=0 now (both IQCLK & IQWRT fell at 1.5T); schedule Q strobe ODDR for t=3T
+                    // ph=2 (at t=2T): launch DAC2 (IQSEL=0, IF_TX_C); schedule strobe ODDR for t=3T
 `ifdef MUTATE_IQ_SWAP
-                    dacs_d <= to_offset14(cur_i_s);
+                    dacs_d <= to_offset14(hf_dac2_mode ? cur_q_s : cur_i_s);
 `else
-                    dacs_d <= to_offset14(cur_q_s);
+                    dacs_d <= to_offset14(hf_dac2_mode ? cur_i_s : cur_q_s);
 `endif
-                    dacs_iqsel <= 1'b0; // 0 = DAC2 (Q)
+                    dacs_iqsel <= 1'b0; // 0 = DAC2 (IF_TX_C in HF default / Q in IQ legacy)
 `ifdef MUTATE_DAC_CLK_EDGE_WRONG
                     iqclk_d1 <= 1'b0; iqclk_d2 <= 1'b0;
                     iqwrt_d1 <= 1'b0; iqwrt_d2 <= 1'b0;

@@ -21,10 +21,14 @@ module tb_dac_tx;
     // Clocks & Reset
     // -------------------------------------------------------------------------
     reg rst      = 1'b1;
-    reg dac_clk  = 1'b0; // 100 MHz (T = 10.0 ns -> t_S = 5 ns, t_H = 5 ns, t_LPW = 5 ns on ODDR)
+    reg dac_clk  = 1'b0; // 100 MHz (400M mode) or 125 MHz (500M mode)
     reg link_clk = 1'b0; // 125 MHz (T = 8.0 ns)
 
-    always #5.0 dac_clk  = ~dac_clk;  // 100 MHz
+`ifdef FPGA_CLK_400M
+    always #5.0 dac_clk  = ~dac_clk;  // 100 MHz (400 MHz CLK_FPGA / 4)
+`else
+    always #4.0 dac_clk  = ~dac_clk;  // 125 MHz (500 MHz CLK_FPGA / 4)
+`endif
     always #4.0 link_clk = ~link_clk; // 125 MHz
 
     // -------------------------------------------------------------------------
@@ -186,6 +190,8 @@ module tb_dac_tx;
         .dac_clk         (dac_clk),
         .dac_rst         (rst),
         .tx_enable       (sdr_tx_enable),
+        .hf_dac2_mode    (1'b0),
+        .dac1_mute       (1'b0),
         .underflow_cnt   (underflow_cnt),
         .fifo_level_link (),
         .dacs_d          (dacs_d),

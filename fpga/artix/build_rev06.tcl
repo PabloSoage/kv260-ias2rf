@@ -18,6 +18,7 @@ opt_design
 place_design
 phys_opt_design
 route_design
+phys_opt_design
 
 report_timing_summary    -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -file [file join $rpt_dir "timing_summary.rpt"]
 report_pulse_width       -all_violators -file [file join $rpt_dir "pulse_width.rpt"]

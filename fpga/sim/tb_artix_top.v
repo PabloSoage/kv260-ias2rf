@@ -96,7 +96,19 @@ module tb_artix_top;
     // -------------------------------------------------------------------------
     // Clocks
     // -------------------------------------------------------------------------
-    reg fpga_clk_100m = 1'b0; always #5.000 fpga_clk_100m = ~fpga_clk_100m; // 100 MHz
+`ifdef FPGA_CLK_400M
+    localparam [0:0] TB_BOOT_500M = 1'b0;
+    real fpga_clk_half = 1.250; // 400 MHz
+`else
+    localparam [0:0] TB_BOOT_500M = 1'b1;
+    real fpga_clk_half = 1.000; // 500 MHz
+`endif
+    reg fpga_clk_100m = 1'b0;
+    initial forever #(fpga_clk_half) fpga_clk_100m = ~fpga_clk_100m;
+    always @(*) begin
+        if (u_si549.mem[23] == 8'h1C)      fpga_clk_half = 1.250;
+        else if (u_si549.mem[23] == 8'h16) fpga_clk_half = 1.000;
+    end
     reg adcr_clk_400m = 1'b0; always #1.250 adcr_clk_400m = ~adcr_clk_400m; // 400 MSPS AD9484
     reg adcs_dco_400m = 1'b0; always #1.250 adcs_dco_400m = ~adcs_dco_400m; // 400 MHz AD9253 DCO (8*50 MSPS)
     reg kria_ref_300m = 1'b0; always #1.666 kria_ref_300m = ~kria_ref_300m;
@@ -309,6 +321,7 @@ module tb_artix_top;
         .HK_CLK_DIV          (3),
         .HK_POLL_DIV         (500000),
         .XO_FCAL_WAIT_CYC    (32),
+        .BOOT_FREQ_500M      (TB_BOOT_500M),
         .XADC_POLL_DIV_P     (64),
         .PPS_DEFAULT_NOM_CYC (32'd1250)
     ) u_artix (
@@ -656,12 +669,18 @@ module tb_artix_top;
             $display("FAIL: tb_artix_top missing ACK on 0x7D NOT detected (ack_err_cnt=0)"); $finish;
         end
 
-        // XO CLK_SEL = 1 (drives D8 low) + prog 500M
+        // XO CLK_SEL = 1 (drives D8 low) + prog 500M (retrains IAS1 during MMCM reset)
         wr_reg(16'h00A8, 32'h0000_0007); // prog_start=1, prog_500m=1, use_ext_clk=1
         repeat (50) @(posedge kria_tx_clk);
         if (clk_sel !== 1'b0) begin
             $display("FAIL: tb_artix_top clk_sel=%b (exp 0 when use_ext_clk=1)", clk_sel); $finish;
         end
+        kria_rx_rst <= 1'b1;
+        wait (!u_artix.u_clk_mode_ctrl.mmcm_rst && u_artix.sys_mmcm_locked && !u_artix.sys_rst);
+        repeat (32) @(posedge rx_clkdiv);
+        kria_rx_rst <= 1'b0;
+        wait (ul_link_up && u_artix.dl_link_up);
+        repeat (20) @(posedge kria_tx_clk);
         wait_c = 0;
         rval   = 32'd0;
         while (!rval[9] && wait_c < 40) begin
@@ -672,6 +691,12 @@ module tb_artix_top;
         if (!rval[9] || !rval[10]) begin
             $display("FAIL: tb_artix_top XO_CTRL=0x%08h (exp xo_prog_done=1, 500m=1)", rval); $finish;
         end
+        // Re-trigger AD9708 chirp after XO reprogram sys_rst/dac_rst cycle
+        wr_reg(16'h0058, 32'h28F5_C28F);
+        wr_reg(16'h005C, 32'h0014_0000);
+        wr_reg(16'h0060, 32'd32);
+        wr_reg(16'h0064, 32'd0);
+        wr_reg(16'h0054, 32'h00FF_0003);
 
         // PPS_SYNC two pulses spaced 1251 clk cycles apart (nom=1250 -> +800 ppm)
         wr_reg(16'h00C0, 32'h0001_0800); // pps_disc_en=1

@@ -158,7 +158,7 @@ Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h
 | `0x28` | `PRBS_ERR_CNT` | RO | `0x0000_0000` | `[31:0]` Saturating bit-error counter when `prbs7_rx_chk_en == 1` |
 | `0x2C` | `EYE_SCAN_L0` | RO | `0x0000_0000` | `[8:0]` Discovered eye-left tap; `[24:16]` Discovered eye-right tap (Lane 0) |
 | `0x30` | `EYE_SCAN_L1` | RO | `0x0000_0000` | `[8:0]` Discovered eye-left tap; `[24:16]` Discovered eye-right tap (Lane 1) |
-| `0x34` | `ADCS_CTRL` | R/W | `0x0000_0001` | **AD9253 + DDC:** `[0]` `adcs_enable`; `[1]` `conv_spi_start_init` (W1P); `[3:2]` `sdr_ddc_ch_enable` (`[2]=ChA, [3]=ChB`) |
+| `0x34` | `ADCS_CTRL` | R/W | `0x0000_0009` | **AD9253 + DDC:** `[0]` `adcs_enable`; `[1]` `conv_spi_start_init` (W1P); `[3:2]` `sdr_ddc_ch_enable` (`[2]=ChA`, `[3]=ChB`, default `ChB=1` on `IF_RX_C J951` for switch-free HF) |
 | `0x38` | `ADCS_STATUS` | RO | `0x0000_0000` | `[0]` `aligned`; `[1]` `idelay_done`; `[2]` `idelay_err`; `[3]` `bitslip_err`; `[8:4]` `best_tap`; `[16]` `conv_init_done`; `[17]` `conv_init_err`; `[31:24]` `ad9253_id` |
 | `0x3C` | `CONV_SPI_CMD` | R/W | `0x0000_0000` | `[7:0]` `req_wdata`; `[20:8]` `req_addr[12:0]`; `[21]` `req_rw` (`0=W,1=R`); `[22]` `req_target` (`0=AD9484,1=AD9253`); `[31]` Start (W1P) |
 | `0x40` | `CONV_SPI_RDATA` | RO | `0x0000_0000` | `[7:0]` `resp_rdata`; `[8]` `resp_valid_sticky`; `[9]` `req_ready` |
@@ -173,7 +173,7 @@ Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h
 | `0x64` | `DACR_PRI_LEN` | R/W | `0x0000_2000` | `[31:0]` Radar PRI in `dac_clk` cycles (`0` = trigger-only single shot) |
 | `0x68` | `DACR_STATUS` | RO | `0x0000_0000` | `[0]` `chirp_active` |
 | `0x6C` | `DACR_PULSE_CNT` | RO | `0x0000_0000` | `[31:0]` Total radar chirps transmitted (`pulse_cnt`) |
-| `0x70` | `DACS_CTRL` | R/W | `0x0000_0000` | `[0]` AD9767 `tx_enable`; `[1]` clear/latch note (soft reset via `LINK_CTRL`) |
+| `0x70` | `DACS_CTRL` | R/W | `0x0000_0000` | `[0]` AD9767 `tx_enable`; `[1]` `~hf_dac2_mode` (`0`=switch-free HF primary `I` on `DAC2 / IF_TX_C J952`, `1`=legacy `Ch1/Ch2 I/Q`); `[2]` `dac1_mute` (`1`=clamp `DAC1` to midscale `14'h2000` when `hf_dac2_mode=1`) |
 | `0x74` | `DACS_UNDERFLOW` | RO | `0x0000_0000` | `[31:0]` AD9767 `underflow_cnt` |
 | `0x78` | `DACS_FIFO_LVL` | RO | `0x0000_0000` | `[9:0]` `dac_sdr.fifo_level_link` |
 | `0x7C` | `ADAR_CTRL` | R/W | `0x0000_0000` | **ADAR1000 + RF SW:** `[4:0]` `active_beam_id`; `[5]` `tr_req` (`0=RX,1=TX`); `[6]` `soft_load` (W1P); `[7]` `start_init` (W1P); `[11:8]` `rf_sw_req[3:0]`; `[12]` `auto_tr_chirp` (drive `tr_req` from `chirp_active`) |
@@ -187,8 +187,8 @@ Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h
 | `0x9C` | `HK_I2C_WDATA` | R/W | `0x0000_0000` | `[31:0]` Packed TX bytes (`[7:0]`=byte0 .. `[31:24]`=byte3) |
 | `0xA0` | `HK_I2C_STATUS` | RO | `0x0000_0000` | `[15:0]` `req_rdata`; `[16]` `req_ready`; `[17]` `last_ack_err`; `[18]` `busy`; `[19]` `alert_active` (`~HK_ALERT_N`); `[20]` `tmp_valid` |
 | `0xA4` | `HK_TEMP_ERR` | RO | `0x0000_0000` | `[15:0]` `tmp_raw` (TMP1075 `[15:4]*0.0625 C`); `[31:16]` `ack_err_cnt` |
-| `0xA8` | `XO_CTRL` | R/W | `0x0000_0000` | `[0]` `use_ext_clk` (`CLK_SEL` `D8`: `0=Si549 Z`, `1=SMA 0`); `[1]` `prog_freq_500m` (`0=400MHz,1=500MHz`); `[2]` `prog_start` (W1P); `[3]` `delta_start` (W1P); `[8]` `xo_busy` (RO); `[9]` `xo_prog_done` (RO); `[10]` `xo_active_freq_500m` (RO); `[11]` `xo_ack_err` (RO); `[31:16]` `xo_ack_err_cnt` (RO) |
-| `0xAC` | `XO_DELTA_M` | R/W | `0x0000_0000` | `[23:0]` Si549 `ADPLL_DELTA_M` (`±950 ppm`, Regs `231..233`) |
+| `0xA8` | `XO_CTRL` | R/W | `0x0000_0000` | `[0]` `use_ext_clk` (`CLK_SEL` `D8`: `0=Si549 Z`, `1=SMA 0`); `[1]` `prog_freq_500m` (`0=400MHz,1=500MHz`, triggers safe `clk_mode_ctrl` MMCM DRP + Si549 switch); `[2]` `prog_start` (W1P); `[3]` `delta_start` (W1P); `[8]` `xo_busy` (RO); `[9]` `xo_prog_done` (RO); `[10]` `xo_active_freq_500m` (RO); `[11]` `xo_ack_err` (RO); `[12]` `xo_boot_err` (RO); `[13]` `xo_delta_clamped` (RO); `[14]` `xo_boot_done` (RO); `[31:16]` `xo_ack_err_cnt` (RO) |
+| `0xAC` | `XO_DELTA_M` | R/W | `0x0000_0000` | Signed `[23:0]` Si549 `ADPLL_DELTA_M` (Regs `231..233`); clamped to `±429553` (`±50.0 ppm` @ `0.0001164 ppm/LSB`) when `ENABLE_ETH=1` (unclamped `±950 ppm` otherwise) |
 | `0xB0` | `XO_RAW_CMD` | R/W | `0x0000_0000` | `[7:0]` Si549 `reg_addr`; `[15:8]` `wdata`; `[16]` `rw` (`0=W,1=R`); `[31]` Trigger (W1P) |
 | `0xB4` | `XO_RAW_RDATA` | RO | `0x0000_0000` | `[7:0]` `raw_resp_rdata`; `[8]` `raw_resp_valid_sticky`; `[9]` `raw_req_ready`; `[10]` `raw_resp_err` |
 | `0xB8` | `XADC_TEMPV` | RO | `0x0000_0000` | `[11:0]` `xadc_temp_raw`; `[23:12]` `xadc_vccint_raw`; `[24]` `xadc_valid`; `[25]` `xadc_overtemp` |

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Sat Nov 14 17:37:07 2026
+| Date         : Sun Nov 15 03:19:42 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_methodology -file D:/Repos/kv260-ias2rf/fpga/artix/reports/methodology.rpt
 | Design       : artix_top
@@ -23,17 +23,18 @@ Table of Contents
           Floorplan: design_1
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 45
+             Checks found: 50
 +-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
 | Rule      | Severity | Description                                                                                           | Checks |
 +-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
-| LUTAR-1   | Warning  | LUT drives async reset alert                                                                          | 4      |
+| LUTAR-1   | Warning  | LUT drives async reset alert                                                                          | 5      |
 | PDRC-190  | Warning  | Suboptimally placed synchronized register chain                                                       | 4      |
 | SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal                                                            | 18     |
 | TIMING-9  | Warning  | Unknown CDC Logic                                                                                     | 1      |
 | TIMING-10 | Warning  | Missing property on synchronizer                                                                      | 1      |
-| TIMING-28 | Warning  | Auto-derived clock referenced by a timing constraint                                                  | 8      |
-| TIMING-47 | Warning  | False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks | 8      |
+| TIMING-18 | Warning  | Missing input or output delay                                                                         | 3      |
+| TIMING-28 | Warning  | Auto-derived clock referenced by a timing constraint                                                  | 7      |
+| TIMING-47 | Warning  | False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks | 10     |
 | ULMTCS-1  | Warning  | Control Sets use limits recommend reduction                                                           | 1      |
 +-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
 
@@ -53,12 +54,20 @@ Related violations: <none>
 
 LUTAR-1#3 Warning
 LUT drives async reset alert  
+LUT cell u_clk_mode_ctrl/dac_rst_sync[3]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) u_clk_mode_ctrl/dac_rst_sync_reg[0]/PRE,
+u_clk_mode_ctrl/dac_rst_sync_reg[1]/PRE,
+u_clk_mode_ctrl/dac_rst_sync_reg[2]/PRE
+u_clk_mode_ctrl/dac_rst_sync_reg[3]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
+Related violations: <none>
+
+LUTAR-1#4 Warning
+LUT drives async reset alert  
 LUT cell u_pmod_spi/FSM_onehot_st[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) adcs_ddc_rst_sync_reg[0]/PRE, adcs_ddc_rst_sync_reg[1]/PRE,
 adcs_rst_sync_reg[0]/PRE, adcs_rst_sync_reg[1]/PRE, dl_rst_sync_reg[0]/PRE
 dl_rst_sync_reg[1]/PRE. The LUT may glitch and trigger an unexpected reset, even if it is a properly timed path.
 Related violations: <none>
 
-LUTAR-1#4 Warning
+LUTAR-1#5 Warning
 LUT drives async reset alert  
 LUT cell u_pmod_spi/gen_rev06_eth.eth_rst_312_s[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) gen_rev06_eth.eth_rst_125_s_reg[0]/PRE,
 gen_rev06_eth.eth_rst_125_s_reg[1]/PRE,
@@ -70,22 +79,22 @@ Related violations: <none>
 
 PDRC-190#1 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X36Y20 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X40Y28 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#2 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X38Y20 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X37Y28 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#3 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X29Y32 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X41Y26 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#4 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X35Y34 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X37Y31 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 SYNTH-6#1 Warning
@@ -188,89 +197,109 @@ Missing property on synchronizer
 One or more logic synchronizer has been detected between 2 clock domains but the synchronizer does not have the property ASYNC_REG defined on one or both registers. It is recommended to run report_cdc for a complete and detailed CDC coverage
 Related violations: <none>
 
+TIMING-18#1 Warning
+Missing input or output delay  
+An output delay is missing on link_rx_clk_n relative to the rising and/or falling clock edge(s) of clk_fpga_500.
+Related violations: <none>
+
+TIMING-18#2 Warning
+Missing input or output delay  
+An output delay is missing on link_rx_d0_n relative to the rising and/or falling clock edge(s) of clk_fpga_500.
+Related violations: <none>
+
+TIMING-18#3 Warning
+Missing input or output delay  
+An output delay is missing on link_rx_d1_n relative to the rising and/or falling clock edge(s) of clk_fpga_500.
+Related violations: <none>
+
 TIMING-28#1 Warning
 Auto-derived clock referenced by a timing constraint  
-The auto-derived clock clk_100m_unbuf is referenced by name inside timing constraint (see constraint position 18 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT1]
+The auto-derived clock clk_100m_unbuf is referenced by name inside timing constraint (see constraint position 24 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT1]
 Related violations: <none>
 
 TIMING-28#2 Warning
 Auto-derived clock referenced by a timing constraint  
-The auto-derived clock clk_100m_unbuf is referenced by name inside timing constraint (see constraint position 19 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT1]
+The auto-derived clock clk_100m_unbuf is referenced by name inside timing constraint (see constraint position 25 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT1]
 Related violations: <none>
 
 TIMING-28#3 Warning
 Auto-derived clock referenced by a timing constraint  
-The auto-derived clock clk_200m_unbuf is referenced by name inside timing constraint (see constraint position 17 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT2]
+The auto-derived clock clk_200m_unbuf is referenced by name inside timing constraint (see constraint position 23 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT2]
 Related violations: <none>
 
 TIMING-28#4 Warning
 Auto-derived clock referenced by a timing constraint  
-The auto-derived clock clk_200m_unbuf is referenced by name inside timing constraint (see constraint position 21 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT2]
+The auto-derived clock clk_200m_unbuf is referenced by name inside timing constraint (see constraint position 27 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT2]
 Related violations: <none>
 
 TIMING-28#5 Warning
 Auto-derived clock referenced by a timing constraint  
-The auto-derived clock clk_400m_unbuf is referenced by name inside timing constraint (see constraint position 18 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT0]
+The auto-derived clock clk_400m_unbuf is referenced by name inside timing constraint (see constraint position 24 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT0]
 Related violations: <none>
 
 TIMING-28#6 Warning
 Auto-derived clock referenced by a timing constraint  
-The auto-derived clock clk_400m_unbuf is referenced by name inside timing constraint (see constraint position 19 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT0]
+The auto-derived clock clk_400m_unbuf is referenced by name inside timing constraint (see constraint position 25 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_adc_cap/u_mmcm_adc/CLKOUT0]
 Related violations: <none>
 
 TIMING-28#7 Warning
-Auto-derived clock referenced by a timing constraint  
-The auto-derived clock link_clk_unbuf is referenced by name inside timing constraint (see constraint position 20 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]
-Related violations: <none>
-
-TIMING-28#8 Warning
 Auto-derived clock referenced by a timing constraint  
 The auto-derived clock link_clk_unbuf is referenced by name inside timing constraint (see constraint position 26 in the Timing Constraint window in Vivado IDE). It is recommended to reference an auto-derived clock by the pin name attached to the clock: get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]
 Related violations: <none>
 
 TIMING-47#1 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks adcs_ddc_clk_unbuf and link_clk_unbuf (see constraint position 25 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks adcs_ddc_clk_unbuf and link_clk_unbuf (see constraint position 31 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#2 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_100m_unbuf and clk_400m_unbuf (see constraint position 18 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_100m_unbuf and clk_400m_unbuf (see constraint position 24 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#3 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_400m_unbuf and clk_100m_unbuf (see constraint position 19 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_400m_unbuf and clk_100m_unbuf (see constraint position 25 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#4 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_adcr_dco and clk_200m_unbuf (see constraint position 17 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_adcr_dco and clk_200m_unbuf (see constraint position 23 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#5 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks gen_rev06_eth.clk_312p5_u and link_clk_unbuf (see constraint position 22 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks clk_dac_500 and link_clk_unbuf (see constraint position 33 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#6 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and adcs_ddc_clk_unbuf (see constraint position 24 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks gen_rev06_eth.clk_312p5_u and link_clk_unbuf (see constraint position 28 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#7 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and gen_rev06_eth.clk_312p5_u (see constraint position 23 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and adcs_ddc_clk_unbuf (see constraint position 30 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 TIMING-47#8 Warning
 False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
-A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and gen_rev06_eth.clk_312p5_u (see constraint position 26 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and clk_dac_500 (see constraint position 32 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+TIMING-47#9 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and gen_rev06_eth.clk_312p5_u (see constraint position 29 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
+Related violations: <none>
+
+TIMING-47#10 Warning
+False path, asynchronous clock group or max delay datapath only constraint between synchronous clocks  
+A Max Delay Datapath Only timing constraint is set between synchronous clocks link_clk_unbuf and gen_rev06_eth.clk_312p5_u (see constraint position 34 in the Timing Constraint window in Vivado IDE). Masking entire synchronous clock domains via  set_false_path, set_clock_groups or set_max_delay -datapath_only may result in failure in hardware.
 Related violations: <none>
 
 ULMTCS-1#1 Warning
 Control Sets use limits recommend reduction  
-This design uses 914 control sets (vs. available limit of 8150, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
+This design uses 934 control sets (vs. available limit of 8150, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
 Related violations: <none>
 
 

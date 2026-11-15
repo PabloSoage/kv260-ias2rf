@@ -19,9 +19,20 @@ module tb_system;
     // -------------------------------------------------------------------------
     // 1. Clocks (+/-100 ppm skew between Artix 100.000 MHz and Kria/PHY peer)
     // -------------------------------------------------------------------------
-    reg fpga_clk_p   = 1'b0; // Artix 100.000 MHz nominal (T = 10.000 ns)
-    always #5000.000 fpga_clk_p = ~fpga_clk_p;
+`ifdef FPGA_CLK_400M
+    localparam [0:0] TB_BOOT_500M = 1'b0;
+    real fpga_half_ps = 1250.000; // Artix 400.000 MHz nominal (T = 2.500 ns)
+`else
+    localparam [0:0] TB_BOOT_500M = 1'b1;
+    real fpga_half_ps = 1000.000; // Artix 500.000 MHz nominal (T = 2.000 ns)
+`endif
+    reg  fpga_clk_p   = 1'b0;
+    initial forever #(fpga_half_ps) fpga_clk_p = ~fpga_clk_p;
     wire fpga_clk_n = ~fpga_clk_p;
+    always @(*) begin
+        if (u_si549.mem[23] == 8'h1C)      fpga_half_ps = 1250.000;
+        else if (u_si549.mem[23] == 8'h16) fpga_half_ps = 1000.000;
+    end
 
     reg clk_400m_adc = 1'b0; // AD9484 400 MSPS clock (200 MHz DDR DCO)
     always #1250.000 clk_400m_adc = ~clk_400m_adc;
@@ -213,6 +224,7 @@ module tb_system;
         .HK_CLK_DIV        (3),
         .HK_POLL_DIV       (16000),
         .XO_FCAL_WAIT_CYC  (150),
+        .BOOT_FREQ_500M    (TB_BOOT_500M),
         .XADC_POLL_DIV_P   (500),
         .PPS_DEFAULT_NOM_CYC(32'd1250)
     ) u_artix (
@@ -476,7 +488,7 @@ module tb_system;
         .eth_sgrx_p      (p_sgrx_p),
         .eth_sgrx_n      (p_sgrx_n),
         .peer_half_ui_fs (peer_half_ui_fs),
-        .peer_rst_n      (pl_resetn),
+        .peer_rst_n      (pl_resetn & eth_rst_n),
         .link_rx_cut     (peer_link_rx_cut),
         .mdio_poll_reads (mdio_poll_reads),
         .mdio_custom_wrs (mdio_custom_wrs),
@@ -777,13 +789,13 @@ module tb_system;
         begin : an_handshake
             integer an_tmo;
             an_tmo = 0;
-            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state == 2'd0) && (an_tmo < 300)) begin
+            while ((u_artix.sys_rst || u_artix.gen_rev06_eth.u_eth_phy.an_state == 2'd0) && (an_tmo < 1500)) begin
                 #200_000;
                 an_tmo = an_tmo + 1;
             end
             u_phy_peer.set_an_mode(2'd1); // Acknowledge /C/ Ack=1
             an_tmo = 0;
-            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state != 2'd2) && (an_tmo < 200)) begin
+            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state != 2'd2) && (an_tmo < 500)) begin
                 #200_000;
                 an_tmo = an_tmo + 1;
             end
@@ -885,8 +897,39 @@ module tb_system;
         if (!art_r[17] || csr_r[31:16] == 16'd0)
             fail_msg("S2: Missing-ACK slave 0x7D did not set ack_err_cnt");
 
-        // 2d. Si549 500 MHz XO programming & CLK_SEL pin check
+        // 2d. Si549 500 MHz XO programming & CLK_SEL pin check (retrains IAS1 + SGMII)
+        u_phy_peer.set_an_mode(2'd0); // Peer restarts AN at Ack=0 when eth_rst_n pulses low
         kria_reg_wr(16'h00A8, 32'h0000_0006); // use_ext_clk=0 (Si549), prog_freq_500m=1, prog_start=1
+        begin : an_handshake_s2
+            integer an_tmo;
+            an_tmo = 0;
+            while (eth_rst_n && (an_tmo < 500)) begin
+                #100_000;
+                an_tmo = an_tmo + 1;
+            end
+            an_tmo = 0;
+            while ((!eth_rst_n || u_artix.sys_rst || u_artix.gen_rev06_eth.u_eth_phy.an_state == 2'd0) && (an_tmo < 1500)) begin
+                #200_000;
+                an_tmo = an_tmo + 1;
+            end
+            u_phy_peer.set_an_mode(2'd1);
+            an_tmo = 0;
+            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state != 2'd2) && (an_tmo < 500)) begin
+                #200_000;
+                an_tmo = an_tmo + 1;
+            end
+            u_phy_peer.set_an_mode(2'd2);
+            an_tmo = 0;
+            csr_r  = 32'd0;
+            while ((!csr_r[6] || !csr_r[21] || !u_artix.dl_up_sync[1] || !u_artix.eth_link_up_stat) && (an_tmo < 1000)) begin
+                #1_000_000;
+                axil_rd(8'h04, csr_r);
+                an_tmo = an_tmo + 1;
+            end
+        end
+        $display("[DBG2d] k_up=%b adc_tr=%b dl_up=%b eth_up=%b eye_w=%0d taps=%010h drop=%0d",
+                 csr_r[6], csr_r[21], u_artix.dl_up_sync[1], u_artix.eth_link_up_stat,
+                 u_artix.adc_eye_width_min, u_artix.adc_tap_flat, u_artix.u_ddc.dropped_cnt);
         tmo_cnt = 0;
         art_r   = 32'd0;
         while (!art_r[9] && tmo_cnt < 300) begin
@@ -970,7 +1013,7 @@ module tb_system;
 
         // 3b. 121.5625 MHz CW IF -> +1.5625 MHz @ 25 MSPS -> bin +4 in 64-pt DFT (>= 50 dB image rej)
         adcr_mode = 2'd1;
-        #3_000_000; // Flush DDC FIR pipeline for CW steady-state
+        #16_000_000; // Flush S3a backlog, IAS1/Kria RX FIFOs & DDC CIC/FIR (~25 pkts) for CW steady-state
         rad_cap_wr = 0;
         rad_cap_en = 1'b1;
         tmo_cnt = 0;
@@ -1001,7 +1044,9 @@ module tb_system;
         if (pwr_img < 1.0) pwr_img = 1.0;
         img_rej_db = 10.0 * $log10(pwr_pos / pwr_img);
         if (img_rej_db < 50.0) begin
-            $display("[S3b] img_rej_db=%0f dB (pwr_pos=%0e pwr_img=%0e)", img_rej_db, pwr_pos, pwr_img);
+            $display("[S3b] img_rej_db=%0f dB (pwr_pos=%0e pwr_img=%0e) adc_tr=%b eye_w=%0d taps=%010h drop=%0d",
+                     img_rej_db, pwr_pos, pwr_img,
+                     u_artix.adc_trained, u_artix.adc_eye_width_min, u_artix.adc_tap_flat, u_artix.u_ddc.dropped_cnt);
             fail_msg("S3: CW DDC image rejection < 50 dB");
         end
         kria_reg_wr(16'h0054, 32'h0000_0000); // Disable chirp generator
@@ -1197,8 +1242,13 @@ module tb_system;
         end
         #2_000_000;
         axil_rd(8'h18, csr_r);
-        if (csr_r == 32'd0 || rx_crc_err_pkts == 0)
+        if (csr_r == 32'd0 || rx_crc_err_pkts == 0) begin
+            $display("[DBG_S6] csr_18=%0d rx_crc_err_pkts=%0d pcs_crc=%0d l0_lock=%b l1_lock=%b d_lock=%b k_up=%b sh0=%0d sh1=%0d",
+                     csr_r, rx_crc_err_pkts, u_kria.crc_err_cnt,
+                     u_kria.l0_lock, u_kria.l1_lock, u_kria.d_lock, u_kria.kria_link_up,
+                     u_kria.sh_err0, u_kria.sh_err1);
             fail_msg("S6: Glitch injection did not flag m_axis_rx_tuser[0] & REG_ERR_CRC > 0");
+        end
 
         // Clear via AXI-Lite control clear pulse (0x00 bit 6)
         axil_wr(8'h00, 32'h0000_0040);

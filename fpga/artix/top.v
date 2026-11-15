@@ -29,13 +29,14 @@ module artix_top #(
     parameter [0:0]   CONV_SPI_AUTO_INIT = 1'b1,        // Auto-init AD9253 + read AD9484/AD9253 IDs at boot
     parameter integer ADAR_CLK_DIV       = 8,           // Half-SCLK in 125 MHz cycles
     parameter [0:0]   ADAR_AUTO_INIT     = 1'b1,        // Auto-init all 8 ADAR1000 chips at boot
-    parameter integer HK_CLK_DIV         = 312,         // ~100 kHz I2C @ 125 MHz (4*312 = 1248)
+    parameter integer HK_CLK_DIV         = 250,         // ~125 kHz @ 125 MHz link_clk; <=97.5 kHz @ CFGMCLK
     parameter integer HK_POLL_DIV        = 12_500_000,  // 100 ms TMP1075 background poll interval
-    parameter integer XO_FCAL_WAIT_CYC   = 1_250_000,   // 10 ms Si549 FCAL settle wait @ 125 MHz
+    parameter integer XO_FCAL_WAIT_CYC   = 3_000_000,   // >=30.7 ms Si549 FCAL wait @ +50% CFGMCLK (97.5 MHz)
+    parameter [0:0]   BOOT_FREQ_500M     = 1'b1,        // Safe boot target: 1 = 500 MHz SDR, 0 = 400 MHz Radar
     parameter integer XADC_POLL_DIV_P    = 125_000,     // 1 ms XADC poll @ 125 MHz
     parameter [31:0]  PPS_DEFAULT_NOM_CYC= 32'd125_000_000
 ) (
-    // System clock: 100 MHz LVDS via attenuator on Bank 14 MRCC (DIFF_TERM=FALSE)
+    // System clock: 400 MHz (radar) or 500 MHz (SDR) LVDS on Bank 14 MRCC (DIFF_TERM=FALSE)
     input  wire       fpga_clk_p,
     input  wire       fpga_clk_n,
 
@@ -155,11 +156,22 @@ module artix_top #(
     wire link_clk, tx_clk_ddr, refclk_200m, adcs_ddc_clk;
     wire sys_mmcm_locked;
 
+    // Safe-boot / mode-switch & non-MMCM DAC clock wires (driven by u_clk_mode_ctrl)
+    wire        cfgmclk, cfg_por_rst;
+    wire        dac_clk, dac_rst;
+    wire        mmcm_rst;
+    wire [6:0]  sys_daddr, eth_daddr_w;
+    wire        sys_den, sys_dwe, sys_drdy;
+    wire [15:0] sys_di, sys_do;
+    wire        eth_mmcm_locked_w;
+    wire        eth_den_w, eth_dwe_w, eth_drdy_w;
+    wire [15:0] eth_di_w, eth_do_w;
+
     MMCME2_ADV #(
         .BANDWIDTH          ("OPTIMIZED"),
-        .CLKFBOUT_MULT_F    (10.000),   // 100 MHz * 10 = 1000 MHz VCO
+        .CLKFBOUT_MULT_F    (10.000),   // 100 MHz PFD * 10 = 1000 MHz VCO
         .CLKFBOUT_PHASE     (0.0),
-        .CLKIN1_PERIOD      (10.000),
+        .CLKIN1_PERIOD      (2.000),    // Static worst-case 500 MHz (DRP sets DIVCLK=4 @ 400M, 5 @ 500M)
         .CLKOUT0_DIVIDE_F   (8.000),    // 125 MHz link_clk / parallel fabric
         .CLKOUT0_PHASE      (0.0),
         .CLKOUT1_DIVIDE     (2),        // 500 MHz DDR serial clock (1.0 Gb/s)
@@ -168,7 +180,7 @@ module artix_top #(
         .CLKOUT2_PHASE      (0.0),
         .CLKOUT3_DIVIDE     (12),       // 83.333 MHz AD9253 SDR DDC fabric clock
         .CLKOUT3_PHASE      (0.0),
-        .DIVCLK_DIVIDE      (1),
+        .DIVCLK_DIVIDE      (5),
         .COMPENSATION       ("INTERNAL"),
         .STARTUP_WAIT       ("FALSE")
     ) u_mmcm_sys (
@@ -191,14 +203,14 @@ module artix_top #(
         .CLKOUT6      (),
         .LOCKED       (sys_mmcm_locked),
         .PWRDWN       (1'b0),
-        .RST          (1'b0),
-        .DADDR        (7'd0),
-        .DCLK         (1'b0),
-        .DEN          (1'b0),
-        .DI           (16'd0),
-        .DWE          (1'b0),
-        .DO           (),
-        .DRDY         (),
+        .RST          (mmcm_rst),
+        .DADDR        (sys_daddr),
+        .DCLK         (cfgmclk),
+        .DEN          (sys_den),
+        .DI           (sys_di),
+        .DWE          (sys_dwe),
+        .DO           (sys_do),
+        .DRDY         (sys_drdy),
         .PSCLK        (1'b0),
         .PSEN         (1'b0),
         .PSINCDEC     (1'b0),
@@ -824,15 +836,17 @@ module artix_top #(
 
     generate
         if (ENABLE_ETH) begin : gen_rev06_eth
-            // Second MMCM (1250 MHz VCO) -> 625 MHz (0/90) & 312.5 MHz (0/45)
+            // Second MMCM (1250 MHz VCO from 100 MHz PFD) -> 625 MHz (0/90) & 312.5 MHz (0/45)
             wire eth_mmcm_fb, eth_mmcm_locked;
             wire clk_625_0_u, clk_625_90_u, clk_312p5_u, clk_312p5_45_u;
             wire clk_625_0,   clk_625_90,   clk_312p5,   clk_312p5_45;
 
+            assign eth_mmcm_locked_w = eth_mmcm_locked;
+
             MMCME2_ADV #(
                 .BANDWIDTH         ("OPTIMIZED"),
-                .CLKIN1_PERIOD     (10.000),
-                .DIVCLK_DIVIDE     (1),
+                .CLKIN1_PERIOD     (2.000),   // Static 500 MHz (DRP sets DIVCLK=4 @ 400M, 5 @ 500M)
+                .DIVCLK_DIVIDE     (5),
                 .CLKFBOUT_MULT_F   (12.500),
                 .CLKFBOUT_PHASE    (0.0),
                 .CLKOUT0_DIVIDE_F  (2.000),   // 625.0 MHz 0 deg
@@ -865,9 +879,9 @@ module artix_top #(
                 .CLKOUT6      (),
                 .LOCKED       (eth_mmcm_locked),
                 .PWRDWN       (1'b0),
-                .RST          (1'b0),
-                .DADDR        (7'd0), .DCLK(1'b0), .DEN(1'b0), .DI(16'd0), .DWE(1'b0),
-                .DO           (), .DRDY(), .PSCLK(1'b0), .PSEN(1'b0), .PSINCDEC(1'b0), .PSDONE(),
+                .RST          (mmcm_rst),
+                .DADDR        (eth_daddr_w), .DCLK(cfgmclk), .DEN(eth_den_w), .DI(eth_di_w), .DWE(eth_dwe_w),
+                .DO           (eth_do_w), .DRDY(eth_drdy_w), .PSCLK(1'b0), .PSEN(1'b0), .PSINCDEC(1'b0), .PSDONE(),
                 .CLKFBSTOPPED (), .CLKINSTOPPED()
             );
 
@@ -1143,6 +1157,9 @@ module artix_top #(
                 .failover_cnt  ()
             );
         end else begin : gen_no_eth
+            assign eth_mmcm_locked_w     = 1'b1;
+            assign eth_do_w              = 16'd0;
+            assign eth_drdy_w            = 1'b0;
             assign eth_ctrl_wr           = 1'b0;
             assign eth_ctrl_addr         = 16'd0;
             assign eth_ctrl_wdata        = 32'd0;
@@ -1368,6 +1385,7 @@ module artix_top #(
     reg  [31:0] reg_hk_i2c_wdata;
 
     reg  [31:0] reg_xo_ctrl;
+    reg         reg_xo_ctrl_wr_p;
     reg         reg_xo_prog_p;
     reg         reg_xo_delta_p;
     reg  [23:0] reg_xo_delta_m;
@@ -1713,26 +1731,66 @@ module artix_top #(
         .dropped_cnt   (sdr_adc_dropped_cnt)
     );
 
-    // AD9708 Radar Chirp DAC + AD9767 Interleaved SDR DAC
-    wire        dacr_chirp_active;
-    wire [31:0] dacr_pulse_cnt;
+    // AD9708 Radar Chirp DAC + AD9767 Interleaved SDR DAC (non-MMCM dac_clk domain)
+    reg         dacr_cfg_tog_link, dacr_trig_tog_link;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] dacr_cfg_tog_s, dacr_trig_tog_s;
+    reg         dacr_en_dac, dacr_trig_dac;
+    reg  [7:0]  dacr_amp_dac;
+    reg  [31:0] dacr_f0_dac, dacr_df_dac, dacr_plen_dac, dacr_pri_dac;
+
+    (* ASYNC_REG = "TRUE" *) reg [2:0] dacs_ctrl_s1, dacs_ctrl_s2;
+
+    always @(posedge dac_clk or posedge dac_rst) begin
+        if (dac_rst) begin
+            dacr_cfg_tog_s  <= 3'd0;
+            dacr_trig_tog_s <= 3'd0;
+            dacr_en_dac     <= 1'b0;
+            dacr_trig_dac   <= 1'b0;
+            dacr_amp_dac    <= 8'hFF;
+            dacr_f0_dac     <= 32'd0;
+            dacr_df_dac     <= 32'd0;
+            dacr_plen_dac   <= 32'h0000_0400;
+            dacr_pri_dac    <= 32'h0000_2000;
+            dacs_ctrl_s1    <= 3'd0;
+            dacs_ctrl_s2    <= 3'd0;
+        end else begin
+            dacr_cfg_tog_s  <= {dacr_cfg_tog_s[1:0],  dacr_cfg_tog_link};
+            dacr_trig_tog_s <= {dacr_trig_tog_s[1:0], dacr_trig_tog_link};
+            dacr_trig_dac   <= 1'b0;
+            if (dacr_cfg_tog_s[2] ^ dacr_cfg_tog_s[1]) begin
+                dacr_en_dac   <= reg_dacr_ctrl[0];
+                dacr_amp_dac  <= reg_dacr_ctrl[23:16];
+                dacr_f0_dac   <= reg_dacr_f0;
+                dacr_df_dac   <= reg_dacr_df;
+                dacr_plen_dac <= reg_dacr_plen;
+                dacr_pri_dac  <= reg_dacr_pri;
+            end
+            if (dacr_trig_tog_s[2] ^ dacr_trig_tog_s[1])
+                dacr_trig_dac <= 1'b1;
+            dacs_ctrl_s1 <= reg_dacs_ctrl[2:0];
+            dacs_ctrl_s2 <= dacs_ctrl_s1;
+        end
+    end
+
+    wire        dacr_chirp_active_dac;
+    wire [31:0] dacr_pulse_cnt_dac;
     dac_radar u_dac_radar (
-        .dac_clk      (link_clk),
-        .dac_rst      (link_rst),
-        .chirp_enable (reg_dacr_ctrl[0]),
-        .chirp_trig   (reg_dacr_trig_p),
-        .f0_ftw       (reg_dacr_f0),
-        .df_ftw       (reg_dacr_df),
-        .pulse_len    (reg_dacr_plen),
-        .pri_len      (reg_dacr_pri),
-        .amp_scale    (reg_dacr_ctrl[23:16]),
-        .chirp_active (dacr_chirp_active),
-        .pulse_cnt    (dacr_pulse_cnt),
+        .dac_clk      (dac_clk),
+        .dac_rst      (dac_rst),
+        .chirp_enable (dacr_en_dac),
+        .chirp_trig   (dacr_trig_dac),
+        .f0_ftw       (dacr_f0_dac),
+        .df_ftw       (dacr_df_dac),
+        .pulse_len    (dacr_plen_dac),
+        .pri_len      (dacr_pri_dac),
+        .amp_scale    (dacr_amp_dac),
+        .chirp_active (dacr_chirp_active_dac),
+        .pulse_cnt    (dacr_pulse_cnt_dac),
         .dacr_clk     (dacr_clk),
         .dacr_d       (dacr_d)
     );
 
-    wire [31:0] dacs_underflow_cnt;
+    wire [31:0] dacs_underflow_cnt_dac;
     wire [9:0]  dacs_fifo_lvl_dl;
     dac_sdr #(
         .FIFO_AW (9)
@@ -1742,10 +1800,12 @@ module artix_top #(
         .s_valid         (dl_is_iq_pkt),
         .s_ready         (),
         .s_data          (dl_out_data),
-        .dac_clk         (link_clk),
-        .dac_rst         (link_rst),
-        .tx_enable       (reg_dacs_ctrl[0]),
-        .underflow_cnt   (dacs_underflow_cnt),
+        .dac_clk         (dac_clk),
+        .dac_rst         (dac_rst),
+        .tx_enable       (dacs_ctrl_s2[0]),
+        .hf_dac2_mode    (~dacs_ctrl_s2[1]),
+        .dac1_mute       (dacs_ctrl_s2[2]),
+        .underflow_cnt   (dacs_underflow_cnt_dac),
         .fifo_level_link (dacs_fifo_lvl_dl),
         .dacs_d          (dacs_d),
         .dacs_iqclk      (dacs_iqclk),
@@ -1753,6 +1813,50 @@ module artix_top #(
         .dacs_iqsel      (dacs_iqsel),
         .dacs_iqreset    (dacs_iqreset)
     );
+
+    // Toggle-sampled CDC for DAC status (dac_clk -> link_clk)
+    (* ASYNC_REG = "TRUE" *) reg [1:0] dacr_active_s;
+    reg [31:0] dacr_pcnt_hold_dac, dacs_uflow_hold_dac;
+    reg        dac_stat_tog_dac;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] dac_stat_tog_s;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] dac_stat_ack_s;
+    reg        dac_stat_ack_link;
+    reg [31:0] dacr_pulse_cnt, dacs_underflow_cnt;
+    wire       dacr_chirp_active = dacr_active_s[1];
+
+    always @(posedge dac_clk or posedge dac_rst) begin
+        if (dac_rst) begin
+            dacr_pcnt_hold_dac  <= 32'd0;
+            dacs_uflow_hold_dac <= 32'd0;
+            dac_stat_tog_dac    <= 1'b0;
+            dac_stat_ack_s      <= 2'd0;
+        end else begin
+            dac_stat_ack_s <= {dac_stat_ack_s[0], dac_stat_ack_link};
+            if (dac_stat_tog_dac == dac_stat_ack_s[1]) begin
+                dacr_pcnt_hold_dac  <= dacr_pulse_cnt_dac;
+                dacs_uflow_hold_dac <= dacs_underflow_cnt_dac;
+                dac_stat_tog_dac    <= ~dac_stat_tog_dac;
+            end
+        end
+    end
+
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            dacr_active_s      <= 2'd0;
+            dac_stat_tog_s     <= 3'd0;
+            dac_stat_ack_link  <= 1'b0;
+            dacr_pulse_cnt     <= 32'd0;
+            dacs_underflow_cnt <= 32'd0;
+        end else begin
+            dacr_active_s  <= {dacr_active_s[0],  dacr_chirp_active_dac};
+            dac_stat_tog_s <= {dac_stat_tog_s[1:0], dac_stat_tog_dac};
+            if (dac_stat_tog_s[2] ^ dac_stat_tog_s[1]) begin
+                dacr_pulse_cnt     <= dacr_pcnt_hold_dac;
+                dacs_underflow_cnt <= dacs_uflow_hold_dac;
+                dac_stat_ack_link  <= dac_stat_tog_s[1];
+            end
+        end
+    end
 
     // Toggle-sampled CDC for dacs_fifo_lvl_dl (dl_rx_clk -> link_clk)
     reg [9:0] dacs_lvl_hold_dl;
@@ -1901,43 +2005,71 @@ module artix_top #(
     IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_hk_scl (.I(1'b0), .T(hk_scl_t), .O(hk_scl_in), .IO(hk_scl));
     IOBUF #(.IOSTANDARD("LVCMOS18")) u_iobuf_hk_sda (.I(1'b0), .T(hk_sda_t), .O(hk_sda_in), .IO(hk_sda));
 
-    // Si549 XO I2C + CLK_SEL Mux (Bank 15 LVCMOS33)
+    // Safe-Boot / 400<->500 MHz Clock Mode Sequencer + Non-MMCM DAC Clock + Si549 XO I2C
     wire        xo_raw_req_ready, xo_raw_resp_valid, xo_raw_resp_err;
     wire [7:0]  xo_raw_resp_rdata;
     wire        xo_busy, xo_prog_done, xo_active_500m, xo_ack_err;
+    wire        xo_boot_done, xo_boot_err, xo_delta_clamped, xo_use_ext_clk_sync, xo_req_500m_sync;
     wire [15:0] xo_ack_err_cnt;
     wire        clk_sel_t, xo_scl_t, xo_scl_in, xo_sda_t, xo_sda_in;
 
-    hk_xo_ctrl #(
-        .SI549_ADDR    (7'h55),
-        .CLK_DIV       (HK_CLK_DIV),
-        .FCAL_WAIT_CYC (XO_FCAL_WAIT_CYC)
-    ) u_hk_xo (
-        .clk              (link_clk),
-        .rst              (link_rst),
-        .use_ext_clk      (reg_xo_ctrl[0]),
-        .clk_sel_t        (clk_sel_t),
-        .prog_start       (reg_xo_prog_p),
-        .prog_freq_500m   (reg_xo_ctrl[1]),
-        .delta_start      (reg_xo_delta_p),
-        .delta_m          (reg_xo_delta_m),
-        .raw_req_valid    (reg_xo_raw_p),
-        .raw_req_ready    (xo_raw_req_ready),
-        .raw_req_rw       (reg_xo_raw_cmd[16]),
-        .raw_req_reg      (reg_xo_raw_cmd[7:0]),
-        .raw_req_wdata    (reg_xo_raw_cmd[15:8]),
-        .raw_resp_valid   (xo_raw_resp_valid),
-        .raw_resp_rdata   (xo_raw_resp_rdata),
-        .raw_resp_err     (xo_raw_resp_err),
-        .busy             (xo_busy),
-        .prog_done        (xo_prog_done),
-        .active_freq_500m (xo_active_500m),
-        .ack_err          (xo_ack_err),
-        .ack_err_cnt      (xo_ack_err_cnt),
-        .xo_scl_t         (xo_scl_t),
-        .xo_scl_in        (xo_scl_in),
-        .xo_sda_t         (xo_sda_t),
-        .xo_sda_in        (xo_sda_in)
+    clk_mode_ctrl #(
+        .BOOT_FREQ_500M   (BOOT_FREQ_500M),
+        .ENABLE_ETH       (ENABLE_ETH),
+        .SI549_ADDR       (7'h55),
+        .HK_CLK_DIV       (HK_CLK_DIV),
+        .XO_FCAL_WAIT_CYC (XO_FCAL_WAIT_CYC)
+    ) u_clk_mode_ctrl (
+        .fpga_clk_bufg       (fpga_clk_bufg),
+        .cfgmclk             (cfgmclk),
+        .cfg_por_rst         (cfg_por_rst),
+        .dac_clk             (dac_clk),
+        .dac_rst             (dac_rst),
+        .sys_mmcm_locked     (sys_mmcm_locked),
+        .eth_mmcm_locked     (eth_mmcm_locked_w),
+        .mmcm_rst            (mmcm_rst),
+        .sys_daddr           (sys_daddr),
+        .sys_den             (sys_den),
+        .sys_dwe             (sys_dwe),
+        .sys_di              (sys_di),
+        .sys_do              (sys_do),
+        .sys_drdy            (sys_drdy),
+        .eth_daddr           (eth_daddr_w),
+        .eth_den             (eth_den_w),
+        .eth_dwe             (eth_dwe_w),
+        .eth_di              (eth_di_w),
+        .eth_do              (eth_do_w),
+        .eth_drdy            (eth_drdy_w),
+        .link_clk            (link_clk),
+        .link_rst            (link_rst),
+        .wr_xo_ctrl_p        (reg_xo_ctrl_wr_p),
+        .wr_xo_prog_p        (reg_xo_prog_p),
+        .wr_xo_ctrl_bits     (reg_xo_ctrl[1:0]),
+        .delta_start_p       (reg_xo_delta_p),
+        .delta_m_in          (reg_xo_delta_m),
+        .raw_req_p           (reg_xo_raw_p),
+        .raw_req_rw          (reg_xo_raw_cmd[16]),
+        .raw_req_reg         (reg_xo_raw_cmd[7:0]),
+        .raw_req_wdata       (reg_xo_raw_cmd[15:8]),
+        .raw_req_ready_link  (xo_raw_req_ready),
+        .raw_resp_valid_link (xo_raw_resp_valid),
+        .raw_resp_rdata_link (xo_raw_resp_rdata),
+        .raw_resp_err_link   (xo_raw_resp_err),
+        .xo_busy_link        (xo_busy),
+        .xo_prog_done_link   (xo_prog_done),
+        .xo_active_500m_link (xo_active_500m),
+        .xo_ack_err_link     (xo_ack_err),
+        .xo_boot_done_link   (xo_boot_done),
+        .xo_boot_err_link    (xo_boot_err),
+        .xo_delta_clamped_link(xo_delta_clamped),
+        .xo_use_ext_clk_link (xo_use_ext_clk_sync),
+        .xo_req_500m_link    (xo_req_500m_sync),
+        .xo_ack_err_cnt_link (xo_ack_err_cnt),
+        .clk_sel_t           (clk_sel_t),
+        .xo_scl_t            (xo_scl_t),
+        .xo_scl_in           (xo_scl_in),
+        .xo_sda_t            (xo_sda_t),
+        .xo_sda_in           (xo_sda_in)
     );
     OBUFT #(.IOSTANDARD("LVCMOS33")) u_obuft_clk_sel (.I(1'b0), .T(clk_sel_t), .O(clk_sel));
     IOBUF #(.IOSTANDARD("LVCMOS33")) u_iobuf_xo_scl  (.I(1'b0), .T(xo_scl_t),  .O(xo_scl_in), .IO(xo_scl));
@@ -1964,7 +2096,7 @@ module artix_top #(
                 6'h19: reg_rd_word = reg_dacr_pri;                                          // 0x64
                 6'h1A: reg_rd_word = {31'd0, dacr_chirp_active};                            // 0x68
                 6'h1B: reg_rd_word = dacr_pulse_cnt;                                        // 0x6C
-                6'h1C: reg_rd_word = {31'd0, reg_dacs_ctrl[0]};                             // 0x70
+                6'h1C: reg_rd_word = {29'd0, reg_dacs_ctrl[2:0]};                             // 0x70
                 6'h1D: reg_rd_word = dacs_underflow_cnt;                                    // 0x74
                 6'h1E: reg_rd_word = {22'd0, dacs_fifo_lvl_link};                           // 0x78
                 6'h1F: reg_rd_word = {19'd0, reg_adar_ctrl[12:8], 2'd0, reg_adar_ctrl[5:0]}; // 0x7C
@@ -1981,8 +2113,9 @@ module artix_top #(
                 6'h28: reg_rd_word = {11'd0, hk_tmp_valid, hk_alert_active, hk_busy,
                                       hk_last_ack_err, hk_req_ready, hk_req_rdata};         // 0xA0
                 6'h29: reg_rd_word = {hk_ack_err_cnt, hk_tmp_raw};                          // 0xA4
-                6'h2A: reg_rd_word = {xo_ack_err_cnt, 4'd0, xo_ack_err, xo_active_500m,
-                                      xo_prog_done, xo_busy, 6'd0, reg_xo_ctrl[1:0]};       // 0xA8
+                6'h2A: reg_rd_word = {xo_ack_err_cnt, 1'b0, xo_boot_done, xo_delta_clamped,
+                                      xo_boot_err, xo_ack_err, xo_active_500m, xo_prog_done,
+                                      xo_busy, 6'd0, xo_req_500m_sync, xo_use_ext_clk_sync}; // 0xA8
                 6'h2B: reg_rd_word = {8'd0, reg_xo_delta_m};                                // 0xAC
                 6'h2C: reg_rd_word = reg_xo_raw_cmd;                                        // 0xB0
                 6'h2D: reg_rd_word = {21'd0, xo_raw_err_hold, xo_raw_req_ready,
@@ -2021,7 +2154,7 @@ module artix_top #(
 
     always @(posedge link_clk) begin
         if (link_rst) begin
-            reg_adcs_ctrl          <= 32'h0000_0001;
+            reg_adcs_ctrl          <= 32'h0000_0009; // Switch-free HF default: enable ADCS + Ch B (IF_RX_C / J951)
             reg_conv_spi_cmd       <= 32'd0;
             reg_conv_spi_start_p   <= 1'b0;
             reg_adcs_init_p        <= 1'b0;
@@ -2038,6 +2171,8 @@ module artix_top #(
             reg_dacr_df            <= 32'd0;
             reg_dacr_plen          <= 32'h0000_0400;
             reg_dacr_pri           <= 32'h0000_2000;
+            dacr_cfg_tog_link      <= 1'b0;
+            dacr_trig_tog_link     <= 1'b0;
             reg_dacs_ctrl          <= 32'd0;
             reg_adar_ctrl          <= 32'd0;
             reg_adar_load_p        <= 1'b0;
@@ -2053,7 +2188,8 @@ module artix_top #(
             reg_hk_i2c_cmd         <= 32'd0;
             reg_hk_i2c_p           <= 1'b0;
             reg_hk_i2c_wdata       <= 32'd0;
-            reg_xo_ctrl            <= 32'd0;
+            reg_xo_ctrl            <= {30'd0, BOOT_FREQ_500M, 1'b0};
+            reg_xo_ctrl_wr_p       <= 1'b0;
             reg_xo_prog_p          <= 1'b0;
             reg_xo_delta_p         <= 1'b0;
             reg_xo_delta_m         <= 24'd0;
@@ -2080,10 +2216,14 @@ module artix_top #(
             reg_adar_tbl_p       <= 1'b0;
             reg_adar_spi_p       <= 1'b0;
             reg_hk_i2c_p         <= 1'b0;
+            reg_xo_ctrl_wr_p     <= 1'b0;
             reg_xo_prog_p        <= 1'b0;
             reg_xo_delta_p       <= 1'b0;
             reg_xo_raw_p         <= 1'b0;
             reg_pps_clear_p      <= 1'b0;
+
+            if (reg_dacr_trig_p)
+                dacr_trig_tog_link <= ~dacr_trig_tog_link;
 
             if (conv_resp_valid) begin
                 conv_resp_valid_sticky <= 1'b1;
@@ -2124,13 +2264,14 @@ module artix_top #(
                         sdr_cfg_tog_link      <= ~sdr_cfg_tog_link;
                     end
                     6'h15: begin // 0x54 DACR_CTRL
-                        reg_dacr_ctrl   <= reg_wr_wdata;
-                        reg_dacr_trig_p <= reg_wr_wdata[1];
+                        reg_dacr_ctrl     <= reg_wr_wdata;
+                        reg_dacr_trig_p   <= reg_wr_wdata[1];
+                        dacr_cfg_tog_link <= ~dacr_cfg_tog_link;
                     end
-                    6'h16: reg_dacr_f0   <= reg_wr_wdata; // 0x58
-                    6'h17: reg_dacr_df   <= reg_wr_wdata; // 0x5C
-                    6'h18: reg_dacr_plen <= reg_wr_wdata; // 0x60
-                    6'h19: reg_dacr_pri  <= reg_wr_wdata; // 0x64
+                    6'h16: begin reg_dacr_f0   <= reg_wr_wdata; dacr_cfg_tog_link <= ~dacr_cfg_tog_link; end // 0x58
+                    6'h17: begin reg_dacr_df   <= reg_wr_wdata; dacr_cfg_tog_link <= ~dacr_cfg_tog_link; end // 0x5C
+                    6'h18: begin reg_dacr_plen <= reg_wr_wdata; dacr_cfg_tog_link <= ~dacr_cfg_tog_link; end // 0x60
+                    6'h19: begin reg_dacr_pri  <= reg_wr_wdata; dacr_cfg_tog_link <= ~dacr_cfg_tog_link; end // 0x64
                     6'h1C: reg_dacs_ctrl <= reg_wr_wdata; // 0x70
                     6'h1F: begin // 0x7C ADAR_CTRL
                         reg_adar_ctrl   <= reg_wr_wdata;
@@ -2155,9 +2296,10 @@ module artix_top #(
                     end
                     6'h27: reg_hk_i2c_wdata <= reg_wr_wdata; // 0x9C
                     6'h2A: begin // 0xA8 XO_CTRL
-                        reg_xo_ctrl    <= reg_wr_wdata;
-                        reg_xo_prog_p  <= reg_wr_wdata[2];
-                        reg_xo_delta_p <= reg_wr_wdata[3];
+                        reg_xo_ctrl      <= reg_wr_wdata;
+                        reg_xo_ctrl_wr_p <= 1'b1;
+                        reg_xo_prog_p    <= reg_wr_wdata[2];
+                        reg_xo_delta_p   <= reg_wr_wdata[3];
                     end
                     6'h2B: reg_xo_delta_m <= reg_wr_wdata[23:0]; // 0xAC
                     6'h2C: begin // 0xB0 XO_RAW_CMD

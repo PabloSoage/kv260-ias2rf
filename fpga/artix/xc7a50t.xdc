@@ -210,13 +210,33 @@ set_property DRIVE       4        [get_ports {adar_sclk adar_sdio adar_csb[*] ad
 # ------------------------------------------------------------------------------
 # Timing Constraints
 # ------------------------------------------------------------------------------
-create_clock -period 10.000 -name clk_fpga     [get_ports fpga_clk_p]
+# Primary RF/FPGA clock (400 MHz radar OR 500 MHz SDR, mutually exclusive)
+create_clock -period 2.000 -name clk_fpga_500 [get_ports fpga_clk_p]
+create_clock -period 2.500 -name clk_fpga_400 -add [get_ports fpga_clk_p]
+
+# Non-MMCM DAC clock (CLK_FPGA / 4 = 125 MHz @ 500M SDR, 100 MHz @ 400M Radar)
+create_generated_clock -name clk_dac_500 -divide_by 4 -add -source [get_pins u_clk_mode_ctrl/dac_div_q_reg[1]/C] -master_clock clk_fpga_500 [get_pins u_clk_mode_ctrl/dac_div_q_reg[1]/Q]
+create_generated_clock -name clk_dac_400 -divide_by 4 -add -source [get_pins u_clk_mode_ctrl/dac_div_q_reg[1]/C] -master_clock clk_fpga_400 [get_pins u_clk_mode_ctrl/dac_div_q_reg[1]/Q]
+
+# Hardware DRP reconfigures MMCM DIVCLK_DIVIDE (5->4) in 400 MHz mode so VCO/MMCM outputs remain identical
+# to 500 MHz mode (200 MHz IDELAYCTRL REFCLK, 125 MHz link_clk, 625/312.5 MHz ETH). Prevent static 4/5 scaling
+# through fixed-DIVCLK_DIVIDE=5 RTL MMCM parameters while keeping clk_fpga_400 & clk_dac_400 active at 400/100 MHz.
+set_clock_sense -stop_propagation -clocks [get_clocks clk_fpga_400] [get_pins -quiet {u_mmcm_sys/CLKIN1 gen_rev06_eth.u_mmcm_eth/CLKIN1}]
+
+# Always-on STARTUPE2 CFGMCLK (~65 MHz +/-50% -> worst-case 97.5 MHz -> 10 ns)
+create_clock -period 10.000 -name clk_cfgmclk [get_pins u_clk_mode_ctrl/u_startupe2/CFGMCLK]
+
 create_clock -period 5.000  -name clk_adcr_dco [get_ports adcr_dco_n]
 create_clock -period 4.000  -name clk_adcs_dco [get_ports adcs_dco_p]
 create_clock -period 2.000  -name clk_link_tx  [get_ports link_tx_clk_p]
 
+set_clock_groups -physically_exclusive \
+    -group [get_clocks -include_generated_clocks clk_fpga_500] \
+    -group [get_clocks -include_generated_clocks clk_fpga_400]
+
 set_clock_groups -asynchronous \
-    -group [get_clocks -include_generated_clocks clk_fpga] \
+    -group [get_clocks -include_generated_clocks {clk_fpga_500 clk_fpga_400}] \
+    -group [get_clocks clk_cfgmclk] \
     -group [get_clocks -include_generated_clocks clk_adcr_dco] \
     -group [get_clocks -include_generated_clocks clk_adcs_dco] \
     -group [get_clocks -include_generated_clocks clk_link_tx]
@@ -250,4 +270,6 @@ set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -quiet -of_objects [
 set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]]
 set_max_delay -quiet -datapath_only 6.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT3]]
 set_max_delay -quiet -datapath_only 6.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT3]] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]]
-set_max_delay -quiet -datapath_only 3.000 -from [get_clocks link_clk_unbuf] -to [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]]
+set_max_delay -quiet -datapath_only 6.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks {clk_dac_500 clk_dac_400}]
+set_max_delay -quiet -datapath_only 6.000 -from [get_clocks {clk_dac_500 clk_dac_400}] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]]
+set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]]

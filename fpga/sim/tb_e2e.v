@@ -24,8 +24,17 @@ module tb_e2e;
     //   AD9484 400 MSPS sample clock & 200 MHz DDR DCO (centered for eye scan)
     //   Kria 300 MHz IDELAYCTRL REFCLK & 500/125 MHz Downlink TX clock
     // -------------------------------------------------------------------------
+`ifdef FPGA_CLK_400M
+    localparam [0:0] TB_BOOT_500M = 1'b0;
     reg fpga_clk_100m = 1'b0;
-    always #5.000 fpga_clk_100m = ~fpga_clk_100m;
+    always #1.250 fpga_clk_100m = ~fpga_clk_100m; // 400 MHz
+`else
+    localparam [0:0] TB_BOOT_500M = 1'b1;
+    reg fpga_clk_100m = 1'b0;
+    always #1.000 fpga_clk_100m = ~fpga_clk_100m; // 500 MHz
+`endif
+    reg adcs_dummy_clk = 1'b0;
+    always #5.000 adcs_dummy_clk = ~adcs_dummy_clk;
 
     reg clk_400m_adc = 1'b0;
     always #1.250 clk_400m_adc = ~clk_400m_adc;
@@ -123,6 +132,7 @@ module tb_e2e;
     reg        pmod_spare1 = 1'b1;
     reg        pps_sync    = 1'b0;
     wire       hk_scl, hk_sda;
+    tri1       xo_scl, xo_sda;
     pullup(hk_scl);
     pullup(hk_sda);
     pulldown(u_artix.filter_overflow);
@@ -138,7 +148,10 @@ module tb_e2e;
         .ENABLE_ETH         (1'b0),
         .CONV_SPI_AUTO_INIT (1'b0),
         .ADAR_AUTO_INIT     (1'b0),
-        .HK_POLL_DIV        (12500000)
+        .HK_CLK_DIV         (3),
+        .HK_POLL_DIV        (12500000),
+        .XO_FCAL_WAIT_CYC   (32),
+        .BOOT_FREQ_500M     (TB_BOOT_500M)
     ) u_artix (
         .fpga_clk_p    (fpga_clk_100m),
         .fpga_clk_n    (~fpga_clk_100m),
@@ -148,8 +161,8 @@ module tb_e2e;
         .adcr_or_n     (adcr_or_n),
         .adcr_dco_n    (adcr_dco_n_pin),
         .adcr_dco_p    (adcr_dco_p_pin),
-        .adcs_dco_p    (fpga_clk_100m),
-        .adcs_dco_n    (~fpga_clk_100m),
+        .adcs_dco_p    (adcs_dummy_clk),
+        .adcs_dco_n    (~adcs_dummy_clk),
         .adcs_fco_p    (1'b0),
         .adcs_fco_n    (1'b1),
         .adcs_d0_p     (1'b0),
@@ -178,6 +191,8 @@ module tb_e2e;
         .hk_scl        (hk_scl),
         .hk_sda        (hk_sda),
         .hk_alert_n    (1'b1),
+        .xo_scl        (xo_scl),
+        .xo_sda        (xo_sda),
         .fpga_irq      (fpga_irq),
         .eth_sgtx_p    (eth_sgtx_p),
         .eth_sgtx_n    (eth_sgtx_n),

@@ -25,9 +25,10 @@
 `timescale 1ns/1ps
 
 module hk_xo_ctrl #(
-    parameter [6:0]   SI549_ADDR    = 7'h55,
-    parameter integer CLK_DIV       = 250,       // ~100 kHz I2C @ 100 MHz
-    parameter integer FCAL_WAIT_CYC = 3_000_000  // 30 ms @ 100 MHz (override small in sim)
+    parameter [6:0]   SI549_ADDR         = 7'h55,
+    parameter integer CLK_DIV            = 250,       // ~100 kHz I2C @ 100 MHz
+    parameter integer FCAL_WAIT_CYC      = 3_000_000, // 30 ms @ 100 MHz (override small in sim)
+    parameter         ENABLE_DELTA_CLAMP = 1'b0       // 1 = clamp ADPLL_DELTA_M to +/-50 ppm (SGMII guard)
 ) (
     input  wire        clk,
     input  wire        rst,
@@ -60,6 +61,7 @@ module hk_xo_ctrl #(
     output reg         active_freq_500m,
     output reg         ack_err,
     output reg  [15:0] ack_err_cnt,
+    output reg         delta_clamped,
 
     // Physical pins (Bank 15 LVCMOS33)
     output wire        xo_scl_t,
@@ -73,6 +75,10 @@ module hk_xo_ctrl #(
     localparam [42:0] FBDIV_400 = 43'h049_64FDA6C1;
     localparam [10:0] HSDIV_500 = 11'd22;              // 0x016 -> Fvco = 11.0 GHz
     localparam [42:0] FBDIV_500 = 43'h048_15791F34;
+
+    // SGMII +/-100 ppm crystal/discipline guard (+/-50.0 ppm margin @ 0.0001164 ppm/LSB)
+    localparam signed [23:0] DELTA_M_CLAMP_POS =  24'sd429553;
+    localparam signed [23:0] DELTA_M_CLAMP_NEG = -24'sd429553;
 
     assign clk_sel_t = ~use_ext_clk; // 1 = Hi-Z (Si549 CLK1), 0 = drive Low (SMA CLK0)
 
@@ -175,6 +181,7 @@ module hk_xo_ctrl #(
             active_freq_500m <= 1'b0;
             ack_err          <= 1'b0;
             ack_err_cnt      <= 16'd0;
+            delta_clamped    <= 1'b0;
             raw_resp_valid   <= 1'b0;
             raw_resp_rdata   <= 8'd0;
             raw_resp_err     <= 1'b0;
@@ -194,7 +201,21 @@ module hk_xo_ctrl #(
                             ack_err       <= 1'b0;
                             state         <= ST_PROG_ISSUE;
                         end else if (delta_start) begin
-                            lat_delta_m <= delta_m;
+`ifdef MUTATE_NO_DELTA_CLAMP
+                            lat_delta_m   <= delta_m;
+                            delta_clamped <= 1'b0;
+`else
+                            if (ENABLE_DELTA_CLAMP && ($signed(delta_m) > DELTA_M_CLAMP_POS)) begin
+                                lat_delta_m   <= DELTA_M_CLAMP_POS;
+                                delta_clamped <= 1'b1;
+                            end else if (ENABLE_DELTA_CLAMP && ($signed(delta_m) < DELTA_M_CLAMP_NEG)) begin
+                                lat_delta_m   <= DELTA_M_CLAMP_NEG;
+                                delta_clamped <= 1'b1;
+                            end else begin
+                                lat_delta_m   <= delta_m;
+                                delta_clamped <= 1'b0;
+                            end
+`endif
                             delta_idx   <= 2'd0;
                             busy        <= 1'b1;
                             ack_err     <= 1'b0;
