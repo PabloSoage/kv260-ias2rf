@@ -186,6 +186,7 @@ class BuiltCaseConfig:
     fan_5015: bool = False           # 15 Nov study: 50x50x15 mm 5 V high-pressure fan (Orion OD5015-05HB, 0.13 A)
     exhaust_fan_right: bool = False  # 15 Nov study: add 40x40x10 mm 5 V right-wall exhaust fan (Sunon MF40100V1, 0.13 A)
     extra_exhaust_slots: bool = False  # 15 Nov study: expanded right slots + upper back-wall slots above adapter/VRM
+    adopted_back_slots: bool = False   # 15 Nov adopted upgrade: 9 printed back-wall 3.5x18 mm slots (567 mm^2) clearing J1001
     tall_hs: bool = False            # 15 Nov study: taller decoupled sinks (U401/Y401 9x7x8 mm, U501 14x14x8.5 mm)
     pad_to_lid: bool = False         # 15 Nov study: 5 W/mK thermal pad from U1001 & K26 perimeter rails to Al lid plate
     keep_vtk: bool = False
@@ -449,9 +450,15 @@ boundary
         set f_ad_opening;
     }""")
 
-    # Built v2 right-wall exhaust: 13 slots 3x16 mm (y=10..85 mm, z=10..26 mm), or expanded 17x(3.5x22 mm) y=4..106, z=6..28 mm
-    rv_y0, rv_y1 = (4.0e-3, 106.0e-3) if (cfg.expand_exhaust or cfg.extra_exhaust_slots) else (10.0e-3, 85.0e-3)
-    rv_z0, rv_z1 = (6.0e-3, 28.0e-3) if (cfg.expand_exhaust or cfg.extra_exhaust_slots) else (10.0e-3, 26.0e-3)
+    # Built v2 right-wall exhaust: 13 slots 3x16 mm (y=10..85 mm, z=10..26 mm), or expanded 17x(3.5x21 mm) y=4..106, z=7.5..28.5 mm
+    has_exp_right = cfg.expand_exhaust or cfg.extra_exhaust_slots or cfg.adopted_back_slots
+    rv_y0, rv_y1 = (4.0e-3, 106.0e-3) if has_exp_right else (10.0e-3, 85.0e-3)
+    if cfg.adopted_back_slots:
+        rv_z0, rv_z1 = 7.5e-3, 28.5e-3
+    elif has_exp_right:
+        rv_z0, rv_z1 = 6.0e-3, 28.0e-3
+    else:
+        rv_z0, rv_z1 = 10.0e-3, 26.0e-3
     if cfg.exhaust_fan_right:
         # 40x40x10 mm exhaust fan bore (r=19.0 mm) centered at (y=45, z=12 mm) clearing top/bottom wall seams
         top_actions.append(f"""
@@ -490,7 +497,7 @@ boundary
     }""")
 
     if cfg.extra_exhaust_slots:
-        # Upper back-wall slots above adapter regulators & K26 rear (Y = CAV_Y1, Z = 10..28 mm, clearing J1001 & rear I/O)
+        # Legacy 15 Nov unbaffled upper back-wall window (retained for study comparison)
         top_actions.append(f"""
     {{
         name    f_back_vents;
@@ -498,6 +505,37 @@ boundary
         action  new;
         source  boxToFace;
         box     (-0.08500 {CAV_Y1 - 0.002:.5f} 0.01000) (-0.01800 {CAV_Y1 + 0.002:.5f} 0.02800);
+    }}
+    {{
+        name    f_back_vents;
+        type    faceSet;
+        action  subset;
+        source  patchToFace;
+        patch   wall_back;
+    }}""")
+        create_patches.append("""
+    {
+        name back_vents;
+        patchInfo { type patch; }
+        constructFrom set;
+        set f_back_vents;
+    }""")
+    elif cfg.adopted_back_slots:
+        # 15 Nov adopted upgrade: 9 printed back-wall slots 3.5x18 mm (567 mm^2 open), x=[-85..-51.5] (6 slots) & [-31..-16] (3 slots), clearing J1001 [-51.5..-31]
+        top_actions.append(f"""
+    {{
+        name    f_back_vents;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (-0.08500 {CAV_Y1 - 0.002:.5f} 0.01000) (-0.05150 {CAV_Y1 + 0.002:.5f} 0.02800);
+    }}
+    {{
+        name    f_back_vents;
+        type    faceSet;
+        action  add;
+        source  boxToFace;
+        box     (-0.03100 {CAV_Y1 - 0.002:.5f} 0.01000) (-0.01600 {CAV_Y1 + 0.002:.5f} 0.02800);
     }}
     {{
         name    f_back_vents;
@@ -683,6 +721,29 @@ boundary
         source  setToCellZone;
         set     dust_filter_zone;
     }""")
+    if cfg.adopted_back_slots:
+        air_actions.append(f"""
+    {{
+        name    back_slot_zone;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        box     (-0.08500 {CAV_Y1 - 0.005:.5f} 0.01000) (-0.05150 {CAV_Y1:.5f} 0.02800);
+    }}
+    {{
+        name    back_slot_zone;
+        type    cellSet;
+        action  add;
+        source  boxToCell;
+        box     (-0.03100 {CAV_Y1 - 0.005:.5f} 0.01000) (-0.01600 {CAV_Y1:.5f} 0.02800);
+    }}
+    {{
+        name    back_slot_zone;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        set     back_slot_zone;
+    }}""")
 
     (case_dir / "system" / "air").mkdir(parents=True, exist_ok=True)
     (case_dir / "system" / "air" / "topoSetDict").write_text(
@@ -781,7 +842,7 @@ relaxationFactors { fields { p_rgh 0.35; rho 1; } equations { U 0.55; h 0.80; k 
     # Built right exhaust: 13 slots 3x16 mm (y=10..85, z=10..26 -> f=210), or expanded 17x(3.5x22 mm) -> f=120
     # Built filter + double 3mm hex grille (39 cells = 984.9 mm2 inside 41x41mm -> 3.38x higher dyn loss vs 48 mm open bore)
     c = cfg.filter_clog_factor
-    f_rv = 10.0 if cfg.exhaust_fan_right else (120.0 if (cfg.expand_exhaust or cfg.extra_exhaust_slots) else 210.0)
+    f_rv = 10.0 if cfg.exhaust_fan_right else (120.0 if (cfg.expand_exhaust or cfg.extra_exhaust_slots or cfg.adopted_back_slots) else 210.0)
     d_rv = 1.0e4 if cfg.exhaust_fan_right else 1.0e6
     if cfg.wide_grille:
         d_coef, f_coef = 1.65e7 * c, 740.0 * c
@@ -825,6 +886,22 @@ dust_filter_loss
         coordinateSystem {{ origin (0 0 0); e1 (1 0 0); e2 (0 1 0); }}
     }}
 }}
+"""
+    if cfg.adopted_back_slots:
+        fv_air += """back_slot_loss
+{
+    type            explicitPorositySource;
+    active          true;
+    explicitPorositySourceCoeffs
+    {
+        selectionMode   cellZone;
+        cellZone        back_slot_zone;
+        type DarcyForchheimer;
+        d   (1e6 1e6 1e6);
+        f   (100.0 100.0 100.0);
+        coordinateSystem { origin (0 0 0); e1 (1 0 0); e2 (0 1 0); }
+    }
+}
 """
     (case_dir / "system" / "air" / "fvOptions").write_text(fv_air)
 
@@ -933,7 +1010,7 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     coupled_solid = f"""type compressible::turbulentTemperatureRadCoupledMixed; qrNbr none; qr none; Tnbr T; kappaMethod solidThermo; useImplicit false; value uniform {t_amb_k:.2f};"""
 
     open_patches = ["kv_grille", "adapter_opening", "right_vents"]
-    if cfg.extra_exhaust_slots:
+    if cfg.extra_exhaust_slots or cfg.adopted_back_slots:
         open_patches.append("back_vents")
 
     u_txt = foam_file("volVectorField", "U", "0/air") + "dimensions [0 1 -1 0 0 0 0];\ninternalField uniform (0 0 0);\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n"
@@ -979,7 +1056,7 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     }}"""
     else:
         rv_bc = "    right_vents { type totalPressure; p0 uniform 101325; value $internalField; }"
-    bv_bc = "    back_vents  { type totalPressure; p0 uniform 101325; value $internalField; }\n" if cfg.extra_exhaust_slots else ""
+    bv_bc = "    back_vents  { type totalPressure; p0 uniform 101325; value $internalField; }\n" if (cfg.extra_exhaust_slots or cfg.adopted_back_slots) else ""
     pr_txt += f"""    kv_grille {{ type totalPressure; p0 uniform 101325; value $internalField; }}
 {rv_bc}
 {bv_bc}    adapter_opening
@@ -1279,6 +1356,7 @@ p_{op}
         "fan_5015": cfg.fan_5015,
         "exhaust_fan_right": cfg.exhaust_fan_right,
         "extra_exhaust_slots": cfg.extra_exhaust_slots,
+        "adopted_back_slots": cfg.adopted_back_slots,
         "tall_hs": cfg.tall_hs,
         "pad_to_lid": cfg.pad_to_lid,
         "cells_air": int(len(T_air)),
@@ -1323,6 +1401,11 @@ def build_suite() -> List[BuiltCaseConfig]:
         BuiltCaseConfig("v2_opt_pad_lid_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, pad_to_lid=True),
         BuiltCaseConfig("v2_opt_combined_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, extra_exhaust_slots=True, tall_hs=True, pad_to_lid=True, keep_vtk=True),
         BuiltCaseConfig("v2_opt_combined_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, extra_exhaust_slots=True, tall_hs=True, pad_to_lid=True, keep_vtk=True),
+        # 15 Nov adopted printable PETG-CF/ASA upgrade (OD5015 fan + wide spoke grille + 17 right slots + 9 back slots clearing J1001 + tall decoupled sinks, NO Al lid/pads)
+        BuiltCaseConfig("v2_adopted_clean_fine_45C", ambient_c=45.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
+        BuiltCaseConfig("v2_adopted_clean_fine_55C", ambient_c=55.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
+        BuiltCaseConfig("v2_adopted_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, keep_vtk=True),
+        BuiltCaseConfig("v2_adopted_clogged_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=2.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
     ]
 
 
@@ -1330,7 +1413,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scratch", default="/home/varuna/cfd_scratch_v2")
     parser.add_argument("--nprocs", type=int, default=16)
-    parser.add_argument("--only", help="Run single case by name")
+    parser.add_argument("--only", nargs="+", help="Run one or more cases by name")
     parser.add_argument("--keep-scratch", action="store_true")
     args = parser.parse_args()
 
@@ -1347,7 +1430,8 @@ def main() -> None:
 
     suite = build_suite()
     if args.only:
-        suite = [c for c in suite if c.name == args.only]
+        want = set(args.only)
+        suite = [c for c in suite if c.name in want]
         if not suite:
             raise SystemExit(f"Case {args.only} not found")
 

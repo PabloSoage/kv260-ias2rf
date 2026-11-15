@@ -200,17 +200,18 @@ Comparing `v2_built_nohs_clean_70C` against `v2_built_hs_clean_70C`, plus six ta
 | **`v2_opt_right_fan_70C`** (40×10 exhaust fan alone) | 2.39 | 16.24 | 98.22 | 103.61 | 108.10 | 107.59 | 99.09 | 114.81 | 94.15 | 100.87 |
 | **`v2_opt_extra_slots_70C`** (+ back slots + wide grille) | 4.28 | 11.50 | 90.62 | 102.80 | 104.82 | 101.24 | 95.79 | 112.04 | 90.50 | 97.29 |
 | **`v2_opt_tall_hs_70C`** (`8 / 8.5 mm` decoupled sinks) | 2.56 | 15.83 | 94.47 | 104.02 | 107.24 | 102.55 | 97.43 | 114.26 | 93.83 | 100.29 |
-| **`v2_opt_pad_lid_70C`** (`5 W/m·K` pads on `U1001` & `K26`) | 2.06 | 17.04 | 99.80 | 102.40 | 107.37 | 106.85 | 98.36 | **109.18** | 92.80 | 100.16 |
-| **`v2_opt_combined_70C`** (`OD5015`+grille+slots+tall+pad, med) | **7.51** | 24.24 | **84.94** | 101.27 | 102.14 | **98.99** | 93.14 | **105.27** | **88.98** | **95.62** |
-| **`v2_opt_combined_fine_70C`** (same, **`426,491`-cell fine**) | **7.50** | 24.25 | **86.96** | **97.96** | **97.80** | **94.72** | **90.26** | **104.35** | **87.15** | **91.53** |
+| **`v2_opt_pad_lid_70C`** (`5 W/m·K` pads on `U1001` & `K26` **[not built]**) | 2.06 | 17.04 | 99.80 | 102.40 | 107.37 | 106.85 | 98.36 | **109.18** | 92.80 | 100.16 |
+| **`v2_opt_combined_70C`** (w/ Al lid+pad **[not built — unprintable]**, med) | **7.51** | 24.24 | **84.94** | 101.27 | 102.14 | **98.99** | 93.14 | **105.27** | **88.98** | **95.62** |
+| **`v2_opt_combined_fine_70C`** (same Al lid+pad **[not built]**, `426k` fine) | **7.50** | 24.25 | **86.96** | **97.96** | **97.80** | **94.72** | **90.26** | **104.35** | **87.15** | **91.53** |
+| **`v2_adopted_clean_fine_70C`** (**Adopted PETG-CF**, `17R/9B`, `429k` fine) | **7.52** | 24.18 | **87.12** | **99.08** | **97.95** | **95.06** | **90.30** | 109.76 | **87.78** | **91.57** |
 
 Key engineering findings:
 1. **Why `v2_opt_right_fan_70C` hurts while `v2_opt_extra_slots_70C` shines:** Replacing the 13 passive right-wall exhaust slots with a single `40×40×10 mm` (`8.0 CFM`, `27 Pa`, `r=19 mm` bore) exhaust fan actually *increases* system backpressure (`2.56 -> 2.39 CFM`) because the fan hub + circular cutout restrict the combined KV260 + 50 mm exhaust flow unless passive bypass vents remain open. Opening back-wall vents alongside expanded right slots (`v2_opt_extra_slots_70C`, `4.28 CFM`, cavity pressure `+3.51 Pa`) drops `T_air,max` by `-7.13 °C` (`90.62 °C`), `Y401` by `-6.24 °C`, and `K26` by `-1.19 °C`.
 2. **Higher-pressure `50×50×15 mm` intake fan (`v2_opt_fan5015_70C`):** Swapping the `50×50×10 mm` (`8.5 CFM / 22 Pa`) fan for `Orion OD5015-05HB` (`50×50×15 mm`, `14.0 CFM / 49.8 Pa`, **`0.13 A` << `0.50 A` `F1002` limit**) doubles adapter intake flow (`2.56 -> 5.45 CFM`) and cuts every front-strip IC by `-3.7 to -3.9 °C` (`U401` `-3.85 °C`, `Y401` `-3.66 °C`, `U501` `-3.85 °C`).
 3. **Taller decoupled heatsinks + lid thermal pads (`v2_opt_tall_hs_70C`, `v2_opt_pad_lid_70C`):** Separating `U401` and `Y401` eliminates their flush thermal bridge (`Y401 -2.90 °C`), raising fin height to `8 / 8.5 mm` cuts `Y401 -4.93 °C`, and adding `5 W/m·K` gap pads from `U1001` (`-5.11 °C -> 109.18 °C`) and the outer `K26` fin (`-1.59 °C`, outside `kv_grille`) shunts rear regulator heat straight out the top cover.
-4. **Full combined upgrade (`v2_opt_combined_fine_70C`, `426,491` fluid cells):** Combining `OD5015` + spoke grille + right/back slots + tall decoupled sinks + gap pads delivers **`7.50 CFM`** (`+5.13 Pa` positive dust-exclusion pressure), drops `T_air,max` by **`-14.60 °C`** (`101.56 -> 86.96 °C`), lowers every local IC air pocket to **`70.6–75.7 °C`** (`>= +9.3 °C` below `85 °C`), cools `Y401` by **`-11.25 °C` (`94.72 °C`)**, `LMR33630` by **`-10.54 °C` (`104.35 °C`)**, `U1201` by **`-7.98 °C` (`91.53 °C`)**, and brings **`K26I` SOM to `97.96 °C` (`+2.04 °C` PASS below `100 °C`) at full `70 °C` ambient**. *(Under strict `T_board <= 85 °C`, `U401`/`U1201`/`Y401` PCB copper still sits at `88.1–91.5 °C` at `Ta = 70 °C`, raising the strict PCB/commercial-KV260 ceiling from `50–54 °C` to `~57–64 °C`, while unlocking true **`70 °C` junction-compliant industrial operation with `K26I`**.)*
+4. **Comparison note (`v2_opt_combined_fine_70C` [not built] vs. printable PETG-CF `v2_adopted_*` in §7):** `v2_opt_pad_lid_70C` / `v2_opt_combined_*` modeled an unprintable `2 mm` aluminium top plate (`k = 167`) plus tall `5 W/m·K` pads (`28 mm` from `U1001`) and an open `67 × 18 mm` back window, and are preserved above strictly as theoretical parametric bounds (marked **[not built]**). Section 7 verifies the exact printable PETG-CF/ASA enclosure without aluminium or pads.
 
-![3D Heatsink Comparison: No Heatsinks vs Built Touching 9x9 vs Combined Upgrade](sim/v2_thermal_3d_heatsinks_compare.png)
+![3D Heatsink Comparison: No Heatsinks vs Built Touching 9x9 vs Adopted Upgrade](sim/v2_thermal_3d_heatsinks_compare.png)
 
 ### 4. Fan P-Q Operating Point, Airflow Budget & Hardware Critiques
 
@@ -222,8 +223,10 @@ Key engineering findings:
 | `v2_built_widegrille_hs_70C` (spoke ring) | **2.90** | 14.99 | 6.57 | +9.99 | 107.26 | 103.94 |
 | `v2_built_decoupled_hs_70C` (U401/Y401 gap) | **2.57** | 15.80 | 6.82 | +9.69 | 104.58 | 103.98 |
 | `v2_built_proposed_70C` (`50×10` + spoke + 17 slots) | **3.62** | 13.16 | 10.97 | +6.01 | 101.40 | 102.79 |
-| `v2_opt_combined_70C` (`OD5015`+slots+tall+pad, med) | **7.51** | **24.24** | **13.20** | **+5.41** | **98.99** | 101.27 |
-| `v2_opt_combined_fine_70C` (same, `426k` fine) | **7.50** | **24.25** | **12.40** | **+5.13** | **94.72** | **97.96** |
+| `v2_opt_combined_70C` (`OD5015`+slots+tall+pad **[not built]**, med) | **7.51** | **24.24** | **13.20** | **+5.41** | **98.99** | 101.27 |
+| `v2_opt_combined_fine_70C` (same **[not built]**, `426k` fine) | **7.50** | **24.25** | **12.40** | **+5.13** | **94.72** | **97.96** |
+| `v2_adopted_clean_fine_70C` (**Adopted PETG-CF**, `17R/9B`, `429k` fine) | **7.52** | **24.18** | **10.31** | **+5.25** | **95.06** | **99.08** |
+| `v2_adopted_clogged_fine_70C` (**Adopted PETG-CF**, `2×` clogged, `429k`) | **6.77** | **26.78** | **10.56** | **+4.80** | **95.34** | **99.06** |
 
 ![Built Enclosure v2 Fan P-Q Curve and Ambient Temperature Sweep](sim/v2_built_fan_pq_and_ambient.png)
 
@@ -241,7 +244,7 @@ For **`25–50 °C` continuous ambient**, built v2 passes every IC and commercia
 
 ### 6. Adopted (14 Nov)
 
-All three changes are in the v2 that `_work/mech/build_case.py --v2` now builds (docs/ENCLOSURE.md §6):
+All three 14 Nov geometry changes were integrated in `_work/mech/build_case.py --v2` (docs/ENCLOSURE.md §6), and extended on 15 Nov in §7 below with the `OD5015` blower, 9 back-wall exhaust slots, and `8/8.5 mm` tall heatsinks (printable PETG-CF/ASA, no aluminium or gap pads):
 
 - **The intake:** the fan's whole 47 mm bore, crossed by six 1.6 mm spokes and a 10 mm hub, about 1550 mm² open.
   The lid and the filter frame use the same ring, so the mesh is clamped between their spokes.
@@ -249,6 +252,55 @@ All three changes are in the v2 that `_work/mech/build_case.py --v2` now builds 
   edge sits 1.5 mm above the tongue's groove, so the slots are 1.5 mm shorter than the simulated 6–28 mm.
 - **The heatsinks:** U401's and Y401's are cut to 9 × 7 mm, each set 1 mm off its package's centre, leaving a
   4 mm gap between them, as `decouple_hs` modelled.
+
+### 7. Adopted upgrade, 15 Nov
+
+This subsection verifies the exact printable **PETG-CF / ASA (`k = 0.25 W/m·K`, NO aluminium lid plate, NO gap pads)** enclosure built by `_work/mech/build_case.py --v2` on a **`429,263`-cell fine CFD mesh** (`v2_adopted_*` in `mech/v2_cfd/run_built_v2_cfd.py`):
+
+- **Fan:** `Orion OD5015-05HB` (`50 × 50 × 15 mm`, `0.13 A` within `F1002 0.50 A` hold), centered at `(-40, +14) mm`, `z = 13.75..28.75 mm` beneath the `4 mm` ceiling plenum (`1.5 mm` above the tall heatsink tops).
+- **Intake:** Built `Ø47 mm` six-spoke ring (`wide_grille`, `~1550 mm²` open) + `100`-mesh dust filter (`1×` clean and `2×` clogged).
+- **Exhaust vents:** Built `17` right-wall slots (`3.5 × 21 mm`, `y = 4..106 mm`, `z = 7.5..28.5 mm`) **plus `9` new back-wall slots** at `y = 112 mm` (`3.5 × 18 mm`, `z = 10..28 mm`, `567 mm²` open area) starting at `x = -85, -79, -73, -67, -61, -55` (`6` slots) and `-31, -25, -19.5` (`3` slots), leaving `x = [-51.5, -31.0]` solid around `J1001` (`back_slot_loss` Darcy-Forchheimer `f = 100.0`).
+- **Heatsinks:** Tall decoupled aluminum sinks — `U401` and `Y401` `9 × 7 × 8 mm` (`±1 mm` Y offset, `4 mm` air gap), `U501` `14 × 14 × 8.5 mm`.
+
+| Metric / Flow Summary | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
+| --- | ---: | ---: | ---: | ---: |
+| **50 mm `OD5015` Flow / Static ΔP** | `7.38 CFM` @ `24.68 Pa` | `7.44 CFM` @ `24.47 Pa` | **`7.52 CFM` @ `24.18 Pa`** | `6.77 CFM` @ `26.78 Pa` |
+| **KV260 Intake / Right (`17`) / Back (`9`) Slots** | `9.90 / 12.18 / 5.10 CFM` | `10.07 / 12.34 / 5.17 CFM` | `10.31 / 12.56 / 5.27 CFM` | `10.56 / 12.12 / 5.21 CFM` |
+| **Mean Cavity Pressure / Air `T_mean` / `T_max`** | `+5.30 Pa` / `47.12` / `61.39 °C` | `+5.28 Pa` / `57.16` / `71.87 °C` | **`+5.25 Pa`** / `72.22` / `87.12 °C` | **`+4.80 Pa`** / `72.30` / `88.88 °C` |
+
+#### Per-Part Fine-Mesh Temperatures (`Tb / Tj / Tair_local`, °C)
+
+| Component | Rating Class (`Limit`) | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `U401_ADCLK948` | `TA 85 °C` (`150 °C` abs) | 66.40 / 72.68 / 46.69 | 76.52 / 82.79 / 56.73 | **91.68** / 97.95 / 71.79 | **92.10** / 98.36 / 72.03 |
+| `Y401_Si549` | `TA 85 °C` (`125 °C Tj`) | 63.16 / 69.79 / 48.36 | 73.28 / 79.90 / 58.42 | **88.44** / 95.06 / 73.50 | **88.81** / 95.34 / 73.60 |
+| `U501_AD9484` | `TA 85 °C` (`150 °C` abs) | 61.92 / 65.03 / 48.38 | 72.04 / 75.14 / 58.47 | **87.20** / 90.30 / 73.59 | **87.56** / 90.65 / 73.88 |
+| `U502_AD8352` | `TA 85 °C` (`125 °C` abs) | 62.29 / 65.09 / 45.63 | 72.40 / 75.20 / 55.65 | **87.55** / 90.35 / 70.67 | **87.90** / 90.70 / 70.73 |
+| `U503_AD8352` | `TA 85 °C` (`125 °C` abs) | 59.72 / 62.52 / 45.57 | 69.82 / 72.62 / 55.59 | 84.97 / 87.77 / 70.61 | **85.30** / 88.10 / 70.64 |
+| `U601_AD9253` | `TA 85 °C` (`150 °C` abs) | 57.17 / 62.69 / 45.89 | 67.28 / 72.80 / 55.91 | 82.43 / 87.95 / 70.94 | 82.76 / 88.28 / 71.02 |
+| `U1101_XC7A50T` | `Tj 100 °C` (`-I` grade) | 56.39 / 62.52 / 46.05 | 66.50 / 72.63 / 56.07 | 81.65 / **87.78** / 71.10 | 82.00 / **88.13** / 71.45 |
+| `U1001_LMR33630` | `Tj 125 °C` | 70.32 / 84.33 / 48.36 | 80.49 / 94.50 / 58.43 | 95.75 / **109.76** / 73.55 | 96.46 / **110.47** / 73.78 |
+| `U1002_TPS562201` | `Tj 125 °C` | 62.50 / 68.65 / 47.23 | 72.65 / 78.80 / 57.27 | 87.86 / 94.01 / 72.34 | 88.27 / 94.42 / 72.30 |
+| `U1003_TPS562201` | `Tj 125 °C` | 60.19 / 63.19 / 47.00 | 70.34 / 73.34 / 57.04 | 85.56 / 88.56 / 72.10 | 86.04 / 89.04 / 72.28 |
+| `U1004_TPS562201` | `Tj 125 °C` | 58.17 / 59.67 / 46.64 | 68.32 / 69.82 / 56.66 | 83.53 / 85.03 / 71.71 | 84.04 / 85.54 / 72.02 |
+| `U1005_TPS7A8300` | `Tj 125 °C` | 64.09 / 70.24 / 46.96 | 74.24 / 80.39 / 57.02 | 89.47 / 95.62 / 72.11 | 90.01 / 96.16 / 72.86 |
+| `U1006_TPS7A8300` | `Tj 125 °C` | 64.52 / 68.83 / 47.51 | 74.67 / 78.98 / 57.57 | 89.91 / 94.21 / 72.67 | 90.38 / 94.69 / 72.83 |
+| `U1007_TPS7A8300` | `Tj 125 °C` | 62.25 / 64.34 / 47.48 | 72.40 / 74.49 / 57.53 | 87.64 / 89.74 / 72.62 | 88.15 / 90.24 / 72.69 |
+| `U1201_RTL8211FSI` | `TA 85 °C` (`125 °C Tj`) | 63.79 / 66.29 / 45.63 | 73.91 / 76.41 / 55.64 | **89.07** / 91.57 / 70.66 | **89.60** / 92.10 / 70.76 |
+| `AD9708_AD9767` | `TA 85 °C` (`125 °C` abs) | 58.11 / 63.51 / 46.52 | 68.25 / 73.65 / 56.58 | 83.46 / 88.86 / 71.67 | 83.98 / 89.38 / 72.42 |
+| **`K26_SOM`** (`sink / Tj`) | `XCK26-C 85` / `K26I 100` | 61.29 / **73.89** | 71.37 / **83.97** (`C:+1.03`) | 86.48 / **99.08** (`I:+0.92`) | 86.46 / **99.06** (`I:+0.94`) |
+
+#### Honest Maximum Rated Ambient (`45 -> 55 -> 70 °C` Clean Adopted Upgrade)
+
+| Governing Limit Criterion | Limiting Device (`45 -> 55 -> 70 °C`) | `55 °C` Value | `70 °C` Value | Max Rated `T_amb` |
+| --- | --- | ---: | ---: | ---: |
+| **Stock commercial `KV260` (`XCK26-C Tj <= 85 °C`)** | `K26_SOM` (`Tj`) | `83.97 °C` (PASS) | `99.08 °C` (`-14.08 °C`) | **`56.0 °C`** |
+| **`TA = -40..+85 °C` ICs checked at PCB pad (`Tb <= 85 °C`)** | `U401_ADCLK948` (`U1201` `66.0 °C`, `Y401` `66.6 °C`, `U502` `67.5 °C`, `U501` `67.8 °C`) | `76.52 °C` | `91.68 °C` | **`63.4 °C`** |
+| **Industrial `K26I` SOM (`Tj <= 100 °C`)** | `K26_SOM` (`Tj`) | `83.97 °C` (`+16.03 °C`) | `99.08 °C` (`+0.92 °C`) | **`70.9 °C`** (passes **`70 °C` clogged** at `99.06 °C`) |
+| **`TA = -40..+85 °C` ICs checked at local cavity air (`Tair_loc <= 85 °C`)** | `U501_AD9484` (`Y401` `81.4 °C`, `U401` `83.2 °C`) | `58.47 °C` | `73.59 °C` | **`81.3 °C`** |
+| **Adapter silicon `Tj`-only limits (`U1101 <= 100`, `U1001/Y401 <= 125`)** | `U1101_XC7A50T` (`100`), `U1001_LMR33630` (`125`), `Y401_Si549` (`125`) | `72.6 / 94.5 / 79.9` | `87.8 / 109.8 / 95.1` | **`82.1 °C`** (`U1101`) / `85.0 °C` (`LMR`) / `99.6 °C` (`Y401`) |
+
+- **Adopted upgrade conclusion:** Even strictly inside printable **PETG-CF/ASA** (no aluminium lid, no pads), every silicon junction passes **`70 °C` clean AND `2×` clogged** when paired with the industrial **`K26I` SOM** (`99.08 °C` clean, `99.06 °C` clogged, `LMR33630 = 109.76 °C` vs `125 °C`, `Y401 = 95.06 °C` vs `125 °C`, `XC7A50T = 87.78 °C` vs `100 °C`), while holding `+5.25 Pa` (`+4.80 Pa` clogged) positive enclosure overpressure. With a stock commercial **`KV260` (`XCK26-C`)**, the continuous ambient rating increases from `51.3 °C` (as first built) to **`56.0 °C`** (`63.4 °C` under strict `T_board <= 85 °C` on all `TA`-rated adapter parts).
 
 ---
 

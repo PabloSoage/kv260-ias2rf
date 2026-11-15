@@ -267,9 +267,9 @@ def render_streamlines() -> None:
 
 def render_heatsink_comparison() -> None:
     panels = [
-        ("v2_built_nohs_clean_70C",  False, "1) Built v2 — NO Heatsinks\nY401=114.9 C | U401=116.6 C | U501=108.5 C"),
-        ("v2_built_hs_clean_70C",    True,  "2) Built v2 — Touching 9x9 Sinks\nY401=107.5 C (bridged) | U401=108.0 C | U501=99.0 C"),
-        ("v2_opt_combined_fine_70C", True,  "3) Combined Upgrade (Fine 426k)\nY401=94.7 C | U401=97.8 C | K26=98.0 C (PASS)"),
+        ("v2_built_nohs_clean_70C",    False, "1) Built v2 — NO Heatsinks\nY401=114.9 C | U401=116.6 C | U501=108.5 C"),
+        ("v2_built_hs_clean_70C",      True,  "2) Built v2 — Touching 9x9 Sinks\nY401=107.5 C (bridged) | U401=108.0 C | U501=99.0 C"),
+        ("v2_adopted_clean_fine_70C",  True,  "3) Adopted PETG-CF Upgrade (Fine 429k)\nY401=95.1 C | U401=98.0 C | K26I=99.1 C (PASS)"),
     ]
     pl = pv.Plotter(off_screen=True, shape=(1, 3), window_size=(2250, 860))
     pl.set_background("white")
