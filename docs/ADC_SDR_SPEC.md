@@ -13,6 +13,9 @@ IF_RX_C ──► U603 AD8352, 12 dB ──► AD9253 channel B ─┴─► one
             AD9253 channels C and D unused
 ```
 
+> **Rev07 (15 Nov).** `IF_RX_C` now arrives through a 30 MHz anti-alias low-pass on the ROUTING sheet
+> (ROUTING_SPEC §1.1, SIGNAL_INTEGRITY §9.9): channel B is the HF input. Channel A stays wideband.
+
 ---
 
 ## 1. Decisions this sheet makes, for your approval

@@ -1454,6 +1454,184 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:L"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "L"
+				(at -1.27 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "L"
+				(at 1.905 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Inductor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "inductor choke coil reactor magnetic"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Choke_* *Coil* Inductor_* L_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "L_0_1"
+				(arc
+					(start 0 2.54)
+					(mid 0.6323 1.905)
+					(end 0 1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 1.27)
+					(mid 0.6323 0.635)
+					(end 0 0)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 0)
+					(mid 0.6323 -0.635)
+					(end 0 -1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -1.27)
+					(mid 0.6323 -1.905)
+					(end 0 -2.54)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "L_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 	)
 	(junction
 		(at 46.99 85.09)
@@ -3609,16 +3787,6 @@
 	)
 	(wire
 		(pts
-			(xy 304.8 91.44) (xy 313.69 91.44)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1fa6ee5a-6796-526a-af32-a551a087e980")
-	)
-	(wire
-		(pts
 			(xy 304.8 111.76) (xy 313.69 111.76)
 		)
 		(stroke
@@ -3717,12 +3885,12 @@
 	)
 	(hierarchical_label "IF_RX_C"
 		(shape output)
-		(at 304.8 91.44 180)
+		(at 373.38 190.50 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "289b16f0-5cb9-5bdd-b9a7-0b53087b7fdd")
 	)
@@ -13786,5 +13954,1229 @@
 				)
 			)
 		)
+	)
+	(label "IF_RX_C_AAF"
+		(at 313.69 91.44 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e67c0576-5943-44af-b70b-3408cc80e4d1")
+	)
+	(text "Anti-alias low-pass on IF_RX_C (Rev07): 7th-order elliptic, 50 ohm, flat to 30 MHz,"
+		(exclude_from_sim no)
+		(at 297.18 167.64 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b45c3e49-10cb-4e53-a7bd-8f585104f040")
+	)
+	(text "60 dB or more from 50 MHz. ROUTING_SPEC 1.1, SIGNAL_INTEGRITY 9.9."
+		(exclude_from_sim no)
+		(at 297.18 170.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "342869eb-0902-4dc1-a32a-d89e6e0dbed2")
+	)
+	(label "IF_RX_C_AAF"
+		(at 297.18 190.50 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a1eeb08d-b6b0-47da-8850-d074bf1c7381")
+	)
+	(wire
+		(pts
+			(xy 297.18 190.50) (xy 304.80 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "42dedf7b-d9d5-44d6-944b-9d22c8d12b7e")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 304.80 194.31 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3a39439d-f62d-4d5a-900c-658c16bcded6")
+		(property "Reference" "C953"
+			(at 308.61 193.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "82p"
+			(at 308.61 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 304.80 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 304.80 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 304.80 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2ea77ea1-34b1-4f1a-997c-b8763312e902")
+		)
+		(pin "2"
+			(uuid "61dc1fe8-69ab-4ad5-a3e2-125a28917cb5")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C953")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 304.80 198.12 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "437d86af-99fc-4abe-bc5d-d7c46faa8b4a")
+		(property "Reference" "#PWR1283"
+			(at 307.34 196.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 307.34 199.39 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 304.80 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 304.80 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 304.80 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0b850621-84fb-4509-8c48-324894aeed83")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "#PWR1283")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(junction
+		(at 304.80 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6423bfd9-8a96-4f29-914b-8bad1aaa6b07")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 325.12 194.31 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a760d790-d82e-447c-94d4-8423e109b01c")
+		(property "Reference" "C955"
+			(at 328.93 193.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "150p"
+			(at 328.93 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 325.12 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 325.12 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 325.12 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5f3aa773-8ccd-4401-a08e-ec68714237c2")
+		)
+		(pin "2"
+			(uuid "81142c86-d83a-4b6d-9b85-756a4dac0d2c")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C955")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 325.12 198.12 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "00aca031-4db8-4b47-88d9-b513b7eac0bf")
+		(property "Reference" "#PWR1284"
+			(at 327.66 196.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 327.66 199.39 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 325.12 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 325.12 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 325.12 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f46f0a68-a147-400d-be0e-8a191e4c8637")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "#PWR1284")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(junction
+		(at 325.12 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "09d20752-8017-4518-a51c-70bba950881e")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 345.44 194.31 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "65567a8d-bf4f-4b57-9df1-c41c824b73d8")
+		(property "Reference" "C957"
+			(at 349.25 193.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "160p"
+			(at 349.25 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 345.44 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 345.44 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 345.44 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a962188d-8346-4fa9-85df-ea3dad119a0d")
+		)
+		(pin "2"
+			(uuid "45f98769-d408-4f0d-bb60-2b1ede7b12bb")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C957")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 345.44 198.12 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "62e327d0-a876-4291-a1ca-7904d017ae45")
+		(property "Reference" "#PWR1285"
+			(at 347.98 196.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 347.98 199.39 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 345.44 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 345.44 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 345.44 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "20a7a66e-d65d-48c0-9721-5edd9b6ba443")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "#PWR1285")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(junction
+		(at 345.44 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a2712faa-63fc-4032-a51f-16f20e60b1e6")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 365.76 194.31 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "7451c5ac-9488-4a84-b7df-2d078b0edef9")
+		(property "Reference" "C959"
+			(at 369.57 193.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100p"
+			(at 369.57 195.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 365.76 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 365.76 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 365.76 194.31 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "780726b1-553c-40b3-a1e7-7e56c2574d9d")
+		)
+		(pin "2"
+			(uuid "6c14590c-8b45-45b4-97fd-d77be4e7e113")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C959")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 365.76 198.12 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "176c1fb7-268c-4dff-8cdc-199ebf622b31")
+		(property "Reference" "#PWR1286"
+			(at 368.30 196.85 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 368.30 199.39 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 365.76 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 365.76 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 365.76 198.12 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "39b82d7c-6909-45c9-84c7-487e7371f95d")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "#PWR1286")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(junction
+		(at 365.76 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "892b9244-b4e0-4565-869b-a8f9b516c1b3")
+	)
+	(symbol
+		(lib_id "Device:L")
+		(at 314.96 190.50 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "387c492c-3f5d-4a8c-bb9b-e4c38195f381")
+		(property "Reference" "L951"
+			(at 314.96 187.96 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "220n"
+			(at 314.96 193.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
+			(at 314.96 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 314.96 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 314.96 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ff1d3445-0da2-4c7b-8cdf-4589a776aea1")
+		)
+		(pin "2"
+			(uuid "75dfcc10-b7ac-4a2e-9d49-fb1f3cf3c010")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "L951")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 314.96 182.88 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "125265a8-ae4a-4e69-af8d-89252faf15a3")
+		(property "Reference" "C954"
+			(at 314.96 180.34 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "47p"
+			(at 314.96 185.42 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 314.96 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 314.96 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 314.96 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "cbd11787-3877-4e04-a491-5324fb77d2b2")
+		)
+		(pin "2"
+			(uuid "a2d47116-3f60-47e5-8a06-dbe7f2daa220")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C954")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 304.80 190.50) (xy 311.15 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7e5a5d7f-2720-4d99-8601-6f46c0314635")
+	)
+	(wire
+		(pts
+			(xy 318.77 190.50) (xy 325.12 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a27a8578-872f-4587-b210-3a49f758ae27")
+	)
+	(wire
+		(pts
+			(xy 311.15 182.88) (xy 311.15 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "73f30f37-a62b-4f0e-ac7d-3188c9c01f62")
+	)
+	(wire
+		(pts
+			(xy 318.77 182.88) (xy 318.77 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a529be11-8f8b-4d3f-b955-c83ce49fa017")
+	)
+	(junction
+		(at 311.15 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "07dfba41-6d28-4ef5-bf6d-c7c4dd809513")
+	)
+	(junction
+		(at 318.77 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "956e67eb-20d3-4e1b-ad58-c18c58b04b4c")
+	)
+	(symbol
+		(lib_id "Device:L")
+		(at 335.28 190.50 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "33d5386f-084c-4825-b7ff-e8d206b80777")
+		(property "Reference" "L952"
+			(at 335.28 187.96 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "270n"
+			(at 335.28 193.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
+			(at 335.28 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 335.28 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 335.28 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1f35493f-b03b-444d-bfdc-f74fc72f5777")
+		)
+		(pin "2"
+			(uuid "2f76314c-53f7-4981-99ec-510e246e3d71")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "L952")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 335.28 182.88 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a9cd6eda-aefc-49ee-afa0-95125131fcf4")
+		(property "Reference" "C956"
+			(at 335.28 180.34 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "39p"
+			(at 335.28 185.42 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 335.28 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 335.28 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 335.28 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "4d91cd1a-5795-444d-a243-731989a88398")
+		)
+		(pin "2"
+			(uuid "73c3fc39-ee94-42d1-8f1e-4a78cd8a25bd")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C956")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 325.12 190.50) (xy 331.47 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "44c4f81a-29c7-44ad-9c4a-3f0384ec9d15")
+	)
+	(wire
+		(pts
+			(xy 339.09 190.50) (xy 345.44 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c8fce1e7-a9b1-4e59-b4e0-f226d902b9d8")
+	)
+	(wire
+		(pts
+			(xy 331.47 182.88) (xy 331.47 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e85d2785-c48a-4ebb-aa1f-bdf9958a942a")
+	)
+	(wire
+		(pts
+			(xy 339.09 182.88) (xy 339.09 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "81aea812-4e28-4373-835e-8f50d8dbb867")
+	)
+	(junction
+		(at 331.47 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0329aa7d-3c61-4328-8958-401ac7e0844f")
+	)
+	(junction
+		(at 339.09 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "869cbc4e-868b-4d45-b1ad-775b198a9310")
+	)
+	(symbol
+		(lib_id "Device:L")
+		(at 355.60 190.50 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "775988dc-3bf1-4fd0-be79-3fcfd6e1d655")
+		(property "Reference" "L953"
+			(at 355.60 187.96 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "330n"
+			(at 355.60 193.04 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
+			(at 355.60 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 355.60 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 355.60 190.50 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "234442ef-7ae7-4738-9e67-18224c4d1de8")
+		)
+		(pin "2"
+			(uuid "b9af87cd-9173-4199-9313-6f0716be3f83")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "L953")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 355.60 182.88 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6e09b7c5-ad52-4fff-bfe1-be700d28b4c8")
+		(property "Reference" "C958"
+			(at 355.60 180.34 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10p"
+			(at 355.60 185.42 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 355.60 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 355.60 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 355.60 182.88 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "993e0594-4915-49ce-9e62-167d66541a6c")
+		)
+		(pin "2"
+			(uuid "6b6764be-e241-42ea-8bbe-e80f1cbe8b2a")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C958")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 345.44 190.50) (xy 351.79 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "38c35a3f-9264-454a-b8d2-fe05056f9a99")
+	)
+	(wire
+		(pts
+			(xy 359.41 190.50) (xy 365.76 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "790e40db-5118-4654-934e-9c596fd51712")
+	)
+	(wire
+		(pts
+			(xy 351.79 182.88) (xy 351.79 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9e1c44b4-3656-4158-b118-4f049eebefb0")
+	)
+	(wire
+		(pts
+			(xy 359.41 182.88) (xy 359.41 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "459e8a3d-688c-471f-956a-5a15e1bb1738")
+	)
+	(junction
+		(at 351.79 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "dfd21062-68d4-433c-bca7-3bfc5c921042")
+	)
+	(junction
+		(at 359.41 190.50)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "5e7cacfa-e36b-4859-b96e-e0d8f49f93ec")
+	)
+	(wire
+		(pts
+			(xy 365.76 190.50) (xy 373.38 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "49ff0292-763a-486f-acc1-358811d7ae97")
+	)
+	(label "AAF_C_N1"
+		(at 325.12 190.50 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "eb3e1952-4daa-4b43-8961-bd4986a68793")
+	)
+	(label "AAF_C_N2"
+		(at 345.44 190.50 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "091f0979-a835-4fcd-8719-81511c63cf05")
 	)
 )

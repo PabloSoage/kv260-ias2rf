@@ -36,7 +36,13 @@ few cents up since 12 Nov (§2).
 **Rev06 (14 November, branch `rev06`), re-priced the same way:** parts $1,523.80 for two boards and $3,644.36 for
 five (115 LCSC codes; +$20 and +$41), feeder loading 114 × $1.53 = $174.42 (+$12). The difference is the Rev05 input
 protection, now with codes (LM74502-Q1, two DMT10H015LFG, SMCJ33CA, SMBJ18CA), the fan header with its PTC, and the
-SGMII bias network; C1218–C1221 are now fitted. Two boards come to **≈ $2,156**, five to **≈ $4,361**. The same
+SGMII bias network; C1218–C1221 are now fitted. Two boards come to **≈ $2,156**, five to **≈ $4,361**.
+
+**Rev07 (15 November):** the HF input's anti-alias low-pass (SIGNAL_INTEGRITY §9.9) adds ten parts and nine LCSC
+codes, all extended and in stock (`_work/fab/lcsc_parts.csv`): six C0G 0402 capacitors and three 0805 wirewound
+inductors (LQW2BASR22J00L, SDWL2012CR27GSTF, LQW2BASR33G00L, the scarcest at 949 in stock). Estimated, not
+re-quoted: 9 × $1.53 of feeder loading and about $1 of parts per board, so **≈ $2,172** for two boards and
+**≈ $4,385** for five. Run `quote.py` before ordering. The same
 eight parts are short (plus TPD4E05U06DQAR, 71 in stock for 80): see below.
 
 **Parts are three quarters of the cost,** and eight lines are almost 90 % of the parts (about $654 of $739 per board):

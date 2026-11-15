@@ -28,6 +28,14 @@ their SMAs.
 | **Pull-down on each control** (10 kΩ) | Keeps every switch on its default (RF1) while the FPGA is unconfigured. Control current is below 1 µA low (DC Electrical Specifications) | Pull-up, if the other chain should be the default |
 | **DC block on every SMA** (100 nF) | Electrical Specifications, note 3: *"All RF-ports must be DC blocked or held at 0 V DC"*. The converter side is already at 0 V: the ADC inputs are terminated to ground and the DAC baluns' secondaries are grounded. The SMA side is whatever is plugged in. 100 nF into 50 Ω gives a 32 kHz corner, below the SDR's 100 kHz | — |
 
+### 1.1 Rev07: an anti-alias low-pass on `IF_RX_C` (15 November)
+
+`SDR_RX_C` (J951) is the board's HF receive input: it reaches the AD9253 (channel B) with no RF switch in its
+path. Between C951 and the sheet's `IF_RX_C` output there is now a 7th-order elliptic low-pass for 50 Ω, flat to
+30 MHz and at least 60 dB down from 50 MHz (C953–C959, L951–L953; values and response in SIGNAL_INTEGRITY §9.9,
+design in `_work/sim/aaf_lpf.py`, drawn by `_work/rev07_aaf.py`). C951's side of the filter is the local net
+`IF_RX_C_AAF`. `IF_RX_A` stays unfiltered: SW1's RF2 throw brings the radar IF to the same ADC.
+
 ---
 
 ## 2. Every value, and where it comes from

@@ -1043,6 +1043,67 @@ the clock tree (Si549 into the ADCLK948) is far better than either ADC needs (ab
 120 MHz IF for the 120 fs of the Si549 and the buffer together), the SMA launches and the 50 Ω lines are right for the band, every external
 connector is protected, and ERC, DRC and schematic parity are clean on the board as committed.
 
+### 9.9 Rev07: what was done about 9.8 (15 November)
+
+**1. An anti-alias filter on the HF input (J951, `IF_RX_C`).** A 7th-order elliptic low-pass, 50 Ω at both
+ends, on the board between C951 (the SMA's DC block) and the AD8352, on the straight L1 run of the line
+(`_work/rev07_aaf.py` for the ROUTING sheet, `_work/rev07_aaf_pcb.py` for the board, values from
+`_work/sim/aaf_lpf.py`):
+
+| Ref | C953 | L951 ∥ C954 | C955 | L952 ∥ C956 | C957 | L953 ∥ C958 | C959 |
+|---|---|---|---|---|---|---|---|
+| Value | 82 p | 220 n ∥ 47 p | 150 p | 270 n ∥ 39 p | 160 p | 330 n ∥ 10 p | 100 p |
+
+C0G 0402 capacitors and 0805 wirewound inductors (LQW2BASR22J, SDWL2012CR27G, LQW2BASR33G: 0.7–1.4 Ω, Q about
+40 at 30 MHz; the 0603 LQW18AN of the DAC filters have 3.4 Ω and would have cost about 1 dB more).
+
+![IF_RX_C anti-alias low-pass](sim/aaf_lpf.png)
+
+| | 10 MHz | 25 MHz | 30 MHz | 45 MHz | 50–54 MHz | 88–108 MHz | 146 / 433 MHz |
+|---|---|---|---|---|---|---|---|
+| \|S21\| (fitted values, Q 35) | −0.2 dB | −0.7 dB | −1.3 dB | −55 dB | −68 to −89 dB | −67 to −88 dB | −63 / −68 dB |
+
+Monte Carlo over the fitted parts' tolerances (2000 boards: L951 ±5 %, L952/L953 ±2 %, capacitors ±5 % or 0.1 pF,
+Q 30–45): passband loss 1.7 dB at most, return loss 11 dB or better to 30 MHz, at least 34 dB at 42 MHz and
+**at least 60 dB from 50 to 600 MHz**. FM broadcast, 6 m and every VHF/UHF service are now 60 dB or more down
+before they reach the converter. Above about 700 MHz the rejection depends on the parts' parasitics (the
+capacitors' ESL with their vias, the inductors' self-resonance) and is to be swept on the first board.
+
+What it costs on this input: 0.2–0.7 dB more noise figure and full scale over HF (§9.6: NF 21.8 → about 22.3 dB,
+full scale −3.0 → about −2.6 dBm at 25 MHz). In the 400 MHz master mode the Nyquist is 25 MHz: 25–30 MHz still
+folds onto 20–25 MHz there, as before.
+
+Channel A (J911 → SW1 → AD9253) is left wideband on purpose: SW1's other throw brings the radar IF (120 MHz)
+to the same ADC, sampled in a higher Nyquist zone, which a low-pass would remove. J911, J922 and the radar ports
+still need an external preselector when an antenna is connected.
+
+**Layout.** Four nodes 4.5 mm apart along the line; each shunt capacitor stands on the track with its GND via
+0.9 mm above it, each inductor sits in the line, its parallel capacitor above it. The check of point 4 below
+found `IF_RX_B` running 9.8 mm beside the filter's output at 0.57 mm (−58 dB at 100 MHz, a path round the filter
+for anything arriving on J921/J922). `IF_RX_B` was moved 2.4 mm away, same length: no same-layer copper within
+1.5 mm now. DRC with zones refilled and schematic parity: 0 errors, 0 unconnected, 0 parity problems.
+
+**3. HF on the inputs and outputs without a switch.** J951 (`IF_RX_C`, now filtered) and J952 (`IF_TX_C`,
+DAC2) have no RF switch in their path, so the GaAs switch's behaviour below 10 MHz does not touch them. They are
+the board's HF receive and transmit ports; the gateware makes channel B and DAC2 the SDR's default channels. J911 and J931 still reach the same converters through SW1 and SW3, for use above HF or to compare.
+The two-tone test of 9.8 stays on the first board's list, to know what SW1/SW3 do at 1–5 MHz.
+
+**4. Transmit to receive.** `_work/sim/txrx_isolation.py` walks every receive line's copper and looks for
+transmit or clock copper on the same layer (lines on different layers are screened by a ground plane
+0.12–0.13 mm away): within 1.5 mm, it integrates the field-solver coupling of §3.5 along the run.
+
+| Receive line | Same-layer transmit copper within 1.5 mm | Clock copper within 1.5 mm |
+|---|---|---|
+| `IF_RX_A` (SW1, AD9253 ch A) | none | none |
+| `IF_RX_B` (SW2, AD9484) | none | `CLK_REF_IN`, 0.4 mm at 1.1 mm on L3: about −100 dB at 120 MHz |
+| `IF_RX_C` (filter, AD9253 ch B) | none | none |
+
+So the board's tracks are not the leak path: at 0 dBm out, a track coupling of −100 dB is far under the radar
+receiver's floor. What is left for the measurement is what the script cannot see: radiation between the SMAs
+(8.5 mm apart, edge-mounted, each with its ground vias), coupling through the shared −3V3/+3V3 switch supplies,
+and the converters' own feedthrough. The measurement is unchanged: S21 TX SMA → RX SMA on the first board,
+converters off, then the radar ADC's spectrum with the chirp running.
+
 ## 10. How it was checked
 
 The checks were scripts run on the board file, none by hand: a KiCad-style plane fill, the

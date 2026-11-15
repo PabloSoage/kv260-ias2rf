@@ -81,6 +81,15 @@ RULES = {
     ("20p", "C_0402_1005Metric"): ("C", "20p", "0402", 25, C0G),
     ("62p", "C_0402_1005Metric"): ("C", "62p", "0402", 25, C0G),
     ("27p", "C_0402_1005Metric"): ("C", "27p", "0402", 25, C0G),       # Y1201 load
+    ("82p", "C_0402_1005Metric"): ("C", "82p", "0402", 25, C0G),       # IF_RX_C anti-alias LPF (Rev07)
+    ("47p", "C_0402_1005Metric"): ("C", "47p", "0402", 25, C0G),
+    ("150p", "C_0402_1005Metric"): ("C", "150p", "0402", 25, C0G),
+    ("39p", "C_0402_1005Metric"): ("C", "39p", "0402", 25, C0G),
+    ("160p", "C_0402_1005Metric"): ("C", "160p", "0402", 25, C0G),
+    ("10p", "C_0402_1005Metric"): ("C", "10p", "0402", 25, C0G),
+    ("220n", "L_0805_2012Metric"): ("P", "LQW2BASR22J", r"^LQW2BASR22J"),   # anti-alias LPF: 0805 wirewound, Q ~40 at 30 MHz (the 2 % part is not stocked)
+    ("270n", "L_0805_2012Metric"): ("P", "SDWL2012CR27G", r"^SDWL2012CR27G"),
+    ("330n", "L_0805_2012Metric"): ("P", "LQW2BASR33G", r"^LQW2BASR33G"),
     ("22n", "C_0402_1005Metric"): ("C", "22n", "0402", 16, XR),
     ("47u 25V", "C_1210_3225Metric"): ("C", "47u", "1210", 25, XR),
     ("10u 25V", "C_1206_3216Metric"): ("C", "10u", "1206", 25, XR),
