@@ -305,21 +305,26 @@ self-tapping fan screws and 4 × M2.5 × 6.
 
 **Thermal result (3-D CFD of v2 as built, [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md#verification-of-the-built-v2)).**
 
-- **25 °C and 45 °C ambient:** every adapter IC and the K26 stay at least 21 °C under their limits, even with
-  the filter half clogged.
-- **70 °C ambient (a vehicle parked in the sun), as first built:**
-  - Without heatsinks, the Si549 would reach 113.8 °C, over its 105 °C limit.
-  - With the three heatsinks it is still 0.5 to 2 °C over. Two causes:
-    - U401's and Y401's sinks touched;
-    - the 39-cell honeycomb and the 13 exhaust slots held the fan to 2.57 CFM.
-- **70 °C, with the three changes above** (open intake, wide exhaust, cut sinks):
-  - the fan reaches 3.62 CFM and the cavity runs at +6 Pa, still overpressure against dust;
-  - the Si549 is at 101.7 °C (3.3 °C of margin);
-  - the XC7A50T is at 91.3 °C (8.7 °C of margin);
-  - every adapter IC passes.
-- **The K26 SOM** stays within about 1 °C of its 100 °C limit at 70 °C: 99 to 103 °C, depending on the mesh. Its
-  cooling is the KV260's own fan-sink, and the KV260 is a commercial-grade kit, not rated for that ambient. A
-  vehicle that soaks at 70 °C needs the K26 throttled or the case shaded.
+- **25 °C and 45 °C ambient:** every adapter IC and the K26 stay safely under their limits, even with
+  the filter half clogged. As first built, the honest continuous ambient rating is **~50 °C** on the stock
+  commercial `KV260` (`XCK26-C` hits `Tj = 85 °C` at `51.27 °C` ambient; board-surface `TA = 85 °C` ICs
+  cross `85 °C` PCB temperature starting at `54.2 °C` for `U401`, `57.3 °C` for `Y401`, and `60.3 °C` for
+  `U501`), or **`~66–70 °C`** on adapter silicon `Tj` (`U1101` `75.8 °C`, `U1001` `80.5 °C`, `Y401` `125 °C`
+  grade up to `87.2 °C` with `0.44 W` Si549 + `0.06 W` `R402/R403`).
+- **70 °C ambient (a vehicle parked in the sun), as first built (clean fine mesh):**
+  - `XCK26` reaches `100.21 °C` (over commercial `85 °C` and `0.21 °C` over industrial `100 °C` `K26I`);
+  - `LMR33630` reaches `114.89 °C` (`10.11 °C` margin to `125 °C`), `XC7A50T` `92.91 °C`, `PHY` `99.51 °C`,
+    and `Y401` `105.97 °C` (under `125 °C` silicon `Tj_max`, though board-surface `TA = 85 °C` parts `U401`
+    `106.67 °C` and `U501` `99.20 °C` exceed `85 °C` local PCB/board temperature);
+  - Cause: the 39-cell intake honeycomb (`23.6%` open area) and 13 narrow exhaust slots hold the stock
+    5010 blower to `2.72 CFM` (`15.42 Pa`).
+- **70 °C, with the combined upgrade (`v2_opt_combined_fine_70C`):** `Orion OD5015` 50×15 mm blower + wide
+  `66%`-open intake grille + widened rear/right exhaust slots + tall sinks + thermal pads to lid:
+  - the fan reaches **`7.50 CFM` at `24.25 Pa`** and **`+5.13 Pa`** cavity overpressure (positive dust seal);
+  - **`K26I` drops to `97.96 °C`** (`+2.04 °C` margin to the `100 °C` industrial limit; commercial `XCK26-C`
+    `85 °C` still requires shading or throttling above `~51 °C`);
+  - `Y401` drops to `94.72 °C`, `U401` to `97.80 °C`, `U501` to `90.26 °C`, `LMR33630` to `104.35 °C`,
+    `XC7A50T` to `87.15 °C`, and `PHY` to `91.53 °C`.
 
 ![Built v2 at 70 °C: no heatsinks, touching sinks, and the changes](sim/v2_thermal_3d_heatsinks_compare.png)
 

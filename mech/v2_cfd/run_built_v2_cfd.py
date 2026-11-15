@@ -90,40 +90,67 @@ class ComponentSpec:
     hs_size_mm: Optional[Tuple[float, float, float]] = None  # (wx, wy, h)
     r_tim: float = 0.0
     k_pkg: float = 1.5
+    rating_type: str = "TA_85"  # TA_85 (-40..85 C ambient), Tj_100 (-40..100 C Tj), Tj_125 (-40..125 C Tj)
+    ta_max_c: Optional[float] = 85.0
 
 
-# Rev06 adapter specs & coords (Rev06 RTL8211FSI 10 thermal vias)
+# Rev06 adapter specs & coords (datasheet TA/Tj audit)
+# Note: Y401 Si549 total LVPECL supply @ 3.3 V * 153 mA max = 0.505 W (~0.50 W).
+# External LVPECL 130 ohm pull-downs (R402/R403) + ADCLK948 100 ohm AC load dissipate ~0.06 W on the PCB,
+# leaving 0.44 W in the Si549 CLCC-7050 package (theta_JA=53, Psi_JB=Psi_JT=26 C/W, Tj_max=125 C, TA=-40..85 C).
 COMPONENTS: List[ComponentSpec] = [
-    ComponentSpec("U401_ADCLK948",    -34.90,  -0.20,  6.0, 0.95,  8.8, 12.0, 150.0, hs_size_mm=(9.0, 9.0, 5.0),  r_tim=5.0, k_pkg=1.51),
-    ComponentSpec("Y401_Si549",       -35.00,   8.80,  5.0, 0.50, 20.0, 25.0, 105.0, hs_size_mm=(9.0, 9.0, 5.0),  r_tim=6.0, k_pkg=1.10),
-    ComponentSpec("U501_AD9484",      -51.80,  10.60,  8.0, 1.05,  8.5,  1.7, 125.0, hs_size_mm=(14.0, 14.0, 6.0), r_tim=1.95, k_pkg=1.79),
-    ComponentSpec("U502_AD8352",      -48.90,  -1.20,  4.0, 0.20, 14.0, 20.0, 125.0),
-    ComponentSpec("U503_AD8352",      -57.20,  -2.40,  4.0, 0.20, 14.0, 20.0, 125.0),
-    ComponentSpec("U601_AD9253",      -70.25,  10.35,  8.0, 0.46, 12.0,  7.1, 125.0),
-    ComponentSpec("U1101_XC7A50T",    -42.75,  40.00, 17.0, 0.73,  8.4,  4.24, 100.0),
-    ComponentSpec("U1001_LMR33630",   -30.25,  94.00,  6.0, 0.88, 13.6, 22.0, 150.0),
-    ComponentSpec("U1002_TPS562201",  -54.75, 104.50,  4.0, 0.41, 15.0, 28.0, 125.0),
-    ComponentSpec("U1003_TPS562201",  -54.75,  95.50,  4.0, 0.20, 15.0, 28.0, 125.0),
-    ComponentSpec("U1004_TPS562201",  -54.75,  86.50,  4.0, 0.10, 15.0, 28.0, 125.0),
-    ComponentSpec("U1005_TPS7A8300",  -43.25,  81.00,  4.5, 0.50, 12.3, 25.0, 125.0),
-    ComponentSpec("U1006_TPS7A8300",  -35.25,  81.00,  4.5, 0.35, 12.3, 25.0, 125.0),
-    ComponentSpec("U1007_TPS7A8300",  -27.25,  81.00,  4.5, 0.17, 12.3, 25.0, 125.0),
-    ComponentSpec("U1201_RTL8211FSI", -18.20,  -1.00,  6.0, 0.50,  5.0, 18.0, 125.0),  # Rev06: 10 thermal vias (was 12.0 C/W)
-    ComponentSpec("AD9708_AD9767",    -45.50,  71.00, 14.0, 0.30, 18.0, 30.0, 125.0),
+    ComponentSpec("U401_ADCLK948",    -34.90,  -0.20,  6.0, 0.95,  8.8, 12.0, 150.0, hs_size_mm=(9.0, 9.0, 5.0),  r_tim=5.0, k_pkg=1.51, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("Y401_Si549",       -35.00,   8.80,  5.0, 0.44, 26.0, 26.0, 125.0, hs_size_mm=(9.0, 9.0, 5.0),  r_tim=6.0, k_pkg=1.10, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U501_AD9484",      -51.80,  10.60,  8.0, 1.05,  8.5,  1.7, 150.0, hs_size_mm=(14.0, 14.0, 6.0), r_tim=1.95, k_pkg=1.79, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U502_AD8352",      -48.90,  -1.20,  4.0, 0.20, 14.0, 20.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U503_AD8352",      -57.20,  -2.40,  4.0, 0.20, 14.0, 20.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U601_AD9253",      -70.25,  10.35,  8.0, 0.46, 12.0,  7.1, 150.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U1101_XC7A50T",    -42.75,  40.00, 17.0, 0.73,  8.4,  4.24, 100.0, rating_type="Tj_100", ta_max_c=None),
+    ComponentSpec("U1001_LMR33630",   -30.25,  94.00,  6.0, 0.88, 13.6, 22.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1002_TPS562201",  -54.75, 104.50,  4.0, 0.41, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1003_TPS562201",  -54.75,  95.50,  4.0, 0.20, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1004_TPS562201",  -54.75,  86.50,  4.0, 0.10, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1005_TPS7A8300",  -43.25,  81.00,  4.5, 0.50, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1006_TPS7A8300",  -35.25,  81.00,  4.5, 0.35, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1007_TPS7A8300",  -27.25,  81.00,  4.5, 0.17, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1201_RTL8211FSI", -18.20,  -1.00,  6.0, 0.50,  5.0, 18.0, 125.0, rating_type="TA_85", ta_max_c=85.0),  # Rev06: 10 thermal vias (was 12.0 C/W)
+    ComponentSpec("AD9708_AD9767",    -45.50,  71.00, 14.0, 0.30, 18.0, 30.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
 ]
+
+R402_R403_EXT_W = 0.06  # External 130 ohm LVPECL pull-downs (R402/R403) between Y401 & U401
 
 KV260_CARRIER_W = 2.0
 K26_SOM_W = 9.0
 K26_R_JC = 1.4
-K26_TJ_MAX = 100.0
+K26_C_TJ_MAX = 85.0   # Commercial KV260 starter kit (XCK26-SFVC784-2LV-C, kit ambient 0..35 C)
+K26_I_TJ_MAX = 100.0  # Industrial K26I SOM (XCK26-SFVC784-2LI-I)
+K26_TJ_MAX = K26_I_TJ_MAX
 
-# Sunon MF50100V1-1000U 5V: 8.5 CFM (4.00e-3 m3/s) max, 22.0 Pa shutoff
+# Sunon MF50100V1-1000U 5V (50x50x10 mm, 0.11 A): 8.5 CFM (4.00e-3 m3/s) max, 22.0 Pa shutoff
 FAN_50_PQ = [
     (0.0,      22.0),
     (0.00133,  15.2),
     (0.00267,   8.0),
     (0.00400,   0.0),
     (0.00800, -22.0),
+]
+
+# Orion OD5015-05HB 5V (50x50x15 mm, 0.13 A <= F1002 0.5 A hold): 14.0 CFM (6.61e-3 m3/s) max, 49.8 Pa shutoff
+FAN_5015_PQ = [
+    (0.0,      49.8),
+    (0.00220,  34.0),
+    (0.00440,  18.0),
+    (0.00661,   0.0),
+    (0.01200, -49.8),
+]
+
+# Sunon MF40100V1-1000U 5V (40x40x10 mm right-wall exhaust fan, 0.13 A): 8.0 CFM (3.78e-3 m3/s) max, 27.0 Pa shutoff
+FAN_4010_EXHAUST_PQ = [
+    (0.0,      27.0),
+    (0.00126,  18.5),
+    (0.00252,   9.5),
+    (0.00378,   0.0),
+    (0.00756, -27.0),
 ]
 
 FOAM_HEADER = """/*--------------------------------*- C++ -*----------------------------------*\\
@@ -154,8 +181,13 @@ class BuiltCaseConfig:
     with_heatsinks: bool = True      # stick-on heatsinks on U401, Y401, U501
     filter_clog_factor: float = 1.0  # 1.0 = clean 100-mesh; 2.0 = 2x clogged
     wide_grille: bool = False        # Improvement 1: widen 39-hex (985 mm^2) to 48 mm bore (~1700 mm^2)
-    decouple_hs: bool = False        # Improvement 2: trim U401/Y401 sinks so >=1.8 mm air gap separates them
+    decouple_hs: bool = False        # Improvement 2: trim U401/Y401 sinks so >=3 mm air gap separates them
     expand_exhaust: bool = False     # Improvement 3: widen right-wall slots y=4..106, z=6..28 mm
+    fan_5015: bool = False           # 15 Nov study: 50x50x15 mm 5 V high-pressure fan (Orion OD5015-05HB, 0.13 A)
+    exhaust_fan_right: bool = False  # 15 Nov study: add 40x40x10 mm 5 V right-wall exhaust fan (Sunon MF40100V1, 0.13 A)
+    extra_exhaust_slots: bool = False  # 15 Nov study: expanded right slots + upper back-wall slots above adapter/VRM
+    tall_hs: bool = False            # 15 Nov study: taller decoupled sinks (U401/Y401 9x7x8 mm, U501 14x14x8.5 mm)
+    pad_to_lid: bool = False         # 15 Nov study: 5 W/mK thermal pad from U1001 & K26 perimeter rails to Al lid plate
     keep_vtk: bool = False
 
 
@@ -247,10 +279,11 @@ def generate_case(cfg: BuiltCaseConfig, case_dir: Path, nprocs: int = 16) -> dic
 
     # Fan shroud + 4mm ceiling plenum duct (PETG-CF) in built v2
     # Outer square: x [-66.2, -13.8], y [-12.2, 40.2]; inner square bore: x [-65, -15], y [-11, 39]
+    fan_z0_cur = 13.75e-3 if cfg.fan_5015 else FAN2_Z0
     duct_outer = nearest_grid_box(
         AD_FAN_X - FAN2_HALF - DUCT_T, AD_FAN_X + FAN2_HALF + DUCT_T,
         AD_FAN_Y - FAN2_HALF - DUCT_T, AD_FAN_Y + FAN2_HALF + DUCT_T,
-        FAN2_Z0, CAV_Z1, xs, ys, zs
+        fan_z0_cur, CAV_Z1, xs, ys, zs
     )
     duct_inner_plenum = nearest_grid_box(
         AD_FAN_X - FAN2_HALF, AD_FAN_X + FAN2_HALF,
@@ -260,7 +293,7 @@ def generate_case(cfg: BuiltCaseConfig, case_dir: Path, nprocs: int = 16) -> dic
     fan_outer = nearest_grid_box(
         AD_FAN_X - FAN2_HALF - DUCT_T, AD_FAN_X + FAN2_HALF + DUCT_T,
         AD_FAN_Y - FAN2_HALF - DUCT_T, AD_FAN_Y + FAN2_HALF + DUCT_T,
-        FAN2_Z0, FAN2_Z1, xs, ys, zs
+        fan_z0_cur, FAN2_Z1, xs, ys, zs
     )
     fan_z0_snap = fan_outer[4]
     fan_z1_snap = fan_outer[5]
@@ -281,10 +314,13 @@ def generate_case(cfg: BuiltCaseConfig, case_dir: Path, nprocs: int = 16) -> dic
             pkg_boxes[c.name] = pb
             # Heatsink body directly on top of pb[5]
             wx, wy, hz = c.hs_size_mm
-            if cfg.decouple_hs and c.name == "U401_ADCLK948":
+            if cfg.tall_hs:
+                hz = 8.5 if c.name == "U501_AD9484" else 8.0
+            sep_hs = cfg.decouple_hs or cfg.tall_hs
+            if sep_hs and c.name == "U401_ADCLK948":
                 # Trim +Y edge so a clean air gap isolates U401 (0.95 W) from Y401 while covering 6x6 mm pkg
                 y0_hs, y1_hs = c.y_mm * 1e-3 - 4.5e-3, c.y_mm * 1e-3 + 2.5e-3
-            elif cfg.decouple_hs and c.name == "Y401_Si549":
+            elif sep_hs and c.name == "Y401_Si549":
                 # Trim -Y edge so >=3 mm air gap separates hs_U401 and hs_Y401 while covering 5x5 mm pkg
                 y0_hs, y1_hs = c.y_mm * 1e-3 - 2.5e-3, c.y_mm * 1e-3 + 4.5e-3
             else:
@@ -303,6 +339,12 @@ def generate_case(cfg: BuiltCaseConfig, case_dir: Path, nprocs: int = 16) -> dic
             short = c.name.split("_")[0]
             regions_solid.append(f"pkg_{short}")
             regions_solid.append(f"hs_{short}")
+    pad_boxes: Dict[str, Tuple[float, float, float, float, float, float]] = {}
+    if cfg.pad_to_lid:
+        pad_boxes["pad_U1001"] = nearest_grid_box(-36.0e-3, -24.0e-3, 88.0e-3, 100.0e-3, ad_box[5], CAV_Z1, xs, ys, zs)
+        # Front K26 outer fin rail (y=18..21.5 mm stays strictly outside kv_grille r=24.3 mm @ y=47.0 mm)
+        pad_boxes["pad_K26"] = nearest_grid_box(53.0e-3, 119.0e-3, 18.0e-3, 21.5e-3, SINK_FIN_Z1, CAV_Z1, xs, ys, zs)
+        regions_solid.extend(["pad_U1001", "pad_K26"])
 
     (case_dir / "system").mkdir()
     (case_dir / "constant").mkdir()
@@ -408,29 +450,68 @@ boundary
     }""")
 
     # Built v2 right-wall exhaust: 13 slots 3x16 mm (y=10..85 mm, z=10..26 mm), or expanded 17x(3.5x22 mm) y=4..106, z=6..28 mm
-    rv_y0, rv_y1 = (4.0e-3, 106.0e-3) if cfg.expand_exhaust else (10.0e-3, 85.0e-3)
-    rv_z0, rv_z1 = (6.0e-3, 28.0e-3) if cfg.expand_exhaust else (10.0e-3, 26.0e-3)
-    top_actions.append(f"""
+    rv_y0, rv_y1 = (4.0e-3, 106.0e-3) if (cfg.expand_exhaust or cfg.extra_exhaust_slots) else (10.0e-3, 85.0e-3)
+    rv_z0, rv_z1 = (6.0e-3, 28.0e-3) if (cfg.expand_exhaust or cfg.extra_exhaust_slots) else (10.0e-3, 26.0e-3)
+    if cfg.exhaust_fan_right:
+        # 40x40x10 mm exhaust fan bore (r=19.0 mm) centered at (y=45, z=12 mm) clearing top/bottom wall seams
+        top_actions.append(f"""
+    {{
+        name    f_right_vents;
+        type    faceSet;
+        action  new;
+        source  cylinderToFace;
+        p1      ({CAV_X1 - 0.002:.5f} 0.04500 0.01200);
+        p2      ({CAV_X1 + 0.002:.5f} 0.04500 0.01200);
+        radius  0.01900;
+    }}""")
+    else:
+        top_actions.append(f"""
     {{
         name    f_right_vents;
         type    faceSet;
         action  new;
         source  boxToFace;
         box     ({CAV_X1 - 0.002:.5f} {rv_y0:.5f} {rv_z0:.5f}) ({CAV_X1 + 0.002:.5f} {rv_y1:.5f} {rv_z1:.5f});
-    }}
-    {{
+    }}""")
+    top_actions.append("""
+    {
         name    f_right_vents;
         type    faceSet;
         action  subset;
         source  patchToFace;
         patch   wall_right;
-    }}""")
+    }""")
     create_patches.append("""
     {
         name right_vents;
         patchInfo { type patch; }
         constructFrom set;
         set f_right_vents;
+    }""")
+
+    if cfg.extra_exhaust_slots:
+        # Upper back-wall slots above adapter regulators & K26 rear (Y = CAV_Y1, Z = 10..28 mm, clearing J1001 & rear I/O)
+        top_actions.append(f"""
+    {{
+        name    f_back_vents;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (-0.08500 {CAV_Y1 - 0.002:.5f} 0.01000) (-0.01800 {CAV_Y1 + 0.002:.5f} 0.02800);
+    }}
+    {{
+        name    f_back_vents;
+        type    faceSet;
+        action  subset;
+        source  patchToFace;
+        patch   wall_back;
+    }}""")
+        create_patches.append("""
+    {
+        name back_vents;
+        patchInfo { type patch; }
+        constructFrom set;
+        set f_back_vents;
     }""")
 
     # Solid cellZones
@@ -441,7 +522,7 @@ boundary
     for fb in fin_boxes:
         solid_actions.append(box_src("k26_sink", fb, "add"))
 
-    # Duct + fan shroud + center motor hub in `duct_petg` (full z=18.75..32.75 mm shroud)
+    # Duct + fan shroud + center motor hub in `duct_petg`
     solid_actions.append(box_src("duct_petg", duct_outer, "new"))
     solid_actions.append(box_src("duct_petg", duct_inner_plenum, "delete"))
     solid_actions.append(cyl_src("duct_petg", AD_FAN_X, AD_FAN_Y, fan_z0_snap - 1e-4, fan_z1_snap + 1e-4, FAN2_BORE_R, "delete"))
@@ -452,6 +533,8 @@ boundary
             short = c.name.split("_")[0]
             solid_actions.append(box_src(f"pkg_{short}", pkg_boxes[c.name], "new"))
             solid_actions.append(box_src(f"hs_{short}", hs_boxes[c.name], "new"))
+    for pname, pbox in pad_boxes.items():
+        solid_actions.append(box_src(pname, pbox, "new"))
 
     air_invert = "".join(
         f"""
@@ -513,6 +596,18 @@ boundary
         source  setToCellZone;
         set     {c.name};
     }}""")
+    r402_box = nearest_grid_box(-35.0e-3 - 2.0e-3, -35.0e-3 + 2.0e-3,
+                                4.3e-3 - 2.0e-3, 4.3e-3 + 2.0e-3,
+                                ad_box[4], ad_box[5], xs, ys, zs)
+    ic_actions.append(box_src("R402_R403_ext", r402_box, "new"))
+    ic_actions.append("""
+    {
+        name    R402_R403_ext;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        set     R402_R403_ext;
+    }""")
     (case_dir / "system" / "adapter_pcb").mkdir(parents=True, exist_ok=True)
     (case_dir / "system" / "adapter_pcb" / "topoSetDict").write_text(
         foam_file("dictionary", "topoSetDict", "system") + "actions\n(\n" + "".join(ic_actions) + "\n);\n"
@@ -686,7 +781,8 @@ relaxationFactors { fields { p_rgh 0.35; rho 1; } equations { U 0.55; h 0.80; k 
     # Built right exhaust: 13 slots 3x16 mm (y=10..85, z=10..26 -> f=210), or expanded 17x(3.5x22 mm) -> f=120
     # Built filter + double 3mm hex grille (39 cells = 984.9 mm2 inside 41x41mm -> 3.38x higher dyn loss vs 48 mm open bore)
     c = cfg.filter_clog_factor
-    f_rv = 120.0 if cfg.expand_exhaust else 210.0
+    f_rv = 10.0 if cfg.exhaust_fan_right else (120.0 if (cfg.expand_exhaust or cfg.extra_exhaust_slots) else 210.0)
+    d_rv = 1.0e4 if cfg.exhaust_fan_right else 1.0e6
     if cfg.wide_grille:
         d_coef, f_coef = 1.65e7 * c, 740.0 * c
     else:
@@ -710,7 +806,7 @@ right_slot_loss
         selectionMode   cellZone;
         cellZone        right_slot_zone;
         type DarcyForchheimer;
-        d   (1e6 1e6 1e6);
+        d   ({d_rv:.1e} {d_rv:.1e} {d_rv:.1e});
         f   ({f_rv:.1f} {f_rv:.1f} {f_rv:.1f});
         coordinateSystem {{ origin (0 0 0); e1 (1 0 0); e2 (0 1 0); }}
     }}
@@ -747,6 +843,8 @@ dust_filter_loss
             t_pkg = max(pkg_boxes[cspec.name][5] - pkg_boxes[cspec.name][4], 1e-4)
             solid_k[f"pkg_{short}"] = cspec.k_pkg * (t_pkg / 1.5e-3)
             solid_k[f"hs_{short}"] = 167.0  # Aluminum 6063/6061 stick-on heatsink
+    for pname in pad_boxes:
+        solid_k[pname] = 5.0  # 5 W/mK silicone thermal gap pad to top aluminum plate
 
     for sreg in regions_solid:
         (case_dir / "constant" / sreg).mkdir(parents=True, exist_ok=True)
@@ -784,6 +882,16 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     cellZone        {cspec.name};
     volumeMode      absolute;
     sources {{ h ( {pw:.4f} 0 ); }}
+}}
+"""
+    fv_ad += f"""src_R402_R403_ext
+{{
+    type            scalarSemiImplicitSource;
+    active          true;
+    selectionMode   cellZone;
+    cellZone        R402_R403_ext;
+    volumeMode      absolute;
+    sources {{ h ( {R402_R403_EXT_W:.4f} 0 ); }}
 }}
 """
     (case_dir / "system" / "adapter_pcb" / "fvOptions").write_text(fv_ad)
@@ -825,6 +933,8 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     coupled_solid = f"""type compressible::turbulentTemperatureRadCoupledMixed; qrNbr none; qr none; Tnbr T; kappaMethod solidThermo; useImplicit false; value uniform {t_amb_k:.2f};"""
 
     open_patches = ["kv_grille", "adapter_opening", "right_vents"]
+    if cfg.extra_exhaust_slots:
+        open_patches.append("back_vents")
 
     u_txt = foam_file("volVectorField", "U", "0/air") + "dimensions [0 1 -1 0 0 0 0];\ninternalField uniform (0 0 0);\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n"
     for w in ["wall_bottom", "wall_top", "wall_left", "wall_right", "wall_front", "wall_back"]:
@@ -836,7 +946,10 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
 
     t_txt = foam_file("volScalarField", "T", "0/air") + f"dimensions [0 0 0 1 0 0 0];\ninternalField uniform {t_amb_k:.2f};\nboundaryField\n{{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n"
     t_txt += f"    wall_bottom {{ {ext_wall_t(0.0030, k_shell, 8.0)} }}\n"
-    t_txt += f"    wall_top    {{ {ext_wall_t(0.0030, k_shell, 12.0)} }}\n"
+    if cfg.pad_to_lid:
+        t_txt += f"    wall_top    {{ {ext_wall_t(0.0020, 167.0, 14.0)} }}\n"
+    else:
+        t_txt += f"    wall_top    {{ {ext_wall_t(0.0030, k_shell, 12.0)} }}\n"
     for w in ["wall_left", "wall_right", "wall_front", "wall_back"]:
         t_txt += f"    {w} {{ {ext_wall_t(0.0035, k_shell, 10.5)} }}\n"
     t_txt += f'    "air_to_.*" {{ {coupled_fluid} }}\n'
@@ -848,10 +961,28 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     for w in ["wall_bottom", "wall_top", "wall_left", "wall_right", "wall_front", "wall_back"]:
         pr_txt += f"    {w} {{ type fixedFluxPressure; value $internalField; }}\n"
     pr_txt += '    "air_to_.*" { type fixedFluxPressure; value $internalField; }\n'
-    pts = " ".join(f"({q:.6f} {dp:.2f})" for q, dp in FAN_50_PQ)
+    fan_pq = FAN_5015_PQ if cfg.fan_5015 else FAN_50_PQ
+    pts = " ".join(f"({q:.6f} {dp:.2f})" for q, dp in fan_pq)
+    if cfg.exhaust_fan_right:
+        pts_ex = " ".join(f"({q:.6f} {dp:.2f})" for q, dp in FAN_4010_EXHAUST_PQ)
+        rv_bc = f"""    right_vents
+    {{
+        type            fanPressure;
+        direction       out;
+        fanCurve
+        {{
+            type        table;
+            values      ( {pts_ex} );
+        }}
+        p0              uniform 101325;
+        value           $internalField;
+    }}"""
+    else:
+        rv_bc = "    right_vents { type totalPressure; p0 uniform 101325; value $internalField; }"
+    bv_bc = "    back_vents  { type totalPressure; p0 uniform 101325; value $internalField; }\n" if cfg.extra_exhaust_slots else ""
     pr_txt += f"""    kv_grille {{ type totalPressure; p0 uniform 101325; value $internalField; }}
-    right_vents {{ type totalPressure; p0 uniform 101325; value $internalField; }}
-    adapter_opening
+{rv_bc}
+{bv_bc}    adapter_opening
     {{
         type            fanPressure;
         direction       in;
@@ -895,7 +1026,10 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     for sreg in regions_solid:
         st_txt = foam_file("volScalarField", "T", f"0/{sreg}") + f"dimensions [0 0 0 1 0 0 0];\ninternalField uniform {t_amb_k + 10.0:.2f};\nboundaryField\n{{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n"
         st_txt += f'    "{sreg}_to_.*" {{ {coupled_solid} }}\n'
-        st_txt += f'    "wall_.*" {{ {ext_wall_t(0.0035, k_shell, 10.5, "solidThermo")} }}\n}}\n'
+        if cfg.pad_to_lid and sreg.startswith("pad_"):
+            st_txt += f'    "wall_.*" {{ {ext_wall_t(0.0020, 167.0, 14.0, "solidThermo")} }}\n}}\n'
+        else:
+            st_txt += f'    "wall_.*" {{ {ext_wall_t(0.0035, k_shell, 10.5, "solidThermo")} }}\n}}\n'
         (case_dir / "0.orig" / sreg / "T").write_text(st_txt)
         (case_dir / "0.orig" / sreg / "p").write_text(
             foam_file("volScalarField", "p", f"0/{sreg}")
@@ -1108,11 +1242,30 @@ p_{op}
     m_res = re.findall(r"Solving for h, Initial residual = ([0-9.eE+-]+)", log_sol)
     p_air = read_foam_scalar_field(t_dir / "air" / "p_rgh") - 101325.0
 
-    # Interpolate theoretical fan static pressure at actual flow rate on FAN_50_PQ
+    # Interpolate theoretical fan static pressure at actual flow rate on active intake fan P-Q curve
     q_fan = max(0.0, -patch_flows["adapter_opening"]["vol_m3_s"])
-    pq_q = [pt[0] for pt in FAN_50_PQ]
-    pq_dp = [pt[1] for pt in FAN_50_PQ]
+    fan_pq = FAN_5015_PQ if cfg.fan_5015 else FAN_50_PQ
+    pq_q = [pt[0] for pt in fan_pq]
+    pq_dp = [pt[1] for pt in fan_pq]
     fan_curve_dp = float(np.interp(q_fan, pq_q, pq_dp))
+
+    # Local cavity air temperature 2..14 mm above each IC + explicit TA vs Tj audit
+    for cspec in COMPONENTS:
+        cr = comp_results[cspec.name]
+        cx, cy = cspec.x_mm * 1e-3, cspec.y_mm * 1e-3
+        air_mask = (
+            (np.abs(cc_air[:, 0] - cx) <= 8.0e-3)
+            & (np.abs(cc_air[:, 1] - cy) <= 8.0e-3)
+            & (cc_air[:, 2] >= ADAPTER_Z1)
+            & (cc_air[:, 2] <= ADAPTER_Z1 + 12.0e-3)
+        )
+        t_air_loc = float(np.mean(T_air[air_mask])) if np.any(air_mask) else float(np.mean(T_air))
+        cr["T_air_local_C"] = round(t_air_loc, 2)
+        cr["rating_type"] = cspec.rating_type
+        cr["ta_max_C"] = cspec.ta_max_c
+        if cspec.ta_max_c is not None:
+            cr["margin_TA_board_C"] = round(cspec.ta_max_c - cr["T_board_C"], 2)
+            cr["margin_TA_air_C"] = round(cspec.ta_max_c - t_air_loc, 2)
 
     return {
         "name": cfg.name,
@@ -1123,6 +1276,11 @@ p_{op}
         "wide_grille": cfg.wide_grille,
         "decouple_hs": cfg.decouple_hs,
         "expand_exhaust": cfg.expand_exhaust,
+        "fan_5015": cfg.fan_5015,
+        "exhaust_fan_right": cfg.exhaust_fan_right,
+        "extra_exhaust_slots": cfg.extra_exhaust_slots,
+        "tall_hs": cfg.tall_hs,
+        "pad_to_lid": cfg.pad_to_lid,
         "cells_air": int(len(T_air)),
         "cells_solid": int(len(T_ad) + len(T_k26)),
         "T_air_mean_C": round(float(np.mean(T_air)), 2),
@@ -1133,7 +1291,9 @@ p_{op}
         "fan50_curve_dp_Pa": round(fan_curve_dp, 2),
         "K26_sink_C": round(t_k26_sink_c, 2),
         "K26_Tj_C": round(t_k26_j_c, 2),
-        "K26_margin_C": round(K26_TJ_MAX - t_k26_j_c, 2),
+        "K26_margin_C": round(K26_I_TJ_MAX - t_k26_j_c, 2),
+        "K26I_margin_C": round(K26_I_TJ_MAX - t_k26_j_c, 2),
+        "K26C_margin_C": round(K26_C_TJ_MAX - t_k26_j_c, 2),
         "hottest_ic": hottest_name,
         "hottest_Tj_C": round(hottest_tj, 2),
         "patch_flows": patch_flows,
@@ -1155,6 +1315,14 @@ def build_suite() -> List[BuiltCaseConfig]:
         BuiltCaseConfig("v2_built_decoupled_hs_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, decouple_hs=True),
         BuiltCaseConfig("v2_built_proposed_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, decouple_hs=True, expand_exhaust=True, keep_vtk=True),
         BuiltCaseConfig("v2_built_hs_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, keep_vtk=True),
+        # 15 Nov individual 70 C improvement studies & combined fine verification
+        BuiltCaseConfig("v2_opt_fan5015_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, fan_5015=True),
+        BuiltCaseConfig("v2_opt_right_fan_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, exhaust_fan_right=True),
+        BuiltCaseConfig("v2_opt_extra_slots_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, decouple_hs=True, extra_exhaust_slots=True),
+        BuiltCaseConfig("v2_opt_tall_hs_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, tall_hs=True),
+        BuiltCaseConfig("v2_opt_pad_lid_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, pad_to_lid=True),
+        BuiltCaseConfig("v2_opt_combined_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, extra_exhaust_slots=True, tall_hs=True, pad_to_lid=True, keep_vtk=True),
+        BuiltCaseConfig("v2_opt_combined_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, extra_exhaust_slots=True, tall_hs=True, pad_to_lid=True, keep_vtk=True),
     ]
 
 
