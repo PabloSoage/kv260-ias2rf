@@ -1038,16 +1038,17 @@ def add_summary_page(master: fitz.Document, part_summary: Iterable[tuple[str, in
     y = 80
     page.insert_text(fitz.Point(48, y), "Platform Baseline Summary", fontname="hebo", fontsize=12.5, color=navy)
     y += 10
-    card_rect = fitz.Rect(48, y, A4_W - 48, y + 204)
+    card_rect = fitz.Rect(48, y, A4_W - 48, y + 231)
     page.draw_rect(card_rect, color=(0.78, 0.83, 0.89), fill=light_bg, width=0.8)
 
     facts = [
         ("PCB & Stackup", "8-layer JLC08161H-2116C (140 x 132 mm, 0 DRC / 0 ERC, openEMS S11 = -30.9 dB @ 1 GHz)"),
         ("High-Speed Link", "2-lane IAS1 LVDS (2.0-2.5 Gb/s UL, 1.0 Gb/s DL) + dedicated-pin 1000BASE-T RTL8211FSI UDP"),
-        ("Artix-7 (XC7A50T)", "15,416 LUTs (47.3%), 17,445 FFs (26.8%), 16 BRAM36 (21.3%), 110 DSPs (91.7%), WNS = +0.147 ns"),
+        ("Artix-7 (XC7A50T)", "15,681 LUTs (48.1%), 18,084 FFs (27.7%), 16 BRAM36 (21.3%), 110 DSPs (91.7%), WNS = +0.111 ns at 400 and 500 MHz"),
         ("Kria K26 (XCK26)", "Full BD: 11,034 LUTs (9.4%), 18,212 FFs (7.8%), 3 BRAM36 (2.1%), WNS = +1.291 ns"),
         ("RF Missions", "AERIS-10 X-Band Radar (10.5 GHz, 20 km, 8x ADAR1000) + Wideband SDR (0-62.5 MHz HF/CB + VHF/UHF)"),
-        ("Thermal & Mech.", "Enclosure v2 (50 mm filtered lid fan, 50 g FEA BGA <= 162 ue); HS1-HS3 sinks keep every adapter IC in limit at 70 C"),
+        ("HF input", "J951: 30 MHz 7th-order elliptic anti-alias filter on the board, >= 60 dB from 50 MHz; no RF switch in the path"),
+        ("Thermal & Mech.", "Enclosure v2 (50x15 mm filtered lid fan, HS1-HS3, 50 g FEA BGA <= 162 ue): rated 56 C ambient with the stock KV260, 70 C with a K26I SOM"),
         ("XSim Co-Sim", "Dual-FPGA Artix-7 + PCB channels + K26 PL + RTL8211FSI/GEM3 UDP end-to-end PASS (S1..S6)"),
     ]
     ry = y + 12

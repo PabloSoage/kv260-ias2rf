@@ -193,9 +193,9 @@ rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards them
 
 | Load case | Case, 99.7th pct / peak | Safety factor 23 °C / 70 °C | Adapter / carrier strain, 99.7th pct | At the BGAs (U1101, U501, U601) | Max displacement |
 |---|---|---|---|---|---|
-| v2, 50 g down | 3.6 / 9.2 MPa | 8.2 / 4.9 | 399 / 302 µε | 158 / 162 / 126 µε | 0.23 mm |
-| v2, 50 g sideways (X) | 2.2 / 5.8 MPa | 13.2 / 7.9 | 92 / 193 µε | 15 / 15 / 13 µε | 0.09 mm |
-| v2, 50 g fore-aft (Y) | 1.9 / 3.2 MPa | 15.3 / 9.2 | 95 / 108 µε | 10 / 8 / 11 µε | 0.09 mm |
+| v2, 50 g down | 3.5 / 9.3 MPa | 8.3 / 5.0 | 431 / 344 µε | 162 / 162 / 127 µε | 0.25 mm |
+| v2, 50 g sideways (X) | 2.2 / 5.6 MPa | 13.4 / 8.0 | 103 / 238 µε | 15 / 16 / 14 µε | 0.09 mm |
+| v2, 50 g fore-aft (Y) | 2.0 / 3.5 MPa | 14.8 / 8.9 | 106 / 102 µε | 10 / 8 / 10 µε | 0.09 mm |
 | v1, 50 g down | 3.5 / 9.2 MPa | 8.3 / 5.0 | 417 / 326 µε | 159 / 159 / 130 µε | 0.22 mm |
 
 The two maps rendered on the parts themselves (Cycles; colours are the solver's, scale as in the plots below):
@@ -221,8 +221,9 @@ v1 for comparison: [down](sim/case3d_v1_Zm.png), [sideways](sim/case3d_v1_Xp.png
     USB cut-outs carry the load into the ear.
   - Its peak, about 9 MPa, is a sharp inside corner: the real corners are rounded and the value is
     mesh-dependent.
-  - Even that peak leaves a safety factor of 3.2 at 23 °C and 1.9 at 70 °C. The 99.7th percentile leaves 8 and 5.
-  - The fan duct, the open spoke intake and the 17 exhaust slots of v2 change nothing measurable.
+  - Even that peak leaves a safety factor of 3.1 at 23 °C and 1.9 at 70 °C. The 99.7th percentile leaves 8 and 5.
+  - The fan duct, the open spoke intake, the 17 right-wall and (since 15 Nov, re-run) 9 back-wall exhaust slots
+    of v2 change nothing measurable.
 - **The boards.**
   - Down is the worst direction.
   - Both boards bend over the honeycomb by 0.1–0.16 mm.
@@ -245,13 +246,13 @@ v1 for comparison: [down](sim/case3d_v1_Zm.png), [sideways](sim/case3d_v1_Xp.png
 
 ### Heatsink Placement & Mechanical Sizing (`HS1`–`HS5`)
 
-To keep every IC within junction limits at `70 °C` ambient without shorting or blocking airflow from the lid-mounted `50 × 50 × 10 mm` intake fan (`fan2_vis` at `z = 18.8–28.8 mm`), five heatsinks are specified across the assembly:
+Five heatsinks are specified across the assembly, clear of the lid-mounted `50 × 50 × 15 mm` intake fan (`fan2_vis` at `z = 13.75–28.75 mm`); the three under the fan were made taller on 15 Nov:
 
 | Heatsink | Target Component | Dimensions (`L × W × H`) | Assembly centre (`X, Y`, case frame) | Vertical Envelope & Clearance |
 |---|---|---|---|---|
-| **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 6 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `9.5 mm` (`9.4 mm` clearance below `50 mm` fan at `z = 18.8 mm`) |
-| **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 5 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `~8.3 mm` (`y_max = +2.3 mm`) |
-| **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 5 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `~9.2 mm` (`y_min = +6.3 mm` -> **`4.0 mm` thermal gap** to `HS2`) |
+| **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 8.5 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `11.8 mm` (`1.9 mm` below the fan at `z = 13.75 mm`) |
+| **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 8 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `11.2 mm` (`y_max = +2.3 mm`) |
+| **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 8 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `12.0 mm`, `1.8 mm` under the fan (`y_min = +6.3 mm` -> **`4.0 mm` thermal gap** to `HS2`) |
 | **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` |
 | **`HS5`** | `K26 SOM` (`XCK26` OEM cooler) | **`68 × 58 × 18 mm` + `54 mm` fan** | `(+86.1, +47.0) mm` | Fin top `~25.1 mm` (`7.6 mm` to Enclosure v2 roof) |
 
@@ -279,7 +280,7 @@ the fan 5 V.
 | ![v2 section](img/case_v2_section.jpg) | ![v2, SMA side](img/case_v2_sma.jpg) |
 
 **What changes from v1.**
-- **A 50 × 50 × 10 mm 5 V fan** blowing down onto the adapter's hot strip along its front edge: U401 (ADCLK948),
+- **A 50 × 50 × 15 mm 5 V fan** (Orion OD5015-05HB: 14 CFM, 50 Pa, 0.13 A; a 5010 until 15 Nov) blowing down onto the adapter's hot strip along its front edge: U401 (ADCLK948),
   Y401 (Si549), U501 (AD9484), U502/U503 (AD8352) and U1201 (the Ethernet PHY). It hangs from the lid in a 1.2 mm
   square duct whose top stands 4 mm below the ceiling, a plenum under the grille, so the fan can only draw through
   the grille. Four M3 self-tapping fan screws go from below into bosses in the duct's corners.
@@ -291,17 +292,19 @@ the fan 5 V.
 - **The SMA wall has no slots**: with the fan blowing in, the box runs at a slight overpressure (CFD: about
   +11 Pa), so air leaves through the vents and dust does not come in at the seams.
 - **Right-wall exhaust along the whole wall**: 17 slots of 3.5 × 21 mm (y 4 to 103.5 mm, z 7.5 to 28.5 mm, 1.5 mm
-  above the tongue's groove) instead of v1's 9 of 3 × 14 mm.
+  above the tongue's groove) instead of v1's 9 of 3 × 14 mm, and **9 back-wall slots** of 3.5 × 18 mm (z 10 to 28 mm)
+  over the adapter's regulators, none between x −51.5 and −31 mm where the J1001 jack's opening is (15 Nov). In the
+  CFD they carry 5.2 of the 7.5 CFM the fan blows in.
 - **The "KV260 · IAS2RF" label** is kept, at its new place behind the ribbon slot (as v1).
 - **Stick-on aluminium heatsinks** in the fan's jet (bought parts, thermally conductive epoxy rather than tape for
-  vibration): 14 × 14 × 6 mm on U501, and on U401 and Y401 a 9 × 9 × 5 mm sink **cut down to 9 × 7 mm**. U401 and
+  vibration): 14 × 14 × 8.5 mm on U501, and on U401 and Y401 an 8 mm tall 9 × 9 mm sink **cut down to 9 × 7 mm**. U401 and
   Y401 sit only 9 mm apart: two full 9 × 9 sinks touch, and U401's (0.95 W) then heats the Si549's instead of
   cooling it. Fit each cut sink with its cut edge towards the other and 1 mm off its package's centre, away from
-  the other, for a 4 mm air gap between them. They sit about 9 mm below the fan.
+  the other, for a 4 mm air gap between them. Their tops sit 1.8–1.9 mm below the fan: no taller sinks.
 
-**Parts to buy.** A 50 × 50 × 10 mm 5 V fan with a 2-pin JST PH plug (the CFD used the Sunon MF50100V1-1000U-A99
-curve: 8.5 CFM free air, 22 Pa); a 100-mesh stainless sheet cut to 56 × 56 mm; the three heatsinks; 4 × M3 × 14
-self-tapping fan screws and 4 × M2.5 × 6.
+**Parts to buy.** An Orion OD5015-05HB fan (50 × 50 × 15 mm, 5 V, 0.13 A, well inside F1002's 0.5 A) with a 2-pin JST
+PH plug fitted; a 100-mesh stainless sheet cut to 56 × 56 mm; the three heatsinks; 4 × M3 × 20 self-tapping fan
+screws and 4 × M2.5 × 6.
 
 **Thermal result (3-D CFD of v2 as built, [ENCLOSURE_V2_THERMAL.md](ENCLOSURE_V2_THERMAL.md#verification-of-the-built-v2)).**
 
@@ -325,6 +328,14 @@ self-tapping fan screws and 4 × M2.5 × 6.
     `85 °C` still requires shading or throttling above `~51 °C`);
   - `Y401` drops to `94.72 °C`, `U401` to `97.80 °C`, `U501` to `90.26 °C`, `LMR33630` to `104.35 °C`,
     `XC7A50T` to `87.15 °C`, and `PHY` to `91.53 °C`.
+
+- **The upgrade as built (15 Nov, printed lid, no aluminium, no pads; [ENCLOSURE_V2_THERMAL §7](ENCLOSURE_V2_THERMAL.md)):**
+  the OD5015 fan, the spoke intake, the 17 right-wall and 9 back-wall slots and the taller sinks give 7.5 CFM and
+  +5.3 Pa. **Rated ambient: 56 °C with the stock KV260** (its commercial K26 reaches its 85 °C junction limit there;
+  UG1090), 63 °C by the adapter's own parts on their board temperature, **70.9 °C with an industrial K26I SOM**
+  (99.1 °C at 70 °C, also with the filter clogged twice over). At 70 °C the adapter's hottest junctions are the
+  LMR33630 at 109.8 °C (of 125), the ADCLK948 at 98.0 °C, the Si549 at 95.1 °C (of 125) and the XC7A50T at
+  87.8 °C (of 100). The aluminium-lid study (pads from U1001 and the K26 to a metal top) is in the report, not built.
 
 ![Built v2 at 70 °C: no heatsinks, touching sinks, and the changes](sim/v2_thermal_3d_heatsinks_compare.png)
 

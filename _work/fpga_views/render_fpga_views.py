@@ -360,18 +360,18 @@ def plot_artix7_schematic(artix_json):
 
     ax.text(12, 14.65, "Artix-7 XC7A50T-FTG256-2 (artix_top) — Vivado Post-Route Hierarchical Circuit Schematic",
             ha="center", va="center", fontsize=13.5, fontweight="bold", color="#0F172A")
-    ax.text(12, 14.25, f"Clock Domains: fpga_clk 100M | link_clk 125M | tx_clk_ddr 500M | clk_400m 400M | clk_625 625M 0/90° | adcs_clk 125M   |   WNS = +{d['wns_ns']:.3f} ns, WHS = +{d['whs_ns']:.3f} ns",
+    ax.text(12, 14.25, f"Clock Domains: fpga_clk 400/500M | dac_clk 100/125M (no MMCM) | link_clk 125M | tx_clk_ddr 500M | clk_400m 400M | clk_625 625M | cfgmclk   |   WNS = +{d['wns_ns']:.3f} ns, WHS = +{d['whs_ns']:.3f} ns",
             ha="center", va="center", fontsize=9.0, color="#334155")
 
     # Left Column: RF Converters & Clocks Input Interfaces
-    draw_module(ax, 0.4, 11.4, 3.8, 2.3, "Clock Synthesizer", "u_ibuf_fpga_clk + MMCME2_ADV",
-                ["fpga_clk_p/n (100M LVDS)", "MMCME2_ADV (1000 MHz VCO):", " -> 125M link_clk", " -> 500M tx_clk_ddr (IAS1)", " -> 200M refclk (IDELAYCTRL)", "g_eth MMCME2_ADV -> 625/312.5M"],
+    draw_module(ax, 0.4, 11.4, 3.8, 2.3, "Clock Synthesizer", "u_clk_mode_ctrl + 2x MMCME2_ADV",
+                ["fpga_clk_p/n (400/500M LVDS)", "DRP DIVCLK /4 or /5 -> 1000 MHz VCO:", " -> 125M link_clk, 500M tx_clk_ddr", " -> 200M refclk, eth 625/312.5M", "fpga_clk/4 -> dac_clk (no MMCM)", "CFGMCLK safe boot + Si549 I2C"],
                 hdr_col="#0E7490", fill_col="#ECFEFF", badge="2x MMCME2")
     draw_module(ax, 0.4, 8.2, 3.8, 2.8, "AD9484 Radar ADC RX", "adc_capture (400 MSPS)",
                 ["IBUFDS_DIFF_OUT (adcr_d[7:0],", "  adcr_dco, adcr_or)", "MMCME2_ADV (clk_400m)", "IDELAYE2 + ISERDESE2 (8b)", "Auto eye scan (32 taps)"],
                 hdr_col="#9D174D", fill_col="#FDF2F8", badge="Bank 14 HR")
     draw_module(ax, 0.4, 4.9, 3.8, 2.9, "AD9253 SDR Dual ADC", "adcs_capture (2x14b 125M)",
-                ["adcs_d0[1:0], d1[1:0], dco, fco", "2-wire DDR 7:1 ISERDESE2", "IDELAYE2 + Bitslip align FSM", "Ch A (HF) & Ch B (VHF/UHF)", "Syncs FCO frame word"],
+                ["adcs_d0[1:0], d1[1:0], dco, fco", "2-wire DDR 7:1 ISERDESE2", "IDELAYE2 + Bitslip align FSM", "Ch B (HF, J951 LPF) & Ch A", "Syncs FCO frame word"],
                 hdr_col="#1D4ED8", fill_col="#EFF6FF", badge="Bank 34 2.5V")
     draw_module(ax, 0.4, 1.0, 3.8, 3.5, "Housekeeping, XADC & SPI", "Bank 15 & Bank 35 (1.8/3.3V)",
                 ["conv_spi: AD9484 / AD9253 SPI", "hk_i2c_master: TMP1075 / EEPROM", "hk_xo_ctrl: Si549 I2C + CLK_SEL", "hk_xadc_pps: XADC die T/V", "  + PPS timestamp + ppm meas.", "pmod_spi: Failsafe J1102 SPI"],
@@ -385,7 +385,7 @@ def plot_artix7_schematic(artix_json):
                 ["2x sdr_ddc_nco (32b FTW A & B)", "Programmable 3-stage CIC3 +", "  15-tap symmetric Halfband FIR", "Decim 2..65535 -> HF / FM / SSB", "Gray BRAM FIFO -> Stream 8'h04/05", f"{cnt('u_sdr_ddc','DSP')} DSP48E1 | {cnt('u_sdr_ddc','LUT'):,} LUTs"],
                 hdr_col="#1E40AF", fill_col="#EFF6FF", badge=f"{cnt('u_sdr_ddc','DSP')} DSPs")
     draw_module(ax, 5.1, 1.0, 4.5, 3.1, "DAC TX + ADAR1000 Beam", "u_dac_radar / u_dac_sdr / u_adar",
-                ["dac_radar: 32b LFM Chirp DDS ->", "  ODDR + 8b CMOS @ 125M (AD9708)", "dac_sdr: Async FIFO + IQ -> AD9767", "adar_ctrl: 32x8x24B Beam RAM +", "  15.6M SPI + T/R guard FSM", "rf_switch: 4x M3SWA-2+ SPDT"],
+                ["dac_radar: 32b LFM Chirp DDS ->", "  ODDR, dac_clk 100/125M (AD9708)", "dac_sdr: Async FIFO + IQ -> AD9767", "adar_ctrl: 32x8x24B Beam RAM +", "  15.6M SPI + T/R guard FSM", "rf_switch: 4x M3SWA-2+ SPDT"],
                 hdr_col="#15803D", fill_col="#F0FDF4", badge="32 T/R Ch.")
 
     # Center-Right Column: Arbitration, CSR Control & Dual-Path Failover

@@ -32,12 +32,12 @@ def annotate_render():
     ax.axis("off")
 
     callouts = [
-        ("HS1_U501",  (0.03, 0.22), "HS1: U501 (AD9484 ADC, 1.05 W)\n14 × 14 × 6 mm Black Anodized Al\nClearance to Fan: 9.4 mm", "#94A3B8"),
-        ("HS2_U401",  (0.03, 0.84), "HS2: U401 (ADCLK948 Fanout, 0.95 W)\n9 × 7 × 5 mm (-1 mm Y Shift)", "#60A5FA"),
+        ("HS1_U501",  (0.03, 0.22), "HS1: U501 (AD9484 ADC, 1.05 W)\n14 × 14 × 8.5 mm Black Anodized Al\nClearance to Fan: 1.9 mm", "#94A3B8"),
+        ("HS2_U401",  (0.03, 0.84), "HS2: U401 (ADCLK948 Fanout, 0.95 W)\n9 × 7 × 8 mm (-1 mm Y Shift)", "#60A5FA"),
         ("GAP_4MM",   (0.27, 0.90), "4.0 mm Thermal Isolation Air Gap\n(Prevents U401 Heat Transfer to Y401)", "#38BDF8"),
-        ("HS3_Y401",  (0.55, 0.87), "HS3: Y401 (Si549 VCXO, 0.50 W)\n9 × 7 × 5 mm (+1 mm Y Shift, Tj ≤ 105 °C)", "#60A5FA"),
+        ("HS3_Y401",  (0.55, 0.87), "HS3: Y401 (Si549 VCXO, 0.50 W)\n9 × 7 × 8 mm (+1 mm Y Shift, Tj ≤ 125 °C)", "#60A5FA"),
         ("HS4_U1101", (0.27, 0.11), "HS4: U1101 (XC7A50T FPGA, 0.73 W typ)\n14 × 14 × 5 mm Optional Low-Profile Cu/Al", "#F59E0B"),
-        ("FAN_50MM",  (0.51, 0.11), "Enclosure v2 Fan Envelope (Wireframe)\n50 × 50 × 10 mm @ (-40, +14) mm, z=18.8 mm", "#22D3EE"),
+        ("FAN_50MM",  (0.51, 0.11), "Enclosure v2 Fan Envelope (Wireframe)\n50 × 50 × 15 mm OD5015 @ (-40, +14) mm, z=13.75 mm", "#22D3EE"),
         ("HS5_K26",   (0.74, 0.12), "HS5: K26 SOM OEM Heatsink + Fan\n68 × 58 × 18 mm (9.0 W PS+PL Budget)", "#CBD5E1"),
     ]
 
@@ -123,23 +123,23 @@ def plot_mechanical_blueprint():
     # Enclosures ceiling & fan
     ax_side.add_patch(Rectangle((-80, 32.75), 185, 3.0, facecolor="#475569", edgecolor="#0F172A", lw=1.0))
     ax_side.text(12, 34.25, "Enclosure v2 Lid Inner Roof (z = 32.75..35.75 mm)", ha="center", va="center", color="white", fontsize=8.0, fontweight="bold")
-    ax_side.add_patch(Rectangle((-65, 18.8), 50, 10.0, facecolor="#BAE6FD", edgecolor="#0284C7", lw=1.5, ls="--"))
-    ax_side.text(-40, 23.8, "50×50×10 mm Fan\nz ∈ [18.8, 28.8] mm", ha="center", va="center", color="#0369A1", fontsize=8.0, fontweight="bold")
+    ax_side.add_patch(Rectangle((-65, 13.75), 50, 15.0, facecolor="#BAE6FD", edgecolor="#0284C7", lw=1.5, ls="--"))
+    ax_side.text(-40, 21.3, "50×50×15 mm Fan (OD5015)\nz ∈ [13.75, 28.75] mm", ha="center", va="center", color="#0369A1", fontsize=8.0, fontweight="bold")
 
     # Heatsink side elevation profiles at clean schematic X positions and exact Z heights [mm]
-    ax_side.add_patch(Rectangle((-58.8, 3.34), 14.0, 6.0, facecolor="#1E293B", edgecolor="black"))
-    ax_side.text(-55.5, 10.2, "HS1 (U501)\nz=9.4 mm", ha="center", va="bottom", fontsize=7.2, fontweight="bold")
-    ax_side.add_patch(Rectangle((-39.4, 3.15), 9.0, 5.0, facecolor="#1D4ED8", edgecolor="black"))
-    ax_side.add_patch(Rectangle((-39.5, 3.99), 9.0, 5.0, facecolor="#3B82F6", edgecolor="black", alpha=0.82))
-    ax_side.text(-33.5, 10.2, "HS2/HS3\nU401+Y401\nz=8.2/9.1", ha="center", va="bottom", fontsize=7.2, fontweight="bold", color="#1E40AF")
+    ax_side.add_patch(Rectangle((-58.8, 3.34), 14.0, 8.5, facecolor="#1E293B", edgecolor="black"))
+    ax_side.text(-51.8, 7.6, "HS1\nU501\nz=11.8", ha="center", va="center", fontsize=7.0, fontweight="bold", color="white")
+    ax_side.add_patch(Rectangle((-39.4, 3.15), 9.0, 8.0, facecolor="#1D4ED8", edgecolor="black"))
+    ax_side.add_patch(Rectangle((-39.5, 3.99), 9.0, 8.0, facecolor="#3B82F6", edgecolor="black", alpha=0.82))
+    ax_side.text(-34.9, 7.6, "HS2/3\nU401\nY401\nz=12.0", ha="center", va="center", fontsize=6.6, fontweight="bold", color="white")
     ax_side.add_patch(Rectangle((-19.0, 3.84), 14.0, 5.0, facecolor="#D97706", edgecolor="black"))
     ax_side.text(-11.5, 9.8, "HS4 (Opt.)\nXC7A50T\nz=8.9 mm", ha="center", va="bottom", fontsize=7.2, fontweight="bold", color="#B45309")
     ax_side.add_patch(Rectangle((28.0, 5.80), 68.0, 18.0, facecolor="#334155", edgecolor="black"))
     ax_side.text(62.0, 14.8, "HS5: K26 SOM OEM Heatsink\n68 × 58 × 18 mm (z_top ≈ 25.1 mm)", ha="center", va="center", color="white", fontsize=8.0, fontweight="bold")
 
     # Vertical Clearance Arrows
-    ax_side.annotate("", xy=(-51.8, 18.8), xytext=(-51.8, 9.5), arrowprops=dict(arrowstyle="<->", color="#0284C7", lw=1.6))
-    ax_side.text(-49.5, 15.2, "≥ 9.4 mm Air\nPlenum Clearance", color="#0369A1", fontsize=7.8, fontweight="bold")
+    ax_side.annotate("", xy=(-24.0, 13.75), xytext=(-24.0, 11.99), arrowprops=dict(arrowstyle="<->", color="#0284C7", lw=1.6))
+    ax_side.text(-63.0, 15.0, "1.8 mm over HS3, the tallest sink", color="#0369A1", fontsize=7.4, fontweight="bold")
     ax_side.annotate("", xy=(62.0, 32.75), xytext=(62.0, 23.8), arrowprops=dict(arrowstyle="<->", color="#0F766E", lw=1.6))
     ax_side.text(60.0, 28.5, "7.6 mm Roof Clearance", color="#0F766E", fontsize=7.8, fontweight="bold", ha="right")
 

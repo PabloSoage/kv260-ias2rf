@@ -39,14 +39,14 @@ signal chains:
 |---|---|
 | Size | 119 × 132 mm, 140 × 132 with the RJ45's tab. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 | Stackup | 8 layers, JLCPCB `JLC08161H-2116C`: `L1 SIG – L2 GND – L3 SIG – L4 PWR (split) – L5 GND – L6 SIG – L7 GND – L8 SIG` ([LAYOUT §3](docs/LAYOUT.md)) |
-| Parts | 551 fitted, none DNP: 475 on the top face and 76 on the bottom (the Hirose connectors, the LVDS terminations and VCCINT caps under the FPGA, the switches' bias parts, the input protection) |
+| Parts | 561 fitted, none DNP: 485 on the top face and 76 on the bottom (the Hirose connectors, the LVDS terminations and VCCINT caps under the FPGA, the switches' bias parts, the input protection) |
 | Front-end FPGA | Xilinx XC7A50T-2FTG256I (the same part as AERIS-10) with a 128 Mb QSPI flash, plus JTAG |
 | Radar ADC | AD9484, 8 bit, 400 MSPS, driven by two cascaded AD8352s |
 | SDR ADC | AD9253, 14 bit, two channels at 62.5 MSPS (one LVDS lane each) |
 | Radar DAC | AD9708, with reconstruction filter and balun |
 | SDR DAC | AD9767, dual 14 bit, two output chains |
 | Clock | Si549 programmable XO (400 or 500 MHz, GPS-disciplinable) into an ADCLK948 LVPECL fan-out |
-| RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs |
+| RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs. The HF ports J951 (receive, through an on-board 30 MHz 7th-order elliptic anti-alias filter) and J952 (transmit) have no switch in their path ([SIGNAL_INTEGRITY §9.9](docs/SIGNAL_INTEGRITY.md)) |
 | Link to the Kria | IAS1 (Hirose BM20B), five LVDS pairs at up to 1 Gb/s each, AC-coupled; the Pmod J2 for control |
 | Ethernet | Gigabit RJ45 through an RTL8211FSI SGMII PHY on its own FPGA pins, so it runs alongside IAS1 ([CONTROL_SPEC §8](docs/CONTROL_SPEC.md)) |
 | To AERIS-10 | 2×20 IDC ribbon for eight ADAR1000s |
@@ -111,8 +111,8 @@ BGA, for one).
 | DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board (re-run 15 Nov; one warning: D1003's footprint differs from its library copy) |
 | Signal and power integrity | Full-wave openEMS + ngspice verification ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch `S11 = -30.9 dB` at 1 GHz (`-13.7 dB` at 3 GHz) with ESD diode, LVDS eyes within `1–26 mV` of ideal except `LINK_RX_D0` (`-52 mV`), worst intra-pair skew `9 ps`, `VCCINT` impedance `41 / 63 mΩ` (`target 120 mΩ`), ESD protection on every SMA, Pmod and JTAG, GND via within `3 mm` of all `89` LVDS layer changes |
 | Planes | L2, L5, and L7 carry solid ground; L4 carries split power islands (`_work/layout/planechk.py`) |
-| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `15,416` Slice LUTs (`47.3%`), `17,445` FFs (`26.8%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.147 ns`; `ias2rf_k26_bd` uses `11,034` Slice LUTs (`9.4%`), `18,212` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +1.291 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
-| RF limits to know before first use | No anti-alias filter on the SDR inputs (an external preselector is required), DAC clocks come from the FPGA, the RF switches are not characterised below 10 MHz, TX-to-RX isolation is not yet measured: [SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md) |
+| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `15,681` LUTs (`48.1%`), `18,084` FFs (`27.7%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.111 ns` with `CLK_FPGA` constrained at both `400` and `500 MHz`; `ias2rf_k26_bd` uses `11,034` Slice LUTs (`9.4%`), `18,212` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +1.291 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
+| Final RF review (15 Nov) | Five limits found ([SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md)) and addressed ([§9.9](docs/SIGNAL_INTEGRITY.md)): a 30 MHz 7th-order anti-alias filter on the HF input J951 (≥ 60 dB from 50 MHz); the switch-free J951/J952 as the default HF ports; DAC clocks from `CLK_FPGA` ÷ 4 without an MMCM (clock uncertainty `0.165 → 0.035 ns`); no transmit copper within 1.5 mm of any receive line; the enclosure's honest rating below. Still to measure on the first board: TX→RX isolation, the RF switches at 1–5 MHz, the filter above 700 MHz, switcher spurs |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: mounting holes land within `5 µm` ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
 **Design & verification highlights** ([docs/LAYOUT.md](docs/LAYOUT.md), [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)):
@@ -122,7 +122,7 @@ BGA, for one).
 3. **ADCR data to DCO skew (`-90 to +5 ps`).** `ADCR_DCO` legs are swapped cleanly at the Artix-7 BGA (`N14 = DCO_N`, `P14 = DCO_P`); `adc_capture.v` compensates with `ISERDESE2` inversion + per-bit `IDELAYE2` calibration.
 4. **8-layer `JLC08161H-2116C` fabrication stack.** Controlled impedances verified against JLCPCB's solver ([FABRICATION.md](docs/FABRICATION.md)); 5 bare boards quoted at `$287.96` (`140 × 132 mm` with Ethernet tab).
 5. **Kria IAS1 I/O standard.** `DIFF_SSTL12` with `RTT_48` on-die split termination (`~96 Ω` to `0.6 V`) and `RDRV_60_60` driver ([INTERFACE_SPEC §6.3](docs/INTERFACE_SPEC.md)); `2 Gb/s` uplink (`2` pairs) + `1 Gb/s` downlink (`1` pair), `1.25 Gb/s` per lane silicon headroom.
-6. **3-D full-wave EM, RF cascade & thermal envelope.** openEMS 3-D sub-models cover L1–L6 vias (`S11 < -29 dB`), BGA escapes (`< -24 dB`), adjacent-pair NEXT (`1.9%`), and `J101` launch (`< -25 dB`). Receive cascades (`cascade.py`) give `NF = 26.8 dB` (radar) / `22 dB` (SDR). Enclosure v2 (`50 mm` filtered lid fan + `HS1`–`HS3` heatsinks) keeps every adapter IC under its junction limit at `70 °C` ambient (tightest: `Si549` `101.7 °C` of `105 °C`) ([ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)).
+6. **3-D full-wave EM, RF cascade & thermal envelope.** openEMS 3-D sub-models cover L1–L6 vias (`S11 < -29 dB`), BGA escapes (`< -24 dB`), adjacent-pair NEXT (`1.9%`), and `J101` launch (`< -25 dB`). Receive cascades (`cascade.py`) give `NF = 26.8 dB` (radar) / `22 dB` (SDR). Enclosure v2 (`50 × 50 × 15 mm` filtered lid fan + `HS1`–`HS3` heatsinks) is rated for `56 °C` ambient with the stock KV260, whose commercial K26 is the limit (`Tj` `85 °C`), and `70 °C` with an industrial K26I SOM ([ENCLOSURE_V2_THERMAL.md §7](docs/ENCLOSURE_V2_THERMAL.md)).
 7. **Dual-FPGA Vivado 2026.1 gateware & XSim verification.** Full RTL, constraints, Vivado post-route floorplans/schematics, and XSim end-to-end testbenches live in `fpga/` ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)). *(Design evolution history is archived in [docs/history/README.md](docs/history/README.md).)*
 
 **Estimated cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md)): about **$2,125 for two assembled boards** and **$4,310 for five** (parts + assembly + `JLC08161H-2116C` bare boards).
@@ -219,7 +219,7 @@ Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to
 
 | Target FPGA (`Vivado 2026.1`) | Slice LUTs | Flip-Flops | BRAM36 eq. | DSP48 | Timing (`WNS` / `WHS`) |
 |---|---|---|---|---|---|
-| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `15,416 / 32,600` (`47.3%`; `18,045` leaf LUTs) | `17,445 / 65,200` (`26.8%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.147 ns` / `+0.036 ns`** |
+| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `15,681 / 32,600` (`48.1%`) | `18,084 / 65,200` (`27.7%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.111 ns` / `+0.016 ns`** (`CLK_FPGA` at `400` and `500 MHz`) |
 | **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+1.291 ns` / `+0.010 ns`** (`kria_top` alone: `+1.008 ns` / `+0.017 ns`) |
 
 | Artix-7 Silicon Die Floorplan (`XC7A50T`) | Artix-7 Post-Route Vivado Circuit Schematic |
@@ -307,14 +307,14 @@ carry the Ethernet tab ([MECHANICAL](docs/MECHANICAL.md); STLs in `mech/`). Rend
 
 ## Heatsink Placement, Mechanical Envelope & Thermal Cooling (`Enclosure v2`)
 
-The closed field enclosure (**Enclosure v2**, PETG-CF / ASA / PAHT-CF with optional TPU 95A drop bumpers; [ENCLOSURE.md](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)) integrates a `50 × 50 × 10 mm` filtered intake fan on `J1002` directly above the RF/clock hot strip and specifies five mechanically decoupled heatsinks (`HS1`–`HS5`) with verified structural clearances:
+The closed field enclosure (**Enclosure v2**, PETG-CF / ASA / PAHT-CF with optional TPU 95A drop bumpers; [ENCLOSURE.md](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)) integrates a `50 × 50 × 15 mm` filtered intake fan (Orion OD5015-05HB, `0.13 A`) on `J1002` directly above the RF/clock hot strip and specifies five mechanically decoupled heatsinks (`HS1`–`HS5`) with verified structural clearances:
 
 | Heatsink | Target Component | Dimensions (`L × W × H`) | Assembly centre (`X, Y`, case frame) | Vertical Envelope & Clearance |
 |---|---|---|---|---|
-| **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 6 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `9.5 mm` (`9.4 mm` clearance below `50 mm` fan at `z = 18.8 mm`) |
-| **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 5 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `~8.3 mm` (`y_max = +2.3 mm`) |
-| **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 5 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `~9.2 mm` (`y_min = +6.3 mm` -> **`4.0 mm` thermal air gap** to `HS2`) |
-| **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` (not needed: `91.3 °C` at `70 °C` ambient without it in the CFD) |
+| **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 8.5 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `11.8 mm` (`1.9 mm` below the fan at `z = 13.75 mm`) |
+| **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 8 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `11.2 mm` (`y_max = +2.3 mm`) |
+| **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 8 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `12.0 mm`, `1.8 mm` under the fan (`y_min = +6.3 mm` -> **`4.0 mm` thermal air gap** to `HS2`) |
+| **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` (not needed: `87.8 °C` at `70 °C` ambient without it in the CFD) |
 | **`HS5`** | `K26 SOM` (`XCK26` OEM cooler) | **`68 × 58 × 18 mm` + `54 mm` fan** | `(+86.1, +47.0) mm` | Fin top `~25.1 mm` (`7.6 mm` to Enclosure v2 roof honeycomb vent) |
 
 ![Annotated 4K heatsink placement over KV260 + IAS2RF assembly](docs/img/board_heatsinks.jpg)
@@ -323,14 +323,14 @@ The closed field enclosure (**Enclosure v2**, PETG-CF / ASA / PAHT-CF with optio
 
 ### Enclosure v2: Filtered Active Cooling & 3-D FEA
 
-With `HS1`–`HS3` plus the `50 × 50 × 10 mm` lid fan (`J1002`) pressurising the housing and exhausting through 17 right-wall slots, every adapter IC stays under its junction limit at `70 °C` ambient in full 3-D CFD: the tightest is the `Si549` at `101.7 °C` (limit `105 °C`), the `XC7A50T` reaches `91.3 °C`. The K26 SOM, cooled by the KV260's own fan-sink, sits within about `1 °C` of its `100 °C` limit at `70 °C` ([ENCLOSURE §6](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md](docs/ENCLOSURE_V2_THERMAL.md)). A 197k-tetrahedra 3-D CalculiX FEA under a `50 g` shock keeps peak case stress at `9.2 MPa` (`1.9×` margin at `70 °C`) and BGA strain `<= 162 µε` (vs. `500 µε` limit; [ENCLOSURE §5.3](docs/ENCLOSURE.md)).
+With `HS1`–`HS3` plus the `50 × 50 × 15 mm` lid fan (`J1002`) pressurising the housing (`7.5 CFM`, `+5.3 Pa`) and exhausting through 17 right-wall and 9 back-wall slots, the fine-mesh 3-D CFD of the enclosure as built rates it for **`56 °C` ambient with the stock KV260**, whose commercial K26 reaches its `85 °C` junction limit there (UG1090), and **`70.9 °C` with an industrial K26I SOM** (`99.1 °C` of `100 °C` at `70 °C`, also with the filter clogged twice over). At `70 °C` the adapter's hottest junctions are the `LMR33630` at `109.8 °C` (of `125 °C`), the `ADCLK948` at `98.0 °C`, the `Si549` at `95.1 °C` (of `125 °C`) and the `XC7A50T` at `87.8 °C` (of `100 °C`) ([ENCLOSURE §6](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md §7](docs/ENCLOSURE_V2_THERMAL.md)). A 203k-tetrahedra 3-D CalculiX FEA under a `50 g` shock keeps peak case stress at `9.3 MPa` (`1.9×` margin at `70 °C`) and BGA strain `<= 162 µε` (vs. `500 µε` limit; [ENCLOSURE §5.3](docs/ENCLOSURE.md)).
 
 ![Enclosure v2 closed, with 50 mm filtered intake fan and TPU bumpers](docs/img/case_v2_closed.jpg)
 
 | Version 2 opened (`case_v2`) | Cross-section: fan duct, SMAs & Kria K26 heatsink |
 |---|---|
 | ![v2 open](docs/img/case_v2_open.jpg) | ![v2 section](docs/img/case_v2_section.jpg) |
-| **Version 2 lifted lid: `50 × 50 × 10 mm` blower alignment** | **3-D 50 g FEA: peak stress `9.2 MPa` / BGA strain `<= 162 µε`** |
+| **Version 2 lifted lid: `50 × 50 × 15 mm` fan in its duct** | **3-D 50 g FEA: peak stress `9.3 MPa` / BGA strain `<= 162 µε`** |
 | ![v2 fan](docs/img/case_v2_fan.jpg) | ![FEA stress](docs/img/case3d_v2_stress.jpg) |
 
 *(4K `3840 × 2160` Cycles renders `board_iso_4k.png`, `board_heatsinks_closeup_4k.jpg`, `case_v2_closed_4k.jpg`, `case_v2_open_4k.jpg`, and `case_v2_section_4k.jpg` are in [`docs/img/highres/renders/`](docs/img/highres/README.md#4-hardware-heatsink--enclosure-4k-renders-renders).)*

@@ -24,7 +24,7 @@ This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 
 
 | Target Device | Top / Wrapper | Slice LUTs | FFs | BRAM36 eq. | DSP | WNS | WHS | DRC |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `15,416 / 32,600` (`47.3%`) | `17,445 / 65,200` (`26.8%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | `+0.147 ns` | `+0.036 ns` | `0` Err |
+| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `15,681 / 32,600` (`48.1%`) | `18,084 / 65,200` (`27.7%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | `+0.111 ns` | `+0.016 ns` | `0` Err |
 | **`XCK26-SFVC784-2LV-c`** | `ias2rf_k26_bd_wrapper` (BD) | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` (`0.0%`) | `+1.291 ns` | MET | `0` Err |
 | **`XCK26-SFVC784-2LV-c`** | `kria_top` (PL link core) | `4,629` LUT prims | `6,817` | `0` | `0` | `+1.008 ns` | `+0.017 ns` | `0` Err |
 

@@ -1083,6 +1083,23 @@ found `IF_RX_B` running 9.8 mm beside the filter's output at 0.57 mm (−58 dB a
 for anything arriving on J921/J922). `IF_RX_B` was moved 2.4 mm away, same length: no same-layer copper within
 1.5 mm now. DRC with zones refilled and schematic parity: 0 errors, 0 unconnected, 0 parity problems.
 
+**2. The FPGA's clock, and the DAC clocks without an MMCM (gateware).** Checking where the DAC clocks
+come from found a worse problem: the gateware took `CLK_FPGA` as 100 MHz, while the board gives it the
+400/500 MHz master through the ADCLK948. Its MMCMs would never have locked. Now ([FPGA_GATEWARE.md](FPGA_GATEWARE.md),
+`fpga/artix/clk_mode_ctrl.v`):
+- at power-up the FPGA runs from its own configuration clock (STARTUPE2 CFGMCLK), programs the Si549, sets
+  both MMCMs' input divider through the DRP (÷5 at 500 MHz, ÷4 at 400 MHz), then releases them; the 400/500 MHz
+  switch at run time goes the same way, and the IAS link retrains after it;
+- the XDC constrains `CLK_FPGA` at both 400 and 500 MHz;
+- `DACR_CLK` and `DACS_IQCLK` come from `CLK_FPGA` ÷ 4 (100 / 125 MHz) through a BUFG, no MMCM: Vivado's clock
+  uncertainty on them falls from 0.165 to 0.035 ns, with no MMCM discrete jitter or phase error left. What is
+  left is the master's own jitter and the FPGA's output buffer, to be measured as 9.8 says;
+- with Ethernet on, the GPS discipline of the Si549 is clamped to ±50 ppm (SGMII needs ±100 ppm).
+
+Vivado 2026.1, both builds: WNS +0.111 ns, WHS +0.016 ns, pulse width +0.008 ns, no failing endpoint. Every
+bench passes at 400 and at 500 MHz, `tb_system` included (S1–S6 with Ethernet and IAS1), re-run independently;
+the clamp's mutation fails as it should.
+
 **3. HF on the inputs and outputs without a switch.** J951 (`IF_RX_C`, now filtered) and J952 (`IF_TX_C`,
 DAC2) have no RF switch in their path, so the GaAs switch's behaviour below 10 MHz does not touch them. They are
 the board's HF receive and transmit ports; the gateware makes channel B and DAC2 the SDR's default channels. J911 and J931 still reach the same converters through SW1 and SW3, for use above HF or to compare.
@@ -1103,6 +1120,14 @@ receiver's floor. What is left for the measurement is what the script cannot see
 (8.5 mm apart, edge-mounted, each with its ground vias), coupling through the shared −3V3/+3V3 switch supplies,
 and the converters' own feedthrough. The measurement is unchanged: S21 TX SMA → RX SMA on the first board,
 converters off, then the radar ADC's spectrum with the chirp running.
+
+**5. Thermal margin (the 15 November upgrade, [ENCLOSURE_V2_THERMAL §7](ENCLOSURE_V2_THERMAL.md)).** The Si549's limit in 9.8
+was wrong: its junction limit is 125 °C and its rating is 85 °C *ambient* (data sheet Tables 2.1 and 2.6), so at
+70 °C its junction had 20 °C to spare. The real limit is the KV260 itself: its SOM is the commercial K26C,
+85 °C junction (UG1090). Enclosure v2 now has a 50 × 50 × 15 mm fan, nine more exhaust slots in the back wall
+and taller heatsinks (ENCLOSURE.md §6). Fine-mesh CFD of what is built: **rated 56 °C ambient with the stock
+KV260, 63 °C by the adapter's own parts, 70.9 °C with an industrial K26I SOM**. "70 °C" in this
+documentation now means with a K26I.
 
 ## 10. How it was checked
 

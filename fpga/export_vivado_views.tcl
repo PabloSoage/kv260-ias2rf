@@ -199,6 +199,7 @@ if {$run_mode eq "all" || $run_mode eq "artix"} {
     place_design
     phys_opt_design
     route_design
+    phys_opt_design                                ;# as build_rev06.tcl: the same netlist and WNS as the reports
 
     export_die_json [file join $out_dir "artix7_die_data.json"] "artix_top" "xc7a50t-ftg256-2"
     close_design

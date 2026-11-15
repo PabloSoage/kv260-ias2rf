@@ -464,6 +464,11 @@ for k in range(NR):                                            # right wall, bes
     y = (4.0 if V2 else 22.0) + k * 6.0
     vents.append(box("vr", INNER[5][0] - 1, OUTER[5][0] + 1, y, y + (3.5 if V2 else 3.0),
                      7.5 if V2 else 12.0, 28.5 if V2 else 26.0))
+if V2:
+    # 15 Nov: nine slots in the back wall, over the adapter's regulators, 3.5 x 18 mm, z 10-28, none
+    # between x -51.5 and -31 where the J1001 jack's opening is. The box runs at overpressure: they are exhausts.
+    for x0 in (-85.0, -79.0, -73.0, -67.0, -61.0, -55.0, -31.0, -25.0, -19.5):
+        vents.append(box("vb", x0, x0 + 3.5, INNER[6][1] - 1, OUTER[6][1] + 1, 10.0, 28.0))
 if not V2:                                                     # v2 closes the SMA wall: dust stays out
     for k in range(14):                                        # SMA wall, above the SMAs: air across the adapter
         y = 4.0 + k * 7.0
@@ -476,6 +481,10 @@ cut(lid, join(vents, "vents"))
 # 2.5 mm pilots for M3 self-tapping fan screws from below. Outside: a 58 x 58 x 1.2 mm recess for a 100-mesh
 # stainless filter, held by a printed grille frame (case_v2_filter_frame.stl) with four M2.5 x 6 screws.
 FAN2_C, FAN2, FAN2_P = (-40.0, 14.0), 50.0, 40.0
+# 15 Nov: a 50 x 50 x 15 mm fan, Orion OD5015-05HB (5 V, 0.13 A, 14 CFM, 50 Pa): twice the flow of the
+# 5010 through the filter and the slots. Its top stays under the plenum; its bottom comes down to z 13.75, 1.5 mm
+# over the tallest heatsink (Y401, 8 mm).
+FAN2_T = 15.0
 filter_frame = None
 if V2:
     fx, fy = FAN2_C
@@ -518,22 +527,22 @@ if V2:
     g3 = [spoke_ring("g3", Z_TOP - 2, Z_TOP + 1)]
     g3 +=[cyl("fh", fx + sx * (R2 - 3.0), fy + sy * (R2 - 3.0), Z_TOP - 2, Z_TOP + 1, 2.8) for sx in (-1, 1) for sy in (-1, 1)]
     cut(filter_frame, join(g3, "frame_holes"))
-    # the fan itself, for the renders only (not exported): a 5010 axial fan blowing down onto the adapter.
+    # the fan itself, for the renders only (not exported): a 5015 axial fan blowing down onto the adapter.
     # Frame with rounded corners, venturi bore and four 4.3 mm holes; seven swept, pitched blades on the rotor;
     # the motor hub with its label on the intake side; four struts holding the motor on the exhaust side.
     FANM = mat("fan PBT", (0.035, 0.035, 0.038), 0.55)
     LABEL = mat("fan label", (0.07, 0.07, 0.075), 0.45)        # dark: through the open intake it is in plain view
     sq = [(fx - h, fy - h), (fx + h, fy - h), (fx + h, fy + h), (fx - h, fy + h)]
-    frame = prism("fan2_vis", round_poly(sq, [3.5] * 4), ZF - 10.0, ZF, FANM)
-    cut(frame, cyl("fan2_bore", fx, fy, ZF - 11, ZF + 1, 47.0, verts=96))
-    cut(frame, join([cyl("fan2_hole", fx + sx * 20, fy + sy * 20, ZF - 11, ZF + 1, 4.3, verts=24)
+    frame = prism("fan2_vis", round_poly(sq, [3.5] * 4), ZF - FAN2_T, ZF, FANM)
+    cut(frame, cyl("fan2_bore", fx, fy, ZF - FAN2_T - 1, ZF + 1, 47.0, verts=96))
+    cut(frame, join([cyl("fan2_hole", fx + sx * 20, fy + sy * 20, ZF - FAN2_T - 1, ZF + 1, 4.3, verts=24)
                      for sx in (-1, 1) for sy in (-1, 1)], "fan2_holes"))
-    parts_v = [cyl("fan2_hub", fx, fy, ZF - 9.0, ZF - 0.6, 21.0, FANM, verts=64),
+    parts_v = [cyl("fan2_hub", fx, fy, ZF - FAN2_T + 1.0, ZF - 0.6, 21.0, FANM, verts=64),
                cyl("fan2_label", fx, fy, ZF - 0.6, ZF - 0.5, 15.0, LABEL, verts=64),
-               cyl("fan2_motor", fx, fy, ZF - 10.0, ZF - 9.0, 23.0, FANM, verts=64)]
+               cyl("fan2_motor", fx, fy, ZF - FAN2_T, ZF - FAN2_T + 1.0, 23.0, FANM, verts=64)]
     for k in range(4):                                        # motor struts, exhaust side
         a = math.pi / 4 + k * math.pi / 2
-        st = box("strut", 11.0, 33.0, -1.0, 1.0, ZF - 10.0, ZF - 8.8, FANM)
+        st = box("strut", 11.0, 33.0, -1.0, 1.0, ZF - FAN2_T, ZF - FAN2_T + 1.2, FANM)
         st.rotation_euler = (0, 0, a)
         st.location = (fx * MM, fy * MM, 0)
         parts_v.append(st)
@@ -550,8 +559,8 @@ if V2:
             for j in range(NS + 1):
                 s = j / NS
                 th = a0 + s * math.radians(50) + (r - 10.2) * 0.018
-                pitch = 6.4 - 1.6 * (r - 10.2) / 12.8
-                z = ZF - 5.0 + (0.5 - s) * pitch
+                pitch = (6.4 - 1.6 * (r - 10.2) / 12.8) * FAN2_T / 10.0
+                z = ZF - FAN2_T / 2 + (0.5 - s) * pitch
                 row.append(bm.verts.new((fx + r * math.cos(th), fy + r * math.sin(th), z)))
             grid.append(row)
         for i in range(NR):

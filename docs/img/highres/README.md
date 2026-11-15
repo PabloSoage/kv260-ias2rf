@@ -64,7 +64,7 @@ Generated directly from post-route Vivado 2026.1 checkpoints ([`docs/FPGA_GATEWA
 - **Bare Adapter PCB (`3840 × 2160` KiCad raytrace):**
   - [`board_iso_4k.png`](renders/board_iso_4k.png) · [`board_top_4k.png`](renders/board_top_4k.png) · [`board_bottom_4k.png`](renders/board_bottom_4k.png)
 - **Heatsink Placement, Envelope & Sizing (`3840 × 2160` Cycles + Vector Map):**
-  - [`board_heatsinks_4k.jpg`](renders/board_heatsinks_4k.jpg) (annotated 4K overview with ghosted `50 × 50 × 10 mm` overhead fan)
+  - [`board_heatsinks_4k.jpg`](renders/board_heatsinks_4k.jpg) (annotated 4K overview with ghosted `50 × 50 × 15 mm` overhead fan)
   - [`board_heatsinks_clean_4k.jpg`](renders/board_heatsinks_clean_4k.jpg) (clean 4K render without overlays)
   - [`board_heatsinks_closeup_4k.jpg`](renders/board_heatsinks_closeup_4k.jpg) (4K macro on `HS1`–`HS4` showing `4.0 mm` air gap between `HS2` `U401` and `HS3` `Y401`)
   - [`heatsink_mechanical_map.svg`](renders/heatsink_mechanical_map.svg) (vector CAD keep-out, height budget, and sizing table)

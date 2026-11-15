@@ -105,17 +105,17 @@ def main():
     mat_fan   = make_metal_mat("FanEnvelope", (0.02, 0.11, 0.19, 1.0),    metallic=0.5, roughness=0.45)
 
     # Mounted heatsinks matching assembly.blend exact IC top surfaces (meters):
-    # HS1: U501 AD9484 14x14x6 mm at (-51.8, +10.55) mm, IC top z=3.34 mm
-    add_finned_heatsink("HS1_U501_AD9484",  -0.05180,  0.01055, 0.00334, 0.014, 0.014, 0.006, 7, mat_black, mat_pad)
-    # HS2: U401 ADCLK948 9x7x5 mm shifted -1.0 mm Y -> cy=-1.2 mm, IC top z=3.15 mm
-    add_finned_heatsink("HS2_U401_ADCLK948",-0.03490, -0.00120, 0.00315, 0.009, 0.007, 0.005, 5, mat_blue,  mat_pad)
-    # HS3: Y401 Si549 9x7x5 mm shifted +1.0 mm Y -> cy=+9.8 mm, IC top z=3.99 mm -> 4.0 mm air gap!
-    add_finned_heatsink("HS3_Y401_Si549",   -0.03500,  0.00980, 0.00399, 0.009, 0.007, 0.005, 5, mat_blue,  mat_pad)
+    # HS1: U501 AD9484 14x14x8.5 mm at (-51.8, +10.55) mm, IC top z=3.34 mm (8.5 mm since 15 Nov)
+    add_finned_heatsink("HS1_U501_AD9484",  -0.05180,  0.01055, 0.00334, 0.014, 0.014, 0.0085, 7, mat_black, mat_pad)
+    # HS2: U401 ADCLK948 9x7x8 mm shifted -1.0 mm Y -> cy=-1.2 mm, IC top z=3.15 mm
+    add_finned_heatsink("HS2_U401_ADCLK948",-0.03490, -0.00120, 0.00315, 0.009, 0.007, 0.008, 5, mat_blue,  mat_pad)
+    # HS3: Y401 Si549 9x7x8 mm shifted +1.0 mm Y -> cy=+9.8 mm, IC top z=3.99 mm -> 4.0 mm air gap!
+    add_finned_heatsink("HS3_Y401_Si549",   -0.03500,  0.00980, 0.00399, 0.009, 0.007, 0.008, 5, mat_blue,  mat_pad)
     # HS4: U1101 XC7A50T 14x14x5 mm optional low-profile at (-42.75, +40.0) mm, IC top z=3.84 mm
     add_finned_heatsink("HS4_U1101_XC7A50T",-0.04275,  0.04000, 0.00384, 0.014, 0.014, 0.005, 8, mat_cu,    mat_pad)
 
-    # Overhead 50x50x10 mm Fan Wireframe Cage at (-40.0, +14.0) mm, z in [18.8, 28.8] mm (no hazy glass panes)
-    fan_obj = add_wireframe_box("ENCLOSURE_FAN_50MM_ENVELOPE", -0.040, 0.014, 0.0188, 0.050, 0.050, 0.010, 0.0007, mat_fan)
+    # Overhead 50x50x15 mm Fan Wireframe Cage (OD5015, since 15 Nov) at (-40.0, +14.0) mm, z in [13.75, 28.75] mm
+    fan_obj = add_wireframe_box("ENCLOSURE_FAN_50MM_ENVELOPE", -0.040, 0.014, 0.01375, 0.050, 0.050, 0.015, 0.0007, mat_fan)
 
     # Hero isometric view showing both ADAPTER heatsinks (left) & KV260 OEM heatsink (right)
     cam_hero = add_camera("Cam_Heatsinks_Hero", (-0.115, -0.145, 0.135), (0.008, 0.028, 0.006), lens_mm=44.0)
@@ -124,9 +124,9 @@ def main():
 
     # Project 3D anchor points for annotated callout overlay
     anchors_world = {
-        "HS1_U501":  (-0.05180,  0.01055, 0.0095),
-        "HS2_U401":  (-0.03490, -0.00120, 0.0083),
-        "HS3_Y401":  (-0.03500,  0.00980, 0.0091),
+        "HS1_U501":  (-0.05180,  0.01055, 0.0120),
+        "HS2_U401":  (-0.03490, -0.00120, 0.0113),
+        "HS3_Y401":  (-0.03500,  0.00980, 0.0121),
         "GAP_4MM":   (-0.03500,  0.00430, 0.0052),
         "HS4_U1101": (-0.04275,  0.04000, 0.0090),
         "HS5_K26":   ( 0.08600,  0.04700, 0.0250),
