@@ -12,7 +12,8 @@ An adapter board for the **AMD Kria KV260 Vision AI Starter Kit**. It plugs into
 camera connector and carries the converters, a common clock and a front-end FPGA. It serves two
 signal chains:
 
-- **Software-defined radio**: HF, AM, FM, airband, amateur bands and PMR446. Receive, and
+- **Software-defined radio**: HF to 30 MHz directly; FM, airband, VHF/UHF amateur bands and PMR446 through
+  an external converter until the Rev08 receive front end ([plan](docs/REV08_PLAN.md)). Receive, and
   transmit on the bands a licence covers.
 - **Radar at 10.5 GHz**: the IF of the X-band chain from the open
   [AERIS-10 / PLFM_RADAR](https://github.com/NawfalMotii79/PLFM_RADAR) project, with ADAR1000
@@ -213,7 +214,7 @@ adapter board.** If that is what you want, use the original project.
 
 Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to-end mixed-signal/digital XSim co-simulation ([`fpga/`](fpga/), full specification in [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)):
 
-- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct `0–62.5 MHz` HF/CB bypass path (`stream_id = 8'h03`) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`) for `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`), and `UHF` IF segments, paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
+- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct HF/CB bypass path (`stream_id = 8'h03`; first Nyquist zone `0–31.25 MHz` at `62.5 MSPS`, `0–25 MHz` at `50 MSPS`, and `0–30 MHz` on `J951` behind its low-pass) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`); `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`) and `UHF` reach it only as the IF of an external converter until Rev08, paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
 - **AERIS-10 X-Band Radar (`10.5 GHz` / `20 km` / `8× ADAR1000`):** `400 MSPS` `AD9484` IF capture into the verbatim `AERIS-10 / PLFM_RADAR` (`62d4c55`) 400 -> 100 MSPS I/Q DDC (`stream_id = 8'h01`), `AD9708` chirp DAC (`DAC_RADAR`), `ADF4382` LO + `8× ADAR1000` beamformer SPI controller (`u_adar_ctrl`), and `u_rf_switch` T/R sequencing.
 - **High-Speed Interconnect:** Dual-lane Clause-49 `64B/66B` `IAS1` LVDS (`1.0–1.25 Gb/s` per lane, `2.0–2.5 Gb/s` uplink + `0.5–1.0 Gb/s` downlink) plus dedicated-pin `1000BASE-T` SGMII/UDP over `U1201 RTL8211FSI` (`~2.94 Gb/s` combined).
 
