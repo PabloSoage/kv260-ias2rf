@@ -34,7 +34,7 @@ module adc_peak #(
     input  wire         valid,
     input  wire         ovr,
     output reg          peak_tog,       // toggles once per window
-    output reg  [127:0] peak_set        // bit k set: a sample of magnitude k in the window; steady between toggles
+    output reg  [127:0] peak_set = 128'd0 // bit k set: a sample of magnitude k in the window; steady between toggles
 );
     // At 400/500 MHz a compare-and-select running maximum does not close in one cycle, so the window's peak is
     // kept as a set: each sample's magnitude becomes a one-hot bit (a decoder, no feedback) and the window ORs them
@@ -45,13 +45,16 @@ module adc_peak #(
     //   stage 3  OR into the window's set; at the window's end, hand it over (over-range sets bit 127)
     reg [WIN_LOG2-1:0] n;
     reg                v1, o1, last1, o2, last2;
-    reg [6:0]          m1;
-    reg [127:0]        oh2, hits;
+    // the 128-bit data registers start from their power-up value and take no reset: a reset fanned out to
+    // 3 x 128 flip-flops did not reach them within the 400 MHz cycle. After a reset the first window may carry
+    // stale bits, which only delays the AGC's first step by one window.
+    reg [6:0]          m1 = 7'd0;
+    reg [127:0]        oh2 = 128'd0, hits = 128'd0;
     wire [7:0]         s = code ^ 8'h80;
     always @(posedge clk) begin
         if (rst) begin
             n <= 0; v1 <= 1'b0; o1 <= 1'b0; last1 <= 1'b0; o2 <= 1'b0; last2 <= 1'b0;
-            m1 <= 7'd0; oh2 <= 128'd0; hits <= 128'd0; peak_tog <= 1'b0; peak_set <= 128'd0;
+            peak_tog <= 1'b0;
         end else begin
             v1    <= valid;
             o1    <= ovr && valid;
