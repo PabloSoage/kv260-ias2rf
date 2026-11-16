@@ -306,9 +306,21 @@ Each was optimised as a 7th-order elliptic ladder with lossy inductors, the meth
 | FM reject, for airband and VHF | 118–170 MHz | 87–108 MHz | 55 | 0.5–3.2 dB | **≥ 44.9 dB** |
 | UHF image filter | 400–480 MHz | from 660 MHz | 60 | 0.5–1.4 dB | **≥ 50.4 dB** |
 
-All three meet their masks. Not done yet: snapping to catalogue values and the tolerance Monte Carlo. The
-FM-reject filter has a 9 % transition (108 → 118 MHz) and will be the sensitive one; it sits after the LNA,
-where 3 dB of loss costs nothing.
+All three meet their masks with ideal values. **Phase 3 (16 November): catalogue values and tolerance Monte Carlo**
+(`_work/sim/rev08_filters_mc.py`, 2,000 samples, L ±2 % LQW15AN/LQW18AN, C0G ±0.1 pF below 10 pF and ±2 % above,
+pads 0.10 ± 0.05 pF) [V arithmetic on E parts data]:
+
+| Filter | Parts | Loss in band, p99 | Rejection, p1 | Verdict |
+|---|---|---|---|---|
+| Anti-alias, 7th order | 11 pF, 56 nH ‖ 5.6 pF, 22 pF, 62 nH ‖ 7.5 pF, 24 pF, 75 nH ‖ 1.2 pF, 20 pF | 2.2 dB (at 170 MHz) | **56.0 dB** (mask 55) | Pass; 0.7 dB more edge loss than the ideal, after the mixer where it costs nothing |
+| UHF image, 7th order | 6.2 pF, 22 nH ‖ 1.8 pF, 6.8 pF, 27 nH ‖ 2 pF, 6.8 pF, 22 nH ‖ 0.4 pF, 1.3 pF | 2.4 dB | **50.7 dB** (mask 50) | Pass, 90 % yield; needs the ±0.1 pF parts (with ±0.25 pF: 45 dB) |
+| FM reject, 7th order | — | 7.3 dB | 34.4 dB | **Fails G2**: a 9 % transition does not survive ±2 % parts |
+| **FM reject, 9th order (adopted)** | 18 pF, 68 nH + 110 pF, 13 pF, 82 nH + 36 pF, 18 pF, 100 nH + 24 pF, 24 pF, 220 nH + 10 pF, 91 pF | ≤ 3.1 dB from 121.5 MHz up; 4.1–6.7 dB at 118–120 MHz | **42.5 dB** (gate 40) | **G2 passed.** 13 parts instead of 10. The edge costs about 1 dB of noise figure on the lowest 2 MHz of the airband in a worst-case unit |
+
+No commercial FM band-stop filter is stocked (searched 16 November); higher inductor Q does not help, since the
+tolerances, not the losses, set the edge.
+
+![Filters with catalogue parts and Monte Carlo](img/rev08_filters_mc.png)
 
 ### 5.5 Sensitivity and range
 
@@ -500,7 +512,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 0 | Decisions (section 12) | — | Done, 16 November |
 | 1 | Audit corrections A-1 to A-6, and G-1 (debug UART) | Rebuild: timing with the corrected clocks; the existing benches at both clock modes; a new bench for the UART with a mutation; documents and PDF regenerated | Independent of the rest; can be merged as Rev07 gateware |
 | 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work.** Passed 16 November (section 11.4) |
-| 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances** |
+| 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances.** Passed 16 November with a 9th-order filter (section 5.4); the RFFC5072 data sheet and loop filter are still open |
 | 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | — |
 | 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | — |
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **G3: LO and IF-line coupling into either ADC below the Rev07 isolation figure** |
