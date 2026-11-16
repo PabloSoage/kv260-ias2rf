@@ -1,14 +1,14 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Mon Nov 16 14:46:46 2026
+| Date         : Mon Nov 16 21:21:20 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
-| Command      : report_methodology -file D:/Repos/kv260-ias2rf/fpga/artix/reports_rev06/methodology.rpt
+| Command      : report_methodology -file build/g32/fpga/artix/reports_rev06/methodology.rpt
 | Design       : artix_top
 | Device       : xc7a50tftg256-2
 | Speed File   : -2
 | Design State : Fully Routed
----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Report Methodology
 
@@ -23,12 +23,12 @@ Table of Contents
           Floorplan: design_1
       Design limits: <entire design considered>
              Max checks: <unlimited>
-             Checks found: 51
+             Checks found: 83
 +-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
 | Rule      | Severity | Description                                                                                           | Checks |
 +-----------+----------+-------------------------------------------------------------------------------------------------------+--------+
 | LUTAR-1   | Warning  | LUT drives async reset alert                                                                          | 6      |
-| PDRC-190  | Warning  | Suboptimally placed synchronized register chain                                                       | 4      |
+| PDRC-190  | Warning  | Suboptimally placed synchronized register chain                                                       | 36     |
 | SYNTH-6   | Warning  | Timing of a RAM block might be sub-optimal                                                            | 18     |
 | TIMING-9  | Warning  | Unknown CDC Logic                                                                                     | 1      |
 | TIMING-10 | Warning  | Missing property on synchronizer                                                                      | 1      |
@@ -74,7 +74,7 @@ Related violations: <none>
 
 LUTAR-1#6 Warning
 LUT drives async reset alert  
-LUT cell u_pmod_spi/gen_rev06_eth.eth_rst_312_s[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) gen_rev06_eth.eth_rst_125_s_reg[0]/PRE,
+LUT cell u_pmod_spi/gen_rev06_eth.eth_rst_125_s[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) gen_rev06_eth.eth_rst_125_s_reg[0]/PRE,
 gen_rev06_eth.eth_rst_125_s_reg[1]/PRE,
 gen_rev06_eth.eth_rst_125_s_reg[2]/PRE,
 gen_rev06_eth.eth_rst_312_s_reg[0]/PRE,
@@ -84,22 +84,182 @@ Related violations: <none>
 
 PDRC-190#1 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X36Y52 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[5] in site SLICE_X31Y60 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[5] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#2 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X37Y53 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[6] in site SLICE_X30Y64 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[6] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#3 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X36Y55 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[7] in site SLICE_X32Y61 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[7] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 PDRC-190#4 Warning
 Suboptimally placed synchronized register chain  
-The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X32Y64 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
+The FDRE cell dl_tap_sync1_reg[8] in site SLICE_X34Y65 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell dl_tap_sync2_reg[8] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#5 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[0] in site SLICE_X53Y121 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[0] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#6 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[10] in site SLICE_X50Y117 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[10] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#7 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[11] in site SLICE_X49Y118 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[11] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#8 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[12] in site SLICE_X51Y119 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[12] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#9 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[13] in site SLICE_X52Y118 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[13] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#10 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[14] in site SLICE_X52Y120 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[14] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#11 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[15] in site SLICE_X41Y119 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[15] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#12 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[16] in site SLICE_X50Y119 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[16] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#13 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[17] in site SLICE_X48Y116 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[17] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#14 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[18] in site SLICE_X52Y120 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[18] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#15 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[19] in site SLICE_X53Y119 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[19] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#16 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[1] in site SLICE_X57Y122 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[1] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#17 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[20] in site SLICE_X48Y118 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[20] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#18 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[21] in site SLICE_X41Y116 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[21] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#19 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[22] in site SLICE_X52Y116 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[22] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#20 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[23] in site SLICE_X49Y116 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[23] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#21 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[24] in site SLICE_X51Y117 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[24] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#22 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[25] in site SLICE_X53Y117 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[25] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#23 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[26] in site SLICE_X55Y119 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[26] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#24 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[27] in site SLICE_X54Y116 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[27] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#25 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[28] in site SLICE_X56Y117 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[28] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#26 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[29] in site SLICE_X55Y115 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[29] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#27 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[2] in site SLICE_X56Y119 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[2] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#28 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[30] in site SLICE_X55Y121 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[30] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#29 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[31] in site SLICE_X55Y117 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[31] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#30 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[3] in site SLICE_X54Y118 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[3] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#31 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[4] in site SLICE_X57Y120 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[4] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#32 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[5] in site SLICE_X57Y118 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[5] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#33 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[6] in site SLICE_X56Y121 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[6] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#34 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[7] in site SLICE_X51Y121 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[7] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#35 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[8] in site SLICE_X54Y118 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[8] is not placed in the same (SLICE) site.
+Related violations: <none>
+
+PDRC-190#36 Warning
+Suboptimally placed synchronized register chain  
+The FDRE cell u_ddc/u_ddc/ftw_ovrd_s1_reg[9] in site SLICE_X49Y120 is part of a synchronized register chain that is suboptimally placed as the load FDRE cell u_ddc/u_ddc/ftw_ovrd_s2_reg[9] is not placed in the same (SLICE) site.
 Related violations: <none>
 
 SYNTH-6#1 Warning
@@ -304,7 +464,7 @@ Related violations: <none>
 
 ULMTCS-1#1 Warning
 Control Sets use limits recommend reduction  
-This design uses 996 control sets (vs. available limit of 8150, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
+This design uses 1049 control sets (vs. available limit of 8150, determined by 1 control set per CLB). This exceeds the control set use guideline of 7.5 percent. This is at a level where reduction is RECOMMENDED (see UG949). Use report_control_sets to get more details.
 Related violations: <none>
 
 

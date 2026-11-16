@@ -27,7 +27,9 @@ synth_design -top artix_top -part xc7a50t-ftg256-2 -flatten_hierarchy rebuilt \
     -generic GIT_HASH=32'h$git_hash
 opt_design
 place_design
-phys_opt_design
+# Post-place physical optimisation without -dsp_register_opt: that pass pulled the AERIS mixer's AREG out of the
+# DSP48 into a slice, which left a fabric -> DSP multiplier path short of the 2.5 ns cycle (WNS -0.146 ns).
+phys_opt_design -fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime     -shift_register_opt -bram_register_opt -hold_fix
 route_design
 phys_opt_design
 
