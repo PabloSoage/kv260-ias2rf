@@ -45,8 +45,10 @@ module hk_xo_ctrl #(
     input  wire        delta_start,
     input  wire [23:0] delta_m,
 
-    // Generic raw Si549 register read/write (when idle)
+    // Generic raw register read/write (when idle). raw_req_dev = 0 addresses the Si549; any other value is the
+    // 7-bit address of another device on the bus (Rev08 G-2: the two TCA6416A expanders, 0x20 and 0x21)
     input  wire        raw_req_valid,
+    input  wire [6:0]  raw_req_dev,
     output wire        raw_req_ready,
     input  wire        raw_req_rw,    // 0 = Write, 1 = Read
     input  wire [7:0]  raw_req_reg,
@@ -54,6 +56,18 @@ module hk_xo_ctrl #(
     output reg         raw_resp_valid,
     output reg  [7:0]  raw_resp_rdata,
     output reg         raw_resp_err,
+
+    // Rev08 G-2: a second client, the front-end sequencer (fe_ctrl), with the core's full transaction shape.
+    // Priority: Si549 preset > delta-M > raw > this port. Nothing is sent unless a client asks.
+    input  wire        gen_req_valid,
+    output wire        gen_req_ready,
+    input  wire [6:0]  gen_req_dev,
+    input  wire [2:0]  gen_req_wr_len,
+    input  wire [31:0] gen_req_wdata,
+    input  wire [1:0]  gen_req_rd_len,
+    output reg         gen_resp_valid,
+    output reg  [15:0] gen_resp_rdata,
+    output reg         gen_resp_err,
 
     // Status
     output reg         busy,
@@ -90,6 +104,7 @@ module hk_xo_ctrl #(
     wire       core_resp_valid;
     wire       core_resp_ack_err;
     wire [15:0] core_resp_rdata;
+    reg  [6:0]  core_dev;
 
     hk_i2c_core #(
         .CLK_DIV (CLK_DIV)
@@ -98,7 +113,7 @@ module hk_xo_ctrl #(
         .rst          (rst),
         .cmd_valid    (core_cmd_valid),
         .cmd_ready    (core_cmd_ready),
-        .cmd_dev_addr (SI549_ADDR),
+        .cmd_dev_addr (core_dev),
         .cmd_wr_len   (core_wr_len),
         .cmd_wdata    (core_wdata),
         .cmd_rd_len   (core_rd_len),
@@ -118,7 +133,8 @@ module hk_xo_ctrl #(
         ST_FCAL_WAIT  = 3'd3,
         ST_DELTA_SEND = 3'd4,
         ST_DELTA_WAIT = 3'd5,
-        ST_RAW_WAIT   = 3'd6;
+        ST_RAW_WAIT   = 3'd6,
+        ST_GEN_WAIT   = 3'd7;
 
     reg [2:0]  state;
     reg [3:0]  step_idx;
@@ -163,6 +179,7 @@ module hk_xo_ctrl #(
     endfunction
 
     assign raw_req_ready = (state == ST_IDLE) && core_cmd_ready && !prog_start && !delta_start;
+    assign gen_req_ready = (state == ST_IDLE) && core_cmd_ready && !prog_start && !delta_start && !raw_req_valid;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -185,14 +202,20 @@ module hk_xo_ctrl #(
             raw_resp_valid   <= 1'b0;
             raw_resp_rdata   <= 8'd0;
             raw_resp_err     <= 1'b0;
+            core_dev         <= SI549_ADDR;
+            gen_resp_valid   <= 1'b0;
+            gen_resp_rdata   <= 16'd0;
+            gen_resp_err     <= 1'b0;
         end else begin
             core_cmd_valid <= 1'b0;
             raw_resp_valid <= 1'b0;
+            gen_resp_valid <= 1'b0;
 
             case (state)
                 ST_IDLE: begin
                     busy <= 1'b0;
                     if (core_cmd_ready) begin
+                        core_dev <= SI549_ADDR;
                         if (prog_start) begin
                             lat_freq_500m <= prog_freq_500m;
                             step_idx      <= 4'd0;
@@ -222,6 +245,7 @@ module hk_xo_ctrl #(
                             state       <= ST_DELTA_SEND;
                         end else if (raw_req_valid) begin
                             core_cmd_valid <= 1'b1;
+                            core_dev       <= (raw_req_dev == 7'd0) ? SI549_ADDR : raw_req_dev;
                             if (raw_req_rw) begin
                                 core_wr_len <= 3'd1;
                                 core_wdata  <= {24'd0, raw_req_reg};
@@ -233,7 +257,29 @@ module hk_xo_ctrl #(
                             end
                             busy  <= 1'b1;
                             state <= ST_RAW_WAIT;
+                        end else if (gen_req_valid) begin
+                            core_cmd_valid <= 1'b1;
+                            core_dev       <= gen_req_dev;
+                            core_wr_len    <= gen_req_wr_len;
+                            core_wdata     <= gen_req_wdata;
+                            core_rd_len    <= gen_req_rd_len;
+                            busy           <= 1'b1;
+                            state          <= ST_GEN_WAIT;
                         end
+                    end
+                end
+
+                ST_GEN_WAIT: begin
+                    if (core_resp_valid) begin
+                        gen_resp_valid <= 1'b1;
+                        gen_resp_rdata <= core_resp_rdata;
+                        gen_resp_err   <= core_resp_ack_err;
+                        if (core_resp_ack_err) begin
+                            ack_err <= 1'b1;
+                            if (ack_err_cnt != 16'hFFFF)
+                                ack_err_cnt <= ack_err_cnt + 16'd1;
+                        end
+                        state <= ST_IDLE;
                     end
                 end
 

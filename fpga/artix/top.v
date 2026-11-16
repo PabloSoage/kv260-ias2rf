@@ -1466,6 +1466,17 @@ module artix_top #(
     reg         reg_xo_delta_p;
     reg  [23:0] reg_xo_delta_m;
     reg  [31:0] reg_xo_raw_cmd;
+    // Rev08 G-2/G-3/G-6: front-end control (fe_ctrl in clk_mode_ctrl), CSR page 0x100
+    reg  [31:0] reg_fe_cmd;
+    reg         reg_fe_cmd_p;
+    reg  [31:0] reg_fe_led_ctrl;          // 0x11C: [0] LED auto-map on, [15:8] LED override value, [1] override
+    reg  [7:0]  fe_led_sent;
+    reg  [23:0] fe_led_hold;
+    reg         fe_led_p;
+    wire        fe_busy;
+    wire [31:0] fe_stat;
+    wire [15:0] fe_rffc;
+    wire [7:0]  fe_led_want;
     reg         reg_xo_raw_p;
     reg         xo_raw_valid_sticky;
     reg  [7:0]  xo_raw_rdata_hold;
@@ -2150,6 +2161,12 @@ module artix_top #(
         .raw_req_rw          (reg_xo_raw_cmd[16]),
         .raw_req_reg         (reg_xo_raw_cmd[7:0]),
         .raw_req_wdata       (reg_xo_raw_cmd[15:8]),
+        .raw_req_dev         (reg_xo_raw_cmd[23:17]),
+        .fe_cmd_p            (reg_fe_cmd_p | fe_led_p),
+        .fe_cmd_word         (reg_fe_cmd_p ? reg_fe_cmd : {4'h7, 20'd0, fe_led_want}),
+        .fe_busy_link        (fe_busy),
+        .fe_stat_link        (fe_stat),
+        .fe_rffc_link        (fe_rffc),
         .raw_req_ready_link  (xo_raw_req_ready),
         .raw_resp_valid_link (xo_raw_resp_valid),
         .raw_resp_rdata_link (xo_raw_resp_rdata),
@@ -2185,10 +2202,50 @@ module artix_top #(
     wire        uart_rx_idle_high, uart_tx_busy, uart_banner_done;
     wire [4:0]  uart_rx_ferr_cnt;
 
-    // Register File 0x00..0xFC Read Mux
+    // Rev08 G-6: status LEDs D1501..D1508 on U1501 (RX_VU_SPEC section 2), bit 0 = D1501. Written on change,
+    // at most every 100 ms; FE_LED_CTRL[0] = 0 stops it (no bus traffic at all), [1] shows [15:8] instead.
+    localparam [23:0] FE_LED_HOLD = 24'd12_500_000;
+    wire [7:0] fe_led_auto = {xo_ack_err | fe_stat[31] | adc_err_sync[1],      // ERR (red)
+                              reg_dacs_ctrl[0] | dacr_chirp_active,           // TX (red)
+                              fe_stat[30] & fe_stat[12],                      // LO lock, as of the last POLL (green)
+                              adcs_clip_sticky,                               // ADC-S clip, sticky (red)
+                              adcr_or_sticky,                                 // ADC-R over-range, sticky (red)
+                              dl_up_sync[1] & adc_tr_sync[1],                 // LINK (green)
+                              xo_active_500m,                                 // CLK: on = 500 MHz (yellow)
+                              xo_boot_done & ~xo_boot_err};                   // CFG (green)
+    assign fe_led_want = reg_fe_led_ctrl[1] ? reg_fe_led_ctrl[15:8] : fe_led_auto;
+    always @(posedge link_clk) begin
+        if (link_rst) begin
+            fe_led_sent <= 8'd0;
+            fe_led_hold <= 24'd0;
+            fe_led_p    <= 1'b0;
+        end else begin
+            fe_led_p <= 1'b0;
+            if (fe_led_hold != 24'd0)
+                fe_led_hold <= fe_led_hold - 24'd1;
+            else if (reg_fe_led_ctrl[0] && fe_led_want != fe_led_sent && !fe_busy && !reg_fe_cmd_p && !fe_led_p) begin
+                fe_led_p    <= 1'b1;
+                fe_led_sent <= fe_led_want;
+                fe_led_hold <= FE_LED_HOLD;
+            end
+        end
+    end
+
+    // Register File Read Mux: page 0 (0x00..0xFC) and page 1 (0x100..0x1FC, Rev08); anything above reads 0
     function [31:0] reg_rd_word;
         input [15:0] addr;
         begin
+            if (addr[15:8] == 8'h01) begin
+                case (addr[7:2])
+                    6'h04: reg_rd_word = reg_fe_cmd;                                    // 0x110 FE_CMD
+                    6'h05: reg_rd_word = {fe_stat[31:29], fe_busy, fe_stat[27:0]};       // 0x114 FE_STAT
+                    6'h06: reg_rd_word = {16'd0, fe_rffc};                              // 0x118 FE_RFFC
+                    6'h07: reg_rd_word = {fe_led_sent, reg_fe_led_ctrl[23:0]};          // 0x11C FE_LED_CTRL
+                    default: reg_rd_word = 32'd0;
+                endcase
+            end else if (addr[15:8] != 8'h00) begin
+                reg_rd_word = 32'd0;
+            end else
             case (addr[7:2])
                 6'h00: reg_rd_word = {23'd0, spi_ctrl_fallback_en, 1'b0,
                                       1'b0, spi_ctrl_prbs7_rx_chk_en, spi_ctrl_prbs7_tx_en,
@@ -2399,6 +2456,9 @@ module artix_top #(
             reg_xo_delta_p         <= 1'b0;
             reg_xo_delta_m         <= 24'd0;
             reg_xo_raw_cmd         <= 32'd0;
+            reg_fe_cmd             <= 32'd0;
+            reg_fe_cmd_p           <= 1'b0;
+            reg_fe_led_ctrl        <= 32'h0000_0001;     // LED auto-map on
             reg_xo_raw_p           <= 1'b0;
             xo_raw_valid_sticky    <= 1'b0;
             xo_raw_rdata_hold      <= 8'd0;
@@ -2425,6 +2485,7 @@ module artix_top #(
             reg_xo_prog_p        <= 1'b0;
             reg_xo_delta_p       <= 1'b0;
             reg_xo_raw_p         <= 1'b0;
+            reg_fe_cmd_p         <= 1'b0;
             reg_pps_clear_p      <= 1'b0;
             reg_clip_ovf_clr_p   <= 1'b0;
             reg_uart_force_stat_p<= 1'b0;
@@ -2501,7 +2562,17 @@ module artix_top #(
                 resp_pkt_seq  <= resp_pkt_seq + 32'd1;
             end
 
-            if (reg_wr_en) begin
+            if (reg_wr_en && reg_wr_addr[15:8] == 8'h01) begin
+                case (reg_wr_addr[7:2])
+                    6'h04: begin // 0x110 FE_CMD
+                        reg_fe_cmd   <= reg_wr_wdata;
+                        reg_fe_cmd_p <= 1'b1;
+                    end
+                    6'h07: reg_fe_led_ctrl <= reg_wr_wdata; // 0x11C FE_LED_CTRL
+                    default: ;
+                endcase
+            end
+            if (reg_wr_en && reg_wr_addr[15:8] == 8'h00) begin
                 case (reg_wr_addr[7:2])
                     6'h0D: begin // 0x34 ADCS_CTRL
                         reg_adcs_ctrl   <= reg_wr_wdata;

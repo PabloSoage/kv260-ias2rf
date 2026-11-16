@@ -66,6 +66,7 @@ module clk_mode_ctrl #(
     input  wire        raw_req_rw,
     input  wire [7:0]  raw_req_reg,
     input  wire [7:0]  raw_req_wdata,
+    input  wire [6:0]  raw_req_dev,      // 0 = Si549; else another device on the XO bus (Rev08 G-2)
 
     output reg         raw_req_ready_link  = 1'b1,
     output reg         raw_resp_valid_link = 1'b0,
@@ -83,6 +84,13 @@ module clk_mode_ctrl #(
     output wire        xo_use_ext_clk_link,
     output wire        xo_req_500m_link,
     output reg  [15:0] xo_ack_err_cnt_link = 16'd0,
+
+    // Rev08 front-end control (fe_ctrl): FE_CMD write and status, link clock side
+    input  wire        fe_cmd_p,
+    input  wire [31:0] fe_cmd_word,
+    output wire        fe_busy_link,
+    output wire [31:0] fe_stat_link,
+    output wire [15:0] fe_rffc_link,
 
     // External Si549 + CLK_SEL open-drain pins
     output wire        clk_sel_t,
@@ -171,6 +179,7 @@ module clk_mode_ctrl #(
     reg        req_raw_rw_link    = 1'b0;
     reg [7:0]  req_raw_reg_link   = 8'd0;
     reg [7:0]  req_raw_wdata_link = 8'd0;
+    reg [6:0]  req_raw_dev_link   = 7'd0;
 
     always @(posedge link_clk) begin
         if (link_rst) begin
@@ -195,6 +204,7 @@ module clk_mode_ctrl #(
                 req_raw_rw_link    <= raw_req_rw;
                 req_raw_reg_link   <= raw_req_reg;
                 req_raw_wdata_link <= raw_req_wdata;
+                req_raw_dev_link   <= raw_req_dev;
                 req_raw_tog_link   <= ~req_raw_tog_link;
             end
         end
@@ -247,6 +257,13 @@ module clk_mode_ctrl #(
     reg        xo_raw_rw_cfg      = 1'b0;
     reg [7:0]  xo_raw_reg_cfg     = 8'd0;
     reg [7:0]  xo_raw_wdata_cfg   = 8'd0;
+    reg [6:0]  xo_raw_dev_cfg     = 7'd0;
+    wire        fe_g_valid, fe_g_ready, fe_g_rvalid, fe_g_rerr;
+    wire [6:0]  fe_g_dev;
+    wire [2:0]  fe_g_wl;
+    wire [31:0] fe_g_wd;
+    wire [1:0]  fe_g_rl;
+    wire [15:0] fe_g_rd;
 
     wire       xo_raw_ready_cfg;
     wire       xo_raw_resp_valid_cfg, xo_raw_resp_err_cfg;
@@ -274,6 +291,16 @@ module clk_mode_ctrl #(
         .raw_req_rw       (xo_raw_rw_cfg),
         .raw_req_reg      (xo_raw_reg_cfg),
         .raw_req_wdata    (xo_raw_wdata_cfg),
+        .raw_req_dev      (xo_raw_dev_cfg),
+        .gen_req_valid    (fe_g_valid),
+        .gen_req_ready    (fe_g_ready),
+        .gen_req_dev      (fe_g_dev),
+        .gen_req_wr_len   (fe_g_wl),
+        .gen_req_wdata    (fe_g_wd),
+        .gen_req_rd_len   (fe_g_rl),
+        .gen_resp_valid   (fe_g_rvalid),
+        .gen_resp_rdata   (fe_g_rd),
+        .gen_resp_err     (fe_g_rerr),
         .raw_resp_valid   (xo_raw_resp_valid_cfg),
         .raw_resp_rdata   (xo_raw_resp_rdata_cfg),
         .raw_resp_err     (xo_raw_resp_err_cfg),
@@ -287,6 +314,28 @@ module clk_mode_ctrl #(
         .xo_scl_in        (xo_scl_in),
         .xo_sda_t         (xo_sda_t),
         .xo_sda_in        (xo_sda_in)
+    );
+
+    // Rev08 G-2/G-3/G-6: front-end expanders, RFFC5072 and PE4312 sequencer on hk_xo_ctrl's client port
+    fe_ctrl u_fe_ctrl (
+        .link_clk       (link_clk),
+        .link_rst       (link_rst),
+        .cmd_p          (fe_cmd_p),
+        .cmd_word       (fe_cmd_word),
+        .busy_link      (fe_busy_link),
+        .stat_link      (fe_stat_link),
+        .rffc_link      (fe_rffc_link),
+        .clk            (cfgmclk),
+        .rst            (cfg_por_rst),
+        .gen_req_valid  (fe_g_valid),
+        .gen_req_ready  (fe_g_ready),
+        .gen_req_dev    (fe_g_dev),
+        .gen_req_wr_len (fe_g_wl),
+        .gen_req_wdata  (fe_g_wd),
+        .gen_req_rd_len (fe_g_rl),
+        .gen_resp_valid (fe_g_rvalid),
+        .gen_resp_rdata (fe_g_rd),
+        .gen_resp_err   (fe_g_rerr)
     );
 
     // -------------------------------------------------------------------------
@@ -499,6 +548,7 @@ module clk_mode_ctrl #(
                         xo_raw_rw_cfg    <= req_raw_rw_link;
                         xo_raw_reg_cfg   <= req_raw_reg_link;
                         xo_raw_wdata_cfg <= req_raw_wdata_link;
+                        xo_raw_dev_cfg   <= req_raw_dev_link;
                         xo_raw_valid_cfg <= 1'b1;
                     end
                 end

@@ -564,6 +564,7 @@ module tb_artix_top;
     // -------------------------------------------------------------------------
     reg [31:0] rval;
     integer wait_c, pi;
+    reg [31:0] fe_e4, fe_r;
 
     initial begin
         // Match FPGA GSR INIT=0 for adc_clk_* registers before u_mmcm_adc locks
@@ -772,6 +773,36 @@ module tb_artix_top;
                      cnt_01, cnt_04, cnt_05, ul_crc_err, rval, dacr_t_errs, dacs_wrt_edges, tr_viol,
                      u_artix.adc_trained, u_artix.adc_dco_phase_err, u_artix.adc_eye_width_min,
                      u_artix.u_adc_cap.tr_state, u_artix.u_ddc.ddc_en, u_artix.tx_pkt_valid, u_artix.tx_dropped_cnt);
+            $finish;
+        end
+
+        // Rev08 CSR page 1: front-end control reaches the XO bus (no expander on this bench: the command must end
+        // with an I2C error), page-0 registers do not alias into 0x1xx, and unmapped addresses read 0
+        rd_reg(16'h011C, fe_r);
+        if (fe_r[0] !== 1'b1) begin $display("FAIL: tb_artix_top FE_LED_CTRL reset=0x%08h (exp auto-map on)", fe_r); $finish; end
+        wr_reg(16'h011C, 32'd0);                    // LED auto-map off: the bus stays quiet
+        rd_reg(16'h00E4, fe_r);
+        fe_e4 = fe_r;
+        wr_reg(16'h01E4, ~fe_e4);                   // would hit RADAR_CTRL if page 1 aliased page 0
+        rd_reg(16'h00E4, fe_r);
+        if (fe_r != fe_e4) begin $display("FAIL: tb_artix_top write to 0x1E4 aliased RADAR_CTRL (0x%08h)", fe_r); $finish; end
+        rd_reg(16'h01E4, fe_r);
+        if (fe_r != 32'd0) begin $display("FAIL: tb_artix_top unmapped 0x1E4 reads 0x%08h", fe_r); $finish; end
+        rd_reg(16'h02E4, fe_r);
+        if (fe_r != 32'd0) begin $display("FAIL: tb_artix_top unmapped 0x2E4 reads 0x%08h", fe_r); $finish; end
+        repeat (200) @(posedge kria_tx_clk);
+        wr_reg(16'h0110, 32'h3000_0000);            // FE_CMD POLL
+        rd_reg(16'h0110, fe_r);
+        if (fe_r != 32'h3000_0000) begin $display("FAIL: tb_artix_top FE_CMD readback 0x%08h", fe_r); $finish; end
+        wait_c = 0;
+        rd_reg(16'h0114, fe_r);
+        while (fe_r[28] && wait_c < 400) begin
+            repeat (200) @(posedge kria_tx_clk);
+            rd_reg(16'h0114, fe_r);
+            wait_c = wait_c + 1;
+        end
+        if (fe_r[28] !== 1'b0 || fe_r[31] !== 1'b1) begin
+            $display("FAIL: tb_artix_top FE_STAT=0x%08h (exp idle with an I2C error: no expander on this bench)", fe_r);
             $finish;
         end
 
