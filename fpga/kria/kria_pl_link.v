@@ -180,6 +180,9 @@ module kria_pl_link (
     input  wire [7:0]  emio_gpio_t,
     output wire [7:0]  emio_gpio_i,
 
+    input  wire        emio_uart1_txd,
+    output wire        emio_uart1_rxd,
+
     // Interrupts to PS pl_ps_irq0
     output wire        irq_fpga,
     output wire        irq_link_up,
@@ -896,17 +899,17 @@ module kria_pl_link (
     assign emio_spi_mi      = pmod_miso;
     assign pmod_beam_strobe = emio_gpio_o[1];
     assign pmod_pps_sync    = emio_gpio_o[2];
-    assign pmod_spare1      = emio_gpio_o[3];
+    assign pmod_spare1      = emio_uart1_txd;
+    assign emio_uart1_rxd   = pmod_spare2;
 
-    (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync, spare2_sync, linkup_pl_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync, linkup_pl_sync;
     always @(posedge pl_clk_100m) begin
         irq_sync       <= {irq_sync[0], fpga_irq};
-        spare2_sync    <= {spare2_sync[0], pmod_spare2};
         linkup_pl_sync <= {linkup_pl_sync[0], kria_link_up};
     end
 
     assign irq_fpga    = irq_sync[1];
     assign irq_link_up = linkup_pl_sync[1];
-    assign emio_gpio_i = {1'b0, linkup_pl_sync[1], spare2_sync[1], irq_sync[1], emio_gpio_o[3:0]};
+    assign emio_gpio_i = {1'b0, linkup_pl_sync[1], 1'b0, irq_sync[1], 1'b0, emio_gpio_o[2:0]};
 
 endmodule

@@ -31,11 +31,11 @@ Simulation resolution is `` `timescale 1ps/10fs `` ([`tb_system.v`](sim/tb_syste
 
 | Component / Model | File | Modeled Behavior |
 | :--- | :--- | :--- |
-| Artix-7 Top RTL | [`artix/top.v`](artix/top.v) | Real `artix_top` (`ENABLE_ETH = 1`), nominal `100.000 MHz` (`#5000.000` ps half-period) |
-| Kria K26 PL Wrapper | [`kria/kria_pl_link.v`](kria/kria_pl_link.v) | Real `kria_pl_link` with AXI4-Lite CSRs, 64-bit AXI4-Stream TX/RX DMA, MMCM, `IDELAYE3`/`ISERDESE3`, `u_train_fsm`, configurable `pl_clk_100m` (`4999.500` ps `+100 ppm` initial, `-100 ppm` in S5) |
+| Artix-7 Top RTL | [`artix/top.v`](artix/top.v) | Real `artix_top` (`ENABLE_ETH = 1`), Si549 `500 MHz` (`#1000.000` ps half-period, default) and `400 MHz` (`#1250.000` ps, `-Define FPGA_CLK_400M`), with A-1 radar reset gate + G-1 `dbg_uart` monitor |
+| Kria K26 PL Wrapper | [`kria/kria_pl_link.v`](kria/kria_pl_link.v) | Real `kria_pl_link` with AXI4-Lite CSRs, 64-bit AXI4-Stream TX/RX DMA, MMCM, `IDELAYE3`/`ISERDESE3`, `u_train_fsm`, PS `UART1` EMIO -> `pmod_spare1/2`, configurable `pl_clk_100m` (`4999.500` ps `+100 ppm` initial, `-100 ppm` in S5) |
 | LVDS Channel & Fault Hook | [`sim/models/board_lvds_channel.v`](sim/models/board_lvds_channel.v) | `sim_board_lvds_channel`: independent `DLY_P_PS` / `DLY_N_PS` leg delays, PRNG differential timing jitter (`JITTER_SPREAD_PS`), transport delays preserving multi-UI transitions (`>1000 ps` @ 1 Gbps), dynamic `cut_fault` and `glitch_inj` inputs |
-| AD9484 400 MSPS Radar ADC | [`sim/models/ad9484_radar_model.v`](sim/models/ad9484_radar_model.v) | `sim_ad9484_model`: 3-wire SPI (Chip ID `0x6C`), inverted DCO routing, `lvds_skew.py` per-bit skew + eye spread; `mode=0` (`0xAA`/`0x55` IDELAY calibration), `mode=1` (`121.5625 MHz` IF CW -> `+1.5625 MHz` baseband @ 25 MSPS), `mode=2` (closed-loop echo sampling `dacr_d`/`dacr_clk` delayed by `ECHO_DELAY_DAC_CYC = 250` @ 125 MHz DAC clock, upconverted to `120 MHz` IF + noise, `no_echo_mut` fault control) |
-| AD9253 Dual 14-bit SDR ADC | [`sim/models/ad9253_sdr_model.v`](sim/models/ad9253_sdr_model.v) | `sim_ad9253_model`: 3-wire SPI (Chip ID `0x8F`), coherent `6.25 MHz` (Ch A) + `12.5 MHz` (Ch B) @ 50 MSPS, `lvds_skew.py` skew (`ADCS_D0 -8 ps`, `ADCS_D1 -34 ps`, `ADCS_FCO -18 ps` vs DCO) with `25 ps` transport margin |
+| AD9484 400 MSPS Radar ADC | [`sim/models/ad9484_radar_model.v`](sim/models/ad9484_radar_model.v) | `sim_ad9484_model`: 3-wire SPI (Chip ID `0x6C`), inverted DCO routing, `lvds_skew.py` per-bit skew + eye spread; `mode=0` (`0xAA`/`0x55` IDELAY calibration), `mode=1` (`121.5625 MHz` IF CW -> `+1.5625 MHz` baseband @ 25 MSPS), `mode=2` (closed-loop echo sampling `dacr_d`/`dacr_clk` delayed by `ECHO_DELAY_DAC_CYC = 250` @ DAC clock, upconverted to `120 MHz` IF + noise, `no_echo_mut` fault control) |
+| AD9253 Dual 14-bit SDR ADC | [`sim/models/ad9253_sdr_model.v`](sim/models/ad9253_sdr_model.v) | `sim_ad9253_model`: 3-wire SPI (Chip ID `0x8F`), coherent `6.25 MHz` (Ch A) + `12.5 MHz` (Ch B) @ `50.0` / `62.5 MSPS` (1-lane 16b DDR, `DCO = 400`/`500 MHz`), `lvds_skew.py` skew (`ADCS_D0 -8 ps`, `ADCS_D1 -34 ps`, `ADCS_FCO -18 ps` vs DCO) with `25 ps` transport margin |
 | 8x ADAR1000 SPI Array | [`sim/models/adar1000_array_model.v`](sim/models/adar1000_array_model.v) | `sim_adar1000_array`: 8 independent slaves on `adar_csb[7:0]`, 24-bit SPI read/write + `tx_load`/`rx_load` active latching, real-time `tr_viol` monitor |
 | AD9708 & AD9767 DAC Monitors | [`sim/models/dac_monitor_models.v`](sim/models/dac_monitor_models.v) | `sim_dac_radar_mon` (AD9708 setup `>=2.0 ns`, hold `>=1.5 ns`, LFM chirp zero-crossing slope check) and `sim_dac_sdr_mon` (AD9767 `IQWRT`/`IQCLK`/`IQSEL` 14-bit I/Q quadrature capture) |
 | Housekeeping I2C Slaves | [`sim/models/hk_i2c_periph_models.v`](sim/models/hk_i2c_periph_models.v) | `sim_hk_i2c_slave`: open-drain I2C slaves for TMP1075 (`0x48`, `0x2A80`), CAT24C02 EEPROM (`0x50`), and Si549 XO (`0x55`) |
@@ -73,37 +73,37 @@ To complete all six multi-domain scenarios in ~6 minutes of batch XSim while run
 
 ## Verification Results (Vivado XSim 2026.1)
 
-Post-fold checks below ran directly after all Rev06, `clk_mode_ctrl` (`400`/`500 MHz` DRP + safe-boot + `±50 ppm` Si549 clamp), non-MMCM `÷4` DAC clock, and switch-free HF (`Ch B` / `DAC2`) updates on the gateware branch:
+Post-Rev08 Phase 1 (A-1..A-4 & G-1) verification ran directly against the final RTL in Vivado XSim 2026.1:
 
 ### Baseline Full-System Passes (`tb_system`, `500 MHz` and `400 MHz`, Hardware `TAP_DWELL_CYCLES = 1800`, `t = 0` Live Streaming)
 
-- **Default `500 MHz` Si549 mode:** `.\fpga\sim\run.ps1 tb_system` -> **Exit code `0`**, elapsed **`946.6 s`** ([`tb_system.log`](sim/out/tb_system.log))
-  - `[S1] PASS REG_LINK_STATUS=0x003500fd mdio_polls=6 dl_up=1 eth_up=1 eye0=[216..416]@316 eye1=[0..200]@100`
+- **Default `500 MHz` Si549 mode:** `.\fpga\sim\run.ps1 tb_system` -> **Exit code `0`**, elapsed **`453.23 s`** ([`tb_system.log`](sim/out/tb_system.log))
+  - `[S1] PASS REG_LINK_STATUS=0x000100fd 0xE8=0x00000411 uart_resp=00000411 mdio_polls=8 dl_up=1 eth_up=1` (`A-1`: `adc_trained=0` in `500M` mode)
   - `[S2] PASS AD9253=0x8F AD9484=0x6C TMP1075=0x2A80 PPS=1251(+800 ppm)`
-  - `[S3] PASS chirp zc1=18->zc2=34 echo_snr=167.1x cw_img_rej=52.2 dB`
-  - `[S4] PASS rx04=5(max=12045) rx05=48(max=8019) dacs_i=35 dacs_q=35`
+  - `[S4] PASS rx04=4(max=12043) rx05=86(max=8000) dacs_i=35 dacs_q=35` (`62.5 MSPS` AD9253)
+  - `[SW] PASS 500->400 switch OK 0xE8=0x00460436 drop=2398 ddc_en=1 cap_rst=0 ddc_rst=0`
+  - `[S3] PASS chirp zc1=18->zc2=34 echo_snr=152.7x cw_img_rej=60.4 dB`
   - `[S5] PASS -100ppm MIRROR_1P1 + mid-run ETH/IAS1 cuts lost_s1=0 lost_s2=0 mdio_wrs=1`
   - `[S6] PASS glitch->crc_err->clear->retrain(drop=1,up=1,post_crc=0)`
   - `PASS: tb_system full-system verification (S1..S6, +/-100 ppm, Rev05 SI, ETH+IAS1) passed`
-- **`400 MHz` Si549 mode:** `.\fpga\sim\run.ps1 tb_system -Define FPGA_CLK_400M` -> **Exit code `0`**, elapsed **`943.57 s`** ([`tb_system-def-FPGA_CLK_400M.log`](sim/out/tb_system-def-FPGA_CLK_400M.log))
-  - `[S1] PASS REG_LINK_STATUS=0x003500fd mdio_polls=6 dl_up=1 eth_up=1 eye0=[216..416]@316 eye1=[0..200]@100`
+- **`400 MHz` Si549 mode:** `.\fpga\sim\run.ps1 tb_system -Define FPGA_CLK_400M` -> **Exit code `0`**, elapsed **`516.44 s`** ([`tb_system-def-FPGA_CLK_400M.log`](sim/out/tb_system-def-FPGA_CLK_400M.log))
+  - `[S1] PASS REG_LINK_STATUS=0x003500fd 0xE8=0x00460436 uart_resp=00460436 mdio_polls=7 dl_up=1 eth_up=1`
   - `[S2] PASS AD9253=0x8F AD9484=0x6C TMP1075=0x2A80 PPS=1251(+800 ppm)`
-  - `[S3] PASS chirp zc1=18->zc2=34 echo_snr=317.4x cw_img_rej=52.1 dB`
-  - `[S4] PASS rx04=5(max=9091) rx05=48(max=8570) dacs_i=35 dacs_q=35`
+  - `[S3] PASS chirp zc1=18->zc2=34 echo_snr=201.0x cw_img_rej=67.7 dB`
+  - `[S4] PASS rx04=5(max=8579) rx05=80(max=7999) dacs_i=32 dacs_q=31` (`50.0 MSPS` AD9253)
   - `[S5] PASS -100ppm MIRROR_1P1 + mid-run ETH/IAS1 cuts lost_s1=0 lost_s2=0 mdio_wrs=1`
   - `[S6] PASS glitch->crc_err->clear->retrain(drop=1,up=1,post_crc=0)`
   - `PASS: tb_system full-system verification (S1..S6, +/-100 ppm, Rev05 SI, ETH+IAS1) passed`
 
-### Dual-Frequency & Module Testbench Suite (`500 MHz` + `400 MHz`)
+### Dual-Frequency, Debug UART & Module Testbench Suite (`500 MHz` + `400 MHz`)
 
-- **All 18 unit/module testbenches passed at both `500 MHz` (default) and `400 MHz` (`-Define FPGA_CLK_400M`)**, including `tb_clk_mode_switch` (safe-boot Si549 init, `500 <-> 400 MHz` MMCM DRP + Si549 live switch, and `±50 ppm` `ADPLL_DELTA_M` clamp when `ENABLE_ETH=1`), `tb_dac_tx`, `tb_artix_top`, `tb_e2e`, `tb_rev06`, and `tb_link_a2k`.
-- **Negative mutation (`tb_clk_mode_switch`):** `.\fpga\sim\run.ps1 tb_clk_mode_switch -Mutate no_delta_clamp` -> failed as expected when the `±50 ppm` Si549 `ADPLL_DELTA_M` Ethernet clamp was disabled.
+- **All 19 unit/module testbenches passed at both `500 MHz` (default) and `400 MHz` (`-Define FPGA_CLK_400M`)**, with all `artix_top`-instantiating benches (`tb_dbg_uart`, `tb_artix_top`, `tb_clk_mode_switch`, `tb_e2e`, `tb_rev06`, `tb_system`) and the 13 standalone submodule benches (`tb_adar_ctrl`, `tb_adcs_capture`, `tb_adc_ddc`, `tb_dac_tx`, `tb_hk`, `tb_link_a2k`, `tb_link_axis`, `tb_link_k2a`, `tb_pcs_loop`, `tb_pcs_unit`, `tb_pmod_spi`, `tb_serdes7`, `tb_serdes_us`) verified at both frequencies.
+- **`tb_dbg_uart` (G-1):** Verified boot banner, periodic `STAT`, `r`/`w`/`s`/`h` CLI, 4-master CSR arbitration, and BREAK framing error recovery (`500 MHz` & `400 MHz` exit `0`). Negative mutations `-Mutate wrong_divisor` (exit `1`, `ferr=72`) and `-Mutate drop_monitor_write` (exit `1`, stale `'r e4'` readback `00000001`) both failed as designed.
+- **Negative mutation (`tb_clk_mode_switch`):** `.\fpga\sim\run.ps1 tb_clk_mode_switch -Mutate no_delta_clamp` -> exit `1` as expected when the `±50 ppm` Si549 `ADPLL_DELTA_M` Ethernet clamp was disabled.
 
 ### Negative Mutation Runs (`tb_system -Mutate`)
 
-Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `no_echo_return` exit `1` in `270.72 s`, `eth_skip_fcs` exit `1` in `261.98 s`) passed on commit `231fbf6`; `no_retrain` was re-run post-fold:
-
-- `.\fpga\sim\run.ps1 tb_system -Mutate no_retrain` -> **Exit code `1`**, elapsed **`287.13 s`** (`FAIL @ 93784159500 ps: S6: LINK_CTRL[2] retrain did not execute and recover link_up`)
+Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `no_echo_return` exit `1` in `270.72 s`, `eth_skip_fcs` exit `1` in `261.98 s`, `no_retrain` exit `1` in `287.13 s`) validated `tb_system` fault sensitivity.
 
 ---
 
@@ -113,6 +113,6 @@ Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `n
 2. **PS firmware & Linux stack excluded:** `tb_system` drives `kria_pl_link` AXI4-Lite/AXIS ports directly via testbench BFMs rather than executing ARM Zynq PS C code, Linux DMA drivers, or GEM3 MAC microcode.
 3. **Scaled timers & watchdog intervals:** Simulation speed-up overrides compress housekeeping polling, Si549 FCAL wait, MDIO polling, and `ETH_ALIVE_TIMEOUT` (`200 us` vs `1 s` hardware); `TAP_DWELL_CYCLES` runs at hardware default (`1800`).
 4. **XSim UltraScale+ primitive advisory:** Vivado XSim 2026.1 emits `[Unisim IDELAYE3-1]` advisories on `u_kria.u_idelay_d0`/`d1` noting behavioral reset limitations when `DELAY_FORMAT = TIME`.
-5. **Vivado 2026.1 implementation signoff refreshed (with post-route `phys_opt_design`):** Both [`artix/build.tcl`](artix/build.tcl) and [`artix/build_rev06.tcl`](artix/build_rev06.tcl) (`ENABLE_ETH=1`), alongside [`kria/bd.tcl`](kria/bd.tcl), were synthesized, placed, routed, and post-route `phys_opt_design`-optimized in Vivado 2026.1 against the updated RTL, refreshing [`artix/reports/`](artix/reports), [`artix/reports_rev06/`](artix/reports_rev06), [`kria/reports/`](kria/reports), and `kria/out/` (`ias2rf_k26.bit`, `ias2rf_k26.xsa`). Both designs meet all user timing constraints with `0` DRC errors:
-   - **`artix_top` (`build.tcl` & `build_rev06.tcl`):** `WNS = +0.111 ns` (`0 / 58,037` failing setup), `WHS = +0.016 ns` (`0 / 57,590` failing hold), `WPWS = +0.008 ns` (`0 / 18,616` failing pulse-width); non-MMCM `÷4` `dac_clk` cuts `Clock Uncertainty` from `0.165 ns` to **`0.035 ns`** (`DJ = 0.000 ns`, `PE = 0.000 ns`).
-   - **`ias2rf_k26_bd_wrapper`:** `WNS = +1.291 ns`, `WHS = +0.010 ns`, `WPWS = +0.000 ns`.
+5. **Vivado 2026.1 implementation signoff refreshed (with post-route `phys_opt_design`):** [`artix/build.tcl`](artix/build.tcl), [`artix/build_rev06.tcl`](artix/build_rev06.tcl) (`ENABLE_ETH=1`), [`kria/build.tcl`](kria/build.tcl), and [`kria/bd.tcl`](kria/bd.tcl) were synthesized, placed, routed, and post-route optimized in Vivado 2026.1 against the updated RTL, refreshing [`artix/reports/`](artix/reports), [`artix/reports_rev06/`](artix/reports_rev06), [`kria/reports/`](kria/reports), and `kria/out/` (`ias2rf_k26.bit`, `ias2rf_k26.xsa`) with `0` DRC errors and all timing constraints met:
+   - **`artix_top` (`build_rev06.tcl` -> `reports_rev06/`):** `WNS = +0.071 ns` (`0 / 60,614` failing setup; `clk_400m_unbuf` `400 MSPS` only, held in reset at `500 MHz` per A-1), `WHS = +0.014 ns` (`0 / 60,161` failing hold), `WPWS = +0.008 ns` (`0 / 19,561` failing pulse-width); `clk_adcs_dco_500` (`2.000 ns`) `WPWS = +0.529 ns` (`adcs_clk_div_1` `WNS = +1.970 ns`) and `clk_adcs_dco_400` (`2.500 ns`) `WPWS = +1.029 ns` (`adcs_clk_div` `WNS = +3.970 ns`); `17,450` LUTs, `19,029` FFs, `110` DSP (`+1,769` LUTs, `+945` FFs, `+0` DSP vs Rev07 baseline). (`build.tcl` -> `reports/`: `WNS = +0.119 ns`, `WHS = +0.036 ns`, `WPWS = +0.008 ns`.)
+   - **`ias2rf_k26_bd_wrapper` (`bd.tcl` -> `kria/reports/`):** `WNS = +0.814 ns`, `WHS = +0.011 ns`, `WPWS = +0.000 ns`; `11,038` LUTs, `18,210` FFs, `3.0` BRAM36 eq., `0` DSP.

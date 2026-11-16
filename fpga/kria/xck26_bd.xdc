@@ -65,6 +65,7 @@ set_property PACKAGE_PIN B11 [get_ports pmod_spare2]
 set_property IOSTANDARD LVCMOS33 [get_ports {pmod_cs_n pmod_mosi pmod_miso pmod_sclk pmod_beam_strobe pmod_pps_sync pmod_spare1 pmod_spare2}]
 set_property DRIVE 8 [get_ports {pmod_cs_n pmod_mosi pmod_sclk pmod_beam_strobe pmod_pps_sync pmod_spare1}]
 set_property SLEW SLOW [get_ports {pmod_cs_n pmod_mosi pmod_sclk pmod_beam_strobe pmod_pps_sync pmod_spare1}]
+set_property PULLUP TRUE [get_ports pmod_spare2]
 
 # Async / low-rate control I/Os
 set_false_path -from [get_ports {fpga_irq hk_scl hk_sda pmod_miso pmod_spare2}]

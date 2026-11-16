@@ -98,7 +98,17 @@ module pmod_spi #(
     // Fallback DDC baseband stream (clk domain)
     input  wire [15:0] fb_ddc_i,
     input  wire [15:0] fb_ddc_q,
-    input  wire        fb_ddc_valid
+    input  wire        fb_ddc_valid,
+
+    // External CSR write port (0x00, 0x08, 0x0C from top.v 4-master arbiter)
+    input  wire        ext_wr_en,
+    input  wire [6:0]  ext_wr_addr,
+    input  wire [31:0] ext_wr_wdata,
+
+    // Forwarded SPI writes (0x3C..0x7C) to top.v 4-master CSR arbiter
+    output reg         spi_csr_wr_valid,
+    output reg  [6:0]  spi_csr_wr_addr,
+    output reg  [31:0] spi_csr_wr_wdata
 );
 
     localparam integer FB_AW = $clog2(FB_FIFO_DEPTH);
@@ -214,6 +224,20 @@ module pmod_spi #(
     wire [7:0]  hdr_byte = {cmd_shift[6:0], mosi_bit};
     wire [31:0] wr_word  = {wdata_shift[30:0], mosi_bit};
 
+    reg         spi_loc_pend;
+    reg  [4:0]  spi_loc_addr;
+    reg  [31:0] spi_loc_wdata;
+
+    wire        spi_wr_end_w    = cs_active && !cs_fall && sample_edge && (bit_cnt == 6'd39) && rw_latched;
+    wire        spi_csr_fwd_hit = spi_wr_end_w && (addr_latched[6:2] >= 5'h0F);
+    wire        spi_loc_wr_hit  = spi_wr_end_w && (addr_latched[6:2] <  5'h0F);
+
+    wire        loc_wr_en       = ext_wr_en | spi_loc_pend | spi_loc_wr_hit;
+    wire [4:0]  loc_wr_addr     = ext_wr_en    ? ext_wr_addr[6:2] :
+                                  spi_loc_pend ? spi_loc_addr     : addr_latched[6:2];
+    wire [31:0] loc_wr_wdata    = ext_wr_en    ? ext_wr_wdata     :
+                                  spi_loc_pend ? spi_loc_wdata    : wr_word;
+
     always @(posedge clk) begin
         if (rst) begin
             ctrl_soft_rst        <= 1'b0;
@@ -236,6 +260,12 @@ module pmod_spi #(
             wdata_shift          <= 32'd0;
             rdata_shift          <= 32'd0;
             pmod_miso            <= 1'b0;
+            spi_csr_wr_valid     <= 1'b0;
+            spi_csr_wr_addr      <= 7'd0;
+            spi_csr_wr_wdata     <= 32'd0;
+            spi_loc_pend         <= 1'b0;
+            spi_loc_addr         <= 5'd0;
+            spi_loc_wdata        <= 32'd0;
         end else begin
             // One-cycle self-clearing pulses
             ctrl_retrain_pulse <= 1'b0;
@@ -243,6 +273,39 @@ module pmod_spi #(
             cfg_load_l0        <= 1'b0;
             cfg_load_l1        <= 1'b0;
             fb_rd_pulse        <= 1'b0;
+            spi_csr_wr_valid   <= 1'b0;
+
+            if (loc_wr_en) begin
+                case (loc_wr_addr)
+                    5'h00: begin
+                        ctrl_soft_rst        <= loc_wr_wdata[0];
+                        ctrl_loopback_en     <= loc_wr_wdata[1];
+                        ctrl_retrain_pulse   <= loc_wr_wdata[2];
+                        ctrl_tap_override_en <= loc_wr_wdata[3];
+                        ctrl_prbs7_tx_en     <= loc_wr_wdata[4];
+                        ctrl_prbs7_rx_chk_en <= loc_wr_wdata[5];
+                        ctrl_clr_err_pulse   <= loc_wr_wdata[6];
+                        ctrl_fallback_en     <= loc_wr_wdata[8];
+                    end
+                    5'h02: begin
+                        cfg_tap_l0  <= loc_wr_wdata[8:0];
+                        cfg_load_l0 <= loc_wr_wdata[31];
+                    end
+                    5'h03: begin
+                        cfg_tap_l1  <= loc_wr_wdata[8:0];
+                        cfg_load_l1 <= loc_wr_wdata[31];
+                    end
+                    default: ;
+                endcase
+            end
+
+            if (ext_wr_en && spi_loc_wr_hit) begin
+                spi_loc_pend  <= 1'b1;
+                spi_loc_addr  <= addr_latched[6:2];
+                spi_loc_wdata <= wr_word;
+            end else if (!ext_wr_en && spi_loc_pend) begin
+                spi_loc_pend  <= 1'b0;
+            end
 
             if (!cs_active || cs_fall) begin
                 bit_cnt   <= 6'd0;
@@ -266,28 +329,10 @@ module pmod_spi #(
                         bit_cnt     <= bit_cnt + 6'd1;
                     end else if (bit_cnt == 6'd39) begin
                         wdata_shift <= wr_word;
-                        if (rw_latched) begin
-                            case (addr_latched[6:2])
-                                5'h00: begin
-                                    ctrl_soft_rst        <= wr_word[0];
-                                    ctrl_loopback_en     <= wr_word[1];
-                                    ctrl_retrain_pulse   <= wr_word[2];
-                                    ctrl_tap_override_en <= wr_word[3];
-                                    ctrl_prbs7_tx_en     <= wr_word[4];
-                                    ctrl_prbs7_rx_chk_en <= wr_word[5];
-                                    ctrl_clr_err_pulse   <= wr_word[6];
-                                    ctrl_fallback_en     <= wr_word[8];
-                                end
-                                5'h02: begin
-                                    cfg_tap_l0  <= wr_word[8:0];
-                                    cfg_load_l0 <= wr_word[31];
-                                end
-                                5'h03: begin
-                                    cfg_tap_l1  <= wr_word[8:0];
-                                    cfg_load_l1 <= wr_word[31];
-                                end
-                                default: ;
-                            endcase
+                        if (spi_csr_fwd_hit) begin
+                            spi_csr_wr_valid <= 1'b1;
+                            spi_csr_wr_addr  <= addr_latched;
+                            spi_csr_wr_wdata <= wr_word;
                         end
                         bit_cnt <= 6'd40;
                     end

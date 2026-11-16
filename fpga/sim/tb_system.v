@@ -88,9 +88,11 @@ module tb_system;
 
     wire        emio_i2c_scl_i, emio_i2c_sda_i;
     wire        emio_spi_mi;
-    reg  [7:0]  emio_gpio_o = 8'h00; // Do not pause DDC/generators at t=0; RTL idle-gate handles training
+    reg  [7:0]  emio_gpio_o = 8'h00;
     reg  [7:0]  emio_gpio_t = 8'h00;
     wire [7:0]  emio_gpio_i;
+    reg         emio_uart1_txd = 1'b1;
+    wire        emio_uart1_rxd;
 
     wire        irq_fpga, irq_link_up;
 
@@ -226,7 +228,9 @@ module tb_system;
         .XO_FCAL_WAIT_CYC  (150),
         .BOOT_FREQ_500M    (TB_BOOT_500M),
         .XADC_POLL_DIV_P   (500),
-        .PPS_DEFAULT_NOM_CYC(32'd1250)
+        .PPS_DEFAULT_NOM_CYC(32'd1250),
+        .DBG_UART_BAUD_DIV (16'd16),      // Fast 7.8125 Mbaud for sim EMIO UART check
+        .DBG_UART_STAT_CYC (32'd100_000)
     ) u_artix (
         .fpga_clk_p     (fpga_clk_p),
         .fpga_clk_n     (fpga_clk_n),
@@ -346,6 +350,8 @@ module tb_system;
         .emio_gpio_o      (emio_gpio_o),
         .emio_gpio_t      (emio_gpio_t),
         .emio_gpio_i      (emio_gpio_i),
+        .emio_uart1_txd   (emio_uart1_txd),
+        .emio_uart1_rxd   (emio_uart1_rxd),
         .irq_fpga         (irq_fpga),
         .irq_link_up      (irq_link_up),
         .link_rx_clk_p    (k_ul_clk_p),
@@ -757,6 +763,79 @@ module tb_system;
         end
     endtask
 
+    // EMIO UART1 BFM helpers (scaled 128 ns/bit matching DBG_UART_BAUD_DIV=16 @ 125 MHz)
+    localparam integer SIM_UART_BIT_PS = 128_000;
+    reg [8*96-1:0] sys_uart_banner = {96{8'h00}};
+    integer        sys_uart_bn_len = 0;
+    integer        sys_uart_ferr   = 0;
+
+    task automatic sys_uart_recv_line(output [8*96-1:0] ln, output integer nlen);
+        integer bi, tmo;
+        reg [7:0] ch;
+        reg       stp, done;
+        begin
+            ln   = {96{8'h00}};
+            nlen = 0;
+            done = 1'b0;
+            tmo  = 0;
+            while (!done && tmo < 4000) begin
+                while ((emio_uart1_rxd !== 1'b0) && (tmo < 4000)) begin
+                    #20_000;
+                    tmo = tmo + 1;
+                end
+                if (tmo < 4000) begin
+                    #(SIM_UART_BIT_PS + SIM_UART_BIT_PS/2);
+                    for (bi = 0; bi < 8; bi = bi + 1) begin
+                        ch[bi] = emio_uart1_rxd;
+                        #(SIM_UART_BIT_PS);
+                    end
+                    stp = emio_uart1_rxd;
+                    if (stp !== 1'b1) begin
+                        sys_uart_ferr = sys_uart_ferr + 1;
+                    end else if (ch == 8'h0A) begin
+                        if (nlen > 0) done = 1'b1;
+                    end else if (ch >= 8'h20 && ch <= 8'h7E && nlen < 96) begin
+                        ln[(95 - nlen)*8 +: 8] = ch;
+                        nlen = nlen + 1;
+                    end
+                end
+            end
+        end
+    endtask
+
+    task automatic sys_uart_send_byte(input [7:0] b);
+        integer bi;
+        begin
+            emio_uart1_txd = 1'b0;
+            #(SIM_UART_BIT_PS);
+            for (bi = 0; bi < 8; bi = bi + 1) begin
+                emio_uart1_txd = b[bi];
+                #(SIM_UART_BIT_PS);
+            end
+            emio_uart1_txd = 1'b1;
+            #(SIM_UART_BIT_PS);
+        end
+    endtask
+
+    task automatic run_sgmii_an_handshake;
+        integer an_tmo;
+        begin
+            u_phy_peer.set_an_mode(2'd0);
+            an_tmo = 0;
+            while ((u_artix.sys_rst || u_artix.gen_rev06_eth.u_eth_phy.an_state == 2'd0) && (an_tmo < 1500)) begin
+                #200_000;
+                an_tmo = an_tmo + 1;
+            end
+            u_phy_peer.set_an_mode(2'd1);
+            an_tmo = 0;
+            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state != 2'd2) && (an_tmo < 500)) begin
+                #200_000;
+                an_tmo = an_tmo + 1;
+            end
+            u_phy_peer.set_an_mode(2'd2);
+        end
+    endtask
+
     // -------------------------------------------------------------------------
     // 8. Whole-System Execution Across Scenarios 1 .. 6
     // -------------------------------------------------------------------------
@@ -770,6 +849,84 @@ module tb_system;
     integer    s0_rx01, s0_eth_s2;
     reg        retrain_saw_drop;
     integer    post_crc_errs;
+
+    task automatic switch_xo_mode(input [0:0] to_500m);
+        integer sw_tmo;
+        begin
+            u_phy_peer.set_an_mode(2'd0); // Peer restarts AN at Ack=0 when eth_rst_n pulses low
+            kria_reg_wr(16'h00A8, to_500m ? 32'h0000_0006 : 32'h0000_0004); // Si549 prog_start=1
+            #2_000_000;
+            u_ad9253.dco_half_ps = to_500m ? 1000.000 : 1250.000;
+            sw_tmo = 0;
+            while ((u_artix.u_clk_mode_ctrl.busy_cfg || u_artix.sys_rst ||
+                    !u_artix.sys_mmcm_locked || u_artix.u_clk_mode_ctrl.mmcm_rst) && (sw_tmo < 5000)) begin
+                #200_000;
+                sw_tmo = sw_tmo + 1;
+            end
+            run_sgmii_an_handshake();
+            axil_wr(8'h00, 32'h0000_0004); // Retrain Kria IAS1 after Artix MMCM reset
+            sw_tmo = 0;
+            csr_r  = 32'd0;
+            while (((!csr_r[6]) || (!to_500m && !csr_r[21]) || (!u_artix.dl_up_sync[1]) ||
+                    (!u_artix.eth_link_up_stat)) && (sw_tmo < 2500)) begin
+                #1_000_000;
+                axil_rd(8'h04, csr_r);
+                sw_tmo = sw_tmo + 1;
+            end
+            if (!to_500m) begin
+                sw_tmo = 0;
+                while (((u_artix.gen_rev06_eth.u_dual_mux.u_fifo_ias.meta_used > 1) ||
+                        (u_kria.u_fifo_rx2pl.wr_bin != u_kria.u_fifo_rx2pl.rd_bin)) && (sw_tmo < 2500)) begin
+                    #100_000;
+                    sw_tmo = sw_tmo + 1;
+                end
+                #5_000_000;
+                $display("[SW_DRAIN] tmo=%0d meta=%0d data=%0d rx2pl=%0d drop=%0d",
+                         sw_tmo, u_artix.gen_rev06_eth.u_dual_mux.u_fifo_ias.meta_used,
+                         u_artix.gen_rev06_eth.u_dual_mux.u_fifo_ias.data_used,
+                         u_kria.u_fifo_rx2pl.wr_bin - u_kria.u_fifo_rx2pl.rd_bin,
+                         u_artix.u_ddc.dropped_cnt);
+            end
+        end
+    endtask
+
+    task automatic run_scenario4_sdr;
+        begin
+            // Disable ADC capture gating check & run AD9253 (0x04/0x05) + AD9767 (0x12)
+            kria_reg_wr(16'h0044, 32'h2000_0000); // Ch A NCO = Fs/8
+            kria_reg_wr(16'h0048, 32'h4000_0000); // Ch B NCO = Fs/4
+            kria_reg_wr(16'h004C, 32'h0008_0004); // 8 words/pkt, decim=4
+            sdr_cap_en = 1'b1;
+            kria_reg_wr(16'h0034, 32'h0000_000D); // Enable ADCS capture + Ch A/B
+
+            tmo_cnt = 0;
+            while ((rx04_pkts < 2 || rx05_pkts < 2) && tmo_cnt < 200) begin
+                #200_000;
+                tmo_cnt = tmo_cnt + 1;
+            end
+            sdr_cap_en = 1'b0;
+            kria_reg_wr(16'h0034, 32'h0000_0000); // Pause SDR RX before Scenario 5
+            if (rx04_pkts < 2 || rx05_pkts < 2 || sdr_a_max < 16'sd50 || sdr_b_max < 16'sd50)
+                fail_msg("S4: AD9253 SDR RX TID=0x04/0x05 missing or zero-amplitude");
+
+            kria_send_sdr_pkt(1024);
+            kria_send_sdr_pkt(1536);
+            kria_send_sdr_pkt(2048);
+            kria_send_sdr_pkt(2560);
+            #500_000;
+            kria_reg_wr(16'h0070, 32'h0000_0001); // Enable AD9767 TX
+            tmo_cnt = 0;
+            while ((dacs_i_cnt < 32'd16 || dacs_q_cnt < 32'd16) && tmo_cnt < 100) begin
+                #100_000;
+                tmo_cnt = tmo_cnt + 1;
+            end
+            kria_reg_wr(16'h0070, 32'h0000_0000);
+            if (dacs_i_cnt < 32'd16 || dacs_q_cnt < 32'd16 || dacs_last_i == 14'sd0)
+                fail_msg("S4: AD9767 s_axis_tx TID=0x12 IQ capture failed");
+            $display("[S4] PASS rx04=%0d(max=%0d) rx05=%0d(max=%0d) dacs_i=%0d dacs_q=%0d",
+                     rx04_pkts, sdr_a_max, rx05_pkts, sdr_b_max, dacs_i_cnt, dacs_q_cnt);
+        end
+    endtask
 
     initial begin
         // Pre-seed housekeeping I2C peripherals
@@ -785,33 +942,22 @@ module tb_system;
         // SCENARIO 1: Power-Up & Dual Link Training (+100 ppm Clock Skew)
         // =====================================================================
         $display("[S1] Waiting for Kria uplink eye training, Artix dl_link_up, AD9484 train & SGMII AN...");
-        // Track Artix Clause 37 AN state machine on behavioral RTL8211FSI peer
-        begin : an_handshake
-            integer an_tmo;
-            an_tmo = 0;
-            while ((u_artix.sys_rst || u_artix.gen_rev06_eth.u_eth_phy.an_state == 2'd0) && (an_tmo < 1500)) begin
-                #200_000;
-                an_tmo = an_tmo + 1;
-            end
-            u_phy_peer.set_an_mode(2'd1); // Acknowledge /C/ Ack=1
-            an_tmo = 0;
-            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state != 2'd2) && (an_tmo < 500)) begin
-                #200_000;
-                an_tmo = an_tmo + 1;
-            end
-            u_phy_peer.set_an_mode(2'd2); // Enter normal 8b/10b IDLE / Data
-        end
+        run_sgmii_an_handshake();
 
         tmo_cnt = 0;
         csr_r   = 32'd0;
-        while (((!csr_r[6]) || (!csr_r[21]) || (!u_artix.dl_up_sync[1]) ||
+        while (((!csr_r[6]) || (!TB_BOOT_500M && !csr_r[21]) || (!u_artix.dl_up_sync[1]) ||
                 (!u_artix.eth_link_up_stat) || (mdio_poll_reads == 32'd0)) && (tmo_cnt < 2500)) begin
             #1_000_000; // 1 us polling interval -> up to 2.5 ms timeout
             axil_rd(8'h04, csr_r);
             tmo_cnt = tmo_cnt + 1;
         end
-        if (!csr_r[6] || !csr_r[21])
-            fail_msg("S1: Kria REG_LINK_STATUS did not report link_up & adc_trained");
+        if (!csr_r[6])
+            fail_msg("S1: Kria REG_LINK_STATUS did not report link_up");
+        if (!TB_BOOT_500M && !csr_r[21])
+            fail_msg("S1: Kria REG_LINK_STATUS did not report adc_trained in 400M mode");
+        if (TB_BOOT_500M && csr_r[21])
+            fail_msg("S1: A-1 violation - adc_trained asserted in 500M SDR mode");
         if (!u_artix.dl_up_sync[1])
             fail_msg("S1: Artix dl_link_up did not lock");
         if (!u_artix.eth_link_up_stat || mdio_poll_reads == 32'd0)
@@ -821,10 +967,22 @@ module tb_system;
         if ((u_kria.eye_r0 <= u_kria.eye_l0) || (u_kria.eye_r1 <= u_kria.eye_l1) ||
             (u_kria.train_cnt_l0 > 9'd511) || (u_kria.train_cnt_l1 > 9'd511))
             fail_msg("S1: Kria eye bounds invalid or outside 0..511 taps");
-        $display("[S1] PASS REG_LINK_STATUS=0x%08h mdio_polls=%0d dl_up=%b eth_up=%b eye0=[%0d..%0d]@%0d eye1=[%0d..%0d]@%0d",
-                 csr_r, mdio_poll_reads, u_artix.dl_up_sync[1], u_artix.eth_link_up_stat,
-                 u_kria.eye_l0, u_kria.eye_r0, u_kria.train_cnt_l0,
-                 u_kria.eye_l1, u_kria.eye_r1, u_kria.train_cnt_l1);
+
+        // Verify RADAR_STATUS (0xE8) & PS EMIO UART1 path
+        kria_reg_rd(16'h00E8, art_r);
+        if (art_r[0] !== TB_BOOT_500M)
+            fail_msg("S1: RADAR_STATUS[0] mismatch vs boot freq mode");
+        while (!u_artix.u_dbg_uart.banner_done) #100_000;
+        sys_uart_send_byte("r");
+        sys_uart_send_byte(" ");
+        sys_uart_send_byte("E");
+        sys_uart_send_byte("8");
+        sys_uart_send_byte(8'h0D);
+        sys_uart_recv_line(sys_uart_banner, sys_uart_bn_len); // captures 8-char hex response (skips 0-len echo newline)
+        if (sys_uart_ferr != 0 || sys_uart_bn_len != 8)
+            fail_msg("S1: PS EMIO UART1 read of 0xE8 failed");
+        $display("[S1] PASS REG_LINK_STATUS=0x%08h 0xE8=0x%08h uart_resp=%s mdio_polls=%0d dl_up=%b eth_up=%b",
+                 csr_r, art_r, sys_uart_banner, mdio_poll_reads, u_artix.dl_up_sync[1], u_artix.eth_link_up_stat);
         if (fails > 0) begin
             $display("FAIL: tb_system aborting early after S1 failure");
             $fatal(1, "tb_system S1 failed");
@@ -898,35 +1056,7 @@ module tb_system;
             fail_msg("S2: Missing-ACK slave 0x7D did not set ack_err_cnt");
 
         // 2d. Si549 500 MHz XO programming & CLK_SEL pin check (retrains IAS1 + SGMII)
-        u_phy_peer.set_an_mode(2'd0); // Peer restarts AN at Ack=0 when eth_rst_n pulses low
-        kria_reg_wr(16'h00A8, 32'h0000_0006); // use_ext_clk=0 (Si549), prog_freq_500m=1, prog_start=1
-        begin : an_handshake_s2
-            integer an_tmo;
-            an_tmo = 0;
-            while (eth_rst_n && (an_tmo < 500)) begin
-                #100_000;
-                an_tmo = an_tmo + 1;
-            end
-            an_tmo = 0;
-            while ((!eth_rst_n || u_artix.sys_rst || u_artix.gen_rev06_eth.u_eth_phy.an_state == 2'd0) && (an_tmo < 1500)) begin
-                #200_000;
-                an_tmo = an_tmo + 1;
-            end
-            u_phy_peer.set_an_mode(2'd1);
-            an_tmo = 0;
-            while ((u_artix.gen_rev06_eth.u_eth_phy.an_state != 2'd2) && (an_tmo < 500)) begin
-                #200_000;
-                an_tmo = an_tmo + 1;
-            end
-            u_phy_peer.set_an_mode(2'd2);
-            an_tmo = 0;
-            csr_r  = 32'd0;
-            while ((!csr_r[6] || !csr_r[21] || !u_artix.dl_up_sync[1] || !u_artix.eth_link_up_stat) && (an_tmo < 1000)) begin
-                #1_000_000;
-                axil_rd(8'h04, csr_r);
-                an_tmo = an_tmo + 1;
-            end
-        end
+        switch_xo_mode(1'b1);
         $display("[DBG2d] k_up=%b adc_tr=%b dl_up=%b eth_up=%b eye_w=%0d taps=%010h drop=%0d",
                  csr_r[6], csr_r[21], u_artix.dl_up_sync[1], u_artix.eth_link_up_stat,
                  u_artix.adc_eye_width_min, u_artix.adc_tap_flat, u_artix.u_ddc.dropped_cnt);
@@ -942,6 +1072,13 @@ module tb_system;
         if (clk_sel !== 1'b0)
             fail_msg("S2: clk_sel external override did not drive 0");
         kria_reg_wr(16'h00A8, 32'h0000_0002); // Restore internal Si549 (Hi-Z -> 1)
+        if (!TB_BOOT_500M) begin
+            // In 400M boot mode, restore 400 MHz before Scenarios 3/4/5/6
+            switch_xo_mode(1'b0);
+            kria_reg_rd(16'h00E8, art_r);
+            if (!csr_r[6] || !csr_r[21] || art_r[0] || !art_r[2])
+                fail_msg("S2d: failed to restore 400 MHz AD9484 Radar Path");
+        end
 
         // 2e. XADC valid + PPS 1251-cycle -> +800 ppm measurement
         kria_reg_rd(16'h00B8, art_r);
@@ -968,10 +1105,23 @@ module tb_system;
         $display("[S2] PASS AD9253=0x8F AD9484=0x6C TMP1075=0x2A80 PPS=%0d(+%0d ppm)",
                  art_r, $signed(csr_r));
 
+        if (TB_BOOT_500M) begin
+            // Run S4 at 500 MHz (62.5 MSPS AD9253), then switch runtime 500 MHz -> 400 MHz before S3/S5/S6
+            run_scenario4_sdr();
+
+            $display("[SW] Switching Si549 500 MHz -> 400 MHz to unlock AD9484 Radar Path for S3/S5/S6...");
+            switch_xo_mode(1'b0);
+            kria_reg_rd(16'h00E8, art_r);
+            if (!csr_r[6] || !csr_r[21] || art_r[0] || !art_r[2])
+                fail_msg("SW: 500->400 switch did not enable/train AD9484 Radar Path");
+            $display("[SW] PASS 500->400 switch OK 0xE8=0x%08h drop=%0d ddc_en=%b cap_rst=%b ddc_rst=%b",
+                     art_r, u_artix.u_ddc.dropped_cnt, u_artix.u_ddc.ddc_en,
+                     u_artix.u_adc_cap.rst, u_artix.u_ddc.rst);
+        end
+
         // =====================================================================
         // SCENARIO 3: Radar Chirp Out (AD9708) -> RF Echo & CW Image Rejection
         // =====================================================================
-        emio_gpio_o[3] <= 1'b0; // Release pmod_spare1 to enable Artix DDC uplink stream
         adcr_mode  = 2'd2; // Closed-loop RF echo mode
         rad_cap_wr = 0;
         rad_cap_en = 1'b1;
@@ -1056,39 +1206,9 @@ module tb_system;
         // =====================================================================
         // SCENARIO 4: SDR RX (AD9253 0x04/0x05) & SDR TX (0x12 -> AD9767)
         // =====================================================================
-        kria_reg_wr(16'h0044, 32'h2000_0000); // Ch A NCO = 6.25 MHz @ 50 MSPS
-        kria_reg_wr(16'h0048, 32'h4000_0000); // Ch B NCO = 12.5 MHz @ 50 MSPS
-        kria_reg_wr(16'h004C, 32'h0008_0004); // 8 words/pkt, decim=4
-        sdr_cap_en = 1'b1;
-        kria_reg_wr(16'h0034, 32'h0000_000D); // Enable ADCS capture + Ch A/B
-
-        tmo_cnt = 0;
-        while ((rx04_pkts < 2 || rx05_pkts < 2) && tmo_cnt < 200) begin
-            #200_000;
-            tmo_cnt = tmo_cnt + 1;
+        if (!TB_BOOT_500M) begin
+            run_scenario4_sdr();
         end
-        sdr_cap_en = 1'b0;
-        kria_reg_wr(16'h0034, 32'h0000_0000); // Pause SDR RX before Scenario 5
-        if (rx04_pkts < 2 || rx05_pkts < 2 || sdr_a_max < 16'sd50 || sdr_b_max < 16'sd50)
-            fail_msg("S4: AD9253 SDR RX TID=0x04/0x05 missing or zero-amplitude");
-
-        // Pre-fill DAC SDR FIFO via s_axis_tx TID=8'h12 before enabling TX
-        kria_send_sdr_pkt(1024);
-        kria_send_sdr_pkt(1536);
-        kria_send_sdr_pkt(2048);
-        kria_send_sdr_pkt(2560);
-        #500_000;
-        kria_reg_wr(16'h0070, 32'h0000_0001); // Enable AD9767 TX
-        tmo_cnt = 0;
-        while ((dacs_i_cnt < 32'd16 || dacs_q_cnt < 32'd16) && tmo_cnt < 100) begin
-            #100_000;
-            tmo_cnt = tmo_cnt + 1;
-        end
-        kria_reg_wr(16'h0070, 32'h0000_0000);
-        if (dacs_i_cnt < 32'd16 || dacs_q_cnt < 32'd16 || dacs_last_i == 14'sd0)
-            fail_msg("S4: AD9767 s_axis_tx TID=0x12 IQ capture failed");
-        $display("[S4] PASS rx04=%0d(max=%0d) rx05=%0d(max=%0d) dacs_i=%0d dacs_q=%0d",
-                 rx04_pkts, sdr_a_max, rx05_pkts, sdr_b_max, dacs_i_cnt, dacs_q_cnt);
 
         // =====================================================================
         // SCENARIO 5: Concurrent IAS1 + Ethernet, Poisoned FCS, Cuts -> lost==0

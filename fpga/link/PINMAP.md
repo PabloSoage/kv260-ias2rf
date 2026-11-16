@@ -109,8 +109,8 @@ These two 12-pin Pmod headers are **independent** hardware ports (not wired to e
 | `3` | `/CONTROL/PMOD_MOSI` | `G16` | `IO_L22N_T3_A16_15` | `[M]` |
 | `4` | `/CONTROL/PPS_SYNC` | `H14` | `IO_L24P_T3_RS1_15` | `[M]` |
 | `5` | `/CONTROL/PMOD_MISO` | `J15` | `IO_L23P_T3_FOE_B_15` | `[M]` |
-| `6` | `/CONTROL/PMOD_SPARE1` | `G15` | `IO_L24N_T3_RS0_15` | `[M]` |
+| `6` | `/CONTROL/PMOD_SPARE1` | `G15` | `IO_L24N_T3_RS0_15` (`dbg_uart` RX / Kria `D11` PS `UART1` TX, `PULLUP`) | `[M]` |
 | `7` | `/CONTROL/PMOD_SCLK` | `D13` | `IO_L12P_T1_MRCC_15` (`MRCC`) | `[M]` |
-| `8` | `/CONTROL/PMOD_SPARE2` | `G11` | `IO_25_15` | `[M]` |
+| `8` | `/CONTROL/PMOD_SPARE2` | `G11` | `IO_25_15` (`dbg_uart` TX / Kria `B11` PS `UART1` RX) | `[M]` |
 | `9, 10` | `GND` | — | — | `[M]` |
 | `11, 12` | Unconnected (NC) | — | — | `[M]` |

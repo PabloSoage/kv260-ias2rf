@@ -39,6 +39,8 @@ set_property -dict [list \
     CONFIG.PSU__I2C0__PERIPHERAL__IO {EMIO} \
     CONFIG.PSU__SPI0__PERIPHERAL__ENABLE {1} \
     CONFIG.PSU__SPI0__PERIPHERAL__IO {EMIO} \
+    CONFIG.PSU__UART1__PERIPHERAL__ENABLE {1} \
+    CONFIG.PSU__UART1__PERIPHERAL__IO {EMIO} \
     CONFIG.PSU__GPIO_EMIO__PERIPHERAL__ENABLE {1} \
     CONFIG.PSU__GPIO_EMIO__PERIPHERAL__IO {8} \
     CONFIG.PSU__DDRC__ENABLE {1} \
@@ -132,6 +134,9 @@ connect_bd_net [get_bd_pins ps8/emio_spi0_m_i]    [get_bd_pins kria_pl_link_0/em
 connect_bd_net [get_bd_pins ps8/emio_gpio_o] [get_bd_pins kria_pl_link_0/emio_gpio_o]
 connect_bd_net [get_bd_pins ps8/emio_gpio_t] [get_bd_pins kria_pl_link_0/emio_gpio_t]
 connect_bd_net [get_bd_pins ps8/emio_gpio_i] [get_bd_pins kria_pl_link_0/emio_gpio_i]
+
+connect_bd_net [get_bd_pins ps8/emio_uart1_txd] [get_bd_pins kria_pl_link_0/emio_uart1_txd]
+connect_bd_net [get_bd_pins ps8/emio_uart1_rxd] [get_bd_pins kria_pl_link_0/emio_uart1_rxd]
 
 # External Board Pins (names match fpga/kria/xck26_bd.xdc)
 foreach {dir p} {

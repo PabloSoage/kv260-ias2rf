@@ -75,6 +75,7 @@ module clk_mode_ctrl #(
     output wire        xo_busy_link,
     output wire        xo_prog_done_link,
     output wire        xo_active_500m_link,
+    output wire        radar_dis_cfg,
     output wire        xo_ack_err_link,
     output wire        xo_boot_done_link,
     output wire        xo_boot_err_link,
@@ -579,6 +580,7 @@ module clk_mode_ctrl #(
     assign xo_busy_link          = busy_s[1];
     assign xo_prog_done_link     = prog_done_s[1];
     assign xo_active_500m_link   = active_500m_s[1];
+    assign radar_dis_cfg         = seq_busy_cfg | active_500m_cfg;
     assign xo_ack_err_link       = ack_err_s[1];
     assign xo_boot_done_link     = boot_done_s[1];
     assign xo_boot_err_link      = boot_err_s[1];

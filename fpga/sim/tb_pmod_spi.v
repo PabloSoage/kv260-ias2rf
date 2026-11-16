@@ -102,7 +102,13 @@ module tb_pmod_spi;
         .eye_right_l1         (9'd30),
         .fb_ddc_i             (fb_ddc_i),
         .fb_ddc_q             (fb_ddc_q),
-        .fb_ddc_valid         (fb_ddc_valid)
+        .fb_ddc_valid         (fb_ddc_valid),
+        .ext_wr_en            (1'b0),
+        .ext_wr_addr          (7'd0),
+        .ext_wr_wdata         (32'd0),
+        .spi_csr_wr_valid     (),
+        .spi_csr_wr_addr      (),
+        .spi_csr_wr_wdata     ()
     );
 
     // -------------------------------------------------------------------------

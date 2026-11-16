@@ -698,32 +698,46 @@ module tb_e2e;
         repeat (16) @(posedge rx_clkdiv);
         kria_rx_rst = 1'b0;
 
-        // 1. Wait for both Kria uplink link_up and Artix downlink pmod_spare2
+        // 1. Wait for Kria uplink link_up and Artix downlink lock (rem_stat[8])
         wait_cyc = 0;
-        while (((kria_link_up !== 1'b1) || (pmod_spare2 !== 1'b1)) && wait_cyc < 60000) begin
+        while (((kria_link_up !== 1'b1) || (rem_stat[8] !== 1'b1)) && wait_cyc < 60000) begin
             @(posedge rx_clkdiv);
             wait_cyc = wait_cyc + 1;
         end
-        if ((kria_link_up !== 1'b1) || (pmod_spare2 !== 1'b1)) begin
-            $display("FAIL: tb_e2e bringup timeout (kria_link_up=%0d spare2=%0d train_st=%0d tap=%0d len0=%0d len1=%0d l0=%0d l1=%0d d_lock=%0d crc_err=%0d)",
-                     kria_link_up, pmod_spare2, train_state, u_kria_train.scan_tap,
+        if ((kria_link_up !== 1'b1) || (rem_stat[8] !== 1'b1)) begin
+            $display("FAIL: tb_e2e bringup timeout (kria_link_up=%0d rem_stat=%04x train_st=%0d tap=%0d len0=%0d len1=%0d l0=%0d l1=%0d d_lock=%0d crc_err=%0d)",
+                     kria_link_up, rem_stat, train_state, u_kria_train.scan_tap,
                      u_kria_train.best_len0, u_kria_train.best_len1, l0_lock, l1_lock, d_lock, crc_err_cnt);
             $finish;
         end
 
-        // Wait for Artix ADC training confirmation in remote_status[5]
+        if (TB_BOOT_500M) begin
+            // Rev08 A-1: at 500 MHz SDR mode, AD9484 capture & Radar DDC are held in reset
+            repeat (4000) @(posedge rx_clkdiv);
+            if (!u_artix.radar_dis_link || u_artix.adc_trained || rem_stat[5] ||
+                u_artix.tx_pkt_valid || (good_pkt_cnt != 0)) begin
+                $display("FAIL: tb_e2e 500M A-1 expected radar disabled (dis=%b tr=%b rem5=%b txv=%b pkts=%0d)",
+                         u_artix.radar_dis_link, u_artix.adc_trained, rem_stat[5],
+                         u_artix.tx_pkt_valid, good_pkt_cnt);
+                $finish;
+            end
+            $display("PASS: tb_e2e 500M mode verified A-1 radar path isolation (radar_dis=1, adc_trained=0, 0x01_pkts=0)");
+            $finish;
+        end
+
+        // Wait for Artix ADC training confirmation in remote_status[5] (400 MHz radar mode)
         wait_cyc = 0;
         while ((rem_stat[5] !== 1'b1) && wait_cyc < 4000) begin
             @(posedge rx_clkdiv);
             wait_cyc = wait_cyc + 1;
         end
         if (rem_stat[5] !== 1'b1) begin
-            $display("FAIL: tb_e2e ADC training timeout (kria_link_up=%0d adc_tr=%0d spare2=%0d train_st=%0d crc_err=%0d)",
-                     kria_link_up, rem_stat[5], pmod_spare2, train_state, crc_err_cnt);
+            $display("FAIL: tb_e2e ADC training timeout (kria_link_up=%0d adc_tr=%0d train_st=%0d crc_err=%0d)",
+                     kria_link_up, rem_stat[5], train_state, crc_err_cnt);
             $finish;
         end
-        $display("tb_e2e bringup: link_up=1 tap0=%0d tap1=%0d skew=%0d rem_stat=%04x spare2=%0d",
-                 cntval_l0, cntval_l1, skew_blk, rem_stat, pmod_spare2);
+        $display("tb_e2e bringup: link_up=1 tap0=%0d tap1=%0d skew=%0d rem_stat=%04x",
+                 cntval_l0, cntval_l1, skew_blk, rem_stat);
 
         // Read AXI-Lite CSR 0x04 to verify CSR interface reports link_up
         @(posedge rx_clkdiv);
@@ -744,7 +758,6 @@ module tb_e2e;
         adc_tone_mode = 1'b1;
         @(posedge fpga_clk_100m);
         beam_strobe   = 1'b1;
-        pmod_spare1   = 1'b0;
 
         flush_pkts = good_pkt_cnt + 2;
         wait_cyc = 0;

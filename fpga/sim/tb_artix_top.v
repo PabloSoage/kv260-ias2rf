@@ -110,7 +110,7 @@ module tb_artix_top;
         else if (u_si549.mem[23] == 8'h16) fpga_clk_half = 1.000;
     end
     reg adcr_clk_400m = 1'b0; always #1.250 adcr_clk_400m = ~adcr_clk_400m; // 400 MSPS AD9484
-    reg adcs_dco_400m = 1'b0; always #1.250 adcs_dco_400m = ~adcs_dco_400m; // 400 MHz AD9253 DCO (8*50 MSPS)
+    reg adcs_dco_400m = 1'b0; initial forever #(fpga_clk_half) adcs_dco_400m = ~adcs_dco_400m; // 500M (62.5 MSPS) / 400M (50 MSPS) AD9253 DCO
     reg kria_ref_300m = 1'b0; always #1.666 kria_ref_300m = ~kria_ref_300m;
     reg kria_tx_ddr   = 1'b0; always #1.000 kria_tx_ddr   = ~kria_tx_ddr;
 
@@ -163,7 +163,7 @@ module tb_artix_top;
     // AD9253 16-bit DDR Wordwise transmitter (50 MSPS, Ch A=6.25 MHz, Ch B=12.5 MHz)
     reg        fco_serial = 1'b0, d0_serial = 1'b0, d1_serial = 1'b0;
     reg        adcs_dco_quad = 1'b0;
-    always @(adcs_dco_400m) adcs_dco_quad <= #0.625 adcs_dco_400m;
+    always @(adcs_dco_400m) adcs_dco_quad <= #(fpga_clk_half * 0.5) adcs_dco_400m;
 
     // Behavioral AD9253 & AD9484 3-wire SPI slaves
     reg [7:0]  ad9253_regs [0:255], ad9484_regs [0:255];
@@ -357,7 +357,7 @@ module tb_artix_top;
         .pmod_sclk     (1'b0),
         .beam_strobe   (beam_strobe),
         .pps_sync      (pps_sync),
-        .pmod_spare1   (1'b0),
+        .pmod_spare1   (1'b1),
         .pmod_spare2   (pmod_spare2),
         .dacr_clk      (dacr_clk),
         .dacr_d        (dacr_d),
@@ -669,14 +669,38 @@ module tb_artix_top;
             $display("FAIL: tb_artix_top missing ACK on 0x7D NOT detected (ack_err_cnt=0)"); $finish;
         end
 
-        // XO CLK_SEL = 1 (drives D8 low) + prog 500M (retrains IAS1 during MMCM reset)
-        wr_reg(16'h00A8, 32'h0000_0007); // prog_start=1, prog_500m=1, use_ext_clk=1
+        // Verify pre-switch A-1 status (500M: radar disabled, SDR works; 400M: radar works)
+        rd_reg(16'h00E8, rval);
+        if (TB_BOOT_500M) begin
+            if (!rval[0] || (cnt_01 != 0)) begin
+                $display("FAIL: tb_artix_top 500M A-1 leak 0xE8=0x%08h cnt_01=%0d", rval, cnt_01);
+                $finish;
+            end
+        end else begin
+            if (rval[0]) begin
+                $display("FAIL: tb_artix_top 400M unexpected radar_dis=1 0xE8=0x%08h", rval);
+                $finish;
+            end
+            wait_c = 0;
+            while ((cnt_04 < 2 || cnt_05 < 2 || cnt_01 < 4) && wait_c < 8000) begin
+                @(posedge rx_clkdiv); wait_c = wait_c + 1;
+            end
+            if (cnt_01 < 4 || cnt_04 < 2 || cnt_05 < 2) begin
+                $display("FAIL: tb_artix_top 400M pre-switch counts c01=%0d c04=%0d c05=%0d", cnt_01, cnt_04, cnt_05);
+                $finish;
+            end
+        end
+
+        // XO CLK_SEL = 1 (drives D8 low) + toggle mode (500M->400M or 400M->500M)
+        wr_reg(16'h00A8, TB_BOOT_500M ? 32'h0000_0005 : 32'h0000_0007);
         repeat (50) @(posedge kria_tx_clk);
         if (clk_sel !== 1'b0) begin
             $display("FAIL: tb_artix_top clk_sel=%b (exp 0 when use_ext_clk=1)", clk_sel); $finish;
         end
         kria_rx_rst <= 1'b1;
-        wait (!u_artix.u_clk_mode_ctrl.mmcm_rst && u_artix.sys_mmcm_locked && !u_artix.sys_rst);
+        #2000;
+        wait (!u_artix.u_clk_mode_ctrl.xo_busy_link && !u_artix.u_clk_mode_ctrl.mmcm_rst &&
+              u_artix.sys_mmcm_locked && u_artix.eth_mmcm_locked_w && !u_artix.sys_rst);
         repeat (32) @(posedge rx_clkdiv);
         kria_rx_rst <= 1'b0;
         wait (ul_link_up && u_artix.dl_link_up);
@@ -688,10 +712,34 @@ module tb_artix_top;
             rd_reg(16'h00A8, rval);
             wait_c = wait_c + 1;
         end
-        if (!rval[9] || !rval[10]) begin
-            $display("FAIL: tb_artix_top XO_CTRL=0x%08h (exp xo_prog_done=1, 500m=1)", rval); $finish;
+        if (!rval[9] || (rval[10] !== ~TB_BOOT_500M)) begin
+            $display("FAIL: tb_artix_top XO_CTRL=0x%08h (exp xo_prog_done=1, 500m=%0d)", rval, ~TB_BOOT_500M); $finish;
         end
-        // Re-trigger AD9708 chirp after XO reprogram sys_rst/dac_rst cycle
+
+        if (TB_BOOT_500M) begin
+            // Now in 400 MHz mode: wait for AD9484 auto-training and verify 0xE8[0]=0, 0xE8[2]=1
+            wait_c = 0; rval = 32'd0;
+            while ((rval[0] || !rval[2]) && wait_c < 80) begin
+                repeat (200) @(posedge kria_tx_clk);
+                rd_reg(16'h00E8, rval);
+                wait_c = wait_c + 1;
+            end
+            if (rval[0] || !rval[2]) begin
+                $display("FAIL: tb_artix_top post-400M switch AD9484 did not train (0xE8=0x%08h)", rval); $finish;
+            end
+        end else begin
+            // Now in 500 MHz mode: verify A-1 re-asserts radar_dis=1
+            rd_reg(16'h00E8, rval);
+            if (!rval[0] || rval[1] || rval[2]) begin
+                $display("FAIL: tb_artix_top post-500M switch A-1 expected dis=1,mmcm=0,tr=0 got 0x%08h", rval); $finish;
+            end
+        end
+
+        // Re-trigger AD9708 chirp after XO reprogram sys_rst/dac_rst cycle (and re-enable ADCS 0x34/0x44/0x48/0x4C)
+        wr_reg(16'h0044, 32'h2000_0000);
+        wr_reg(16'h0048, 32'h4000_0000);
+        wr_reg(16'h004C, 32'h0008_0004);
+        wr_reg(16'h0034, 32'h0000_000D);
         wr_reg(16'h0058, 32'h28F5_C28F);
         wr_reg(16'h005C, 32'h0014_0000);
         wr_reg(16'h0060, 32'd32);
@@ -714,7 +762,7 @@ module tb_artix_top;
 
         // Verify uplink streams & DACs & safety
         wait_c = 0;
-        while ((cnt_04 < 2 || cnt_05 < 2 || cnt_01 < 4) && wait_c < 8000) begin
+        while ((cnt_04 < 2 || cnt_05 < 2 || (TB_BOOT_500M && cnt_01 < 4)) && wait_c < 8000) begin
             @(posedge rx_clkdiv); wait_c = wait_c + 1;
         end
         rd_reg(16'h006C, rval);

@@ -226,22 +226,36 @@ set_clock_sense -stop_propagation -clocks [get_clocks clk_fpga_400] [get_pins -q
 # Always-on STARTUPE2 CFGMCLK (~65 MHz +/-50% -> worst-case 97.5 MHz -> 10 ns)
 create_clock -period 10.000 -name clk_cfgmclk [get_pins u_clk_mode_ctrl/u_startupe2/CFGMCLK]
 
-create_clock -period 5.000  -name clk_adcr_dco [get_ports adcr_dco_n]
-create_clock -period 4.000  -name clk_adcs_dco [get_ports adcs_dco_p]
-create_clock -period 2.000  -name clk_link_tx  [get_ports link_tx_clk_p]
+# A-1 & G-7 (docs/REV08_PLAN.md): u_adc_cap and u_ddc are held in reset whenever the master clock
+# is 500 MHz, so clk_adcr_dco is analysed at 5.000 ns (400 MSPS -> 200 MHz DDR DCO) only.
+# G-7 will add a separate 500 MSPS capture/DDC path before 500 MHz radar/VHF operation is enabled.
+create_clock -period 5.000  -name clk_adcr_dco     [get_ports adcr_dco_n]
+
+# A-2 (docs/REV08_PLAN.md): AD9253 runs 1-lane 16-bit DDR (DCO = 8 * f_S):
+#   - 500 MHz master (f_S = 62.5 MSPS) -> 500 MHz DCO (2.000 ns), BUFR(DIV4) clk_div = 125 MHz (8.000 ns)
+#   - 400 MHz master (f_S = 50.0 MSPS) -> 400 MHz DCO (2.500 ns), BUFR(DIV4) clk_div = 100 MHz (10.000 ns)
+create_clock -period 2.000  -name clk_adcs_dco_500 [get_ports adcs_dco_p]
+create_clock -period 2.500  -name clk_adcs_dco_400 -add [get_ports adcs_dco_p]
+
+create_clock -period 2.000  -name clk_link_tx      [get_ports link_tx_clk_p]
 
 set_clock_groups -physically_exclusive \
     -group [get_clocks -include_generated_clocks clk_fpga_500] \
     -group [get_clocks -include_generated_clocks clk_fpga_400]
 
+set_clock_groups -physically_exclusive \
+    -group [get_clocks -include_generated_clocks clk_adcs_dco_500] \
+    -group [get_clocks -include_generated_clocks clk_adcs_dco_400]
+
 set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {clk_fpga_500 clk_fpga_400}] \
     -group [get_clocks clk_cfgmclk] \
     -group [get_clocks -include_generated_clocks clk_adcr_dco] \
-    -group [get_clocks -include_generated_clocks clk_adcs_dco] \
+    -group [get_clocks -include_generated_clocks {clk_adcs_dco_500 clk_adcs_dco_400}] \
     -group [get_clocks -include_generated_clocks clk_link_tx]
 
-# Asynchronous / dynamically eye-trained board I/Os
+# Debug UART (PMOD_SPARE1 RX / PMOD_SPARE2 TX) + asynchronous board I/Os
+set_property PULLUP TRUE [get_ports pmod_spare1]
 set_false_path -from [get_ports {pmod_* beam_strobe pps_sync hk_alert_n}]
 set_false_path -to   [get_ports {pmod_miso pmod_spare2 fpga_irq}]
 
