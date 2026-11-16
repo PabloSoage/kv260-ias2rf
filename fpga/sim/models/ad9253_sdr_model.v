@@ -23,11 +23,16 @@ module sim_ad9253_model (
     output wire adcs_d1_p,
     output wire adcs_d1_n
 );
-    reg adcs_dco_400m = 1'b0;
-    always #1250.000 adcs_dco_400m = ~adcs_dco_400m; // 400 MHz DDR DCO (8 * 50 MSPS)
+`ifdef FPGA_CLK_400M
+    real dco_half_ps = 1250.000; // 400 MHz DDR DCO (8 * 50.0 MSPS)
+`else
+    real dco_half_ps = 1000.000; // 500 MHz DDR DCO (8 * 62.5 MSPS)
+`endif
+    reg adcs_dco_clk = 1'b0;
+    initial forever #(dco_half_ps) adcs_dco_clk = ~adcs_dco_clk;
 
     reg adcs_dco_quad = 1'b0;
-    always @(adcs_dco_400m) adcs_dco_quad <= #625.000 adcs_dco_400m;
+    always @(adcs_dco_clk) adcs_dco_quad <= #(dco_half_ps * 0.5) adcs_dco_clk;
 
     // -------------------------------------------------------------------------
     // 3-Wire SPI Slave (Chip ID 0x8F)
@@ -100,7 +105,7 @@ module sim_ad9253_model (
     reg [15:0] fa = 16'd0, fb = 16'd0;
     reg        fco_raw = 1'b0, d0_raw = 1'b0, d1_raw = 1'b0;
 
-    always @(adcs_dco_400m) begin
+    always @(adcs_dco_clk) begin
         if (!configured) begin
             fco_raw <= 1'b0; d0_raw <= 1'b0; d1_raw <= 1'b0;
             ui_idx <= 4'd3; s_idx <= 3'd0;

@@ -82,7 +82,7 @@ if ($Bench -eq 'tb_sgmii_lvds') {
     foreach ($sub in @('third_party', 'link', 'artix', 'kria')) {
         $dir = Join-Path $fpgaDir $sub
         if (Test-Path $dir) {
-            $rtlFiles += Get-ChildItem $dir -Recurse -Include *.v, *.sv | ForEach-Object { $_.FullName }
+            $rtlFiles += Get-ChildItem $dir -Recurse -Include *.v, *.sv | Where-Object { $_.FullName -notmatch '[\\/]\.' } | ForEach-Object { $_.FullName }
         }
     }
     $modelsDir = Join-Path $simDir 'models'
@@ -91,7 +91,10 @@ if ($Bench -eq 'tb_sgmii_lvds') {
     }
 }
 
-$xvlogArgs += @($glblPath) + $rtlFiles + @($benchFile)
+$xvlogRsp = Join-Path $workDir 'xvlog_files.f'
+$rspLines = @($glblPath) + $rtlFiles + @($benchFile) | ForEach-Object { $_ -replace '\\', '/' }
+[System.IO.File]::WriteAllLines($xvlogRsp, $rspLines, [System.Text.UTF8Encoding]::new($false))
+$xvlogArgs += @('-f', $xvlogRsp)
 
 $logLines = New-Object System.Collections.Generic.List[string]
 $logLines.Add("=== run.ps1: bench=$Bench run=$runName date=$(Get-Date -Format o) ===")

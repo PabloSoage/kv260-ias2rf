@@ -202,3 +202,10 @@ Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h
 | `0xD8` | `TS_NOW_HI` | RO | `0x0000_0000` | `[31:0]` `pps_timestamp_ns[63:32]` snapshot (`sys_clk`) |
 | `0xDC` | `PPS_LATCH_LO` | RO | `0x0000_0000` | `[31:0]` `pps_latch_ts[31:0]` captured on last `PPS_SYNC` edge |
 | `0xE0` | `PPS_LATCH_HI` | RO | `0x0000_0000` | `[31:0]` `pps_latch_ts[63:32]` captured on last `PPS_SYNC` edge |
+| `0xE4` | `RADAR_CTRL` | R/W | `0x0000_0001` | **Rev08 A-1/G-1:** `[0]` `rad_ddc_en` (replaces `~pmod_spare1`); `[1]` W1P clear sticky clip/ovf flags & `0xEC` counters |
+| `0xE8` | `RADAR_STATUS` | RO | `0x0000_0000` | `[0]` `radar_dis_by_clk_mode` (1 at 500M); `[1]` `adcr_mmcm_locked`; `[2]` `adc_trained`; `[3]` `dco_phase_err`; `[4]` `dl_link_up`; `[5]` `dl_up & adc_trained` (replaces `pmod_spare2`); `[6]` `adcr_or_sticky`; `[7]` `adcs_clip_sticky`; `[8]` `ddc_sat_sticky`; `[9]` `ddc_ovf_sticky`; `[10]` `reg_rad_ddc_en`; `[21:16]` `adc_eye_width_min`; `[23:22]` `ddc_status` |
+| `0xEC` | `CLIP_OVF_CNT` | RO | `0x0000_0000` | `[15:0]` `adcr_clip_cnt` (saturating 16b); `[31:16]` `adcs_clip_cnt` (saturating 16b) |
+| `0xF0` | `DBG_UART_CTRL` | R/W | `0x0000_043D` | `[15:0]` `baud_div` (default `1085` on `125 MHz` `link_clk` = `115,207.4` baud, `+0.0064%` err); `[16]` `stat_periodic_dis`; `[17]` `force_stat_p` (W1P); `[24]` `uart_rx_idle_high` (RO); `[25]` `uart_tx_busy` (RO); `[26]` `uart_banner_done` (RO); `[31:27]` `uart_rx_ferr_cnt[4:0]` (RO) |
+| `0xF4` | `DBG_UART_STAT_DIV` | R/W | `0x0773_5940` | `[31:0]` Periodic `STAT` interval in `link_clk` cycles (default `125,000,000` = `1.000 s`) |
+| `0xF8` | `BUILD_GIT_HASH` | RO | generic | `[31:0]` 8-hex git commit prefix injected via `synth_design -generic` |
+| `0xFC` | `BUILD_TIMESTAMP` | RO | generic | `{BUILD_DATE[15:0], BUILD_TIME[23:8]}` (`MMDD_HHMM`) injected via `synth_design -generic` |

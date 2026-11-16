@@ -300,6 +300,7 @@ module tb_rev06;
 
     wire        rx_out_v, rx_out_sop, rx_out_eop;
     wire [7:0]  rx_out_sid;
+    wire [15:0] kria_rem_status;
     wire [15:0] rx_out_len;
     wire [31:0] rx_out_seq;
     wire [63:0] rx_out_ts, rx_out_data;
@@ -368,7 +369,7 @@ module tb_rev06;
         .l1_block_lock      (l1_lock),
         .deskew_lock        (d_lock),
         .skew_blocks        (),
-        .remote_status      (),
+        .remote_status      (kria_rem_status),
         .remote_dropped_cnt (),
         .sh_err_cnt_l0      (),
         .sh_err_cnt_l1      (),
@@ -931,15 +932,17 @@ module tb_rev06;
         repeat (16) @(posedge rx_clkdiv);
         kria_rx_rst = 1'b0;
 
-        // Wait for IAS1 training link_up + Artix ADC training (pmod_spare2)
+        // Wait for IAS1 training link_up + Artix downlink lock (rem_stat[8]) (+ Artix ADC training in 400M radar mode)
         wait_cyc = 0;
-        while (((kria_link_up !== 1'b1) || (pmod_spare2 !== 1'b1)) && wait_cyc < 150000) begin
+        while (((kria_link_up !== 1'b1) || (kria_rem_status[8] !== 1'b1) ||
+                (!TB_BOOT_500M && (kria_rem_status[5] !== 1'b1))) && wait_cyc < 150000) begin
             @(posedge rx_clkdiv);
             wait_cyc = wait_cyc + 1;
         end
-        if ((kria_link_up !== 1'b1) || (pmod_spare2 !== 1'b1)) begin
-            $display("FAIL: tb_rev06 IAS1 link did not reach link_up (link=%b spare2=%b st=%0d l0=%b l1=%b dl=%b idc=%b | sys=%b link_rst=%b ref_rst=%b dl_st=%0d dl_l0=%b dl_up=%b dl_up_s=%b adc_tr=%b adc_tr_s=%b adc_lock=%b)",
-                     kria_link_up, pmod_spare2, train_state, l0_lock, l1_lock, d_lock, idelayctrl_rdy,
+        if ((kria_link_up !== 1'b1) || (kria_rem_status[8] !== 1'b1) ||
+            (!TB_BOOT_500M && (kria_rem_status[5] !== 1'b1))) begin
+            $display("FAIL: tb_rev06 IAS1 link did not reach link_up (link=%b rem_stat=%04x st=%0d l0=%b l1=%b dl=%b idc=%b | sys=%b link_rst=%b ref_rst=%b dl_st=%0d dl_l0=%b dl_up=%b dl_up_s=%b adc_tr=%b adc_tr_s=%b adc_lock=%b)",
+                     kria_link_up, kria_rem_status, train_state, l0_lock, l1_lock, d_lock, idelayctrl_rdy,
                      u_artix.sys_mmcm_locked, u_artix.link_rst, u_artix.ref_rst,
                      u_artix.dl_train_state, u_artix.dl_l0_lock, u_artix.dl_link_up, u_artix.dl_up_sync,
                      u_artix.adc_trained, u_artix.adc_tr_sync, u_artix.adc_mmcm_locked);
@@ -978,24 +981,23 @@ module tb_rev06;
             $finish;
         end
 
-        // Enable ADC Radar tone -> concurrent stream 0x01 (IAS1) + stream 0x02 (ETH)
+        // Enable ADC Radar tone -> concurrent stream 0x01 (IAS1) + stream 0x02 (ETH) in 400M mode (or A-1 isolation + 0x02 in 500M)
         @(posedge clk_400m_adc);
         adc_tone_mode = 1'b1;
         @(posedge fpga_clk_100m);
         beam_strobe = 1'b1;
-        pmod_spare1 = 1'b0;
 
         // Send valid UDP Keepalive + configure SPLIT policy explicitly
         send_udp_frame(16'hA55B, 16'h0000, 32'h0000_0000, 32'd1, 1'b0);
         send_udp_frame(16'hA55A, 16'h0000, 32'h0000_0004, 32'd2, 1'b0); // policy=0 SPLIT, sdr_en=1
 
-        // Wait until >= 12 Radar packets on IAS1 AND >= 12 SDR packets on ETH (Phase 1 @ +100 ppm)
+        // Wait until >= 12 Radar packets (if 400M) AND >= 12 SDR packets on ETH (Phase 1 @ +100 ppm)
         wait_cyc = 0;
-        while ((ias_s1_cnt < 12 || eth_s2_cnt < 12) && wait_cyc < 100000) begin
+        while (((!TB_BOOT_500M && ias_s1_cnt < 12) || eth_s2_cnt < 12) && wait_cyc < 100000) begin
             @(posedge fpga_clk_100m);
             wait_cyc = wait_cyc + 1;
         end
-        if (ias_s1_cnt < 12 || eth_s2_cnt < 12) begin
+        if ((!TB_BOOT_500M && ias_s1_cnt < 12) || eth_s2_cnt < 12) begin
             $display("FAIL: tb_rev06 Phase 1 SPLIT timeout ias_s1=%0d eth_s2=%0d eth_s1=%0d ias_s2=%0d adc_tr=%b ddc_v=%b ias_v=%b ias_r=%b crc_err=%0d",
                      ias_s1_cnt, eth_s2_cnt, eth_s1_cnt, ias_s2_cnt,
                      u_artix.u_adc_cap.adc_trained,
@@ -1003,6 +1005,11 @@ module tb_rev06;
                      u_artix.ias_mux_valid,
                      u_artix.ias_mux_ready,
                      crc_err_cnt);
+            $finish;
+        end
+        if (TB_BOOT_500M && (!u_artix.radar_dis_link || u_artix.adc_trained || (ias_s1_cnt != 0) || (eth_s1_cnt != 0))) begin
+            $display("FAIL: tb_rev06 500M A-1 leak radar_dis=%b adc_tr=%b ias_s1=%0d eth_s1=%0d",
+                     u_artix.radar_dis_link, u_artix.adc_trained, ias_s1_cnt, eth_s1_cnt);
             $finish;
         end
         $display("tb_rev06 Phase 1 (+100ppm SPLIT): ias_s1=%0d eth_s2=%0d eth_fcs_fail=%0d", ias_s1_cnt, eth_s2_cnt, eth_fcs_fail);
@@ -1049,19 +1056,19 @@ module tb_rev06;
         snap_ias_s2_a = ias_s2_cnt;
         snap_eth_s2_b = eth_s2_cnt;
         wait_cyc = 0;
-        while ((ias_s1_cnt < snap_ias_s1_a + 6 || eth_s1_cnt < snap_eth_s1_a + 6 ||
+        while (((!TB_BOOT_500M && (ias_s1_cnt < snap_ias_s1_a + 6 || eth_s1_cnt < snap_eth_s1_a + 6)) ||
                 ias_s2_cnt < snap_ias_s2_a + 6 || eth_s2_cnt < snap_eth_s2_b + 6) && wait_cyc < 120000) begin
             @(posedge fpga_clk_100m);
             wait_cyc = wait_cyc + 1;
         end
-        if (eth_s1_cnt < snap_eth_s1_a + 6 || ias_s2_cnt < snap_ias_s2_a + 6) begin
+        if ((!TB_BOOT_500M && eth_s1_cnt < snap_eth_s1_a + 6) || ias_s2_cnt < snap_ias_s2_a + 6) begin
             $display("FAIL: tb_rev06 Phase 3 MIRROR_1P1 missing mirrored streams (ias1=%0d eth1=%0d ias2=%0d eth2=%0d)",
                      ias_s1_cnt - snap_ias_s1_a, eth_s1_cnt - snap_eth_s1_a,
                      ias_s2_cnt - snap_ias_s2_a, eth_s2_cnt - snap_eth_s2_b);
             $finish;
         end
         wait_cyc = 0;
-        while ((mdio_custom_wrs <= snap_mdio_wr || phy_regs[4] != 16'h01E1) && wait_cyc < 20000) begin
+        while ((mdio_custom_wrs <= snap_mdio_wr || phy_regs[4] != 16'h01E1) && wait_cyc < 40000) begin
             @(posedge fpga_clk_100m);
             wait_cyc = wait_cyc + 1;
         end
@@ -1072,9 +1079,10 @@ module tb_rev06;
 
         // Mid-run ETH cut under MIRROR_1P1, then mid-run IAS1 cut under MIRROR_1P1
         snap_ias_s1_b = ias_s1_cnt;
+        snap_ias_s2_a = ias_s2_cnt;
         send_udp_frame(16'hA55A, 16'h0000, 32'h0000_0015, 32'd9, 1'b0); // force_eth_fault=1
         wait_cyc = 0;
-        while ((ias_s1_cnt < snap_ias_s1_b + 5) && wait_cyc < 60000) begin
+        while (((TB_BOOT_500M ? (ias_s2_cnt < snap_ias_s2_a + 5) : (ias_s1_cnt < snap_ias_s1_b + 5))) && wait_cyc < 60000) begin
             @(posedge fpga_clk_100m);
             wait_cyc = wait_cyc + 1;
         end
@@ -1089,11 +1097,16 @@ module tb_rev06;
 
         // Check behavioral Kria (stream_id, seq_num) merge/dedup across ALL packets
         lost_s1 = 0;
-        for (k = 0; k <= ((ias_max_s1 > eth_max_s1) ? ias_max_s1 : eth_max_s1); k = k + 1) begin
-            if (!(seen_ias_s1[k[9:0]] || seen_eth_s1[k[9:0]])) begin
-                $display("  LOST s1 seq=%0d", k);
-                lost_s1 = lost_s1 + 1;
+        if (!TB_BOOT_500M) begin
+            for (k = 0; k <= ((ias_max_s1 > eth_max_s1) ? ias_max_s1 : eth_max_s1); k = k + 1) begin
+                if (!(seen_ias_s1[k[9:0]] || seen_eth_s1[k[9:0]])) begin
+                    $display("  LOST s1 seq=%0d", k);
+                    lost_s1 = lost_s1 + 1;
+                end
             end
+        end else if (ias_s1_cnt != 0 || eth_s1_cnt != 0) begin
+            $display("FAIL: tb_rev06 500M mode saw unexpected 0x01 packets (ias=%0d eth=%0d)", ias_s1_cnt, eth_s1_cnt);
+            $finish;
         end
         lost_s2 = 0;
         for (k = 0; k <= ((ias_max_s2 > eth_max_s2) ? ias_max_s2 : eth_max_s2); k = k + 1) begin

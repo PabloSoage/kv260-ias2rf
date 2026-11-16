@@ -135,6 +135,7 @@ module kria_top (
     wire         ps_spi0_sclko, ps_spi0_sclktn;
     wire [2:0]   ps_spi0_sson;
     wire         ps_spi0_ssntn;
+    wire         ps_uart1_txd;
 
     wire [39:0]  m_axi_awaddr, m_axi_araddr;
     wire [15:0]  m_axi_awid,   m_axi_arid;
@@ -197,6 +198,9 @@ module kria_top (
         .EMIOSPI0SCLKI  (1'b0),
         .EMIOSPI0SI     (1'b0),
         .EMIOSPI0SSIN   (1'b1),
+
+        .EMIOUART1TX    (ps_uart1_txd),
+        .EMIOUART1RX    (pmod_spare2),
 
         .PLPSIRQ0       (pl_ps_irq0),
 
@@ -1107,7 +1111,7 @@ module kria_top (
         .IO (hk_sda)
     );
 
-    reg pmod_cs_r, pmod_mosi_r, pmod_sclk_r, pmod_strobe_r, pmod_pps_r, pmod_sp1_r, prog_b_r;
+    reg pmod_cs_r, pmod_mosi_r, pmod_sclk_r, pmod_strobe_r, pmod_pps_r, prog_b_r;
     always @(posedge tx_clk_div) begin
         if (rst_tx) begin
             pmod_cs_r     <= 1'b1;
@@ -1115,7 +1119,6 @@ module kria_top (
             pmod_sclk_r   <= 1'b0;
             pmod_strobe_r <= 1'b0;
             pmod_pps_r    <= 1'b0;
-            pmod_sp1_r    <= 1'b0;
             prog_b_r      <= 1'b1;
         end else begin
             pmod_cs_r     <= ps_gpio_o[4] ? ~ps_gpio_tn[4] : ps_spi0_sson[0];
@@ -1123,7 +1126,6 @@ module kria_top (
             pmod_sclk_r   <= ps_spi0_sclko;
             pmod_strobe_r <= ps_gpio_o[1];
             pmod_pps_r    <= ps_gpio_o[2];
-            pmod_sp1_r    <= ps_gpio_o[3];
             prog_b_r      <= ps_gpio_o[0];
         end
     end
@@ -1134,19 +1136,18 @@ module kria_top (
     assign pmod_sclk        = pmod_sclk_r;
     assign pmod_beam_strobe = pmod_strobe_r;
     assign pmod_pps_sync    = pmod_pps_r;
-    assign pmod_spare1      = pmod_sp1_r;
+    assign pmod_spare1      = ps_uart1_txd;
 
-    (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync, spare2_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync;
     reg [63:0] rx_meta_snap_tx;
     always @(posedge tx_clk_div) begin
         irq_sync        <= {irq_sync[0], fpga_irq};
-        spare2_sync     <= {spare2_sync[0], pmod_spare2};
         rx_meta_snap_tx <= {last_rx_len, last_rx_seq[15:0], last_rx_ts[31:0]};
     end
 
     assign ps_gpio_i  = {rx_meta_snap_tx, 27'd0,
                          rx_err_or_flags(s_axi_hp_bresp, s_axi_hp_rresp),
-                         link_up_tx_sync[1], spare2_sync[1], irq_sync[1]};
+                         link_up_tx_sync[1], 1'b0, irq_sync[1]};
     assign pl_ps_irq0 = {6'd0, kria_link_up, irq_sync[1]};
 
     function [1:0] rx_err_or_flags;

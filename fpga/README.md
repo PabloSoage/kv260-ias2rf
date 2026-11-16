@@ -2,7 +2,7 @@
 
 This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 constraints/build scripts, and full-system XSim co-simulation testbenches for both FPGAs in the **KV260-IAS2RF** platform (**Apache License 2.0**, with `third_party/aeris/` under MIT).
 
-> **Comprehensive Documentation & Vivado Silicon Renders:** See [`docs/FPGA_GATEWARE.md`](../docs/FPGA_GATEWARE.md) for complete post-route Vivado silicon die floorplans (`XC7A50T` & `XCK26`), hierarchical circuit schematics, complete SDR (`HF`/`CB`/`VHF`/`FM`/`Walkie`/`UHF`) & `AERIS-10` (`10.5 GHz` / `20 km` / `8x ADAR1000`) signal chains, and the full `0x00..0xE0` register map.
+> **Comprehensive Documentation & Vivado Silicon Renders:** See [`docs/FPGA_GATEWARE.md`](../docs/FPGA_GATEWARE.md) for complete post-route Vivado silicon die floorplans (`XC7A50T` & `XCK26`), hierarchical circuit schematics, complete SDR (direct HF `0–31.25/25 MHz` & external-converter VHF/UHF) & `AERIS-10` (`10.5 GHz` / `20 km` / `8x ADAR1000`) signal chains, the `dbg_uart` monitor, and the full `0x00..0xFC` register map.
 
 ---
 
@@ -10,8 +10,8 @@ This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 
 
 | Folder / File | Purpose |
 |---|---|
-| `artix/` | Front-end `XC7A50T-FTG256-2` RTL (`top.v` with integrated Radar DDC, Dual-Ch SDR DDC, `dac_radar`, `dac_sdr`, `adar_ctrl`, `rf_switch`, `eth_sgmii_phy`, `eth_mac_udp`, `dual_path_mux`, `hk_*`, `pmod_spi`), `xc7a50t.xdc`, `build_rev06.tcl`, and routed reports (`reports_rev06/`) |
-| `kria/` | Kria KV260 `XCK26-SFVC784-2LV-c` PL core (`top.v`, `kria_pl_link.v`, `link_axis.v`), Vivado IPI block design (`bd.tcl`), `xck26.xdc`, `build.tcl`, and routed reports (`reports/`) |
+| `artix/` | Front-end `XC7A50T-FTG256-2` RTL (`top.v` with integrated Radar DDC, Dual-Ch SDR DDC, `dac_radar`, `dac_sdr`, `adar_ctrl`, `rf_switch`, `eth_sgmii_phy`, `eth_mac_udp`, `dual_path_mux`, `dbg_uart`, `hk_*`, `pmod_spi`), `xc7a50t.xdc`, `build_rev06.tcl`, and routed reports (`reports_rev06/`) |
+| `kria/` | Kria KV260 `XCK26-SFVC784-2LV-c` PL core (`top.v`, `kria_pl_link.v`, `link_axis.v`, PS `UART1` EMIO), Vivado IPI block design (`bd.tcl`), `xck26.xdc`, `build.tcl`, and routed reports (`reports/`) |
 | `link/` | Shared bidirectional `64b/66b` IAS1 PCS (`link_crc32`, `link_scrambler`, `link_gearbox`, `link_framer`, `link_lanes`, `link_rx_train_fsm`, `link_top`) + [`LINK_PROTOCOL.md`](link/LINK_PROTOCOL.md) & [`PINMAP.md`](link/PINMAP.md) |
 | `third_party/aeris/` | Verbatim `PLFM_RADAR` (`62d4c55`, MIT) 400 -> 100 MSPS radar DDC modules (`ddc_400m.v`, `nco_400m_enhanced.v`, `cic_decimator_4x_enhanced.v`, `fir_lowpass.v`, `ddc_input_interface.v`, `cdc_modules.v`) |
 | `eth/` | `1000BASE-T` SGMII feasibility, pin-dedicated implementation notes ([`REV06.md`](eth/REV06.md)), failover architecture ([`REDUNDANCY.md`](eth/REDUNDANCY.md)), and standalone SGMII XSim bench |
@@ -24,9 +24,8 @@ This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 
 
 | Target Device | Top / Wrapper | Slice LUTs | FFs | BRAM36 eq. | DSP | WNS | WHS | DRC |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `15,681 / 32,600` (`48.1%`) | `18,084 / 65,200` (`27.7%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | `+0.111 ns` | `+0.016 ns` | `0` Err |
-| **`XCK26-SFVC784-2LV-c`** | `ias2rf_k26_bd_wrapper` (BD) | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` (`0.0%`) | `+1.291 ns` | MET | `0` Err |
-| **`XCK26-SFVC784-2LV-c`** | `kria_top` (PL link core) | `4,629` LUT prims | `6,817` | `0` | `0` | `+1.008 ns` | `+0.017 ns` | `0` Err |
+| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `17,450 / 32,600` (`53.5%`) | `19,029 / 65,200` (`29.2%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | `+0.071 ns` (`clk_400m_unbuf`; AD9484 closed at `400 MSPS` only, `AD9253` `2.0/2.5 ns` MET) | `+0.014 ns` | `0` Err |
+| **`XCK26-SFVC784-2LV-c`** | `ias2rf_k26_bd_wrapper` (BD) | `11,038 / 117,120` (`9.4%`) | `18,210 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` (`0.0%`) | `+0.814 ns` | `+0.011 ns` | `0` Err |
 
 ---
 
@@ -37,10 +36,12 @@ This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 
 <Vivado 2026.1 install>\bin\vivado.bat -mode batch -nojournal -nolog -source fpga/artix/build_rev06.tcl
 
 # Build Kria K26 Vivado Block Design + XSA + bitstream
-<Vivado 2026.1 install>\bin\vivado.bat -mode batch -nojournal -nolog -source fpga/kria/build.tcl -tclargs bd
+<Vivado 2026.1 install>\bin\vivado.bat -mode batch -nojournal -nolog -source fpga/kria/bd.tcl
 
 # Run XSim unit, E2E, SGMII & full-system dual-FPGA co-simulations
 .\fpga\sim\run.ps1 tb_system
+.\fpga\sim\run.ps1 tb_system -Define FPGA_CLK_400M
+.\fpga\sim\run.ps1 tb_dbg_uart
 .\fpga\sim\run.ps1 tb_rev06
 .\fpga\sim\run.ps1 tb_e2e
 ```

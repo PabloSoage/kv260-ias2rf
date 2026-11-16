@@ -13,7 +13,18 @@ read_verilog [glob [file join $fpga_dir "link" "*.v"]]
 read_verilog [glob [file join $script_dir "*.v"]]
 read_xdc     [file join $script_dir "xc7a50t.xdc"]
 
-synth_design -top artix_top -part xc7a50t-ftg256-2 -flatten_hierarchy rebuilt -generic ENABLE_ETH=1'b1
+set now_sec    [clock seconds]
+set build_date [clock format $now_sec -format "%Y%m%d"]
+set build_time [clock format $now_sec -format "00%H%M%S"]
+set git_hash   "DEADC0DE"
+catch { set git_hash [string toupper [string trim [exec git -C [file dirname $fpga_dir] rev-parse --short=8 HEAD]]] }
+if {![regexp {^[0-9A-F]{8}$} $git_hash]} { set git_hash "DEADC0DE" }
+
+synth_design -top artix_top -part xc7a50t-ftg256-2 -flatten_hierarchy rebuilt \
+    -generic ENABLE_ETH=1'b1 \
+    -generic BUILD_DATE=32'h$build_date \
+    -generic BUILD_TIME=32'h$build_time \
+    -generic GIT_HASH=32'h$git_hash
 opt_design
 place_design
 phys_opt_design
@@ -26,6 +37,7 @@ report_utilization       -hierarchical -file [file join $rpt_dir "utilization.rp
 report_clock_utilization -file [file join $rpt_dir "clock_utilization.rpt"]
 report_drc               -file [file join $rpt_dir "drc.rpt"]
 report_methodology       -file [file join $rpt_dir "methodology.rpt"]
+report_cdc               -details -file [file join $rpt_dir "cdc.rpt"]
 
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
 set whs [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -hold]]

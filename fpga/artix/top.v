@@ -34,7 +34,12 @@ module artix_top #(
     parameter integer XO_FCAL_WAIT_CYC   = 3_000_000,   // >=30.7 ms Si549 FCAL wait @ +50% CFGMCLK (97.5 MHz)
     parameter [0:0]   BOOT_FREQ_500M     = 1'b1,        // Safe boot target: 1 = 500 MHz SDR, 0 = 400 MHz Radar
     parameter integer XADC_POLL_DIV_P    = 125_000,     // 1 ms XADC poll @ 125 MHz
-    parameter [31:0]  PPS_DEFAULT_NOM_CYC= 32'd125_000_000
+    parameter [31:0]  PPS_DEFAULT_NOM_CYC= 32'd125_000_000,
+    parameter [31:0]  BUILD_DATE         = 32'h2026_1116, // YYYYMMDD packed BCD (overridden by build.tcl)
+    parameter [31:0]  BUILD_TIME         = 32'h0000_0000, // 00HHMMSS packed BCD (overridden by build.tcl)
+    parameter [31:0]  GIT_HASH           = 32'hDEAD_C0DE, // 8-hex git short HEAD (overridden by build.tcl)
+    parameter [15:0]  DBG_UART_BAUD_DIV  = 16'd1085,      // 125 MHz / 1085 = 115,207.37 baud (+0.0064% err)
+    parameter [31:0]  DBG_UART_STAT_CYC  = 32'd125_000_000// 1 Hz default UART status line period
 ) (
     // System clock: 400 MHz (radar) or 500 MHz (SDR) LVDS on Bank 14 MRCC (DIFF_TERM=FALSE)
     input  wire       fpga_clk_p,
@@ -261,13 +266,39 @@ module artix_top #(
     wire [8:0] spi_cfg_tap_l0, spi_cfg_tap_l1;
     wire       spi_cfg_load_l0, spi_cfg_load_l1;
 
+    wire        xo_radar_dis_cfg;
+    wire        b14_idelay_rdy;
+    reg         reg_rad_ddc_en;
+
+    // Shared Bank 14 IDELAYCTRL (kept active across 400<->500 MHz switches for AD9253 & Downlink)
+    (* IODELAY_GROUP = "bank14_idelay_grp" *)
+    IDELAYCTRL u_idelayctrl_b14 (
+        .RDY    (b14_idelay_rdy),
+        .REFCLK (refclk_200m),
+        .RST    (ref_rst)
+    );
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] radar_dis_ref_s = 2'b11;
+    always @(posedge refclk_200m or posedge ref_rst) begin
+        if (ref_rst) radar_dis_ref_s <= 2'b11;
+        else         radar_dis_ref_s <= {radar_dis_ref_s[0], xo_radar_dis_cfg};
+    end
+    wire adcr_cap_rst_ref = ref_rst | radar_dis_ref_s[1];
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] radar_dis_link_s = 2'b11;
+    always @(posedge link_clk) begin
+        if (sys_rst) radar_dis_link_s <= 2'b11;
+        else         radar_dis_link_s <= {radar_dis_link_s[0], xo_radar_dis_cfg};
+    end
+    wire radar_dis_link = radar_dis_link_s[1];
+
     wire       link_rst = sys_rst | spi_ctrl_soft_rst;
 
     // -------------------------------------------------------------------------
-    // 2. PPS-Disciplined 64-bit Timestamp & Pmod Misc Synchronizers (link_clk)
+    // 2. PPS-Disciplined 64-bit Timestamp & Housekeeping Synchronizers (link_clk)
     // -------------------------------------------------------------------------
     (* ASYNC_REG = "TRUE" *) reg [2:0] pps_sync_r;
-    (* ASYNC_REG = "TRUE" *) reg [1:0] beam_sync_r, spare1_sync_r, alert_sync_r;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] beam_sync_r, alert_sync_r;
     reg [63:0] timestamp_cnt;
     reg [15:0] pps_pulse_cnt;
 
@@ -275,14 +306,12 @@ module artix_top #(
         if (link_rst) begin
             pps_sync_r    <= 3'b000;
             beam_sync_r   <= 2'b00;
-            spare1_sync_r <= 2'b00;
             alert_sync_r  <= 2'b11;
             timestamp_cnt <= 64'd0;
             pps_pulse_cnt <= 16'd0;
         end else begin
             pps_sync_r    <= {pps_sync_r[1:0], pps_sync};
             beam_sync_r   <= {beam_sync_r[0], beam_strobe};
-            spare1_sync_r <= {spare1_sync_r[0], pmod_spare1};
             alert_sync_r  <= {alert_sync_r[0], hk_alert_n};
 
             // Increment in 8 ns steps at 125 MHz link_clk; align upper bits on PPS edge
@@ -348,9 +377,9 @@ module artix_top #(
         .DCO_INVERT      (1'b1),
         .DCO_PERIOD_NS   (5.000),
         .REFCLK_FREQ_MHZ (200.0),
-        .INST_IDELAYCTRL (1'b1)
+        .INST_IDELAYCTRL (1'b0)
     ) u_adc_cap (
-        .rst              (ref_rst),
+        .rst              (adcr_cap_rst_ref),
         .refclk_200m      (refclk_200m),
         .adcr_d_p         (adcr_d_p),
         .adcr_d_n         (adcr_d_n),
@@ -372,6 +401,23 @@ module artix_top #(
         .eye_width_min    (adc_eye_width_min)
     );
 
+    // Rate-limited AD9484 overrange toggle in clk_400m for clean CDC into link_clk
+    reg [3:0] adcr_or_holdoff_400;
+    reg       adcr_or_tog_400;
+    always @(posedge adc_clk_400m or posedge adc_rst_100m) begin
+        if (adc_rst_100m) begin
+            adcr_or_holdoff_400 <= 4'd0;
+            adcr_or_tog_400     <= 1'b0;
+        end else begin
+            if (adcr_or_holdoff_400 != 4'd0)
+                adcr_or_holdoff_400 <= adcr_or_holdoff_400 - 4'd1;
+            else if (adc_valid && adc_or) begin
+                adcr_or_tog_400     <= ~adcr_or_tog_400;
+                adcr_or_holdoff_400 <= 4'd15;
+            end
+        end
+    end
+
     wire signed [15:0] bb_i, bb_q;
     wire               bb_valid;
     wire [1:0]         ddc_status;
@@ -384,14 +430,14 @@ module artix_top #(
     wire [63:0]        tx_pkt_timestamp, tx_pkt_data;
     wire [23:0]        tx_dropped_cnt;
 
-    (* ASYNC_REG = "TRUE" *) reg [1:0] adc_tr_100_sync, spare1_100_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adc_tr_100_sync, rad_en_100_sync;
     always @(posedge adc_clk_100m) begin
         if (adc_rst_100m) begin
             adc_tr_100_sync <= 2'b00;
-            spare1_100_sync <= 2'b00;
+            rad_en_100_sync <= 2'b00;
         end else begin
             adc_tr_100_sync <= {adc_tr_100_sync[0], adc_trained};
-            spare1_100_sync <= {spare1_100_sync[0], pmod_spare1};
+            rad_en_100_sync <= {rad_en_100_sync[0], reg_rad_ddc_en};
         end
     end
 
@@ -403,7 +449,7 @@ module artix_top #(
         .clk_400m         (adc_clk_400m),
         .clk_100m         (adc_clk_100m),
         .rst              (adc_rst_100m),
-        .ddc_en           (adc_tr_100_sync[1] & ~spare1_100_sync[1]),
+        .ddc_en           (adc_tr_100_sync[1] & rad_en_100_sync[1]),
         .reset_monitors   (spi_ctrl_clr_err_pulse),
         .adc_data         (adc_data),
         .adc_valid        (adc_valid),
@@ -415,7 +461,7 @@ module artix_top #(
         .filter_overflow  (filter_overflow),
         .sync_error       (sync_error),
         .link_clk         (link_clk),
-        .link_rst         (link_rst),
+        .link_rst         (link_rst | radar_dis_link),
         .timestamp_cnt    (timestamp_cnt),
         .pkt_valid        (tx_pkt_valid),
         .pkt_ready        (tx_pkt_ready),
@@ -444,14 +490,18 @@ module artix_top #(
         end
     end
 
-    (* ASYNC_REG = "TRUE" *) reg [2:0] fb_tog_sync;
-    (* ASYNC_REG = "TRUE" *) reg [1:0] adc_tr_sync, adc_err_sync, sat_sync, ovf_sync;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] fb_tog_sync, adcr_or_tog_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adc_tr_sync, adc_err_sync, sat_sync, ovf_sync, adcr_mmcm_s;
+    (* ASYNC_REG = "TRUE" *) reg [5:0] adc_eye_s1, adc_eye_s2;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] ddc_stat_s1, ddc_stat_s2;
     reg [15:0] fb_ddc_i_link, fb_ddc_q_link;
     reg        fb_ddc_valid_link;
+    wire       adcr_or_pulse_link = adcr_or_tog_sync[2] ^ adcr_or_tog_sync[1];
 
     always @(posedge link_clk) begin
-        if (link_rst) begin
+        if (link_rst || radar_dis_link) begin
             fb_tog_sync       <= 3'd0;
+            adcr_or_tog_sync  <= 3'd0;
             fb_ddc_i_link     <= 16'd0;
             fb_ddc_q_link     <= 16'd0;
             fb_ddc_valid_link <= 1'b0;
@@ -459,8 +509,14 @@ module artix_top #(
             adc_err_sync      <= 2'b00;
             sat_sync          <= 2'b00;
             ovf_sync          <= 2'b00;
+            adcr_mmcm_s       <= 2'b00;
+            adc_eye_s1        <= 6'd0;
+            adc_eye_s2        <= 6'd0;
+            ddc_stat_s1       <= 2'd0;
+            ddc_stat_s2       <= 2'd0;
         end else begin
             fb_tog_sync       <= {fb_tog_sync[1:0], fb_tog_100};
+            adcr_or_tog_sync  <= {adcr_or_tog_sync[1:0], adcr_or_tog_400};
             fb_ddc_valid_link <= (fb_tog_sync[2] ^ fb_tog_sync[1]);
             if (fb_tog_sync[2] ^ fb_tog_sync[1]) begin
                 fb_ddc_i_link <= fb_i_hold_100;
@@ -470,6 +526,11 @@ module artix_top #(
             adc_err_sync <= {adc_err_sync[0], adc_dco_phase_err};
             sat_sync     <= {sat_sync[0], mixer_saturation};
             ovf_sync     <= {ovf_sync[0], filter_overflow};
+            adcr_mmcm_s  <= {adcr_mmcm_s[0], adc_mmcm_locked};
+            adc_eye_s1   <= adc_eye_width_min;
+            adc_eye_s2   <= adc_eye_s1;
+            ddc_stat_s1  <= ddc_status;
+            ddc_stat_s2  <= ddc_stat_s1;
         end
     end
 
@@ -810,8 +871,8 @@ module artix_top #(
         beam_sync_r[1],
         adc_err_sync[1],
         adc_tr_sync[1],
-        adc_mmcm_locked,
-        ddc_status,
+        adcr_mmcm_s[1],
+        ddc_stat_s2,
         dl_st_sync2[1:0]
     };
 
@@ -1289,7 +1350,13 @@ module artix_top #(
     // -------------------------------------------------------------------------
     // 6. Pmod J1102 SPI Slave & Housekeeping (Bank 15 & Bank 35)
     // -------------------------------------------------------------------------
-    wire pmod_miso_int, pmod_miso_oe;
+    wire        pmod_miso_int, pmod_miso_oe;
+    reg         pmod_ext_wr_en;
+    reg  [6:0]  pmod_ext_wr_addr;
+    reg  [31:0] pmod_ext_wr_wdata;
+    wire        spi_csr_wr_valid;
+    wire [6:0]  spi_csr_wr_addr;
+    wire [31:0] spi_csr_wr_wdata;
 
     pmod_spi #(
         .FB_FIFO_DEPTH (64)
@@ -1318,12 +1385,12 @@ module artix_top #(
         .st_l1_block_lock     (1'b1),
         .st_deskew_lock       (dl_lock_sync[1]),
         .st_link_up           (dl_up_sync[1]),
-        .st_idelayctrl_rdy    (1'b1),
+        .st_idelayctrl_rdy    (b14_idelay_rdy),
         .st_remote_status     (dl_rem_sync2),
         .active_tap_l0        (dl_tap_sync2),
-        .active_tap_l1        ({4'd0, adc_tap_flat[4:0]}),
+        .active_tap_l1        ({4'd0, (radar_dis_link ? 5'd0 : adc_tap_flat[4:0])}),
         .err_cnt_sh_l0        (dl_sh_sync2),
-        .err_cnt_sh_l1        ({26'd0, adc_eye_width_min}),
+        .err_cnt_sh_l1        ({26'd0, adc_eye_s2}),
         .err_cnt_crc          (dl_crc_sync2),
         .pkt_cnt_rx           (dl_pkt_sync2),
         .tx_dropped_cnt       (tx_dropped_cnt),
@@ -1337,11 +1404,16 @@ module artix_top #(
         .eye_right_l1         (9'd0),
         .fb_ddc_i             (fb_ddc_i_link),
         .fb_ddc_q             (fb_ddc_q_link),
-        .fb_ddc_valid         (fb_ddc_valid_link)
+        .fb_ddc_valid         (fb_ddc_valid_link),
+        .ext_wr_en            (pmod_ext_wr_en),
+        .ext_wr_addr          (pmod_ext_wr_addr),
+        .ext_wr_wdata         (pmod_ext_wr_wdata),
+        .spi_csr_wr_valid     (spi_csr_wr_valid),
+        .spi_csr_wr_addr      (spi_csr_wr_addr),
+        .spi_csr_wr_wdata     (spi_csr_wr_wdata)
     );
 
-    assign pmod_miso   = pmod_miso_oe ? pmod_miso_int : 1'bz;
-    assign pmod_spare2 = dl_up_sync[1] & adc_tr_sync[1];
+    assign pmod_miso = pmod_miso_oe ? pmod_miso_int : 1'bz;
 
     // -------------------------------------------------------------------------
     // 7. Tasks 13-16: AD9253 + SDR DDC, DACs, 8x ADAR1000 + RF SW, HK + XO + XADC + PPS
@@ -1602,20 +1674,43 @@ module artix_top #(
         end
     end
 
+    // AD9253 fullscale clip detector (adcs_ddc_clk domain, rate-limited toggle -> link_clk)
+    reg [3:0] adcs_clip_holdoff;
+    reg       adcs_clip_tog_ddc;
+    wire      adcs_a_clip_w = (adcs_ch_en_s2[0] && ((sdr_in_a == 14'sh1FFF) || (sdr_in_a == 14'sh2000)));
+    wire      adcs_b_clip_w = (adcs_ch_en_s2[1] && ((sdr_in_b == 14'sh1FFF) || (sdr_in_b == 14'sh2000)));
+    always @(posedge adcs_ddc_clk) begin
+        if (adcs_ddc_rst) begin
+            adcs_clip_holdoff <= 4'd0;
+            adcs_clip_tog_ddc <= 1'b0;
+        end else begin
+            if (adcs_clip_holdoff != 4'd0)
+                adcs_clip_holdoff <= adcs_clip_holdoff - 4'd1;
+            else if (sdr_in_valid && (adcs_a_clip_w || adcs_b_clip_w)) begin
+                adcs_clip_tog_ddc <= ~adcs_clip_tog_ddc;
+                adcs_clip_holdoff <= 4'd15;
+            end
+        end
+    end
+
     (* ASYNC_REG = "TRUE" *) reg [1:0] adcs_al_s, adcs_id_s, adcs_ie_s, adcs_be_s;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] adcs_clip_tog_sync;
     (* ASYNC_REG = "TRUE" *) reg [4:0] adcs_tap_s1, adcs_tap_s2;
+    wire       adcs_clip_pulse_link = adcs_clip_tog_sync[2] ^ adcs_clip_tog_sync[1];
     always @(posedge link_clk) begin
         if (link_rst) begin
-            adcs_al_s   <= 2'b00; adcs_id_s <= 2'b00;
-            adcs_ie_s   <= 2'b00; adcs_be_s <= 2'b00;
-            adcs_tap_s1 <= 5'd0;  adcs_tap_s2 <= 5'd0;
+            adcs_al_s          <= 2'b00; adcs_id_s <= 2'b00;
+            adcs_ie_s          <= 2'b00; adcs_be_s <= 2'b00;
+            adcs_clip_tog_sync <= 3'd0;
+            adcs_tap_s1        <= 5'd0;  adcs_tap_s2 <= 5'd0;
         end else begin
-            adcs_al_s   <= {adcs_al_s[0], adcs_aligned};
-            adcs_id_s   <= {adcs_id_s[0], adcs_idelay_done};
-            adcs_ie_s   <= {adcs_ie_s[0], adcs_idelay_err};
-            adcs_be_s   <= {adcs_be_s[0], adcs_bitslip_err};
-            adcs_tap_s1 <= adcs_best_tap;
-            adcs_tap_s2 <= adcs_tap_s1;
+            adcs_al_s          <= {adcs_al_s[0], adcs_aligned};
+            adcs_id_s          <= {adcs_id_s[0], adcs_idelay_done};
+            adcs_ie_s          <= {adcs_ie_s[0], adcs_idelay_err};
+            adcs_be_s          <= {adcs_be_s[0], adcs_bitslip_err};
+            adcs_clip_tog_sync <= {adcs_clip_tog_sync[1:0], adcs_clip_tog_ddc};
+            adcs_tap_s1        <= adcs_best_tap;
+            adcs_tap_s2        <= adcs_tap_s1;
         end
     end
 
@@ -2058,6 +2153,7 @@ module artix_top #(
         .xo_busy_link        (xo_busy),
         .xo_prog_done_link   (xo_prog_done),
         .xo_active_500m_link (xo_active_500m),
+        .radar_dis_cfg       (xo_radar_dis_cfg),
         .xo_ack_err_link     (xo_ack_err),
         .xo_boot_done_link   (xo_boot_done),
         .xo_boot_err_link    (xo_boot_err),
@@ -2075,11 +2171,39 @@ module artix_top #(
     IOBUF #(.IOSTANDARD("LVCMOS33")) u_iobuf_xo_scl  (.I(1'b0), .T(xo_scl_t),  .O(xo_scl_in), .IO(xo_scl));
     IOBUF #(.IOSTANDARD("LVCMOS33")) u_iobuf_xo_sda  (.I(1'b0), .T(xo_sda_t),  .O(xo_sda_in), .IO(xo_sda));
 
-    // Register File 0x34..0xE0 Read Mux
+    // REV08 A-1..A-4 + G-1 CSR & Monitor State (link_clk)
+    reg         reg_clip_ovf_clr_p;
+    reg         adcr_or_sticky, adcs_clip_sticky, ddc_sat_sticky, ddc_ovf_sticky;
+    reg  [15:0] adcr_clip_cnt, adcs_clip_cnt;
+    reg  [15:0] reg_uart_baud_div;
+    reg         reg_uart_stat_dis, reg_uart_force_stat_p;
+    reg  [31:0] reg_uart_stat_div;
+    wire        uart_rx_idle_high, uart_tx_busy, uart_banner_done;
+    wire [4:0]  uart_rx_ferr_cnt;
+
+    // Register File 0x00..0xFC Read Mux
     function [31:0] reg_rd_word;
         input [15:0] addr;
         begin
             case (addr[7:2])
+                6'h00: reg_rd_word = {23'd0, spi_ctrl_fallback_en, 1'b0,
+                                      1'b0, spi_ctrl_prbs7_rx_chk_en, spi_ctrl_prbs7_tx_en,
+                                      spi_ctrl_tap_override_en, 1'b0,
+                                      spi_ctrl_loopback_en, spi_ctrl_soft_rst};             // 0x00
+                6'h01: reg_rd_word = {8'd0, dl_rem_sync2, 8'd0,
+                                      b14_idelay_rdy, dl_up_sync[1], dl_lock_sync[1],
+                                      1'b1, dl_lock_sync[1], dl_st_sync2};                   // 0x04
+                6'h02: reg_rd_word = {7'd0, dl_tap_sync2, 7'd0, spi_cfg_tap_l0};             // 0x08
+                6'h03: reg_rd_word = {11'd0, (radar_dis_link ? 5'd0 : adc_tap_flat[4:0]), 7'd0, spi_cfg_tap_l1}; // 0x0C
+                6'h04: reg_rd_word = dl_sh_sync2;                                            // 0x10
+                6'h05: reg_rd_word = {26'd0, adc_eye_s2};                                    // 0x14
+                6'h06: reg_rd_word = dl_crc_sync2;                                           // 0x18
+                6'h07: reg_rd_word = dl_pkt_sync2;                                           // 0x1C
+                6'h08: reg_rd_word = {dl_drop_sync2, tx_dropped_cnt};                        // 0x20
+                6'h09: reg_rd_word = {8'd0, 15'd0, eth_copper_up_stat, 8'd0};                // 0x24
+                6'h0A: reg_rd_word = dl_prbs_sync2;                                          // 0x28
+                6'h0B: reg_rd_word = {7'd0, dl_er_sync2, 7'd0, dl_el_sync2};                 // 0x2C
+                6'h0C: reg_rd_word = 32'd0;                                                  // 0x30
                 6'h0D: reg_rd_word = {28'd0, reg_adcs_ctrl[3:2], 1'b0, reg_adcs_ctrl[0]}; // 0x34
                 6'h0E: reg_rd_word = {ad9253_chip_id, 6'd0, conv_init_err, conv_init_done,
                                       7'd0, adcs_tap_s2, adcs_be_s[1], adcs_ie_s[1], adcs_id_s[1], adcs_al_s[1]}; // 0x38
@@ -2131,21 +2255,73 @@ module artix_top #(
                 6'h36: reg_rd_word = xadc_ts_sys[63:32];                                    // 0xD8
                 6'h37: reg_rd_word = pps_latch_ts[31:0];                                    // 0xDC
                 6'h38: reg_rd_word = pps_latch_ts[63:32];                                   // 0xE0
+                6'h39: reg_rd_word = {31'd0, reg_rad_ddc_en};                               // 0xE4 RADAR_CTRL
+                6'h3A: reg_rd_word = {8'd0, ddc_stat_s2, adc_eye_s2, 5'd0,
+                                      reg_rad_ddc_en, ddc_ovf_sticky, ddc_sat_sticky,
+                                      adcs_clip_sticky, adcr_or_sticky,
+                                      (dl_up_sync[1] & adc_tr_sync[1]), dl_up_sync[1],
+                                      adc_err_sync[1], adc_tr_sync[1], adcr_mmcm_s[1],
+                                      radar_dis_link};                                      // 0xE8 RADAR_STATUS
+                6'h3B: reg_rd_word = {adcs_clip_cnt, adcr_clip_cnt};                        // 0xEC CLIP_OVF_CNT
+                6'h3C: reg_rd_word = {uart_rx_ferr_cnt, uart_banner_done, uart_tx_busy,
+                                      uart_rx_idle_high, 7'd0, reg_uart_stat_dis,
+                                      reg_uart_baud_div};                                   // 0xF0 DBG_UART_CTRL
+                6'h3D: reg_rd_word = reg_uart_stat_div;                                     // 0xF4 DBG_UART_STAT_DIV
+                6'h3E: reg_rd_word = GIT_HASH;                                              // 0xF8 BUILD_GIT_HASH
+                6'h3F: reg_rd_word = {BUILD_DATE[15:0], BUILD_TIME[23:8]};                  // 0xFC BUILD_TIMESTAMP
                 default: reg_rd_word = 32'hDEAD_BEEF;
             endcase
         end
     endfunction
 
-    // Write & Downlink 8'h11 Readback Response Engine (link_clk)
+    // Write & Downlink 8'h11 Readback Response Engine + 4-Master Non-Blocking CSR Arbiter (link_clk)
     reg         resp_pkt_pend;
     reg  [31:0] resp_pkt_seq;
     reg  [63:0] resp_pkt_data;
     wire        resp_pkt_ready;
 
-    wire        reg_wr_en    = (dl_cmd_pop_r && (dl_cmd_word[63:56] == 8'h01)) ||
-                               (eth_ctrl_wr && (eth_ctrl_addr >= 16'h0034));
-    wire [15:0] reg_wr_addr  = dl_cmd_pop_r ? dl_cmd_word[47:32] : eth_ctrl_addr;
-    wire [31:0] reg_wr_wdata = dl_cmd_pop_r ? dl_cmd_word[31:0]  : eth_ctrl_wdata;
+    wire        uart_csr_req_valid, uart_csr_req_wr;
+    wire [15:0] uart_csr_req_addr;
+    wire [31:0] uart_csr_req_wdata;
+    reg         uart_csr_ack_r;
+    reg  [31:0] uart_csr_rdata_r;
+    wire        uart_csr_req_ack   = uart_csr_ack_r;
+    wire [31:0] uart_csr_req_rdata = uart_csr_rdata_r;
+
+    reg         dl_pend, eth_pend, spi_pend;
+    reg  [15:0] dl_pend_addr, eth_pend_addr, spi_pend_addr;
+    reg  [31:0] dl_pend_wdata, eth_pend_wdata, spi_pend_wdata;
+
+`ifdef MUTATE_DROP_MONITOR_WRITE
+    localparam [0:0] DROP_UART_WR = 1'b1;
+`else
+    localparam [0:0] DROP_UART_WR = 1'b0;
+`endif
+
+    wire grant_dl   = dl_pend;
+    wire grant_eth  = !dl_pend && eth_pend;
+    wire grant_spi  = !dl_pend && !eth_pend && spi_pend;
+    wire grant_uart = !dl_pend && !eth_pend && !spi_pend && uart_csr_req_valid && !uart_csr_ack_r;
+
+    wire        arb_wr_en    = grant_dl | grant_eth | grant_spi |
+                               (grant_uart & uart_csr_req_wr & ~DROP_UART_WR);
+    wire [15:0] arb_wr_addr  = grant_dl  ? dl_pend_addr  :
+                               grant_eth ? eth_pend_addr :
+                               grant_spi ? spi_pend_addr : uart_csr_req_addr;
+    wire [31:0] arb_wr_wdata = grant_dl  ? dl_pend_wdata  :
+                               grant_eth ? eth_pend_wdata :
+                               grant_spi ? spi_pend_wdata : uart_csr_req_wdata;
+
+    wire        reg_wr_en    = arb_wr_en && (arb_wr_addr >= 16'h0034);
+    wire [15:0] reg_wr_addr  = arb_wr_addr;
+    wire [31:0] reg_wr_wdata = arb_wr_wdata;
+
+    always @* begin
+        pmod_ext_wr_en    = arb_wr_en && (arb_wr_addr <= 16'h000C);
+        pmod_ext_wr_addr  = arb_wr_addr[6:0];
+        pmod_ext_wr_wdata = arb_wr_wdata;
+    end
+
 `ifdef MUTATE_NO_REG_RESP
     wire        reg_rd_req   = 1'b0;
 `else
@@ -2154,6 +2330,29 @@ module artix_top #(
 
     always @(posedge link_clk) begin
         if (link_rst) begin
+            uart_csr_ack_r         <= 1'b0;
+            uart_csr_rdata_r       <= 32'd0;
+            dl_pend                <= 1'b0;
+            dl_pend_addr           <= 16'd0;
+            dl_pend_wdata          <= 32'd0;
+            eth_pend               <= 1'b0;
+            eth_pend_addr          <= 16'd0;
+            eth_pend_wdata         <= 32'd0;
+            spi_pend               <= 1'b0;
+            spi_pend_addr          <= 16'd0;
+            spi_pend_wdata         <= 32'd0;
+            reg_rad_ddc_en         <= 1'b1;
+            reg_clip_ovf_clr_p     <= 1'b0;
+            adcr_or_sticky         <= 1'b0;
+            adcs_clip_sticky       <= 1'b0;
+            ddc_sat_sticky         <= 1'b0;
+            ddc_ovf_sticky         <= 1'b0;
+            adcr_clip_cnt          <= 16'd0;
+            adcs_clip_cnt          <= 16'd0;
+            reg_uart_baud_div      <= DBG_UART_BAUD_DIV;
+            reg_uart_stat_dis      <= 1'b0;
+            reg_uart_force_stat_p  <= 1'b0;
+            reg_uart_stat_div      <= DBG_UART_STAT_CYC;
             reg_adcs_ctrl          <= 32'h0000_0009; // Switch-free HF default: enable ADCS + Ch B (IF_RX_C / J951)
             reg_conv_spi_cmd       <= 32'd0;
             reg_conv_spi_start_p   <= 1'b0;
@@ -2221,6 +2420,63 @@ module artix_top #(
             reg_xo_delta_p       <= 1'b0;
             reg_xo_raw_p         <= 1'b0;
             reg_pps_clear_p      <= 1'b0;
+            reg_clip_ovf_clr_p   <= 1'b0;
+            reg_uart_force_stat_p<= 1'b0;
+
+            uart_csr_ack_r <= grant_uart;
+            if (grant_uart)
+                uart_csr_rdata_r <= reg_rd_word(uart_csr_req_addr);
+
+            // Enqueue / drain 4-master CSR write requests
+            if (dl_cmd_pop_r && (dl_cmd_word[63:56] == 8'h01)) begin
+                dl_pend       <= 1'b1;
+                dl_pend_addr  <= dl_cmd_word[47:32];
+                dl_pend_wdata <= dl_cmd_word[31:0];
+            end else if (grant_dl) begin
+                dl_pend <= 1'b0;
+            end
+
+            if (eth_ctrl_wr && (eth_ctrl_addr >= 16'h0034)) begin
+                eth_pend       <= 1'b1;
+                eth_pend_addr  <= eth_ctrl_addr;
+                eth_pend_wdata <= eth_ctrl_wdata;
+            end else if (grant_eth) begin
+                eth_pend <= 1'b0;
+            end
+
+            if (spi_csr_wr_valid) begin
+                spi_pend       <= 1'b1;
+                spi_pend_addr  <= {9'd0, spi_csr_wr_addr};
+                spi_pend_wdata <= spi_csr_wr_wdata;
+            end else if (grant_spi) begin
+                spi_pend <= 1'b0;
+            end
+
+            // Sticky clip / overflow telemetry + saturating 16-bit counters (0xE8, 0xEC)
+            if (reg_clip_ovf_clr_p || spi_ctrl_clr_err_pulse) begin
+                adcr_or_sticky   <= 1'b0;
+                adcs_clip_sticky <= 1'b0;
+                ddc_sat_sticky   <= 1'b0;
+                ddc_ovf_sticky   <= 1'b0;
+                adcr_clip_cnt    <= 16'd0;
+                adcs_clip_cnt    <= 16'd0;
+            end else begin
+                if (adcr_or_pulse_link)
+                    adcr_or_sticky <= 1'b1;
+                if (adcs_clip_pulse_link) begin
+                    adcs_clip_sticky <= 1'b1;
+                    if (adcs_clip_cnt != 16'hFFFF)
+                        adcs_clip_cnt <= adcs_clip_cnt + 16'd1;
+                end
+                if (sat_sync[1])
+                    ddc_sat_sticky <= 1'b1;
+                if (ovf_sync[1])
+                    ddc_ovf_sticky <= 1'b1;
+                if (adcr_or_pulse_link || sat_sync[1] || ovf_sync[1]) begin
+                    if (adcr_clip_cnt != 16'hFFFF)
+                        adcr_clip_cnt <= adcr_clip_cnt + 16'd1;
+                end
+            end
 
             if (reg_dacr_trig_p)
                 dacr_trig_tog_link <= ~dacr_trig_tog_link;
@@ -2313,6 +2569,16 @@ module artix_top #(
                         reg_pps_clear_p <= reg_wr_wdata[17];
                     end
                     6'h31: reg_pps_nom_cyc <= reg_wr_wdata; // 0xC4
+                    6'h39: begin // 0xE4 RADAR_CTRL
+                        reg_rad_ddc_en     <= reg_wr_wdata[0];
+                        reg_clip_ovf_clr_p <= reg_wr_wdata[1];
+                    end
+                    6'h3C: begin // 0xF0 DBG_UART_CTRL
+                        reg_uart_baud_div     <= reg_wr_wdata[15:0];
+                        reg_uart_stat_dis     <= reg_wr_wdata[16];
+                        reg_uart_force_stat_p <= reg_wr_wdata[17];
+                    end
+                    6'h3D: reg_uart_stat_div <= reg_wr_wdata; // 0xF4 DBG_UART_STAT_DIV
                     default: ;
                 endcase
             end else if (reg_rd_req) begin
@@ -2377,6 +2643,56 @@ module artix_top #(
     assign resp_pkt_ready    = (arb_owner == 2'd1) && s0_arb_ready;
     assign tx_pkt_ready      = (arb_owner == 2'd2) && s0_arb_ready;
     assign sdr_adc_pkt_ready = (arb_owner == 2'd3) && s0_arb_ready;
+
+    // -------------------------------------------------------------------------
+    // 8. Debug UART on PMOD_SPARE1 (RX) / PMOD_SPARE2 (TX) (125 MHz link_clk)
+    // -------------------------------------------------------------------------
+    dbg_uart #(
+        .BUILD_DATE       (BUILD_DATE),
+        .BUILD_TIME       (BUILD_TIME),
+        .GIT_HASH         (GIT_HASH),
+        .ENABLE_ETH       (ENABLE_ETH),
+        .DEFAULT_BAUD_DIV (DBG_UART_BAUD_DIV),
+        .DEFAULT_STAT_CYC (DBG_UART_STAT_CYC)
+    ) u_dbg_uart (
+        .clk              (link_clk),
+        .rst              (link_rst),
+        .uart_rx          (pmod_spare1),
+        .uart_tx          (pmod_spare2),
+        .cfg_baud_div     (reg_uart_baud_div),
+        .cfg_stat_cyc     (reg_uart_stat_div),
+        .cfg_status_dis   (reg_uart_stat_dis),
+        .force_stat_p     (reg_uart_force_stat_p),
+        .st_xo_ok         (xo_boot_done & ~xo_boot_err & ~xo_ack_err),
+        .st_xo_500m       (xo_active_500m),
+        .st_sys_mmcm      (sys_mmcm_locked),
+        .st_eth_mmcm      (eth_mmcm_locked_w),
+        .st_adcr_mmcm     (adcr_mmcm_s[1]),
+        .st_dl_state      (dl_st_sync2),
+        .st_dl_l0_lock    (dl_lock_sync[1]),
+        .st_dl_link_up    (dl_up_sync[1]),
+        .st_eth_link_up   (eth_link_up_stat),
+        .st_eth_copper_up (eth_copper_up_stat),
+        .st_adcr_trained  (adc_tr_sync[1]),
+        .st_adcs_aligned  (adcs_al_s[1]),
+        .st_adcr_clip_cnt (adcr_clip_cnt),
+        .st_adcs_clip_cnt (adcs_clip_cnt),
+        .st_xadc_temp_raw (xadc_temp_raw),
+        .st_hk_tmp_raw    (hk_tmp_raw),
+        .st_err_flags_lo  ({1'b0, adc_err_sync[1], adcs_ie_s[1], adcs_be_s[1],
+                            ddc_ovf_sticky, ddc_sat_sticky, adcr_or_sticky}),
+        .st_radar_dis     (radar_dis_link),
+        .rx_idle_high     (uart_rx_idle_high),
+        .tx_busy_o        (uart_tx_busy),
+        .banner_done      (uart_banner_done),
+        .rx_ferr_cnt      (uart_rx_ferr_cnt),
+        .csr_req_valid    (uart_csr_req_valid),
+        .csr_req_wr       (uart_csr_req_wr),
+        .csr_req_addr     (uart_csr_req_addr),
+        .csr_req_wdata    (uart_csr_req_wdata),
+        .csr_req_ack      (uart_csr_req_ack),
+        .csr_req_rdata    (uart_csr_req_rdata)
+    );
 
     // Active-high interrupt to KV260 carrier (Bank 35, LVCMOS18)
     assign fpga_irq = ~alert_sync_r[1] | hk_alert_active | xadc_overtemp |

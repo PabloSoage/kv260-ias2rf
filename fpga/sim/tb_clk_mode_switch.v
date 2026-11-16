@@ -107,8 +107,14 @@ module tb_clk_mode_switch;
     initial forever #(clk_half_ns) fpga_clk_raw = ~fpga_clk_raw;
 
     reg adcs_dco_400m = 1'b0; always #1.250 adcs_dco_400m = ~adcs_dco_400m;
-    reg dco_true      = 1'b0; always #2.500 dco_true      = ~dco_true;
+    reg clk_400m_adc  = 1'b0; always #1.250 clk_400m_adc  = ~clk_400m_adc;
+    reg dco_true      = 1'b0;
+    initial begin dco_true = 1'b0; #1.875; forever #2.500 dco_true = ~dco_true; end
     reg dco_board_del = 1'b0; always @(dco_true) dco_board_del <= #0.250 dco_true;
+    reg [7:0] adcr_samp = 8'h55;
+    always @(posedge clk_400m_adc) adcr_samp <= (adcr_samp == 8'hAA) ? 8'h55 : 8'hAA;
+    reg [7:0] adcr_d_del = 8'h55;
+    always @(adcr_samp) adcr_d_del <= #0.250 adcr_samp;
 
     reg kria_ref_300m = 1'b0; always #1.666 kria_ref_300m = ~kria_ref_300m;
     reg kria_tx_ddr   = 1'b0; always #1.000 kria_tx_ddr   = ~kria_tx_ddr;
@@ -187,7 +193,7 @@ module tb_clk_mode_switch;
     artix_top #(
         .DDC_POST_DECIM      (4),
         .LINK_AM_PERIOD      (64),
-        .ADC_AUTO_TRAIN      (1'b0),
+        .ADC_AUTO_TRAIN      (1'b1),
         .ENABLE_ETH          (1'b1),
         .ETH_BYPASS_AN       (1'b1),
         .ETH_ALIVE_TIMEOUT   (12500000),
@@ -204,8 +210,8 @@ module tb_clk_mode_switch;
     ) u_artix (
         .fpga_clk_p    (fpga_clk_p),
         .fpga_clk_n    (fpga_clk_n),
-        .adcr_d_p      (8'hAA),
-        .adcr_d_n      (8'h55),
+        .adcr_d_p      (adcr_d_del),
+        .adcr_d_n      (~adcr_d_del),
         .adcr_or_p     (1'b0),
         .adcr_or_n     (1'b1),
         .adcr_dco_n    (~dco_board_del),
@@ -571,7 +577,12 @@ module tb_clk_mode_switch;
             $finish;
         end
 
-        // Check Test 4a: Runtime switch 500 MHz -> 400 MHz
+        // Check Test 4a: Runtime switch 500 MHz -> 400 MHz (must clear radar_path_disabled & train AD9484)
+        rd_reg(16'h00E8, rval);
+        if (!rval[0] || rval[1] || rval[2]) begin
+            $display("FAIL: tb_clk_mode_switch 500M boot A-1 expected 0xE8[0]=1,mmcm=0,tr=0 got 0x%08h", rval);
+            $finish;
+        end
         wr_reg(16'h00A8, 32'h0000_0004); // prog_start=1, prog_500m=0
         #2000;
         wait_ias_retrain();
@@ -581,6 +592,17 @@ module tb_clk_mode_switch;
                      u_si549.mem[23], rval);
             $finish;
         end
+        wait_c = 0;
+        rval = 32'd0;
+        while ((!rval[2] || rval[0]) && wait_c < 80) begin
+            #2000;
+            rd_reg(16'h00E8, rval);
+            wait_c = wait_c + 1;
+        end
+        if (rval[0] || !rval[1] || !rval[2]) begin
+            $display("FAIL: tb_clk_mode_switch 400M switch did not enable/train AD9484 (0xE8=0x%08h)", rval);
+            $finish;
+        end
         repeat (8) @(posedge u_artix.dac_clk);
         dac_per_400 = dac_clk_per_ns;
         if (dac_per_400 < 9.9 || dac_per_400 > 10.1) begin
@@ -588,7 +610,7 @@ module tb_clk_mode_switch;
             $finish;
         end
 
-        // Check Test 4b: Runtime switch 400 MHz -> 500 MHz
+        // Check Test 4b: Runtime switch 400 MHz -> 500 MHz (must re-assert A-1 radar_path_disabled=1)
         wr_reg(16'h00A8, 32'h0000_0006); // prog_start=1, prog_500m=1
         #2000;
         wait_ias_retrain();
@@ -596,6 +618,11 @@ module tb_clk_mode_switch;
         if (u_si549.mem[23] !== 8'h16 || rval[10] !== 1'b1 || !rval[9]) begin
             $display("FAIL: tb_clk_mode_switch 400->500 switch mismatch mem[23]=%02x 0xA8=0x%08h",
                      u_si549.mem[23], rval);
+            $finish;
+        end
+        rd_reg(16'h00E8, rval);
+        if (!rval[0] || rval[1] || rval[2]) begin
+            $display("FAIL: tb_clk_mode_switch 500M-back did not re-disable AD9484 (0xE8=0x%08h)", rval);
             $finish;
         end
         repeat (8) @(posedge u_artix.dac_clk);

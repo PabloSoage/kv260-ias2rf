@@ -22,7 +22,11 @@ module tb_adcs_capture;
 
     always #2.500 refclk_200 = ~refclk_200; // 200 MHz
     always #4.000 link_clk   = ~link_clk;   // 125 MHz
-    always #1.250 adc_dco    = ~adc_dco;    // 400 MHz DCO
+`ifdef FPGA_CLK_400M
+    always #1.250 adc_dco    = ~adc_dco;    // 400 MHz DCO (50.0 MSPS, 1 UI = 1.25 ns)
+`else
+    always #1.000 adc_dco    = ~adc_dco;    // 500 MHz DCO (62.5 MSPS, 1 UI = 1.00 ns)
+`endif
 
     // -------------------------------------------------------------------------
     // conv_spi + Behavioral AD9253 / AD9484 3-wire SPI Slaves
