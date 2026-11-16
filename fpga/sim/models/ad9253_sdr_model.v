@@ -105,6 +105,24 @@ module sim_ad9253_model (
     reg [15:0] fa = 16'd0, fb = 16'd0;
     reg        fco_raw = 1'b0, d0_raw = 1'b0, d1_raw = 1'b0;
 
+    // Optional external signal sample file (+ADCS_SIG_FILE=<path>, optional +SIG_WAIT_ARM)
+    integer    sig_fd = 0;
+    reg        use_sig_file = 1'b0;
+    reg        sig_armed = 1'b1;
+    reg [1023:0] sig_path;
+    reg signed [13:0] file_sa, file_sb;
+    integer    fsc_n;
+
+    initial begin
+        if ($value$plusargs("ADCS_SIG_FILE=%s", sig_path)) begin
+            sig_fd = $fopen(sig_path, "r");
+            if (sig_fd != 0)
+                use_sig_file = 1'b1;
+        end
+        if ($test$plusargs("SIG_WAIT_ARM"))
+            sig_armed = 1'b0;
+    end
+
     always @(adcs_dco_clk) begin
         if (!configured) begin
             fco_raw <= 1'b0; d0_raw <= 1'b0; d1_raw <= 1'b0;
@@ -116,9 +134,19 @@ module sim_ad9253_model (
             d1_raw  <= fb[15 - ui_idx];
             if (ui_idx == 4'd15) begin
                 ui_idx <= 4'd0;
-                s_idx  <= s_idx + 3'd1;
-                fa     <= {tone_a(s_idx + 3'd1), 2'b00};
-                fb     <= {tone_b(s_idx[1:0] + 2'd1), 2'b00};
+                if (use_sig_file && sig_armed) begin
+                    fsc_n = $fscanf(sig_fd, "%h %h\n", file_sa, file_sb);
+                    if (fsc_n != 2) begin
+                        file_sa = 14'sd0;
+                        file_sb = 14'sd0;
+                    end
+                    fa <= {file_sa, 2'b00};
+                    fb <= {file_sb, 2'b00};
+                end else begin
+                    s_idx  <= s_idx + 3'd1;
+                    fa     <= {tone_a(s_idx + 3'd1), 2'b00};
+                    fb     <= {tone_b(s_idx[1:0] + 2'd1), 2'b00};
+                end
             end else begin
                 ui_idx <= ui_idx + 4'd1;
             end

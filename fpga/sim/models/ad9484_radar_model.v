@@ -118,12 +118,39 @@ module sim_ad9484_model #(
     real       if_lo, echo_scaled, adc_val_r;
     integer    noise_lsb;
 
+    // Optional external signal sample file (+ADCR_SIG_FILE=<path>, optional +SIG_WAIT_ARM)
+    integer    sig_fd = 0;
+    reg        use_sig_file = 1'b0;
+    reg        sig_armed = 1'b1;
+    reg [1023:0] sig_path;
+    reg [7:0]  file_samp;
+    integer    fsc_n;
+
+    initial begin
+        if ($value$plusargs("ADCR_SIG_FILE=%s", sig_path)) begin
+            sig_fd = $fopen(sig_path, "r");
+            if (sig_fd != 0)
+                use_sig_file = 1'b1;
+        end
+        if ($test$plusargs("SIG_WAIT_ARM"))
+            sig_armed = 1'b0;
+    end
+
     always @(posedge clk_400m_adc) begin
         noise_prng = {noise_prng[30:0], noise_prng[31] ^ noise_prng[21] ^ noise_prng[1] ^ noise_prng[0]};
         noise_lsb  = $signed(noise_prng[1:0]) - 1; // -1..+2 LSB thermal floor
 
         if (mode == 2'd0) begin
             adcr_samp <= (adcr_samp == 8'hAA) ? 8'h55 : 8'hAA;
+        end else if (use_sig_file) begin
+            if (sig_armed) begin
+                fsc_n = $fscanf(sig_fd, "%h\n", file_samp);
+                if (fsc_n != 1)
+                    file_samp = 8'h80;
+                adcr_samp <= file_samp;
+            end else begin
+                adcr_samp <= 8'h80;
+            end
         end else if (mode == 2'd1) begin
             // 121.5625 MHz IF CW tone at 400 MSPS -> +1.5625 MHz baseband
             adc_val_r = 128.0 + 105.0 * $cos(2.0 * PI * 0.30390625 * samp_idx);

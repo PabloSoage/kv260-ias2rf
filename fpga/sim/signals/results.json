@@ -1,0 +1,66 @@
+[
+  {
+    "case": "HF AM broadcast (7.20 MHz, J951)",
+    "measured": "SINAD=23.1 dB @ -100 dBm (E2E=22.0 dB)",
+    "pass": true,
+    "figures": [
+      "docs/img/sim/g8_hf_am.png"
+    ]
+  },
+  {
+    "case": "HF SSB / CB (14.2 MHz USB, QRN + fading)",
+    "measured": "SINAD=29.5 dB @ -100 dBm (E2E=18.0 dB)",
+    "pass": true,
+    "figures": [
+      "docs/img/sim/g8_hf_ssb.png"
+    ]
+  },
+  {
+    "case": "FM broadcast (98.1 MHz WBFM + +60 dB blocker + RDS)",
+    "measured": "Mono SINAD=0.5 dB (max 31.3 dB), Pilot=1, RDS GER=0.00%",
+    "pass": false,
+    "figures": [
+      "docs/img/sim/g8_fm_broadcast.png"
+    ]
+  },
+  {
+    "case": "Airband AM (121.5 MHz, Doppler + FM blocker)",
+    "measured": "10 dB SINAD sensitivity = -120.0 dBm (E2E=214.4 dB)",
+    "pass": true,
+    "figures": [
+      "docs/img/sim/g8_airband_am.png"
+    ]
+  },
+  {
+    "case": "VHF/UHF handhelds (PMR446/2m/70cm/marine, NBFM)",
+    "measured": "12 dB SINAD=-123.8 dBm, CTCSS=DETECTED, ImgRej=77.2 dB",
+    "pass": true,
+    "figures": [
+      "docs/img/sim/g8_vhf_uhf_nbfm.png"
+    ]
+  },
+  {
+    "case": "ADS-B (1090 MHz Mode-S DF17 + CRC-24)",
+    "measured": "E2E=0/3 CRC-OK frames; strong rate=100%",
+    "pass": false,
+    "figures": [
+      "docs/img/sim/g8_adsb_1090.png"
+    ]
+  },
+  {
+    "case": "Transmit (CW/AM/NBFM/USB/Chirp via AD9767+AD9708)",
+    "measured": "CW SFDR=81.3 dBc, AM_SINAD=39.6 dB, FM_SINAD=32.7 dB, USB_Rej=56.1 dB",
+    "pass": true,
+    "figures": [
+      "docs/img/sim/g8_tx_masks.png"
+    ]
+  },
+  {
+    "case": "Radar (400 MSPS AERIS + Kria 2D-FFT + CA-CFAR + ADAR1000)",
+    "measured": "Peak=(51,15), T1_det=False, T2(-30dB)_det=False, Beam=-15.0 deg, Pd@4dB=1.00",
+    "pass": false,
+    "figures": [
+      "docs/img/sim/g8_radar_rd_cfar.png"
+    ]
+  }
+]

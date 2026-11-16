@@ -441,6 +441,9 @@ module artix_top #(
         end
     end
 
+    reg         reg_rad_nco_ovrd;
+    reg  [23:0] reg_rad_nco_hi;
+
     ddc_wrapper #(
         .POST_DECIM (DDC_POST_DECIM),
         .PKT_WORDS  (8),
@@ -451,6 +454,7 @@ module artix_top #(
         .rst              (adc_rst_100m),
         .ddc_en           (adc_tr_100_sync[1] & rad_en_100_sync[1]),
         .reset_monitors   (spi_ctrl_clr_err_pulse),
+        .nco_ftw_ovrd     (reg_rad_nco_ovrd ? {reg_rad_nco_hi, 8'h00} : 32'd0),
         .adc_data         (adc_data),
         .adc_valid        (adc_valid),
         .bb_i             (bb_i),
@@ -2342,6 +2346,8 @@ module artix_top #(
             spi_pend_addr          <= 16'd0;
             spi_pend_wdata         <= 32'd0;
             reg_rad_ddc_en         <= 1'b1;
+            reg_rad_nco_ovrd       <= 1'b0;
+            reg_rad_nco_hi         <= 24'd0;
             reg_clip_ovf_clr_p     <= 1'b0;
             adcr_or_sticky         <= 1'b0;
             adcs_clip_sticky       <= 1'b0;
@@ -2572,6 +2578,8 @@ module artix_top #(
                     6'h39: begin // 0xE4 RADAR_CTRL
                         reg_rad_ddc_en     <= reg_wr_wdata[0];
                         reg_clip_ovf_clr_p <= reg_wr_wdata[1];
+                        reg_rad_nco_ovrd   <= reg_wr_wdata[2];
+                        reg_rad_nco_hi     <= reg_wr_wdata[31:8];
                     end
                     6'h3C: begin // 0xF0 DBG_UART_CTRL
                         reg_uart_baud_div     <= reg_wr_wdata[15:0];

@@ -180,6 +180,7 @@ module tb_adc_ddc;
         .rst              (rst),
         .ddc_en           (ddc_en),
         .reset_monitors   (1'b0),
+        .nco_ftw_ovrd     (32'd0),
         .adc_data         (cap_data),
         .adc_valid        (cap_valid),
         .bb_i             (bb_i),

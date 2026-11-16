@@ -27,6 +27,7 @@ module ddc_400m_enhanced (
     input wire [15:0] test_phase_inc,
     input wire force_saturation,
     input wire reset_monitors,
+    input wire [31:0] ftw_override,
     output wire [31:0] debug_sample_count,
     output wire [17:0] debug_internal_i,
     output wire [17:0] debug_internal_q
@@ -203,15 +204,22 @@ lfsr_dither_enhanced #(
 // ============================================================================
 // Phase Increment Calculation with Dithering
 // ============================================================================
-// Calculate phase increment for 120MHz IF at 400MHz sampling
+// Calculate phase increment for 120MHz IF at 400MHz sampling (default when ftw_override==0)
 localparam PHASE_INC_120MHZ = 32'h4CCCCCCD;
+(* ASYNC_REG = "TRUE" *) reg [31:0] ftw_ovrd_s1, ftw_ovrd_s2;
 
 // Apply dithering to reduce spurious tones (registered for 400 MHz timing)
 always @(posedge clk_400m) begin
-    if (rst_400_nco)
+    if (rst_400_nco) begin
+        ftw_ovrd_s1        <= 32'd0;
+        ftw_ovrd_s2        <= 32'd0;
         phase_inc_dithered <= PHASE_INC_120MHZ;
-    else
-        phase_inc_dithered <= PHASE_INC_120MHZ + {24'b0, phase_dither_bits};
+    end else begin
+        ftw_ovrd_s1        <= ftw_override;
+        ftw_ovrd_s2        <= ftw_ovrd_s1;
+        phase_inc_dithered <= ((ftw_ovrd_s2 != 32'd0) ? ftw_ovrd_s2 : PHASE_INC_120MHZ)
+                            + {24'b0, phase_dither_bits};
+    end
 end
 
 // ============================================================================

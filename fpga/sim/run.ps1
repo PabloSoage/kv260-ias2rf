@@ -18,6 +18,8 @@ param(
     [Parameter(Mandatory = $true, Position = 0)][string]$Bench,
     [string]$Mutate = '',
     [string[]]$Define = @(),
+    [string[]]$PlusArg = @(),
+    [string]$RunTag = '',
     [string]$Vivado = 'D:\AMDDesignTools\2026.1\Vivado'
 )
 
@@ -51,7 +53,8 @@ if ($Define -and ($Define.Count -gt 0)) {
     }
 }
 $mutSuffix = if ($Mutate) { "-mutate-$Mutate" } else { '' }
-$runName = "$Bench$defSuffix$mutSuffix"
+$tagSuffix = if ($RunTag) { "-$RunTag" } else { '' }
+$runName = "$Bench$defSuffix$mutSuffix$tagSuffix"
 $workDir = Join-Path $outDir "work_$runName"
 $logFile = Join-Path $outDir "$runName.log"
 
@@ -136,7 +139,12 @@ try {
     if (-not $toolFailed) {
         $logLines.Add("--- xsim ---")
         $t0 = Get-Date
-        $xsimLines = & (Join-Path $binDir 'xsim.bat') 'sim' '-R' 2>&1 | ForEach-Object { $_.ToString() }
+        $xsimArgs = @('-R')
+        foreach ($pa in $PlusArg) {
+            if ($pa) { $xsimArgs += @('-testplusarg', ('"' + $pa + '"')) }
+        }
+        $xsimArgs += @('sim')
+        $xsimLines = & (Join-Path $binDir 'xsim.bat') @xsimArgs 2>&1 | ForEach-Object { $_.ToString() }
         $xsimEc = $LASTEXITCODE
         $secs = [Math]::Round(((Get-Date) - $t0).TotalSeconds, 2)
         foreach ($ln in $xsimLines) { $logLines.Add($ln) }

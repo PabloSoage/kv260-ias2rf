@@ -464,6 +464,17 @@ module kria_pl_link (
     reg  [3:0] wstrb_lat  = 4'd0;
     reg  [7:0] tx_default_sid_r = 8'h10;
 
+    // Rev08 G-8 DSP Suite CSR wires (pl_clk_100m domain, 0x40..0x7C)
+    reg         dsp_csr_wr_en = 1'b0;
+    reg  [7:0]  dsp_csr_wr_addr = 8'd0;
+    reg  [31:0] dsp_csr_wr_wdata = 32'd0;
+    wire [31:0] dsp_csr_rd_rdata;
+    wire        dsp_tx_en;
+    wire [63:0] dsp_tx_tdata;
+    wire        dsp_tx_tvalid, dsp_tx_tlast;
+    wire [7:0]  dsp_tx_tid;
+    wire [15:0] dsp_tx_tuser;
+
     // rx_clkdiv side AXI-Lite master toward u_link_axis
     reg  [7:0] link_awaddr, link_araddr;
     reg [31:0] link_wdata;
@@ -546,11 +557,15 @@ module kria_pl_link (
             aw_seen          <= 1'b0;
             w_seen           <= 1'b0;
             tx_default_sid_r <= 8'h10;
+            dsp_csr_wr_en    <= 1'b0;
+            dsp_csr_wr_addr  <= 8'd0;
+            dsp_csr_wr_wdata <= 32'd0;
         end else begin
             csr_ack_sync_pl <= {csr_ack_sync_pl[1:0], csr_ack_tog_rx};
             s_axi_awready   <= 1'b0;
             s_axi_wready    <= 1'b0;
             s_axi_arready   <= 1'b0;
+            dsp_csr_wr_en   <= 1'b0;
             if (s_axi_bvalid && s_axi_bready) s_axi_bvalid <= 1'b0;
             if (s_axi_rvalid && s_axi_rready) s_axi_rvalid <= 1'b0;
 
@@ -575,6 +590,14 @@ module kria_pl_link (
                             s_axi_bvalid <= 1'b1;
                             aw_seen      <= 1'b0;
                             w_seen       <= 1'b0;
+                        end else if ((aw_seen ? awaddr_lat[7:6] : s_axi_awaddr[7:6]) == 2'b01) begin
+                            dsp_csr_wr_en    <= 1'b1;
+                            dsp_csr_wr_addr  <= aw_seen ? awaddr_lat : s_axi_awaddr;
+                            dsp_csr_wr_wdata <= w_seen  ? wdata_lat  : s_axi_wdata;
+                            s_axi_bresp      <= 2'b00;
+                            s_axi_bvalid     <= 1'b1;
+                            aw_seen          <= 1'b0;
+                            w_seen           <= 1'b0;
                         end else begin
                             csr_req_wr_pl    <= 1'b1;
                             csr_req_addr_pl  <= aw_seen ? awaddr_lat : s_axi_awaddr;
@@ -590,6 +613,10 @@ module kria_pl_link (
                         s_axi_arready <= 1'b1;
                         if (s_axi_araddr == 8'h34) begin
                             s_axi_rdata  <= {24'd0, tx_default_sid_r};
+                            s_axi_rresp  <= 2'b00;
+                            s_axi_rvalid <= 1'b1;
+                        end else if (s_axi_araddr[7:6] == 2'b01) begin
+                            s_axi_rdata  <= dsp_csr_rd_rdata;
                             s_axi_rresp  <= 2'b00;
                             s_axi_rvalid <= 1'b1;
                         end else begin
@@ -782,12 +809,39 @@ module kria_pl_link (
     assign m_axis_rx_tdata  = rx_afifo_rd[63:0];
     assign m_axis_rx_tkeep  = 8'hFF;
 
-    wire [7:0] tx_eff_sid = (s_axis_tx_tid != 8'd0) ? s_axis_tx_tid : tx_default_sid_r;
+    kria_dsp_suite u_dsp_suite (
+        .clk            (pl_clk_100m),
+        .rst            (!pl_resetn),
+        .csr_wr_en      (dsp_csr_wr_en),
+        .csr_wr_addr    (dsp_csr_wr_addr),
+        .csr_wr_wdata   (dsp_csr_wr_wdata),
+        .csr_rd_addr    (s_axi_araddr),
+        .csr_rd_rdata   (dsp_csr_rd_rdata),
+        .rx_tap_valid   (m_axis_rx_tvalid),
+        .rx_tap_ready   (m_axis_rx_tready),
+        .rx_tap_last    (m_axis_rx_tlast),
+        .rx_tap_tid     (m_axis_rx_tid),
+        .rx_tap_data    (m_axis_rx_tdata),
+        .dsp_tx_en      (dsp_tx_en),
+        .tx_axis_tdata  (dsp_tx_tdata),
+        .tx_axis_tvalid (dsp_tx_tvalid),
+        .tx_axis_tready (!tx_afifo_full && dsp_tx_en),
+        .tx_axis_tlast  (dsp_tx_tlast),
+        .tx_axis_tid    (dsp_tx_tid),
+        .tx_axis_tuser  (dsp_tx_tuser)
+    );
+
+    wire [63:0] eff_tx_tdata  = dsp_tx_en ? dsp_tx_tdata  : s_axis_tx_tdata;
+    wire        eff_tx_tvalid = dsp_tx_en ? dsp_tx_tvalid : s_axis_tx_tvalid;
+    wire        eff_tx_tlast  = dsp_tx_en ? dsp_tx_tlast  : s_axis_tx_tlast;
+    wire [15:0] eff_tx_tuser  = dsp_tx_en ? dsp_tx_tuser  : s_axis_tx_tuser;
+    wire [7:0]  tx_eff_sid    = dsp_tx_en ? dsp_tx_tid    : ((s_axis_tx_tid != 8'd0) ? s_axis_tx_tid : tx_default_sid_r);
+
     kria_pl_async_fifo #(.DW(89), .AW(4)) u_fifo_pl2tx (
         .wr_clk   (pl_clk_100m),
         .wr_rst   (!pl_resetn),
-        .wr_en    (s_axis_tx_tvalid && s_axis_tx_tready),
-        .wr_data  ({s_axis_tx_tlast, s_axis_tx_tuser, tx_eff_sid, s_axis_tx_tdata}),
+        .wr_en    (eff_tx_tvalid && !tx_afifo_full),
+        .wr_data  ({eff_tx_tlast, eff_tx_tuser, tx_eff_sid, eff_tx_tdata}),
         .wr_full  (tx_afifo_full),
         .rd_clk   (rx_clkdiv),
         .rd_rst   (pcs_rst_rx),
@@ -795,7 +849,7 @@ module kria_pl_link (
         .rd_data  (tx_afifo_rd),
         .rd_empty (tx_afifo_empty)
     );
-    assign s_axis_tx_tready = !tx_afifo_full;
+    assign s_axis_tx_tready = !tx_afifo_full && !dsp_tx_en;
 
     kria_pl_async_fifo #(.DW(122), .AW(4)) u_fifo_dl (
         .wr_clk   (rx_clkdiv),

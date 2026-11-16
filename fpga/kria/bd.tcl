@@ -15,6 +15,12 @@ create_project -force kria_bd $proj_dir -part xck26-sfvc784-2LV-c
 # Import plain-Verilog link modules + Kria BD-compatible wrapper
 add_files -norecurse [glob [file join $fpga_dir "link" "*.v"]]
 add_files -norecurse [file join $script_dir "link_axis.v"]
+add_files -norecurse [file join $script_dir "kria_cordic.v"]
+add_files -norecurse [file join $script_dir "kria_channel_rx.v"]
+add_files -norecurse [file join $script_dir "kria_adsb_rx.v"]
+add_files -norecurse [file join $script_dir "kria_tx_mod.v"]
+add_files -norecurse [file join $script_dir "kria_radar_proc.v"]
+add_files -norecurse [file join $script_dir "kria_dsp_suite.v"]
 add_files -norecurse [file join $script_dir "kria_pl_link.v"]
 update_compile_order -fileset sources_1
 

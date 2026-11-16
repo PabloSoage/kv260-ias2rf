@@ -16,6 +16,7 @@ module ddc_wrapper #(
     input  wire        rst,
     input  wire        ddc_en,
     input  wire        reset_monitors,
+    input  wire [31:0] nco_ftw_ovrd,
 
     // AD9484 400 MSPS stream (clk_400m domain)
     input  wire [7:0]  adc_data,
@@ -71,6 +72,7 @@ module ddc_wrapper #(
         .test_phase_inc      (16'd0),
         .force_saturation    (1'b0),
         .reset_monitors      (reset_monitors),
+        .ftw_override        (nco_ftw_ovrd),
         .debug_sample_count  (),
         .debug_internal_i    (),
         .debug_internal_q    ()
