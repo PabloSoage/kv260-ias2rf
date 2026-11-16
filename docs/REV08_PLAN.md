@@ -121,9 +121,9 @@ Today the board has `D1101` (DONE) and the two LEDs in the RJ45 [V].
 Activity is shown by the UART's transmit line: one LED on `PMOD_SPARE2` blinks with every status line the FPGA
 prints, once a second. That is the heartbeat, and it costs no bus traffic.
 
-Placement: a row at the left edge, just south of `J961` (KiCad y 125–131), so they show through a 2 mm slot in
-the back wall beside the antenna connector. Parts: KT-0603R class LEDs (basic part, 5.7 M in stock),
-TCA6416ARTWR (33 k in stock, $0.82).
+Placement (revised by the trial, section 11.4): the 9 status LEDs in a column north of `J961`, x 99.4–103.5,
+y 107.8–117.2, seen through a small window in the lid; the five rail LEDs beside their regulators. Parts:
+0402 LEDs, TCA6416ARTWR (33 k in stock, $0.82).
 
 ### 3.2 Debug serial
 
@@ -150,9 +150,9 @@ TCA6416ARTWR (33 k in stock, $0.82).
   lid's fan (enclosure X −65 to −15; the tongue is at X 0–24.5) and of the KV260's own fan. But the tongue lies
   over the carrier, 0.8 mm above it: **the connector must be surface-mount only, shell tabs included**. A
   vertical USB-C is about 10 mm tall, which leaves 20 mm to the lid.
-- Candidates in stock today [V]: U262-161N-4BVC11 (XKB, 35 k, $0.41; its second source SH-U262-161N-4BVC11,
-  18 k), JS16L-TYPE-C423-H100 (Jushuo, 1.7 k), HX-TYPE-C 16P 180 H10.0 (3.6 k). Their drawings decide: any with
-  through-hole shell legs is out. Fallback if none places: a 1 × 4 header for a USB-TTL cable, same position.
+- Chosen after the trial (section 11.4): **HX-TYPE-C 16P 180 LT H10.0** (LCSC C49261569, 3,635 in stock),
+  surface-mount legs and two locating pegs. `U262-161N-4BVC11` was rejected: through-hole shell legs and not a
+  vertical part. Fallback if the pegs do not clear the carrier: a 1 × 4 header for a USB-TTL cable, same position.
 
 Stock: CH340X 43 k ($0.66), USBLC6-2SC6 38 k.
 
@@ -498,7 +498,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 |---|---|---|---|
 | 0 | Decisions (section 12) | — | Done, 16 November |
 | 1 | Audit corrections A-1 to A-6, and G-1 (debug UART) | Rebuild: timing with the corrected clocks; the existing benches at both clock modes; a new bench for the UART with a mutation; documents and PDF regenerated | Independent of the rest; can be merged as Rev07 gateware |
-| 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work** |
+| 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work.** Passed 16 November (section 11.4) |
 | 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances** |
 | 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | — |
 | 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | — |
@@ -523,12 +523,13 @@ editing numbers into a document. Before Rev08 is called finished:
 | Power | `power_budget.py` with every new load; regulator dissipation; rail LED currents |
 | Thermal | Board thermal maps; the enclosure CFD at the rated ambients (stock K26 and K26I), with the new heat sources and openings; heatsink map; rated ambient recomputed |
 | Mechanical strength | The 3-D FEA of the enclosure (50 g in three axes), with the new notch, slots, lug, lens window and camera clamp; BGA strain; safety factors at 23 and 70 °C |
-| Gateware | Vivado build at both clock modes with the corrected constraints; utilisation, timing, pulse-width, methodology and CDC reports; every bench and its mutations, old and new; the floorplan, schematic and pipeline figures (`render_fpga_views.py`) |
+| Gateware | Vivado build at both clock modes with the corrected constraints; utilisation, timing, pulse-width, methodology and CDC reports; every bench and its mutations, old and new; the floorplan, schematic and pipeline figures (`render_fpga_views.py`) **The full end-to-end simulation must pass again**: `tb_system` with both FPGAs, the board's channel models between them, the IAS1 link and Ethernet carrying traffic together (about 3 Gb/s aggregate), at both clock modes, plus the Vivado builds of both FPGAs |
 | Renders and 3-D | Board renders (top, iso, 4K), case and mount renders, heatsink renders, FEA images, camera module on the tongue; each checked against the render rules before upload |
 | Fabrication | BOM and placement files, LCSC selection with live stock, the quote, the fab package |
 | Documents | **Every document reviewed against the final design**, not only the ones the work touched: README, ARCHITECTURE, every `*_SPEC.md`, LAYOUT, SIGNAL_INTEGRITY, POWER, ENCLOSURE and its thermal study, MECHANICAL, FABRICATION, JLCPCB_QUOTE, FPGA_GATEWARE, `fpga/` and `sw/` documents, LINK_PROTOCOL's register map, PINMAP. Numbers checked against the regenerated outputs; no stale part reference, sample rate, connector name or count (thirteen SMAs). Then the schematic, layout and documentation PDFs regenerated and read through |
 | Documentation PDF layout | The visual defects of the current book fixed (section 11.2), and every page of the regenerated PDFs inspected as an image, not only searched as text |
 | Board manual | Section 11.3, drawn from the final Rev08 board files, in the README and in the documentation PDF |
+| Design history | [`docs/history/README.md`](history/README.md) gets a Rev08 row describing what changed against Rev07 (Rev07's row was added on 16 November 2026) |
 | This plan | Each item of sections 8 and 12 marked done or explicitly deferred, with the reason |
 
 ### 11.2 Known defect in the documentation PDF (reported 16 November 2026)
@@ -581,6 +582,44 @@ front of the documentation PDF.
   each as "connect this, set that".
 - Acceptance: every designator in the callouts exists on the board and every connector, LED and IC of the
   board appears in the tables (checked by script); the pages are inspected as images like the rest of the PDF.
+
+### 11.4 Phase 2 result: placement trial (16 November 2026) — gate G1 passed
+
+Every block of sections 3–5 was placed on a scratch copy of the Rev07 board with its real land pattern (EasyEDA
+footprints for the LCSC parts, KiCad's for the generic ones), two shield-can frames as copper rings, and KiCad's
+DRC run on the copy with the zones refilled [V].
+
+![Placement trial](img/rev08_placement_trial.png)
+
+| Item | Result |
+|---|---|
+| Parts | 164 new footprints: 18 ICs, 4 connectors (`J961`, `J1002` moved, `J103`, `J104`), 3 RF filters, 2 baluns, TCXO, 9 LEDs, 3 resistor arrays, about 120 passives. 119 on the top, **45 on the bottom**, only where the board is not over the carrier (y > 117.75): decoupling, bias chokes, the LED expander and the 3.0 V LDO. The board already has bottom-side assembly |
+| Shield frames | **A** (LNA, bypass, preselectors A and B): 20.7 × 19.2 mm at x 103.8–124.5. **B** (converter): 16.7 × 16.0 mm at x 124.9–141.6. The IF chain (anti-alias filter, IF amplifier, `PE4312`) at x 142–151 needs no can at 30–170 MHz: a via fence |
+| DRC on the copy | **0 conflicts between new parts, 0 with any existing signal net.** What remains is with existing ground: 26 stitching vias, 14 short ground tracks and 3 pads to move (on the tongue and in the block), and the `FAN_5V` track, which is re-routed with `J1002` |
+| `J103` vias | The 34 vias in two staggered ranks clear `J102`'s bottom pads: no violation. The tongue's ground stitching vias under them move |
+| IF line | Routed on L6 from the IF chain to `C926`: **143.8 mm**, 2W from all L6 copper and vias, 1.5 mm from the DAC2 outputs; about 0.5 dB at 170 MHz [E]. It takes a diagonal between the via fields, not the left edge |
+
+![IF line on L6](img/rev08_if_route.png)
+
+**What the trial changed in this plan:**
+- **`J1002` (fan header, through-hole) sat where `J961` goes.** It moves 5 mm south, under `J961`, off the carrier;
+  `F1002` and `C1092` stay.
+- **13 LEDs do not fit at y 125–131.** The 9 status LEDs (the 8 of section 3.1 and the UART heartbeat), with three
+  resistor arrays, go in a column north of `J961`, x 99.4–103.5, y 107.8–117.2, beside `H1`'s clamp. They are seen
+  through a small window in the lid, not through the back wall (the clamp is in the way); section 9's back-wall
+  slot is dropped. The five rail LEDs go beside their regulators.
+- **The debug USB-C changes.** `U262-161N-4BVC11` has through-hole shell legs and is a mid-mount, not a vertical
+  part: rejected. **HX-TYPE-C 16P 180 LT H10.0** (LCSC C49261569, 3,635 in stock) has surface-mount legs and two
+  plastic locating pegs into 0.9 mm non-plated holes [V: maker's drawing]. It sits rotated on the tongue at
+  x 130–136, y 89.6–102.4. Open point: the pegs' length against the board (1.54 mm) and the 0.8 mm gap to the
+  carrier, read off the drawing before the footprint is made.
+- The RF expander (0x20) is on the tongue with the CH340X and the ESD array; the LED expander (0x21) is on the
+  bottom near the LEDs.
+- **Pin numbering of `J102` and `J103`.** The board's `J102` footprint numbers the contacts along each row
+  (1–17 on one row), the BM20 receptacle footprint numbers them odd/even across the rows. "Pin for pin" is a
+  physical contact-to-contact mapping and is drawn from the Hirose drawings in phase 4, not from the numbers.
+- Not yet tested by the trial: routing inside the blocks (fill is about 60 % in frame A), the ground-via fences, and
+  the exact passive count, which the schematic fixes. They are phase 4 and 5 work.
 
 ### Risk register
 
