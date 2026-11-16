@@ -5616,6 +5616,26 @@
 				(justify right)
 			)
 		)
+		(pin "PMOD_SPARE1" input
+			(at 200.66 193.04 270)
+			(uuid "a9ba4d0b-917a-4e9d-88c0-50ce153d2be9")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "PMOD_SPARE2" output
+			(at 205.74 193.04 270)
+			(uuid "95d5191c-fe1f-4ce2-a194-f0e9cf1187d8")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
@@ -6804,6 +6824,16 @@
 				(justify left)
 			)
 		)
+		(pin "IF_VU" input
+			(at 459.74 142.24 180)
+			(uuid "5b7c6b55-1fbb-42b8-8f34-303fe9ce8cd3")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
@@ -6859,5 +6889,371 @@
 				)
 			)
 		)
+	)
+	(sheet
+		(at 459.74 160.02)
+		(size 50.8 12.70)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 30 64 128 1)
+		)
+		(fill
+			(color 245 248 255 0.9)
+		)
+		(uuid "d38d76a9-30ef-58e4-ab9c-851ccae32d35")
+		(property "Sheetname" "RX_VU"
+			(at 459.74 159.02 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+					(bold yes)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "rev03/RX_VU.kicad_sch"
+			(at 459.74 173.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left top)
+			)
+		)
+		(pin "XO_SCL" input
+			(at 459.74 162.56 180)
+			(uuid "75eb2ca2-34a2-4a2b-8df3-11e8c2a5b8ad")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "XO_SDA" bidirectional
+			(at 459.74 165.10 180)
+			(uuid "36733488-01d6-43e3-9ede-10c6ca94de5a")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "IF_VU" output
+			(at 459.74 167.64 180)
+			(uuid "497fada2-f0d4-4745-96c9-2da242ffd000")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(page "11")
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 459.74 162.56) (xy 447.04 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "26a1cbc7-0279-49ea-b063-f5973e9c309a")
+	)
+	(label "XO_SCL"
+		(at 447.04 162.56 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "43714b0b-e3c1-4a6d-90c5-fe43234b9d5a")
+	)
+	(wire
+		(pts
+			(xy 459.74 165.10) (xy 447.04 165.10)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0501be03-c37c-422f-b626-f9f2689a6f70")
+	)
+	(label "XO_SDA"
+		(at 447.04 165.10 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "e2639c4d-f46f-4220-b532-ef6d5e44cbdb")
+	)
+	(wire
+		(pts
+			(xy 459.74 167.64) (xy 447.04 167.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3cd39bd8-f7b2-42f1-b42a-5d5c05a6a87e")
+	)
+	(label "IF_VU"
+		(at 447.04 167.64 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "4e186c64-a3ee-4144-8238-61ca94ea3827")
+	)
+	(sheet
+		(at 459.74 187.96)
+		(size 50.8 15.24)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 30 64 128 1)
+		)
+		(fill
+			(color 245 248 255 0.9)
+		)
+		(uuid "b9a2f118-1044-5470-8ad4-47f9640e7c61")
+		(property "Sheetname" "STATUS"
+			(at 459.74 186.96 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+					(bold yes)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "rev03/STATUS.kicad_sch"
+			(at 459.74 204.00 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left top)
+			)
+		)
+		(pin "XO_SCL" input
+			(at 459.74 190.50 180)
+			(uuid "fabea7d9-3956-4961-a1cb-9d5028b866e7")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "XO_SDA" bidirectional
+			(at 459.74 193.04 180)
+			(uuid "1bc60139-3e9d-4204-af30-768f6cf034aa")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "PMOD_SPARE1" output
+			(at 459.74 195.58 180)
+			(uuid "3d8eb8e7-f09e-43d5-982c-664be299b669")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "PMOD_SPARE2" input
+			(at 459.74 198.12 180)
+			(uuid "b9ed7d58-0ff8-4b18-9beb-48155fa7fb0d")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(page "12")
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 459.74 190.50) (xy 447.04 190.50)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a6ed3683-42af-4251-8841-7d3235789937")
+	)
+	(label "XO_SCL"
+		(at 447.04 190.50 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "dbf6d088-732c-4fe2-a2d5-c0ecd84ecfa1")
+	)
+	(wire
+		(pts
+			(xy 459.74 193.04) (xy 447.04 193.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ff6799fe-560f-46aa-9b91-a5754172ed54")
+	)
+	(label "XO_SDA"
+		(at 447.04 193.04 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "c270dcdf-e0ab-4d2b-8a79-80ad36f922f7")
+	)
+	(wire
+		(pts
+			(xy 459.74 195.58) (xy 447.04 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "87e8931b-2210-4cec-9e25-6ace038d7f25")
+	)
+	(label "PMOD_SPARE1"
+		(at 447.04 195.58 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "fdf16958-04a5-49d9-ac86-9210e30a2cf9")
+	)
+	(wire
+		(pts
+			(xy 459.74 198.12) (xy 447.04 198.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "13687650-9b6d-4a2f-a102-7c79b46cac28")
+	)
+	(label "PMOD_SPARE2"
+		(at 447.04 198.12 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "dd462781-e28c-4f78-b022-8941f9fb4e9c")
+	)
+	(wire
+		(pts
+			(xy 459.74 142.24) (xy 447.04 142.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "952d00b9-4249-4076-bab6-85c7f4dc6e4a")
+	)
+	(label "IF_VU"
+		(at 447.04 142.24 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "df5b2ccc-3f65-479a-acd6-bae331efd69b")
+	)
+	(wire
+		(pts
+			(xy 200.66 193.04) (xy 200.66 198.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "46bf1f04-543f-4e81-bb20-3aadc92312af")
+	)
+	(label "PMOD_SPARE1"
+		(at 200.66 198.12 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "415420af-7ccf-4e52-ad4b-53d185fc0bc6")
+	)
+	(wire
+		(pts
+			(xy 205.74 193.04) (xy 205.74 203.20)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5daa371e-2a33-4e7a-bf2b-4a659acb8880")
+	)
+	(label "PMOD_SPARE2"
+		(at 205.74 203.20 0)
+		(effects
+			(font
+				(size 1.016 1.016)
+			)
+			(justify left)
+		)
+		(uuid "1508177b-f87d-43cc-902a-335e63b92546")
 	)
 )

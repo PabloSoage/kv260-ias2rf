@@ -518,7 +518,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 1 | Audit corrections A-1 to A-6, and G-1 (debug UART) | Rebuild: timing with the corrected clocks; the existing benches at both clock modes; a new bench for the UART with a mutation; documents and PDF regenerated | Independent of the rest; can be merged as Rev07 gateware |
 | 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work.** Passed 16 November (section 11.4) |
 | 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances.** Passed 16 November with a 9th-order filter (section 5.4); the RFFC5072 data sheet and loop filter are still open |
-| 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | — |
+| 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | **Done 16 November** (section 11.5): ERC 7 warnings as before, `check_sheet` PASS for `RX_VU`, `STATUS`, `IAS_LINK` |
 | 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | — |
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **G3: LO and IF-line coupling into either ADC below the Rev07 isolation figure** |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
@@ -638,6 +638,25 @@ DRC run on the copy with the zones refilled [V].
   physical contact-to-contact mapping and is drawn from the Hirose drawings in phase 4, not from the numbers.
 - Not yet tested by the trial: routing inside the blocks (fill is about 60 % in frame A), the ground-via fences, and
   the exact passive count, which the schematic fixes. They are phase 4 and 5 work.
+
+### 11.5 Phase 4 result: schematic (16 November 2026)
+
+Two new sheets, `RX_VU` (the front end, its expander and LDO) and `STATUS` (LEDs, LED expander, USB bridge), and
+edits to `IAS_LINK` (`J103`), `ROUTING` (`C927`, `IF_VU`), `CONTROL` (two sheet pins) and the root. Details,
+control-line map and values: [RX_VU_SPEC.md](RX_VU_SPEC.md). ERC: the same 7 warnings as Rev07, no error;
+`check_sheet` passes for `RX_VU` (131 parts, 95 nets), `STATUS` and `IAS_LINK` [V].
+
+What drawing it changed in this plan:
+- **The AP22652's enable is active low** (section 5.3 said high): pulled up, so the bias tee is off until written.
+- **The bias tee's low option is 3.3 V from `+3V3_D`**, not the 3.0 V rail, which has 70 mA of headroom.
+- **An FM band-pass was missing** from phase 3 (section 5.4 covered three filters, the preselector needs four):
+  3-pole Butterworth, 84–113 MHz, 2.5 dB in band, ≥ 21 dB at 70 and 137 MHz with tolerances [V arithmetic].
+- **The mixer's bias current flows through the TC4-1W+'s centre tap**, rated 30 mA: G-3 keeps `MIX2_IDD` ≤ 3.
+- **The LEDs and the USB bridge are on their own sheet**, not on `CONTROL` (no legible room on that A1 sheet).
+  `+1V8_D`'s LED gets a transistor as well as `+1V0`'s.
+- **The vertical USB-C's land pattern** was redrawn from the maker's layout: 1.00 mm pitch and no soldered shell
+  tabs; the trial's provisional pattern (0.5 mm, four tabs) was wrong. Placement is unaffected (same outline).
+- **`SW2` is built with the front end**: `C927` fitted, `C926` (`J922`) DNP; swapping the two restores `J922`.
 
 ### Risk register
 
