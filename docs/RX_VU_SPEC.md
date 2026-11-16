@@ -102,11 +102,14 @@ draw 60 parts legibly; on their own sheet they are joined to `CONTROL` by two sh
 `XO_SCL`/`XO_SDA`, which is also how `RX_VU` reaches it. **+1V8_D gets a transistor too** (the plan gave one only to
 `+1V0`): a green 0402 LED barely lights at 1.8 V.
 
-## 3. Open for phase 5
+## 3. Phase 5 (layout): what was open and how it closed
 
-- Shield-can frames are not yet parts: their LCSC part and footprint are chosen with the layout.
-- `J103` and `J102` footprints number their contacts differently (placement trial); the schematic connects pin *n*
-  to pin *n* by Hirose's numbering, and phase 5 checks each footprint against the Hirose drawings (now in hand:
-  BM20 catalogue via LCSC) so that the copper follows the contacts, not the numbers.
-- The USB-C's locating pegs against the carrier, and the TA1090EC's pin-out against the maker's drawing (only
-  LCSC's symbol was available).
+- **`J103` and `J102` numbering**: closed. The `J103` footprint is renumbered by contact position, so pin *n*
+  lands over pin *n* of `J102` (REV08_PLAN §11.6).
+- **Preselector B** sits in frame B with the converter; frame A keeps the LNA, the bypass and preselector A.
+- **The IF chain** (anti-alias filter, IF amplifier, `PE4312`) is on the bottom, east of frame B;
+  `IF_VU` leaves it on L6 (142.3 mm to `C927`).
+- **`U1313`** is on the bottom south of frame B with a via on every pin; the rail LEDs are on the tongue.
+- Still open, for the first board: the shield-can frames' LCSC parts (their footprints are the walls placed on
+  the board), the USB-C's locating pegs against the carrier, and the TA1090EC's pin-out against the maker's
+  drawing (only LCSC's symbol was available).

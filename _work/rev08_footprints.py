@@ -6,7 +6,12 @@ Rev08 footprints into footprints/kv260-ias2rf.pretty (16 Nov 2026).
   exported with easyeda2kicad and upgraded with `kicad-cli fp upgrade`, kept in _work/footprints_rev08/
   (the source of this script). Copied as they are, except:
     - the BM20B(0.8)-34DS receptacle (J103): its four metal fittings, pads 35-38, are renamed "MP" so that
-      they meet the symbol's mounting pin (Conn_02x17_Odd_Even_MountingPin);
+      they meet the symbol's mounting pin (Conn_02x17_Odd_Even_MountingPin), and contacts 1-34 are renumbered
+      from EasyEDA's odd/even-across-the-rows order to the order of `J102`'s footprint (1-17 along one row,
+      18-34 back along the other, the KV260's own numbering). Hirose's catalogue numbers no contact and the part
+      is not polarised, so "pin for pin" is a matter of position: placed at `J102`'s point and angle, on the top,
+      pad n of `J103` stands directly over pad n of `J102` (same column, same row side), so a camera plugged
+      into `J103` meets each signal where it would meet it on the carrier's own receptacle;
     - the 3-D model references are dropped (the board renders take their models from _work/mech).
 * USB_C_HX_16P_180_LT_H10: the vertical USB-C (HX-TYPE-C 16P 180 LT H10.0, LCSC C49261569), drawn from the
   maker's "RECOMMENDED P.C.B. LAYOUT" [V, drawing read 16 Nov 2026]: two rows of eight pads, 0.50 x 1.14 mm
@@ -62,6 +67,15 @@ def copy(name):
         t = t[:i] + t[block_at(t, i + 1):]
     if name.startswith("CONN-SMD_34P"):
         t = re.sub(r'\(pad "3[5-8]"', '(pad "MP"', t)
+
+        def renumber(m):
+            x, y = float(m.group(2)), float(m.group(3))
+            col = round((x + 3.2) / 0.4)                        # 0 at x -3.2 ... 16 at x +3.2
+            n = col + 1 if y < 0 else 34 - col
+            return f'(pad "{n}"{m.group(1)}(at {m.group(2)} {m.group(3)})'
+        t = re.sub(r'\(pad "(?:[1-9]|[1-2]\d|3[0-4])"( smd rect\s*)\(at ([-\d.]+) ([-\d.]+)\)', renumber, t)
+    # zero-length lines (the converter leaves some on the courtyard) make KiCad read the outline as malformed
+    t = re.sub(r'\n\t\(fp_line\s*\(start ([-\d.]+) ([-\d.]+)\)\s*\(end \1 \2\)[^\n]*(?:\n\t\t[^\n]*)*\n\t\)', '', t)
     open(os.path.join(DST, name + ".kicad_mod"), "w", encoding="utf-8", newline="\n").write(t)
 
 

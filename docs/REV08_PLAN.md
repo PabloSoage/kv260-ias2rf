@@ -520,7 +520,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work.** Passed 16 November (section 11.4) |
 | 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances.** Passed 16 November with a 9th-order filter (section 5.4); the RFFC5072 data sheet and loop filter are still open |
 | 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | **Done 16 November** (section 11.5): ERC 7 warnings as before, `check_sheet` PASS for `RX_VU`, `STATUS`, `IAS_LINK` |
-| 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | — |
+| 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | **Done 16 November** (section 11.6): 0 errors, 0 unconnected, 0 parity errors |
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **G3: LO and IF-line coupling into either ADC below the Rev07 isolation figure** |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
 | 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | — |
@@ -661,6 +661,39 @@ What drawing it changed in this plan:
 - **The vertical USB-C's land pattern** was redrawn from the maker's layout: 1.00 mm pitch and no soldered shell
   tabs; the trial's provisional pattern (0.5 mm, four tabs) was wrong. Placement is unaffected (same outline).
 - **`SW2` is built with the front end**: `C927` fitted, `C926` (`J922`) DNP; swapping the two restores `J922`.
+
+### 11.6 Phase 5 result: layout (16 November 2026)
+
+The two new sheets are on the board: 183 footprints (588 to 771), 2,631 mm of new track and 336 vias. DRC with
+the zones refilled: **0 errors, 0 unconnected, 0 schematic-parity errors** [V, kicad-cli 10.0]. The copper of
+every net that existed before Rev08 is unchanged, checked item by item against Rev07 (the LVDS pairs, the DAC
+outputs, Ethernet); only `FAN_5V` (reconnected) and the two Pmod spare lines (renamed in phase 4) differ.
+
+What the layout settled:
+- **`J103` mapping.** The 34-pin footprint numbered its contacts in a different order from `J102`'s; it is now
+  renumbered by position (`_work/rev08_footprints.py`), so contact *n* of `J103` sits over contact *n* of `J102`
+  and the pass-through vias are straight.
+- **Frames.** Frame A holds the LNA, the bypass and preselector A; preselector B moved into frame B beside the
+  converter. The IF chain (anti-alias filter, IF amplifier, `PE4312`) is on the bottom east of frame B.
+- **`U1313`** (the front end's expander) is on the bottom, south of frame B, with every pin fanned out to a
+  via so the control lines leave in all directions. `R1340`, `R1341` and `R1345` are on the bottom by the
+  converter; the rail LEDs are on the tongue.
+- **Decoupling.** The RFFC5072's six decaps sit on their supply pins; `C1310`, `C1312` and `C1313` (switch
+  supplies) were turned so that the switches' control pins are not walled in. `U1501`'s decaps sit south of
+  frame A's wall, where vias are allowed.
+- **`JP1301`** moved 0.15 mm west so that `U1501`'s pin 4 has its 0.15 mm clearance to the 3.3 V pad.
+- **IF line `IF_VU`**: 142.3 mm of 0.151 mm stripline on L6 between the L5 and L7 ground planes, a via at each
+  end; at least 0.3 mm (2W) from all other L6 copper and vias, at least 1.5 mm from the DAC2 output tracks,
+  and at least 0.575 mm from the DAC output vias that cross L6 (a via is a short vertical, not a parallel run).
+  About 0.47 dB at 170 MHz [E: 0.33 dB/100 mm].
+- **`VU_PSB_OUT`** (preselector B to preselector A, up to 1.1 GHz) crosses the wall between the two frames
+  as 0.12 mm stripline: 21 mm on L3 and 9 mm on L6, three vias, about 55 ohm [E]. Phase 6 simulates it.
+- **Fiducials** moved to (130.6, 125.2) on the top and (122.6, 132.0) on the bottom, clear of the new parts.
+- References of the new parts are on the assembly (Fab) drawing: the blocks are too dense for legible silkscreen.
+
+Left as warnings (no error): 10 dangling track ends and 7 vias left by the router (inert copper), 13
+silkscreen-over-pad warnings from footprint outlines (the fab clips silkscreen on pads), and one hole-to-hole
+warning between two vias of the same net.
 
 ### Risk register
 
