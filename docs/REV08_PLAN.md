@@ -526,7 +526,37 @@ editing numbers into a document. Before Rev08 is called finished:
 | Renders and 3-D | Board renders (top, iso, 4K), case and mount renders, heatsink renders, FEA images, camera module on the tongue; each checked against the render rules before upload |
 | Fabrication | BOM and placement files, LCSC selection with live stock, the quote, the fab package |
 | Documents | **Every document reviewed against the final design**, not only the ones the work touched: README, ARCHITECTURE, every `*_SPEC.md`, LAYOUT, SIGNAL_INTEGRITY, POWER, ENCLOSURE and its thermal study, MECHANICAL, FABRICATION, JLCPCB_QUOTE, FPGA_GATEWARE, `fpga/` and `sw/` documents, LINK_PROTOCOL's register map, PINMAP. Numbers checked against the regenerated outputs; no stale part reference, sample rate, connector name or count (thirteen SMAs). Then the schematic, layout and documentation PDFs regenerated and read through |
+| Documentation PDF layout | The visual defects of the current book fixed (section 11.2), and every page of the regenerated PDFs inspected as an image, not only searched as text |
 | This plan | Each item of sections 8 and 12 marked done or explicitly deferred, with the reason |
+
+### 11.2 Known defect in the documentation PDF (reported 16 November 2026)
+
+In `docs/KV260-IAS2RF_Documentation.pdf` as built for Rev07, long tables that break across pages are drawn
+wrongly. Seen on pages 162–163 (the LCSC parts table of JLCPCB_QUOTE) and page 38 (the register map of
+LINK_PROTOCOL) [V, rendered and inspected]:
+
+- **A navy band across the table in the middle of a page** (page 162 at y ≈ 300 pt, page 163, page 38 at
+  y ≈ 485 pt). It is the table header's background (`th`, `#0f3a60` in `export_documentation.py`), drawn
+  empty, 4–7 pt tall, over a body row: the header is repeated where the HTML layout engine (MuPDF's Story)
+  split the table on an earlier pass, not where the page actually breaks. It looks like an end-of-page bar
+  while the table carries on beneath it.
+- **Rows that overlap their neighbours.** In the two price columns the text wraps to three lines while the
+  rest of the row has one or two. The cells then come out taller than their row, and their borders no longer
+  line up with the other columns.
+- The table continues on the next page with no header.
+
+**Fix, before Rev08 is finished.** The table renderer must break tables at row boundaries, repeat the header
+row at the top of each continuation page (and only there), and size every row to its tallest cell. Two routes:
+
+| Route | What | For | Against |
+|---|---|---|---|
+| Keep `export_documentation.py` | Paginate tables in the script: split each long table into per-page chunks, each a complete table with its header, measured before placing; widen or shorten the price columns so they do not wrap to three lines | Smallest change; the rest of the book is unchanged | The splitting logic has to be right for every table |
+| LaTeX (`longtable` or `xltabular`, via Pandoc or a direct writer) | Built-in page breaking with repeated headers, `\endhead` / `\endfoot` | The standard tool for exactly this; better typography throughout | A new toolchain; the cover, part pages and the figures' layout have to be rebuilt |
+
+The choice is made when the work is done; either is acceptable as long as the defects are gone. Acceptance: a
+script that renders every page and flags (a) a header-coloured band with no text in it, (b) a cell whose bottom
+edge crosses the next row's top, (c) a table continuing from the previous page without a header row; it must
+report zero, and the pages it would have flagged are checked by eye as well.
 
 ### Risk register
 
