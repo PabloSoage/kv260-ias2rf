@@ -9,6 +9,7 @@ module tb_kria_adsb_rx;
     reg                rst = 1'b1;
     reg                in_valid = 1'b0;
     reg signed [15:0]  in_i = 16'sd0, in_q = 16'sd0;
+    reg [7:0]          osr = 8'd2;
     wire               msg_valid, msg_crc_ok;
     wire [111:0]       msg_data;
     wire [15:0]        msg_snr_est;
@@ -20,7 +21,7 @@ module tb_kria_adsb_rx;
         .in_valid       (in_valid),
         .in_i           (in_i),
         .in_q           (in_q),
-        .cfg_chip_osr   (8'd2), // 4 MSPS (2 samples per 0.5 us chip)
+        .cfg_chip_osr   (osr),  // 4 MSPS (2 samples per chip), then 25 MSPS (8'h8C, 12.5 samples per chip)
         .cfg_min_hi_sum (16'd4000),
         .msg_valid      (msg_valid),
         .msg_crc_ok     (msg_crc_ok),
@@ -73,6 +74,33 @@ module tb_kria_adsb_rx;
         end
     endtask
 
+    // 25 MSPS: chip c covers samples [12.5 c, 12.5 (c + 1)); the frame starts off_q quarter chips into sample time
+    integer off_q;
+    reg [15:0] pre_bits;
+    reg     ok4, ok25;
+    task send_frame_25(input [111:0] frm, input integer hi, input integer lo, input integer offq);
+        reg [255:0] chips;
+        integer b, c, n, nch;
+        begin
+            pre_bits = 16'b1010_0001_0100_0000;
+            chips = 256'd0;
+            nch = 16 + 224;
+            for (b = 0; b < 16; b = b + 1) chips[b] = pre_bits[15 - b];
+            for (b = 0; b < 112; b = b + 1) begin
+                chips[16 + 2 * b]     = frm[111 - b];
+                chips[16 + 2 * b + 1] = ~frm[111 - b];
+            end
+            // 20 quiet chips, the frame, 20 quiet chips; sample n sits at chip time (8 n - 25 offq) / 100
+            for (n = 0; n < (nch + 40) * 25 / 2; n = n + 1) begin
+                c = (n * 8 - offq * 25) / 100 - 20;
+                @(negedge clk);
+                in_valid = 1'b1;
+                in_i = (c >= 0 && c < nch && chips[c]) ? hi : lo;
+                in_q = 16'sd0;
+            end
+        end
+    endtask
+
     reg [111:0] last_ok_frame;
     always @(posedge clk) begin
         if (msg_valid && msg_crc_ok)
@@ -94,10 +122,22 @@ module tb_kria_adsb_rx;
 
         $display("[ADSB_RX] pre=%0d ok=%0d err=%0d last=%028h",
                  preamble_cnt, crc_ok_cnt, crc_err_cnt, last_ok_frame);
-        if (preamble_cnt == 3 && crc_ok_cnt == 2 && crc_err_cnt == 1 && last_ok_frame === VALID_FRAME_1)
-            $display("PASS: tb_kria_adsb_rx (2 valid DF17 CRC-24 pass, 1 bit-flip rejected)");
+        ok4 = (preamble_cnt == 3 && crc_ok_cnt == 2 && crc_err_cnt == 1 && last_ok_frame === VALID_FRAME_1);
+
+        // 25 MSPS, 12.5 samples per chip: the same frame a quarter chip later each time, against a free-running
+        // chip grid; every one must decode (Rev08 G-8: one grid alone fails half a chip off)
+        osr = 8'h8C;
+        rst = 1'b1; repeat (4) @(negedge clk); rst = 1'b0;
+        for (off_q = 0; off_q < 4; off_q = off_q + 1)
+            send_frame_25(VALID_FRAME_1, 8000, 150, off_q);
+        @(negedge clk); in_valid = 1'b0; repeat (10) @(posedge clk);
+        $display("[ADSB_RX 25 MSPS] pre=%0d ok=%0d err=%0d", preamble_cnt, crc_ok_cnt, crc_err_cnt);
+        ok25 = (crc_ok_cnt == 4 && crc_err_cnt == 0);
+
+        if (ok4 && ok25)
+            $display("PASS: tb_kria_adsb_rx (4 MSPS: 2 valid, 1 bit-flip rejected; 25 MSPS: 4 of 4 at quarter-chip offsets)");
         else
-            $display("FAIL: tb_kria_adsb_rx unexpected counts/frame");
+            $display("FAIL: tb_kria_adsb_rx unexpected counts/frame (4 MSPS ok=%0d, 25 MSPS ok=%0d)", ok4, ok25);
         $finish;
     end
 endmodule
