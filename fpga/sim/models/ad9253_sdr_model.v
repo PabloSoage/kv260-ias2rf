@@ -109,7 +109,7 @@ module sim_ad9253_model (
     integer    sig_fd = 0;
     reg        use_sig_file = 1'b0;
     reg        sig_armed = 1'b1;
-    reg [1023:0] sig_path;
+    reg [8*1024-1:0] sig_path;   // long absolute paths (a 128-character buffer truncated them silently)
     reg signed [13:0] file_sa, file_sb;
     integer    fsc_n;
 
@@ -118,6 +118,8 @@ module sim_ad9253_model (
             sig_fd = $fopen(sig_path, "r");
             if (sig_fd != 0)
                 use_sig_file = 1'b1;
+            else
+                $fatal(1, "%m: cannot open %0s=%0s", "ADCS_SIG_FILE", sig_path);
         end
         if ($test$plusargs("SIG_WAIT_ARM"))
             sig_armed = 1'b0;

@@ -162,7 +162,7 @@ All X-band front-end modules are sized and pin-mapped to drive the external `AER
 | **`8'h11`** | Artix -> Kria | `artix_top` Readback Engine | Register read response `{16'h0002, addr[47:32], rdata[31:0]}` |
 | **`8'h12`** | Kria -> Artix | `kria_pl_link` -> `dac_sdr` | AD9767 dual `14`-bit `I/Q` TX sample stream |
 
-### 5.2 Artix-7 Full CSR Space (`0x00..0xFC` via IAS1 CMD `8'h10`, UDP Port `0x4952`, Pmod SPI, or Debug UART)
+### 5.2 Artix-7 Full CSR Space (`0x00..0xFC` and, since Rev08, `0x110..0x124` via IAS1 CMD `8'h10`, UDP Port `0x4952` or Debug UART; the Pmod SPI port reaches `0x00..0x7F` only)
 
 | Offset | Register | Access | Fields & Function |
 | :---: | :--- | :---: | :--- |
@@ -175,16 +175,36 @@ All X-band front-end modules are sized and pin-mapped to drive the external `AER
 | `0x70`–`0x78` | `DACS_*` (SDR IQ DAC TX) | R/W | `tx_enable` (`[0]`), `~hf_dac2_mode` (`[1]`, default `0` = primary `I` on `DAC2 / IF_TX_C J952`), `dac1_mute` (`[2]`) (`0x70`); underflow counter (`0x74`); async TX FIFO level (`0x78`) |
 | `0x7C`–`0x90` | `ADAR_*` & RF Switches | R/W | `active_beam_id[4:0]`, soft T/R, `sw_req[11:8]`, `auto_tr_chirp[12]`, `soft_load` (`0x7C`); `guard_pre/post` (`0x80`); `sw_settle` (`0x84`); 32-beam RAM write (`0x88`); raw ADAR SPI (`0x8C`); status (`0x90`) |
 | `0x94`–`0xA4` | `HK_I2C_*` & `HK_TEMP_ERR` | R/W | Open-drain I2C controller for `TMP1075` (`0x48`) & `CAT24C02` (`0x50`) temperature & EEPROM polling |
-| `0xA8`–`0xB4` | `XO_CTRL`, `XO_DELTA_M`, `XO_RAW` | R/W | `Si549` fractional N-delta (`±50 ppm` `ENABLE_ETH` clamp, `0xAC`), raw I2C (`0xB0`/`0xB4`), `CLK_SEL` + safe-boot/`400<->500 MHz` DRP switch (`xo_boot_err[12]`, `xo_delta_clamped[13]`, `xo_boot_done[14]`) |
+| `0xA8`–`0xB4` | `XO_CTRL`, `XO_DELTA_M`, `XO_RAW` | R/W | `Si549` fractional N-delta (`±50 ppm` `ENABLE_ETH` clamp, `0xAC`), raw I2C (`0xB0`/`0xB4`; `0xB0[23:17]` device address, `0` = the `Si549`, Rev08), `CLK_SEL` + safe-boot/`400<->500 MHz` DRP switch (`xo_boot_err[12]`, `xo_delta_clamped[13]`, `xo_boot_done[14]`) |
 | `0xB8`–`0xBC` | `XADC_TEMP_VCCINT` / `VCCAUX` | R | On-die Artix-7 XADC 12-bit temperature, `VCCINT`, `VCCAUX`, and overtemp flag |
 | `0xC0`–`0xE0` | `PPS_*` & `TS_SYS` / `PPS_LATCH` | R/W | 1-PPS loop gain/nom period/ppm frequency error & locked `64`-bit nanosecond wall-clock timestamp registers |
-| `0xE4` | `RADAR_CTRL` | R/W | `[0]` `rad_ddc_en` (reset `1`, replaces legacy `~pmod_spare1`), `[1]` W1P clear sticky clip/ovf flags & `0xEC` counters |
+| `0xE4` | `RADAR_CTRL` | R/W | `[0]` `rad_ddc_en` (reset `1`, replaces legacy `~pmod_spare1`), `[1]` W1P clear sticky clip/ovf flags & `0xEC` counters, `[2]` radar NCO override, `[31:8]` its frequency word (Rev08 G-4) |
 | `0xE8` | `RADAR_STATUS` | RO | `[0]` `radar_dis_by_clk_mode` (`1` at `500 MHz`), `[1]` `adcr_mmcm_locked`, `[2]` `adc_trained`, `[3]` `dco_phase_err`, `[4]` `dl_link_up`, `[5]` `dl_up & adc_trained` (replaces legacy `pmod_spare2`), `[6..9]` sticky `adcr_or`/`adcs_clip`/`ddc_sat`/`ddc_ovf`, `[10]` `reg_rad_ddc_en`, `[21:16]` `adc_eye_width_min`, `[23:22]` `ddc_status` |
 | `0xEC` | `CLIP_OVF_CNT` | RO | `[15:0]` saturating `adcr_clip_cnt` (`AD9484`), `[31:16]` saturating `adcs_clip_cnt` (`AD9253`) |
 | `0xF0` | `DBG_UART_CTRL` | R/W | `[15:0]` `baud_div` (default `1085` = `115,207.4` baud on `125 MHz` `link_clk`), `[16]` `stat_periodic_dis`, `[17]` W1P `force_stat_p`, `[24]` `rx_idle_high`, `[25]` `tx_busy`, `[26]` `banner_done`, `[31:27]` `rx_ferr_cnt` |
 | `0xF4` | `DBG_UART_STAT_DIV` | R/W | `[31:0]` periodic `STAT` interval in `link_clk` cycles (default `125,000,000` = `1.000 s`) |
 | `0xF8`–`0xFC` | `BUILD_GIT_HASH` / `BUILD_TIMESTAMP` | RO | Injected `synth_design -generic` 8-hex git commit prefix (`0xF8`) and `{BUILD_DATE[15:0], BUILD_TIME[23:8]}` (`0xFC`) |
+| `0x110` | `FE_CMD` | R/W | Rev08 front-end command (`fe_ctrl.v`), `[31:28]` op: `1` INIT, `2` EXP_OUT `[15:0]` = `{port 1, port 0}` of `U1313` (software owns port 0, `RESETX` and `ENBL`; written on change), `3` POLL inputs, `4` RFFC5072 write `[22:16]` register `[15:0]` data, `5` RFFC5072 read, `6` PE4312 `[5:0]` in 0.5 dB steps, `7` LEDs `[7:0]` (written on change). Wait for `FE_STAT[28]` = 0 before the next write |
+| `0x114` | `FE_STAT` | RO | `[31]` I2C error, `[30]` expanders initialised, `[29]` overrun (a command written while busy, dropped), `[28]` busy, `[23:16]` I2C transactions of the last command, `[15:0]` `U1313` inputs at the last POLL (`[12]` = `VU_LD` lock detect, `[8]` = `VU_BIAS_FLT_N`) |
+| `0x118` | `FE_RFFC` | RO | `[15:0]` the last RFFC5072 register read |
+| `0x11C` | `FE_LED_CTRL` | R/W | `[0]` LED auto-map on (reset `1`), `[1]` show `[15:8]` instead, `[31:24]` RO what was last written to `U1501` |
+| `0x120` | `FE_AGC_CTRL` | R/W | Rev08 G-5 AGC (`fe_agc.v`), off at reset: `[0]` enable, `[1]` LNA bypass allowed, `[14:8]` high threshold (default `96` of `128`), `[22:16]` low threshold (default `24`), `[31:24]` hold-off in ms (default `50`) |
+| `0x124` | `FE_AGC_STAT` | RO | `[31]` LNA in, `[29:24]` attenuation code, `[22:16]` last peak of the AD9484 codes, `[15:0]` changes made |
+| `0x100`–`0x10C`, others | (reserved) | — | `0x100`–`0x10C` for G-7; any address from `0x100` not listed reads `0` and ignores writes; page 0 no longer aliases into `0x1xx` |
 | UDP `0x0000` / `0x0004` | `ETH_MUX_CTRL` / `ETH_MDIO` | R/W | Dual-path policy (`[1:0]`), SDR UDP gen enable (`[2]`), fault injection (`[4:3]`), AN restart (`[5]`), Clause 22 MDIO access to `RTL8211FSI` |
+
+### 5.2a Front-end control (Rev08 G-2 to G-6)
+
+The two `TCA6416A` expanders (`U1313` at `0x20` on `RX_VU`, `U1501` at `0x21` on `STATUS`) share the `XO_SCL`/`XO_SDA` bus with the `Si549`. `hk_xo_ctrl` (`cfgmclk`) gained a device address on its raw port and a second client port, and `fe_ctrl` drives the expanders through it; the `Si549` presets, its delta-M and raw accesses keep priority. The expanders' `INT` pins are not connected, so inputs are read on request (`POLL`). Nothing goes on the bus unless a command asks.
+
+- **INIT** runs before the first command and after any I2C error: output registers first, then configuration, so no pin glitches when it turns into an output. It drives `VU_ATT_LE` low, which latches the `PE4312` at its power-up `31.5 dB`. `LE` must stay low whenever `SCLK` moves: with `LE` high the attenuator's latch is transparent, and `SCLK`/`SDATA` are shared with the `RFFC5072`.
+- **RFFC5072** register write and read-back with HackRF's three-wire framing ([RFFC5072_PROGRAMMING.md](RFFC5072_PROGRAMMING.md) §2): every `SCLK` or `SDATA` edge is one write of `U1313`'s port 1, so a register write is `59` I2C transactions (about `17 ms` at the `65 kHz` bus) and a read `82` (about `33 ms`). A gateware three-wire master would be the upgrade for fast hopping.
+- **PE4312**: six bits MSB first (`C16` first), then an `LE` pulse; about `5 ms`.
+- **LEDs (G-6)**: `D1501..D1508` = CFG (boot done), CLK (`500 MHz`), LINK (link up and ADC trained), ADC-R over-range, ADC-S clip (both sticky until `0xE4[1]`), LO lock (from the last `POLL`), TX (SDR DAC or radar chirp), ERR (I2C or ADC phase error). Written on change, at most once every `100 ms`; `FE_LED_CTRL[0]` = 0 stops them and the bus stays quiet.
+- **AGC (G-5)**: `adc_peak` takes the largest `|code − 128|` of the AD9484 per `65,536`-sample window (over-range counts as full scale); `fe_agc` adds `3 dB` above the high threshold, removes `0.5 dB` after each quiet hold-off period, bypasses the LNA only at `31.5 dB`, and puts it back `18 dB` under the low threshold. Command priority: software, then AGC, then LEDs. With the AGC on, software must not send `ATT`. The AD9484 path runs in the `400 MHz` mode only (A-1), so the AGC does too.
+- **G-4** (tunable DDC): the AERIS NCO is a register through `RADAR_CTRL[2]` and `[31:8]`, default unchanged; the second decimation stage down to channel bandwidths is in the Kria PL (`kria_channel_rx`, section 4), where DSP slices are plentiful, instead of in the Artix (10 free).
+
+Benches: `tb_fe_ctrl` (models of the `TCA6416A`, the `RFFC5072` port and the `PE4312`; 25 checks; mutations `le_high`, `no_shadow`, `lsb_first`), `tb_fe_agc` (closed loop with a tone; mutation `no_holdoff`), and `tb_artix_top` (CSR page 1, no aliasing).
 
 ### 5.3 Kria `kria_pl_link` AXI4-Lite Slave (`s_axi` at `0x8000_0000`)
 

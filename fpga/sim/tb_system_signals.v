@@ -461,7 +461,7 @@ module tb_system_signals;
     end
 
     // Main Control Sequence
-    reg [2047:0] case_str, fpath;
+    reg [8*1024-1:0] case_str, fpath;
     reg [31:0]   artix_nco_b, artix_decim, artix_rad_ctrl;
     reg [31:0]   k_ctrl, k_nco, k_decim, k_demod, k_pilot, k_ctcss, k_thr, k_adsb;
     reg [31:0]   tx_car, tx_tone, tx_cfg, rad_alpha;
@@ -472,11 +472,11 @@ module tb_system_signals;
     initial begin
         if (!$value$plusargs("CASE=%s", case_str)) case_str = "HF_AM";
         if (!$value$plusargs("RUN_US=%d", run_us)) run_us = 1000;
-        if ($value$plusargs("OUT_DDC=%s", fpath))   fd_ddc   = $fopen(fpath, "w");
-        if ($value$plusargs("OUT_DEMOD=%s", fpath)) fd_demod = $fopen(fpath, "w");
-        if ($value$plusargs("OUT_ADSB=%s", fpath))  fd_adsb  = $fopen(fpath, "w");
-        if ($value$plusargs("OUT_TX=%s", fpath))    fd_tx    = $fopen(fpath, "w");
-        if ($value$plusargs("OUT_RADAR=%s", fpath)) fd_radar = $fopen(fpath, "w");
+        if ($value$plusargs("OUT_DDC=%s", fpath))   fd_ddc   = $fopen(fpath, "w"); if (fd_ddc == 0 && $test$plusargs("OUT_DDC=")) $fatal(1, "cannot open OUT_DDC");
+        if ($value$plusargs("OUT_DEMOD=%s", fpath)) fd_demod = $fopen(fpath, "w"); if (fd_demod == 0 && $test$plusargs("OUT_DEMOD=")) $fatal(1, "cannot open OUT_DEMOD");
+        if ($value$plusargs("OUT_ADSB=%s", fpath))  fd_adsb  = $fopen(fpath, "w"); if (fd_adsb == 0 && $test$plusargs("OUT_ADSB=")) $fatal(1, "cannot open OUT_ADSB");
+        if ($value$plusargs("OUT_TX=%s", fpath))    fd_tx    = $fopen(fpath, "w"); if (fd_tx == 0 && $test$plusargs("OUT_TX=")) $fatal(1, "cannot open OUT_TX");
+        if ($value$plusargs("OUT_RADAR=%s", fpath)) fd_radar = $fopen(fpath, "w"); if (fd_radar == 0 && $test$plusargs("OUT_RADAR=")) $fatal(1, "cannot open OUT_RADAR");
 
         artix_nco_b    = 32'd0;
         artix_decim    = 32'h0040_0004;
@@ -579,6 +579,9 @@ module tb_system_signals;
 
         repeat (run_us) #1_000_000;
         cap_en = 1'b0;
+        $display("PROBE nco_b_reg=%08h nco_b_adcs=%08h decim_adcs=%0d adcs_ctrl=%08h ch_en=%b",
+                 dut_artix.reg_sdr_nco_b, dut_artix.sdr_nco_b_adcs, dut_artix.sdr_decim_adcs,
+                 dut_artix.reg_adcs_ctrl, dut_artix.adcs_ch_en_s2);
 
         kria_rd(8'h60, stat1);
         kria_rd(8'h7C, stat2);

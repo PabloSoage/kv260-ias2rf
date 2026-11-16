@@ -207,18 +207,30 @@ lfsr_dither_enhanced #(
 // Calculate phase increment for 120MHz IF at 400MHz sampling (default when ftw_override==0)
 localparam PHASE_INC_120MHZ = 32'h4CCCCCCD;
 (* ASYNC_REG = "TRUE" *) reg [31:0] ftw_ovrd_s1, ftw_ovrd_s2;
+reg [31:0] ftw_ovrd_s3, ftw_sel;   // Rev08 G-4: compare, select and add each get a 400 MHz register stage
+reg        ftw_stable, ftw_nz;
 
 // Apply dithering to reduce spurious tones (registered for 400 MHz timing)
 always @(posedge clk_400m) begin
     if (rst_400_nco) begin
         ftw_ovrd_s1        <= 32'd0;
         ftw_ovrd_s2        <= 32'd0;
+        ftw_ovrd_s3        <= 32'd0;
+        ftw_stable         <= 1'b0;
+        ftw_nz             <= 1'b0;
+        ftw_sel            <= PHASE_INC_120MHZ;
         phase_inc_dithered <= PHASE_INC_120MHZ;
     end else begin
         ftw_ovrd_s1        <= ftw_override;
         ftw_ovrd_s2        <= ftw_ovrd_s1;
-        phase_inc_dithered <= ((ftw_ovrd_s2 != 32'd0) ? ftw_ovrd_s2 : PHASE_INC_120MHZ)
-                            + {24'b0, phase_dither_bits};
+        ftw_ovrd_s3        <= ftw_ovrd_s2;
+        // the override is a quasi-static CSR: take it only once two samples agree, so a word caught mid-change
+        // never reaches the NCO
+        ftw_stable         <= (ftw_ovrd_s2 == ftw_ovrd_s3);
+        ftw_nz             <= (ftw_ovrd_s2 != 32'd0);
+        if (ftw_stable)
+            ftw_sel        <= ftw_nz ? ftw_ovrd_s3 : PHASE_INC_120MHZ;
+        phase_inc_dithered <= ftw_sel + {24'b0, phase_dither_bits};
     end
 end
 

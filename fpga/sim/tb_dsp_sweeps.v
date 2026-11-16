@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Fast Kria PL DSP RTL Sweep Bench (drives kria_channel_rx, kria_adsb_rx, kria_tx_mod, kria_radar_proc
 // directly from file-backed realistic waveforms for multi-level SINAD, RDS GER, Pd curves).
+// +IN_RATE_HZ=<fs> paces the input at the stream's real sample rate on the 100 MHz pl_clk (one valid every
+// 100e6/fs cycles on average, as kria_dsp_suite sees it behind the link); without it, one sample per clock.
 `timescale 1ns/1ps
 
 module tb_dsp_sweeps;
@@ -74,9 +76,10 @@ module tb_dsp_sweeps;
         .peak_rbin(rad_pk_r), .peak_dbin(rad_pk_d), .peak_pwr(rad_pk_p)
     );
 
-    reg [2047:0] mode_str, in_path, out_path;
+    reg [8*1024-1:0] mode_str, in_path, out_path;
     integer      fd_in, fd_out, rc, s_i, s_q;
     reg [31:0]   tmpv;
+    real         in_rate = 0.0, pace_acc = 0.0;
     integer      dbg = 0, dbg_cnt = 0, dbg_cor_cnt = 0;
     reg          dbg_pmsb = 1'b0;
 
@@ -151,6 +154,7 @@ module tb_dsp_sweeps;
         if ($value$plusargs("RAD_ALPHA=%d", tmpv)) rad_alpha = tmpv[15:0];
         if ($value$plusargs("RAD_MIN=%d", tmpv))   rad_minpwr = tmpv;
 
+        if ($value$plusargs("IN_RATE_HZ=%d", tmpv)) in_rate = tmpv;
         rad_mode = (mode_str == "RADAR");
 
         fd_in  = $fopen(in_path, "r");
@@ -173,6 +177,15 @@ module tb_dsp_sweeps;
             if (rad_mode) begin
                 @(negedge clk);
                 in_valid = 1'b0;
+            end else if (in_rate > 0.0) begin
+                // idle cycles until the next sample is due
+                pace_acc = pace_acc + 100.0e6 / in_rate - 1.0;
+                if (pace_acc >= 1.0) begin
+                    @(negedge clk);
+                    in_valid = 1'b0;
+                    while (pace_acc >= 2.0) begin @(posedge clk); pace_acc = pace_acc - 1.0; end
+                    @(posedge clk); pace_acc = pace_acc - 1.0;
+                end
             end
         end
         @(negedge clk);

@@ -120,7 +120,7 @@ module fe_ctrl #(
     wire cmd_edge = cmd_tog_s[2] ^ cmd_tog_s[1];
 
     // ------------------------------------------------------------------ cfg side: sequencer
-    localparam [2:0] S_IDLE = 3'd0, S_ISSUE = 3'd1, S_WAIT = 3'd2, S_DONE = 3'd3;
+    localparam [2:0] S_IDLE = 3'd0, S_ISSUE = 3'd1, S_WAIT = 3'd2, S_DONE = 3'd3, S_PREP = 3'd4;
     reg [2:0]  st;
     reg [3:0]  op;            // command being run
     reg        pre_init;      // INIT runs first
@@ -140,18 +140,20 @@ module fe_ctrl #(
     wire [7:0] idle = base | B_ENX;
 
     // one step of a command: kind 0 = write port 1 of U1313, 1 = write U1313 config 1, 2 = read U1313 inputs
-    // (and shift SDATA into rd_shift), 3 = a full two-byte write (INIT, EXP_OUT, LED), 7 = end
-    reg [2:0]  kind;
-    reg [7:0]  val;
-    reg [6:0]  dev;
-    reg [23:0] wr3;           // {byte1, byte0, register} for kind 3
+    // (and shift SDATA into rd_shift), 3 = a full two-byte write (INIT, EXP_OUT, LED), 7 = end.
+    // The table is registered (kind, val, dev, wr3) for timing at the 100 MHz worst-case CFGMCLK: the sequencer
+    // passes through S_PREP after every change of op, k or pre_init, so the registered step matches them in S_ISSUE.
+    reg [2:0]  kind_c, kind;
+    reg [7:0]  val_c, val;
+    reg [6:0]  dev_c, dev;
+    reg [23:0] wr3_c, wr3;    // {byte1, byte0, register} for kind 3
     reg [24:0] frame;
     reg [8:0]  hdr;
     reg [5:0]  att;
     integer    j;
 
     always @* begin
-        kind = 3'd7; val = 8'h00; dev = EXP_ADDR; wr3 = 24'd0;
+        kind_c = 3'd7; val_c = 8'h00; dev_c = EXP_ADDR; wr3_c = 24'd0;
         frame = {2'b00, arg[22:16], arg[15:0]};
         hdr   = {2'b01, arg[22:16]};
 `ifdef MUTATE_LSB_FIRST
@@ -162,71 +164,75 @@ module fe_ctrl #(
         j = 0;
         if (pre_init) begin
             case (k)
-                7'd0: begin kind = 3'd3; dev = EXP_ADDR; wr3 = {idle | le_idle, p0_sh, 8'h02}; end
-                7'd1: begin kind = 3'd3; dev = EXP_ADDR; wr3 = {CFG1_OUT, 8'h00, 8'h06}; end
-                7'd2: begin kind = 3'd3; dev = LED_ADDR; wr3 = {8'hFF, ~led_sh, 8'h02}; end
-                7'd3: begin kind = 3'd3; dev = LED_ADDR; wr3 = {8'hFF, 8'h00, 8'h06}; end
-                default: kind = 3'd7;
+                7'd0: begin kind_c = 3'd3; dev_c = EXP_ADDR; wr3_c = {idle | le_idle, p0_sh, 8'h02}; end
+                7'd1: begin kind_c = 3'd3; dev_c = EXP_ADDR; wr3_c = {CFG1_OUT, 8'h00, 8'h06}; end
+                7'd2: begin kind_c = 3'd3; dev_c = LED_ADDR; wr3_c = {8'hFF, ~led_sh, 8'h02}; end
+                7'd3: begin kind_c = 3'd3; dev_c = LED_ADDR; wr3_c = {8'hFF, 8'h00, 8'h06}; end
+                default: kind_c = 3'd7;
             endcase
         end else begin
             case (op)
-                OP_EXP: if (k == 7'd0) begin kind = 3'd3; dev = EXP_ADDR;
-                            wr3 = {(arg[15:8] & (B_RESETX | B_ENBL)) | B_ENX | le_idle, arg[7:0], 8'h02}; end
-                OP_LED: if (k == 7'd0) begin kind = 3'd3; dev = LED_ADDR; wr3 = {8'hFF, ~arg[7:0], 8'h02}; end
-                OP_POLL: if (k == 7'd0) kind = 3'd2;
+                OP_EXP: if (k == 7'd0) begin kind_c = 3'd3; dev_c = EXP_ADDR;
+                            wr3_c = {(arg[15:8] & (B_RESETX | B_ENBL)) | B_ENX | le_idle, arg[7:0], 8'h02}; end
+                OP_LED: if (k == 7'd0) begin kind_c = 3'd3; dev_c = LED_ADDR; wr3_c = {8'hFF, ~arg[7:0], 8'h02}; end
+                OP_POLL: if (k == 7'd0) kind_c = 3'd2;
                 OP_RFW: begin
-                    kind = 3'd0;
-                    if (k < 7'd4)       val = idle | ((k[0] == 1'b0) ? B_SCLK : 8'h00);
-                    else if (k == 7'd4) val = base;
+                    kind_c = 3'd0;
+                    if (k < 7'd4)       val_c = idle | ((k[0] == 1'b0) ? B_SCLK : 8'h00);
+                    else if (k == 7'd4) val_c = base;
                     else if (k < 7'd55) begin
                         j   = (k - 7'd5) >> 1;
-                        val = base | (frame[24 - j] ? B_SDATA : 8'h00) | (((k - 7'd5) & 1) ? B_SCLK : 8'h00);
+                        val_c = base | (frame[24 - j] ? B_SDATA : 8'h00) | (((k - 7'd5) & 1) ? B_SCLK : 8'h00);
                     end
-                    else if (k == 7'd55) val = base;
-                    else if (k == 7'd56) val = idle;
-                    else if (k == 7'd57) val = idle | B_SCLK;
-                    else if (k == 7'd58) val = idle;
-                    else kind = 3'd7;
+                    else if (k == 7'd55) val_c = base;
+                    else if (k == 7'd56) val_c = idle;
+                    else if (k == 7'd57) val_c = idle | B_SCLK;
+                    else if (k == 7'd58) val_c = idle;
+                    else kind_c = 3'd7;
                 end
                 OP_RFR: begin
-                    kind = 3'd0;
-                    if (k < 7'd4)       val = idle | ((k[0] == 1'b0) ? B_SCLK : 8'h00);
-                    else if (k == 7'd4) val = base;
+                    kind_c = 3'd0;
+                    if (k < 7'd4)       val_c = idle | ((k[0] == 1'b0) ? B_SCLK : 8'h00);
+                    else if (k == 7'd4) val_c = base;
                     else if (k < 7'd23) begin
                         j   = (k - 7'd5) >> 1;
-                        val = base | (hdr[8 - j] ? B_SDATA : 8'h00) | (((k - 7'd5) & 1) ? B_SCLK : 8'h00);
+                        val_c = base | (hdr[8 - j] ? B_SDATA : 8'h00) | (((k - 7'd5) & 1) ? B_SCLK : 8'h00);
                     end
-                    else if (k == 7'd23) val = base;
-                    else if (k == 7'd24) begin kind = 3'd1; val = CFG1_RD; end
-                    else if (k == 7'd25) val = base | B_SCLK;          // turnaround clock
-                    else if (k == 7'd26) val = base;
+                    else if (k == 7'd23) val_c = base;
+                    else if (k == 7'd24) begin kind_c = 3'd1; val_c = CFG1_RD; end
+                    else if (k == 7'd25) val_c = base | B_SCLK;          // turnaround clock
+                    else if (k == 7'd26) val_c = base;
                     else if (k < 7'd75) begin
                         case ((k - 7'd27) % 3)
-                            0:       val = base | B_SCLK;
-                            1:       kind = 3'd2;                      // sample after the rising edge
-                            default: val = base;
+                            0:       val_c = base | B_SCLK;
+                            1:       kind_c = 3'd2;                      // sample after the rising edge
+                            default: val_c = base;
                         endcase
                     end
-                    else if (k == 7'd75) begin kind = 3'd1; val = CFG1_OUT; end
-                    else if (k == 7'd76) val = idle;
-                    else if (k == 7'd77) val = idle | B_SCLK;
-                    else if (k == 7'd78) val = idle;
-                    else kind = 3'd7;
+                    else if (k == 7'd75) begin kind_c = 3'd1; val_c = CFG1_OUT; end
+                    else if (k == 7'd76) val_c = idle;
+                    else if (k == 7'd77) val_c = idle | B_SCLK;
+                    else if (k == 7'd78) val_c = idle;
+                    else kind_c = 3'd7;
                 end
                 OP_ATT: begin
-                    kind = 3'd0;
+                    kind_c = 3'd0;
                     if (k < 7'd12) begin
                         j   = k >> 1;
-                        val = idle | le_idle | (att[5 - j] ? B_SDATA : 8'h00) | (k[0] ? B_SCLK : 8'h00);
+                        val_c = idle | le_idle | (att[5 - j] ? B_SDATA : 8'h00) | (k[0] ? B_SCLK : 8'h00);
                     end
-                    else if (k == 7'd12) val = idle | le_idle;
-                    else if (k == 7'd13) val = idle | B_LE;
-                    else if (k == 7'd14) val = idle | le_idle;
-                    else kind = 3'd7;
+                    else if (k == 7'd12) val_c = idle | le_idle;
+                    else if (k == 7'd13) val_c = idle | B_LE;
+                    else if (k == 7'd14) val_c = idle | le_idle;
+                    else kind_c = 3'd7;
                 end
-                default: kind = 3'd7;
+                default: kind_c = 3'd7;
             endcase
         end
+    end
+
+    always @(posedge clk) begin
+        kind <= kind_c; val <= val_c; dev <= dev_c; wr3 <= wr3_c;
     end
 
     always @(posedge clk) begin
@@ -265,7 +271,7 @@ module fe_ctrl #(
                     res_ops  <= 8'd0;
                     res_err  <= 1'b0;
                     pre_init <= !init_done || (cmd_hold_link[31:28] == OP_INIT);
-                    st       <= S_ISSUE;
+                    st       <= S_PREP;
                     // write-on-change: an unchanged EXP_OUT or LED costs no bus traffic
 `ifndef MUTATE_NO_SHADOW
                     if (init_done && cmd_hold_link[31:28] == OP_EXP &&
@@ -283,7 +289,7 @@ module fe_ctrl #(
                             pre_init  <= 1'b0;
                             init_done <= 1'b1;
                             k         <= 7'd0;
-                            if (op == OP_INIT) st <= S_DONE;
+                            st        <= (op == OP_INIT) ? S_DONE : S_PREP;
                         end else begin
                             st <= S_DONE;
                         end
@@ -319,9 +325,11 @@ module fe_ctrl #(
                         if (kind == 3'd3 && !pre_init && op == OP_LED)
                             led_sh <= arg[7:0];
                         k  <= k + 7'd1;
-                        st <= S_ISSUE;
+                        st <= S_PREP;
                     end
                 end
+
+                S_PREP: st <= S_ISSUE;           // the registered step catches up with op, k, pre_init
 
                 default: begin   // S_DONE
                     if (op == OP_RFR && !res_err) res_rffc <= rd_shift;
