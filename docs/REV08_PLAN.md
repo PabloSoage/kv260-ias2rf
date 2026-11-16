@@ -284,16 +284,21 @@ J961 ─ ESD ─ DC block ─┬─ LNA ─┬─ preselector ─┬─ RFFC5072
 | LNA and IF amplifier | SPF5043Z × 2, at 3.0 V | 5,923, $3.39 | 50–4000 MHz; 22.6 dB and NF 0.60 dB at 100 MHz, 18 dB at 900 MHz, 25 mA at 3 V |
 | Bypass switches | PE4259 × 4 | 14.7 k, $1.19 | 10 MHz – 3 GHz SPDT |
 | Preselector A, 30 MHz up | PE42442 × 2 (SP4T, 30 MHz – 6 GHz) | 245, $4.95 | Paths: straight, FM band-pass, FM-reject high-pass, to preselector B |
-| Preselector B, 170 MHz up | SKY13418-485LF × 2 (SP8T, 0.1–3.8 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
-| Converter | **RFFC5072** | **64**, $14.62 | LO 85–4200 MHz, mixer 30–6000 MHz, gain −2 dB, NF 10–13 dB, IIP3 +23 dBm, 125 mA at 2.7–3.3 V, reference 10–104 MHz |
-| Baluns | TC1-1-13M+ × 2 | 239, $2.12 | 4.5–3000 MHz |
+| Preselector B, 170 MHz up | SKY13418-485LF × 2 (SP8T, 0.1–6.0 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
+| Converter | **RFFC5072** (RFFC5072TR13) | **64**, $14.62 | LO 85–4200 MHz, mixer 30–6000 MHz in, 30–4500 MHz out; gain −2 dB into a 4:1 balun (−7 dB into a 1:1); NF 10 dB (low current) to 13 dB (high linearity); IIP3 +10 / +23 dBm; 100–125 mA at 2.7–3.3 V; reference 10–104 MHz, 0.5–1.5 V p-p AC-coupled; logic high ≥ VDD/1.5 |
+| Baluns | Input TC1-1-13M+ (1:1, 4.5–3000 MHz, 239, $2.12); output **TC4-1W+** (1:4, 3–800 MHz, 2,136 in stock), the data sheet's 4:1 output arrangement, same 3.8 × 3.8 mm body | — | Mixer input 100 Ω differential |
 | Reference | 26 MHz TCXO (KDS 1XXD26000MAA) | 15.7 k, $0.61 | Not locked to the Si549: section 5.9 |
 | Anti-alias filter | 7th-order elliptic, 0402 | — | Section 5.4 |
 | Step attenuator | PE4312 | 1,557, $2.84 | 0–31.5 dB in 0.5 dB steps, serial |
 | Supply | LP5907-3.0 from `+3V3_D` through a ferrite | 32 k, $0.28 | One 3.0 V rail for the whole block |
 
-The frequency ranges of the PE42442, PE4259, PE4312 and TC1-1-13M+ are quoted from memory of their data
-sheets [E] and are confirmed when the schematic is drawn; the others were read today.
+Read from the data sheets on 16 November (phase 3) [V]: PE42442 30 MHz–6 GHz, logic high ≥ 1.17 V, internal
+negative supply; PE4259 10 MHz–3 GHz, logic high ≥ 0.7·VDD; PE4312 1 MHz–4 GHz, 1.8 V logic; SKY13418
+0.1–6.0 GHz, logic high ≥ 1.35 V; SPF5043Z 50–4000 MHz; AP22652 enable high ≥ 1.5 V. Everything is driven from
+the expander at 3.0 V, so all levels are met. **Correction:** the RFFC5072's −2 dB is with a 4:1 output
+balun; the output balun becomes a TC4-1W+ (it was a 1:1). **Loop filter:** the data sheet's wideband
+application schematic (26 MHz reference, active filter on LFILT1–3) is used as is; its phase noise is
+checked in phase 6.
 
 ### 5.4 The three filters the plan depends on
 
@@ -385,7 +390,7 @@ converter works behind the UHF low-pass; below 390 MHz its image rejection falls
 
 | Point | Why it is open | How it closes |
 |---|---|---|
-| RFFC5072 logic thresholds and serial timing | The data sheet could not be fetched today (Qorvo and Mouser refused the requests); the figures above are from Qorvo's product page and search extracts | Read the data sheet before the schematic. The expander runs at 3.0 V, the part's own supply, so levels are not expected to be an issue |
+| RFFC5072 logic thresholds and serial timing | **Closed 16 November**: data sheet read (through JLC's copy). Input high ≥ VDD/1.5 = 2.0 V at 3.0 V; proprietary 3-wire bus with read-back (register map in Qorvo's programming guide, still to be fetched for G-3) | — |
 | RFFC5072 stock | 64 units today, and the A version has none. Nothing is bought during the design | Designed in as the RFFC5072; re-check stock when the board is ordered. Fallback, kept in the schematic as a note: MAX2871 (3,065) with an ADE-1+ mixer (139), about 60 mm² more |
 | Switches below their specified band | SKY13418 is specified from 100 MHz, so it only carries paths from 170 MHz up. PE42442 is specified from 30 MHz | Bench check of loss at 30–100 MHz on the first board |
 | Reference not locked to the ADC clock | A separate TCXO: the LO and the sample clock drift apart by a few ppm. Harmless for voice and data reception; not for phase-coherent work | Option: feed the synthesiser's reference from `J401`'s 10 MHz when one is connected |
