@@ -107,9 +107,9 @@ module tb_dsp_sweeps;
                              u_ch.pilot_phase, u_ch.pilot_acc_err);
                 end
                 if (dbg && u_ch.rds_bit_valid && dbg_cnt < 35) begin
-                    $display("DBG_RDS[%0d] bit=%0d plk=%0d pphase=%08x acc=%0d rds_i=%0d cnt=%0d",
+                    $display("DBG_RDS[%0d] bit=%0d plk=%0d pphase=%08x acc=%0d rds_q0=%0d cnt=%0d",
                              dbg_cnt, u_ch.rds_bit, u_ch.pilot_locked, u_ch.pilot_phase,
-                             u_ch.pilot_acc_err, u_ch.rds_int, dbg_cor_cnt);
+                             u_ch.pilot_acc_err, u_ch.rds_q0, dbg_cor_cnt);
                     dbg_cnt = dbg_cnt + 1;
                 end
                 if (audio_valid)

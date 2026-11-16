@@ -36,24 +36,67 @@ module adc_peak #(
     output reg        peak_tog,       // toggles once per window
     output reg  [6:0] peak            // steady between toggles
 );
+    // At 400/500 MHz a compare-and-select running maximum does not close in one cycle, so the maximum is kept as
+    // a set: each sample's magnitude becomes a one-hot bit (a decoder, no feedback), the window ORs them (one LUT in
+    // the loop), and at the end of the window a 7-step binary search on the snapshot finds the highest bit.
+    //   stage 1  magnitude: offset binary to two's complement is an MSB flip; the one's complement stands in for
+    //            the negation (at most 1 LSB low)
+    //   stage 2  one-hot
+    //   stage 3  OR into the window's set; at the window's end, snapshot (over-range sets bit 127)
+    //   search   seven cycles later the peak is ready and peak_tog toggles
     reg [WIN_LOG2-1:0] n;
-    reg [6:0]          acc;
-    wire [7:0]         s   = code - 8'd128;              // offset binary to two's complement
-    wire [7:0]         neg = 8'd0 - s;
-    wire [6:0]         mag = s[7] ? (neg[7] ? 7'd127 : neg[6:0]) : s[6:0];
+    reg                v1, o1, last1, v2, o2, last2;
+    reg [6:0]          m1;
+    reg [127:0]        oh2, hits, srch;
+    reg [6:0]          pk_w;
+    reg [2:0]          step;
+    reg                busy;
+    wire [7:0]         s = code ^ 8'h80;
     always @(posedge clk) begin
         if (rst) begin
-            n <= 0; acc <= 7'd0; peak_tog <= 1'b0; peak <= 7'd0;
-        end else if (valid) begin
-            n <= n + 1'b1;
-            if (&n) begin
-                peak     <= ovr ? 7'd127 : ((mag > acc) ? mag : acc);
-                peak_tog <= ~peak_tog;
-                acc      <= 7'd0;
-            end else if (ovr) begin
-                acc <= 7'd127;
-            end else if (mag > acc) begin
-                acc <= mag;
+            n <= 0; v1 <= 1'b0; o1 <= 1'b0; last1 <= 1'b0; v2 <= 1'b0; o2 <= 1'b0; last2 <= 1'b0;
+            m1 <= 7'd0; oh2 <= 128'd0; hits <= 128'd0; srch <= 128'd0; pk_w <= 7'd0;
+            step <= 3'd0; busy <= 1'b0; peak_tog <= 1'b0; peak <= 7'd0;
+        end else begin
+            v1    <= valid;
+            o1    <= ovr;
+            m1    <= s[7] ? ~s[6:0] : s[6:0];
+            last1 <= valid && (&n);
+            if (valid) n <= n + 1'b1;
+
+            v2    <= v1;
+            o2    <= o1;
+            last2 <= v1 && last1;
+            oh2   <= v1 ? (128'd1 << m1) : 128'd0;
+
+            if (last2) begin
+                srch <= hits | oh2 | {o2, 127'd0};
+                hits <= 128'd0;
+                busy <= 1'b1;
+                step <= 3'd0;
+                pk_w <= 7'd0;
+            end else begin
+                hits <= hits | oh2 | {o2, 127'd0};
+            end
+
+            // binary search, one bit of the result per cycle (the snapshot is steady for a whole window)
+            if (busy) begin
+                case (step)
+                    3'd0: if (|srch[127:64]) begin pk_w[6] <= 1'b1; srch[63:0] <= srch[127:64]; end
+                    3'd1: if (|srch[63:32])  begin pk_w[5] <= 1'b1; srch[31:0] <= srch[63:32];  end
+                    3'd2: if (|srch[31:16])  begin pk_w[4] <= 1'b1; srch[15:0] <= srch[31:16];  end
+                    3'd3: if (|srch[15:8])   begin pk_w[3] <= 1'b1; srch[7:0]  <= srch[15:8];   end
+                    3'd4: if (|srch[7:4])    begin pk_w[2] <= 1'b1; srch[3:0]  <= srch[7:4];    end
+                    3'd5: if (|srch[3:2])    begin pk_w[1] <= 1'b1; srch[1:0]  <= srch[3:2];    end
+                    3'd6: if (srch[1])             pk_w[0] <= 1'b1;
+                    default: ;
+                endcase
+                step <= step + 3'd1;
+                if (step == 3'd7) begin
+                    peak     <= pk_w;
+                    peak_tog <= ~peak_tog;
+                    busy     <= 1'b0;
+                end
             end
         end
     end

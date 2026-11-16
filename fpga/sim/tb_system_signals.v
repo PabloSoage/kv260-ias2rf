@@ -400,6 +400,11 @@ module tb_system_signals;
     // Real-Time Output Recorders (when +SIG_WAIT_ARM is released)
     // -------------------------------------------------------------------------
     integer fd_ddc = 0, fd_demod = 0, fd_adsb = 0, fd_tx = 0, fd_radar = 0;
+    // +OUT_ADCS=<file>: channel B samples as the Artix's sdr_ddc receives them (capture check against the stimulus)
+    integer fd_adcs = 0;
+    always @(posedge dut_artix.u_sdr_ddc.adc_clk)
+        if (fd_adcs != 0 && dut_artix.u_sdr_ddc.sample_valid)
+            $fwrite(fd_adcs, "%0d\n", dut_artix.u_sdr_ddc.sample_b);
     reg     cap_en = 1'b0;
     integer cnt_ddc = 0, cnt_demod = 0, cnt_adsb = 0, cnt_tx_sdr = 0, cnt_tx_rad = 0, cnt_radar = 0;
     reg [7:0] target_ddc_sid = 8'h05;
@@ -472,6 +477,7 @@ module tb_system_signals;
     initial begin
         if (!$value$plusargs("CASE=%s", case_str)) case_str = "HF_AM";
         if (!$value$plusargs("RUN_US=%d", run_us)) run_us = 1000;
+        if ($value$plusargs("OUT_ADCS=%s", fpath))  fd_adcs  = $fopen(fpath, "w");
         if ($value$plusargs("OUT_DDC=%s", fpath))   fd_ddc   = $fopen(fpath, "w"); if (fd_ddc == 0 && $test$plusargs("OUT_DDC=")) $fatal(1, "cannot open OUT_DDC");
         if ($value$plusargs("OUT_DEMOD=%s", fpath)) fd_demod = $fopen(fpath, "w"); if (fd_demod == 0 && $test$plusargs("OUT_DEMOD=")) $fatal(1, "cannot open OUT_DEMOD");
         if ($value$plusargs("OUT_ADSB=%s", fpath))  fd_adsb  = $fopen(fpath, "w"); if (fd_adsb == 0 && $test$plusargs("OUT_ADSB=")) $fatal(1, "cannot open OUT_ADSB");
@@ -588,6 +594,7 @@ module tb_system_signals;
         kria_rd(8'h68, rdv);
 
         if (fd_ddc   != 0) $fclose(fd_ddc);
+        if (fd_adcs  != 0) $fclose(fd_adcs);
         if (fd_demod != 0) $fclose(fd_demod);
         if (fd_adsb  != 0) $fclose(fd_adsb);
         if (fd_tx    != 0) $fclose(fd_tx);

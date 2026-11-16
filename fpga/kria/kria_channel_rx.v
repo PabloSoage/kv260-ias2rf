@@ -34,7 +34,7 @@ module kria_channel_rx (
     input  wire signed [15:0] cfg_ctcss_coeff,   // Goertzel Q14 2*cos(2*pi*f_tone/Fs_ch)
     input  wire [15:0]        cfg_ctcss_n,       // Goertzel block length N samples
     input  wire [31:0]        cfg_ctcss_thresh,  // CTCSS detection power threshold
-    input  wire [15:0]        cfg_rds_sym_samps, // Post-FIR samples per RDS bit (1187.5 bps -> ~202 @ 240kS/s)
+    input  wire [15:0]        cfg_rds_sym_samps, // Post-FIR samples per RDS bit, Q8.8 (250 kS/s: 210.53 -> 0xD287)
 
     // Outputs (at channel sample rate Fs_ch)
     output reg                audio_valid,
@@ -486,9 +486,16 @@ module kria_channel_rx (
     reg  signed [31:0] pilot_acc_err, pilot_lock_lpf;
     reg  signed [15:0] pilot_bp_x1, pilot_bp_x2;
     reg  signed [47:0] pilot_bp_y1, pilot_bp_y2;
-    reg  signed [31:0] lr_lpf, rds_int;
-    reg  [15:0]        rds_sym_cnt;
+    reg  signed [31:0] lr_lpf;
     reg                rds_prev_sign;
+    // RDS: 57 kHz product low-passed (two 1st-order sections, about 2.5 kHz at 250 kS/s), then integrated over
+    // the four quarters of each bit. The bit clock is a Q8.8 accumulator against cfg_rds_sym_samps (the bit is a
+    // fractional number of samples), pulled by an early-late gate on the bi-phase mid-bit transition, which is
+    // there whatever the data: aligned, the second and third quarters cancel; early, they leave the sign of the
+    // first half.
+    reg  signed [31:0] rds_lp1, rds_lp2;
+    reg  signed [31:0] rds_q0, rds_q1, rds_q2, rds_q3;
+    reg  signed [17:0] rds_ph;          // Q8.8 samples into the bit (negative right after a delayed start)
 
     // Goertzel CTCSS Detector (active in NBFM mode 3'd3 on raw discriminator dphi)
     reg signed [31:0] g_s1, g_s2, g_s0;
@@ -516,9 +523,14 @@ module kria_channel_rx (
             pilot_bp_y1    <= 32'sd0;
             pilot_bp_y2    <= 32'sd0;
             lr_lpf         <= 32'sd0;
-            rds_int        <= 32'sd0;
-            rds_sym_cnt    <= 16'd0;
             rds_prev_sign  <= 1'b0;
+            rds_lp1        <= 32'sd0;
+            rds_lp2        <= 32'sd0;
+            rds_q0         <= 32'sd0;
+            rds_q1         <= 32'sd0;
+            rds_q2         <= 32'sd0;
+            rds_q3         <= 32'sd0;
+            rds_ph         <= 18'sd0;
 
             g_s1           <= 32'sd0;
             g_s2           <= 32'sd0;
@@ -551,7 +563,9 @@ module kria_channel_rx (
                 reg signed [15:0] cur_dphi;
                 reg signed [15:0] p_sin, p_cos, c38, c57;
                 reg signed [47:0] bp_in, bp_out, bp_sig;
-                reg signed [31:0] err_ph, lock_iir, rds_final, acc_half;
+                reg signed [31:0] err_ph, lock_iir, acc_half;
+                reg signed [31:0] rds_d, rds_e, rds_x;
+                reg signed [17:0] rds_nph, rds_spb, rds_rem;
                 reg signed [47:0] l_plus_r, l_minus_r;
                 reg signed [31:0] rds_mix, prop_corr;
                 reg signed [31:0] lr_demod, de_step;
@@ -649,22 +663,45 @@ module kria_channel_rx (
                     audio_r     <= sat16_48(l_plus_r - l_minus_r);
                     audio_valid <= 1'b1;
 
-                    // 57 kHz RDS BPSK coherent demod & bi-phase Manchester (h0 - h1) integrate-and-dump
+                    // 57 kHz RDS: coherent product, low-pass, quarter integrals, bit clock with early-late gate
                     rds_mix = ($signed(cur_dphi) * $signed(c57)) >>> 15;
+                    rds_lp1 <= rds_lp1 + ((($signed(rds_mix) <<< 8) - rds_lp1) >>> 4);
+                    rds_lp2 <= rds_lp2 + ((rds_lp1 - rds_lp2) >>> 4);
+                    rds_x    = rds_lp2 >>> 8;
+                    rds_spb = $signed({2'b00, cfg_rds_sym_samps});
                     if (cfg_rds_sym_samps != 16'd0) begin
-                        if (rds_sym_cnt >= (cfg_rds_sym_samps - 16'd1)) begin
-                            rds_final     = rds_int - rds_mix;
-                            rds_sym_cnt   <= 16'd0;
+                        rds_nph = rds_ph + 18'sd256;
+                        if (rds_nph >= rds_spb) begin
+                            // end of the bit: decision on the halves, timing error from the middle quarters
+                            rds_d   = rds_q0 + rds_q1 - rds_q2 - (rds_q3 + rds_x);
+                            rds_e   = rds_q1 + rds_q2;
+                            rds_rem = rds_nph - rds_spb;
                             rds_bit_valid <= 1'b1;
-                            rds_bit       <= (rds_final >= 0) ^ rds_prev_sign; // Differential decoding
-                            rds_prev_sign <= (rds_final >= 0);
-                            rds_int       <= 32'sd0;
-                        end else begin
-                            rds_sym_cnt <= rds_sym_cnt + 16'd1;
-                            if (rds_sym_cnt < (cfg_rds_sym_samps >> 1))
-                                rds_int <= rds_int + rds_mix;
+                            rds_bit       <= (rds_d >= 0) ^ rds_prev_sign;   // differential decoding
+                            rds_prev_sign <= (rds_d >= 0);
+                            rds_q0 <= 32'sd0; rds_q1 <= 32'sd0; rds_q2 <= 32'sd0; rds_q3 <= 32'sd0;
+`ifdef MUTATE_RDS_NO_TIMING
+                            rds_ph <= rds_rem;
+`else
+                            // early (the transition falls late in the window): the next bit starts a sample
+                            // later; late: a sample sooner
+                            if (rds_e == 0)
+                                rds_ph <= rds_rem;
+                            else if ((rds_e >= 0) == (rds_d >= 0))
+                                rds_ph <= rds_rem - 18'sd256;
                             else
-                                rds_int <= rds_int - rds_mix;
+                                rds_ph <= rds_rem + 18'sd256;
+`endif
+                        end else begin
+                            rds_ph <= rds_nph;
+                            if (rds_ph < (rds_spb >>> 2))
+                                rds_q0 <= rds_q0 + rds_x;
+                            else if (rds_ph < (rds_spb >>> 1))
+                                rds_q1 <= rds_q1 + rds_x;
+                            else if (rds_ph < (rds_spb >>> 1) + (rds_spb >>> 2))
+                                rds_q2 <= rds_q2 + rds_x;
+                            else
+                                rds_q3 <= rds_q3 + rds_x;
                         end
                     end
                 end
