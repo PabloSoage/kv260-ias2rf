@@ -36,9 +36,10 @@ module tb_fe_agc;
     end
 
     wire       ptog;
-    wire [6:0] pk;
+    wire [127:0] pks;
     adc_peak #(.WIN_LOG2(8)) u_pk (.clk(aclk), .rst(rst), .code(code), .valid(1'b1), .ovr(ovr),
-        .peak_tog(ptog), .peak(pk));
+        .peak_tog(ptog), .peak_set(pks));
+    wire [6:0] pk = dut.pk;
 
     // fe_ctrl stand-in: busy 300 cycles per command, then applies it
     reg  busy = 0;
@@ -60,7 +61,7 @@ module tb_fe_agc;
         end
     end
 
-    fe_agc #(.CYC_PER_MS(CPM)) dut (.clk(clk), .rst(rst), .ctrl(ctrl), .peak_tog_async(ptog), .peak_async(pk),
+    fe_agc #(.CYC_PER_MS(CPM)) dut (.clk(clk), .rst(rst), .ctrl(ctrl), .peak_tog_async(ptog), .peak_set_async(pks),
         .exp_sw(exp_sw), .att_sw(att_sw), .fe_busy(busy), .cmd_block(1'b0), .cmd_p(cmd_p), .cmd_word(cmd_word),
         .stat(stat));
 

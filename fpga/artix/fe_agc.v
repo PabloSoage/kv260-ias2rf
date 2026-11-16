@@ -28,75 +28,47 @@
 module adc_peak #(
     parameter integer WIN_LOG2 = 16
 ) (
-    input  wire       clk,
-    input  wire       rst,
-    input  wire [7:0] code,
-    input  wire       valid,
-    input  wire       ovr,
-    output reg        peak_tog,       // toggles once per window
-    output reg  [6:0] peak            // steady between toggles
+    input  wire         clk,
+    input  wire         rst,
+    input  wire [7:0]   code,
+    input  wire         valid,
+    input  wire         ovr,
+    output reg          peak_tog,       // toggles once per window
+    output reg  [127:0] peak_set        // bit k set: a sample of magnitude k in the window; steady between toggles
 );
-    // At 400/500 MHz a compare-and-select running maximum does not close in one cycle, so the maximum is kept as
-    // a set: each sample's magnitude becomes a one-hot bit (a decoder, no feedback), the window ORs them (one LUT in
-    // the loop), and at the end of the window a 7-step binary search on the snapshot finds the highest bit.
+    // At 400/500 MHz a compare-and-select running maximum does not close in one cycle, so the window's peak is
+    // kept as a set: each sample's magnitude becomes a one-hot bit (a decoder, no feedback) and the window ORs them
+    // (one LUT in the loop). The set is handed over whole; fe_agc finds its highest bit on the link clock.
     //   stage 1  magnitude: offset binary to two's complement is an MSB flip; the one's complement stands in for
     //            the negation (at most 1 LSB low)
     //   stage 2  one-hot
-    //   stage 3  OR into the window's set; at the window's end, snapshot (over-range sets bit 127)
-    //   search   seven cycles later the peak is ready and peak_tog toggles
+    //   stage 3  OR into the window's set; at the window's end, hand it over (over-range sets bit 127)
     reg [WIN_LOG2-1:0] n;
-    reg                v1, o1, last1, v2, o2, last2;
+    reg                v1, o1, last1, o2, last2;
     reg [6:0]          m1;
-    reg [127:0]        oh2, hits, srch;
-    reg [6:0]          pk_w;
-    reg [2:0]          step;
-    reg                busy;
+    reg [127:0]        oh2, hits;
     wire [7:0]         s = code ^ 8'h80;
     always @(posedge clk) begin
         if (rst) begin
-            n <= 0; v1 <= 1'b0; o1 <= 1'b0; last1 <= 1'b0; v2 <= 1'b0; o2 <= 1'b0; last2 <= 1'b0;
-            m1 <= 7'd0; oh2 <= 128'd0; hits <= 128'd0; srch <= 128'd0; pk_w <= 7'd0;
-            step <= 3'd0; busy <= 1'b0; peak_tog <= 1'b0; peak <= 7'd0;
+            n <= 0; v1 <= 1'b0; o1 <= 1'b0; last1 <= 1'b0; o2 <= 1'b0; last2 <= 1'b0;
+            m1 <= 7'd0; oh2 <= 128'd0; hits <= 128'd0; peak_tog <= 1'b0; peak_set <= 128'd0;
         end else begin
             v1    <= valid;
-            o1    <= ovr;
+            o1    <= ovr && valid;
             m1    <= s[7] ? ~s[6:0] : s[6:0];
             last1 <= valid && (&n);
             if (valid) n <= n + 1'b1;
 
-            v2    <= v1;
             o2    <= o1;
             last2 <= v1 && last1;
             oh2   <= v1 ? (128'd1 << m1) : 128'd0;
 
             if (last2) begin
-                srch <= hits | oh2 | {o2, 127'd0};
-                hits <= 128'd0;
-                busy <= 1'b1;
-                step <= 3'd0;
-                pk_w <= 7'd0;
+                peak_set <= hits | oh2 | {o2, 127'd0};
+                peak_tog <= ~peak_tog;
+                hits     <= 128'd0;
             end else begin
                 hits <= hits | oh2 | {o2, 127'd0};
-            end
-
-            // binary search, one bit of the result per cycle (the snapshot is steady for a whole window)
-            if (busy) begin
-                case (step)
-                    3'd0: if (|srch[127:64]) begin pk_w[6] <= 1'b1; srch[63:0] <= srch[127:64]; end
-                    3'd1: if (|srch[63:32])  begin pk_w[5] <= 1'b1; srch[31:0] <= srch[63:32];  end
-                    3'd2: if (|srch[31:16])  begin pk_w[4] <= 1'b1; srch[15:0] <= srch[31:16];  end
-                    3'd3: if (|srch[15:8])   begin pk_w[3] <= 1'b1; srch[7:0]  <= srch[15:8];   end
-                    3'd4: if (|srch[7:4])    begin pk_w[2] <= 1'b1; srch[3:0]  <= srch[7:4];    end
-                    3'd5: if (|srch[3:2])    begin pk_w[1] <= 1'b1; srch[1:0]  <= srch[3:2];    end
-                    3'd6: if (srch[1])             pk_w[0] <= 1'b1;
-                    default: ;
-                endcase
-                step <= step + 3'd1;
-                if (step == 3'd7) begin
-                    peak     <= pk_w;
-                    peak_tog <= ~peak_tog;
-                    busy     <= 1'b0;
-                end
             end
         end
     end
@@ -110,7 +82,7 @@ module fe_agc #(
     input  wire        rst,
     input  wire [31:0] ctrl,                       // FE_AGC_CTRL
     input  wire        peak_tog_async,             // from adc_peak
-    input  wire [6:0]  peak_async,
+    input  wire [127:0] peak_set_async,           // adc_peak's set, steady for a window around the toggle
     input  wire [15:0] exp_sw,                     // last EXP_OUT word software wrote through FE_CMD
     input  wire [5:0]  att_sw,                     // last ATT code software wrote (31.5 dB until then)
     input  wire        fe_busy,
@@ -127,6 +99,16 @@ module fe_agc #(
     wire [7:0] hold_ms = (ctrl[31:24] == 8'd0) ? 8'd50 : ctrl[31:24];
 
     (* ASYNC_REG = "TRUE" *) reg [2:0] tog_s;
+
+    // highest set bit of the peak set (8 ns on the link clock is plenty for a 128-input priority encoder)
+    function automatic [6:0] top_bit(input [127:0] v);
+        integer i;
+        begin
+            top_bit = 7'd0;
+            for (i = 0; i < 128; i = i + 1)
+                if (v[i]) top_bit = i[6:0];
+        end
+    endfunction
     reg  [6:0]  pk;
     reg         pk_new;
     reg  [6:0]  pk_max;                // largest peak since the last decision
@@ -152,7 +134,7 @@ module fe_agc #(
             tog_s  <= {tog_s[1:0], peak_tog_async};
             pk_new <= 1'b0;
             if (tog_s[2] ^ tog_s[1]) begin
-                pk     <= peak_async;                  // steady for a whole window before and after the toggle
+                pk     <= top_bit(peak_set_async);    // steady for a whole window before and after the toggle
                 pk_new <= 1'b1;
             end
             if (pk_new && pk > pk_max) pk_max <= pk;

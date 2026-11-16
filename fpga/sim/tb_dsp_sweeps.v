@@ -65,6 +65,21 @@ module tb_dsp_sweeps;
     wire [15:0] rad_det_cnt;
     reg        rad_mode = 1'b0;
 
+    // TX: kria_tx_mod at 25 MSPS (cfg_samp_div 3), the internal audio DDS; +TX_MODE +TX_CAR +TX_TONE +TX_CFG
+    // (the CSR 0x40 [12:10], 0x70, 0x74, 0x78 values) and +TX_SAMPLES; writes "i q" per output sample
+    reg        tx_run = 1'b0;
+    reg [2:0]  tx_mode = 3'd0;
+    reg [31:0] tx_car = 32'd0, tx_tone = 32'd0, tx_cfg = 32'd0;
+    integer    tx_n = 0, tx_cnt = 0;
+    wire       tx_iq_valid;
+    wire signed [15:0] tx_i, tx_q;
+    kria_tx_mod u_tx (
+        .clk(clk), .rst(rst), .en(tx_run), .cfg_mode(tx_mode), .cfg_carrier_ftw(tx_car), .cfg_tone_ftw(tx_tone),
+        .cfg_mod_param(tx_cfg[15:0]), .cfg_amp_scale(tx_cfg[31:16]), .cfg_samp_div(16'd3), .cfg_pkt_words(16'd32),
+        .ext_aud_en(1'b0), .ext_aud_valid(1'b0), .ext_aud_sample(16'sd0),
+        .iq_valid(tx_iq_valid), .iq_i(tx_i), .iq_q(tx_q),
+        .m_axis_tdata(), .m_axis_tvalid(), .m_axis_tready(1'b1), .m_axis_tlast(), .m_axis_tid(), .m_axis_tuser());
+
     kria_radar_proc #(.RANGE_N(64), .DOPPLER_M(16)) u_rad (
         .clk(clk), .rst(rst || !rad_mode),
         .in_valid(rad_mode && in_valid), .in_ready(rad_in_ready),
@@ -113,12 +128,18 @@ module tb_dsp_sweeps;
                     dbg_cnt = dbg_cnt + 1;
                 end
                 if (audio_valid)
-                    $fwrite(fd_out, "%d %d %d %0d %0d\n", audio_l, audio_r, audio_mono, pilot_locked, ctcss_detected);
+                    $fwrite(fd_out, "%d %d %d %0d %0d %0d\n", audio_l, audio_r, audio_mono, pilot_locked,
+                            ctcss_detected, ctcss_power);
                 if (rds_bit_valid)
                     $fwrite(fd_out, "RDS %0d\n", rds_bit);
             end else if (mode_str == "ADSB") begin
                 if (adsb_msg_valid)
                     $fwrite(fd_out, "%0d %028h %0d\n", adsb_crc_ok, adsb_msg_data, adsb_snr);
+            end else if (mode_str == "TX") begin
+                if (tx_iq_valid) begin
+                    $fwrite(fd_out, "%0d %0d\n", tx_i, tx_q);
+                    tx_cnt = tx_cnt + 1;
+                end
             end else if (mode_str == "RADAR") begin
                 if (rad_out_valid)
                     $fwrite(fd_out, "%0d %0d %0d %0d\n", rad_rbin, rad_dbin, rad_pwr, rad_out_det);
@@ -156,6 +177,22 @@ module tb_dsp_sweeps;
 
         if ($value$plusargs("IN_RATE_HZ=%d", tmpv)) in_rate = tmpv;
         rad_mode = (mode_str == "RADAR");
+        if ($value$plusargs("TX_MODE=%d", tmpv))    tx_mode = tmpv[2:0];
+        if ($value$plusargs("TX_CAR=%h", tmpv))     tx_car  = tmpv;
+        if ($value$plusargs("TX_TONE=%h", tmpv))    tx_tone = tmpv;
+        if ($value$plusargs("TX_CFG=%h", tmpv))     tx_cfg  = tmpv;
+        if ($value$plusargs("TX_SAMPLES=%d", tmpv)) tx_n    = tmpv;
+        if (mode_str == "TX") begin
+            fd_out = $fopen(out_path, "w");
+            if (fd_out == 0) begin $display("FAIL: cannot open %0s", out_path); $finish; end
+            repeat (5) @(negedge clk);
+            rst = 1'b0;
+            tx_run = 1'b1;
+            while (tx_cnt < tx_n) @(posedge clk);
+            $fclose(fd_out);
+            $display("PASS: tb_dsp_sweeps (TX)");
+            $finish;
+        end
 
         fd_in  = $fopen(in_path, "r");
         fd_out = $fopen(out_path, "w");

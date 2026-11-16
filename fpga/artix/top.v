@@ -2241,13 +2241,13 @@ module artix_top #(
 
     // Rev08 G-5: AGC of the VHF/UHF front end on the AD9484's raw codes (fe_agc.v)
     wire       adcr_pk_tog;
-    wire [6:0] adcr_pk;
+    wire [127:0] adcr_pk;
     adc_peak #(.WIN_LOG2(16)) u_adcr_peak (
         .clk(adc_clk_400m), .rst(adc_rst_100m), .code(adc_data), .valid(adc_valid), .ovr(adc_or),
-        .peak_tog(adcr_pk_tog), .peak(adcr_pk));
+        .peak_tog(adcr_pk_tog), .peak_set(adcr_pk));
     fe_agc #(.CYC_PER_MS(LINK_CYC_PER_MS)) u_fe_agc (
         .clk(link_clk), .rst(link_rst), .ctrl(reg_fe_agc_ctrl), .peak_tog_async(adcr_pk_tog),
-        .peak_async(adcr_pk), .exp_sw(fe_exp_sw), .att_sw(fe_att_sw), .fe_busy(fe_busy),
+        .peak_set_async(adcr_pk), .exp_sw(fe_exp_sw), .att_sw(fe_att_sw), .fe_busy(fe_busy),
         .cmd_block(reg_fe_cmd_p | fe_csr_wr), .cmd_p(fe_agc_p), .cmd_word(fe_agc_word), .stat(fe_agc_stat),
         .pending(fe_agc_pending));
 
