@@ -20,10 +20,18 @@ detail that [DS] does not state, it says so, and the first board confirms it (§
 | Output balun | TC4-1W+, mixer current through its centre tap | `P2MIXIDD` ≤ 3 (about 30 mA, the balun's DC rating) |
 
 The expander is U1313, a TCA6416A at I²C address 0x20 on the `XO_SCL`/`XO_SDA` bus that the Artix-7 masters
-(`hk_i2c_master`). The Kria reaches it through the raw I²C registers `XO_RAW` (`0xB0`/`0xB4`, FPGA_GATEWARE §CSR
-map). Every edge on the three-wire bus is then one write to the expander's output port 1 (register `0x03`), so one
-RFFC5072 register costs about 58 I²C writes of three bytes each: a few milliseconds per register. That is fast enough for tuning by hand or
-by band; a gateware three-wire master is the upgrade if fast hopping is ever needed.
+(`hk_i2c_master`). Every edge on the three-wire bus is one write to the expander's output port 1 (register
+`0x03`), so one RFFC5072 register costs about 58 I²C writes of three bytes each. At the bus's 100 kHz
+(`CLK_DIV` 250 at 100 MHz) a three-byte write takes about 0.29 ms, so one register takes **about 17 ms** and the
+power-on table of §3 about half a second. That is fast enough for tuning by hand or by band; a gateware three-wire
+master is the upgrade if fast hopping is ever needed.
+
+**Reaching the expander from the Kria.** The raw I²C registers `XO_RAW` (`0xB0`/`0xB4`, LINK_PROTOCOL's CSR map)
+carry a register address, a data byte and a read/write bit, but no device address: `clk_mode_ctrl` sends every raw
+request to the Si549 (`SI549_ADDR`, 0x55). In today's gateware the Kria therefore cannot write the TCA6416A at
+0x20. Rev08 item G-2 (REV08_PLAN §7) turns `hk_xo_ctrl` into a shared master for the Si549 and both expanders, and
+G-3 adds the RFFC5072 and PE4312 sequencers on top of it; until then the sequence below can only be exercised in
+simulation.
 
 ## 2. The three-wire bus
 
