@@ -21,9 +21,12 @@ detail that [DS] does not state, it says so, and the first board confirms it (§
 
 The expander is U1313, a TCA6416A at I²C address 0x20 on the `XO_SCL`/`XO_SDA` bus that the Artix-7 masters
 (`hk_i2c_master`). Every edge on the three-wire bus is one write to the expander's output port 1 (register
-`0x03`), so one RFFC5072 register costs about 58 I²C writes of three bytes each. At the bus's 100 kHz
-(`CLK_DIV` 250 at 100 MHz) a three-byte write takes about 0.29 ms, so one register takes **about 17 ms** and the
-power-on table of §3 about half a second. That is fast enough for tuning by hand or by band; a gateware three-wire
+`0x03`), so one RFFC5072 register costs 59 I²C writes of three bytes each. The bus clock is
+`CFGMCLK / (4 × HK_CLK_DIV)` with `HK_CLK_DIV` 250, and `CFGMCLK` (the Artix's internal configuration clock) is
+nominally 65 MHz but ±50 % from part to part: 65 kHz nominal, 33 to 98 kHz. A three-byte write is about 29 bit
+times, 0.45 ms at 65 kHz, so one register takes **about 26 ms** (17 ms on the fastest part, 52 ms on the slowest)
+and a read-back, 82 transactions, about 37 ms. The 31 registers of the power-on table in §3 take under a second
+at the nominal clock. That is fast enough for tuning by hand or by band; a gateware three-wire
 master is the upgrade if fast hopping is ever needed.
 
 **Reaching the expander from the Kria.** The raw I²C registers `XO_RAW` (`0xB0`/`0xB4`, LINK_PROTOCOL's CSR map)
