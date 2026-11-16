@@ -297,9 +297,19 @@ regressions passing in the new clock domain.
 
 ---
 
+## Rev08 (planned 16 November 2026)
+
+Scope approved, implementation not started: [REV08_PLAN.md](REV08_PLAN.md). The audit corrections to the
+Rev07 gateware constraints and documents; status LEDs; a debug UART with a vertical USB-C inside the box; a
+camera pass-through receptacle on IAS0; a VHF receive front end on its own (thirteenth) SMA, direct-sampled by
+the AD9484, and an RFFC5072 converter for 170 MHz – 3 GHz; the 500 MSPS capture path. Rev08 is finished only
+when every simulation, thermal and strength run, render and document has been redone and reviewed against the
+final design (REV08_PLAN §11.1).
+
 ## Later phases
 
-- **SDR front-end board.** Independent. Can start as soon as phase 1 freezes the IF interface.
+- **SDR front-end board.** Superseded by Rev08's on-board front end (REV08_PLAN §5); dual conversion for
+  image-free coverage above 500 MHz is the Rev09 candidate (§6).
 - **Integration with AERIS-10X.** Depends on the author publishing the Extended variant (B-05).
 
 ---
