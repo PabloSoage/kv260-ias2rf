@@ -34,6 +34,7 @@ module artix_top #(
     parameter integer XO_FCAL_WAIT_CYC   = 3_000_000,   // >=30.7 ms Si549 FCAL wait @ +50% CFGMCLK (97.5 MHz)
     parameter [0:0]   BOOT_FREQ_500M     = 1'b1,        // Safe boot target: 1 = 500 MHz SDR, 0 = 400 MHz Radar
     parameter integer XADC_POLL_DIV_P    = 125_000,     // 1 ms XADC poll @ 125 MHz
+    parameter integer LINK_CYC_PER_MS    = 125_000,     // link_clk cycles per ms (fe_agc hold-off)
     parameter [31:0]  PPS_DEFAULT_NOM_CYC= 32'd125_000_000,
     parameter [31:0]  BUILD_DATE         = 32'h2026_1116, // YYYYMMDD packed BCD (overridden by build.tcl)
     parameter [31:0]  BUILD_TIME         = 32'h0000_0000, // 00HHMMSS packed BCD (overridden by build.tcl)
@@ -1477,6 +1478,12 @@ module artix_top #(
     wire [31:0] fe_stat;
     wire [15:0] fe_rffc;
     wire [7:0]  fe_led_want;
+    reg  [31:0] reg_fe_agc_ctrl;          // 0x120 FE_AGC_CTRL (fe_agc.v)
+    reg  [15:0] fe_exp_sw;                // last EXP_OUT word software wrote
+    reg  [5:0]  fe_att_sw;                // last ATT code software wrote
+    wire        fe_agc_p, fe_agc_pending;
+    wire [31:0] fe_agc_word, fe_agc_stat;
+    wire        fe_csr_wr;                // FE_CMD write strobe, a cycle before reg_fe_cmd_p
     reg         reg_xo_raw_p;
     reg         xo_raw_valid_sticky;
     reg  [7:0]  xo_raw_rdata_hold;
@@ -2162,8 +2169,8 @@ module artix_top #(
         .raw_req_reg         (reg_xo_raw_cmd[7:0]),
         .raw_req_wdata       (reg_xo_raw_cmd[15:8]),
         .raw_req_dev         (reg_xo_raw_cmd[23:17]),
-        .fe_cmd_p            (reg_fe_cmd_p | fe_led_p),
-        .fe_cmd_word         (reg_fe_cmd_p ? reg_fe_cmd : {4'h7, 20'd0, fe_led_want}),
+        .fe_cmd_p            (reg_fe_cmd_p | fe_agc_p | fe_led_p),
+        .fe_cmd_word         (reg_fe_cmd_p ? reg_fe_cmd : fe_agc_p ? fe_agc_word : {4'h7, 20'd0, fe_led_want}),
         .fe_busy_link        (fe_busy),
         .fe_stat_link        (fe_stat),
         .fe_rffc_link        (fe_rffc),
@@ -2223,13 +2230,26 @@ module artix_top #(
             fe_led_p <= 1'b0;
             if (fe_led_hold != 24'd0)
                 fe_led_hold <= fe_led_hold - 24'd1;
-            else if (reg_fe_led_ctrl[0] && fe_led_want != fe_led_sent && !fe_busy && !reg_fe_cmd_p && !fe_led_p) begin
+            else if (reg_fe_led_ctrl[0] && fe_led_want != fe_led_sent && !fe_busy && !reg_fe_cmd_p && !fe_led_p &&
+                     !fe_csr_wr && !fe_agc_pending && !fe_agc_p) begin
                 fe_led_p    <= 1'b1;
                 fe_led_sent <= fe_led_want;
                 fe_led_hold <= FE_LED_HOLD;
             end
         end
     end
+
+    // Rev08 G-5: AGC of the VHF/UHF front end on the AD9484's raw codes (fe_agc.v)
+    wire       adcr_pk_tog;
+    wire [6:0] adcr_pk;
+    adc_peak #(.WIN_LOG2(16)) u_adcr_peak (
+        .clk(adc_clk_400m), .rst(adc_rst_100m), .code(adc_data), .valid(adc_valid), .ovr(adc_or),
+        .peak_tog(adcr_pk_tog), .peak(adcr_pk));
+    fe_agc #(.CYC_PER_MS(LINK_CYC_PER_MS)) u_fe_agc (
+        .clk(link_clk), .rst(link_rst), .ctrl(reg_fe_agc_ctrl), .peak_tog_async(adcr_pk_tog),
+        .peak_async(adcr_pk), .exp_sw(fe_exp_sw), .att_sw(fe_att_sw), .fe_busy(fe_busy),
+        .cmd_block(reg_fe_cmd_p | fe_csr_wr), .cmd_p(fe_agc_p), .cmd_word(fe_agc_word), .stat(fe_agc_stat),
+        .pending(fe_agc_pending));
 
     // Register File Read Mux: page 0 (0x00..0xFC) and page 1 (0x100..0x1FC, Rev08); anything above reads 0
     function [31:0] reg_rd_word;
@@ -2241,6 +2261,8 @@ module artix_top #(
                     6'h05: reg_rd_word = {fe_stat[31:29], fe_busy, fe_stat[27:0]};       // 0x114 FE_STAT
                     6'h06: reg_rd_word = {16'd0, fe_rffc};                              // 0x118 FE_RFFC
                     6'h07: reg_rd_word = {fe_led_sent, reg_fe_led_ctrl[23:0]};          // 0x11C FE_LED_CTRL
+                    6'h08: reg_rd_word = reg_fe_agc_ctrl;                               // 0x120 FE_AGC_CTRL
+                    6'h09: reg_rd_word = fe_agc_stat;                                   // 0x124 FE_AGC_STAT
                     default: reg_rd_word = 32'd0;
                 endcase
             end else if (addr[15:8] != 8'h00) begin
@@ -2375,6 +2397,7 @@ module artix_top #(
 
     wire        reg_wr_en    = arb_wr_en && (arb_wr_addr >= 16'h0034);
     wire [15:0] reg_wr_addr  = arb_wr_addr;
+    assign fe_csr_wr = reg_wr_en && (reg_wr_addr == 16'h0110);
     wire [31:0] reg_wr_wdata = arb_wr_wdata;
 
     always @* begin
@@ -2459,6 +2482,9 @@ module artix_top #(
             reg_fe_cmd             <= 32'd0;
             reg_fe_cmd_p           <= 1'b0;
             reg_fe_led_ctrl        <= 32'h0000_0001;     // LED auto-map on
+            reg_fe_agc_ctrl        <= 32'd0;             // AGC off
+            fe_exp_sw              <= 16'h2080;          // INIT's values: RESETX high, bias tee off
+            fe_att_sw              <= 6'h3F;             // the PE4312's power-up 31.5 dB
             reg_xo_raw_p           <= 1'b0;
             xo_raw_valid_sticky    <= 1'b0;
             xo_raw_rdata_hold      <= 8'd0;
@@ -2567,8 +2593,11 @@ module artix_top #(
                     6'h04: begin // 0x110 FE_CMD
                         reg_fe_cmd   <= reg_wr_wdata;
                         reg_fe_cmd_p <= 1'b1;
+                        if (reg_wr_wdata[31:28] == 4'h2) fe_exp_sw <= reg_wr_wdata[15:0];
+                        if (reg_wr_wdata[31:28] == 4'h6) fe_att_sw <= reg_wr_wdata[5:0];
                     end
                     6'h07: reg_fe_led_ctrl <= reg_wr_wdata; // 0x11C FE_LED_CTRL
+                    6'h08: reg_fe_agc_ctrl <= reg_wr_wdata; // 0x120 FE_AGC_CTRL
                     default: ;
                 endcase
             end
