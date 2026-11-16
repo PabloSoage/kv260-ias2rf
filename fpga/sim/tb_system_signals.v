@@ -462,8 +462,9 @@ module tb_system_signals;
         end
     end
     always @(posedge dacr_clk) begin
-        if (cap_en && fd_tx != 0 && dacr_d != 8'h80) begin
-            $fwrite(fd_tx, "R %d\n", $signed(dacr_d) - 8'sd128);
+        // every AD9708 sample with the chirp_active flag: "R <offset-binary code - 128> <active>"
+        if (cap_en && fd_tx != 0) begin
+            $fwrite(fd_tx, "R %0d %0d\n", $signed({1'b0, dacr_d}) - 128, dut_artix.dacr_chirp_active_dac);
             cnt_tx_rad = cnt_tx_rad + 1;
         end
     end

@@ -116,18 +116,28 @@ module kria_tx_mod #(
         end
     endfunction
 
-    function automatic signed [15:0] lut_sin;
-        input [31:0] ph;
-        reg [1:0] q;
-        reg [6:0] idx;
+    // sin of the 32-bit phase: quarter-wave table (512 points per turn) plus linear interpolation on the next
+    // 8 phase bits. The bare table left phase-truncation spurs at -60 dBc; interpolated, the worst is below -90.
+    function automatic signed [15:0] lut_sin_grid;
+        input [8:0] p;                              // phase in 1/512 turn
         reg [7:0] addr;
         reg signed [15:0] raw;
         begin
-            q    = ph[31:30];
-            idx  = ph[29:23];
-            addr = q[0] ? (8'd128 - {1'b0, idx}) : {1'b0, idx};
+            addr = p[7] ? (8'd128 - {1'b0, p[6:0]}) : {1'b0, p[6:0]};
             raw  = sin_qwave(addr);
-            lut_sin = q[1] ? -raw : raw;
+            lut_sin_grid = p[8] ? -raw : raw;
+        end
+    endfunction
+
+    function automatic signed [15:0] lut_sin;
+        input [31:0] ph;
+        reg signed [15:0] v0, v1;
+        reg signed [25:0] d;
+        begin
+            v0 = lut_sin_grid(ph[31:23]);
+            v1 = lut_sin_grid(ph[31:23] + 9'd1);
+            d  = ($signed({v1[15], v1}) - $signed({v0[15], v0})) * $signed({1'b0, ph[22:15]});
+            lut_sin = v0 + (d >>> 8);
         end
     endfunction
 
@@ -181,12 +191,13 @@ module kria_tx_mod #(
             end
 
             if (tick) begin : blk_mod
-                reg signed [15:0] aud_cur, c_cos, c_sin;
+                reg signed [15:0] aud_cur, aud_sin, c_cos, c_sin;
                 reg signed [15:0] bb_i, bb_q;
                 reg signed [31:0] am_env, nbfm_df, mix_i_w, mix_q_w;
                 reg signed [15:0] hilb_q, out_i_s, out_q_s;
 
                 aud_cur = ext_aud_en ? ext_aud_sample : lut_cos(tone_ph);
+                aud_sin = lut_sin(tone_ph);                 // the internal tone's quadrature (SSB)
                 tone_ph <= tone_ph + cfg_tone_ftw;
 
                 for (hi = 30; hi > 0; hi = hi - 1)
@@ -224,17 +235,21 @@ module kria_tx_mod #(
                         bb_i = 16'sd16384;
                         bb_q = 16'sd0;
                     end
-                    3'd3: begin // USB: analytic +j*H{m} -> I*cos - Q*sin shifts to +f_c + f_m
-                        bb_i = aud_dly[14] >>> 1;
+                    // SSB. The internal tone has an exact quadrature (cos + j sin of the tone DDS), so the opposite
+                    // sideband is limited only by the table. External audio arrives at the audio rate and goes
+                    // through the 31-tap Hilbert (aud_dly[14] is its centre); at 25 MSPS that filter is flat to
+                    // DC for any audio tone and would give double sideband, hence the split.
+                    3'd3: begin // USB: m + j*H{m} -> +f_c + f_m
+                        bb_i = (ext_aud_en ? aud_dly[14] : aud_cur) >>> 1;
 `ifdef MUTATE_FLIP_USB_Q
-                        bb_q = -(hilb_q >>> 1); // MUTATION: produces LSB instead of USB
+                        bb_q = -((ext_aud_en ? hilb_q : aud_sin) >>> 1); // MUTATION: produces LSB instead of USB
 `else
-                        bb_q = hilb_q >>> 1;
+                        bb_q = (ext_aud_en ? hilb_q : aud_sin) >>> 1;
 `endif
                     end
                     default: begin // 3'd4 LSB: m - j*H{m} -> +f_c - f_m
-                        bb_i = aud_dly[14] >>> 1;
-                        bb_q = -(hilb_q >>> 1);
+                        bb_i = (ext_aud_en ? aud_dly[14] : aud_cur) >>> 1;
+                        bb_q = -((ext_aud_en ? hilb_q : aud_sin) >>> 1);
                     end
                 endcase
 
