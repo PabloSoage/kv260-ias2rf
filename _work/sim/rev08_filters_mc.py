@@ -4,6 +4,7 @@ Rev08 phase 3 (docs/REV08_PLAN.md, section 11, gate G2): the three front-end fil
 to parts that exist, then a tolerance Monte Carlo, the method of aaf_lpf.py.
 
     python _work/sim/rev08_filters_mc.py          # about five minutes; writes docs/img/rev08_filters_mc.png
+    python _work/sim/rev08_filters_mc.py --fmbp   # the FM band-pass alone, in seconds
 
 Parts and tolerances [E: catalogue series, checked against LCSC stock when the schematic is drawn]:
   inductors  Murata LQW15AN (0402 wirewound, +-2 %, G) up to 120 nH, LQW18AN (0603, +-2 %) above
@@ -174,6 +175,73 @@ def monte_carlo(name, v, tight, n=2000, seed=1):
     return np.array(il), np.array(rl), np.array(rj)
 
 
+# The FM band-pass (phase 4 found it missing, section 5.4 of the plan): 3 poles, shunt tank, series resonator,
+# shunt tank, at the values drawn in RX_VU (rx_vu_spec.py). The first drawing (24 nH || 110 pF, 560 nH + 4.7 pF)
+# gave 3.4 dB loss and 21.1 dB at p1; a search over LQW15/LQW18 and E24 values gave these, 2.2 dB and 24.3 dB.
+FMBP = "FMBP: FM broadcast, 3-pole band-pass, pass 87.5-108 MHz, at 70 and 137 MHz >= 21 dB"
+FMBP_V = [16e-9, 160e-12, 390e-9, 6.8e-12, 16e-9, 160e-12]     # L1431 C1431, L1432 C1432, L1433 C1433
+FMBP_PASS, FMBP_REJ = (87.5e6, 108e6), (70e6, 137e6)
+
+
+def abcd_fmbp(v, f, cpad=(CPAD, CPAD)):
+    w = 2 * np.pi * f; one = np.ones_like(w, dtype=complex)
+    def tank(L, C, cp):                # LQW15AN 16 nH: Q about 40 at 100 MHz; pad capacitance across it
+        return [one, 0 * one, 1 / (1j * w * L + w * L / 40) + 1j * w * (C + cp + 0.1e-12), one]
+    L, C = v[2], v[3]                  # 390 nH 0603 wirewound: Q about 45, 0.25 pF self-capacitance
+    ZL = 1 / (1 / (1j * w * L + w * L / 45) + 1j * w * 0.25e-12)
+    ser = [one, ZL + 1 / (1j * w * C), 0 * one, one]
+    return fe._mul(fe._mul(tank(v[0], v[1], cpad[0]), ser), tank(v[4], v[5], cpad[1]))
+
+
+def fmbp_metrics(v, cpad=(CPAD, CPAD)):
+    FP = np.linspace(*FMBP_PASS, 80)
+    il = -20 * np.log10(np.abs(fe.s21(abcd_fmbp(v, FP, cpad))[0]))
+    rj = -20 * np.log10(np.abs(fe.s21(abcd_fmbp(v, np.array(FMBP_REJ), cpad))[0]))
+    return il.max(), rj.min()
+
+
+def fmbp_mc(n=2000, seed=1):
+    """L +-2 % (0402) and +-5 % (the 390 nH 0603, conservatively), C +-2 % from 10 pF and +-0.1 pF below, pads 0.10 +- 0.05 pF"""
+    rng = np.random.default_rng(seed)
+    il, rj = [], []
+    for _ in range(n):
+        w = list(FMBP_V)
+        w[0] *= 1 + rng.uniform(-0.02, 0.02); w[4] *= 1 + rng.uniform(-0.02, 0.02)
+        w[2] *= 1 + rng.uniform(-0.05, 0.05)
+        w[1] *= 1 + rng.uniform(-0.02, 0.02); w[5] *= 1 + rng.uniform(-0.02, 0.02)
+        w[3] += rng.uniform(-0.1e-12, 0.1e-12)
+        a, b = fmbp_metrics(w, CPAD + rng.uniform(-0.05e-12, 0.05e-12, 2))
+        il.append(a); rj.append(b)
+    return np.array(il), np.array(rj)
+
+
+def report_fmbp(ax=None):
+    a, b = fmbp_metrics(FMBP_V)
+    il, rj = fmbp_mc()
+    print(FMBP)
+    print("  parts   16 nH || 160 pF, 390 nH + 6.8 pF, 16 nH || 160 pF")
+    print("          loss <= %.2f dB in 87.5-108 MHz, rejection >= %.1f dB at 70 and 137 MHz" % (a, b))
+    print("  MC: loss p99 %.2f dB, rejection p1 %.1f dB (mask 21), yield %.1f %%"
+          % (np.percentile(il, 99), np.percentile(rj, 1), 100 * np.mean(rj >= 21)))
+    if ax is None:
+        return
+    f = np.linspace(20e6, 300e6, 1500)
+    rng = np.random.default_rng(7)
+    for i in range(60):
+        w = [x * (1 + rng.uniform(-0.02, 0.02)) for x in FMBP_V]
+        ax.plot(f / 1e6, 20 * np.log10(np.abs(fe.s21(abcd_fmbp(w, f))[0])), color="#9fb8d6", lw=0.5, alpha=0.6)
+    ax.plot(f / 1e6, 20 * np.log10(np.abs(fe.s21(abcd_fmbp(FMBP_V, f))[0])), color="#1f4e79", lw=1.6,
+            label="catalogue values")
+    ax.axvspan(FMBP_PASS[0] / 1e6, FMBP_PASS[1] / 1e6, color="#c6e0b4", alpha=0.4, label="pass band")
+    for fr in FMBP_REJ:
+        ax.plot([fr / 1e6], [-21], "v", color="#c55a11", ms=7)
+    ax.axhline(-21, color="#c55a11", lw=0.8, ls="--", label="−21 dB at 70 and 137 MHz")
+    ax.set_ylim(-100, 3); ax.set_xlim(f[0] / 1e6, f[-1] / 1e6)
+    ax.set_xlabel("MHz"); ax.set_ylabel("S21 (dB)"); ax.grid(lw=0.3)
+    ax.set_title("FMBP: FM broadcast band-pass, 3 poles (as drawn)", fontsize=9)
+    ax.legend(fontsize=7, loc="lower left")
+
+
 def fmt(v, name=None):
     return ", ".join("%.3g nH" % (x * 1e9) if k in inds(name) else "%.3g pF" % (x * 1e12) for k, x in enumerate(v))
 
@@ -183,7 +251,7 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     names = list(fe.FILTERS)
-    fig, axs = plt.subplots(1, 4, figsize=(21, 4.8))
+    fig, axs = plt.subplots(1, 5, figsize=(26, 4.8))
     for ax, name in zip(axs, names):
         kind, fp, fs, ilmax, rej, q, cpar, _ = fe.FILTERS[name]
         vi = ideal(name)
@@ -218,6 +286,7 @@ def main():
         ax.set_xlabel("MHz"); ax.set_ylabel("S21 (dB)"); ax.grid(lw=0.3)
         ax.set_title(name.split(":")[0] + ": " + name.split(":")[1].strip(), fontsize=9)
         ax.legend(fontsize=7, loc="lower left")
+    report_fmbp(axs[4])
     fig.suptitle("Rev08 front-end filters with catalogue parts: nominal (dark) and 60 Monte Carlo samples, "
                  "L ±2 %, C ±0.1 pF / ±2 %, pads 0.10 ± 0.05 pF", fontsize=10)
     plt.tight_layout()
@@ -227,4 +296,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if "--fmbp" in sys.argv:
+        report_fmbp()
+    else:
+        main()

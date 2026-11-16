@@ -12622,7 +12622,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"
 			(at 181.61 57.15 0)
 			(hide yes)
 			(effects
@@ -13738,7 +13738,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 			(at 317.5 67.31 0)
 			(hide yes)
 			(effects
@@ -14160,7 +14160,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SOT343_L2.0-W1.3-P1.30-LS2.1-BL"
 			(at 394.97 54.61 0)
 			(hide yes)
 			(effects
@@ -14998,7 +14998,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 			(at 544.83 67.31 0)
 			(hide yes)
 			(effects
@@ -15420,7 +15420,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:WQFN-24_L4.0-W4.0-P0.50-TL-EP2.5"
 			(at 621.03 81.28 0)
 			(hide yes)
 			(effects
@@ -17345,7 +17345,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:QFN-24_L4.0-W4.0-P0.50-BL-EP2.8"
 			(at 74.93 191.77 0)
 			(hide yes)
 			(effects
@@ -17891,7 +17891,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:QFN-24_L4.0-W4.0-P0.50-BL-EP2.8"
 			(at 177.8 191.77 0)
 			(hide yes)
 			(effects
@@ -18437,7 +18437,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:QFN-14_L2.0-W2.0-P0.45-BL-EP"
 			(at 267.97 194.31 0)
 			(hide yes)
 			(effects
@@ -18886,7 +18886,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:FILTER-SMD_6P-L3.8-W3.8-P1.27-TL-3"
 			(at 344.17 175.26 0)
 			(hide yes)
 			(effects
@@ -19324,7 +19324,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:QFN-14_L2.0-W2.0-P0.45-BL-EP"
 			(at 560.07 194.31 0)
 			(hide yes)
 			(effects
@@ -19773,7 +19773,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 			(at 637.54 187.96 0)
 			(hide yes)
 			(effects
@@ -19990,7 +19990,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:XFMR-SMD_TC1-1TX"
 			(at 706.12 176.53 0)
 			(hide yes)
 			(effects
@@ -20484,7 +20484,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm"
 			(at 69.85 314.96 0)
 			(hide yes)
 			(effects
@@ -20850,7 +20850,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:OSC-SMD_4P-L2.0-W1.6-BL"
 			(at 147.32 293.37 0)
 			(hide yes)
 			(effects
@@ -21062,7 +21062,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:XFMR-SMD_TC1-1TX"
 			(at 217.17 283.21 0)
 			(hide yes)
 			(effects
@@ -25282,7 +25282,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 			(at 293.37 294.64 0)
 			(hide yes)
 			(effects
@@ -25704,7 +25704,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:SOT343_L2.0-W1.3-P1.30-LS2.1-BL"
 			(at 370.84 281.94 0)
 			(hide yes)
 			(effects
@@ -26333,7 +26333,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "kv260-ias2rf:QFN-20_L4.0-W4.0-P0.50-BL-EP2.2"
 			(at 474.98 303.53 0)
 			(hide yes)
 			(effects
@@ -28449,7 +28449,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "24n"
+		(property "Value" "16n"
 			(at 307.34 502.92 0)
 			(effects
 				(font
@@ -28520,7 +28520,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "110p"
+		(property "Value" "160p"
 			(at 320.04 502.92 0)
 			(effects
 				(font
@@ -28724,7 +28724,7 @@
 				)
 			)
 		)
-		(property "Value" "560n"
+		(property "Value" "390n"
 			(at 335.28 501.65 90)
 			(effects
 				(font
@@ -28732,7 +28732,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Inductor_SMD:L_0805_2012Metric"
+		(property "Footprint" "Inductor_SMD:L_0603_1608Metric"
 			(at 335.28 497.84 90)
 			(hide yes)
 			(effects
@@ -28793,7 +28793,7 @@
 				)
 			)
 		)
-		(property "Value" "4.7p"
+		(property "Value" "6.8p"
 			(at 347.98 501.65 90)
 			(effects
 				(font
@@ -28863,7 +28863,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "24n"
+		(property "Value" "16n"
 			(at 363.22 502.92 0)
 			(effects
 				(font
@@ -28934,7 +28934,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "110p"
+		(property "Value" "160p"
 			(at 375.92 502.92 0)
 			(effects
 				(font

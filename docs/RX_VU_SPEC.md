@@ -66,7 +66,7 @@ gateware can take over with the `SIPIN` bit.
 | Anti-alias LPF | 11p, 56n‖5.6p, 22p, 62n‖7.5p, 24p, 75n‖1.2p, 20p | `rev08_filters_mc.py`, plan 5.4 |
 | UHF image LPF | 6.2p, 22n‖1.8p, 6.8p, 27n‖2p, 6.8p, 22n‖0.4p, 1.3p | Same |
 | FM reject, 9th order | 18p, 68n+110p, 13p, 82n+36p, 18p, 100n+24p, 24p, 220n+10p, 91p | Same; G2 passed |
-| **FM band-pass (new in phase 4)** | shunt 24n‖110p, series 560n + 4.7p, shunt 24n‖110p: 3-pole Butterworth, 84–113 MHz | Designed here: 2.5 dB loss in 88–108 MHz (Q 40), 22 dB at 70 and 137 MHz; Monte Carlo (L ±2 %, C ±2 % / ±0.1 pF, 2,000 runs): loss ≤ 3.0 dB p99, rejection ≥ 21.2 dB p1 [V arithmetic]. To be added to `rev08_filters_mc.py` in phase 9 |
+| **FM band-pass (new in phase 4)** | shunt 16n‖160p, series 390n + 6.8p, shunt 16n‖160p: 3-pole band-pass, 88–108 MHz | `rev08_filters_mc.py --fmbp` (phase 5): 2.2 dB loss nominal with Q 40-45 inductors and pad capacitance, Monte Carlo (L ±2 % / ±5 % for the 390 nH, C ±2 % / ±0.1 pF, 2,000 runs) loss ≤ 3.1 dB p99, rejection ≥ 24.3 dB p1 at 70 and 137 MHz [V arithmetic]. Phase 4's first values (24n‖110p, 560n + 4.7p) modelled at 3.4 dB and 21.1 dB p1 once the pads and losses were in, so they were re-chosen |
 | RFFC5072 loop filter, reference, supplies | C8 8.2p, R3 22k + C9 180p, R2 470 / C10 330p, R6 470 / C17 330p; REXT 51k; 1 nF reference coupling; 120 Ω + 10 nF TCXO supply; 33 pF on the serial lines | Data sheet DS140110 p.13, wideband application schematic |
 | SPF5043Z bias | 1 µH (0603) + 56 nH (0402) choke, 1 nF blocks; IF amplifier 1 µH | Qorvo evaluation board (100 nH, 100 pF), scaled down to 30 MHz |
 | Bias tee | 56 nH + 1 µH (0805) chokes, 1 nF block, AP22652 with RLIM 210 k: 125 mA typical (95–155) | AP22652 data sheet table |

@@ -27,7 +27,19 @@ def L(value, why, fp=L0402):
     return ("Device:L", value, fp, why)
 
 
+def _lib_fp(lib):
+    """The footprint a symbol of our library names, so the sheet's instance does not blank it."""
+    import os, re
+    name = lib.split(":", 1)[1]
+    sym = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "symbols", "kv260-ias2rf.kicad_sym"),
+               encoding="utf-8").read()
+    m = re.search(r'\n\t\(symbol "' + re.escape(name) + r'"[\s\S]*?\(property "Footprint" "([^"]*)"', sym)
+    return m.group(1) if m else ""
+
+
 def U(lib, value, why, fp=None):
+    if fp is None and lib.startswith("kv260-ias2rf:"):
+        fp = _lib_fp(lib)
     return (lib, value, fp or "", why)
 
 
@@ -212,8 +224,8 @@ FILTERS = {
         ("sLC", "L1422", "82n", "C1424", "36p"), ("C", "C1425", "18p"), ("sLC", "L1423", "100n", "C1426", "24p"),
         ("C", "C1427", "24p"), ("sLC", "L1424", "220n", "C1428", "10p"), ("C", "C1429", "91p")]),
     "FMBP": ("VU_FMBP_IN", "VU_FMBP_OUT", "FM band-pass, 3-pole Butterworth, 84-113 MHz", [
-        ("pLC", "L1431", "24n", "C1431", "110p"), ("LsC", "L1432", "560n", "C1432", "4.7p"),
-        ("pLC", "L1433", "24n", "C1433", "110p")]),
+        ("pLC", "L1431", "16n", "C1431", "160p"), ("LsC", "L1432", "390n", "C1432", "6.8p"),
+        ("pLC", "L1433", "16n", "C1433", "160p")]),           # rev08_filters_mc.py --fmbp: 3.1 dB p99, 24 dB p1
 }
 
 

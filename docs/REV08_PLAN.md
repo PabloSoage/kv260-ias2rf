@@ -321,6 +321,7 @@ pads 0.10 ± 0.05 pF) [V arithmetic on E parts data]:
 | UHF image, 7th order | 6.2 pF, 22 nH ‖ 1.8 pF, 6.8 pF, 27 nH ‖ 2 pF, 6.8 pF, 22 nH ‖ 0.4 pF, 1.3 pF | 2.4 dB | **50.7 dB** (mask 50) | Pass, 90 % yield; needs the ±0.1 pF parts (with ±0.25 pF: 45 dB) |
 | FM reject, 7th order | — | 7.3 dB | 34.4 dB | **Fails G2**: a 9 % transition does not survive ±2 % parts |
 | **FM reject, 9th order (adopted)** | 18 pF, 68 nH + 110 pF, 13 pF, 82 nH + 36 pF, 18 pF, 100 nH + 24 pF, 24 pF, 220 nH + 10 pF, 91 pF | ≤ 3.1 dB from 121.5 MHz up; 4.1–6.7 dB at 118–120 MHz | **42.5 dB** (gate 40) | **G2 passed.** 13 parts instead of 10. The edge costs about 1 dB of noise figure on the lowest 2 MHz of the airband in a worst-case unit |
+| FM band-pass, 3 poles (added in phase 5) | 16 nH ‖ 160 pF, 390 nH + 6.8 pF, 16 nH ‖ 160 pF | 3.1 dB | **24.3 dB** at 70 and 137 MHz (mask 21) | Pass; re-chosen from the first drawing's values (3.4 dB, 21.1 dB) |
 
 No commercial FM band-stop filter is stocked (searched 16 November); higher inductor Q does not help, since the
 tolerances, not the losses, set the edge.
@@ -650,7 +651,10 @@ What drawing it changed in this plan:
 - **The AP22652's enable is active low** (section 5.3 said high): pulled up, so the bias tee is off until written.
 - **The bias tee's low option is 3.3 V from `+3V3_D`**, not the 3.0 V rail, which has 70 mA of headroom.
 - **An FM band-pass was missing** from phase 3 (section 5.4 covered three filters, the preselector needs four):
-  3-pole Butterworth, 84–113 MHz, 2.5 dB in band, ≥ 21 dB at 70 and 137 MHz with tolerances [V arithmetic].
+  3-pole band-pass, shunt 16 nH ‖ 160 pF, series 390 nH + 6.8 pF, shunt 16 nH ‖ 160 pF. Phase 5 added it to
+  `rev08_filters_mc.py` (`--fmbp`): the first drawing (24 nH ‖ 110 pF, 560 nH + 4.7 pF) gave 3.4 dB in band and
+  only 21.1 dB at p1, so the values were re-searched over catalogue parts: **loss 2.2 dB nominal, 3.1 dB p99;
+  ≥ 24.3 dB at 70 and 137 MHz at p1** (mask 21) [V arithmetic, 2,000 samples, inductor Q 40-45].
 - **The mixer's bias current flows through the TC4-1W+'s centre tap**, rated 30 mA: G-3 keeps `MIX2_IDD` ≤ 3.
 - **The LEDs and the USB bridge are on their own sheet**, not on `CONTROL` (no legible room on that A1 sheet).
   `+1V8_D`'s LED gets a transistor as well as `+1V0`'s.
