@@ -17,7 +17,8 @@
 `timescale 1ns/1ps
 
 module kria_cordic #(
-    parameter integer IN_W = 16
+    parameter integer IN_W = 16,
+    parameter integer FRAC = 8      // fractional guard bits (G-8): small vectors keep their precision
 ) (
     input  wire                   clk,
     input  wire                   rst,
@@ -33,7 +34,9 @@ module kria_cordic #(
     output reg  signed [15:0]     out_angle  // Vectoring: atan2(in_y, in_x); Rotation: ~0 residual
 );
     localparam integer STAGES = 16;
-    localparam integer W      = IN_W + 4; // 4 guard bits against intermediate CORDIC growth (1.647x)
+    // 4 guard bits against intermediate CORDIC growth (1.647x) and FRAC fractional bits: without them the 1/K
+    // pre-scale and the x >> i steps dropped the low bits of a small vector (a weak AM carrier lost 5 dB of SINAD)
+    localparam integer W      = IN_W + 4 + FRAC;
 
     // Pre-scale input by 1/K_16 = 0.6072388 using shift-adds (-92 dB vs exact 0.6072529)
     function automatic signed [W-1:0] inv_k_scale;
@@ -41,7 +44,7 @@ module kria_cordic #(
         reg signed [W+15:0] ext;
         reg signed [W+15:0] acc;
         begin
-            ext = {{(W+16-IN_W){v[IN_W-1]}}, v} <<< 14; // v * 16384
+            ext = {{(W+16-IN_W){v[IN_W-1]}}, v} <<< (14 + FRAC); // v * 16384, FRAC fractional bits
             // 0.60723877 * 16384 = 9949 = 8192 + 1024 + 512 + 256 - 32 - 8 + 4 + 1
             acc = (ext >>> 1) + (ext >>> 4) + (ext >>> 5) + (ext >>> 6)
                 - (ext >>> 9) - (ext >>> 11) + (ext >>> 12) + (ext >>> 14);
@@ -162,10 +165,12 @@ module kria_cordic #(
 
     // Saturation helper for 16-bit output
     function automatic signed [IN_W-1:0] sat_out;
-        input signed [W-1:0] v;
+        input signed [W-1:0] vf;
         localparam signed [W-1:0] MAXV = (1 << (IN_W - 1)) - 1;
         localparam signed [W-1:0] MINV = -(1 << (IN_W - 1));
+        reg signed [W-1:0] v;
         begin
+            v = (vf + (1 <<< (FRAC - 1))) >>> FRAC;       // round off the fractional bits
             if (v > MAXV)      sat_out = MAXV[IN_W-1:0];
             else if (v < MINV) sat_out = MINV[IN_W-1:0];
             else               sat_out = v[IN_W-1:0];

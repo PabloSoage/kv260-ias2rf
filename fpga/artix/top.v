@@ -444,6 +444,16 @@ module artix_top #(
 
     reg         reg_rad_nco_ovrd;
     reg  [23:0] reg_rad_nco_hi;
+    reg         reg_rad_cpi_mark;          // RADAR_CTRL[3]: mark each CPI's first sample in I[0] (G-8)
+    reg  [3:0]  reg_rad_mark_dly;          // RADAR_CTRL[7:4]: the mark's delay in 25 MSPS samples
+    reg  [1:0]  rad_mark_100_s;
+    reg  [3:0]  rad_dly_100_s1, rad_dly_100_s2;
+    always @(posedge adc_clk_100m) begin   // quasi-static CSR bits
+        rad_mark_100_s <= {rad_mark_100_s[0], reg_rad_cpi_mark};
+        rad_dly_100_s1 <= reg_rad_mark_dly;
+        rad_dly_100_s2 <= rad_dly_100_s1;
+    end
+    wire        dacr_chirp_tog;
 
     ddc_wrapper #(
         .POST_DECIM (DDC_POST_DECIM),
@@ -456,6 +466,9 @@ module artix_top #(
         .ddc_en           (adc_tr_100_sync[1] & rad_en_100_sync[1]),
         .reset_monitors   (spi_ctrl_clr_err_pulse),
         .nco_ftw_ovrd     (reg_rad_nco_ovrd ? {reg_rad_nco_hi, 8'h00} : 32'd0),
+        .chirp_tog        (dacr_chirp_tog),
+        .cpi_mark_en      (rad_mark_100_s[1]),
+        .cpi_mark_dly     (rad_dly_100_s2),
         .adc_data         (adc_data),
         .adc_valid        (adc_valid),
         .bb_i             (bb_i),
@@ -1891,6 +1904,13 @@ module artix_top #(
 
     wire        dacr_chirp_active_dac;
     wire [31:0] dacr_pulse_cnt_dac;
+    // chirp start as a toggle for the radar DDC's CPI mark (u_ddc syncs it into clk_100m)
+    reg         dacr_act_d = 1'b0, dacr_tog_r = 1'b0;
+    always @(posedge dac_clk) begin
+        dacr_act_d <= dacr_chirp_active_dac;
+        if (dacr_chirp_active_dac && !dacr_act_d) dacr_tog_r <= ~dacr_tog_r;
+    end
+    assign dacr_chirp_tog = dacr_tog_r;
     dac_radar u_dac_radar (
         .dac_clk      (dac_clk),
         .dac_rst      (dac_rst),
@@ -2428,6 +2448,8 @@ module artix_top #(
             reg_rad_ddc_en         <= 1'b1;
             reg_rad_nco_ovrd       <= 1'b0;
             reg_rad_nco_hi         <= 24'd0;
+            reg_rad_cpi_mark       <= 1'b0;
+            reg_rad_mark_dly       <= 4'd0;
             reg_clip_ovf_clr_p     <= 1'b0;
             adcr_or_sticky         <= 1'b0;
             adcs_clip_sticky       <= 1'b0;
@@ -2680,6 +2702,8 @@ module artix_top #(
                         reg_clip_ovf_clr_p <= reg_wr_wdata[1];
                         reg_rad_nco_ovrd   <= reg_wr_wdata[2];
                         reg_rad_nco_hi     <= reg_wr_wdata[31:8];
+                        reg_rad_cpi_mark   <= reg_wr_wdata[3];
+                        reg_rad_mark_dly   <= reg_wr_wdata[7:4];
                     end
                     6'h3C: begin // 0xF0 DBG_UART_CTRL
                         reg_uart_baud_div     <= reg_wr_wdata[15:0];

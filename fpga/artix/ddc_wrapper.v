@@ -9,7 +9,8 @@
 module ddc_wrapper #(
     parameter integer POST_DECIM = 1,          // 1 = 100 MSPS, 4 = 25 MSPS (0.8 Gb/s)
     parameter integer PKT_WORDS  = 8,          // 8 x 64b words = 64 bytes = 16 I/Q samples
-    parameter [7:0]   STREAM_ID  = 8'h01       // Radar baseband CPI stream
+    parameter [7:0]   STREAM_ID  = 8'h01,      // Radar baseband CPI stream
+    parameter integer CPI_CHIRPS = 16          // chirps per CPI (kria_radar_proc DOPPLER_M)
 ) (
     input  wire        clk_400m,
     input  wire        clk_100m,
@@ -17,6 +18,14 @@ module ddc_wrapper #(
     input  wire        ddc_en,
     input  wire        reset_monitors,
     input  wire [31:0] nco_ftw_ovrd,
+
+    // Rev08 G-8 radar framing: chirp_tog toggles (dac_radar's domain) at each chirp start; with cpi_mark_en, the
+    // first sample of every CPI_CHIRPS-th chirp carries I[0] = 1 and every other sample I[0] = 0, cpi_mark_dly
+    // post-decimation samples after the chirp start (the DDC's latency, so the mark lands on the sample the ADC
+    // took when the chirp left)
+    input  wire        chirp_tog,
+    input  wire        cpi_mark_en,
+    input  wire [3:0]  cpi_mark_dly,
 
     // AD9484 400 MSPS stream (clk_400m domain)
     input  wire [7:0]  adc_data,
@@ -94,35 +103,87 @@ module ddc_wrapper #(
         .data_sync_error (sync_error)
     );
 
+    wire signed [15:0] sw_i, sw_q;
 `ifdef MUTATE_SWAP_IQ
-    assign bb_i = scaled_q;
-    assign bb_q = scaled_i;
+    assign sw_i = scaled_q;
+    assign sw_q = scaled_i;
 `else
-    assign bb_i = scaled_i;
-    assign bb_q = scaled_q;
+    assign sw_i = scaled_i;
+    assign sw_q = scaled_q;
 `endif
 
-    // Optional post-decimation factor (clk_100m domain)
-    reg [7:0] decim_cnt;
-    reg       post_valid;
-    always @(posedge clk_100m) begin
-        if (rst || !ddc_en) begin
-            decim_cnt  <= 8'd0;
-            post_valid <= 1'b0;
-        end else if (scaled_valid) begin
-            if (decim_cnt == POST_DECIM - 1) begin
+    // Post-decimation (clk_100m domain). By 4: two anti-alias half-bands (ddc_hb4, G-8); otherwise one sample in
+    // POST_DECIM, as before.
+    reg [7:0]  decim_cnt;
+    reg        post_valid;
+    reg signed [15:0] post_i, post_q;
+    generate
+        if (POST_DECIM == 4) begin : g_hb4
+            wire               hb_valid;
+            wire signed [15:0] hb_i, hb_q;
+            ddc_hb4 u_hb4 (.clk(clk_100m), .rst(rst || !ddc_en), .in_valid(scaled_valid), .in_i(sw_i), .in_q(sw_q),
+                .out_valid(hb_valid), .out_i(hb_i), .out_q(hb_q));
+            always @(posedge clk_100m) begin
                 decim_cnt  <= 8'd0;
-                post_valid <= 1'b1;
-            end else begin
-                decim_cnt  <= decim_cnt + 8'd1;
-                post_valid <= 1'b0;
+                post_valid <= hb_valid && ddc_en;
+                post_i     <= hb_i;
+                post_q     <= hb_q;
             end
+        end else begin : g_drop
+            always @(posedge clk_100m) begin
+                post_i <= sw_i;
+                post_q <= sw_q;
+                if (rst || !ddc_en) begin
+                    decim_cnt  <= 8'd0;
+                    post_valid <= 1'b0;
+                end else if (scaled_valid) begin
+                    if (decim_cnt == POST_DECIM - 1) begin
+                        decim_cnt  <= 8'd0;
+                        post_valid <= 1'b1;
+                    end else begin
+                        decim_cnt  <= decim_cnt + 8'd1;
+                        post_valid <= 1'b0;
+                    end
+                end else begin
+                    post_valid <= 1'b0;
+                end
+            end
+        end
+    endgenerate
+
+    assign bb_i     = post_i;
+    assign bb_q     = post_q;
+    assign bb_valid = post_valid;
+
+    // CPI mark (clk_100m): count chirp starts; cpi_mark_dly output samples after every CPI_CHIRPS-th one, that
+    // sample's I[0] is 1
+    (* ASYNC_REG = "TRUE" *) reg [2:0] chirp_s;
+    reg [7:0]  chirp_n;
+    reg        mark_arm;
+    reg [3:0]  mark_wait;
+    wire       mark_now = mark_arm && (mark_wait == 4'd0);
+    always @(posedge clk_100m) begin
+        if (rst || !cpi_mark_en) begin
+            chirp_s   <= {3{chirp_tog}};
+            chirp_n   <= 8'd0;
+            mark_arm  <= 1'b0;
+            mark_wait <= 4'd0;
         end else begin
-            post_valid <= 1'b0;
+            chirp_s <= {chirp_s[1:0], chirp_tog};
+            if (post_valid && mark_arm) begin
+                if (mark_wait == 4'd0) mark_arm  <= 1'b0;
+                else                   mark_wait <= mark_wait - 4'd1;
+            end
+            if (chirp_s[2] ^ chirp_s[1]) begin
+                chirp_n <= (chirp_n == CPI_CHIRPS - 1) ? 8'd0 : chirp_n + 8'd1;
+                if (chirp_n == 8'd0) begin
+                    mark_arm  <= 1'b1;
+                    mark_wait <= cpi_mark_dly;
+                end
+            end
         end
     end
-
-    assign bb_valid = post_valid;
+    wire [15:0] bb_i_m = cpi_mark_en ? {bb_i[15:1], mark_now} : bb_i;
 
     // -------------------------------------------------------------------------
     // Pack two 32-bit complex samples {Q, I} into 64-bit word -> Async FIFO
@@ -172,12 +233,12 @@ module ddc_wrapper #(
 
             if (post_valid) begin
                 if (!half_phase) begin
-                    half_word  <= {bb_q, bb_i};
+                    half_word  <= {bb_q, bb_i_m};
                     half_phase <= 1'b1;
                 end else begin
                     half_phase <= 1'b0;
                     if (!fifo_full) begin
-                        fifo_mem[wr_ptr_bin[ADDR_W-1:0]] <= {bb_q, bb_i, half_word};
+                        fifo_mem[wr_ptr_bin[ADDR_W-1:0]] <= {bb_q, bb_i_m, half_word};
                         wr_ptr_bin  <= wr_next_bin;
                         wr_ptr_gray <= wr_next_gray;
                     end else begin

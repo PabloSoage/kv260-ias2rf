@@ -29,6 +29,7 @@ module tb_kria_radar_proc;
         .in_i              (in_i),
         .in_q              (in_q),
         .cpi_sync_start    (cpi_sync_start),
+        .cfg_sync_en       (1'b0),
         .cfg_win_en        (1'b1),
         .cfg_cfar_alpha_q8 (16'd1536), // 6.0x CA-CFAR threshold
         .cfg_cfar_min_pwr  (32'd50000),

@@ -400,6 +400,9 @@ module tb_system_signals;
     // Real-Time Output Recorders (when +SIG_WAIT_ARM is released)
     // -------------------------------------------------------------------------
     integer fd_ddc = 0, fd_demod = 0, fd_adsb = 0, fd_tx = 0, fd_radar = 0;
+    reg     rad_sync = 1'b0;
+    integer rad_sync_dly = 0, pri_cyc = 0;
+    realtime t_dac0, t_dac1;
     // +OUT_ADCS=<file>: channel B samples as the Artix's sdr_ddc receives them (capture check against the stimulus)
     integer fd_adcs = 0;
     always @(posedge dut_artix.u_sdr_ddc.adc_clk)
@@ -506,6 +509,9 @@ module tb_system_signals;
         if ($value$plusargs("TX_TONE=%h", rdv))        tx_tone = rdv;
         if ($value$plusargs("TX_CFG=%h", rdv))         tx_cfg = rdv;
         if ($value$plusargs("RAD_ALPHA=%h", rdv))      rad_alpha = rdv;
+        // +RADAR_SYNC_DLY=<n>: real chirps (PRI 64 stream samples, 2.56 us), the Artix CPI mark with delay n, the
+        // Kria's radar_sync, and the ADC stimulus armed on a chirp start (the echo of chirp 0 is file sample 0)
+        rad_sync = $value$plusargs("RADAR_SYNC_DLY=%d", rad_sync_dly);
 
         target_ddc_sid = (k_ctrl[3:2] == 2'd0) ? 8'h01 : ((k_ctrl[3:2] == 2'd1) ? 8'h05 : 8'h04);
 
@@ -535,7 +541,19 @@ module tb_system_signals;
         // Configure Artix over real IAS1 downlink BEFORE arming DSP RX/TX
         dl_artix_wr(16'h0048, artix_nco_b);
         dl_artix_wr(16'h004C, artix_decim);
-        dl_artix_wr(16'h00E4, artix_rad_ctrl);
+        dl_artix_wr(16'h00E4, rad_sync ? (artix_rad_ctrl | 32'h8 | ((rad_sync_dly & 15) << 4)) : artix_rad_ctrl);
+        if (rad_sync) begin
+            // dac_clk period, then 2.56 us chirps: PRI 2.56 us, 2.0 us long
+            @(posedge dut_artix.dac_clk); t_dac0 = $realtime;
+            @(posedge dut_artix.dac_clk); t_dac1 = $realtime;
+            pri_cyc = $rtoi(2560.0 / (t_dac1 - t_dac0) + 0.5);
+            dl_artix_wr(16'h0058, 32'h0400_0000);
+            dl_artix_wr(16'h005C, 32'h0000_1000);
+            dl_artix_wr(16'h0060, (pri_cyc * 25) / 32);
+            dl_artix_wr(16'h0064, pri_cyc);
+            dl_artix_wr(16'h0054, 32'h00FF_0001);
+            $display("RADAR_SYNC dac_clk %.3f ns, PRI %0d cycles", t_dac1 - t_dac0, pri_cyc);
+        end
         if (k_ctrl[1]) begin
             // TX_ALL mode: enable Artix dac_sdr (0x70) and dac_radar (0x54..0x64)
             dl_artix_wr(16'h0070, 32'h0000_0003); // tx_enable + dual IQ
@@ -571,9 +589,10 @@ module tb_system_signals;
 
         // Arm signal files + DSP suite
         dut_adcs.sig_armed = 1'b1;
+        if (rad_sync) @(posedge dut_artix.dacr_chirp_active_dac);
         dut_adcr.sig_armed = 1'b1;
         cap_en             = 1'b1;
-        if (k_ctrl[8]) begin
+        if (k_ctrl[8] && !k_ctrl[13]) begin
             // Align radar CPI capture to first non-zero DDC sample (within 1 sample of CPI start)
             while (!(m_axis_rx_tvalid && m_axis_rx_tready && (m_axis_rx_tid == 8'h01) &&
                      (($signed(m_axis_rx_tdata[15:0]) > 16'sd500) || ($signed(m_axis_rx_tdata[15:0]) < -16'sd500) ||

@@ -23,7 +23,8 @@ module kria_radar_proc #(
     output wire               in_ready,
     input  wire signed [15:0] in_i,
     input  wire signed [15:0] in_q,
-    input  wire               cpi_sync_start, // Optional frame sync pulse to align chirp=0, samp=0
+    input  wire               cpi_sync_start, // Frame sync: this sample is chirp 0, sample 0
+    input  wire               cfg_sync_en,    // 1 = capture only from a sync sample (the Artix CPI mark, G-8)
 
     // CA-CFAR & Window Configuration
     input  wire               cfg_win_en,       // 1 = enable Hann window on Range & Doppler
@@ -164,6 +165,7 @@ module kria_radar_proc #(
                      ST_RFFT_LOAD   = 3'd7;
 
     reg [2:0] state;
+    reg       synced;
     assign in_ready = (state == ST_LOAD_CHIRP);
 
     // Scratchpads for 64-pt Range FFT & 16-pt Doppler FFT
@@ -188,6 +190,7 @@ module kria_radar_proc #(
     always @(posedge clk) begin
         if (rst) begin
             state          <= ST_LOAD_CHIRP;
+            synced         <= 1'b0;
             samp_idx       <= 6'd0;
             chirp_idx      <= 4'd0;
             bfly_stage     <= 3'd0;
@@ -211,16 +214,21 @@ module kria_radar_proc #(
             case (state)
                 ST_LOAD_CHIRP: begin
                     // Capture full 1024-sample CPI continuously into cpi_re/im without dropping beats
-                    if (cpi_sync_start) begin
+                    if (in_valid && cpi_sync_start) begin
+                        // the marked sample is chirp 0, sample 0
+                        cpi_re[{4'd0, 6'd0}] <= {{8{in_i[15]}}, in_i};
+                        cpi_im[{4'd0, 6'd0}] <= {{8{in_q[15]}}, in_q};
                         chirp_idx <= 4'd0;
-                        samp_idx  <= 6'd0;
-                    end else if (in_valid) begin
+                        samp_idx  <= 6'd1;
+                        synced    <= 1'b1;
+                    end else if (in_valid && (synced || !cfg_sync_en)) begin
                         cpi_re[{chirp_idx, samp_idx}] <= {{8{in_i[15]}}, in_i};
                         cpi_im[{chirp_idx, samp_idx}] <= {{8{in_q[15]}}, in_q};
                         if (samp_idx == 6'd63) begin
                             samp_idx <= 6'd0;
                             if (chirp_idx == 4'd15) begin
                                 chirp_idx <= 4'd0;
+                                synced    <= 1'b0;      // the next CPI starts at the next mark
                                 state     <= ST_RFFT_LOAD;
                             end else begin
                                 chirp_idx <= chirp_idx + 4'd1;

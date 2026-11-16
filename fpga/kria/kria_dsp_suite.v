@@ -42,7 +42,8 @@ module kria_dsp_suite (
 );
     // CSR Registers (0x40..0x7C)
     reg [31:0] reg_dsp_ctrl;      // 0x40: [0]dsp_rx_en, [1]dsp_tx_en, [3:2]src_sel(0=01,1=05,2=04),
-                                  //       [6:4]ch_mode, [7]adsb_en, [8]radar_en, [9]radar_win_en, [12:10]tx_mode
+                                  //       [6:4]ch_mode, [7]adsb_en, [8]radar_en, [9]radar_win_en, [12:10]tx_mode,
+                                  //       [13]radar_sync (CPIs start at the I[0] mark)
     reg [31:0] reg_ch_nco_ftw;    // 0x44
     reg [31:0] reg_ch_decim;      // 0x48: [15:0]cic_decim, [21:16]cic_shift, [31:24]fir_decim
     reg [31:0] reg_ch_demod_cfg;  // 0x4C: [15:0]deemph_alpha, [31:16]ctcss_coeff
@@ -63,6 +64,7 @@ module kria_dsp_suite (
     wire       radar_en    = reg_dsp_ctrl[8];
     wire       radar_win   = reg_dsp_ctrl[9];
     wire [2:0] tx_mode     = reg_dsp_ctrl[12:10];
+    wire       radar_sync  = reg_dsp_ctrl[13];     // radar CPIs start at the Artix's mark (G-8)
 
     wire [7:0] target_tid = (src_sid_sel == 2'd0) ? 8'h01 :
                             (src_sid_sel == 2'd1) ? 8'h05 : 8'h04;
@@ -200,7 +202,8 @@ module kria_dsp_suite (
         .in_ready          (),
         .in_i              (iq_i),
         .in_q              (iq_q),
-        .cpi_sync_start    (1'b0),
+        .cpi_sync_start    (radar_sync && iq_i[0]),   // the Artix CPI mark (RADAR_CTRL[3]) in I[0]
+        .cfg_sync_en       (radar_sync),
         .cfg_win_en        (radar_win),
         .cfg_cfar_alpha_q8 (reg_radar_alpha),
         .cfg_cfar_min_pwr  (32'd20000),

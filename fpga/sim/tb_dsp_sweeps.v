@@ -83,7 +83,7 @@ module tb_dsp_sweeps;
     kria_radar_proc #(.RANGE_N(64), .DOPPLER_M(16)) u_rad (
         .clk(clk), .rst(rst || !rad_mode),
         .in_valid(rad_mode && in_valid), .in_ready(rad_in_ready),
-        .in_i(in_i), .in_q(in_q), .cpi_sync_start(1'b0),
+        .in_i(in_i), .in_q(in_q), .cpi_sync_start(1'b0), .cfg_sync_en(1'b0),
         .cfg_win_en(rad_win_en), .cfg_cfar_alpha_q8(rad_alpha), .cfg_cfar_min_pwr(rad_minpwr),
         .rd_out_valid(rad_out_valid), .rd_out_rbin(rad_rbin), .rd_out_dbin(rad_dbin),
         .rd_out_pwr(rad_pwr), .rd_out_det(rad_out_det),
