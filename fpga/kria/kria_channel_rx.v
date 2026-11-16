@@ -496,6 +496,12 @@ module kria_channel_rx (
     reg  signed [31:0] rds_lp1, rds_lp2;
     reg  signed [31:0] rds_q0, rds_q1, rds_q2, rds_q3;
     reg  signed [17:0] rds_ph;          // Q8.8 samples into the bit (negative right after a delayed start)
+    // gear shift: the loop starts anywhere in the bit (up to half a bit, 105 samples, from lock), so the first
+    // bits correct by 8 samples, then 2, then half a sample, and from bit 112 a quarter sample, which keeps the
+    // steady-state jitter to 0.1 % of a bit
+    reg        [6:0]  rds_nbits;
+    wire signed [17:0] rds_step = (rds_nbits < 7'd16) ? 18'sd2048 : (rds_nbits < 7'd48) ? 18'sd512 :
+                                  (rds_nbits < 7'd112) ? 18'sd128 : 18'sd64;
 
     // Goertzel CTCSS Detector (active in NBFM mode 3'd3 on raw discriminator dphi)
     reg signed [31:0] g_s1, g_s2, g_s0;
@@ -531,6 +537,7 @@ module kria_channel_rx (
             rds_q2         <= 32'sd0;
             rds_q3         <= 32'sd0;
             rds_ph         <= 18'sd0;
+            rds_nbits      <= 7'd0;
 
             g_s1           <= 32'sd0;
             g_s2           <= 32'sd0;
@@ -683,14 +690,15 @@ module kria_channel_rx (
 `ifdef MUTATE_RDS_NO_TIMING
                             rds_ph <= rds_rem;
 `else
-                            // early (the transition falls late in the window): the next bit starts a sample
-                            // later; late: a sample sooner
+                            // early (the transition falls late in the window): the next bit starts rds_step
+                            // later; late: rds_step sooner
+                            if (rds_nbits != 7'd127) rds_nbits <= rds_nbits + 7'd1;
                             if (rds_e == 0)
                                 rds_ph <= rds_rem;
                             else if ((rds_e >= 0) == (rds_d >= 0))
-                                rds_ph <= rds_rem - 18'sd256;
+                                rds_ph <= rds_rem - rds_step;
                             else
-                                rds_ph <= rds_rem + 18'sd256;
+                                rds_ph <= rds_rem + rds_step;
 `endif
                         end else begin
                             rds_ph <= rds_nph;
