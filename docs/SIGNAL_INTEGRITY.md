@@ -1096,7 +1096,8 @@ come from found a worse problem: the gateware took `CLK_FPGA` as 100 MHz, while 
   left is the master's own jitter and the FPGA's output buffer, to be measured as 9.8 says;
 - with Ethernet on, the GPS discipline of the Si549 is clamped to ±50 ppm (SGMII needs ±100 ppm).
 
-Vivado 2026.1, both builds: WNS +0.111 ns, WHS +0.016 ns, pulse width +0.008 ns, no failing endpoint. Every
+Vivado 2026.1, both builds (Rev08 phase 1 re-run): WNS +0.071 ns, WHS +0.014 ns, pulse width +0.008 ns, no failing
+endpoint; the AD9484 radar domain is closed at 400 MSPS only and held in reset in 500 MHz mode. Every
 bench passes at 400 and at 500 MHz, `tb_system` included (S1–S6 with Ethernet and IAS1), re-run independently;
 the clamp's mutation fails as it should.
 

@@ -286,7 +286,7 @@ J961 ─ ESD ─ DC block ─┬─ LNA ─┬─ preselector ─┬─ RFFC5072
 | Preselector A, 30 MHz up | PE42442 × 2 (SP4T, 30 MHz – 6 GHz) | 245, $4.95 | Paths: straight, FM band-pass, FM-reject high-pass, to preselector B |
 | Preselector B, 170 MHz up | SKY13418-485LF × 2 (SP8T, 0.1–6.0 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
 | Converter | **RFFC5072** (RFFC5072TR13) | **64**, $14.62 | LO 85–4200 MHz, mixer 30–6000 MHz in, 30–4500 MHz out; gain −2 dB into a 4:1 balun (−7 dB into a 1:1); NF 10 dB (low current) to 13 dB (high linearity); IIP3 +10 / +23 dBm; 100–125 mA at 2.7–3.3 V; reference 10–104 MHz, 0.5–1.5 V p-p AC-coupled; logic high ≥ VDD/1.5 |
-| Baluns | Input TC1-1-13M+ (1:1, 4.5–3000 MHz, 239, $2.12); output **TC4-1W+** (1:4, 3–800 MHz, 2,136 in stock), the data sheet's 4:1 output arrangement, same 3.8 × 3.8 mm body | — | Mixer input 100 Ω differential |
+| Baluns | Input TC1-1-13M+ (1:1, 4.5–3000 MHz; the LCSC listing, 239 at $2.12, is HLT's 5-pad clone with other pin numbers, so the genuine Mini-Circuits part is ordered: RX_VU_SPEC §1.4); output **TC4-1W+** (1:4, 3–800 MHz, 2,136 in stock), the data sheet's 4:1 output arrangement, same 3.8 × 3.8 mm body | — | Mixer input 100 Ω differential |
 | Reference | 26 MHz TCXO (KDS 1XXD26000MAA) | 15.7 k, $0.61 | Not locked to the Si549: section 5.9 |
 | Anti-alias filter | 7th-order elliptic, 0402 | — | Section 5.4 |
 | Step attenuator | PE4312 | 1,557, $2.84 | 0–31.5 dB in 0.5 dB steps, serial |

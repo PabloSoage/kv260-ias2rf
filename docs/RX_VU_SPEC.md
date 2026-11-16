@@ -58,6 +58,7 @@ J961 ─ D1301 ESD ─┬─ C1301 ─ U1302 ─┬─ U1301 LNA ─┬─ U1303
 The PE4312 powers up at 31.5 dB (its parallel bits are tied high in serial mode), so the ADC is protected until
 the gateware sets the gain. `MODE` is tied high (R1345): mixer 2 and the PLL2 bank, the RFFC5072's normal use; the
 gateware can take over with the `SIPIN` bit.
+Register-level bring-up and the LO settings of every band: [RFFC5072_PROGRAMMING.md](RFFC5072_PROGRAMMING.md).
 
 ### 1.3 Values and where they come from
 
@@ -79,6 +80,7 @@ gateware can take over with the `SIPIN` bit.
 | Bias-tee low voltage | 3.0 V | **3.3 V from `+3V3_D`** (JP1301 2-3) | The 3.0 V LDO has 70 mA of headroom; an active antenna can take 100 mA |
 | Mixer output balun | TC4-1W+ | TC4-1W+ with the mixer's bias through its centre tap | Rated 30 mA DC: the gateware must keep `MIX2_IDD` ≤ 3 (about 30 mA). Two RF chokes would lift the limit if high linearity is ever needed |
 | TCXO pin 1 | — | 10 k to its supply | KDS uses pin 1 as Vcont, ground or standby by variant; 10 k is correct for all three |
+| Mixer input balun source | TC1-1-13M+ | **Mini-Circuits TC1-1-13M+ only** (case AT224-1A, 6 pads: primary 6 / 4, secondary 1 / 3) | LCSC's C22383443 is HLT's H3-TC1-1-13M+, a clone in a 5-pad body numbered differently (1 primary dot, 2 primary, 3 secondary, 4 ground, 5 secondary dot): it does not fit the footprint. The BOM names the Mini-Circuits part; order it from a distributor if JLCPCB has none |
 | `SW2` source | "selects the source" | **C927 fitted (front end), C926 DNP** | The board is built for the front end; `J922` returns by swapping two 0402s |
 
 ## 2. STATUS

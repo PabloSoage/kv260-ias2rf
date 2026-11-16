@@ -112,7 +112,7 @@ BGA, for one).
 | DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board (re-run 15 Nov; one warning: D1003's footprint differs from its library copy) |
 | Signal and power integrity | Full-wave openEMS + ngspice verification ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch `S11 = -30.9 dB` at 1 GHz (`-13.7 dB` at 3 GHz) with ESD diode, LVDS eyes within `1–26 mV` of ideal except `LINK_RX_D0` (`-52 mV`), worst intra-pair skew `9 ps`, `VCCINT` impedance `41 / 63 mΩ` (`target 120 mΩ`), ESD protection on every SMA, Pmod and JTAG, GND via within `3 mm` of all `89` LVDS layer changes |
 | Planes | L2, L5, and L7 carry solid ground; L4 carries split power islands (`_work/layout/planechk.py`) |
-| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `15,681` LUTs (`48.1%`), `18,084` FFs (`27.7%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.111 ns` with `CLK_FPGA` constrained at both `400` and `500 MHz`; `ias2rf_k26_bd` uses `11,034` Slice LUTs (`9.4%`), `18,212` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +1.291 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
+| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `17,450` LUTs (`53.5%`), `19,029` FFs (`29.2%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.071 ns` over every clock of both `CLK_FPGA` modes (`400` and `500 MHz`); the AD9484 radar domain is closed at `400 MSPS` only and held in reset in `500 MHz` mode; `ias2rf_k26_bd` uses `11,038` Slice LUTs (`9.4%`), `18,210` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +0.814 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
 | Final RF review (15 Nov) | Five limits found ([SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md)) and addressed ([§9.9](docs/SIGNAL_INTEGRITY.md)): a 30 MHz 7th-order anti-alias filter on the HF input J951 (≥ 60 dB from 50 MHz); the switch-free J951/J952 as the default HF ports; DAC clocks from `CLK_FPGA` ÷ 4 without an MMCM (clock uncertainty `0.165 → 0.035 ns`); no transmit copper within 1.5 mm of any receive line; the enclosure's honest rating below. Still to measure on the first board: TX→RX isolation, the RF switches at 1–5 MHz, the filter above 700 MHz, switcher spurs |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: mounting holes land within `5 µm` ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
@@ -220,8 +220,8 @@ Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to
 
 | Target FPGA (`Vivado 2026.1`) | Slice LUTs | Flip-Flops | BRAM36 eq. | DSP48 | Timing (`WNS` / `WHS`) |
 |---|---|---|---|---|---|
-| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `15,681 / 32,600` (`48.1%`) | `18,084 / 65,200` (`27.7%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.111 ns` / `+0.016 ns`** (`CLK_FPGA` at `400` and `500 MHz`) |
-| **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+1.291 ns` / `+0.010 ns`** (`kria_top` alone: `+1.008 ns` / `+0.017 ns`) |
+| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `17,450 / 32,600` (`53.5%`) | `19,029 / 65,200` (`29.2%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.071 ns` / `+0.014 ns`** (all clocks of both `CLK_FPGA` modes; AD9484 domain at `400 MSPS` only) |
+| **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,038 / 117,120` (`9.4%`) | `18,210 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+0.814 ns` / `+0.011 ns`** |
 
 | Artix-7 Silicon Die Floorplan (`XC7A50T`) | Artix-7 Post-Route Vivado Circuit Schematic |
 |---|---|

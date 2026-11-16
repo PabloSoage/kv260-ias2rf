@@ -154,13 +154,22 @@ static int run_s2mm_capture(volatile uint32_t *dma, uint64_t phys_buf,
     return -1;
 }
 
-static int send_mm2s_reg_rd(volatile uint32_t *csr, volatile uint32_t *dma,
-                            uint64_t phys_buf, volatile uint64_t *virt_buf,
-                            uint16_t artix_addr)
+/* Artix CSRs reached through the stream 0x10 command channel (FPGA_GATEWARE.md, CSR map) */
+#define ARTIX_ADCS_STAT     0x0038
+#define ARTIX_RADAR_CTRL    0x00E4  /* [0] rad_ddc_en (reset 1); the Pmod spare1 GPIO before Rev08 */
+#define ARTIX_RADAR_STATUS  0x00E8  /* [5] link up and ADC trained; the Pmod spare2 GPIO before Rev08 */
+
+#define CMD_OP_WR           0x01
+#define CMD_OP_RD           0x02
+
+/* phys_buf must be the physical address of virt_buf: the MM2S engine sends what is there */
+static int send_mm2s_cmd(volatile uint32_t *csr, volatile uint32_t *dma,
+                         uint64_t phys_buf, volatile uint64_t *virt_buf,
+                         uint8_t op, uint16_t artix_addr, uint32_t wdata)
 {
-    /* Stream 0x10 command word: {opcode=0x02(RD), rsv=0x00, addr[15:0], data=32'h0} */
+    /* Stream 0x10 command word: {opcode[63:56], flags=0x00, addr[47:32], wdata[31:0]} */
     reg_wr(csr, REG_TX_AXIS_SID, 0x10);
-    virt_buf[0] = ((uint64_t)0x02 << 56) | ((uint64_t)artix_addr << 32);
+    virt_buf[0] = ((uint64_t)op << 56) | ((uint64_t)artix_addr << 32) | wdata;
     __sync_synchronize();
 
     reg_wr(dma, DMA_MM2S_CR, DMA_CR_RS);
@@ -171,7 +180,10 @@ static int send_mm2s_reg_rd(volatile uint32_t *csr, volatile uint32_t *dma,
     for (int i = 0; i < 10000; i++) {
         uint32_t sr = reg_rd(dma, DMA_MM2S_SR);
         if (sr & (DMA_SR_IDLE | DMA_SR_IOC_IRQ)) {
-            printf("DMA MM2S read-req(0x%04x) sent (SR=0x%08x)\n", artix_addr, sr);
+            if (op == CMD_OP_WR)
+                printf("DMA MM2S write(0x%04x <- 0x%08x) sent (SR=0x%08x)\n", artix_addr, wdata, sr);
+            else
+                printf("DMA MM2S read-req(0x%04x) sent (SR=0x%08x)\n", artix_addr, sr);
             return 0;
         }
         usleep(10);
@@ -211,8 +223,23 @@ int main(int argc, char **argv)
                                                                 PROT_READ | PROT_WRITE,
                                                                 MAP_SHARED, ufd, 0);
             if (ubuf != MAP_FAILED) {
+                /* the command word sits 4 KB into the buffer, clear of the S2MM capture */
+                volatile uint64_t *cmd = ubuf + 512;
+                uint64_t cmd_phys = phys_addr + 4096;
                 if (argc > 1 && strcmp(argv[1], "--rd-adcs") == 0)
-                    send_mm2s_reg_rd(csr, dma, phys_addr, ubuf + 512, 0x0038);
+                    send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_RD, ARTIX_ADCS_STAT, 0);
+                else if (argc > 2 && strcmp(argv[1], "--rd") == 0)
+                    send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_RD,
+                                  (uint16_t)strtoul(argv[2], NULL, 0), 0);
+                else if (argc > 3 && strcmp(argv[1], "--wr") == 0)
+                    send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_WR,
+                                  (uint16_t)strtoul(argv[2], NULL, 0),
+                                  (uint32_t)strtoul(argv[3], NULL, 0));
+                else if (argc > 2 && strcmp(argv[1], "--radar-en") == 0)
+                    send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_WR, ARTIX_RADAR_CTRL,
+                                  strtoul(argv[2], NULL, 0) ? 1u : 0u);
+                else if (argc > 1 && strcmp(argv[1], "--radar-status") == 0)
+                    send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_RD, ARTIX_RADAR_STATUS, 0);
                 run_s2mm_capture(dma, phys_addr, ubuf, 4096);
                 munmap((void *)ubuf, 8192);
             }
