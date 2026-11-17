@@ -90,6 +90,11 @@ RULES = {
     ("220n", "L_0805_2012Metric"): ("P", "LQW2BASR22J", r"^LQW2BASR22J"),   # anti-alias LPF: 0805 wirewound, Q ~40 at 30 MHz (the 2 % part is not stocked)
     ("270n", "L_0805_2012Metric"): ("P", "SDWL2012CR27G", r"^SDWL2012CR27G"),
     ("330n", "L_0805_2012Metric"): ("P", "LQW2BASR33G", r"^LQW2BASR33G"),
+    # J961's bias tee (SIGNAL_INTEGRITY 9.10, _work/sim/bias_tee.py): the bead's curve and the 1 uH's SRF are what
+    # the simulation used, so these two are the parts, not a value match (C21516, C333860 on 17 Nov 2026)
+    ("BLM15HD102SN1", "L_0402_1005Metric"): ("P", "BLM15HD102SN1", r"^BLM15HD102SN1"),
+    ("1u", "L_0805_2012Metric"): ("P", "LQW2BAS1R0J", r"^LQW2BAS1R0J"),
+    ("1u", "L_0603_1608Metric"): ("P", "AHW1608F-1R0KTF", r"^AHW1608F-1R0KTF"),   # L1303, L1305: SRF 400 MHz, 330 mA (C6364703)
     ("22n", "C_0402_1005Metric"): ("C", "22n", "0402", 16, XR),
     ("47u 25V", "C_1210_3225Metric"): ("C", "47u", "1210", 25, XR),
     ("10u 25V", "C_1206_3216Metric"): ("C", "10u", "1206", 25, XR),

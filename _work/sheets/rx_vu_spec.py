@@ -139,14 +139,21 @@ def two(ref, part, n1, n2):
 
 # bias tee and LNA
 two("C1301", C("1n", "DC block, antenna side (C0G)"), "VU_ANT", "VU_LNA_SW_IN")
-two("L1302", L("56n", "bias-tee choke near the line, LQW15AN56NG (SRF above 1 GHz)"), "VU_ANT", "VU_BIAS_MID")
-two("L1301", L("1u", "bias-tee choke, low end, 0805 (> 180 ohm at 30 MHz)", L0805), "VU_BIAS_MID", "VU_BIAS_OUT")
+two("FB1302", ("Device:FerriteBead", "BLM15HD102SN1", L0402,
+                "bias-tee choke near the line: a GHz ferrite bead, resistive above 150 MHz, so the branch cannot "
+                "resonate (phase 6, _work/sim/bias_tee.py; a 56 nH resonated with L1301's capacitance)"),
+    "VU_ANT", "VU_BIAS_MID")
+two("L1301", L("1u", "bias-tee choke, low end, 0805 wirewound LQW2BAS1R0J (157 ohm at 25 MHz, 170 mA)", L0805),
+    "VU_BIAS_MID", "VU_BIAS_OUT")
 two("C1302", C("1n", "LNA input DC block (also the switch's RF1)"), "VU_LNA_IN_SW", "VU_LNA_IN")
 two("C1303", C("1n", "LNA output DC block"), "VU_LNA_OUT", "VU_LNA_OUT_SW")
 two("L1303", L("1u", "LNA drain choke, low end (SPF5043Z eval board: 100 nH, here 30 MHz up)", L0603), V3, "VU_LNA_BIAS")
-two("L1304", L("56n", "LNA drain choke near the pin"), "VU_LNA_BIAS", "VU_LNA_OUT")
+two("FB1304", ("Device:FerriteBead", "BLM15HD102SN1", L0402,
+                "LNA drain choke near the pin: a GHz bead (phase 6: a 56 nH here resonated with C1305 at 67 MHz)"),
+    "VU_LNA_BIAS", "VU_LNA_OUT")
 two("C1304", C("100n", "LNA supply"), V3, GND)
-two("C1305", C("100p", "LNA supply, RF"), "VU_LNA_BIAS", GND)
+two("C1305", C("100p", "LNA supply, RF: DNP (phase 6, with FB1304 it would only add loss at 25-60 MHz)"),
+    "VU_LNA_BIAS", GND)
 for k, u in enumerate(("U1302", "U1303", "U1308", "U1309")):
     two(f"C13{6 + k:02d}", C("100p", f"VDD of {u}"), V3, GND)
 two("C1310", C("100p", "VDD of U1304"), V3, GND)

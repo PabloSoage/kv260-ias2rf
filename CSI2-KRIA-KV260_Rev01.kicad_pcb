@@ -115777,7 +115777,7 @@
 		(path "/d38d76a9-30ef-58e4-ab9c-851ccae32d35/1054f2be-2a98-5eb6-ae2f-9314846e09d5")
 		(sheetname "/RX_VU/")
 		(sheetfile "rev03/RX_VU.kicad_sch")
-		(attr smd)
+		(attr smd dnp)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
 			(start -0.107836 0.36)
@@ -121995,7 +121995,7 @@
 		(at 95.75 120.815 90)
 		(descr "Inductor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf)")
 		(tags "inductor")
-		(property "Reference" "L1302"
+		(property "Reference" "FB1302"
 			(at 0 -1.17 90)
 			(layer "F.Fab")
 			(effects
@@ -122005,7 +122005,7 @@
 				)
 			)
 		)
-		(property "Value" "56n"
+		(property "Value" "BLM15HD102SN1"
 			(at 0 1.17 90)
 			(layer "F.Fab")
 			(effects
@@ -122219,7 +122219,7 @@
 		(at 111.43 124.635 90)
 		(descr "Inductor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf)")
 		(tags "inductor")
-		(property "Reference" "L1304"
+		(property "Reference" "FB1304"
 			(at 0 -1.17 90)
 			(layer "F.Fab")
 			(effects
@@ -122229,7 +122229,7 @@
 				)
 			)
 		)
-		(property "Value" "56n"
+		(property "Value" "BLM15HD102SN1"
 			(at 0 1.17 90)
 			(layer "F.Fab")
 			(effects
@@ -352046,5 +352046,117 @@
 		(layer "In5.Cu")
 		(net "/IF_VU")
 		(uuid "3060c0d9-5cf5-4d06-b0d1-05ea0f209bb8")
+	)
+	(via
+		(at 90.5 118.475)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "a11bfdc6-9688-4448-95e3-ed77b92eeb14")
+	)
+	(via
+		(at 91.5 118.475)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "5fede4a4-f5ce-4a44-9b29-b7944a70990c")
+	)
+	(via
+		(at 92.5 118.475)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "c34f033b-81d1-4eab-aa87-8a52e33b5a47")
+	)
+	(via
+		(at 90.5 124.125)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "775e552b-6c69-4b9d-b0e7-443bc4d8b68c")
+	)
+	(via
+		(at 91.5 124.125)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "04a06549-933f-4603-8b5f-83d0f3783b24")
+	)
+	(via
+		(at 92.5 124.125)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "8b145707-3b4a-4433-96c0-d9eb2f2aac90")
+	)
+	(via
+		(at 93.3 120.5)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "adb289f7-d647-4bf6-871e-34cc815609e6")
+	)
+	(via
+		(at 93.3 122.1)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "809fb590-9cb4-4ee9-89c3-badffaa0bb66")
+	)
+	(via
+		(at 95.25 122.1)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(capping yes)
+		(filling yes)
+		(net "GND")
+		(uuid "2e167151-43ae-41cd-a108-471466b1e878")
+	)
+	(zone
+		(net "GND")
+		(layer "F.Cu")
+		(uuid "2daef631-9c49-44d2-a49a-97a9ade8b6bc")
+		(name "L1 VU_ANT GND")
+		(hatch edge 0.5)
+		(priority 20)
+		(connect_pads yes
+			(clearance 0.5)
+		)
+		(min_thickness 0.25)
+		(fill yes
+			(thermal_gap 0.3)
+			(thermal_bridge_width 0.3)
+			(island_removal_mode 0)
+		)
+		(polygon
+			(pts
+				(xy 89 117.6) (xy 93.9 117.6) (xy 93.9 120.9) (xy 98.3 120.9) (xy 98.3 123.4) (xy 93.6 123.4) (xy 93.6 125.0) (xy 89 125.0)
+			)
+		)
 	)
 )

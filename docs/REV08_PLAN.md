@@ -280,7 +280,7 @@ J961 ─ ESD ─ DC block ─┬─ LNA ─┬─ preselector ─┬─ RFFC5072
 | Block | Part | Stock, price [V] | Key figures |
 |---|---|---|---|
 | Antenna connector `J961` | SMA-J-P-H-ST-EM1, as the other twelve | 114, $5.45 | Left edge, back wall |
-| Bias tee | AP22652 current-limited switch, two inductors, 3.0 or 5 V selectable | 8.5 k, $0.33 | Feeds an active antenna or a mast-head LNA; fault flag to an expander |
+| Bias tee | AP22652 current-limited switch, a GHz ferrite bead and a 1 µH inductor (phase 6: the two inductors first drawn resonated in band, section 11.7), 3.0 or 5 V selectable | 8.5 k, $0.33 | Feeds an active antenna or a mast-head LNA; fault flag to an expander |
 | LNA and IF amplifier | SPF5043Z × 2, at 3.0 V | 5,923, $3.39 | 50–4000 MHz; 22.6 dB and NF 0.60 dB at 100 MHz, 18 dB at 900 MHz, 25 mA at 3 V |
 | Bypass switches | PE4259 × 4 | 14.7 k, $1.19 | 10 MHz – 3 GHz SPDT |
 | Preselector A, 30 MHz up | PE42442 × 2 (SP4T, 30 MHz – 6 GHz) | 245, $4.95 | Paths: straight, FM band-pass, FM-reject high-pass, to preselector B |
@@ -521,7 +521,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances.** Passed 16 November with a 9th-order filter (section 5.4); the RFFC5072 data sheet and loop filter are still open |
 | 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | **Done 16 November** (section 11.5): ERC 7 warnings as before, `check_sheet` PASS for `RX_VU`, `STATUS`, `IAS_LINK` |
 | 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | **Done 16 November** (section 11.6): 0 errors, 0 unconnected, 0 parity errors |
-| 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **G3: LO and IF-line coupling into either ADC below the Rev07 isolation figure** |
+| 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **Done 17 November** (section 11.7): G3 passed; `J961` brought to the other SMAs' standard, bias tee and LNA bias fixed, DRC 0 / 0 / 0 |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
 | 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | — |
 | 9 | Regenerate every output and review every document (section 11.1); draw the board manual (section 11.3) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done** |
@@ -694,6 +694,40 @@ What the layout settled:
 Left as warnings (no error): 10 dangling track ends and 7 vias left by the router (inert copper), 13
 silkscreen-over-pad warnings from footprint outlines (the fab clips silkscreen on pads), and one hole-to-hole
 warning between two vias of the same net.
+
+### 11.7 Phase 6 result: simulation of the new copper (17 November 2026), gate G3 passed
+
+Details, tables and figures: SIGNAL_INTEGRITY 9.10. Every check ran on a copy of the board with the zones refilled.
+
+- **G3 passed.** `_work/sim/txrx_isolation.py`, extended with the front end as aggressors (LO, reference, IF
+  chain, `IF_VU`, `VU_PSB_OUT`, USB), finds:
+  - no front-end copper on the same layer within 1.5 mm of either ADC's input or of the clock tree;
+  - no front-end via within 1.0 mm of them.
+
+  The LO is 8.7 mm from `IF_VU`, 29.8 mm from `CLK_FPGA` and 57.8 mm from the AD9484 drivers. Where `IF_VU`
+  crosses the `IF_RX` lines, L5 and L7 are solid ground. The coupling into either ADC is therefore below the
+  Rev07 figure (`CLK_REF_IN` into `IF_RX_B`, −102 dB at 120 MHz). The first board's spectrum with the LO on
+  is the measurement.
+- **`VU_PSB_OUT`** is 55.2 ohm (field solver), against the 55 ohm estimated in phase 5: left as drawn (26 dB
+  return loss at 1.1 GHz).
+- **`J961` brought to the other SMAs' standard.** The L2-L6 cut-out under its pad was already in phase 5. Added:
+  - three ground vias in each leg;
+  - a via fence where B.Cu leaves room;
+  - an L1 ground pour along `VU_ANT`.
+
+  openEMS launch: |S11| −18.1 dB at worst over 0.1-1.1 GHz, the same as the phase 5 copper within 0.3 dB, 6 dB above J921's bare pattern because of D1301's 0.5 pF and the bias tee's pads on the line (0.07 dB of mismatch loss); |S21| −0.28 dB at 1.1 GHz.
+- **Bias tee fixed.** The drawn 56 nH + 1 µH made a series resonance (the 1 µH's own capacitance with the
+  56 nH) at 0.85-1.7 GHz: 12 dB of loss near 1 GHz nominal. Now `FB1302` is a BLM15HD102SN1 GHz bead in the
+  56 nH's pads, and `L1301` is an LQW2BAS1R0J. Worst extra loss from 25 MHz to 1.1 GHz: 0.30 dB over 3,000
+  Monte Carlo draws, including the bead's derating at the 155 mA bias limit (target under 0.5 dB).
+- **The same fault on the LNA, fixed.** The SPF5043Z's drain feed (56 nH to a node with 100 pF to ground) was a
+  short at 67 MHz on the LNA's output: 21 dB at 67 MHz, 4.7 dB at 100 MHz. Now `FB1304` is a BLM15HD102SN1
+  and `C1305` is not fitted: 0.23 dB at worst. The sweep of every other choke on an RF line in `RX_VU` found
+  nothing else (`L1305`, the IF amplifier's, costs 0.31 dB at most over its band).
+- **Checks.** DRC with zones refilled and schematic parity: **0 errors, 0 unconnected, 0 parity errors**. ERC:
+  the same 7 warnings. `check_sheet rx_vu`: PASS. Nothing else's copper moved: the board diff is 5 property
+  lines, 9 vias and 1 zone, and after the refill only the fills around `J961` differ. The BOM rules name the
+  four parts (`lcsc_select.py`): BLM15HD102SN1, LQW2BAS1R0J, and AHW1608F-1R0KTF for the 0603 1 µH chokes.
 
 ### Risk register
 

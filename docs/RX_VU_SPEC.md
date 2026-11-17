@@ -30,7 +30,7 @@ recommended layout.
 ```
 J961 ─ D1301 ESD ─┬─ C1301 ─ U1302 ─┬─ U1301 LNA ─┬─ U1303 ─ U1304 ─┬─ straight ─────────────┬─ U1305 ─ U1308 ─┬─ T1301 ─ U1312 RFFC5072 ─ T1302 ─┬─ U1309 ─ AA LPF ─ U1310 IF amp ─ U1311 att ─ IF_VU
                   │                 └─ bypass ─────┘                 ├─ FM band-pass ─────────┤                 └─ bypass ─────────────────────────┘
- L1302 + L1301 ───┘ (bias tee)                                       ├─ FM reject (9th) ──────┤
+ FB1302 + L1301 ──┘ (bias tee)                                       ├─ FM reject (9th) ──────┤
  U1314 AP22652, JP1301 5 V / 3.3 V                                   └─ U1306 ─┬─ UHF LPF ──┬─ U1307 ─┘
                                                                                ├─ SAW 1090 ─┤
                                                                                ├─ HPF 1 GHz ┤
@@ -69,8 +69,8 @@ Register-level bring-up and the LO settings of every band: [RFFC5072_PROGRAMMING
 | FM reject, 9th order | 18p, 68n+110p, 13p, 82n+36p, 18p, 100n+24p, 24p, 220n+10p, 91p | Same; G2 passed |
 | **FM band-pass (new in phase 4)** | shunt 16n‖160p, series 390n + 6.8p, shunt 16n‖160p: 3-pole band-pass, 88–108 MHz | `rev08_filters_mc.py --fmbp` (phase 5): 2.2 dB loss nominal with Q 40-45 inductors and pad capacitance, Monte Carlo (L ±2 % / ±5 % for the 390 nH, C ±2 % / ±0.1 pF, 2,000 runs) loss ≤ 3.1 dB p99, rejection ≥ 24.3 dB p1 at 70 and 137 MHz [V arithmetic]. Phase 4's first values (24n‖110p, 560n + 4.7p) modelled at 3.4 dB and 21.1 dB p1 once the pads and losses were in, so they were re-chosen |
 | RFFC5072 loop filter, reference, supplies | C8 8.2p, R3 22k + C9 180p, R2 470 / C10 330p, R6 470 / C17 330p; REXT 51k; 1 nF reference coupling; 120 Ω + 10 nF TCXO supply; 33 pF on the serial lines | Data sheet DS140110 p.13, wideband application schematic |
-| SPF5043Z bias | 1 µH (0603) + 56 nH (0402) choke, 1 nF blocks; IF amplifier 1 µH | Qorvo evaluation board (100 nH, 100 pF), scaled down to 30 MHz |
-| Bias tee | 56 nH + 1 µH (0805) chokes, 1 nF block, AP22652 with RLIM 210 k: 125 mA typical (95–155) | AP22652 data sheet table |
+| SPF5043Z bias | LNA: `L1303` 1 µH (0603, AHW1608F-1R0KTF) + `FB1304` BLM15HD102SN1 bead (0402), `C1305` not fitted; 1 nF blocks; IF amplifier `L1305` 1 µH | Qorvo evaluation board (100 nH, 100 pF), scaled down to 30 MHz; phase 6 (SIGNAL_INTEGRITY 9.10): the drawn 56 nH with `C1305`'s 100 pF to ground was a series resonance at 67 MHz on the LNA output (22 dB), now at most 0.23 dB from 25 MHz to 1.1 GHz |
+| Bias tee | `FB1302` BLM15HD102SN1 GHz bead (0402) + `L1301` 1 µH LQW2BAS1R0J (0805 wirewound), 1 nF block, AP22652 with RLIM 210 k: 125 mA typical (95–155) | AP22652 data sheet table; the chokes from phase 6 (SIGNAL_INTEGRITY 9.10, `_work/sim/bias_tee.py`): the drawn 56 nH + 1 µH resonated near 1 GHz (12 dB notch nominal), the bead leaves at most 0.30 dB from 25 MHz to 1.1 GHz |
 
 ### 1.4 Corrections to the plan found while drawing
 

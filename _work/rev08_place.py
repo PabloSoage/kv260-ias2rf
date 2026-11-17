@@ -167,7 +167,7 @@ def near(ref, kind, anchor, side="B"):
 Y = 121.3                                    # the antenna line, J961's axis
 at("J961", 91.1, Y, 180)                     # Rev07's SMA launch (J922); centre pin ends at x 92.7
 two("D1301", "D_SOD-882", 94.6, Y, "S")
-two("L1302", "L_0402", 95.75, Y, "N")         # 56 nH: VU_ANT -> VU_BIAS_MID
+two("FB1302", "L_0402", 95.75, Y, "N")        # bead (was 56 nH L1302): VU_ANT -> VU_BIAS_MID
 two("C1301", "C_0402", 97.6, Y, "E")         # DC block
 two("L1301", "L_0805", 95.9, 118.55, "E")    # 1 uH: VU_BIAS_MID -> VU_BIAS_OUT
 at("U1314", 100.6, 119.2, 90, fp="kv260-ias2rf:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL")
@@ -189,11 +189,11 @@ p = pin("U1302", "1")
 q = two("C1302", "C_0402", p[0] + 0.7, p[1], "E")
 ic("U1301", "kv260-ias2rf:SOT343_L2.0-W1.3-P1.30-LS2.1-BL", 90, "3", q[0] + 0.75, q[1])   # IN W-up, OUT E-low
 o = pin("U1301", "1")
-two("L1304", "L_0402", o[0], o[1] + 0.9, "S", first="2")         # LNA_OUT -> LNA_BIAS
+two("FB1304", "L_0402", o[0], o[1] + 0.9, "S", first="2")         # LNA_OUT -> LNA_BIAS
 r = two("C1303", "C_0402", o[0] + 0.75, o[1], "E")
 ic("U1303", "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL", 270, "1", r[0] + 0.7, r[1])  # RF1 W-up, RFC E
-two("C1305", "C_0402", pin("L1304", "1")[0] + 0.75, pin("L1304", "1")[1], "E", side="B")          # LNA_BIAS -> GND, under the choke
-two("L1303", "L_0603", pin("L1304", "1")[0] - 0.75, pin("L1304", "1")[1], "W", side="B", first="2")   # +3V0_RF -> LNA_BIAS
+two("C1305", "C_0402", pin("FB1304", "1")[0] + 0.75, pin("FB1304", "1")[1], "E", side="B")          # LNA_BIAS -> GND, under the choke
+two("L1303", "L_0603", pin("FB1304", "1")[0] - 0.75, pin("FB1304", "1")[1], "W", side="B", first="2")   # +3V0_RF -> LNA_BIAS
 near("C1304", "C_0402", ("L1303", "1"))
 near("C1306", "C_0402", ("U1302", "6"))
 near("C1307", "C_0402", ("U1303", "6"))

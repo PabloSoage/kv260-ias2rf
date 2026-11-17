@@ -12452,7 +12452,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:L")
+		(lib_id "Device:FerriteBead")
 		(at 60.96 86.36 0)
 		(unit 1)
 		(body_style 1)
@@ -12462,7 +12462,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "f3db2bae-b6b8-5b8e-a5d9-1df171230b48")
-		(property "Reference" "L1302"
+		(property "Reference" "FB1302"
 			(at 63.5 85.09 0)
 			(effects
 				(font
@@ -12471,7 +12471,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "56n"
+		(property "Value" "BLM15HD102SN1"
 			(at 63.5 87.63 0)
 			(effects
 				(font
@@ -12516,7 +12516,7 @@
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
-					(reference "L1302")
+					(reference "FB1302")
 					(unit 1)
 				)
 			)
@@ -14556,7 +14556,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:L")
+		(lib_id "Device:FerriteBead")
 		(at 438.15 95.25 0)
 		(unit 1)
 		(body_style 1)
@@ -14566,7 +14566,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6ef86419-51b3-5eb2-9068-8279f29d210b")
-		(property "Reference" "L1304"
+		(property "Reference" "FB1304"
 			(at 440.69 93.98 0)
 			(effects
 				(font
@@ -14575,7 +14575,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "56n"
+		(property "Value" "BLM15HD102SN1"
 			(at 440.69 96.52 0)
 			(effects
 				(font
@@ -14620,7 +14620,7 @@
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
-					(reference "L1304")
+					(reference "FB1304")
 					(unit 1)
 				)
 			)
@@ -14840,7 +14840,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "1054f2be-2a98-5eb6-ae2f-9314846e09d5")
 		(property "Reference" "C1305"
 			(at 486.41 93.98 0)

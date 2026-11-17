@@ -1130,6 +1130,127 @@ and taller heatsinks (ENCLOSURE.md §6). Fine-mesh CFD of what is built: **rated
 KV260, 63 °C by the adapter's own parts, 70.9 °C with an industrial K26I SOM**. "70 °C" in this
 documentation now means with a K26I.
 
+### 9.10 Rev08: the VHF/UHF front end's copper (phase 6, 17 November)
+
+REV08_PLAN section 11, phase 6 and gate G3: the new copper of phase 5 simulated with the method of 9.9. Every
+check below ran on a copy of the board with the zones refilled (the board in git keeps its zones unfilled, as
+FABRICATION says; `make_fab.py` fills them on its own copy).
+
+**1. Coupling into the converters and the clock tree (G3).** `_work/sim/txrx_isolation.py` now also takes the
+front end's copper as aggressors: the RFFC5072's mixer ports (which carry its LO leakage), its reference, the IF
+chain from the mixer to `IF_VU` (the 142.3 mm L6 stripline to SW2), the preselector link `VU_PSB_OUT` and the
+USB pair. As victims, it takes both converters' inputs (the `IF_RX` lines, the AD8352 driver nets and the ADC
+VIN nets), `IF_VU` itself and the clock tree (Si549, ADCLK948, the ADC and FPGA clock pairs). It adds
+1.1 GHz to the frequencies, caps the in-phase sum at the run's largest Kb, and lists aggressor vias within
+1.0 mm of a victim's track on any layer.
+
+| Front-end aggressor | Same-layer copper within 1.5 mm of an ADC input or a clock net | Aggressor via within 1.0 mm | Closest approach, any layer |
+|---|---|---|---|
+| LO (RFFC5072 mixer ports) | none | none | 8.7 mm to `IF_VU`; 29.8 mm to `CLK_FPGA`, 57.8 mm to the AD9484 drivers |
+| RFFC5072 reference (TCXO) | none | none | 18.0 mm to `IF_VU` |
+| IF chain (anti-alias, IF amplifier, PE4312) | none | none | 23.6 mm to `CLK_FPGA` |
+| IF line `IF_VU` (L6) | none | none | crosses `IF_RX_A/B/C` on other layers; 5.5 mm from the ADCLK948's nets |
+| `VU_PSB_OUT` | none | none | 15.0 mm to `IF_VU` |
+| USB (`J104` to the CH340X) | none | none | 28.4 mm to `IF_VU` |
+
+Where `IF_VU` crosses the `IF_RX` lines it is on L6 and they are on L1 or L8: L5 and L7 are solid ground
+along all of `IF_VU`'s 142.3 mm except 0.9 mm at its own via by SW2. Into `IF_VU` itself, the only
+items within 1.0 mm are two vias that cross L6: the radar chirp's (`IF_TX_B`, 0.87 mm) and a DAC output's ahead
+of its filter (0.57 mm). Both were already placed so in phase 5 (2W from L6 copper), and a via is a short
+vertical, not a parallel run.
+
+**G3: passed.** No LO, reference, IF or USB copper runs on the same layer within 1.5 mm of either converter's
+input or of the clock tree, and no front-end via comes within 1.0 mm of them. The track model therefore
+gives nothing to add to the Rev07 figure (`CLK_REF_IN` into `IF_RX_B`, −102 dB at 120 MHz, which the script
+still reproduces). The front end's coupling into the ADCs is below that figure. What the script cannot see
+is the same as in 9.9: radiation inside the box, the supplies, and the parts' own feedthrough. The frames and
+the front end's own LDO are there for those, and the first board's spectrum (LO on, antenna terminated) is the
+measurement.
+
+`VU_PSB_OUT` (0.12 mm, 21.2 mm on L3 and 9.1 mm on L6, preselector B to A up to 1.1 GHz): 55.2 ohm by the field
+solver of 3.5 (0.151 mm would give 50.1 ohm). The 10 % mismatch over 30 mm costs under 0.05 dB and a
+return loss of about 26 dB at 1.1 GHz. It is left as drawn. Its reference planes are solid except at its own
+three vias.
+
+**2. `J961`'s launch.** The phase 5 copper already had the L2-L6 cut-out under the signal pad (keep-outs on
+In1-In5, x 89-93, y 120.25-122.35), so the pad references L7, as under J921. What the other twelve SMAs have
+and `J961` did not:
+- an L1 ground pour around the line;
+- three ground vias in each leg (it had one, at the edge);
+- a via fence along the line.
+
+Added, as text edits of the board (no router; nothing else's copper moved, checked zone by zone after the refill):
+- six vias in the legs (x 90.5, 91.5, 92.5);
+- fence vias at (93.3, 120.5), (93.3, 122.1) and (95.25, 122.1), the last on D1301's ground, which had no via;
+- the pour "L1 VU_ANT GND" (0.5 mm clearance, as the RF band's) on the legs and south of the line.
+
+North of the line past x 94 there is no room for vias: `U1315` and a LED track sit under it on B.Cu.
+
+`_work/sim/j961_launch.py` (openEMS, the 8-layer stack, 0.1-3 GHz) models the launch with the parts on the
+line: D1301 0.5 pF, the bias tee's pad, and C1301 as a through.
+
+![J961: return loss](sim/j961_launch.png)
+
+| \|S11\| | 100 MHz | 300 MHz | 500 MHz | 1.0 GHz | 1.1 GHz | 2.0 GHz |
+|---|---|---|---|---|---|---|
+| Phase 5 copper | −35.6 dB | −29.7 dB | −25.7 dB | −19.3 dB | −18.3 dB | −11.8 dB |
+| Phase 6 copper | −35.5 dB | −29.4 dB | −25.4 dB | −19.1 dB | −18.1 dB | −11.8 dB |
+| The other SMAs' pattern (J921), bare line | −38.8 dB | −33.9 dB | −30.3 dB | −24.9 dB | −24.2 dB | −19.7 dB |
+| Bare 0.2 mm line (the set-up's floor) | −39.3 dB | −38.5 dB | −37.8 dB | −36.3 dB | −36.0 dB | −34.5 dB |
+
+All four runs are stable (the model's margins keep every via out of the absorbing boundary). The phase 6 copper
+returns the same |S11| as the phase 5 copper, within 0.3 dB: what the legs, the fence and the pour bring is the
+return path and the shielding of the other SMAs, not a better match. Both stay 6 dB above J921's pattern because of
+the parts on the line, not the launch: D1301's 0.5 pF alone is a 21 dB reflection at 1.1 GHz (ωCZ0 = 0.17), and the
+bias tee's and C1301's pads add the rest. The worst in the band is −18.1 dB at 1.1 GHz, a mismatch loss of 0.07 dB,
+and |S21| is −0.28 dB there. With the bias tee added (dashed in the figure, the two reflections summed in magnitude, the worst case of
+their phases), the drawn 56 nH + 1 µH alone reflected −3.8 dB at 1 GHz and took the total near 0 dB; the chosen
+branch reflects −34 dB or less above 500 MHz and moves the total by under 1 dB (−17.1 dB at 1.1 GHz). The SMA's own body is not in the model, the same for every case.
+
+**3. The bias tee, and the same fault on the LNA.** The bias tee's shunt branch hangs across the antenna line:
+whatever it fails to block is lost. As drawn, it was a 56 nH (`L1302`, LQW15AN, self-resonance ≥ 2.8 GHz) in
+series with a 1 µH (`L1301`, 0805). Past its own self-resonance (≥ 200 MHz for the 0805 wirewound) the 1 µH
+is a capacitor of 0.16-0.63 pF, and with the 56 nH it makes a series resonance at 0.85-1.7 GHz: a short across
+the antenna line. The parts' data, the models and the Monte Carlo are in `_work/sim/bias_tee.py`. The ferrite
+bead's impedance curve is fitted from Murata's data sheet; at the bias current it is derated to 40-100 %
+on top of its ±25 % tolerance.
+
+![Bias tee: loss and reflection](sim/bias_tee.png)
+
+| Shunt branch (25 MHz-1.1 GHz, 3,000 draws) | Nominal | p99 | Worst | Where |
+|---|---|---|---|---|
+| As drawn: 56 nH + 1 µH | 12.0 dB | 13.3 dB | 13.7 dB | 0.84-1.1 GHz |
+| **Now: `FB1302` BLM15HD102SN1 + `L1301` LQW2BAS1R0J** | **0.15 dB** | **0.24 dB** | **0.30 dB** | 560 MHz |
+| Bead + 1 µH power inductor (rejected) | 0.25 dB | 0.88 dB | 1.13 dB | 135 MHz |
+| Bead alone (rejected) | 0.31 dB | 0.91 dB | 1.07 dB | 25 MHz |
+
+The 56 nH's place takes a 0402 GHz ferrite bead. Above 150 MHz it is a resistor of 1-2 kohm, so the branch
+can no longer resonate, and below 150 MHz the 1 µH carries the impedance (157 ohm at 25 MHz). The parts use the
+same pads, so no copper changed. The bead is rated 250 mA and the AP22652 limits the bias to 155 mA. The
+two inductors' resistance (1.25 + 2.4 ohm) drops 0.6 V at the limit. The BOM rules name the two parts
+(`lcsc_select.py`: C21516 and C333860, in stock on 17 November). A value match would not do: a BLM21BD-type bead
+or a 1 µH power inductor would bring the dip back (third row).
+
+The same sweep over every choke on an RF line in `RX_VU` found the pattern once more, worse, at the LNA's
+output. The SPF5043Z's drain feed was `L1304` (56 nH) from the output to a node that `C1305` (100 pF) took to
+ground. A 56 nH in series with 100 pF is a short at 67 MHz, right on the LNA's output:
+
+| LNA output, shunt branch | 30 MHz | 67 MHz | 88 MHz | 100 MHz | 150 MHz | Worst, 25 MHz-1.1 GHz (3,000 draws) |
+|---|---|---|---|---|---|---|
+| As drawn: 56 nH, 100 pF to ground, 1 µH to the rail | 0.8 dB | 21 dB | 7.4 dB | 4.7 dB | 1.5 dB | 22.6 dB at 69 MHz |
+| **Now: `FB1304` BLM15HD102SN1, `C1305` not fitted, `L1303` 1 µH** | 0.06 dB | 0.03 dB | 0.03 dB | 0.03 dB | 0.02 dB | **0.23 dB** |
+
+The IF amplifier's choke `L1305` (1 µH straight to `+3V0_RF`) has no series capacitor. The rail's 100 nF puts
+its series resonance near 0.5 MHz, so over the IF band (25-170 MHz) it costs 0.31 dB at most and is left as it
+is. The filters' inductors are the filters (`rev08_filters_mc.py`). The 0603 1 µH of `L1303` and `L1305` gets
+its own BOM rule, AHW1608F-1R0KTF (SRF 400 MHz, 330 mA).
+
+**4. Checks.** The board is changed by text edits (5 property lines, 9 vias, 1 zone). On a copy with the
+zones refilled, DRC with schematic parity gives **0 errors, 0 unconnected, 0 parity errors**. The 35 warnings
+are the 36 of before less one dangling stub, which the pour now covers. ERC: the same 7 pin-to-pin
+warnings. `check_sheet.py rx_vu`: PASS. After the refill, the zone fills differ from those of the unchanged
+board only around `J961`: the new pour, and the antipads of the nine vias on L4.
+
 ## 10. How it was checked
 
 The checks were scripts run on the board file, none by hand: a KiCad-style plane fill, the
