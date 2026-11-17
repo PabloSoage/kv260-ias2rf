@@ -11,12 +11,17 @@
 //       1) +100 ppm clock skew, SPLIT policy: concurrent Radar (0x01) on IAS1 + SDR (0x02) on ETH
 //          + poisoned bad-FCS UDP control packet rejection check
 //       2) SPLIT failover: ETH fault -> 0x02 reroutes onto IAS1; fault cleared -> 0x02 returns to ETH
+//          2b) (400 MHz) the Kria's receiver drops while the downlink stays up (its link_up bit in the
+//              downlink status word): 0x01 fails over onto ETH; it returns to IAS1 when the bit returns.
+//              Only the packets queued for IAS1 when it dropped may be lost (drained; at most the FIFO's 32).
+//       At 400 MHz the 0x01 packets made before the IAS1 uplink first opens are drained (stale), not lost.
 //       3) -100 ppm clock skew, MIRROR_1P1 policy: 0x01 & 0x02 on BOTH paths + UDP MDIO R/W
 //          + mid-run ETH cut (0 loss after dedup) + mid-run IAS1 cut (0 loss after dedup)
 //
 // Mutations:
 //   -Mutate no_phase_select : freezes SGMII RX XAPP523 phase_sel at 0 -> fails under +/-100 ppm
 //   -Mutate eth_skip_fcs    : bypasses Ethernet FCS verification -> accepts poisoned packet -> fails
+//   -Mutate ias_ok_dl_only  : IAS1 health from the downlink alone (before 17 Nov) -> Phase 2b fails (400 MHz)
 
 `timescale 1ps/1fs
 `default_nettype none
@@ -911,6 +916,8 @@ module tb_rev06;
     integer snap_ias_s2_a, snap_ias_s2_b;
     integer snap_eth_s1_a, snap_ias_s1_a, snap_ias_s1_b, snap_eth_s2_b;
     integer snap_fcs_err, snap_mdio_wr;
+    integer gap_s1 = 0, gap_s2 = 0, lo_s1 = 0, lo_s2 = 0, boot_s1 = 0, k2;
+    reg [1023:0] excused_s1 = 1024'd0, excused_s2 = 1024'd0;
 
     initial begin
         // Match FPGA GSR INIT=0 for adc_clk_* registers before u_mmcm_adc locks
@@ -1013,6 +1020,19 @@ module tb_rev06;
             $finish;
         end
         $display("tb_rev06 Phase 1 (+100ppm SPLIT): ias_s1=%0d eth_s2=%0d eth_fcs_fail=%0d", ias_s1_cnt, eth_s2_cnt, eth_fcs_fail);
+        // At 400 MHz the radar stream starts before the Kria's receiver is up: the IAS1 FIFO drains those
+        // first 0x01 packets (stale bulk, 38f7bba). Excuse the sequence numbers below the first one IAS1 delivered.
+        boot_s1 = 0;
+        if (!TB_BOOT_500M) begin
+            k = 0;
+            while (k <= ias_max_s1 && !seen_ias_s1[k[9:0]]) k = k + 1;
+            for (k2 = 0; k2 < k; k2 = k2 + 1)
+                if (!seen_eth_s1[k2[9:0]]) begin
+                    excused_s1[k2[9:0]] = 1'b1;
+                    boot_s1 = boot_s1 + 1;
+                end
+            $display("tb_rev06 boot: %0d 0x01 packets drained before the IAS1 uplink opened", boot_s1);
+        end
 
         // Inject poisoned bad-FCS UDP ctrl write setting force_ias_fault=1 & force_eth_fault=1 (0x1C)
         snap_fcs_err = u_artix.gen_rev06_eth.u_eth_mac.fcs_err_cnt;
@@ -1043,6 +1063,58 @@ module tb_rev06;
         end
         // Restore ETH healthy -> SDR returns to ETH
         send_udp_frame(16'hA55A, 16'h0000, 32'h0000_0004, 32'd5, 1'b0);
+
+        // Phase 2b: the Kria's receiver drops with the downlink up -> 0x01 must fail over onto ETH
+        if (!TB_BOOT_500M) begin
+            snap_eth_s1_a = eth_s1_cnt;
+            lo_s1 = ias_max_s1;
+            lo_s2 = ias_max_s2;
+            force u_artix.dl_remote_status[0] = 1'b0;
+            wait_cyc = 0;
+            while ((eth_s1_cnt < snap_eth_s1_a + 6) && wait_cyc < 80000) begin
+                @(posedge fpga_clk_100m);
+                wait_cyc = wait_cyc + 1;
+            end
+            if (eth_s1_cnt < snap_eth_s1_a + 6) begin
+                $display("FAIL: tb_rev06 Phase 2b Kria uplink loss: 0x01 did not fail over onto ETH (eth_s1 %0d -> %0d, ias_s1=%0d, ias_ok=%b drain=%b)",
+                         snap_eth_s1_a, eth_s1_cnt, ias_s1_cnt,
+                         u_artix.gen_rev06_eth.ias_path_ok, u_artix.ias_ul_drain);
+                $finish;
+            end
+            // The drain discards what was queued for IAS1 when its uplink closed (0x01, and 0x02 still
+            // queued from Phase 2): the sequence numbers after the last ones IAS1 had delivered, seen on
+            // neither path. ETH delivers in order, so nothing below its maximum is still in flight there.
+            gap_s1 = 0;
+            for (k = lo_s1 + 1; k <= eth_max_s1; k = k + 1)
+                if (!(seen_ias_s1[k[9:0]] || seen_eth_s1[k[9:0]])) begin
+                    excused_s1[k[9:0]] = 1'b1;
+                    gap_s1 = gap_s1 + 1;
+                end
+            gap_s2 = 0;
+            for (k = lo_s2 + 1; k <= eth_max_s2; k = k + 1)
+                if (!(seen_ias_s2[k[9:0]] || seen_eth_s2[k[9:0]])) begin
+                    excused_s2[k[9:0]] = 1'b1;
+                    gap_s2 = gap_s2 + 1;
+                end
+            if (gap_s1 + gap_s2 > 32) begin
+                $display("FAIL: tb_rev06 Phase 2b lost %0d + %0d packets at the failover, more than the IAS1 FIFO's 32 packet slots",
+                         gap_s1, gap_s2);
+                $finish;
+            end
+            release u_artix.dl_remote_status[0];
+            snap_ias_s1_a = ias_s1_cnt;
+            wait_cyc = 0;
+            while ((ias_s1_cnt < snap_ias_s1_a + 6) && wait_cyc < 80000) begin
+                @(posedge fpga_clk_100m);
+                wait_cyc = wait_cyc + 1;
+            end
+            if (ias_s1_cnt < snap_ias_s1_a + 6) begin
+                $display("FAIL: tb_rev06 Phase 2b 0x01 did not return to IAS1 (ias_s1 %0d -> %0d)", snap_ias_s1_a, ias_s1_cnt);
+                $finish;
+            end
+            $display("tb_rev06 Phase 2b (Kria uplink loss): 0x01 on ETH (+%0d), back on IAS1; drained at the switch: %0d 0x01, %0d 0x02",
+                     eth_s1_cnt - snap_eth_s1_a, gap_s1, gap_s2);
+        end
 
         // Phase 3: Switch peer to -100 ppm clock skew + switch to MIRROR_1P1 (policy=1) + MDIO write
         peer_half_ui_ps = 400.040; // -100 ppm -> 800.080 ps UI
@@ -1099,7 +1171,7 @@ module tb_rev06;
         lost_s1 = 0;
         if (!TB_BOOT_500M) begin
             for (k = 0; k <= ((ias_max_s1 > eth_max_s1) ? ias_max_s1 : eth_max_s1); k = k + 1) begin
-                if (!(seen_ias_s1[k[9:0]] || seen_eth_s1[k[9:0]])) begin
+                if (!(seen_ias_s1[k[9:0]] || seen_eth_s1[k[9:0]] || excused_s1[k[9:0]])) begin
                     $display("  LOST s1 seq=%0d", k);
                     lost_s1 = lost_s1 + 1;
                 end
@@ -1110,7 +1182,7 @@ module tb_rev06;
         end
         lost_s2 = 0;
         for (k = 0; k <= ((ias_max_s2 > eth_max_s2) ? ias_max_s2 : eth_max_s2); k = k + 1) begin
-            if (!(seen_ias_s2[k[9:0]] || seen_eth_s2[k[9:0]])) begin
+            if (!(seen_ias_s2[k[9:0]] || seen_eth_s2[k[9:0]] || excused_s2[k[9:0]])) begin
                 $display("  LOST s2 seq=%0d", k);
                 lost_s2 = lost_s2 + 1;
             end

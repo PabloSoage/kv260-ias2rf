@@ -1017,6 +1017,11 @@ module artix_top #(
         end
     end
 
+    // The IAS1 uplink carries traffic only while both the downlink (dl_up_sync[1]) and the Kria's
+    // receiver (dl_rem_sync2[0] = the Kria's link_up, returned in the downlink's status word) are up.
+    // The uplink gate below and the dual-path mux's IAS health both use it.
+    wire ul_tx_allow = dl_up_sync[1] & dl_rem_sync2[0];
+
     // -------------------------------------------------------------------------
     // 5. Uplink 2-Lane TX (link_pcs_tx -> OSERDESE2 -> Bank 34 LVDS_25 OBUFDS)
     // -------------------------------------------------------------------------
@@ -1270,7 +1275,7 @@ module artix_top #(
             reg       eth_sdr_en;
             reg       ctrl_force_ias_fault;
             reg       ctrl_force_eth_fault;
-            reg       ias_seen_dl_up;
+            reg       ias_seen_ul_up;
             reg       eth_seen_remote_alive;
 
             always @(posedge link_clk) begin
@@ -1284,14 +1289,14 @@ module artix_top #(
                     mdio_req_wr          <= 1'b0;
                     mdio_req_reg         <= 5'd0;
                     mdio_req_wdata       <= 16'd0;
-                    ias_seen_dl_up       <= 1'b0;
+                    ias_seen_ul_up       <= 1'b0;
                     eth_seen_remote_alive <= 1'b0;
                 end else begin
                     ctrl_an_restart <= 1'b0;
                     if (mdio_req_vld && mdio_req_ready)
                         mdio_req_vld <= 1'b0;
-                    if (dl_up_sync[1])
-                        ias_seen_dl_up <= 1'b1;
+                    if (ul_tx_allow)
+                        ias_seen_ul_up <= 1'b1;
                     if (eth_remote_alive_stat)
                         eth_seen_remote_alive <= 1'b1;
 
@@ -1347,7 +1352,14 @@ module artix_top #(
             assign eth_ctrl_addr  = udp_ctrl_addr;
             assign eth_ctrl_wdata = udp_ctrl_wdata;
 
-            wire ias_path_ok = ~ctrl_force_ias_fault & (dl_up_sync[1] | ~ias_seen_dl_up);
+            // IAS1 is healthy while its uplink may send (ul_tx_allow), not only while the downlink is up:
+            // with the Kria's receiver down the uplink is drained, so SPLIT must move IAS traffic to ETH.
+            // Before the first time the uplink comes up, IAS1 counts as healthy (boot, no failover churn).
+`ifdef MUTATE_IAS_OK_DL_ONLY
+            wire ias_path_ok = ~ctrl_force_ias_fault & (dl_up_sync[1] | ~ias_seen_ul_up);
+`else
+            wire ias_path_ok = ~ctrl_force_ias_fault & (ul_tx_allow | ~ias_seen_ul_up);
+`endif
             wire eth_path_ok = eth_link_up_stat & ~ctrl_force_eth_fault &
                                (eth_remote_alive_stat | ~eth_seen_remote_alive);
 
@@ -1425,10 +1437,8 @@ module artix_top #(
         end
     endgenerate
 
-    // Hold uplink traffic at idles+AM until both downlink (dl_up_sync[1]) and
-    // Kria uplink (dl_rem_sync2[0] = kria link_up) are up; finish any single
-    // in-flight packet cleanly before returning to idles on retrain.
-    wire ul_tx_allow = dl_up_sync[1] & dl_rem_sync2[0];
+    // Hold uplink traffic at idles+AM until ul_tx_allow (downlink and Kria receiver up);
+    // finish any single in-flight packet cleanly before returning to idles on retrain.
     wire ul_tx_ready;
     reg  ul_in_pkt;
     wire ul_tx_gate  = ul_tx_allow | ul_in_pkt;
