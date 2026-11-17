@@ -70,10 +70,14 @@ module ddc_wrapper #(
     // Rev08 G-7: one more 400 MHz register between adc_capture and the AERIS mixer's DSP48 A port. That route has
     // no logic and missed 2.5 ns by up to 0.07 ns with the Artix at 77 %; a register in between lets the placer
     // split it (2.5 ns more latency, far below a 25 MSPS sample)
-    (* shreg_extract = "no" *) reg [7:0] adc_data_q;
+    // The MSB is stored inverted: AERIS turns offset binary into two's complement by inverting it (a LUT1 that drove
+    // 26 DSP48 A pins and missed by 0.08 ns), and the double inversion now folds away, so the flop drives them directly
+    (* shreg_extract = "no" *) reg [6:0] adc_data_q;
+    (* shreg_extract = "no" *) reg       adc_msb_n_q;
     (* shreg_extract = "no" *) reg       adc_valid_q;
     always @(posedge clk_400m) begin
-        adc_data_q  <= adc_data;
+        adc_data_q  <= adc_data[6:0];
+        adc_msb_n_q <= ~adc_data[7];
         adc_valid_q <= adc_valid;
     end
 
@@ -82,7 +86,7 @@ module ddc_wrapper #(
         .clk_100m            (clk_100m),
         .reset_n             (reset_n),
         .mixers_enable       (ddc_en),
-        .adc_data            (adc_data_q),
+        .adc_data            ({~adc_msb_n_q, adc_data_q}),
         .adc_data_valid_i    (adc_valid_q),
         .adc_data_valid_q    (adc_valid_q),
         .baseband_i          (raw_bb_i),

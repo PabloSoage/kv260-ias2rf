@@ -312,7 +312,9 @@ module adc_capture #(
     // Capture IDDR Q1/Q2 in matched dco_bufr domain -> 4-deep Gray FIFO -> clk_200m
     // Absorbs static + PVT clock-tree skew between Bank 14 BUFIO/BUFR and MMCM BUFG.
     reg [17:0] dco_fifo_mem [0:3];
-    reg [8:0]  q_rise_pipe, q_fall_pipe;
+    // No reset on the IDDR pipe flops (q_pipe_valid gates the FIFO write): a shared reset packed all 18 into a few
+    // slices up to 10 rows from their ILOGIC, and the half-cycle IDDR -> pipe path (2 ns at 500 MSPS) missed by 0.015 ns
+    reg [8:0]  q_rise_pipe = 9'd0, q_fall_pipe = 9'd0;
     reg        q_pipe_valid;
     reg [2:0]  wp_bufr_bin, wp_bufr_gray;
     reg [2:0]  rp_200_bin, rp_200_gray;
@@ -324,15 +326,16 @@ module adc_capture #(
     endfunction
 
     always @(posedge dco_bufr) begin
+        q_rise_pipe <= q_rise;
+        q_fall_pipe <= q_fall;
+    end
+
+    always @(posedge dco_bufr) begin
         if (rst_bufr) begin
-            q_rise_pipe  <= 9'd0;
-            q_fall_pipe  <= 9'd0;
             q_pipe_valid <= 1'b0;
             wp_bufr_bin  <= 3'd0;
             wp_bufr_gray <= 3'd0;
         end else begin
-            q_rise_pipe  <= q_rise;
-            q_fall_pipe  <= q_fall;
             q_pipe_valid <= 1'b1;
             if (q_pipe_valid) begin
                 dco_fifo_mem[wp_bufr_bin[1:0]] <= {q_fall_pipe, q_rise_pipe};
