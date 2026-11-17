@@ -478,6 +478,14 @@ module tb_system;
     sim_hk_i2c_slave #(.SLAVE_ADDR(7'h55), .NUM_REGS(256)) u_si549 (
         .scl(xo_scl), .sda(xo_sda), .enable_ack(1'b1)
     );
+    // Rev08 G-2: the front end's two TCA6416A expanders share the XO bus with the Si549 (fe_ctrl writes the status
+    // LEDs on change). Without them every LED write is a NACK, and hk_xo_ctrl counts it in XO_CTRL[11] ack_err.
+    wire [15:0] u1313_out, u1313_oe, u1501_out, u1501_oe;
+    wire [31:0] u1313_wr, u1501_wr;
+    tca6416a_model #(.ADDR(7'h20)) u_u1313 (.scl(xo_scl), .sda(xo_sda), .pin_in(16'hFFFF),
+        .pin_out(u1313_out), .pin_oe(u1313_oe), .n_writes(u1313_wr));
+    tca6416a_model #(.ADDR(7'h21)) u_u1501 (.scl(xo_scl), .sda(xo_sda), .pin_in(16'hFFFF),
+        .pin_out(u1501_out), .pin_oe(u1501_oe), .n_writes(u1501_wr));
 
     reg [31:0]  peer_half_ui_fs  = 32'd399960; // +100 ppm relative to 400.000 ps nominal UI/2
     reg         peer_link_rx_cut = 1'b0;
