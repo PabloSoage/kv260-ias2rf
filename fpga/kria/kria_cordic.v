@@ -36,7 +36,12 @@ module kria_cordic #(
     localparam integer STAGES = 16;
     // 4 guard bits against intermediate CORDIC growth (1.647x) and FRAC fractional bits: without them the 1/K
     // pre-scale and the x >> i steps dropped the low bits of a small vector (a weak AM carrier lost 5 dB of SINAD)
-    localparam integer W      = IN_W + 4 + FRAC;
+`ifdef MUTATE_CORDIC_NO_FRAC
+    localparam integer FR     = 0;          // mutation: no fractional guard bits
+`else
+    localparam integer FR     = FRAC;
+`endif
+    localparam integer W      = IN_W + 4 + FR;
 
     // Pre-scale input by 1/K_16 = 0.6072388 using shift-adds (-92 dB vs exact 0.6072529)
     function automatic signed [W-1:0] inv_k_scale;
@@ -44,7 +49,7 @@ module kria_cordic #(
         reg signed [W+15:0] ext;
         reg signed [W+15:0] acc;
         begin
-            ext = {{(W+16-IN_W){v[IN_W-1]}}, v} <<< (14 + FRAC); // v * 16384, FRAC fractional bits
+            ext = {{(W+16-IN_W){v[IN_W-1]}}, v} <<< (14 + FR); // v * 16384, FR fractional bits
             // 0.60723877 * 16384 = 9949 = 8192 + 1024 + 512 + 256 - 32 - 8 + 4 + 1
             acc = (ext >>> 1) + (ext >>> 4) + (ext >>> 5) + (ext >>> 6)
                 - (ext >>> 9) - (ext >>> 11) + (ext >>> 12) + (ext >>> 14);
@@ -170,7 +175,7 @@ module kria_cordic #(
         localparam signed [W-1:0] MINV = -(1 << (IN_W - 1));
         reg signed [W-1:0] v;
         begin
-            v = (vf + (1 <<< (FRAC - 1))) >>> FRAC;       // round off the fractional bits
+            v = (FR > 0) ? ((vf + (1 <<< (FR - 1))) >>> FR) : vf;   // round off the fractional bits
             if (v > MAXV)      sat_out = MAXV[IN_W-1:0];
             else if (v < MINV) sat_out = MINV[IN_W-1:0];
             else               sat_out = v[IN_W-1:0];

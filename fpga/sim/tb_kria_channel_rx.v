@@ -36,6 +36,7 @@ module tb_kria_channel_rx;
         .cfg_nco_ftw       (cfg_nco_ftw),
         .cfg_cic_decim     (cfg_cic_decim),
         .cfg_cic_shift     (cfg_cic_shift),
+        .cfg_cic_n5        (1'b0),
         .cfg_fir_decim     (cfg_fir_decim),
         .cfg_deemph_alpha  (cfg_deemph_alpha),
         .cfg_pilot_ftw     (cfg_pilot_ftw),

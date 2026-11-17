@@ -16,6 +16,7 @@ module tb_dsp_sweeps;
     reg [31:0]         cfg_nco_ftw = 32'd0;
     reg [15:0]         cfg_cic_decim = 16'd1;
     reg [5:0]          cfg_cic_shift = 6'd0;
+    reg                cfg_cic_n5    = 1'b0;
     reg [7:0]          cfg_fir_decim = 8'd0;
     reg [15:0]         cfg_deemph_alpha = 16'd16384;
     reg [31:0]         cfg_pilot_ftw = 32'd0;
@@ -31,7 +32,7 @@ module tb_dsp_sweeps;
     kria_channel_rx u_ch (
         .clk(clk), .rst(rst), .in_valid(in_valid), .in_i(in_i), .in_q(in_q),
         .cfg_mode(cfg_mode), .cfg_nco_ftw(cfg_nco_ftw),
-        .cfg_cic_decim(cfg_cic_decim), .cfg_cic_shift(cfg_cic_shift), .cfg_fir_decim(cfg_fir_decim),
+        .cfg_cic_decim(cfg_cic_decim), .cfg_cic_shift(cfg_cic_shift), .cfg_cic_n5(cfg_cic_n5), .cfg_fir_decim(cfg_fir_decim),
         .cfg_deemph_alpha(cfg_deemph_alpha), .cfg_pilot_ftw(cfg_pilot_ftw),
         .cfg_ctcss_coeff(cfg_ctcss_coeff), .cfg_ctcss_n(cfg_ctcss_n),
         .cfg_ctcss_thresh(cfg_ctcss_thresh), .cfg_rds_sym_samps(cfg_rds_sym_samps),
@@ -158,6 +159,7 @@ module tb_dsp_sweeps;
         if ($value$plusargs("CH_DECIM=%h", tmpv)) begin
             cfg_cic_decim = tmpv[15:0];
             cfg_cic_shift = tmpv[21:16];
+            cfg_cic_n5    = tmpv[22];
             cfg_fir_decim = tmpv[31:24];
         end
         if ($value$plusargs("CH_DEMOD=%h", tmpv)) begin

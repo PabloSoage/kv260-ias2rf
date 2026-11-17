@@ -82,6 +82,9 @@ reg [7:0] error_counter;
 (* max_fanout = 24 *) reg rst_400_mix    = 1'b1;
 (* max_fanout = 24 *) reg rst_n_400_cici = 1'b0;
 (* max_fanout = 24 *) reg rst_n_400_cicq = 1'b0;
+// Rev08 G-8: the FIR-output CDCs get their own reset copies (sharing the CIC's left 2 ps short at 400 MHz)
+(* max_fanout = 24 *) reg rst_n_400_cdci = 1'b0;
+(* max_fanout = 24 *) reg rst_n_400_cdcq = 1'b0;
 wire reset_n_400m = ~rst_400_mix;
 
 // Active-high resets for DSP48E1 RST ports (avoids LUT1 inverter fan-out)
@@ -102,6 +105,8 @@ always @(posedge clk_400m) begin
     rst_400_mix    <= ~reset_sync_400m[1];
     rst_n_400_cici <= reset_sync_400m[1];
     rst_n_400_cicq <= reset_sync_400m[1];
+    rst_n_400_cdci <= reset_sync_400m[1];
+    rst_n_400_cdcq <= reset_sync_400m[1];
     reset_400m     <= ~reset_sync_400m[1];
     reset_400m_q   <= ~reset_sync_400m[1];
 end
@@ -210,7 +215,8 @@ localparam PHASE_INC_120MHZ = 32'h4CCCCCCD;
 reg [31:0] ftw_ovrd_s3, ftw_sel;   // Rev08 G-4: compare, select and add each get a 400 MHz register stage
 reg        ftw_stable, ftw_nz;
 reg [8:0]  inc_lo;
-reg [23:0] inc_hi;
+reg [23:0] inc_hi, inc_hi_p1;
+reg [12:0] inc_mid_p1;     // ftw_sel[19:8] + 1 with its carry, the first half of inc_hi + 1
 
 // Apply dithering to reduce spurious tones (registered for 400 MHz timing)
 always @(posedge clk_400m) begin
@@ -223,6 +229,8 @@ always @(posedge clk_400m) begin
         ftw_sel            <= PHASE_INC_120MHZ;
         inc_lo             <= {1'b0, PHASE_INC_120MHZ[7:0]};
         inc_hi             <= PHASE_INC_120MHZ[31:8];
+        inc_mid_p1         <= {1'b0, PHASE_INC_120MHZ[19:8]} + 13'd1;
+        inc_hi_p1          <= PHASE_INC_120MHZ[31:8] + 24'd1;
         phase_inc_dithered <= PHASE_INC_120MHZ;
     end else begin
         ftw_ovrd_s1        <= ftw_override;
@@ -234,10 +242,14 @@ always @(posedge clk_400m) begin
         ftw_nz             <= (ftw_ovrd_s2 != 32'd0);
         if (ftw_stable)
             ftw_sel        <= ftw_nz ? ftw_ovrd_s3 : PHASE_INC_120MHZ;
-        // the 8-bit dither goes into the low byte first and its carry into the upper 24 bits a cycle later
+        // the 8-bit dither goes into the low byte first; its carry then selects the upper 24 bits or the upper
+        // 24 bits + 1, both prepared from ftw_sel in 12-bit halves (a 24-bit carry chain after the carry missed
+        // 400 MHz by 64 ps). ftw_sel is quasi-static, so the extra cycle of inc_hi_p1 never shows.
         inc_lo             <= {1'b0, ftw_sel[7:0]} + {1'b0, phase_dither_bits};
         inc_hi             <= ftw_sel[31:8];
-        phase_inc_dithered <= {inc_hi + {23'd0, inc_lo[8]}, inc_lo[7:0]};
+        inc_mid_p1         <= {1'b0, ftw_sel[19:8]} + 13'd1;
+        inc_hi_p1          <= {ftw_sel[31:20] + {11'd0, inc_mid_p1[12]}, inc_mid_p1[11:0]};
+        phase_inc_dithered <= {inc_lo[8] ? inc_hi_p1 : inc_hi, inc_lo[7:0]};
     end
 end
 
@@ -650,7 +662,7 @@ cdc_adc_to_processing #(
 )CDC_FIR_i(
     .src_clk(clk_400m),
     .dst_clk(clk_100m),
-    .src_reset_n(rst_n_400_cici),
+    .src_reset_n(rst_n_400_cdci),
     .dst_reset_n(reset_n),
     .src_data(cic_i_out),
     .src_valid(cic_valid_i),
@@ -664,7 +676,7 @@ cdc_adc_to_processing #(
 )CDC_FIR_q(
     .src_clk(clk_400m),
     .dst_clk(clk_100m),
-    .src_reset_n(rst_n_400_cicq),
+    .src_reset_n(rst_n_400_cdcq),
     .dst_reset_n(reset_n),
     .src_data(cic_q_out),
     .src_valid(cic_valid_q),

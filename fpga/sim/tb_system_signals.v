@@ -399,7 +399,7 @@ module tb_system_signals;
     // -------------------------------------------------------------------------
     // Real-Time Output Recorders (when +SIG_WAIT_ARM is released)
     // -------------------------------------------------------------------------
-    integer fd_ddc = 0, fd_demod = 0, fd_adsb = 0, fd_tx = 0, fd_radar = 0;
+    integer fd_ddc = 0, fd_demod = 0, fd_adsb = 0, fd_tx = 0, fd_radar = 0, fd_radin = 0;
     reg     rad_sync = 1'b0;
     integer rad_sync_dly = 0, pri_cyc = 0;
     realtime t_dac0, t_dac1;
@@ -420,6 +420,10 @@ module tb_system_signals;
                         $signed(m_axis_rx_tdata[47:32]), $signed(m_axis_rx_tdata[63:48]));
                 cnt_ddc = cnt_ddc + 2;
             end
+            // +OUT_RADIN: the samples kria_radar_proc takes in, with its state (0 = capturing a CPI)
+            if (fd_radin != 0 && dut_kria.u_dsp_suite.iq_valid)
+                $fwrite(fd_radin, "%0d %0d %0d\n", $signed(dut_kria.u_dsp_suite.iq_i),
+                        $signed(dut_kria.u_dsp_suite.iq_q), dut_kria.u_dsp_suite.u_radar_proc.state);
             if (fd_demod != 0 && dut_kria.u_dsp_suite.mon_audio_valid) begin
                 $fwrite(fd_demod, "%d %d %d %0d %0d\n",
                         $signed(dut_kria.u_dsp_suite.mon_audio_l),
@@ -482,6 +486,7 @@ module tb_system_signals;
         if (!$value$plusargs("CASE=%s", case_str)) case_str = "HF_AM";
         if (!$value$plusargs("RUN_US=%d", run_us)) run_us = 1000;
         if ($value$plusargs("OUT_ADCS=%s", fpath))  fd_adcs  = $fopen(fpath, "w");
+        if ($value$plusargs("OUT_RADIN=%s", fpath)) fd_radin = $fopen(fpath, "w");
         if ($value$plusargs("OUT_DDC=%s", fpath))   fd_ddc   = $fopen(fpath, "w"); if (fd_ddc == 0 && $test$plusargs("OUT_DDC=")) $fatal(1, "cannot open OUT_DDC");
         if ($value$plusargs("OUT_DEMOD=%s", fpath)) fd_demod = $fopen(fpath, "w"); if (fd_demod == 0 && $test$plusargs("OUT_DEMOD=")) $fatal(1, "cannot open OUT_DEMOD");
         if ($value$plusargs("OUT_ADSB=%s", fpath))  fd_adsb  = $fopen(fpath, "w"); if (fd_adsb == 0 && $test$plusargs("OUT_ADSB=")) $fatal(1, "cannot open OUT_ADSB");
@@ -547,13 +552,14 @@ module tb_system_signals;
             // dac_clk period, then 2.56 us chirps: PRI 2.56 us, 2.0 us long
             @(posedge dut_artix.dac_clk); t_dac0 = $realtime;
             @(posedge dut_artix.dac_clk); t_dac1 = $realtime;
-            pri_cyc = $rtoi(2560.0 / (t_dac1 - t_dac0) + 0.5);
+            pri_cyc = $rtoi(2_560_000.0 / (t_dac1 - t_dac0) + 0.5);   // timescale 1 ps
             dl_artix_wr(16'h0058, 32'h0400_0000);
             dl_artix_wr(16'h005C, 32'h0000_1000);
             dl_artix_wr(16'h0060, (pri_cyc * 25) / 32);
             dl_artix_wr(16'h0064, pri_cyc);
             dl_artix_wr(16'h0054, 32'h00FF_0001);
-            $display("RADAR_SYNC dac_clk %.3f ns, PRI %0d cycles", t_dac1 - t_dac0, pri_cyc);
+            $display("RADAR_SYNC dac_clk %.3f ns, PRI %0d cycles", (t_dac1 - t_dac0) / 1000.0, pri_cyc);
+            if (pri_cyc < 64) begin $display("FAIL: RADAR_SYNC PRI of %0d dac_clk cycles", pri_cyc); $finish; end
         end
         if (k_ctrl[1]) begin
             // TX_ALL mode: enable Artix dac_sdr (0x70) and dac_radar (0x54..0x64)
@@ -629,5 +635,24 @@ module tb_system_signals;
         end
         $display("PASS: tb_system_signals (%0s)", case_str);
         $finish;
+    end
+
+    // G-8 diagnosis (+G8MON): the radar DDC's FIFO drops, the uplink mux's packet drops and path health, with the
+    // number of stream samples the bench had captured at that moment
+    reg [23:0] g8m_drop = 24'd0;
+    reg        g8m_ds0 = 1'b0, g8m_ias = 1'b0, g8m_eth = 1'b0;
+    always @(posedge dut_artix.link_clk) if ($test$plusargs("G8MON")) begin
+        if (dut_artix.u_ddc.drop_100 !== g8m_drop) begin
+            $display("%t G8MON radar DDC FIFO drops %0d (ddc samples captured %0d)", $time, dut_artix.u_ddc.drop_100, cnt_ddc);
+            g8m_drop <= dut_artix.u_ddc.drop_100;
+        end
+        if (dut_artix.gen_rev06_eth.u_dual_mux.drop_s0 && !g8m_ds0)
+            $display("%t G8MON mux drops a stream-0 packet (ddc samples captured %0d)", $time, cnt_ddc);
+        g8m_ds0 <= dut_artix.gen_rev06_eth.u_dual_mux.drop_s0;
+        if (dut_artix.gen_rev06_eth.ias_path_ok !== g8m_ias || dut_artix.gen_rev06_eth.eth_path_ok !== g8m_eth)
+            $display("%t G8MON path health ias=%b eth=%b (ddc samples captured %0d)", $time,
+                     dut_artix.gen_rev06_eth.ias_path_ok, dut_artix.gen_rev06_eth.eth_path_ok, cnt_ddc);
+        g8m_ias <= dut_artix.gen_rev06_eth.ias_path_ok;
+        g8m_eth <= dut_artix.gen_rev06_eth.eth_path_ok;
     end
 endmodule

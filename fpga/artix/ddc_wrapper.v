@@ -8,7 +8,8 @@
 
 module ddc_wrapper #(
     parameter integer POST_DECIM = 1,          // 1 = 100 MSPS, 4 = 25 MSPS (0.8 Gb/s)
-    parameter integer PKT_WORDS  = 8,          // 8 x 64b words = 64 bytes = 16 I/Q samples
+    parameter integer PKT_WORDS  = 8,          // 64-bit words per packet (2 I/Q samples each)
+    parameter integer FIFO_AW    = 5,          // log2 of the CDC FIFO depth in 64-bit words (> PKT_WORDS)
     parameter [7:0]   STREAM_ID  = 8'h01,      // Radar baseband CPI stream
     parameter integer CPI_CHIRPS = 16          // chirps per CPI (kria_radar_proc DOPPLER_M)
 ) (
@@ -193,8 +194,8 @@ module ddc_wrapper #(
     reg        wr_en_100;
     reg [63:0] wr_data_100;
 
-    // 32-deep dual-clock Gray-coded async FIFO
-    localparam ADDR_W = 5;
+    // dual-clock Gray-coded async FIFO, 2^FIFO_AW words (distributed RAM)
+    localparam ADDR_W = FIFO_AW;
     localparam DEPTH  = (1 << ADDR_W);
 
     reg [63:0] fifo_mem [0:DEPTH-1];

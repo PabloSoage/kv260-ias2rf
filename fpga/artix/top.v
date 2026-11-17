@@ -457,7 +457,11 @@ module artix_top #(
 
     ddc_wrapper #(
         .POST_DECIM (DDC_POST_DECIM),
-        .PKT_WORDS  (8),
+        // Rev08 G-8: 512-byte packets (3 header/CRC blocks per 64 data blocks; at 64 bytes the overhead was 37 %
+        // and the radar stream plus SDR channel B ran the 2-lane uplink to saturation) and a 128-word FIFO
+        // (10 us at 25 MSPS) to ride out the other streams' packets
+        .PKT_WORDS  (64),
+        .FIFO_AW    (7),
         .STREAM_ID  (8'h01)
     ) u_ddc (
         .clk_400m         (adc_clk_400m),

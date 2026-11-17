@@ -97,6 +97,9 @@ module kria_adsb_phase #(
                      + {4'b0, p[7]} + {4'b0, p[9]} + {4'b0, p[11]} + {4'b0, p[12]}
                      + {4'b0, p[13]} + {4'b0, p[14]} + {4'b0, p[15]} + {4'b0, chip_amp};
 
+`ifdef MUTATE_STRICT_PREAMBLE
+    // the former high-SNR rules: each pulse twice its neighbouring gaps, every other gap under half the pulses'
+    // mean, pulses' mean twice the gaps' mean (90 % decode 6 dB short of a timing-aware decoder)
     wire [15:0] half_hi_mean = hi4[17:3]; // 0.5 * mean(4 preamble pulses)
     wire pre_shape_ok = (p[1]  > {p[2][14:0], 1'b0})  &&
                         (p[3]  > {p[2][14:0], 1'b0})  && (p[3] > {p[4][14:0], 1'b0}) &&
@@ -106,6 +109,20 @@ module kria_adsb_phase #(
                         (p[12] < half_hi_mean) && (p[13] < half_hi_mean) && (p[14] < half_hi_mean) &&
                         (p[15] < half_hi_mean) && (chip_amp < half_hi_mean);
     wire pre_thr_ok   = (hi4 >= {2'b0, cfg_min_hi_sum}) && (({2'b0, hi4} * 20'd3) > (lo12 * 20'd2));
+`else
+    // Preamble test for chips averaged over 12.5 samples: the weakest of the four pulses above the strongest of
+    // the twelve gaps, the pulses' mean 1.5 times the gaps' mean (2 hi4 > lo12), and the summed pulses above
+    // software's floor. A chip average of noise varies little, so this holds down to about -87 dBm at the
+    // antenna (90 % of frames), against -82.7 dBm for per-chip ratios of 2; on noise alone it never fired in
+    // 20 ms of a numerical model (G-8).
+    function automatic [15:0] max2(input [15:0] a, input [15:0] b); max2 = (a > b) ? a : b; endfunction
+    function automatic [15:0] min2(input [15:0] a, input [15:0] b); min2 = (a < b) ? a : b; endfunction
+    wire [15:0] hi_min = min2(min2(p[1], p[3]), min2(p[8], p[10]));
+    wire [15:0] lo_max = max2(max2(max2(max2(p[2], p[4]), max2(p[5], p[6])), max2(max2(p[7], p[9]), max2(p[11], p[12]))),
+                              max2(max2(p[13], p[14]), max2(p[15], chip_amp)));
+    wire pre_shape_ok = (hi_min > lo_max);
+    wire pre_thr_ok   = (hi4 >= {2'b0, cfg_min_hi_sum}) && (({1'b0, hi4, 1'b0}) > {1'b0, lo12});
+`endif
     wire pre_hit      = chip_valid && !rx_active && pre_shape_ok && pre_thr_ok;
 
     function automatic [23:0] crc24_step;

@@ -27,7 +27,8 @@ module kria_channel_rx (
     input  wire [2:0]         cfg_mode,          // 0=AM, 1=USB, 2=LSB, 3=NBFM, 4=WBFM
     input  wire [31:0]        cfg_nco_ftw,       // Sub-DDC NCO FTW wrt input sample rate (0 = bypass mixer)
     input  wire [15:0]        cfg_cic_decim,     // CIC decimation R >= 1 (1 = bypass CIC)
-    input  wire [5:0]         cfg_cic_shift,     // Right-shift for CIC3 gain normalization
+    input  wire [5:0]         cfg_cic_shift,     // Right-shift for the CIC's gain normalization (R^N)
+    input  wire               cfg_cic_n5,        // 1 = five CIC stages (deeper alias rejection), 0 = three
     input  wire [7:0]         cfg_fir_decim,     // Post-CIC FIR decimation >= 1 (1 = decimate by 1, e.g. 2 or 4)
     input  wire [15:0]        cfg_deemph_alpha,  // Q15 IIR LPF alpha: y = y + alpha*(x - y)
     input  wire [31:0]        cfg_pilot_ftw,     // 19 kHz nominal FTW at post-FIR Fs_ch (2^32 * 19e3 / Fs_ch)
@@ -146,10 +147,35 @@ module kria_channel_rx (
         end
     endfunction
 
+    // The mixer's LO: the same table (512 points per turn) linearly interpolated on the next 8 phase bits, as in
+    // kria_tx_mod. The bare table is 9 bits of phase: with a small offset (the Artix NCO's 24-bit residual, a few
+    // Hz) its index steps every few thousand samples, and the phase sawtooth puts -50 dBc sidebands on every
+    // strong signal in the stream (an airband neighbour 25 dB up cost 7 dB of SINAD). Interpolated, the worst
+    // spur is below -90 dBc. The pilot PLL keeps the bare table (its own loop tracks the steps).
+    function automatic signed [15:0] lut_sin_i;
+        input [31:0] ph;
+        reg signed [15:0] v0, v1;
+        reg signed [25:0] d;
+        begin
+`ifdef MUTATE_MIX_NCO_9BIT
+            lut_sin_i = lut_sin(ph);
+`else
+            v0 = lut_sin({ph[31:23], 23'd0});
+            v1 = lut_sin({ph[31:23] + 9'd1, 23'd0});
+            d  = ($signed({v1[15], v1}) - $signed({v0[15], v0})) * $signed({1'b0, ph[22:15]});
+            lut_sin_i = v0 + (d >>> 8);
+`endif
+        end
+    endfunction
+
     reg [31:0] mix_phase;
     reg        mix_valid;
     reg signed [15:0] mix_i, mix_q;
     reg signed [31:0] p_ic, p_qs, p_is, p_qc;
+    // lo_c/lo_s hold cos/sin of mix_phase: computed when the phase advances, so the interpolation's multiply is
+    // not in series with the mixer's (input samples may arrive on consecutive clocks)
+    reg signed [15:0] lo_c, lo_s;
+    wire [31:0] mix_phase_nx = mix_phase + cfg_nco_ftw;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -157,6 +183,8 @@ module kria_channel_rx (
             mix_valid <= 1'b0;
             mix_i     <= 16'sd0;
             mix_q     <= 16'sd0;
+            lo_c      <= 16'sd32767;
+            lo_s      <= 16'sd0;
         end else begin
             mix_valid <= in_valid;
             if (in_valid) begin
@@ -165,29 +193,55 @@ module kria_channel_rx (
                     mix_q <= in_q;
                 end else begin
                     // Downconvert: (I + jQ) * (cos - j*sin) = (I*cos + Q*sin) + j*(Q*cos - I*sin)
-                    p_ic  = $signed(in_i) * $signed(lut_cos(mix_phase));
-                    p_qs  = $signed(in_q) * $signed(lut_sin(mix_phase));
-                    p_qc  = $signed(in_q) * $signed(lut_cos(mix_phase));
-                    p_is  = $signed(in_i) * $signed(lut_sin(mix_phase));
+                    p_ic  = $signed(in_i) * $signed(lo_c);
+                    p_qs  = $signed(in_q) * $signed(lo_s);
+                    p_qc  = $signed(in_q) * $signed(lo_c);
+                    p_is  = $signed(in_i) * $signed(lo_s);
+                    // rounded: a plain >>> 15 is a -0.5 LSB bias on every input sample, which the CIC's
+                    // R^3 / 2^shift gain turns into a DC offset as large as the channel noise (NBFM lost 6.5 dB)
+`ifdef MUTATE_MIX_TRUNCATE
                     mix_i <= (p_ic + p_qs) >>> 15;
                     mix_q <= (p_qc - p_is) >>> 15;
-                    mix_phase <= mix_phase + cfg_nco_ftw;
+`else
+                    mix_i <= (p_ic + p_qs + 32'sd16384) >>> 15;
+                    mix_q <= (p_qc - p_is + 32'sd16384) >>> 15;
+`endif
+                    mix_phase <= mix_phase_nx;
+                    lo_c      <= lut_sin_i(mix_phase_nx + 32'h4000_0000);
+                    lo_s      <= lut_sin_i(mix_phase_nx);
                 end
             end
         end
     end
 
     // -------------------------------------------------------------------------
-    // 2. Decimating 3-Stage CIC (N=3, 48-bit accumulators, R = cfg_cic_decim)
+    // 2. Decimating CIC, 3 or 5 stages (R = cfg_cic_decim)
+    //    Three stages leave the folding bands next to each multiple of the output rate barely attenuated: an
+    //    airband AM neighbour 25 kHz away at 24 kS/s has sidebands within 3 kHz of the first null, where three
+    //    stages give only -59 dB (a +35 dB neighbour cost 5 dB of SINAD). Five stages give -98 dB there, for
+    //    0.4 dB more droop at the channel edge. The integrators are shared (72 bits, enough for R^5 = 2^50 at
+    //    R = 1040 plus the 16-bit input); the three-stage combs work modulo 2^48 on the third integrator.
     // -------------------------------------------------------------------------
-    reg signed [47:0] cic_i1_i, cic_i2_i, cic_i3_i;
-    reg signed [47:0] cic_i1_q, cic_i2_q, cic_i3_q;
+    reg signed [71:0] cic_i1_i, cic_i2_i, cic_i3_i, cic_i4_i, cic_i5_i;
+    reg signed [71:0] cic_i1_q, cic_i2_q, cic_i3_q, cic_i4_q, cic_i5_q;
     reg signed [47:0] cic_d1_i, cic_d2_i, cic_d3_i;
     reg signed [47:0] cic_d1_q, cic_d2_q, cic_d3_q;
+    reg signed [71:0] cic_e1_i, cic_e2_i, cic_e3_i, cic_e4_i, cic_e5_i;
+    reg signed [71:0] cic_e1_q, cic_e2_q, cic_e3_q, cic_e4_q, cic_e5_q;
     reg [15:0]        cic_cnt;
     reg               cic_out_valid;
     reg signed [15:0] cic_out_i, cic_out_q;
     reg signed [47:0] c1_i, c2_i, c3_i, c1_q, c2_q, c3_q, sc_i, sc_q;
+    reg signed [71:0] f1_i, f2_i, f3_i, f4_i, f5_i, f1_q, f2_q, f3_q, f4_q, f5_q, sf_i, sf_q;
+
+    function automatic signed [15:0] sat16_72;
+        input signed [71:0] v;
+        begin
+            if (v > 72'sd32767)       sat16_72 = 16'sd32767;
+            else if (v < -72'sd32768) sat16_72 = -16'sd32768;
+            else                      sat16_72 = v[15:0];
+        end
+    endfunction
 
     function automatic signed [15:0] sat16_48;
         input signed [47:0] v;
@@ -200,10 +254,12 @@ module kria_channel_rx (
 
     always @(posedge clk) begin
         if (rst) begin
-            cic_i1_i <= 48'sd0; cic_i2_i <= 48'sd0; cic_i3_i <= 48'sd0;
-            cic_i1_q <= 48'sd0; cic_i2_q <= 48'sd0; cic_i3_q <= 48'sd0;
+            cic_i1_i <= 72'sd0; cic_i2_i <= 72'sd0; cic_i3_i <= 72'sd0; cic_i4_i <= 72'sd0; cic_i5_i <= 72'sd0;
+            cic_i1_q <= 72'sd0; cic_i2_q <= 72'sd0; cic_i3_q <= 72'sd0; cic_i4_q <= 72'sd0; cic_i5_q <= 72'sd0;
             cic_d1_i <= 48'sd0; cic_d2_i <= 48'sd0; cic_d3_i <= 48'sd0;
             cic_d1_q <= 48'sd0; cic_d2_q <= 48'sd0; cic_d3_q <= 48'sd0;
+            cic_e1_i <= 72'sd0; cic_e2_i <= 72'sd0; cic_e3_i <= 72'sd0; cic_e4_i <= 72'sd0; cic_e5_i <= 72'sd0;
+            cic_e1_q <= 72'sd0; cic_e2_q <= 72'sd0; cic_e3_q <= 72'sd0; cic_e4_q <= 72'sd0; cic_e5_q <= 72'sd0;
             cic_cnt       <= 16'd0;
             cic_out_valid <= 1'b0;
             cic_out_i     <= 16'sd0;
@@ -216,26 +272,42 @@ module kria_channel_rx (
                     cic_out_i     <= mix_i;
                     cic_out_q     <= mix_q;
                 end else begin
-                    cic_i1_i <= cic_i1_i + {{32{mix_i[15]}}, mix_i};
+                    cic_i1_i <= cic_i1_i + {{56{mix_i[15]}}, mix_i};
                     cic_i2_i <= cic_i2_i + cic_i1_i;
                     cic_i3_i <= cic_i3_i + cic_i2_i;
+                    cic_i4_i <= cic_i4_i + cic_i3_i;
+                    cic_i5_i <= cic_i5_i + cic_i4_i;
 
-                    cic_i1_q <= cic_i1_q + {{32{mix_q[15]}}, mix_q};
+                    cic_i1_q <= cic_i1_q + {{56{mix_q[15]}}, mix_q};
                     cic_i2_q <= cic_i2_q + cic_i1_q;
                     cic_i3_q <= cic_i3_q + cic_i2_q;
+                    cic_i4_q <= cic_i4_q + cic_i3_q;
+                    cic_i5_q <= cic_i5_q + cic_i4_q;
 
                     if (cic_cnt >= (cfg_cic_decim - 16'd1)) begin
                         cic_cnt <= 16'd0;
-                        c1_i     = cic_i3_i - cic_d1_i; cic_d1_i <= cic_i3_i;
+                        c1_i     = cic_i3_i[47:0] - cic_d1_i; cic_d1_i <= cic_i3_i[47:0];
                         c2_i     = c1_i     - cic_d2_i; cic_d2_i <= c1_i;
                         c3_i     = c2_i     - cic_d3_i; cic_d3_i <= c2_i;
-                        c1_q     = cic_i3_q - cic_d1_q; cic_d1_q <= cic_i3_q;
+                        c1_q     = cic_i3_q[47:0] - cic_d1_q; cic_d1_q <= cic_i3_q[47:0];
                         c2_q     = c1_q     - cic_d2_q; cic_d2_q <= c1_q;
                         c3_q     = c2_q     - cic_d3_q; cic_d3_q <= c2_q;
                         sc_i     = c3_i >>> cfg_cic_shift;
                         sc_q     = c3_q >>> cfg_cic_shift;
-                        cic_out_i     <= sat16_48(sc_i);
-                        cic_out_q     <= sat16_48(sc_q);
+                        f1_i     = cic_i5_i - cic_e1_i; cic_e1_i <= cic_i5_i;
+                        f2_i     = f1_i     - cic_e2_i; cic_e2_i <= f1_i;
+                        f3_i     = f2_i     - cic_e3_i; cic_e3_i <= f2_i;
+                        f4_i     = f3_i     - cic_e4_i; cic_e4_i <= f3_i;
+                        f5_i     = f4_i     - cic_e5_i; cic_e5_i <= f4_i;
+                        f1_q     = cic_i5_q - cic_e1_q; cic_e1_q <= cic_i5_q;
+                        f2_q     = f1_q     - cic_e2_q; cic_e2_q <= f1_q;
+                        f3_q     = f2_q     - cic_e3_q; cic_e3_q <= f2_q;
+                        f4_q     = f3_q     - cic_e4_q; cic_e4_q <= f3_q;
+                        f5_q     = f4_q     - cic_e5_q; cic_e5_q <= f4_q;
+                        sf_i     = f5_i >>> cfg_cic_shift;
+                        sf_q     = f5_q >>> cfg_cic_shift;
+                        cic_out_i     <= cfg_cic_n5 ? sat16_72(sf_i) : sat16_48(sc_i);
+                        cic_out_q     <= cfg_cic_n5 ? sat16_72(sf_q) : sat16_48(sc_q);
                         cic_out_valid <= 1'b1;
                     end else begin
                         cic_cnt <= cic_cnt + 16'd1;

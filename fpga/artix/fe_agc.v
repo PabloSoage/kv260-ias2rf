@@ -51,6 +51,18 @@ module adc_peak #(
     reg [6:0]          m1 = 7'd0;
     reg [127:0]        oh2 = 128'd0, hits = 128'd0;
     wire [7:0]         s = code ^ 8'h80;
+    // the data path sits outside the reset branch: written inside it, every one of the 3 x 128 flip-flops still
+    // took the reset as a hold condition (a LUT on its R pin), the same fan-out problem
+    always @(posedge clk) begin
+        m1  <= s[7] ? ~s[6:0] : s[6:0];
+        oh2 <= v1 ? (128'd1 << m1) : 128'd0;
+        if (last2) begin
+            peak_set <= hits | oh2 | {o2, 127'd0};
+            hits     <= 128'd0;
+        end else begin
+            hits     <= hits | oh2 | {o2, 127'd0};
+        end
+    end
     always @(posedge clk) begin
         if (rst) begin
             n <= 0; v1 <= 1'b0; o1 <= 1'b0; last1 <= 1'b0; o2 <= 1'b0; last2 <= 1'b0;
@@ -58,21 +70,12 @@ module adc_peak #(
         end else begin
             v1    <= valid;
             o1    <= ovr && valid;
-            m1    <= s[7] ? ~s[6:0] : s[6:0];
             last1 <= valid && (&n);
             if (valid) n <= n + 1'b1;
 
             o2    <= o1;
             last2 <= v1 && last1;
-            oh2   <= v1 ? (128'd1 << m1) : 128'd0;
-
-            if (last2) begin
-                peak_set <= hits | oh2 | {o2, 127'd0};
-                peak_tog <= ~peak_tog;
-                hits     <= 128'd0;
-            end else begin
-                hits <= hits | oh2 | {o2, 127'd0};
-            end
+            if (last2) peak_tog <= ~peak_tog;
         end
     end
 endmodule

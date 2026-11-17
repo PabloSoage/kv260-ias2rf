@@ -55,6 +55,7 @@ module kria_dsp_suite (
     reg [31:0] reg_tx_tone_ftw;   // 0x74
     reg [31:0] reg_tx_cfg;        // 0x78: [15:0]mod_param, [31:16]amp_scale
     reg [15:0] reg_radar_alpha;   // 0x7C write [15:0] cfar_alpha_q8
+    reg [15:0] reg_radar_minp;    // 0x7C write [31:16] CFAR power floor / 16; 0 keeps the former fixed 20000
 
     wire       dsp_rx_en   = reg_dsp_ctrl[0];
     assign     dsp_tx_en   = reg_dsp_ctrl[1];
@@ -72,35 +73,77 @@ module kria_dsp_suite (
     // -------------------------------------------------------------------------
     // Unpack 64-bit beat {Q1, I1, Q0, I0} -> two consecutive 16-bit IQ samples
     // -------------------------------------------------------------------------
+    // The tap sees the link's packets as they leave the FIFO: up to a whole packet (512 beats) on consecutive
+    // clocks, while the samples go out one per clock. The beats queue in a 512-deep FIFO (one BRAM36); without
+    // it, a beat arriving while the second sample of the previous one went out was lost (G-8: radar CPIs and
+    // ADS-B frames were corrupted in the full chain, never in the paced sweeps). Overflow is sticky in 0x60[2].
     reg               iq_valid;
     reg signed [15:0] iq_i, iq_q;
     reg               pend_half;
     reg signed [15:0] pend_i1, pend_q1;
     wire              beat_hit = dsp_rx_en && rx_tap_valid && rx_tap_ready && (rx_tap_tid == target_tid);
 
+    (* ram_style = "block" *) reg [63:0] beat_mem [0:511];
+    reg  [9:0]  bq_wp, bq_rp;
+    reg  [63:0] bq_q;
+    reg         bq_q_valid;
+    reg         bq_ovf;
+    wire        bq_full  = (bq_wp[8:0] == bq_rp[8:0]) && (bq_wp[9] != bq_rp[9]);
+    wire        bq_empty = (bq_wp == bq_rp);
+    // read a beat when the output stage has room: no beat held, or the held one goes out this clock
+    wire        bq_pop   = !bq_empty && (!bq_q_valid || (!pend_half && bq_q_valid));
+
+    always @(posedge clk) begin
+`ifdef MUTATE_UNPACK_NO_QUEUE
+        if (beat_hit && !bq_full && !(bq_q_valid || pend_half || !bq_empty))
+`else
+        if (beat_hit && !bq_full)
+`endif
+            beat_mem[bq_wp[8:0]] <= rx_tap_data;
+        if (bq_pop)
+            bq_q <= beat_mem[bq_rp[8:0]];
+    end
+
     always @(posedge clk) begin
         if (rst || !dsp_rx_en) begin
-            iq_valid  <= 1'b0;
-            iq_i      <= 16'sd0;
-            iq_q      <= 16'sd0;
-            pend_half <= 1'b0;
-            pend_i1   <= 16'sd0;
-            pend_q1   <= 16'sd0;
+            bq_wp      <= 10'd0;
+            bq_rp      <= 10'd0;
+            bq_q_valid <= 1'b0;
+            bq_ovf     <= 1'b0;
+            iq_valid   <= 1'b0;
+            iq_i       <= 16'sd0;
+            iq_q       <= 16'sd0;
+            pend_half  <= 1'b0;
+            pend_i1    <= 16'sd0;
+            pend_q1    <= 16'sd0;
         end else begin
+`ifdef MUTATE_UNPACK_NO_QUEUE
+            if (beat_hit && !bq_full && !(bq_q_valid || pend_half || !bq_empty)) bq_wp <= bq_wp + 10'd1;
+`else
+            if (beat_hit && !bq_full) bq_wp <= bq_wp + 10'd1;
+`endif
+            if (beat_hit && bq_full)  bq_ovf <= 1'b1;
+            if (bq_pop)               bq_rp <= bq_rp + 10'd1;
+
             iq_valid <= 1'b0;
             if (pend_half) begin
                 iq_valid  <= 1'b1;
                 iq_i      <= pend_i1;
                 iq_q      <= pend_q1;
                 pend_half <= 1'b0;
-            end else if (beat_hit) begin
+            end else if (bq_q_valid) begin
                 iq_valid  <= 1'b1;
-                iq_i      <= rx_tap_data[15:0];
-                iq_q      <= rx_tap_data[31:16];
-                pend_i1   <= rx_tap_data[47:32];
-                pend_q1   <= rx_tap_data[63:48];
+                iq_i      <= bq_q[15:0];
+                iq_q      <= bq_q[31:16];
+                pend_i1   <= bq_q[47:32];
+                pend_q1   <= bq_q[63:48];
                 pend_half <= 1'b1;
             end
+            // bq_q holds the next beat; it is consumed when it goes out (not pend_half), refilled by bq_pop
+            if (bq_pop)
+                bq_q_valid <= 1'b1;
+            else if (!pend_half && bq_q_valid)
+                bq_q_valid <= 1'b0;
         end
     end
 
@@ -123,6 +166,7 @@ module kria_dsp_suite (
         .cfg_nco_ftw       (reg_ch_nco_ftw),
         .cfg_cic_decim     (reg_ch_decim[15:0]),
         .cfg_cic_shift     (reg_ch_decim[21:16]),
+        .cfg_cic_n5        (reg_ch_decim[22]),
         .cfg_fir_decim     (reg_ch_decim[31:24]),
         .cfg_deemph_alpha  (reg_ch_demod_cfg[15:0]),
         .cfg_pilot_ftw     (reg_ch_pilot_ftw),
@@ -206,7 +250,7 @@ module kria_dsp_suite (
         .cfg_sync_en       (radar_sync),
         .cfg_win_en        (radar_win),
         .cfg_cfar_alpha_q8 (reg_radar_alpha),
-        .cfg_cfar_min_pwr  (32'd20000),
+        .cfg_cfar_min_pwr  ((reg_radar_minp == 16'd0) ? 32'd20000 : {12'd0, reg_radar_minp, 4'd0}),
         .rd_out_valid      (mon_rd_valid),
         .rd_out_rbin       (mon_rd_rbin),
         .rd_out_dbin       (mon_rd_dbin),
@@ -239,6 +283,7 @@ module kria_dsp_suite (
             reg_tx_tone_ftw  <= 32'd0;
             reg_tx_cfg       <= 32'h6000_4000;
             reg_radar_alpha  <= 16'd1536;
+            reg_radar_minp   <= 16'd0;
             lat_aud_l        <= 16'sd0;
             lat_aud_r        <= 16'sd0;
             lat_ctcss_det    <= 1'b0;
@@ -271,7 +316,7 @@ module kria_dsp_suite (
                     6'h1C: reg_tx_car_ftw   <= csr_wr_wdata;
                     6'h1D: reg_tx_tone_ftw  <= csr_wr_wdata;
                     6'h1E: reg_tx_cfg       <= csr_wr_wdata;
-                    6'h1F: reg_radar_alpha  <= csr_wr_wdata[15:0];
+                    6'h1F: begin reg_radar_alpha <= csr_wr_wdata[15:0]; reg_radar_minp <= csr_wr_wdata[31:16]; end
                     default: ;
                 endcase
             end
@@ -288,7 +333,7 @@ module kria_dsp_suite (
             6'h15: csr_rd_rdata = reg_ch_ctcss_cfg;
             6'h16: csr_rd_rdata = reg_ch_ctcss_thr;
             6'h17: csr_rd_rdata = {lat_aud_r, lat_aud_l};
-            6'h18: csr_rd_rdata = {aud_cnt, rds_cnt[7:0], 6'd0, lat_ctcss_det, mon_pilot_locked};
+            6'h18: csr_rd_rdata = {aud_cnt, rds_cnt[7:0], 5'd0, bq_ovf, lat_ctcss_det, mon_pilot_locked};
             6'h19: csr_rd_rdata = reg_adsb_cfg;
             6'h1A: csr_rd_rdata = {adsb_err_cnt[15:0], adsb_ok_cnt[15:0]};
             6'h1B: csr_rd_rdata = lat_adsb_msg[31:0];
