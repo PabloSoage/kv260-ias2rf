@@ -29,9 +29,11 @@ opt_design
 place_design
 # Post-place physical optimisation without -dsp_register_opt: that pass pulled the AERIS mixer's AREG out of the
 # DSP48 into a slice, which left a fabric -> DSP multiplier path short of the 2.5 ns cycle (WNS -0.146 ns).
-phys_opt_design -fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime     -shift_register_opt -bram_register_opt -hold_fix
+phys_opt_design -fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime \
+    -shift_register_opt -bram_register_opt -hold_fix
 route_design
-phys_opt_design
+# post-route: the 400 MHz AERIS CIC comb sits within +/-0.05 ns of the cycle and moves with placement
+phys_opt_design -directive AggressiveExplore
 
 report_timing_summary    -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -file [file join $rpt_dir "timing_summary.rpt"]
 report_pulse_width       -all_violators -file [file join $rpt_dir "pulse_width.rpt"]

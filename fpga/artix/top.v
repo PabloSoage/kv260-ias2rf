@@ -2266,8 +2266,11 @@ module artix_top #(
     // Rev08 G-5: AGC of the VHF/UHF front end on the AD9484's raw codes (fe_agc.v)
     wire       adcr_pk_tog;
     wire [127:0] adcr_pk;
+    // adc_peak runs on the 400 MHz clock: its reset is the 100 MHz one taken through two flops of its own
+    (* ASYNC_REG = "TRUE" *) reg [1:0] adcr_pk_rst_s = 2'b11;
+    always @(posedge adc_clk_400m) adcr_pk_rst_s <= {adcr_pk_rst_s[0], adc_rst_100m};
     adc_peak #(.WIN_LOG2(16)) u_adcr_peak (
-        .clk(adc_clk_400m), .rst(adc_rst_100m), .code(adc_data), .valid(adc_valid), .ovr(adc_or),
+        .clk(adc_clk_400m), .rst(adcr_pk_rst_s[1]), .code(adc_data), .valid(adc_valid), .ovr(adc_or),
         .peak_tog(adcr_pk_tog), .peak_set(adcr_pk));
     fe_agc #(.CYC_PER_MS(LINK_CYC_PER_MS)) u_fe_agc (
         .clk(link_clk), .rst(link_rst), .ctrl(reg_fe_agc_ctrl), .peak_tog_async(adcr_pk_tog),

@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Tue Nov 17 01:47:31 2026
+| Date         : Tue Nov 17 02:13:17 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_pulse_width -all_violators -file build/g35/fpga/artix/reports_rev06/pulse_width.rpt
 | Design       : artix_top

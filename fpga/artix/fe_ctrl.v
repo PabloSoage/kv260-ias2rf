@@ -30,7 +30,8 @@
 // ENX high, ENX low, a 9-bit header (0, R/W, 7-bit address) and 16 data bits MSB first, data set while SCLK is low
 // and sampled on the rising edge; for a read SDATA turns to an input after the header, with one turnaround clock.
 // Each SCLK or SDATA edge is one write of U1313's output port 1: 59 writes for a register write, 82 I2C
-// transactions for a read, about 17 ms and 33 ms at the 65 kHz bus.
+// transactions for a read: about 26 ms and 37 ms at the nominal 65 kHz bus (17 to 52 ms for a write over CFGMCLK's
+// +/-50 % spread).
 //
 // Mutations (run.ps1 -Mutate): le_high (LE left high, the attenuator follows the RFFC5072 traffic),
 // no_shadow (EXP_OUT and LED written even when unchanged), lsb_first (attenuator word LSB first).
