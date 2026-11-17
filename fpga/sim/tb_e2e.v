@@ -655,7 +655,8 @@ module tb_e2e;
                 end
 
                 if (m_axis_tlast) begin
-                    if (beat_in_pkt != 7)
+                    // radar stream 0x01: 64 beats (512 bytes) per packet since G-8 (top.v ddc_wrapper PKT_WORDS)
+                    if (beat_in_pkt != 63)
                         len_fail_cnt <= len_fail_cnt + 1;
                     if (m_axis_tuser[0])
                         crc_fail_cnt <= crc_fail_cnt + 1;
