@@ -29,12 +29,16 @@ and a read-back, 82 transactions, about 37 ms. The 31 registers of the power-on 
 at the nominal clock. That is fast enough for tuning by hand or by band; a gateware three-wire
 master is the upgrade if fast hopping is ever needed.
 
-**Reaching the expander from the Kria.** The raw I²C registers `XO_RAW` (`0xB0`/`0xB4`, LINK_PROTOCOL's CSR map)
-carry a register address, a data byte and a read/write bit, but no device address: `clk_mode_ctrl` sends every raw
-request to the Si549 (`SI549_ADDR`, 0x55). In today's gateware the Kria therefore cannot write the TCA6416A at
-0x20. Rev08 item G-2 (REV08_PLAN §7) turns `hk_xo_ctrl` into a shared master for the Si549 and both expanders, and
-G-3 adds the RFFC5072 and PE4312 sequencers on top of it; until then the sequence below can only be exercised in
-simulation.
+**Reaching the expander from the Kria.** The Artix's `fe_ctrl` (Rev08 G-2/G-3, FPGA_GATEWARE §5.2a) does the
+bit-banging: software writes one command to `FE_CMD` (`0x110`) and `fe_ctrl` turns it into the I²C writes to
+U1313. Op `4` writes an RFFC5072 register (`[22:16]` address, `[15:0]` data), op `5` reads one back into `FE_RFFC`
+(`0x118`), op `2` sets the expander pins software owns (`ENBL`, `RESETX`, port 0), op `3` polls the inputs (lock
+detect in `FE_STAT[12]`), and op `6` loads the PE4312. `FE_STAT` (`0x114`) shows busy, an I²C error and a command
+written while busy (dropped), so software waits for busy to clear between commands: about 26 ms per register write
+at the nominal clock. The raw I²C registers `XO_RAW` (`0xB0`/`0xB4`) now carry a device address in `0xB0[23:17]`
+(`0` keeps the Si549), so the expanders can also be reached directly for bring-up. `fe_ctrl` is the normal path;
+`hk_xo_ctrl` serves one transaction at a time and gives the Si549's presets, its delta-M and raw requests priority
+over `fe_ctrl`, so a raw access in the middle of a register write only delays it.
 
 ## 2. The three-wire bus
 
