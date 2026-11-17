@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["core", "vehicled"]
+members = ["core", "vehicled", "sdr"]
 # The R5F firmware builds for armv7r-none-eabihf only; it is its own workspace
 # so `cargo test` here stays a host build. See r5f/README.md.
 exclude = ["r5f"]

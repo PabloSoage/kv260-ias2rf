@@ -1,0 +1,18 @@
+[package]
+name = "kria-sdr"
+description = "The A53 side of the USB receivers on the KV260: KrakenSDR direction finding (alignment, calibration, the PL's kria_doa, MUSIC) and HackRF Pro (sweep through the PL's kria_sweep, the wideband panorama, gated transmit)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kria-core = { path = "../core" }
+
+[features]
+# Link against librtlsdr (KrakenRF's fork) and libhackrf and talk to the devices. Off by default: the host build
+# and the tests run from captures.
+hw = []
+
+[[bin]]
+name = "kria-sdrd"
+path = "src/main.rs"

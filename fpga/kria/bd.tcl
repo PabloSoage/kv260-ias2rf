@@ -25,6 +25,8 @@ add_files -norecurse [file join $script_dir "kria_pl_link.v"]
 add_files -norecurse [file join $script_dir "kria_pps.v"]
 add_files -norecurse [file join $script_dir "integrations" "kria_bev_grid.v"]
 add_files -norecurse [file join $script_dir "kria_bev_axi.v"]
+add_files -norecurse [file join $script_dir "integrations" "kria_doa.v"]
+add_files -norecurse [file join $script_dir "integrations" "kria_sweep.v"]
 update_compile_order -fileset sources_1
 
 # ------------------------------------------------------------------------------
@@ -97,14 +99,43 @@ set_property -dict [list \
     CONFIG.c_m_axi_s2mm_max_burst_len {64} \
 ] $dma0
 
+# KrakenSDR direction finding (integrations/kria_doa.v): the A53s' aligned snapshots in through an MM2S-only DMA;
+# R and the Bartlett spectrum are read back over AXI-Lite
+set doa [create_bd_cell -type module -reference kria_doa_axi kria_doa_0]
+set dma2 [create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma axi_dma_2]
+set_property -dict [list \
+    CONFIG.c_include_sg {0} \
+    CONFIG.c_sg_include_stscntrl_strm {0} \
+    CONFIG.c_include_s2mm {0} \
+    CONFIG.c_sg_length_width {23} \
+    CONFIG.c_m_axi_mm2s_data_width {64} \
+    CONFIG.c_m_axis_mm2s_tdata_width {64} \
+    CONFIG.c_mm2s_burst_size {64} \
+] $dma2
+
+# HackRF Pro sweep (integrations/kria_sweep.v): USB blocks in, 128 power bins per block out, one DMA each way
+set swp [create_bd_cell -type module -reference kria_sweep_axi kria_sweep_0]
+set dma3 [create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma axi_dma_3]
+set_property -dict [list \
+    CONFIG.c_include_sg {0} \
+    CONFIG.c_sg_include_stscntrl_strm {0} \
+    CONFIG.c_sg_length_width {23} \
+    CONFIG.c_m_axi_mm2s_data_width {64} \
+    CONFIG.c_m_axis_mm2s_tdata_width {64} \
+    CONFIG.c_m_axi_s2mm_data_width {64} \
+    CONFIG.c_s_axis_s2mm_tdata_width {64} \
+    CONFIG.c_mm2s_burst_size {64} \
+    CONFIG.c_s2mm_burst_size {64} \
+] $dma3
+
 set smc_ctrl [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc_ctrl]
-set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {5}] $smc_ctrl
+set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {9}] $smc_ctrl
 
 set smc_hp0 [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc_hp0]
-set_property -dict [list CONFIG.NUM_SI {3} CONFIG.NUM_MI {1}] $smc_hp0
+set_property -dict [list CONFIG.NUM_SI {6} CONFIG.NUM_MI {1}] $smc_hp0
 
 set irqc [create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat xlconcat_0]
-set_property -dict [list CONFIG.NUM_PORTS {6}] $irqc
+set_property -dict [list CONFIG.NUM_PORTS {8}] $irqc
 
 # Clocks & Reset
 connect_bd_net [get_bd_pins ps8/pl_clk0] \
@@ -118,6 +149,9 @@ connect_bd_net [get_bd_pins ps8/pl_clk0] \
     [get_bd_pins kria_bev_0/clk] \
     [get_bd_pins axi_dma_1/s_axi_lite_aclk] \
     [get_bd_pins axi_dma_1/m_axi_s2mm_aclk] \
+    [get_bd_pins kria_doa_0/clk] [get_bd_pins axi_dma_2/s_axi_lite_aclk] [get_bd_pins axi_dma_2/m_axi_mm2s_aclk] \
+    [get_bd_pins kria_sweep_0/clk] [get_bd_pins axi_dma_3/s_axi_lite_aclk] \
+    [get_bd_pins axi_dma_3/m_axi_mm2s_aclk] [get_bd_pins axi_dma_3/m_axi_s2mm_aclk] \
     [get_bd_pins axi_smc_ctrl/aclk] \
     [get_bd_pins axi_smc_hp0/aclk]
 
@@ -126,6 +160,8 @@ connect_bd_net [get_bd_pins rst_ps8_100M/peripheral_aresetn] \
     [get_bd_pins kria_pl_link_0/pl_resetn]     [get_bd_pins kria_pps_0/resetn] \
     [get_bd_pins axi_dma_0/axi_resetn] \
     [get_bd_pins kria_bev_0/resetn] [get_bd_pins axi_dma_1/axi_resetn] \
+    [get_bd_pins kria_doa_0/resetn] [get_bd_pins axi_dma_2/axi_resetn] \
+    [get_bd_pins kria_sweep_0/resetn] [get_bd_pins axi_dma_3/axi_resetn] \
     [get_bd_pins axi_smc_ctrl/aresetn] \
     [get_bd_pins axi_smc_hp0/aresetn]
 
@@ -136,11 +172,18 @@ connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M01_AXI] [get_bd_intf_pins ax
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M02_AXI] [get_bd_intf_pins kria_pps_0/s_axi]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M03_AXI] [get_bd_intf_pins kria_bev_0/s_axi]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M04_AXI] [get_bd_intf_pins axi_dma_1/S_AXI_LITE]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M05_AXI] [get_bd_intf_pins kria_doa_0/s_axi]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M06_AXI] [get_bd_intf_pins axi_dma_2/S_AXI_LITE]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M07_AXI] [get_bd_intf_pins kria_sweep_0/s_axi]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M08_AXI] [get_bd_intf_pins axi_dma_3/S_AXI_LITE]
 
 # AXI4 High-Performance Data Plane (axi_dma S2MM/MM2S <-> PS S_AXI_HP0_FPD)
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_MM2S] [get_bd_intf_pins axi_smc_hp0/S00_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_S2MM] [get_bd_intf_pins axi_smc_hp0/S01_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXI_S2MM] [get_bd_intf_pins axi_smc_hp0/S02_AXI]
+connect_bd_intf_net [get_bd_intf_pins axi_dma_2/M_AXI_MM2S] [get_bd_intf_pins axi_smc_hp0/S03_AXI]
+connect_bd_intf_net [get_bd_intf_pins axi_dma_3/M_AXI_MM2S] [get_bd_intf_pins axi_smc_hp0/S04_AXI]
+connect_bd_intf_net [get_bd_intf_pins axi_dma_3/M_AXI_S2MM] [get_bd_intf_pins axi_smc_hp0/S05_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_hp0/M00_AXI]  [get_bd_intf_pins ps8/S_AXI_HP0_FPD]
 
 # AXI4-Stream Link <-> AXI DMA
@@ -148,14 +191,20 @@ connect_bd_intf_net [get_bd_intf_pins kria_pl_link_0/m_axis_rx] [get_bd_intf_pin
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S]   [get_bd_intf_pins kria_pl_link_0/s_axis_tx]
 # Grid dumps -> axi_dma_1. s_axis_det is kept for a LiDAR DMA; until then its tvalid is tied to 0
 connect_bd_intf_net [get_bd_intf_pins kria_bev_0/m_axis] [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM]
+# KrakenSDR snapshots -> kria_doa; HackRF blocks -> kria_sweep -> its bins back to DDR
+connect_bd_intf_net [get_bd_intf_pins axi_dma_2/M_AXIS_MM2S] [get_bd_intf_pins kria_doa_0/s_axis]
+connect_bd_intf_net [get_bd_intf_pins axi_dma_3/M_AXIS_MM2S] [get_bd_intf_pins kria_sweep_0/s_axis]
+connect_bd_intf_net [get_bd_intf_pins kria_sweep_0/m_axis]   [get_bd_intf_pins axi_dma_3/S_AXIS_S2MM]
 
-# Interrupts -> PS pl_ps_irq0[5:0]
+# Interrupts -> PS pl_ps_irq0[7:0] (all eight used; a ninth source goes to pl_ps_irq1)
 connect_bd_net [get_bd_pins kria_pl_link_0/irq_fpga]    [get_bd_pins xlconcat_0/In0]
 connect_bd_net [get_bd_pins kria_pl_link_0/irq_link_up] [get_bd_pins xlconcat_0/In1]
 connect_bd_net [get_bd_pins axi_dma_0/s2mm_introut]     [get_bd_pins xlconcat_0/In2]
 connect_bd_net [get_bd_pins axi_dma_0/mm2s_introut]     [get_bd_pins xlconcat_0/In3]
 connect_bd_net [get_bd_pins kria_pps_0/irq]             [get_bd_pins xlconcat_0/In4]
 connect_bd_net [get_bd_pins axi_dma_1/s2mm_introut]     [get_bd_pins xlconcat_0/In5]
+connect_bd_net [get_bd_pins axi_dma_2/mm2s_introut]     [get_bd_pins xlconcat_0/In6]
+connect_bd_net [get_bd_pins axi_dma_3/s2mm_introut]     [get_bd_pins xlconcat_0/In7]
 connect_bd_net [get_bd_pins xlconcat_0/dout]            [get_bd_pins ps8/pl_ps_irq0]
 
 # PS EMIO Sideband -> kria_pl_link_0
@@ -202,6 +251,10 @@ foreach {seg off} {
     kria_pps_0/s_axi/reg0      0x80020000
     kria_bev_0/s_axi/reg0      0x80030000
     axi_dma_1/S_AXI_LITE/Reg   0x80040000
+    kria_doa_0/s_axi/reg0      0x80050000
+    axi_dma_2/S_AXI_LITE/Reg   0x80060000
+    kria_sweep_0/s_axi/reg0    0x80070000
+    axi_dma_3/S_AXI_LITE/Reg   0x80080000
 } {
     assign_bd_address -target_address_space /ps8/Data -offset $off -range 64K [get_bd_addr_segs $seg]
 }

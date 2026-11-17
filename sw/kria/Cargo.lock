@@ -7,6 +7,13 @@ name = "kria-core"
 version = "0.1.0"
 
 [[package]]
+name = "kria-sdr"
+version = "0.1.0"
+dependencies = [
+ "kria-core",
+]
+
+[[package]]
 name = "kria-vehicled"
 version = "0.1.0"
 dependencies = [

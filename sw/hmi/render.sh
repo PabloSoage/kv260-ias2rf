@@ -8,7 +8,7 @@ OUT="$HERE/../../docs/img/hmi"
 CHROME=${1:-"/c/Program Files/Google/Chrome/Application/chrome.exe"}
 mkdir -p "$OUT"
 win() { if command -v cygpath > /dev/null; then cygpath -m "$1"; else echo "$1"; fi; }
-for f in Main Vehicle Radio Spectrum Adsb Radar Transmit System; do
+for f in Main Vehicle Radio Spectrum Wideband Bearing Adsb Radar Transmit System; do
     name=$(echo "$f" | tr 'A-Z' 'a-z'); [ "$name" = main ] && name=home
     "$CHROME" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1.5 \
         --window-size=1280,720 --virtual-time-budget=8000 \

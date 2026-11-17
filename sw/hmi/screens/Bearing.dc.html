@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HMI bearing</title>
+<script src="./support.js"></script>
+<!-- written by kria-sdrd kraken-post (sw/kria/sdr) from the end-to-end run: MUSIC and Bartlett from kria_doa's R -->
+<script src="./data/kraken_doa.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#E6EDF3;text-decoration:none}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; background: #0B0F14; color: #E6EDF3; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 1px solid #243243">
+    <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.02em">IAS2RF</div>
+    <div style="font-size: 16px; color: #9FB0C0">Bearing · KrakenSDR</div>
+    <div style="flex-grow: 1"></div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700">{{freq}}</div>
+    <div style="height: 36px; padding: 0 14px; border-radius: 18px; background: #12251A; color: #6BD58F; display: flex; align-items: center; font-size: 15px; font-weight: 600">{{calstate}}</div>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; gap: 20px; padding: 16px 24px; min-height: 0">
+    <section style="width: 540px; display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <svg width="500" height="500" viewBox="-250 -250 500 500" role="img" aria-label="Bearing plot, vehicle nose up">
+        <circle r="220" fill="#121A23" stroke="#243243"></circle>
+        <circle r="146.7" fill="none" stroke="#1E2A37"></circle>
+        <circle r="73.3" fill="none" stroke="#1E2A37"></circle>
+        <line x1="0" y1="-220" x2="0" y2="220" stroke="#1E2A37"></line>
+        <line x1="-220" y1="0" x2="220" y2="0" stroke="#1E2A37"></line>
+        <polygon points="{{bart}}" fill="rgba(90,176,255,0.14)" stroke="#5AB0FF" stroke-width="1.6"></polygon>
+        <polygon points="{{mus}}" fill="rgba(245,165,36,0.18)" stroke="#F5A524" stroke-width="2"></polygon>
+        <sc-for list="{{marks}}" as="m" hint-placeholder-count="2">
+          <line x1="0" y1="0" x2="{{m.x}}" y2="{{m.y}}" stroke="#F5A524" stroke-width="2" stroke-dasharray="6 5"></line>
+          <text x="{{m.tx}}" y="{{m.ty}}" fill="#E6EDF3" font-size="18" font-weight="700" text-anchor="middle" font-family="JetBrains Mono, monospace">{{m.label}}</text>
+        </sc-for>
+        <path d="M0 -16 L10 12 L0 6 L-10 12 Z" fill="#E6EDF3"></path>
+        <text x="0" y="-228" fill="#9FB0C0" font-size="14" text-anchor="middle">0° nose</text>
+        <text x="236" y="5" fill="#9FB0C0" font-size="14" text-anchor="middle">90°</text>
+        <text x="0" y="244" fill="#9FB0C0" font-size="14" text-anchor="middle">180°</text>
+        <text x="-236" y="5" fill="#9FB0C0" font-size="14" text-anchor="middle">270°</text>
+      </svg>
+      <div style="display: flex; gap: 20px; font-size: 15px; color: #9FB0C0">
+        <span><span style="color: #F5A524">■</span> MUSIC (A53)</span>
+        <span><span style="color: #5AB0FF">■</span> Bartlett (PL)</span>
+        <span>edge 0 dB · centre −30 / −40 dB</span>
+      </div>
+    </section>
+
+    <aside style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <sc-for list="{{srcs}}" as="s" hint-placeholder-count="2">
+          <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">{{s.title}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 700">{{s.brg}}</span>
+            <span style="font-size: 16px">{{s.sub}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">Eigenvalues of R (dB above the smallest)</span>
+        <div style="display: flex; align-items: flex-end; gap: 10px; height: 70px">
+          <sc-for list="{{eig}}" as="e" hint-placeholder-count="5">
+            <div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 4px">
+              <span style="font-size: 13px; color: #9FB0C0">{{e.v}}</span>
+              <div style="{{e.style}}"></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; font-size: 15px">
+        <span style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">Calibration (noise source)</span>
+        <span>Stream offsets: <span style="font-family: 'JetBrains Mono', monospace">{{lags}}</span> samples</span>
+        <span>Channel phases: <span style="font-family: 'JetBrains Mono', monospace">{{phases}}</span></span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+        <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Calibrate</button>
+        <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Frequency</button>
+        <button type="button" style="height: 60px; border-radius: 12px; background: #F5A524; border: none; color: #14100A; font-family: inherit; font-size: 18px; font-weight: 700">Log fix</button>
+      </div>
+    </aside>
+  </main>
+
+  <nav aria-label="Screens" style="height: 88px; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); border-top: 1px solid #243243; background: #0E141B">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="10">
+      <a href="{{n.href}}" style="{{n.style}}">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg>
+        <span style="font-size: 14px">{{n.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const items = [
+      ['Home', 'Main.dc.html', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'],
+      ['Vehicle', 'Vehicle.dc.html', 'M3 13l2-6h14l2 6v5h-3v-2H6v2H3zM7 13h2M15 13h2'],
+      ['Radio', 'Radio.dc.html', 'M4 9h16v11H4zM8 4l8 5M8 14h2M14 14a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
+      ['Spectrum', 'Spectrum.dc.html', 'M3 20h18M4 16l3-7 3 5 3-9 3 8 2-3 2 6'],
+      ['Wideband', 'Wideband.dc.html', 'M2 12h3l2-6 3 12 3-9 2 5 2-2h5'],
+      ['Bearing', 'Bearing.dc.html', 'M12 21a9 9 0 1 0 0-18a9 9 0 1 0 0 18M12 7l3 8-3-2-3 2z'],
+      ['ADS-B', 'Adsb.dc.html', 'M12 2l2 7 7 3-7 2-2 8-2-8-7-2 7-3z'],
+      ['Radar', 'Radar.dc.html', 'M12 12l7-7M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5'],
+      ['Transmit', 'Transmit.dc.html', 'M12 13v8M8 21h8M12 13a2 2 0 1 0 0-4a2 2 0 1 0 0 4M7 6a7 7 0 0 0 0 10M17 6a7 7 0 0 1 0 10'],
+      ['System', 'System.dc.html', 'M12 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6M19 12h2M3 12h2M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4']
+    ];
+    const nav = items.map(([label, href, icon]) => ({ label, href, icon,
+      style: 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; ' +
+        (label === 'Bearing' ? 'color: #F5A524; background: #1A1710; border-top: 3px solid #F5A524' : 'color: #9FB0C0; border-top: 3px solid transparent') }));
+    const D = window.KRAKEN_DOA;
+    // bearings are counter-clockwise from the array's x axis (the vehicle's nose); the screen shows them clockwise
+    const cw = (b) => (360 - b) % 360;
+    const R = 220;   // radius: 0 dB; Bartlett down to -30 dB, MUSIC to -40 dB at the centre
+    const poly = (db, FLOOR) => db.map((v, b) => {
+      const r = R * Math.max(0, (Math.max(v, FLOOR) - FLOOR) / -FLOOR);
+      const a = cw(b) * Math.PI / 180;
+      return (r * Math.sin(a)).toFixed(1) + ',' + (-r * Math.cos(a)).toFixed(1);
+    }).join(' ');
+    const marks = D.music_bearings.map((b) => {
+      const a = cw(b) * Math.PI / 180;
+      return { x: (R * Math.sin(a)).toFixed(1), y: (-R * Math.cos(a)).toFixed(1),
+        tx: ((R - 34) * Math.sin(a)).toFixed(1), ty: (-(R - 34) * Math.cos(a) + 6).toFixed(1), label: cw(b).toFixed(0) + '°' };
+    });
+    const srcs = D.music_bearings.map((b, i) => ({ title: 'Source ' + (i + 1), brg: cw(b).toFixed(1) + '°',
+      sub: (i === 0 ? 'strongest' : (-D.beam_power_db[i]).toFixed(1) + ' dB weaker') + ' · MUSIC' }));
+    const emax = Math.max(...D.eig_db, 1);
+    const eig = D.eig_db.map((v, i) => ({ v: v.toFixed(1),
+      style: 'width: 100%; border-radius: 6px 6px 0 0; height: ' + Math.max(3, 50 * v / emax).toFixed(0) + 'px; background: ' + (i < D.sources ? '#F5A524' : '#36485C') }));
+    return { nav, freq: (D.f_rf / 1e6).toFixed(3) + ' MHz', calstate: 'Coherent · ' + D.sources + ' sources',
+      bart: poly(D.bartlett_db, -30), mus: poly(D.music_db, -40), marks, srcs, eig,
+      lags: D.cal ? D.cal.lag.join(' ') : '—',
+      phases: D.cal ? D.cal.weight_deg.map((p) => p.toFixed(0) + '°').join(' ') : '—' };
+  }
+}
+</script>
+</body>
+</html>

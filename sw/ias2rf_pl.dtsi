@@ -76,6 +76,42 @@
                 interrupt-names = "s2mm_introut";
                 status = "okay";
             };
+
+            /* KrakenSDR direction finding (fpga/kria/integrations/kria_doa.v): weights, covariance, Bartlett
+             * spectrum and the steering table, 64 KiB of registers. */
+            ias2rf_doa: ias2rf_doa@80050000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80050000 0x0 0x10000>;
+                status = "okay";
+            };
+
+            /* MM2S-only DMA: the KrakenSDR's aligned snapshots from kraken_buf into kria_doa. pl_ps_irq0[6]. */
+            axi_dma_2: dma@80060000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80060000 0x0 0x10000>;
+                interrupt-parent = <&gic>;
+                interrupts = <0 95 4>;
+                interrupt-names = "mm2s_introut";
+                status = "okay";
+            };
+
+            /* HackRF Pro sweep (fpga/kria/integrations/kria_sweep.v): window, twiddles, counters. */
+            ias2rf_sweep: ias2rf_sweep@80070000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80070000 0x0 0x10000>;
+                status = "okay";
+            };
+
+            /* DMA both ways for the sweep: USB blocks from sweep_buf in, 520-byte results back.
+             * pl_ps_irq0[7] is its S2MM completion; MM2S is polled. */
+            axi_dma_3: dma@80080000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80080000 0x0 0x10000>;
+                interrupt-parent = <&gic>;
+                interrupts = <0 96 4>;
+                interrupt-names = "s2mm_introut";
+                status = "okay";
+            };
         };
     };
 
@@ -96,6 +132,16 @@
             bev_frames: bev_frames@3ee10000 {
                 no-map;
                 reg = <0x0 0x3ee10000 0x0 0x20000>;
+            };
+            /* KrakenSDR CPI buffer: 2^15 snapshots of 16 bytes (axi_dma_2 reads). */
+            kraken_buf: kraken_buf@3ee40000 {
+                no-map;
+                reg = <0x0 0x3ee40000 0x0 0x80000>;
+            };
+            /* HackRF sweep: 48 blocks of 16 KiB in (axi_dma_3 reads), then 48 results of 520 bytes out. */
+            sweep_buf: sweep_buf@3ef00000 {
+                no-map;
+                reg = <0x0 0x3ef00000 0x0 0xd0000>;
             };
         };
     };

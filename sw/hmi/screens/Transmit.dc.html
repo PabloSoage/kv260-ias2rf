@@ -67,8 +67,8 @@ a{color:#E6EDF3;text-decoration:none}a:hover{color:#FFFFFF}
     </aside>
   </main>
 
-  <nav aria-label="Screens" style="height: 88px; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-top: 1px solid #243243; background: #0E141B">
-    <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+  <nav aria-label="Screens" style="height: 88px; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); border-top: 1px solid #243243; background: #0E141B">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="10">
       <a href="{{n.href}}" style="{{n.style}}">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg>
         <span style="font-size: 14px">{{n.label}}</span>
@@ -86,6 +86,8 @@ class Component extends DCLogic {
       ['Vehicle', 'Vehicle.dc.html', 'M3 13l2-6h14l2 6v5h-3v-2H6v2H3zM7 13h2M15 13h2'],
       ['Radio', 'Radio.dc.html', 'M4 9h16v11H4zM8 4l8 5M8 14h2M14 14a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
       ['Spectrum', 'Spectrum.dc.html', 'M3 20h18M4 16l3-7 3 5 3-9 3 8 2-3 2 6'],
+      ['Wideband', 'Wideband.dc.html', 'M2 12h3l2-6 3 12 3-9 2 5 2-2h5'],
+      ['Bearing', 'Bearing.dc.html', 'M12 21a9 9 0 1 0 0-18a9 9 0 1 0 0 18M12 7l3 8-3-2-3 2z'],
       ['ADS-B', 'Adsb.dc.html', 'M12 2l2 7 7 3-7 2-2 8-2-8-7-2 7-3z'],
       ['Radar', 'Radar.dc.html', 'M12 12l7-7M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5'],
       ['Transmit', 'Transmit.dc.html', 'M12 13v8M8 21h8M12 13a2 2 0 1 0 0-4a2 2 0 1 0 0 4M7 6a7 7 0 0 0 0 10M17 6a7 7 0 0 1 0 10'],

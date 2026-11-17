@@ -1,17 +1,21 @@
-# Possible integrations: GPS, 77 GHz radar, vehicle telemetry, LiDAR and fusion on the PL
+# Possible integrations: GPS, 77 GHz radar, vehicle telemetry, LiDAR, fusion on the PL, KrakenSDR and HackRF Pro
 
-*17 November 2026 · analysis, simulation and end-to-end tests on the bench; no vehicle hardware yet*
+*17 and 18 November 2026 · analysis, simulation and end-to-end tests on the bench; no vehicle hardware yet*
 
-Four devices could be connected to the KV260 alongside this board in the owner's vehicle (a Mitsubishi Montero V80, [VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md)):
+Six devices could be connected to the KV260 alongside this board in the owner's vehicle (a Mitsubishi Montero V80, [VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md)):
 - a USB GPS;
 - a 77 GHz automotive radar through a CAN-to-USB adapter;
 - the engine's live data through opendash;
-- a 3D LiDAR on a USB-to-Ethernet adapter.
+- a 3D LiDAR on a USB-to-Ethernet adapter;
+- a KrakenSDR, five coherent receivers for direction finding (§9);
+- a HackRF Pro, a transceiver from 100 kHz to 7.1 GHz with a fast sweep (§10).
 
-None of them needs a change to this board. This document gives each one's link, data rate and processing, what it adds to the system, and the simulations and tests behind the numbers. Three pieces are built and tested end to end:
+None of them needs a change to this board. This document gives each one's link, data rate and processing, what it adds to the system, and the simulations and tests behind the numbers. Five pieces are built and tested end to end:
 - the GPS's pulse-per-second on a free PL pin, disciplined by an R5F core (§2);
 - the engine's live data from opendash into a daemon on the A53s, which feeds the transmit lock on the R5F (§4);
-- a fusion grid in the PL that combines the LiDAR and the radars into one occupancy grid, in the K26's block design with its own DMA, fed by R5F core 1, which also scans the board's 10.5 GHz radar beam by beam (§6).
+- a fusion grid in the PL that combines the LiDAR and the radars into one occupancy grid, in the K26's block design with its own DMA, fed by R5F core 1, which also scans the board's 10.5 GHz radar beam by beam (§6);
+- the KrakenSDR's bearings, with the covariance and the Bartlett scan in the PL and MUSIC on the A53s (§9);
+- the HackRF Pro's sweep from 0 to 7.2 GHz through an averaging FFT in the PL, and its transmitter behind the board's transmit lock (§10).
 
 The software that runs on the K26's processors is in Rust, with its logic in one I/O-free crate shared by the A53s and the R5F cores (§7). [HMI.md](HMI.md) shows the screens that display all of it.
 
@@ -24,8 +28,10 @@ The software that runs on the K26's processors is in Rust, with its logic in one
 | Engine live data (opendash) | opendash's telemetry server on the phone (Wi-Fi), or the SM3 directly | Up to 40 identifiers at 100 Hz, about 3,500 values/s | A53: `kria-vehicled`; R5F 0: road speed into the transmit lock | End to end against an emulated ECU (§4) |
 | 3D LiDAR, Ethernet | USB 3.0 to Gigabit Ethernet adapter | 0.2 to 1.3 Mpoints/s, 20 to 70 Mbit/s | A53: driver, SLAM; PL: occupancy grid | Fog performance simulated (§5, §6) |
 | Fusion grid | Inside the PL | 100 M cell updates/s | PL: `kria_bev_grid` behind `kria_bev_axi`; R5F 1: its commands, the 10.5 GHz scan, the frames | RTL bit-exact against its model, in the K26 build; end to end from R5F 1's code through the RTL (§6.1) |
+| KrakenSDR | USB 2.0 (five RTL2832U behind its hub) | 5 × 2.4 MS/s, 24 MB/s | A53: `kria-sdrd` (alignment, calibration, MUSIC); PL: `kria_doa` (weights, covariance, Bartlett) | End to end from USB transfers through the RTL to the Bearing screen (§9) |
+| HackRF Pro | USB 2.0 | Sweep: 1,220 blocks/s, 20 MB/s; stream: 20 MS/s | A53: `kria-sdrd` (panorama, signals, transmit gate); PL: `kria_sweep` (averaging FFT) | End to end from USB transfers through the RTL to the Wideband screen (§10) |
 
-The KV260's own Gigabit port (`J10`) already carries this board's Ethernet link, so the LiDAR needs the USB adapter. The four USB 3.0 ports take the GPS, the CAN adapter, the Wi-Fi adapter and the LiDAR's Ethernet adapter, with the touchscreen on a hub or on the HDMI display's own USB.
+The KV260's own Gigabit port (`J10`) already carries this board's Ethernet link, so the LiDAR needs the USB adapter. The four USB 3.0 ports take the GPS, the CAN adapter, the Wi-Fi adapter and the LiDAR's Ethernet adapter, with the touchscreen on a hub or on the HDMI display's own USB. The KrakenSDR and the HackRF Pro are USB 2.0 devices (24 and 20 MB/s): with them, a powered USB 3.0 hub on one port carries the GPS, the CAN adapter and the touchscreen, and the KrakenSDR takes its own 5 V 2.4 A supply.
 
 ## 2. USB GPS
 
@@ -418,3 +424,138 @@ None of it has run on a KV260 yet.
 2. **The LiDAR on its USB adapter.** Its ROS 2 driver and a SLAM (FAST-LIO2 or similar), fed with the wheel speed from step 1.
 3. **The 77 GHz radar on its own CAN FD adapter or 100BASE-T1 converter (§3).** Its DBC or interface document and a decoder, with its objects on the Vehicle screen.
 4. **The LiDAR into the grid at full rate:** a DMA channel (MM2S) into `kria_bev_axi`'s `s_axis_det`, and the points converted to grid commands on the A53s.
+
+5. **The KrakenSDR and the HackRF Pro (§9, §10).** Built and tested end to end like the grid. On a KV260 they need `kria-sdrd` built with `--features hw` against KrakenRF's librtlsdr and libhackrf, and the two blocks' nodes in the overlay.
+
+## 9. Direction finding with a KrakenSDR
+
+*Added 18 November 2026. Built and tested end to end, from synthetic USB transfers through the PL's RTL to the screen; not run on a KV260.*
+
+**What it is** `[V, KrakenRF's pages and its open-source code]`:
+- five RTL2832U receivers with R820T2 tuners, 24 to 1,766 MHz, on one clock, behind one USB hub;
+- 2.4 MS/s per channel by default, unsigned 8-bit I/Q, 4.8 MB/s per channel and 24 MB/s in all, inside USB 2.0's 480 Mbit/s;
+- a noise source that the control channel's bias-tee GPIO switches onto all five inputs through calibration switches, for the coherence calibration;
+- five SMA inputs with a 4.5 V bias tee each; it takes 5 V at 2.4 A over USB-C.
+
+**What it adds.** This board receives VHF and UHF on one antenna (`J961`, §5 of [REV08_PLAN](REV08_PLAN.md)); it cannot say where a signal comes from. A KrakenSDR on one of the KV260's USB ports, with five antennas on the roof, gives the bearing of a transmitter from 24 MHz to 1.77 GHz: a repeater, a beacon, an interferer, a lost model aircraft. On the move, bearings logged with the GPS position fix the transmitter by triangulation.
+
+**Why not on the board.** It is five complete receivers with their own ADCs. Adding them would mean a new RF section, which reopens every check of the board (DRC, signal integrity, renders, fabrication, documents). Over USB it costs nothing on the board, and it is a product people already own.
+
+### 9.1 The chain
+
+| Step | Where | What |
+|---|---|---|
+| USB | A53, `kria-sdrd` | Five devices, one bulk stream each, through KrakenRF's librtlsdr (feature `hw`, `sw/kria/sdr/src/usb.rs`). The transfers (256 KiB) arrive from the five devices in no fixed order and are reassembled per channel |
+| Noise source on | A53 | Bias-tee GPIO 0 of the control channel (serial 1000), as KrakenRF's own software switches it |
+| Delay | A53 | Each stream starts at its own moment: a whole number of samples. The peak of the cross-correlation with channel 0 over ±64 samples finds it; the streams are then read from aligned offsets |
+| Phase and gain | A53 | With one common source, the covariance's dominant eigenvector is the channels' gains up to a common factor. The weights are its inverse, with each channel's amplitude from its power |
+| Noise source off | A53 | The CPI: 2^15 aligned snapshots (13.7 ms at 2.4 MS/s), packed two 64-bit beats per snapshot into a DMA buffer |
+| Weights, covariance, Bartlett | PL, `kria_doa` | Each channel times its Q2.14 weight; R = Σ y yᴴ over the CPI (15 entries, 48 bits); then a^H R a for 360 bearings, one per clock, from a table of steering cross-products the A53 writes for the array and the frequency |
+| Scale | A53 | Reads R's diagonal, picks `SHIFT` so the largest entry fits 25 bits, asks for a scan of the held R |
+| MUSIC | A53 | R's eigendecomposition (5 × 5, Hermitian, through its 10 × 10 real form), the number of sources from the eigenvalues (10 dB above the smallest), the noise subspace's pseudo-spectrum on the same 360 bearings |
+| Screen | A53 | The Bearing screen ([HMI.md](HMI.md)): both spectra on a polar plot, the bearings, the eigenvalues, the calibration |
+
+The PL takes the part that grows with the sample count: 50 complex products per snapshot, 120 M multiplies a second at 2.4 MS/s, which would occupy an A53 core. What stays on the A53s grows with the number of antennas, not the samples: an eigendecomposition of a 5 × 5 matrix per CPI.
+
+**The methods.** Cross-correlation for the streams' offsets, the principal eigenvector for an array's calibration from a common source, Bartlett (the delay-and-sum beamformer) and MUSIC (Schmidt, 1986) are textbook methods. `kria-sdrd` implements them from their definitions. KrakenRF's [heimdall_daq_fw](https://github.com/krakenrf/heimdall_daq_fw) and [krakensdr_doa](https://github.com/krakenrf/krakensdr_doa) do the same jobs on a Raspberry Pi and were read for the device's facts: the noise source's GPIO, the default rate, the array conventions. They are GPL; none of their code is used here, and this repository stays under Apache-2.0.
+
+**`kria_doa`** ([`fpga/kria/integrations/kria_doa.v`](../fpga/kria/integrations/kria_doa.v)), at `0x8005_0000`, fed by `axi_dma_2` (MM2S) at `0x8006_0000`:
+
+| Offset | Register |
+|---|---|
+| `0x0000` | ID `DOA1` |
+| `0x0004` | CTRL: start a CPI, scan when it ends, scan the held R now |
+| `0x0008` | STATUS: accumulating, scanning, done, CPI count |
+| `0x000C`, `0x0010` | N_LOG2 (CPI of 2 to 65,536 snapshots), SHIFT |
+| `0x0020` to `0x0030` | the five weights, Q2.14 |
+| `0x0100` to `0x01EF` | R, 15 entries of 48 bits |
+| `0x0800` to `0x0D9C` | P(θ), 360 bearings |
+| `0x8000` to `0xD9FC` | the steering table, 10 cross-products per bearing |
+
+### 9.2 End-to-end test
+
+- **The capture** (`sw/integrations/kraken_sim.py`):
+  - five channels at 2.4 MS/s on a circular array of five elements, half a wavelength apart at 446 MHz (28.6 cm radius);
+  - each stream starts 0, 13, 37, 5 and 22 samples late, and each channel has a random complex gain;
+  - 65,536 samples with the noise source on, then two FM emitters at 117° and 250°, the second 6 dB weaker, with each channel's thermal noise;
+  - quantised as the RTL2832U does and cut into 256 KiB transfers.
+- **The A53** (`kria-sdrd kraken-pre`) reassembles the transfers in a shuffled order, finds the offsets and the weights, and writes what its driver sends the PL: the register writes, the snapshots, and from its bit-exact model of `kria_doa` the R and P the PL must return.
+- **The RTL** (`tb_kria_doa`) runs the driver's sequence: the 3,606 register writes, a CPI with gaps in the stream, R's diagonal read back and `SHIFT` chosen from it as the driver does, the rescan. R and all 360 values of P equal the model's, bit for bit. Mutation `doa_no_conj`, the product without its conjugate, fails at the first entry.
+- **The A53 again** (`kria-sdrd kraken-post`) reads the RTL's R and P, runs MUSIC, and writes the record the Bearing screen draws.
+
+| Result | Value |
+|---|---|
+| Stream offsets found | 0, 13, 37, 5, 22: all exact |
+| Calibration phases | within 1° of the truth on every channel |
+| Sources found from R's eigenvalues | 2 (28.2 and 21.7 dB above the smallest; the noise eigenvalues within 2.3 dB) |
+| MUSIC bearings from the RTL's R | **117.0° and 250.0°** (true 117° and 250°) |
+| Bartlett from the PL | 118.0° for the strong emitter; the weaker one is not resolved (its lobe merges into a 274° sidelobe region) |
+
+![KrakenSDR end to end: calibration, Bartlett and MUSIC, eigenvalues](img/integrations/kraken_doa_e2e.png)
+
+Bartlett is what the PL computes cheaply and what the screen shows as the coarse picture. Five antennas give it a beam about 70° wide, too wide to separate two emitters 133° apart when one is 6 dB weaker. MUSIC uses the same R and places both to a tenth of a degree. MUSIC needs the number of sources, which R's eigenvalues give, and fails when two sources are coherent (a reflection of the same signal). Forward-backward averaging of R is the usual cure, an A53 change if needed.
+
+**Not tested:** a real KrakenSDR, and the `hw` paths of `kria-sdrd` (the librtlsdr calls and `/dev/mem`), which build only against the libraries on the board. The array's own errors (cable lengths, antenna placement, the car body's reflections) are not in the model. KrakenRF calibrates the cable lengths through the noise source as here; the body's effect needs a measured array manifold, which the steering table can hold as it is (any complex value per bearing and pair).
+
+## 10. HackRF Pro: 1.1 to 7.1 GHz and a fast sweep
+
+*Added 18 November 2026. Built and tested end to end, from synthetic USB transfers through the PL's RTL to the screen; not run on a KV260.*
+
+**What it is** `[V, Great Scott Gadgets' documentation and the hackrf repository, firmware and host code]`:
+- a half-duplex transceiver from 100 kHz to 6 GHz, tunable from 0 to 7.1 GHz;
+- 20 MS/s of 8-bit I/Q over USB 2.0 (Type-C); 16-bit samples at lower rates (9 to 11 effective bits); 4-bit at up to 40 MS/s;
+- built from a MAX2831 transceiver, an RFFC5072 mixer and synthesiser (the part this board's VHF/UHF front end uses), a MAX5864 converter, an iCE40 UltraPlus FPGA and an LPC43xx microcontroller;
+- a TCXO, clock input and output on SMA (also usable as trigger in and out), a 3.3 V 50 mA port supply, and a trace to cut to disable transmit.
+
+**What it adds** to this board and the other integrations:
+
+| Capability | This board | HackRF Pro |
+|---|---|---|
+| Receive, HF | 0 to 25 MHz (AD9253) | from 100 kHz, but 8 bits at 20 MS/s |
+| Receive, VHF/UHF | 25 MHz to 1.1 GHz (`RX_VU`, Rev08) | yes |
+| **Receive, 1.1 to 7.1 GHz** | no | **yes**: L-band, mobile bands, 2.4 and 5 GHz, 5.8 GHz video links, ITS-G5 |
+| **Transmit, 1.1 to 6 GHz** | no (the DACs reach HF and low VHF) | **yes**: the 23, 13, 9 and 6 cm amateur bands |
+| **Spectrum of the whole range** | no | **yes**: its sweep mode, about 12 GHz/s |
+| Direction finding | no | no (the KrakenSDR, §9) |
+
+So the integration does three things: the sweep, through the PL; reception above 1.1 GHz as a 20 MS/s stream to the A53s (the same path as any USB SDR, with the waterfall on the GPU); and transmission above 1.1 GHz behind the same lock as this board's own transmitter. On the board it would be a second complete transceiver with its own USB, the same objection as §9.
+
+**The sweep** `[V, firmware/hackrf_usb/usb_api_sweep.c, host/hackrf-tools/src/hackrf_sweep.c]`:
+- the firmware retunes for every block and sends 16,384-byte blocks, each starting with `0x7F 0x7F` and the block's frequency f as a little-endian u64;
+- the LO sits at f + 7.5 MHz; the steps alternate +5 MHz and +15 MHz ("interleaved"), and from each block two 5 MHz quarter bands are kept, [f, f + 5) and [f + 10, f + 15) MHz, away from the LO and the filter's edges;
+- after each retune the Pro's firmware discards one block (the One discards two), so 1,220 blocks a second reach the host: about 12 GHz/s;
+- `hackrf_sweep` on a PC Fourier-transforms the last N samples of each block, once.
+
+**`kria_sweep`** ([`fpga/kria/integrations/kria_sweep.v`](../fpga/kria/integrations/kria_sweep.v)), at `0x8007_0000`, fed and drained by `axi_dma_3` at `0x8008_0000`:
+- takes the USB transfers as they come, checks each block's header (a bad one is dropped and counted), and keeps its frequency;
+- transforms the block's last 2^k segments of 256 samples (k = 3: 2,048 of its 8,187), each with a Hann window, and sums their powers bin by bin (Welch's method without overlap);
+- returns per block the frequency and 128 powers, the two quarter bands at 78.125 kHz, for the A53 to place on the panorama.
+- The window and the 128 twiddles are written by the A53 at start. One block takes 30,000 clocks, 0.3 ms at 100 MHz, against 0.82 ms between blocks.
+
+**Why the averaging.** One FFT of a noise-like signal (LTE, Wi-Fi, DVB-T) is ragged, ±5 dB from bin to bin. The sum of eight is within ±1.8 dB. A PC keeps one FFT per block to save its CPU; the PL has the time.
+
+**Transmit.** `kria-sdrd` keys the HackRF only while R5F core 0's interlock reports `transmit` (§7: licence, vehicle stopped, time-out, link up) and only inside the bands of the licence (`TxGate`, the amateur allocations of ITU Region 1 from 1.24 to 5.85 GHz). The HackRF's port is a second transmitter on the same lock, not a way around it.
+
+### 10.1 End-to-end test
+
+- **The capture** (`sw/integrations/hackrf_sim.py`): one sweep from 0 to 7.2 GHz, 720 blocks, as libhackrf delivers them. The scene is a car's radio environment: five FM stations, DAB, two DVB-T multiplexes, PMR446, LTE at 800, 900, 1,800 and 2,600 MHz, UMTS, ADS-B, 5G NR at 3.5 GHz, Wi-Fi at 2.4 and 5 GHz, three Bluetooth hops, a 5.8 GHz video link and ITS-G5, 25 signals from −9 to −38 dBFS. The baseband filter is 15 MHz wide. Block 300's header is corrupted on purpose.
+- **The A53** (`kria-sdrd hackrf-pre`) writes its driver's register writes and the blocks for the PL, and from its bit-exact model of `kria_sweep` the 46,735 output beats the PL must return.
+- **The RTL** (`tb_kria_sweep`) takes 1.47 million input beats with gaps and back-pressure on its output. Every output beat equals the model's, the block with the bad header is dropped and counted (`BAD` = 1, `BLOCKS` = 719). Mutation `sweep_twiddle_conj`, the conjugate twiddle, fails at the first block.
+- **The A53 again** (`kria-sdrd hackrf-post`) places the RTL's bins on the panorama, finds the signals (power averaged over 700 kHz, 5 dB above the median floor, runs less than 1 MHz apart joined), checks the transmit gate, and writes the record the Wideband screen draws.
+
+| Result | Value |
+|---|---|
+| Range covered by one sweep | 99.2 % of 0 to 7.25 GHz (the dropped block's 10 MHz missing) |
+| Signals of the scene found | **25 of 25**, with no false detection |
+| The same with one FFT per block, as `hackrf_sweep` | 25 of 25 at 5 dB but 28 false detections; at 8 dB 24 found and the wide signals in fragments |
+| Carriers | within 0.1 MHz (FM, PMR446), level within 1.3 dB |
+| Wide signals | Wi-Fi 20.2 MHz wide, FPV 8.6 MHz, LTE 800 9.5 MHz; their peak bin is 10 to 15 dB below the total power, which is spread over the channel |
+| Transmit gate | 2,400.1 MHz keyed; the same while moving, blocked by the interlock; 2,412 MHz keyed (inside 2,300 to 2,450); 5,760.1 MHz keyed |
+
+![HackRF Pro end to end: the sweep from 0 to 7.2 GHz, and the 2.4 GHz band](img/integrations/hackrf_sweep_e2e.png)
+
+**Not tested:** a real HackRF Pro, its gains and its spurs, and the `hw` paths of `kria-sdrd` (the libhackrf calls); the 20 MS/s stream path and the transmit path beyond the gate, which use libhackrf's calls as `hackrf_transfer` does. Bluetooth hops faster than a sweep (1,600 hops a second against 1.7 sweeps a second); the panorama sees a few hops per sweep, and the peak-hold shows the band.
+
+### 10.2 In the K26 build
+
+TODO_BUILD
