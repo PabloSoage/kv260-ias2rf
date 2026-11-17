@@ -1,4 +1,4 @@
-# IAS_LINK sheet — specification and review guide
+# IAS_LINK sheet: specification and review guide
 
 *25 September 2026 · `rev03/IAS_LINK.kicad_sch` · drawn by `_work/sheets/ias_link.py` from the
 connection list in `_work/sheets/ias_link_spec.py`*

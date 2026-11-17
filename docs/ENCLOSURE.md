@@ -1,4 +1,4 @@
-# Enclosure — design, printing and simulation
+# Enclosure: design, printing and simulation
 
 *13 November 2026 · `_work/mech/build_case.py` (Blender, exact booleans) · STLs in [`mech/`](../mech/)*
 

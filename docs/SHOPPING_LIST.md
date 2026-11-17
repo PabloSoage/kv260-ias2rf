@@ -5,14 +5,14 @@
 Organised by **stage** (the reasoning behind the order is in
 [VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §6). Every stage delivers something usable on its own.
 
-**Prices are indicative `[E]`**, meant for sizing the effort — they are not quotes. Spanish VAT at
+**Prices are indicative `[E]`**, meant for sizing the effort; they are not quotes. Spanish VAT at
 21 % included where it applies.
 
 **Key:** ☑ already have · ☐ to buy · ◆ to design/fabricate · ⚑ paperwork
 
 ---
 
-## Stage 0 — Start today, designing nothing
+## Stage 0: Start today, designing nothing
 
 > **The most important stage in the project.** Do not design a board to find out what you need.
 
@@ -22,7 +22,7 @@ Organised by **stage** (the reasoning behind the order is in
 | ☐ | 12 V / 3 A supply or on-board adapter | Powering the KV260 | €20 |
 | ☐ | microSD 32–64 GB class A2 | Linux boot | €15 |
 | ☐ | USB 3.0 SSD (256 GB+) | Recording RF captures and point clouds | €40 |
-| ☐ | **bladeRF 2.0 micro xA4** (47 MHz – 6 GHz, 2×2, full duplex, 12-bit) — or an AD9361 **AntSDR E200** | Wideband RX/TX, **2.4 and 5.8 GHz for drones**, two coherent channels | €550 |
+| ☐ | **bladeRF 2.0 micro xA4** (47 MHz – 6 GHz, 2×2, full duplex, 12-bit), or an AD9361 **AntSDR E200** | Wideband RX/TX, **2.4 and 5.8 GHz for drones**, two coherent channels | €550 |
 | ☐ | **SDRplay RSPdx-R2** (1 kHz – 2 GHz, 14-bit, RX only) | HF, AM, airband and weak signals; replaces the HF upconverter | €200 |
 | ☐ | **KrakenSDR** (5 coherent channels, 24 MHz – 1.766 GHz) | **Direction finding, ready to use** | €500 |
 | ☐ | Antenna set: discone, HF whip, 5× VHF/UHF for the Kraken | Coverage and DF | €200 |
@@ -81,7 +81,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 1 — LiDAR
+## Stage 1: LiDAR
 
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
@@ -101,7 +101,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 2 — OBD2 / CAN
+## Stage 2: OBD2 / CAN
 
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
@@ -120,7 +120,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 3 — Communication that actually works (⚑ and ☐)
+## Stage 3: Communication that actually works (⚑ and ☐)
 
 > Deliberately independent of the project. See [VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md) §2.3.
 
@@ -143,7 +143,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 4 — SDR RX adapter (◆ first custom board)
+## Stage 4: SDR RX adapter (◆ first custom board)
 
 > A simple board, no FPGA. It validates the IAS1 interface, which is the foundation of everything
 > that follows.
@@ -167,7 +167,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 - [ ] 6-layer stackup agreed with the fabricator, with computed impedances
 - [ ] ERC with no errors and every warning justified individually
 
-**Bring-up checklist** (in this order — each step validates the previous one)
+**Bring-up checklist** (in this order: each step validates the previous one)
 - [ ] Rail voltages and ripple on every rail, with no converters fitted
 - [ ] Clock on the scope via the CLK_OUT SMA: levels, jitter, termination; Si549 at 400 and 500 MHz
 - [ ] **A known sine into the ADC input, recovered in the PL** ← the critical test
@@ -175,7 +175,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 5 — SDR front end and transmission (◆)
+## Stage 5: SDR front end and transmission (◆)
 
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
@@ -183,7 +183,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 | ☐ | **ADF4351** synthesiser | LO from 35 MHz to 4.4 GHz | €25 |
 | ☐ | **ADL5801ACPZ** mixer | Here it *is* in range (10 MHz – 6 GHz) | €20 |
 | ☐ | LNA (SPF5189Z / PGA-103+) | | €20 |
-| ☐ | Filters: 30 MHz LPF + 3 switched BPFs | **Custom design** — do not underestimate them | €100 |
+| ☐ | Filters: 30 MHz LPF + 3 switched BPFs | **Custom design**: do not underestimate them | €100 |
 | ☐ | **AD9767ASTZ** or **AD9709** DAC + reconstruction filter | Transmission | €40 |
 | ☐ | Input limiter, T/R switching, TX driver | | €80 |
 | ☐ | **Switchable 50 Ω loads** | Validate in loopback without radiating | €30 |
@@ -191,7 +191,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 6 — 77 GHz obstacle radar (☐, nothing to design)
+## Stage 6: 77 GHz obstacle radar (☐, nothing to design)
 
 > **If the radar's purpose is seeing obstacles and fog, this stage replaces AERIS.**
 > 76–77 GHz is allocated to vehicular radar: **no licence**.
@@ -208,7 +208,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Stage 7 — Front-end FPGA (◆ major decision still open)
+## Stage 7: Front-end FPGA (◆ major decision still open)
 
 > Needed for 4-channel direction finding and for AERIS. See [ROADMAP.md](ROADMAP.md) §4.3.
 
@@ -222,12 +222,12 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 | | | **Subtotal** | **~€1,000 – 1,800** |
 
 > The DSP core for this stage **already exists and is measured on silicon**:
-> [scanner64](https://github.com/PabloSoage/scanner64) — 100.05 MSPS sustained, no samples
+> [scanner64](https://github.com/PabloSoage/scanner64): 100.05 MSPS sustained, no samples
 > dropped, 8.38 mW per channel, 169.9 MHz Fmax post-route on the KV260's own PL.
 
 ---
 
-## Stage 8 — AERIS-10 (☐ + ◆, the big project)
+## Stage 8: AERIS-10 (☐ + ◆, the big project)
 
 > Only if the goal is **surveillance at range**. Requires experimental authorisation.
 
@@ -244,7 +244,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 ---
 
-## Cross-cutting — vehicle installation
+## Cross-cutting: vehicle installation
 
 Applies from stage 1 onwards. **This is not an accessory: it is what makes the rest work.**
 
@@ -266,16 +266,16 @@ Applies from stage 1 onwards. **This is not an accessory: it is what makes the r
 
 | Stage | Cost | Cumulative | Custom hardware |
 |---|---|---|---|
-| 0 — Commercial SDR | €1,600 | €1,600 | No |
-| 1 — LiDAR | €950 | €2,550 | No |
-| 2 — OBD/CAN | €150 | €2,700 | No |
-| 3 — Type-approved radio | €1,700 | €4,400 | No |
-| Cross-cutting — installation | €700 | €5,100 | No |
-| 4 — SDR RX adapter | €900 | €6,000 | **Yes** |
-| 5 — SDR front end + TX | €900 | €6,900 | **Yes** |
-| 6 — 77 GHz radar | €430 | €7,300 | No |
-| 7 — Front-end FPGA | €1,400 | €8,700 | **Yes** |
-| 8 — AERIS-10 | €3,000 – 8,000+ | **€11,700 – 16,700+** | **Yes** |
+| 0: Commercial SDR | €1,600 | €1,600 | No |
+| 1: LiDAR | €950 | €2,550 | No |
+| 2: OBD/CAN | €150 | €2,700 | No |
+| 3: Type-approved radio | €1,700 | €4,400 | No |
+| Cross-cutting: installation | €700 | €5,100 | No |
+| 4: SDR RX adapter | €900 | €6,000 | **Yes** |
+| 5: SDR front end + TX | €900 | €6,900 | **Yes** |
+| 6: 77 GHz radar | €430 | €7,300 | No |
+| 7: Front-end FPGA | €1,400 | €8,700 | **Yes** |
+| 8: AERIS-10 | €3,000 – 8,000+ | **€11,700 – 16,700+** | **Yes** |
 
 **Stages 0 to 3, plus the installation, come to ~€5,100 and require designing no boards at all.**
 That is where most of the real usefulness in the vehicle sits: listening, locating, seeing in the
@@ -289,11 +289,11 @@ Everything after that is custom RF engineering, and it costs more than all of th
 
 If you want to start tomorrow, this is the minimum order that gets the KV260 out of a drawer:
 
-- [ ] microSD A2 + USB SSD — **€55**
-- [ ] SDRplay RSPdx-R2 — **€200**
-- [ ] Discone antenna + HF whip — **€150**
-- [ ] u-blox USB GPS — **€40**
-- [ ] USB-CAN adapter with SocketCAN — **€50**
+- [ ] microSD A2 + USB SSD: **€55**
+- [ ] SDRplay RSPdx-R2: **€200**
+- [ ] Discone antenna + HF whip: **€150**
+- [ ] u-blox USB GPS: **€40**
+- [ ] USB-CAN adapter with SocketCAN: **€50**
 
 **~€495**, and you have listening from 1 kHz to 2 GHz, position, and vehicle telemetry. Adding the
 **bladeRF 2.0 micro xA4 (~€550)** brings 2.4 and 5.8 GHz drone detection and transmission, for

@@ -1,4 +1,4 @@
-# Fabrication — ordering the board from JLCPCB
+# Fabrication: ordering the board from JLCPCB
 
 *26 September 2026 · outputs by `_work/fab/make_fab.py` · stack JLC08161H-2116C since 12 November 2026*
 
@@ -112,4 +112,4 @@ RF lines off 50 Ω.
 |---|---|
 | Script run on the placed board | 15 files in the zip (6 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 110 lines / 478 parts, CPL 478 placements, DRC 0 errors (2 October) |
 | CPL against BOM | The same 478 references in both |
-| Settings against JLCPCB's KiCad guide | Protel extensions, subtract soldermask, zone check; Excellon mm, decimal, absolute, alternate oval mode — all as the guide lists |
+| Settings against JLCPCB's KiCad guide | Protel extensions, subtract soldermask, zone check; Excellon mm, decimal, absolute, alternate oval mode, all as the guide lists |

@@ -1,4 +1,4 @@
-# Power budget and stackup — phase 1
+# Power budget and stackup: phase 1
 
 *21 September 2026 · Rev03 architecture, approved · updated 2 October 2026*
 
@@ -7,8 +7,8 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 
 | | Script | Status |
 |---|---|---|
-| Per-rail current budget | `_work/power_budget.py` | Structure settled; **18 of 24 loads verified from datasheets** — see §1.4. The 6 left are the FPGA's rails and one pull-down pair |
-| Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm — see §2.5 |
+| Per-rail current budget | `_work/power_budget.py` | Structure settled; **18 of 24 loads verified from datasheets** (see §1.4). The 6 left are the FPGA's rails and one pull-down pair |
+| Stackup and trace widths | `_work/stackup_impedance.py` | Computed; needs the fabricator's field solver to confirm (see §2.5) |
 
 ---
 
@@ -83,7 +83,7 @@ With 30 % margin:
 | `+2V5` | 2.5 | 601 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
 | `+3V3_A` | 3.3 | 100 mA | LDO | +5V0 | 0.17 W | ≥ 0.13 A |
-| `+1V8_D` | 1.8 | 332 mA | LDO | +3V3_D | **0.50 W** | ≥ 0.43 A — thermal pad |
+| `+1V8_D` | 1.8 | 332 mA | LDO | +3V3_D | **0.50 W** | ≥ 0.43 A, thermal pad |
 | `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | — |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
@@ -110,7 +110,7 @@ records the snapshot, size and SHA-256 of each file.
 
 | Load | Figure | Source |
 |---|---|---|
-| AD9484 AVDD | **300 mA** max | `AD9484.pdf` Rev. A, POWER SUPPLY table. IAVDD 283 typ / 300 max, at the rated 500 MSPS — using it at 400 MSPS is conservative |
+| AD9484 AVDD | **300 mA** max | `AD9484.pdf` Rev. A, POWER SUPPLY table. IAVDD 283 typ / 300 max, at the rated 500 MSPS; using it at 400 MSPS is conservative |
 | AD9484 DRVDD | **100 mA** max | Same table. IDRVDD 89 typ / 100 max, SDR mode |
 | AD9253 AVDD | **200 mA** max | `AD9253.pdf` Rev. D, Table 1, -125 grade: IAVDD 183 typ / 200 max. That is **four** channels at 125 MSPS; we use two, at 62.5 MSPS, so it is an upper bound |
 | AD9253 DRVDD | **100 mA** max, **on 1.8 V** | Same table: IDRVDD 71 typ / 100 max, ANSI-644. See §1.2 for the rail |
@@ -119,7 +119,7 @@ records the snapshot, size and SHA-256 of each file.
 | AD9767 AVDD | **75 mA** max | `AD9763_9765_9767.pdf` Rev. G, Table 1: IAVDD 71 typ / 75 max, both DACs at 20 mA full scale |
 | AD9767 DVDD | **19 mA** | Same table: 15 mA at 100 MSPS, scaled to 125 MSPS. Measured at 5 V, so an over-estimate at 3.3 V |
 | AD8352 ×4 | **2 × 78 mA** at 5 V | `ad8352.pdf` Rev. C, Table 1: quiescent current 37 typ / 39 max each. Two on `rev03/ADC_RADAR`, two on `rev03/ADC_SDR` |
-| ADCLK948 | **330 mA** max | `ADCLK948.pdf` Rev. B, Table 4: IVCC 288 typ / 330 max, **with the outputs loaded** — so it includes the current into the 200 Ω pull-downs. Half the outputs are unused and open, so it is an upper bound |
+| ADCLK948 | **330 mA** max | `ADCLK948.pdf` Rev. B, Table 4: IVCC 288 typ / 330 max, **with the outputs loaded**, so it includes the current into the 200 Ω pull-downs. Half the outputs are unused and open, so it is an upper bound |
 | Si549 | **153 mA** max | `Si549.pdf` Revision H: IDD LVPECL 107 typ / 153 max |
 | M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |
 | M3SWA2 ×4, VEE | **8 mA** | Same, IEE 1.8 mA max each |
@@ -144,7 +144,7 @@ that amount. It does, for the ADCLK944 first considered and for the ADCLK948 dra
 are measured with the outputs loaded. What stays a separate estimated line is the Si549's two
 130 Ω pull-downs, whose inclusion in its IDD the datasheet doesn't state.
 
-This budget is good enough to **choose the topology and size the regulators** — and it has now
+This budget is good enough to **choose the topology and size the regulators**, and it has now
 caught three structural errors: two overheating LDOs and an ADC supply above its absolute maximum.
 It is **not a thermal sign-off**.
 
@@ -152,7 +152,7 @@ The six that remain estimates:
 
 | Load | What to check |
 |---|---|
-| XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists — a datasheet cannot give this, it depends on the design |
+| XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists: a datasheet cannot give this, it depends on the design |
 | XC7A50T VCCAUX, VCCO ×3 | Same: Vivado's power report, not a datasheet |
 | Si549 LVPECL pull-downs | Whether its IDD figure already includes them is not stated |
 
@@ -167,21 +167,21 @@ recompute.
 > JLC06161H-2116A, and widths from a field solver. §2.1–§2.5 are kept as the reasoning that
 > chose the stack's shape.
 
-### 2.1 Proposed stack — 6 layers, 1.6 mm
+### 2.1 Proposed stack: 6 layers, 1.6 mm
 
 | Layer | Use | Copper |
 |---|---|---|
-| **L1** | **SIG** — IAS pairs, converter LVDS | 35 µm |
+| **L1** | **SIG**: IAS pairs, converter LVDS | 35 µm |
 | | prepreg 0.100 mm, Er 4.05 | |
-| **L2** | **GND** — solid reference for L1 | 17.5 µm |
+| **L2** | **GND**: solid reference for L1 | 17.5 µm |
 | | core 0.200 mm, Er 4.30 | |
-| **L3** | SIG — general routing | 17.5 µm |
+| **L3** | SIG: general routing | 17.5 µm |
 | | prepreg 0.800 mm, Er 4.30 | |
-| **L4** | PWR — split planes | 17.5 µm |
+| **L4** | PWR: split planes | 17.5 µm |
 | | core 0.200 mm, Er 4.30 | |
-| **L5** | GND — solid reference for L6 | 17.5 µm |
+| **L5** | GND: solid reference for L6 | 17.5 µm |
 | | prepreg 0.100 mm, Er 4.05 | |
-| **L6** | SIG — slow signals, fan-out | 35 µm |
+| **L6** | SIG: slow signals, fan-out | 35 µm |
 
 Total 1.540 mm before soldermask.
 
@@ -190,11 +190,11 @@ L2 ground, at a thin 0.100 mm dielectric.** Thin prepreg there buys narrow trace
 keeps the five pairs in a manageable routing channel, and it puts the return current directly
 underneath.
 
-### 2.2 Trace widths — L1 microstrip
+### 2.2 Trace widths: L1 microstrip
 
 Computed by `_work/stackup_impedance.py`, h = 0.100 mm, Er = 4.05, t = 35 µm:
 
-**50 Ω single-ended: W = 174 µm** — for the IF lines to the SMAs.
+**50 Ω single-ended: W = 174 µm**, for the IF lines to the SMAs.
 
 **100 Ω differential**, several workable geometries:
 
@@ -202,16 +202,16 @@ Computed by `_work/stackup_impedance.py`, h = 0.100 mm, Er = 4.05, t = 35 µm:
 |---|---|---|---|---|
 | 113 | 100 | 61.3 | 100.0 | Tightest. 100 µm gap is at the edge of low-cost fab capability |
 | 126 | 125 | 58.5 | 100.0 | |
-| **136** | **150** | **56.4** | **100.0** | **Recommended** — comfortable for any fabricator |
+| **136** | **150** | **56.4** | **100.0** | **Recommended**: comfortable for any fabricator |
 | 145 | 175 | 54.9 | 100.0 | |
 | 151 | 200 | 53.8 | 100.0 | |
 
 **The recommendation is W = 136 µm, S = 150 µm**, not the tightest option the script prints. A
 100 µm gap sits at the limit of standard process and pushes the board into a more expensive class
-for no benefit — the 150 µm gap gets the same impedance with margin. A pair then occupies 422 µm of
+for no benefit: the 150 µm gap gets the same impedance with margin. A pair then occupies 422 µm of
 routing channel, so the five IAS pairs need about 2.1 mm plus spacing between pairs.
 
-### 2.3 Trace widths — L3 stripline
+### 2.3 Trace widths: L3 stripline
 
 Between L2 (0.200 mm away) and L4 (0.800 mm away), Er = 4.30, t = 17.5 µm:
 
@@ -232,7 +232,7 @@ controlled on L1.
 - **L2 must be solid under every IAS pair, end to end.** A split under a differential pair costs
   far more than any width error in this table.
 - **Keep the IAS pairs on L1 for their whole run.** Every via pair is a stub and a reference
-  change, and there are only five pairs — there is no routing pressure that justifies dropping
+  change, and there are only five pairs; there is no routing pressure that justifies dropping
   them to an inner layer.
 - **Er falls with frequency.** A fabricator quoting Er at 1 MHz will hand back widths that run high
   in impedance at 1 Gbps. Ask what frequency their number is for.
@@ -259,7 +259,7 @@ constants are as on `jlcpcb.com/impedance`.
 
 | Layer | Use | Dielectric below | Er |
 |---|---|---|---|
-| L1 | SIG — IAS pairs, LVDS, IF | 2116 prepreg, 0.1164 mm | 4.16 |
+| L1 | SIG: IAS pairs, LVDS, IF | 2116 prepreg, 0.1164 mm | 4.16 |
 | L2 | GND | core, 0.130 mm | 4.17 |
 | L3 | SIG | 2116 + core 0.70 + 2116 = 0.933 mm | 4.16 / 4.53 / 4.16 |
 | L4 | PWR (split) | core, 0.130 mm | 4.17 |
@@ -312,9 +312,9 @@ is the property §2.1 was built around.
 | `VCCO` and the link I/O standard | ✅ 1.2 V, AC coupling, `DIFF_SSTL12` on the Kria side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §6.3) |
 | Mechanical envelope | ✅ measured |
 | Power tree topology and regulator sizing | ✅ §1.1–1.3 |
-| Per-rail load figures | ⚠️ 16 of 25 from datasheets — §1.4; the rest need Vivado or parts not yet chosen |
+| Per-rail load figures | ⚠️ 16 of 25 from datasheets (§1.4); the rest need Vivado or parts not yet chosen |
 | Stackup and trace widths | ✅ §2.1–2.3, pending fabricator confirmation |
-| Growth direction within the envelope | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3 — outward, off the carrier's side |
+| Growth direction within the envelope | ✅ [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3: outward, off the carrier's side |
 
 One item left, and it doesn't block the schematic: the remaining load figures refine a budget
 whose **structure** is already settled, and most of them can only come from Vivado once the FPGA

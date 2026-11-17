@@ -16,18 +16,18 @@ interface to the Kria. This document holds the evidence; the consequences are in
 
 ---
 
-## B-01 — Interface to the Kria ⛔ CLOSES AGAINST
+## B-01: Interface to the Kria ⛔ CLOSES AGAINST
 
 ### What the official documentation says
 
-Connector table from **UG1089** (v1.0, April 2021 and v1.3, May 2024 — identical on this point):
+Connector table from **UG1089** (v1.0, April 2021 and v1.3, May 2024, identical on this point):
 
 | Connector | UG1089 description |
 |---|---|
-| **CC J7 — IAS0** | *"OnSemi image access system (IAS) camera module interface supporting four MIPI lanes. **Connects to OnSemi AP1302 ISP device sensor 0 interface**"* |
-| **CC J8 — IAS1** | *"OnSemi IAS camera module interface supporting four MIPI lanes. **Connected directly to the Zynq UltraScale+ MPSoC HPA bank**"* |
-| **CC J9 — RPi camera** | *"Raspberry Pi camera module interface. **15-pin variant supporting two MIPI lanes** directly connected to the Zynq UltraScale+ MPSoC HPA bank"* |
-| **CC J2 — Pmod** | *"Digilent Pmod 2x6 expansion header"* — 3.3 V, 100 mA |
+| **CC J7 (IAS0)** | *"OnSemi image access system (IAS) camera module interface supporting four MIPI lanes. **Connects to OnSemi AP1302 ISP device sensor 0 interface**"* |
+| **CC J8 (IAS1)** | *"OnSemi IAS camera module interface supporting four MIPI lanes. **Connected directly to the Zynq UltraScale+ MPSoC HPA bank**"* |
+| **CC J9 (RPi camera)** | *"Raspberry Pi camera module interface. **15-pin variant supporting two MIPI lanes** directly connected to the Zynq UltraScale+ MPSoC HPA bank"* |
+| **CC J2 (Pmod)** | *"Digilent Pmod 2x6 expansion header"*, 3.3 V, 100 mA |
 
 Later the same guide names them explicitly as *"IAS camera sensor **ISP** interface (J7)"* against
 *"IAS camera sensor **direct** interface (J8)"*.
@@ -37,7 +37,7 @@ from ONSemi, while the second is connected directly to the SOM pins"*.
 
 ### Confirmed from the primary source (21 September 2026)
 
-The carrier card schematic itself — **XTP682**, `KV260_v2/038-05058-03-A1.pdf`, sheet 13 — settles
+The carrier card schematic itself (**XTP682**, `KV260_v2/038-05058-03-A1.pdf`, sheet 13) settles
 it beyond inference `[V]`:
 
 - The sheet is titled **"IMAGE CO-PROCESSOR FOR IAS 0 CONNECTOR"**. The AP1302's sensor-side pins
@@ -47,7 +47,7 @@ it beyond inference `[V]`:
 - The IAS1 connector (designator `J8`, a `BM20B_0.8_-34DS-0.4V`) wires straight to `HPA05_CC`,
   `HPA06`, `HPA07`, `HPA08`, `HPA09`. **No buffer, no ISP.**
 
-A bonus from the same sheet: the pair that the adapter calls `TXC` lands on **`HPA05_CC`** — AMD's
+A bonus from the same sheet: the pair that the adapter calls `TXC` lands on **`HPA05_CC`**, AMD's
 own marking for a clock-capable pin. The choice of that pair for the link clock, made on the
 inference that a former MIPI clock lane would be clock capable, is confirmed. All five pairs were
 cross-checked pin by pin and match including polarity; see
@@ -97,7 +97,7 @@ decision**, but it is one for closing the schematic.
 
 ---
 
-## B-02 — AD9253 one-lane mode ⛔ CLOSES AGAINST
+## B-02: AD9253 one-lane mode ⛔ CLOSES AGAINST
 
 Two specifications from the AD9253 datasheet:
 
@@ -127,7 +127,7 @@ of the one-lane limit.
 
 ---
 
-## B-03 — RF switches ⛔ REOPENED AND CLOSED AGAINST (21 September 2026)
+## B-03: RF switches ⛔ REOPENED AND CLOSED AGAINST (21 September 2026)
 
 ### The correction
 
@@ -150,15 +150,15 @@ Reading the actual datasheet says otherwise. **M3SWA2-34DR+.pdf, DC ELECTRICAL S
 
 And the functional diagram shows pin 5 as **VEE** and pin 8 as VDD.
 
-**The part needs a bipolar supply.** What is positive is the *control logic* — `VCTRL` swings 0 to
-+3.6 V — and that is the distinction the snippet blurred and the earlier reading missed:
+**The part needs a bipolar supply.** What is positive is the *control logic* (`VCTRL` swings 0 to
++3.6 V), and that is the distinction the snippet blurred and the earlier reading missed:
 **positive control, bipolar supply**. They are not the same claim.
 
 ### What this changes
 
 - A **−3.3 V rail is required** after all. The charge-pump inverter goes back into the power tree
   (LM2663 or similar; AERIS carries one for the same reason).
-- The current is tiny — 1.8 mA maximum per switch, so 7.2 mA for four — which is why a small
+- The current is tiny (1.8 mA maximum per switch, so 7.2 mA for four), which is why a small
   charge pump is enough and no real dissipation is involved.
 - `docs/POWER_AND_STACKUP.md` now carries the rail.
 
@@ -171,11 +171,11 @@ identically to one that covers everything. **The lesson is the one already in th
 a search result is not a datasheet.**
 
 The `-5V0_ADAR12` / `-5V0_ADAR34` rails AERIS carries are for the **ADAR1000s**, on its own board,
-and remain irrelevant here — that part of the original note was right.
+and remain irrelevant here; that part of the original note was right.
 
 ---
 
-## B-04 — AERIS-10's intermediate frequency ✅ CLOSES IN FAVOUR
+## B-04: AERIS-10's intermediate frequency ✅ CLOSES IN FAVOUR
 
 **AERIS-10's IF is 120 MHz**, sampled at 400 MSPS. Verified in its own RTL:
 
@@ -200,7 +200,7 @@ are undefined placeholders.
 
 ---
 
-## B-05 — AERIS-10X Extended variant ⚠️ PARTIAL
+## B-05: AERIS-10X Extended variant ⚠️ PARTIAL
 
 There is no published evidence for the 8-ADAR1000 configuration. What is verified:
 
@@ -217,7 +217,7 @@ the AERIS author before freezing the connector.
 
 # Open risks
 
-### R-01 — The KV260 is I/O-poor for this project
+### R-01: The KV260 is I/O-poor for this project
 
 **This is the structural risk.** Eight differential pairs and fourteen loose signals is very little
 for an RF front end with two chains, two converters and up to 32 beamforming channels.
@@ -235,7 +235,7 @@ expensive in work.
 
 ---
 
-### R-02 — Range resolution limited by the converter
+### R-02: Range resolution limited by the converter
 
 | Configuration | Usable bandwidth | Resolution ΔR = c/2B |
 |---|---|---|
@@ -248,7 +248,7 @@ The front-end FPGA is what recovers AERIS's original performance.
 
 ---
 
-### R-03 — Crosstalk if coupled pairs are used single-ended
+### R-03: Crosstalk if coupled pairs are used single-ended
 
 The J8 and J9 pairs are 100 Ω coupled lines. Using their two conductors as independent signals
 means strong coupling. **With the front-end FPGA the problem disappears**: the pairs are used as
@@ -256,7 +256,7 @@ LVDS pairs, which is what they are for.
 
 ---
 
-### R-04 — Mechanical envelope: measured and registered ✅
+### R-04: Mechanical envelope: measured and registered ✅
 
 **Measured** `[V]` from the official 3D model (XTP679) by `_work/kv260_envelope.py`:
 
@@ -290,7 +290,7 @@ complication. The Rev03 allocation avoids J9 for exactly this reason.
 
 ---
 
-### R-05 — Array calibration
+### R-05: Array calibration
 
 32 channels need per-channel phase and amplitude calibration: an anechoic chamber, or at minimum a
 near-field setup. It is the largest hidden cost of the radar project. The adapter does not
@@ -298,7 +298,7 @@ introduce it, but it belongs in the plan.
 
 ---
 
-### R-06 — Regulation of emission at 10.5 GHz
+### R-06: Regulation of emission at 10.5 GHz
 
 `[?]` Not a licence-free ISM band everywhere. In Spain, 10.45–10.5 GHz is allocated to the amateur
 service on a **secondary** basis, and use of 10.0–10.5 GHz requires **special authorisation**;
@@ -314,7 +314,7 @@ without depending on a licence or an authorised site.
 
 ---
 
-### R-07 — Power sequencing of the power amplifiers
+### R-07: Power sequencing of the power amplifiers
 
 A sequencing fault on power-up destroys the GaN amplifiers. AERIS-10 solves this with its STM32.
 
@@ -324,7 +324,7 @@ hardware is taking on risk for nothing.
 
 ---
 
-### R-08 — Porting the AERIS-10 FPGA firmware
+### R-08: Porting the AERIS-10 FPGA firmware
 
 Reusable and well tested, but it is not copy-and-paste: clock domains, bit depths and the host
 interface all need adapting. **With the front-end FPGA, `ddc_400m.v` ports almost as-is**, because
@@ -332,7 +332,7 @@ it would run in its native 400 MSPS domain.
 
 ---
 
-### R-09 — Adding an FPGA to the adapter is a step change in complexity
+### R-09: Adding an FPGA to the adapter is a step change in complexity
 
 **Accepted, knowingly, on 21 September 2026.** The board stops being an adapter and becomes an FPGA
 board: configuration, boot memory, multi-rail sequenced power, JTAG, and a second toolchain.
@@ -348,8 +348,8 @@ work, and the DSP core has been built and measured on silicon
 
 - [Kria KV260 Vision AI Starter Kit User Guide UG1089 v1.0](https://fpga.eetrend.com/files/2021-11/wen_zhang_/100554954-225561-ug1089-kv260-starter-kit.pdf)
 - [Kria KV260 Vision AI Starter Kit User Guide UG1089 v1.3](https://docs.xibif.ch/_downloads/480ec1217d1ac2bd520e695148cfe86f/KV260_Userguide.pdf)
-- [Hardware Architecture of the Platform — Kria KV260 docs](https://xilinx.github.io/kria-apps-docs/kv260/2022.1/build/html/docs/nlp-smartvision/docs/hw_arch_platform_nlp.html)
-- [Kria K26 SOM Data Sheet DS987 — GTH Transceivers](https://docs.amd.com/r/en-US/ds987-k26-som/GTH-Transceivers)
-- [AD9253 Data Sheet — Analog Devices](https://www.analog.com/media/en/technical-documentation/data-sheets/ad9253.pdf)
-- [M3SWA2-34DR+ SPDT RF Switch — Mini-Circuits](https://www.minicircuits.com/pdfs/M3SWA2-34DR+.pdf)
+- [Hardware Architecture of the Platform (Kria KV260 docs)](https://xilinx.github.io/kria-apps-docs/kv260/2022.1/build/html/docs/nlp-smartvision/docs/hw_arch_platform_nlp.html)
+- [Kria K26 SOM Data Sheet DS987: GTH Transceivers](https://docs.amd.com/r/en-US/ds987-k26-som/GTH-Transceivers)
+- [AD9253 Data Sheet, Analog Devices](https://www.analog.com/media/en/technical-documentation/data-sheets/ad9253.pdf)
+- [M3SWA2-34DR+ SPDT RF Switch, Mini-Circuits](https://www.minicircuits.com/pdfs/M3SWA2-34DR+.pdf)
 - [tomverbeure/kv260_bringup](https://github.com/tomverbeure/kv260_bringup)

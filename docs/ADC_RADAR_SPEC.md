@@ -1,4 +1,4 @@
-# ADC_RADAR sheet — specification and review guide
+# ADC_RADAR sheet: specification and review guide
 
 *24 September 2026 · `rev03/ADC_RADAR.kicad_sch` · drawn by `_work/sheets/adc_radar.py` from the
 connection list in `_work/sheets/adc_radar_spec.py`*

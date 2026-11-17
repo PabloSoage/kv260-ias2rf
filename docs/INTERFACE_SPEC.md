@@ -1,4 +1,4 @@
-# Interface specification — phase 1
+# Interface specification: phase 1
 
 *21 September 2026 · Rev03 architecture, approved*
 
@@ -18,15 +18,15 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 | Single-ended allocation on J8 | ✅ Frozen below |
 | Pmod J2 allocation | ✅ Frozen below |
 | KV260 mechanical envelope | ✅ `[V]` measured from the official 3D model (§5) |
-| Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks — §5.3 |
-| `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` — see §6 |
+| Where the adapter sits within that envelope | ✅ `[V]` registered on the STEP, three independent checks (§5.3) |
+| `VCCO` of the HPA bank | ✅ 1.2 V `[E, strongly supported]` (see §6) |
 | Serial link electrical standard | ✅ AC coupling; Kria side `DIFF_SSTL12` with on-die termination (UG571 read, §6.3). There is no `LVDS_12`. DS925 levels still to confirm |
-| Per-rail current budget | ⚠️ 18 of 24 loads from datasheets — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| Per-rail current budget | ⚠️ 18 of 24 loads from datasheets; [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup and impedances | ✅ computed; fabricator to confirm |
 
 ---
 
-## 2. J8 / IAS1 — verified pinout
+## 2. J8 / IAS1: verified pinout
 
 Extracted from `CSI2-KRIA-KV260_Rev01.kicad_pcb`, footprint `J8_IAS0` `[V]`. Both IAS connectors on
 the adapter are the same part, `AVT_KHK_Lib:J-BM20B(0.8)-34DP`, 50.040 mm apart on the X axis and
@@ -52,7 +52,7 @@ Per connector: **5 differential pairs**, 4 single-ended, 4 free pins, 3 incoming
 
 ---
 
-## 3. Link allocation — frozen
+## 3. Link allocation: frozen
 
 The architecture calls for 3 pairs receive and 2 pairs transmit ([ARCHITECTURE.md](../ARCHITECTURE.md)
 §4.1). Assignment:
@@ -65,13 +65,13 @@ The architecture calls for 3 pairs receive and 2 pairs transmit ([ARCHITECTURE.m
 | `LINK_TX_D0±` | `TXD2` | 26 / 27 | Kria → FPGA | ≤1 Gbps |
 | `LINK_TX_CLK±` | `TXD3` | 10 / 11 | Kria → FPGA | source-synchronous |
 
-**Why the clock goes on `TXC` — now confirmed** `[V]`. The reasoning was that the pair had been the
+**Why the clock goes on `TXC`, now confirmed** `[V]`. The reasoning was that the pair had been the
 MIPI clock lane, so it was the one most likely to land on a clock-capable SOM pin. The carrier card
 schematic (XTP682, `038-05058-03-A1.pdf`, sheet 13) settles it: **that pair is `HPA05_CC`, and the
 `_CC` suffix is AMD's own marking for clock capable.** A source-synchronous receiver needs its clock
 on a pin that can drive a BUFG/MMCM directly; this one can.
 
-### 3.1 SOM-side mapping — verified against the carrier schematic
+### 3.1 SOM-side mapping, verified against the carrier schematic
 
 Every one of the five pairs was cross-checked against XTP682 sheet 13, where the IAS1 connector is
 designator `J8`, a `BM20B_0.8_-34DS-0.4V`. **All five match, polarity included** `[V]`:
@@ -85,7 +85,7 @@ designator `J8`, a `BM20B_0.8_-34DS-0.4V`. **All five match, polarity included**
 | `B7-CSI2-TXD1_N` / `_P` | 29 / 30 | `HPA07_N` / `HPA07_P` | HPA07 |
 
 The `_N`-before-`_P` ordering on pins 26/27 and 29/30 that §3.2 notes is **not** an adapter quirk:
-the carrier is wired the same way. Both sides agree, so the pairs mate correctly — but the
+the carrier is wired the same way. Both sides agree, so the pairs mate correctly, but the
 constraints file still has to know.
 
 **And B-01 is now confirmed from the primary source.** Sheet 13 is titled *"IMAGE CO-PROCESSOR FOR
@@ -116,7 +116,7 @@ discovered on the bench.
 
 ### 4.2 On the Pmod J2
 
-Eight signals at 3.3 V, 100 mA on the supply pin `[V — UG1089]`.
+Eight signals at 3.3 V, 100 mA on the supply pin `[V: UG1089]`.
 
 | Signal | Count | Function |
 |---|---|---|
@@ -159,7 +159,7 @@ the 74LVC1G07's V<sub>IH</sub> of 0.65 × 1.8 V = 1.17 V.
 
 ---
 
-## 5. Mechanical envelope — measured
+## 5. Mechanical envelope: measured
 
 ### 5.1 What was measured
 
@@ -183,13 +183,13 @@ From the official 3D CAD model (XTP679), `KV260V2-Starter-Kit.stl`, 1,320,454 tr
 | > 30 mm | X 60 … 110, Y 18.4 … 74.4 | 2,584 mm² |
 | > 35 mm | X 62 … 108, Y 18.4 … 72.4 | 1,396 mm² |
 
-The block above 30 mm — roughly **50 × 56 mm** — is the fansink. It is the dominant obstacle. The
+The block above 30 mm (roughly **50 × 56 mm**) is the fansink. It is the dominant obstacle. The
 band above 20 mm that extends to high Y is the rear I/O (USB, Ethernet, video).
 
 **The useful conclusion:** an adapter sitting at Hirose stacking height, a handful of millimetres
 above the carrier PCB, **cannot pass over the fansink**. It can extend freely over the low regions.
 
-### 5.3 Registration and growth direction — measured `[V]`
+### 5.3 Registration and growth direction: measured `[V]`
 
 **Closed without touching the hardware.** Neither the STL nor the `.brd` could do it, but the
 **STEP** the STL was made from can. It is a Creo assembly with every part named and every placement
@@ -199,7 +199,7 @@ stored as a transform, so the IAS connectors can be found by name instead of by 
 11.6 × 2.9 mm. The STEP shows the carrier's IAS connector is **9.38 × 2.40 × 0.80 mm**. At 0.8 mm
 tall it is nearly flush with the board, so it was never going to show up as a separate body.
 
-#### How it was done — three sources, three independent checks
+#### How it was done: three sources, three independent checks
 
 | Source | What it gives |
 |---|---|
@@ -237,7 +237,7 @@ collides, and nothing can be fitted on the adapter's underside.
 
 | Direction on the carrier | In KiCad | Clear |
 |---|---|---|
-| **Outward, off the carrier's side edge** | **down (+Y)** | **25+ mm along the full 119 mm — nothing at all in the model** |
+| **Outward, off the carrier's side edge** | **down (+Y)** | **25+ mm along the full 119 mm, nothing at all in the model** |
 | Past the front edge | right (+X) | 25+ mm for the part already off the carrier; 2–8.5 mm over it |
 | Past the rear edge | left (−X) | 25+ mm for the part off the carrier; 8.5–16.5 mm for the IAS0 tongue |
 | Inward, towards the SOM | up (−Y) | **1.5–5 mm** almost everywhere. The carrier is crowded |
@@ -275,7 +275,7 @@ Both model files are the official XTP679 download (not redistributed here). It r
 
 ---
 
-## 6. `VCCO` of the HPA bank — 1.2 V, on strong evidence
+## 6. `VCCO` of the HPA bank: 1.2 V, on strong evidence
 
 Everything electrical about the link depends on the `VCCO` the KV260 applies to the SOM bank behind
 J8. XTP682 does not print a net called `VCCO_HPA`, so this is **not a direct citation**. But the
@@ -283,7 +283,7 @@ evidence points one way and it is worth setting out, because the design decision
 
 **What is verified** `[V]` in XTP682:
 
-1. The carrier has a dedicated **`PL_1V2` regulator**, enabled by `VCCOEN_PL_M2C` — the signal the
+1. The carrier has a dedicated **`PL_1V2` regulator**, enabled by `VCCOEN_PL_M2C`, the signal the
    SOM asserts when it wants the carrier to bring up the PL's `VCCO` rails.
 2. `PL_1V2` is routed to the SOM connector (sheet 6).
 3. On sheet 13 the AP1302's MIPI I/O supplies, **`HMIPI_VDD` and `SMIPI_VDD`, are tied to
@@ -370,8 +370,8 @@ about 2 ps per tap. That is just over one 1 ns bit.
 | Mechanical envelope measured | ✅ §5.1, §5.2 |
 | `VCCO` and the link's I/O standard | ✅ §6, 1.2 V; AC coupling, `DIFF_SSTL12` on the Kria side (§6.3) |
 | ADC/DAC operating points fixed | ✅ [ARCHITECTURE.md](../ARCHITECTURE.md) §5 |
-| Growth direction within the envelope | ✅ §5.3 — registered on the STEP; grow outward, off the carrier's side |
-| Per-rail current budget from datasheets | ⚠️ 18 of 24 loads verified — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
+| Growth direction within the envelope | ✅ §5.3: registered on the STEP; grow outward, off the carrier's side |
+| Per-rail current budget from datasheets | ⚠️ 18 of 24 loads verified; [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) |
 | 6-layer stackup with computed impedances | ✅ computed; ⬜ fabricator's field solver to confirm |
 
 Nothing in this list needs the hardware any more. What remains is the fabricator's impedance

@@ -1,4 +1,4 @@
-# Layout — board, rules, placement and routing
+# Layout: board, rules, placement and routing
 
 *25 September 2026 · `CSI2-KRIA-KV260_Rev01.kicad_pcb` · built by `_work/layout/build_board.py`
 from the schematic's netlist; placement refined and L4 drawn the same day*

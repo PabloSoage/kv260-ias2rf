@@ -1,10 +1,10 @@
-# Hardware, RF, Signal Integrity & Physical Design Review — CSI2-KRIA-KV260_Rev01
+# Hardware, RF, Signal Integrity & Physical Design Review: CSI2-KRIA-KV260_Rev01
 
 **Reviewer:** independent review (gateware and hardware verification audit)  
 **Target:** `CSI2-KRIA-KV260_Rev01.kicad_pcb`, `CSI2-KRIA-KV260_Rev01.kicad_sch`, `rev03/*.kicad_sch`, `CSI2-KRIA-KV260_Rev01.kicad_dru`, `CSI2-KRIA-KV260_Rev01-erc.rpt`, and `docs/*.md`  
 **Verification Scripts:**
-- [`fpga/review/parse_pcb_rf_audit.py`](../../fpga/review/parse_pcb_rf_audit.py) — deterministic S-expression extraction of stackup, zone boundaries, via fences, exposed-pad thermal vias, SMA launch order, differential pair lengths/skews/split-plane crossings, and schematic netlists across all 9 sheets.
-- [`fpga/review/calc_rf_si_margins.py`](../../fpga/review/calc_rf_si_margins.py) — closed-form analytical EM (Hammerstad-Jensen microstrip, Wadell CBCPW, Cohn/Wheeler conformal asymmetric stripline), 2-port ABCD ladder filter analysis, Friis/IIP3 RF cascades, aperture-jitter SNR, automotive ISO pulse withstand, and thermal junction estimates.
+- [`fpga/review/parse_pcb_rf_audit.py`](../../fpga/review/parse_pcb_rf_audit.py): deterministic S-expression extraction of stackup, zone boundaries, via fences, exposed-pad thermal vias, SMA launch order, differential pair lengths/skews/split-plane crossings, and schematic netlists across all 9 sheets.
+- [`fpga/review/calc_rf_si_margins.py`](../../fpga/review/calc_rf_si_margins.py): closed-form analytical EM (Hammerstad-Jensen microstrip, Wadell CBCPW, Cohn/Wheeler conformal asymmetric stripline), 2-port ABCD ladder filter analysis, Friis/IIP3 RF cascades, aperture-jitter SNR, automotive ISO pulse withstand, and thermal junction estimates.
 
 ---
 
@@ -46,9 +46,9 @@ python fpga/review/calc_rf_si_margins.py
 ## Detailed Engineering Audit (Sections 1–10)
 
 ### 1. Stackup, CPWG, Asymmetric Stripline & Via Transitions
-* **Stackup (`JLC08161H-2116C`) [PASS / WARN]:** `140.0 x 132.0 x 1.5416 mm` 8-layer buildup: `F.Cu` (`0.035 mm`) — `d1 = 0.1194 mm` (`Er = 4.29`) — `In1.Cu GND` (`0.0152 mm`) — `d2 = 0.1300 mm` (`Er = 4.17`) — `In2.Cu Sig` — `d3 = 0.3658 mm` (`Er = 4.29`) — `In3.Cu PWR` — `d4 = 0.1300 mm` (`Er = 4.17`) — `In4.Cu GND` — `d5 = 0.3658 mm` (`Er = 4.29`) — `In5.Cu Sig` — `d6 = 0.1300 mm` (`Er = 4.17`) — `In6.Cu GND` — `d7 = 0.1194 mm` (`Er = 4.29`) — `B.Cu` (`0.035 mm`), `tan_d = 0.02`. Symmetry and adjacent GND planes for `L1`, `L3`, `L6`, `L8` are fundamentally sound, **except** `L3` (`In2.Cu`) and `L6` (`In5.Cu`) also couple vertically (`h2 = 0.3658 mm`) to the **split power plane `In3.Cu` (`L4`)** (`In5.Cu` sees solid `In4.Cu` GND instead of splits on its thick side).
+* **Stackup (`JLC08161H-2116C`) [PASS / WARN]:** `140.0 x 132.0 x 1.5416 mm` 8-layer buildup: `F.Cu` (`0.035 mm`) / `d1 = 0.1194 mm` (`Er = 4.29`) / `In1.Cu GND` (`0.0152 mm`) / `d2 = 0.1300 mm` (`Er = 4.17`) / `In2.Cu Sig` / `d3 = 0.3658 mm` (`Er = 4.29`) / `In3.Cu PWR` / `d4 = 0.1300 mm` (`Er = 4.17`) / `In4.Cu GND` / `d5 = 0.3658 mm` (`Er = 4.29`) / `In5.Cu Sig` / `d6 = 0.1300 mm` (`Er = 4.17`) / `In6.Cu GND` / `d7 = 0.1194 mm` (`Er = 4.29`) / `B.Cu` (`0.035 mm`), `tan_d = 0.02`. Symmetry and adjacent GND planes for `L1`, `L3`, `L6`, `L8` are fundamentally sound, **except** `L3` (`In2.Cu`) and `L6` (`In5.Cu`) also couple vertically (`h2 = 0.3658 mm`) to the **split power plane `In3.Cu` (`L4`)** (`In5.Cu` sees solid `In4.Cu` GND instead of splits on its thick side).
 * **L1 / L8 `RF50` (`0.183 mm`) CPWG & Microstrip [PASS / WARN]:**
-  * Bare solder-masked microstrip (`w = 0.183 mm`, `h = 0.1194 mm`, `t = 0.035 mm`, `Er = 4.29`): **`Z0 = 50.29 ohm`** (`51.29 ohm` unmasked) — tightly centered on `50 ohm`!
+  * Bare solder-masked microstrip (`w = 0.183 mm`, `h = 0.1194 mm`, `t = 0.035 mm`, `Er = 4.29`): **`Z0 = 50.29 ohm`** (`51.29 ohm` unmasked), tightly centered on `50 ohm`!
   * Inside `L1 RF band GND` (`x = 95.50..200.50, y = 199.60..214.45 mm`), zone `connect_pads` sets **`clearance = 0.50 mm`**, giving **`Z0 = 54.82 ohm`** (`L8` `clearance = 0.30 mm` gives **`53.23 ohm`**; `.kicad_dru` `RF50` `0.20 mm` clearance would give `51.66 ohm`).
   * At `y = 199.60 mm`, `L1/L8` GND pours end abruptly; long RF runs (`IF_TX_B = 111.65 mm`, `IF_RX_B = 76.27 mm`, `IF_RX_C = 61.68 mm`, `IF_RX_A = 59.53 mm`) transition to `50.29 ohm` microstrip (`RL = -27.3 dB`). Calculated conductor+dielectric loss at `120 / 250 / 500 MHz` is `0.0290 / 0.0448 / 0.0693 dB/cm` (`0.32 / 0.50 / 0.77 dB` total over `IF_TX_B`).
   * **[WARN]** `IF_RX_B` dips onto `In2.Cu` for `6.94 mm` directly over `In3.Cu` (`+5V_IFR` / `+3V3_D` plane boundary). Continuous `0.183 mm` asymmetric stripline gives `Z0 = 48.65 ohm` (`RL = -37.3 dB`), but crossing the `In3.Cu` split perturbs return current and injects buck switching noise into the `25 dB`-gain radar receiver!
@@ -70,7 +70,7 @@ python fpga/review/calc_rf_si_margins.py
   * **SDR RX (`U901 -> U602 [12 dB, R604=120R] -> AD9253`):** Net **`G = +10.70 dB`, `NF = 15.80 dB`, `IIP3 = +30.27 dBm`**.
   * **[HIGH]** Both `AD8352` pairs draw `+5V_IFR`/`+5V_IFS` directly from the `400 kHz` buck `+5V0` (`LMR33630`) through `FB501`/`FB601` alone (no LDO!).
 * **TX Baluns (`ADT2-1T+`), Reconstruction LPF & Secondary Skew [WARN]:**
-  * **[MEDIUM]** `ADT2-1T+` lower `-3 dB` edge is **`0.4 MHz` typ** — `4x` higher than the `0.1 MHz` lower SDR target (`3 dB` datasheet rolloff near band edges).
+  * **[MEDIUM]** `ADT2-1T+` lower `-3 dB` edge is **`0.4 MHz` typ**, `4x` higher than the `0.1 MHz` lower SDR target (`3 dB` datasheet rolloff near band edges).
   * **[MEDIUM]** Exact 2-port ABCD simulation of the 5th-order differential ladder (`44 pF -> 214.6 nH -> 106 pF -> 214.6 nH -> 33 pF`, doubly terminated `99.8 ohm <-> 100 ohm` via `R702/R703 = 49.9R` and `2:1` balun) shows **`f_c(-3 dB) = 69.7 MHz`** (`-34.27 dB` at `120 MHz`, strictly 1st-Nyquist baseband TX only) with **`-2.04 dB` passband dip (`|S11| = -4.27 dB`) at `30 MHz`** due to `sqrt(L/C)` mismatch to `100 ohm`.
   * **[MEDIUM]** On `DAC_SDR`, `T801` secondary traces are mismatched: `SEC = 3.97 mm` (`0` vias) vs `SEC_DOT = 13.72 mm` (`2` vias, `dL = 9.75 mm`), introducing **`2.68 deg` phase imbalance at `120 MHz`** (degrading balun even-order HD2 suppression).
 
@@ -79,13 +79,13 @@ python fpga/review/calc_rf_si_margins.py
 ### 3. Clock Distribution, Phase Noise & External Reference Path
 * **Internal Oscillator (`Si549` + `ADCLK948`) Jitter Margin [PASS]:**
   * Root-sum-square additive RMS jitter (`95 fs` `Si549` + `75 fs` `ADCLK948`) = **`121.0 fs` typ**.
-  * Theoretical aperture-jitter SNR ceilings: **`80.79 dB` at `120 MHz`** and **`74.42 dB` at `250 MHz`** (exceeds `AD9484` `47 dBFS` across the board; meets `AD9253` `74 dBFS` up to `~250 MHz`, dropping to `69.31 dB` at `450 MHz` — tight for undersampling near `450 MHz` unless external low-noise source is injected via `J401`).
+  * Theoretical aperture-jitter SNR ceilings: **`80.79 dB` at `120 MHz`** and **`74.42 dB` at `250 MHz`** (exceeds `AD9484` `47 dBFS` across the board; meets `AD9253` `74 dBFS` up to `~250 MHz`, dropping to `69.31 dB` at `450 MHz`: tight for undersampling near `450 MHz` unless external low-noise source is injected via `J401`).
 * **`U401` (`ADCLK948`) Input Termination Verified [PASS]:** Direct schematic/pad verification confirmed pins 2, 3, and 4 (`~CLK0`, `VREF0`, `VT0`) are tied together to `C413` (`100 nF`) to GND, which properly engages **`ADCLK948` internal `50 ohm` single-ended AC-coupled termination** on `CLK0`. *(Previous concern regarding missing termination on `J401/CLK0` was falsified by schematic verification.)*
-* **Series `100 pF` Coupling Caps (`C414..C421`) Break `10 MHz` Ref Pass-Through [FAIL — BLOCKER B2]:**
+* **Series `100 pF` Coupling Caps (`C414..C421`) Break `10 MHz` Ref Pass-Through [FAIL, BLOCKER B2]:**
   * All four differential outputs (`Q0..Q3`) pass through **`100 pF` (`C414..C421`)** into `50 ohm` per-leg load (`100 ohm` diff or `R412 = 49.9R` on `~Q3`): `f_c(-3 dB) = 1 / (2 * pi * 50 * 100 pF) = 31.83 MHz`.
   * At `400 MHz` (`-0.0274 dB`), this is lossless. At **`10 MHz` external reference pass-through**, attenuation is **`-10.47 dB`** (`0.30 V` peak-to-peak out of `1.0 V` nominal), violating receiver threshold / causing massive duty-cycle distortion and false triggering.
-* **Clock Plane Noise, Crossings & Skew [FAIL — HIGH H3, H4]:**
-  * `+3V3_CLK` (`U401` + `Y401`) comes from **digital buck `+3V3_D` (`580 kHz`) via `FB401`** — no LDO!
+* **Clock Plane Noise, Crossings & Skew [FAIL, HIGH H3, H4]:**
+  * `+3V3_CLK` (`U401` + `Y401`) comes from **digital buck `+3V3_D` (`580 kHz`) via `FB401`**, no LDO!
   * `U401-CLK0` (`74.48 mm`, `66.10 mm` on `In2.Cu` @ `0.183 mm`, `Z0 = 48.6 ohm`) and `U401-Q3` (`79.79 mm`, `71.34 mm` on `In2.Cu`) cross **`In3.Cu` power-plane splits (`+3V3_D` / `+5V_IFR` / `+3V3_CLK`)** over noisy digital copper.
   * `Y401` (`Si549`) `CLK+/CLK-` vias sit **`3.04 mm` and `4.01 mm`** from the nearest GND return via.
   * `CLK_ADCS` has **`4.660 mm` intra-pair skew (`31.7 ps` = `1.59%` of 500 MHz clock)**; `CLK_FPGA` has **`3.578 mm` skew (`24.4 ps`)** and crosses the `+3V3_CLK` split on `In3.Cu`.
@@ -93,7 +93,7 @@ python fpga/review/calc_rf_si_margins.py
 ---
 
 ### 4. High-Speed Digital, LVDS & SGMII (`IAS_LINK`, `ADCR`, `ADCS`, `ETH`)
-* **Pair-by-Pair Geometric Coupling & Skew Audit (`v_p ~ 146.8 mm/ns`) [FAIL — HIGH H1, H5]:**
+* **Pair-by-Pair Geometric Coupling & Skew Audit (`v_p ~ 146.8 mm/ns`) [FAIL, HIGH H1, H5]:**
 
 | Pair | Total P / N (mm) | PCB Intra-Skew | UI @ Rate | Skew % UI | Tightly Coupled Same-Layer (`<=0.3 mm`) | Routing Defects |
 |---|---:|---:|---:|---:|---:|---|
@@ -112,26 +112,26 @@ python fpga/review/calc_rf_si_margins.py
 ---
 
 ### 5. PDN, Switching Noise & Power-On Sequencing
-* **Artix-7 (`U1101`, `XC7A50T-2FTG256I`) Power Sequencing [FAIL — HIGH H2]:**
+* **Artix-7 (`U1101`, `XC7A50T-2FTG256I`) Power Sequencing [FAIL, HIGH H2]:**
   * Xilinx `DS181` requires monotonic startup **`VCCINT (+1V0)` -> `VCCBRAM (+1V0)` -> `VCCAUX (+1V8_D)` -> `VCCO (+1V8/+2V5/+3V3_D)`** (or documented supported groupings without prolonged reverse bias between `VCCINT`/`VCCAUX`/`VCCO`).
   * **Actual circuit:** Buck regulators `U1002 (+3V3_D)`, `U1003 (+2V5)`, and `U1004 (+1V0)` all have their `EN` pins tied straight to `+5V0` through `10k` pull-ups. All three switchers enable simultaneously when `+5V0` crosses UVLO, leaving sequencing order solely to arbitrary soft-start/load capacitance ratios!
-* **Analog vs Buck Isolation [FAIL — HIGH H3]:**
+* **Analog vs Buck Isolation [FAIL, HIGH H3]:**
   * Switching frequencies present: `U1008 LM2663 = 150 kHz`, `U1001 LMR33630 = 400 kHz`, `U1002..4 TPS562201 = 580 kHz` (+ harmonics).
-  * `TPS7A8300` LDOs (`U1005 +1V8_A`, `U1006 +1V8_D`, `U1007 +3V3_A`) provide `~40 dB` PSRR around `400–500 kHz` — isolating ADCs, DACs, and RF switches.
+  * `TPS7A8300` LDOs (`U1005 +1V8_A`, `U1006 +1V8_D`, `U1007 +3V3_A`) provide `~40 dB` PSRR around `400–500 kHz`, isolating ADCs, DACs, and RF switches.
   * By contrast, **`AD8352` (`+5V_IFR`, `+5V_IFS`)** and **`ADCLK948`/`Si549` (`+3V3_CLK`)** lack LDO regulation completely, sitting behind `600R@100MHz` ferrites whose impedance at `400–580 kHz` is **`< 10 ohm`** (near zero ripple rejection).
 
 ---
 
 ### 6. Automotive / UAV Input Protection
-* **Reverse-Polarity PFET Upstream of TVS [FAIL — BLOCKER B1]:**
+* **Reverse-Polarity PFET Upstream of TVS [FAIL, BLOCKER B1]:**
   * Verified PCB pad netlist path: `J1001 (+12V jack) -> F1001 (1.5 A PTC) -> Q1001 Drain (DMP3013SFV) -> Q1001 Source (+12V rail) -> D1001 (SMBJ15CA TVS) -> U1001 (LMR33630, 36 V abs max)`. (`D1002 = 15 V` Zener protects `Q1001` Gate-Source.)
-  * **`Q1001` (`DMP3013SFV`) absolute maximum `V_DSS` is `-30 V`.** When a negative inductive transient (`ISO 7637-2 Pulse 1`: `V_s = -100 V` to `-150 V`, `R_i = 10 ohm`) hits `J1001` while `+12V` bulk caps (`C1001 = 47 uF`, `C1002 = 10 uF`) hold `+12 V`, `Q1001` tries to block reverse current — placing **`|V_DS| = 112–162 V` (`3.7x–5.4x` above abs max)** directly across `Q1001` because `D1001` is on the *downstream* side of `Q1001`! `Q1001` suffers avalanche failure immediately.
+  * **`Q1001` (`DMP3013SFV`) absolute maximum `V_DSS` is `-30 V`.** When a negative inductive transient (`ISO 7637-2 Pulse 1`: `V_s = -100 V` to `-150 V`, `R_i = 10 ohm`) hits `J1001` while `+12V` bulk caps (`C1001 = 47 uF`, `C1002 = 10 uF`) hold `+12 V`, `Q1001` tries to block reverse current, placing **`|V_DS| = 112–162 V` (`3.7x–5.4x` above abs max)** directly across `Q1001` because `D1001` is on the *downstream* side of `Q1001`! `Q1001` suffers avalanche failure immediately.
   * Furthermore, `D1001` (`SMBJ15CA`, `600 W` @ 10/1000 us, `V_C ~ 24.4 V`) is vastly undersized for automotive/alternator `ISO 16750-2` Load Dump surges (`U_s = 35 / 65 / 87 V`, `R_i = 2 ohm`, `t_d = 200–400 ms`), which inject **`I_pk = 5.3 / 20.3 / 31.3 A` (`P_pk = 129 / 495 / 764 W` continuous-pulse) and `E = 12.9 / 49.5 / 152.7 J`** into the TVS (`~1.5 J` 100 ms single-pulse limit -> thermal short/explosion unless supply is purely regulated UAV LiPo + suppressed bus).
 
 ---
 
 ### 7. Thermal Analysis
-* **Steady-State Junction Temperature Estimate (Unventilated Enclosure, Still Air) [FAIL — HIGH H6]:**
+* **Steady-State Junction Temperature Estimate (Unventilated Enclosure, Still Air) [FAIL, HIGH H6]:**
   * Using datasheet dissipation & JEDEC `theta_JA` adjusted conservatively for PCB exposed-pad via count:
 
 | Ref | Device | Power (`W`) | EP Size (`mm`) | EP GND Vias (`r4mm`) | JEDEC / Eff `theta_JA` (`C/W`) | `T_j @ 55 C` | `T_j @ 70 C` | `T_j Max` | Status |
@@ -150,30 +150,30 @@ python fpga/review/calc_rf_si_margins.py
 ---
 
 ### 8. EMI / EMC & Crosstalk
-* **`J1103` (`2x20 AERIS ADAR`) Return-Path Starvation [FAIL — HIGH H5]:** Verified footprint pad netlist shows `35` active `1.8 V` digital/SPI/control lines with **only `5` GND pins (`34, 36, 38, 39, 40`) — leaving pins `1..33` with zero GND pins** and zero series termination resistors! Multi-bit ribbon toggles form wide-loop common-mode radiating antennas right beside the `120 MHz` IF chain.
-* **Outer-Layer Uncoupled Differential Pairs [FAIL — HIGH H1]:** `LINK_RX_D0` (`84.2 mm` @ `1 Gbps`), `LINK_RX_D1` (`~68 mm` @ `1 Gbps`), and `ETH_SGRX_PHY` (`45.9 mm` `P`-leg only on `B.Cu` @ `1.25 Gbps`) act as poorly balanced single-ended outer microstrips, maximizing near-field crosstalk and radiated harmonics (`500–1250 MHz`).
+* **`J1103` (`2x20 AERIS ADAR`) Return-Path Starvation [FAIL, HIGH H5]:** Verified footprint pad netlist shows `35` active `1.8 V` digital/SPI/control lines with **only `5` GND pins (`34, 36, 38, 39, 40`), leaving pins `1..33` with zero GND pins** and zero series termination resistors! Multi-bit ribbon toggles form wide-loop common-mode radiating antennas right beside the `120 MHz` IF chain.
+* **Outer-Layer Uncoupled Differential Pairs [FAIL, HIGH H1]:** `LINK_RX_D0` (`84.2 mm` @ `1 Gbps`), `LINK_RX_D1` (`~68 mm` @ `1 Gbps`), and `ETH_SGRX_PHY` (`45.9 mm` `P`-leg only on `B.Cu` @ `1.25 Gbps`) act as poorly balanced single-ended outer microstrips, maximizing near-field crosstalk and radiated harmonics (`500–1250 MHz`).
 * **Top-Edge GND Via Fence [PASS]:** `124` GND vias stitch `y >= 209.5 mm` with maximum gap `2.85 mm`, yielding **`lambda/20 = 2.54 GHz`** in FR4 (`> 5x` margin at `500 MHz`; `1017` total GND vias, `381` in RF band `y >= 198 mm`).
-* **GbE Crystal Proximity [WARN — MEDIUM M3]:** `Y1201` (`25 MHz` Ethernet crystal at `(200.5, 131.25)`) sits **`11.14 mm`** from `U401` (`(198.2, 142.15)`) and **`15.77 mm`** from `Y401` (`(189.2, 142.25)`); `U1201` sits `16.67 mm` from `U401`. Expect `25 MHz` harmonic spurs around the clock buffer if shielding/guarding is tight.
+* **GbE Crystal Proximity [WARN, MEDIUM M3]:** `Y1201` (`25 MHz` Ethernet crystal at `(200.5, 131.25)`) sits **`11.14 mm`** from `U401` (`(198.2, 142.15)`) and **`15.77 mm`** from `Y401` (`(189.2, 142.25)`); `U1201` sits `16.67 mm` from `U401`. Expect `25 MHz` harmonic spurs around the clock buffer if shielding/guarding is tight.
 
 ---
 
 ### 9. Mechanical & Connectors
-* **South SOM Cantilever & Modal Stiffness [FAIL — HIGH H7]:**
+* **South SOM Cantilever & Modal Stiffness [FAIL, HIGH H7]:**
   * Five M3 mounting holes sit at `H1=(94.0, 112.25)`, `H2=(203.0, 112.25)`, `H3=(93.0, 209.75)`, `H4=(148.5, 192.5)`, `H5=(204.0, 209.75)`.
   * KV260 Samtec high-density mating connectors `J101=(186.02, 85.60)` and `J102=(135.98, 85.60)` hang **`26.65 mm` south** of `H1/H2` with zero board-edge support beneath the SOM's heavy heatsink mass!
   * Main `H1–H3` `Y`-span is **`97.50 mm`**. Even an unloaded `1.54 mm` FR4 plate across a `97.5 mm` span has a fundamental bending mode around **`~258 Hz`**, which plunges well into typical multicopter rotor/propeller vibration harmonics (`~80–160 Hz`) once carrying the cantilevered KV260 SOM (`>= 220 g`), risking intermittent BGA/Samtec fretting.
-* **Unlatched Flight Connectors & Tight SMA Pitch [WARN — MEDIUM M3]:**
+* **Unlatched Flight Connectors & Tight SMA Pitch [WARN, MEDIUM M3]:**
   * `J1001` (`PJ-102AH` barrel jack) and `J1102`/`J1103` lack positive mechanical latches.
   * `12` edge SMAs are pitched on **`8.50 mm` centers** (`x = 101.0..194.5 mm`, closest M3 hole `8.51 mm` at `J931`), leaving `0.50 mm` total clearance between `8.0 mm` SMA hex nuts (impossible with thick torque-wrench sockets without sequential outer-to-inner assembly or flexible tools).
 
 ---
 
 ### 10. DFM / DFA & Documentation Consistency
-* **Fabrication Spec vs CAD Mismatches [FAIL — HIGH H7]:**
+* **Fabrication Spec vs CAD Mismatches [FAIL, HIGH H7]:**
   * `docs/FABRICATION.md` specifies `JLC08161F-3313` (`0.100 mm` outer prepreg, `0.25 / 0.50 mm` vias), whereas `CSI2-KRIA-KV260_Rev01.kicad_pcb` uses `JLC08161H-2116C` (`0.1194 / 0.1300 mm` dielectrics) and `0.20 / 0.45 mm` (`2177` total) vias.
   * `docs/JLCPCB_QUOTE.md` selects **POFV (Via-in-Pad Plated Over Filled)** for BGA/QFN thermal pads, yet `.kicad_pcb` `setup` flags explicitly declare **`capping = no`, `filling = no`, `covering = no`**, and split vias across **`1400` tented vs `777` untented (`None`)**. If ordered as-exported without overriding FAB notes cleanly, solder wicking under `U1101`/`U1201` will cause assembly defects.
   * `JLCPCB_QUOTE.md` flags **`8` component stockouts** blocking turnkey SMT (`M3SWA2-34DR+`, `AD9253BCPZ-125`, `AD9484BCPZ-500`, `AD9708AR`, `AD8352ACPZ`, `ADCLK948BCPZ`, `ADT2-1T+`, `TMP1075DR`).
-* **Non-Standard BOM Values & ERC [WARN — LOW L1]:** `DAC_RADAR`/`DAC_SDR` LPF uses custom/non-E-series values (`107.3 nH`, `106 pF`). `CSI2-KRIA-KV260_Rev01-erc.rpt` reports `0` Errors and `7` benign Warnings (bidirectional vs power-flag warnings on `U1101 CFGBVS_0` and unused XADC pins `VP/VN/VREFP/VREFN/DXP/DXN`).
+* **Non-Standard BOM Values & ERC [WARN, LOW L1]:** `DAC_RADAR`/`DAC_SDR` LPF uses custom/non-E-series values (`107.3 nH`, `106 pF`). `CSI2-KRIA-KV260_Rev01-erc.rpt` reports `0` Errors and `7` benign Warnings (bidirectional vs power-flag warnings on `U1101 CFGBVS_0` and unused XADC pins `VP/VN/VREFP/VREFN/DXP/DXN`).
 
 ---
 

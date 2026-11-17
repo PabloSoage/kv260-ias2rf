@@ -1,4 +1,4 @@
-# ROUTING sheet — specification and review guide
+# ROUTING sheet: specification and review guide
 
 *25 September 2026 · `rev03/ROUTING.kicad_sch` · drawn by `_work/sheets/routing.py` from the
 connection list in `_work/sheets/routing_spec.py`*
@@ -7,7 +7,7 @@ Four M3SWA2-34DR+ SPDT switches between the converters and the SMAs. Each conver
 default to its own chain, and on command to the other one. The second SDR channels go straight to
 their SMAs.
 
-| Switch | Converter | RF1 — control low, **default** | RF2 — control high | What RF2 enables |
+| Switch | Converter | RF1 (control low, **default**) | RF2 (control high) | What RF2 enables |
 |---|---|---|---|---|
 | SW1 (U901) | `IF_RX_A`, AD9253 ch A | `SDR_RX_A` | `AERIS_IF_A` | Radar IF sampled at 14 bits |
 | SW2 (U902) | `IF_RX_B`, AD9484 | `AERIS_IF` | `SDR_RX_WB` | Wideband SDR at 400/500 MSPS, 8 bits |

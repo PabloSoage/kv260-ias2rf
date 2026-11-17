@@ -1,4 +1,4 @@
-# KV260-IAS2RF Enclosure v2 — 3D Conjugate Heat Transfer (CHT) CFD Report
+# KV260-IAS2RF Enclosure v2: 3D Conjugate Heat Transfer (CHT) CFD Report
 
 **Date:** 2026-11-14  
 **Solver:** OpenFOAM v2412 `chtMultiRegionSimpleFoam` (steady-state compressible buoyant CHT, `kOmegaSST` RAS turbulence, coupled air + solid PCB/heatsink/spreader regions)  
@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-Enclosure v1 wraps the KV260 Starter Kit (K26 SOM + OEM carrier/finned heatsink) and the IAS2RF Rev01/v2 adapter PCB inside an inner cavity of **240.6 × 124.2 × 40.75 mm** (`x ∈ [-109.6, +131.0] mm`, `y ∈ [-12.2, +112.0] mm`, `z ∈ [-8.0, +32.75] mm`), printed in PETG-CF (`k = 0.25 W/m·K`). Open SMA-side slots and unbaffled top/side openings admit road dust in automotive/field operation (`T_amb = 25 °C / 45 °C / 70 °C`), while closing the openings without thermal management risks over-temperature on tight-limit silicon—most notably **`Y401` Si549 (`Tj,max = 105 °C`)** and **`U1101` XC7A50T / K26 SOM (`Tj,max = 100 °C`)**.
+Enclosure v1 wraps the KV260 Starter Kit (K26 SOM + OEM carrier/finned heatsink) and the IAS2RF Rev01/v2 adapter PCB inside an inner cavity of **240.6 × 124.2 × 40.75 mm** (`x ∈ [-109.6, +131.0] mm`, `y ∈ [-12.2, +112.0] mm`, `z ∈ [-8.0, +32.75] mm`), printed in PETG-CF (`k = 0.25 W/m·K`). Open SMA-side slots and unbaffled top/side openings admit road dust in automotive/field operation (`T_amb = 25 °C / 45 °C / 70 °C`), while closing the openings without thermal management risks over-temperature on tight-limit silicon, most notably **`Y401` Si549 (`Tj,max = 105 °C`)** and **`U1101` XC7A50T / K26 SOM (`Tj,max = 100 °C`)**.
 
 This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-fan and conductive-spreader configurations against dust ingress protection and junction-temperature limits up to `T_amb = 70 °C`.
 
@@ -133,7 +133,7 @@ This section audits the **actual fabricated Enclosure v2 + Rev06 adapter hardwar
 ### 1. Built Geometry & Rev06 Deltas vs. Initial Option 4b Assumptions
 
 1. **Relocated `50×50×10 mm` impinging fan (`(-40.0, +14.0) mm`):** Centered directly over the front hot strip (`U401` at `(-34.9, -0.2)`, `Y401` at `(-35.0, +8.8)`, `U501` at `(-51.8, +10.6)`), rather than `(-45, +45) mm`. Powered from `J1002` (`FAN 5V` rail fused via `F1002 = PTC 0.5 A hold`). A `1.2 mm` PETG-CF square shroud (`x ∈ [-66.2, -13.8]`, `y ∈ [-12.2, +40.2]`, `z = 18.75..28.75 mm`, `Ø48 mm` bore, `Ø20 mm` hub) sits beneath a `4.0 mm` ceiling plenum (`z = 28.75..32.75 mm`).
-2. **Double `7 mm` hex grille constriction (`984.9 mm²`):** Stacking `g2` (lid hex) and `g3` (removable `case_v2_filter_frame.stl` clamping the `100`-mesh filter) with `1.6 mm` walls leaves **`39` open hex cells (`984.9 mm²`)** inside the `~41 × 41 mm` inner recess—only **`54.4%`** of the `Ø48 mm` (`1809.6 mm²`) fan bore (`3.38×` higher local dynamic pressure drop through the filter than an unobstructed bore).
+2. **Double `7 mm` hex grille constriction (`984.9 mm²`):** Stacking `g2` (lid hex) and `g3` (removable `case_v2_filter_frame.stl` clamping the `100`-mesh filter) with `1.6 mm` walls leaves **`39` open hex cells (`984.9 mm²`)** inside the `~41 × 41 mm` inner recess: only **`54.4%`** of the `Ø48 mm` (`1809.6 mm²`) fan bore (`3.38×` higher local dynamic pressure drop through the filter than an unobstructed bore).
 3. **Closed SMA wall & `13` right-wall exhaust slots:** Zero SMA-wall openings (`x = -109.6 mm` sealed); exhaust relies exclusively on `13` right-wall slots (`3 × 16 mm`, `6 mm` pitch over `y = 10..85 mm, z = 10..26 mm` at `x = +131.0 mm`).
 4. **Corrected Rev06 Si549 (`Y401`), `LMR33630` (`U1001`), `U1201`, and `KV260` / `K26` thermal ratings (`mech/v2_cfd/run_built_v2_cfd.py`):**
    - **`Y401` Si549 (LVPECL 3V3 pinout C, datasheet-verified):** `Tj,max = 125.0 °C` (`-40..+85 °C TA` industrial ambient, `T_op max = 95 °C`), `θ_JA = 53 °C/W`, `Ψ_JB = Ψ_JT = 26.0 °C/W` (replacing the prior erroneous `105 °C` assumption). Total `0.50 W` draw (`~153 mA × 3.3 V`) splits between **`0.44 W` inside the Si549 package** and **`0.06 W` dissipated externally** across the `130 Ω` LVPECL pull-down resistors `R402`/`R403` (`~62 mW`) and AC `ADCLK948` termination on the PCB.
@@ -201,7 +201,7 @@ Comparing `v2_built_nohs_clean_70C` against `v2_built_hs_clean_70C`, plus six ta
 | **`v2_opt_extra_slots_70C`** (+ back slots + wide grille) | 4.28 | 11.50 | 90.62 | 102.80 | 104.82 | 101.24 | 95.79 | 112.04 | 90.50 | 97.29 |
 | **`v2_opt_tall_hs_70C`** (`8 / 8.5 mm` decoupled sinks) | 2.56 | 15.83 | 94.47 | 104.02 | 107.24 | 102.55 | 97.43 | 114.26 | 93.83 | 100.29 |
 | **`v2_opt_pad_lid_70C`** (`5 W/m·K` pads on `U1001` & `K26` **[not built]**) | 2.06 | 17.04 | 99.80 | 102.40 | 107.37 | 106.85 | 98.36 | **109.18** | 92.80 | 100.16 |
-| **`v2_opt_combined_70C`** (w/ Al lid+pad **[not built — unprintable]**, med) | **7.51** | 24.24 | **84.94** | 101.27 | 102.14 | **98.99** | 93.14 | **105.27** | **88.98** | **95.62** |
+| **`v2_opt_combined_70C`** (w/ Al lid+pad **[not built, unprintable]**, med) | **7.51** | 24.24 | **84.94** | 101.27 | 102.14 | **98.99** | 93.14 | **105.27** | **88.98** | **95.62** |
 | **`v2_opt_combined_fine_70C`** (same Al lid+pad **[not built]**, `426k` fine) | **7.50** | 24.25 | **86.96** | **97.96** | **97.80** | **94.72** | **90.26** | **104.35** | **87.15** | **91.53** |
 | **`v2_adopted_clean_fine_70C`** (**Adopted PETG-CF**, `17R/9B`, `429k` fine) | **7.52** | 24.18 | **87.12** | **99.08** | **97.95** | **95.06** | **90.30** | 109.76 | **87.78** | **91.57** |
 
@@ -260,7 +260,7 @@ This subsection verifies the exact printable **PETG-CF / ASA (`k = 0.25 W/m·K`,
 - **Fan:** `Orion OD5015-05HB` (`50 × 50 × 15 mm`, `0.13 A` within `F1002 0.50 A` hold), centered at `(-40, +14) mm`, `z = 13.75..28.75 mm` beneath the `4 mm` ceiling plenum (`1.5 mm` above the tall heatsink tops).
 - **Intake:** Built `Ø47 mm` six-spoke ring (`wide_grille`, `~1550 mm²` open) + `100`-mesh dust filter (`1×` clean and `2×` clogged).
 - **Exhaust vents:** Built `17` right-wall slots (`3.5 × 21 mm`, `y = 4..106 mm`, `z = 7.5..28.5 mm`) **plus `9` new back-wall slots** at `y = 112 mm` (`3.5 × 18 mm`, `z = 10..28 mm`, `567 mm²` open area) starting at `x = -85, -79, -73, -67, -61, -55` (`6` slots) and `-31, -25, -19.5` (`3` slots), leaving `x = [-51.5, -31.0]` solid around `J1001` (`back_slot_loss` Darcy-Forchheimer `f = 100.0`).
-- **Heatsinks:** Tall decoupled aluminum sinks — `U401` and `Y401` `9 × 7 × 8 mm` (`±1 mm` Y offset, `4 mm` air gap), `U501` `14 × 14 × 8.5 mm`.
+- **Heatsinks:** Tall decoupled aluminum sinks: `U401` and `Y401` `9 × 7 × 8 mm` (`±1 mm` Y offset, `4 mm` air gap), `U501` `14 × 14 × 8.5 mm`.
 
 | Metric / Flow Summary | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
 | --- | ---: | ---: | ---: | ---: |

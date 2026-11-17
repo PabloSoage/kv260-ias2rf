@@ -1,4 +1,4 @@
-# KV260-IAS2RF — an RF front-end carrier for the AMD Kria KV260
+# KV260-IAS2RF: an RF front-end carrier for the AMD Kria KV260
 
 **Status (15 November 2026): schematic and layout complete, on 8 layers. The board is fully routed, with zero
 DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
@@ -352,4 +352,4 @@ whoever builds and operates the equipment.
 
 ## Licence
 
-Licensed under the **Apache License 2.0** — see [`LICENSE`](LICENSE). Third-party MIT notices for the inherited Allied Vision CSI-2 adapter reference (`2023`) and verbatim `AERIS-10 / PLFM_RADAR` DSP modules (`fpga/third_party/aeris/`) are preserved in [`LICENSE`](LICENSE).
+Licensed under the **Apache License 2.0**; see [`LICENSE`](LICENSE). Third-party MIT notices for the inherited Allied Vision CSI-2 adapter reference (`2023`) and verbatim `AERIS-10 / PLFM_RADAR` DSP modules (`fpga/third_party/aeris/`) are preserved in [`LICENSE`](LICENSE).

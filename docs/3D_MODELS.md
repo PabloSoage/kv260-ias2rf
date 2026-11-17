@@ -8,7 +8,7 @@ An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01
 - **Missing functional 3D models:** **7** functional component instances without any `(model ...)` tag (`U901`–`U904` `M3SWA2-34DR+`, `J101`–`J102` `BM20B(0.8)-34DP`, `J1201` `HR911130C`).
 - **Non-functional omitted items (27):** Test points (`TP*`), fiducials (`FID*`), mounting holes (`MH*`), and solder jumper (`JP1101`) remain intentionally unmodeled.
 
-All **26** missing or broken functional component instances (across **14** unique package geometries) have been resolved with real 3D CAD models — **no synthetic boxes or block placeholders are used**.
+All **26** missing or broken functional component instances (across **14** unique package geometries) have been resolved with real 3D CAD models: **no synthetic boxes or block placeholders are used**.
 
 ---
 

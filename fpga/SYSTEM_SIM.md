@@ -109,7 +109,7 @@ Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `n
 
 ## Explicit Verification Limits
 
-1. **Behavioral peripheral & analog/PHY models:** `u_ad9484`, `u_ad9253`, `u_adar1000`, `u_dacr_mon`, `u_dacs_mon`, `sim_hk_i2c_slave`, `sgmii_phy_kria_peer`, and `sim_board_lvds_channel` are Verilog behavioral models approximating datasheet protocols, `lvds_skew.py` static delays, and `SIGNAL_INTEGRITY.md` jitter/noise budgets — not SPICE/IBIS full-wave SI or silicon converter models.
+1. **Behavioral peripheral & analog/PHY models:** `u_ad9484`, `u_ad9253`, `u_adar1000`, `u_dacr_mon`, `u_dacs_mon`, `sim_hk_i2c_slave`, `sgmii_phy_kria_peer`, and `sim_board_lvds_channel` are Verilog behavioral models approximating datasheet protocols, `lvds_skew.py` static delays, and `SIGNAL_INTEGRITY.md` jitter/noise budgets, not SPICE/IBIS full-wave SI or silicon converter models.
 2. **PS firmware & Linux stack excluded:** `tb_system` drives `kria_pl_link` AXI4-Lite/AXIS ports directly via testbench BFMs rather than executing ARM Zynq PS C code, Linux DMA drivers, or GEM3 MAC microcode.
 3. **Scaled timers & watchdog intervals:** Simulation speed-up overrides compress housekeeping polling, Si549 FCAL wait, MDIO polling, and `ETH_ALIVE_TIMEOUT` (`200 us` vs `1 s` hardware); `TAP_DWELL_CYCLES` runs at hardware default (`1800`).
 4. **XSim UltraScale+ primitive advisory:** Vivado XSim 2026.1 emits `[Unisim IDELAYE3-1]` advisories on `u_kria.u_idelay_d0`/`d1` noting behavioral reset limitations when `DELAY_FORMAT = TIME`.

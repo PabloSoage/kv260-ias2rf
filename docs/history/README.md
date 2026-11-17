@@ -17,9 +17,9 @@ This directory preserves the chronological engineering history, intermediate des
 
 ## Archived Documents & Plots
 
-- [`AUDIT_Rev01.md`](AUDIT_Rev01.md) — Forensic audit of the original Rev01 schematics, BOM, and PCB.
-- [`HISTORY_Rev01.md`](HISTORY_Rev01.md) — Record of the earliest design iterations prior to the Rev03 clean rebuild.
-- [`EIGHT_LAYERS.md`](EIGHT_LAYERS.md) — Side-by-side comparison of the superseded 6-layer board against the 8-layer stackup (`sim/rev04_*.png`).
-- [`RF_REVIEW_EXTERNAL.md`](RF_REVIEW_EXTERNAL.md) — Independent RF, signal integrity, PDN, and physical layout review that drove the filter re-tuning, ESD/TVS hardening, and dedicated Ethernet pinout.
-- [`REV06_REVIEW.md`](REV06_REVIEW.md) — Final pre-tapeout hardware, thermal, mechanical FEA, and co-simulation signoff matrix comparing the final design against Rev05.
-- [`sim/`](sim/) — Archived 6-layer vs 8-layer comparison figures (`rev04_eyes.png`, `rev04_eye_open.png`, `rev04_eye_penalty.png`, `rev04_skew.png`, `rev04_pdn.png`, `rev04_sma.png`), shared-pair Ethernet stub study (`eth_branches.png`), and before/after DAC filter comparison (`rev05_filters.png`).
+- [`AUDIT_Rev01.md`](AUDIT_Rev01.md): forensic audit of the original Rev01 schematics, BOM, and PCB.
+- [`HISTORY_Rev01.md`](HISTORY_Rev01.md): record of the earliest design iterations prior to the Rev03 clean rebuild.
+- [`EIGHT_LAYERS.md`](EIGHT_LAYERS.md): side-by-side comparison of the superseded 6-layer board against the 8-layer stackup (`sim/rev04_*.png`).
+- [`RF_REVIEW_EXTERNAL.md`](RF_REVIEW_EXTERNAL.md): independent RF, signal integrity, PDN, and physical layout review that drove the filter re-tuning, ESD/TVS hardening, and dedicated Ethernet pinout.
+- [`REV06_REVIEW.md`](REV06_REVIEW.md): final pre-tapeout hardware, thermal, mechanical FEA, and co-simulation signoff matrix comparing the final design against Rev05.
+- [`sim/`](sim/): archived 6-layer vs 8-layer comparison figures (`rev04_eyes.png`, `rev04_eye_open.png`, `rev04_eye_penalty.png`, `rev04_skew.png`, `rev04_pdn.png`, `rev04_sma.png`), shared-pair Ethernet stub study (`eth_branches.png`), and before/after DAC filter comparison (`rev05_filters.png`).

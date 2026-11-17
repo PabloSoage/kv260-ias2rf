@@ -8,30 +8,30 @@ criteria, and that is where all of it came from.
 
 ---
 
-## Phase 0 — Close the blockers ✅ COMPLETE
+## Phase 0: Close the blockers ✅ COMPLETE
 
 | Blocker | Outcome |
 |---|---|
-| **B-01** — Interface to the Kria | ⛔ **Against.** IAS0 ends at the AP1302 ISP; there is no 40-pin RPi header; the GTHs are not reachable. Real budget: **8 pairs + ~14 loose signals** |
-| **B-02** — AD9253 1-lane mode | ⛔ **Against.** Capped at **62.5 MSPS** |
-| **B-03** — RF switches | ⛔ **Against, after a first wrong closure.** The M3SWA2-34DR+ has positive control logic but needs VDD +3.3 V **and VEE −3.3 V** |
-| **B-04** — AERIS-10 IF | ✅ **In favour.** 120 MHz; the `BPF2` filters are unspecified placeholders |
-| **B-05** — Extended variant | ⚠️ **Partial.** Not published. Sized for 8 chips |
+| **B-01**: Interface to the Kria | ⛔ **Against.** IAS0 ends at the AP1302 ISP; there is no 40-pin RPi header; the GTHs are not reachable. Real budget: **8 pairs + ~14 loose signals** |
+| **B-02**: AD9253 1-lane mode | ⛔ **Against.** Capped at **62.5 MSPS** |
+| **B-03**: RF switches | ⛔ **Against, after a first wrong closure.** The M3SWA2-34DR+ has positive control logic but needs VDD +3.3 V **and VEE −3.3 V** |
+| **B-04**: AERIS-10 IF | ✅ **In favour.** 120 MHz; the `BPF2` filters are unspecified placeholders |
+| **B-05**: Extended variant | ⚠️ **Partial.** Not published. Sized for 8 chips |
 
 Evidence and sources in [BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md). Consequence: the Rev02
 architecture was not realisable and has been replaced by **Rev03, with a front-end FPGA**.
 
-Still outstanding — not blocking the decision, but blocking schematic sign-off:
+Still outstanding, not blocking the decision but blocking schematic sign-off:
 
 | Task | Source |
 |---|---|
-| ~~Exact `VCCO` of the HPA bank as the KV260 sets it~~ | ✅ 1.2 V, from XTP682 — [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §6 |
+| ~~Exact `VCCO` of the HPA bank as the KV260 sets it~~ | ✅ 1.2 V, from XTP682 (see [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §6) |
 | Confirm the AERIS Extended variant (B-05) | The project's author |
-| ~~Measure the mechanical envelope on the KV260~~ | ✅ from the official 3D model, no hardware needed — [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5 |
+| ~~Measure the mechanical envelope on the KV260~~ | ✅ from the official 3D model, no hardware needed (see [INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5) |
 
 ---
 
-## Phase 0.5 — Architecture decision ✅ DECIDED (21 September 2026)
+## Phase 0.5: Architecture decision ✅ DECIDED (21 September 2026)
 
 **The front-end FPGA is accepted.** The reason is the one in phase 0: the KV260 does not expose
 enough pins for a converter to connect directly.
@@ -41,7 +41,7 @@ something that will be operated (see the licensing position in
 [BLOCKERS_AND_RISKS.md](BLOCKERS_AND_RISKS.md) R-06).
 
 **Obstacle detection leaves this board.** It will be a commercial automotive radar connected over
-USB — cheaper, licence-free at 76–77 GHz, and purpose-built. It is therefore **not** a subsystem of
+USB: cheaper, licence-free at 76–77 GHz, and purpose-built. It is therefore **not** a subsystem of
 this adapter, and nothing in the schematic has to account for it.
 
 The comparison that led here:
@@ -60,14 +60,14 @@ The comparison that led here:
 
 **Exit criterion:** decision taken and recorded. Without it, any schematic is wasted work.
 
-> **Note:** the DSP core for the "with FPGA" branch already exists and is measured on silicon —
+> **Note:** the DSP core for the "with FPGA" branch already exists and is measured on silicon:
 > [scanner64](https://github.com/PabloSoage/scanner64). That removes a large part of the risk from
 > this decision: the hard question (can the PL sustain a converter stream in real time?) has been
 > answered with hardware.
 
 ---
 
-## Phase 1 — Frozen specification
+## Phase 1: Frozen specification
 
 | Task | Deliverable |
 |---|---|
@@ -78,13 +78,13 @@ The comparison that led here:
 | Per-rail current budget from datasheet figures | Replace the `[E]` estimates in §10.1 |
 | Define the 6-layer stackup with computed impedances | Stackup sheet for the fabricator |
 
-**Status (21 September 2026):** partly done — see [INTERFACE_SPEC.md](INTERFACE_SPEC.md).
+**Status (21 September 2026):** partly done; see [INTERFACE_SPEC.md](INTERFACE_SPEC.md).
 
 | Item | State |
 |---|---|
 | Pin map of J8 and the Pmod | ✅ frozen |
 | Mechanical envelope | ✅ measured from the official 3D model |
-| Growth direction within that envelope | ✅ registered on the STEP model — outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
+| Growth direction within that envelope | ✅ registered on the STEP model: outward, off the carrier's side ([INTERFACE_SPEC.md](INTERFACE_SPEC.md) §5.3) |
 | `VCCO` of the HPA bank | ❌ **needs XTP682**, the carrier card schematic |
 | Power tree topology and regulator sizing | ✅ [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
 | Per-rail load figures | ⚠️ **16 of 25 verified from datasheets**; the rest need Vivado or parts not yet chosen |
@@ -95,7 +95,7 @@ the power `[E]` marks replaced by datasheet values.
 
 ---
 
-## Phase 2 — Schematic ⬅ **STARTED**
+## Phase 2: Schematic ⬅ **STARTED**
 
 ### Done: the hierarchy skeleton
 
@@ -105,16 +105,16 @@ the root, **108 interface signals** in total:
 | Sheet | Signals | Contents |
 |---|---|---|
 | `IAS_LINK` | 14 | Hirose IAS1, AC coupling, link terminations |
-| `CONTROL` | 40 | **Drawn** (25 Sep) — XC7A50T, flash, JTAG, Pmod, AERIS ribbon. [CONTROL_SPEC.md](CONTROL_SPEC.md) |
-| `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers — **split in four on 24 Sep**, below |
-| `CLOCK` | 9 | **Drawn** (23 Sep), **reviewed and accepted** (24 Sep) — Si549 XO, ADCLK948 select + fan-out. [CLOCK_SPEC.md](CLOCK_SPEC.md) |
+| `CONTROL` | 40 | **Drawn** (25 Sep): XC7A50T, flash, JTAG, Pmod, AERIS ribbon. [CONTROL_SPEC.md](CONTROL_SPEC.md) |
+| `CONVERTERS` | 37 | AD9484, AD9253, AD9708, AD9767, AD8352 drivers, **split in four on 24 Sep**, below |
+| `CLOCK` | 9 | **Drawn** (23 Sep), **reviewed and accepted** (24 Sep): Si549 XO, ADCLK948 select + fan-out. [CLOCK_SPEC.md](CLOCK_SPEC.md) |
 | `ROUTING` | 9 | 4× SPDT channel routing, IF and clock SMAs |
-| `POWER` | 0 | 12 V input, protection, buck/LDO tree — rails are global symbols |
+| `POWER` | 0 | 12 V input, protection, buck/LDO tree; rails are global symbols |
 
 **Why this is not what §8 of the audit warns against.** That warning is about generating
 *circuits* by script: untyped symbols wired with auto-generated labels, which cannot be reviewed
 by eye and which ERC cannot check because the pins carry no electrical type. This skeleton contains
-**no symbols and no wires** — only sheets and the hierarchical labels that define what crosses
+**no symbols and no wires**, only sheets and the hierarchical labels that define what crosses
 between them. There is nothing to mis-type, and ERC verifies exactly the property that matters:
 that every sheet pin matches a hierarchical label by name and direction. All six sheets came out
 with 0 orphan, 0 missing and 0 wrong-direction pins. The circuit gets drawn in the GUI.
@@ -127,10 +127,10 @@ way the inherited design already does, which keeps sheet interfaces to signals.
 `_work/sync_sheet_pins.py` did from the command line what *Synchronize Hierarchical Labels* does in
 the GUI, and closed the last 36 structural errors:
 
-- **2 orphan pins removed** — `CLK_KRIA_P` / `CLK_KRIA_N` on the IAS0 block, sheet pins for a label
+- **2 orphan pins removed**: `CLK_KRIA_P` / `CLK_KRIA_N` on the IAS0 block, sheet pins for a label
   that does not exist. Remains of the Rev01 idea of sending a 125 MHz LVPECL clock back into a MIPI
   pin on the SOM, which Rev03 dropped.
-- **34 missing pins added** — the shared sheet exposes 25 hierarchical labels; IAS0 declared only
+- **34 missing pins added**: the shared sheet exposes 25 hierarchical labels; IAS0 declared only
   16 of them and IAS1 only 2.
 - **9 pin directions corrected** on IAS0.
 
@@ -139,7 +139,7 @@ the GUI, and closed the last 36 structural errors:
 ### Done: symbol libraries with correct pin types
 
 See [SYMBOLS.md](SYMBOLS.md). The hardest symbol in the design turned out to be free:
-**`XC7A50T-FTG256` ships in KiCad's own `FPGA_Xilinx_Artix7`** — 256 pins, 4 units, correctly
+**`XC7A50T-FTG256` ships in KiCad's own `FPGA_Xilinx_Artix7`**: 256 pins, 4 units, correctly
 typed, exactly the package AERIS-10 uses. `AD9708AR` and `ADF4351` are likewise in the official
 libraries.
 
@@ -178,7 +178,7 @@ accepted, its `.kicad_sch` is the source and is edited in KiCad.
 
 ---
 
-## Phase 2 — Schematic: requirements
+## Phase 2: Schematic: requirements
 
 Start from `CSI2-KRIA-KV260_Rev01-2.kicad_sch` (the purge, which is valid work). The two
 script-generated sheets have already been **removed** from the project and moved to
@@ -193,15 +193,15 @@ script-generated sheets have already been **removed** from the project and moved
 | Sheet | Contents |
 |---|---|
 | Root | Hierarchy, every sheet pin labelled by net (**wired 25 Sep**, `_work/check_root.py`) |
-| `IAS_LINK` | ✅ Drawn and verified: `check_sheet.py ias_link` PASS. Awaiting review — [IAS_LINK_SPEC.md](IAS_LINK_SPEC.md) |
-| `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review** — [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
-| `ADC_SDR` | ✅ Drawn and verified: `check_sheet.py adc_sdr` PASS. Awaiting review — [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md) |
-| `DAC_RADAR` | ✅ Drawn and verified: `check_sheet.py dac_radar` PASS. Awaiting review — [DAC_RADAR_SPEC.md](DAC_RADAR_SPEC.md) |
-| `DAC_SDR` | ✅ Drawn and verified: `check_sheet.py dac_sdr` PASS. Awaiting review — [DAC_SDR_SPEC.md](DAC_SDR_SPEC.md) |
-| `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep) — [CLOCK_SPEC.md](CLOCK_SPEC.md) |
-| `ROUTING` | ✅ Drawn and verified: `check_sheet.py routing` PASS. Awaiting review — [ROUTING_SPEC.md](ROUTING_SPEC.md) |
+| `IAS_LINK` | ✅ Drawn and verified: `check_sheet.py ias_link` PASS. Awaiting review; [IAS_LINK_SPEC.md](IAS_LINK_SPEC.md) |
+| `ADC_RADAR` | ✅ Drawn and verified: `check_sheet.py adc_radar` PASS. **Awaiting your review**; [ADC_RADAR_SPEC.md](ADC_RADAR_SPEC.md) §5 |
+| `ADC_SDR` | ✅ Drawn and verified: `check_sheet.py adc_sdr` PASS. Awaiting review; [ADC_SDR_SPEC.md](ADC_SDR_SPEC.md) |
+| `DAC_RADAR` | ✅ Drawn and verified: `check_sheet.py dac_radar` PASS. Awaiting review; [DAC_RADAR_SPEC.md](DAC_RADAR_SPEC.md) |
+| `DAC_SDR` | ✅ Drawn and verified: `check_sheet.py dac_sdr` PASS. Awaiting review; [DAC_SDR_SPEC.md](DAC_SDR_SPEC.md) |
+| `CLOCK` | ✅ Drawn, verified, **reviewed and accepted** (24 Sep); [CLOCK_SPEC.md](CLOCK_SPEC.md) |
+| `ROUTING` | ✅ Drawn and verified: `check_sheet.py routing` PASS. Awaiting review; [ROUTING_SPEC.md](ROUTING_SPEC.md) |
 | `CONTROL` | Pmod header, front-end FPGA (if adopted), level translators, IDC to AERIS and the SDR board |
-| `POWER` | ✅ Drawn and verified: `check_sheet.py power` PASS. Awaiting review — [POWER_SPEC.md](POWER_SPEC.md) |
+| `POWER` | ✅ Drawn and verified: `check_sheet.py power` PASS. Awaiting review; [POWER_SPEC.md](POWER_SPEC.md) |
 
 **Non-negotiable quality requirements:**
 
@@ -211,7 +211,7 @@ script-generated sheets have already been **removed** from the project and moved
   topology has to be visible.
 - An explicit `no_connect` on every deliberately unused pin.
 
-**Prerequisite — multi-channel annotation.** ✅ **Done** (21 September 2026). It had two causes:
+**Prerequisite: multi-channel annotation.** ✅ **Done** (21 September 2026). It had two causes:
 duplicate instance references on the shared sheet, and a root schematic whose declared UUID did not
 match its own instance paths. Both fixed by `_work/fix_multichannel_annotation.py`. The netlist now
 exports with 48 components and 61 nets, so `Update PCB from Schematic` is unblocked and phase 3 can
@@ -226,7 +226,7 @@ start once the schematic is done.
 
 ---
 
-## Phase 3 — Layout
+## Phase 3: Layout
 
 | Task | Note |
 |---|---|
@@ -238,7 +238,7 @@ start once the schematic is done.
 | Power planes | Real separation between analogue and digital, ferrites at the junctions |
 | Route the IF lines | 50 Ω to the SMAs |
 
-**Status (26 September 2026)** — [LAYOUT.md](LAYOUT.md), [FABRICATION.md](FABRICATION.md):
+**Status (26 September 2026)**: [LAYOUT.md](LAYOUT.md), [FABRICATION.md](FABRICATION.md):
 
 | Task | State |
 |---|---|
@@ -254,13 +254,13 @@ start once the schematic is done.
 **Exit criteria:**
 
 1. DRC with zero errors **and the correct rules enabled** (not inherited from the import).
-2. Zero unconnected pads — and this time with actual pads.
+2. Zero unconnected pads, and this time with actual pads.
 3. Impedances verified with the fabricator's stackup calculator.
 4. Manufacturability review with the chosen fabricator before ordering.
 
 ---
 
-## Phase 4 — Prototype and bring-up
+## Phase 4: Prototype and bring-up
 
 Deliberate order: each step validates the previous one and does not depend on the next.
 
@@ -279,7 +279,7 @@ the PL recovered by the PL.
 
 ---
 
-## Phase 5 — Gateware
+## Phase 5: Gateware
 
 Can overlap phases 2 and 3.
 

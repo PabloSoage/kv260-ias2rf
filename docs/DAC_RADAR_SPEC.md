@@ -1,4 +1,4 @@
-# DAC_RADAR sheet — specification and review guide
+# DAC_RADAR sheet: specification and review guide
 
 *24 September 2026 · `rev03/DAC_RADAR.kicad_sch` · drawn by `_work/sheets/dac_radar.py` from the
 connection list in `_work/sheets/dac_radar_spec.py`*

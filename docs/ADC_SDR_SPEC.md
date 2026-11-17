@@ -1,4 +1,4 @@
-# ADC_SDR sheet — specification and review guide
+# ADC_SDR sheet: specification and review guide
 
 *24 September 2026 · `rev03/ADC_SDR.kicad_sch` · drawn by `_work/sheets/adc_sdr.py` from the
 connection list in `_work/sheets/adc_sdr_spec.py`*

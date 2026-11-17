@@ -1,4 +1,4 @@
-# FPGA Gateware — Dual-FPGA RTL, Vivado Builds & XSim Verification
+# FPGA Gateware: Dual-FPGA RTL, Vivado Builds & XSim Verification
 
 This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 constraints/build scripts, and full-system XSim co-simulation testbenches for both FPGAs in the **KV260-IAS2RF** platform (**Apache License 2.0**, with `third_party/aeris/` under MIT).
 

@@ -14,7 +14,7 @@ and a "placement" that does not exist.
 
 ## 1. The PCB placement does not exist
 
-The report claimed *"Phase F — 34 footprints placed"*.
+The report claimed *"Phase F: 34 footprints placed"*.
 
 **What is actually there `[V]`:** the 34 footprints were in `CSI2-KRIA-KV260_Rev01.kicad_pcb`, but
 they were **empty shells with not a single pad**. Example:
@@ -36,9 +36,9 @@ They have since been removed; see §6.
 
 ### 1.1 The DRC metric was misleading
 
-> *"PCB DRC: 1,942 violations, **0 unconnected items** — electrical connectivity is correct"*
+> *"PCB DRC: 1,942 violations, **0 unconnected items**, electrical connectivity is correct"*
 
-The DRC report says literally `** Found 0 unconnected pads **` `[V — _work/pcb_drc.rpt:6834]`. But
+The DRC report says literally `** Found 0 unconnected pads **` `[V: _work/pcb_drc.rpt:6834]`. But
 it is zero **because there were no pads to connect**. It is not a health metric; it is the artefact
 of having inserted footprints with no geometry and no netlist. The conclusion drawn from it was
 false.
@@ -96,7 +96,7 @@ to Altium does not hold up.
 
 **63 `pin_to_pin` conflicts in the root** `[V]`, which the report folded into *"Rest ~167
 pre-existing"*. They were not pre-existing: they belonged to `U_PWR1`, `U_PWR2`, `Y_CLK1`,
-`D_TVS1`, `J_PWR1` — all **new** components. Example `[V]`:
+`D_TVS1`, `J_PWR1`: all **new** components. Example `[V]`:
 
 ```
 [pin_to_pin]: Pins of type Unspecified and Unspecified are connected
@@ -124,7 +124,7 @@ The only symbols instantiated in `PHASED_ARRAY.kicad_sch` were `[V]`:
 - 8× `EasyEDA:ADAR1000ACCZN`
 - 1× `Connector_Coaxial:SMA_EdgeMount`
 
-The *"8-pin interface header"* the report described in two separate places **was not instantiated** —
+The *"8-pin interface header"* the report described in two separate places **was not instantiated**:
 it was only text labels. And there was **not one decoupling capacitor** for eight microwave
 beamformers.
 
@@ -161,7 +161,7 @@ That the document disagreed with itself is a symptom that nobody reread it end t
 | *"Addresses 000..111 via ADDR0/ADDR1"* | Two pins give **4** addresses, not 8. And it described daisy-chain and addressing at once, which are alternatives |
 | ADAR power from the carrier's +5 V (§1.4) | *"Independent 5 V/3 A supply"* for the external board (§7) |
 | *"Multiband SDR: AM, FM, CB, VHF, PMR"* with *"1–50 MHz"* | FM broadcast is 88–108, VHF reaches 300, PMR446 is at 446. **None of them fits in 1–50 MHz** |
-| *"Kria power: VCC5V-EXT, VCC3V3, VCC1V8, VCC1V2, VCC2V75 — both Hirose"* | The connector carries only 1V8, 2V75 and 1V2 `[V]`. `VCC5V-EXT` came from the USB-B `J1`, removed by the purge: an orphan rail |
+| *"Kria power: VCC5V-EXT, VCC3V3, VCC1V8, VCC1V2, VCC2V75, both Hirose"* | The connector carries only 1V8, 2V75 and 1V2 `[V]`. `VCC5V-EXT` came from the USB-B `J1`, removed by the purge: an orphan rail |
 | J_RPI pin map | Mixed logical GPIO indices (rows 1–20) with physical pin numbers (the ground row), so "14" was both `DAC_D13` and GND |
 
 ---
@@ -209,13 +209,13 @@ netlist` failed with *"the schematic has annotation errors"*. This matters more 
 while it failed, **`Update PCB from Schematic` could not run**, so no schematic change could ever
 reach the layout.
 
-**Cause 1 — duplicate instance references.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is a multi-channel
+**Cause 1: duplicate instance references.** `CSI2-KRIA-KV260_Rev01-2.kicad_sch` is a multi-channel
 sheet instantiated **twice** (IAS0 and IAS1). Every symbol carries two
 `(path … (reference …))` entries, and both held the *same* reference. This one was expected: the
 earlier documentation mentioned the annotation step, though without noting that it blocks the
 netlist.
 
-**Cause 2 — the root schematic's UUID did not match its own instance paths.** This one was not
+**Cause 2: the root schematic's UUID did not match its own instance paths.** This one was not
 expected, and it is the more interesting failure. The root schematic declared:
 
 ```
@@ -229,11 +229,11 @@ while every instance path in the project, including those inside that same file,
 ```
 
 The instance tree therefore referenced a root sheet that does not exist, and KiCad could not
-resolve a single annotation — which is why fixing cause 1 alone changed nothing.
+resolve a single annotation, which is why fixing cause 1 alone changed nothing.
 
 **How the right value was chosen, rather than guessed:** counting occurrences across the project.
 The declared UUID appeared **once** (its own declaration). The one used by the paths appeared
-**188 times** — 170 in the shared sheet, 16 in the root schematic and 2 in the `.kicad_pro`. The
+**188 times**: 170 in the shared sheet, 16 in the root schematic and 2 in the `.kicad_pro`. The
 declaration was the outlier, so it was rewritten to match.
 
 The likely origin is the Altium import or the earlier script manipulation; either way it had been
@@ -249,7 +249,7 @@ and a cross-check that every new reference exists in the PCB. Measured result:
 | ERC | 427 | **411** (`pin_not_connected` 71 → 55) |
 
 The netlist's 19 `_IAS0` + 19 `_IAS1` + 10 root components are exactly the schematic's contents,
-and all 38 suffixed references already existed in the PCB — so schematic and layout agree.
+and all 38 suffixed references already existed in the PCB, so schematic and layout agree.
 
 ---
 

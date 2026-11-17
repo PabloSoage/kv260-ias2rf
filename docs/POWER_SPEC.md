@@ -1,4 +1,4 @@
-# POWER sheet — specification and review guide
+# POWER sheet: specification and review guide
 
 *25 September 2026 · `rev03/POWER.kicad_sch` (A2) · drawn by `_work/sheets/power.py` from the
 connection list in `_work/sheets/power_spec.py`*

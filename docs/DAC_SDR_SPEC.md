@@ -1,4 +1,4 @@
-# DAC_SDR sheet — specification and review guide
+# DAC_SDR sheet: specification and review guide
 
 *25 September 2026 · `rev03/DAC_SDR.kicad_sch` · drawn by `_work/sheets/dac_sdr.py` from the
 connection list in `_work/sheets/dac_sdr_spec.py`*

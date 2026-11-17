@@ -1,4 +1,4 @@
-# CONTROL sheet — specification and review guide
+# CONTROL sheet: specification and review guide
 
 *25 September 2026, housekeeping devices added 2 October, Ethernet option 13 November · `rev03/CONTROL.kicad_sch` (A1) · drawn by `_work/sheets/control.py` from the
 connection list in `_work/sheets/control_spec.py`*
@@ -109,7 +109,7 @@ the FPGA's constraint file.
 
 ---
 
-## 4. Power sequencing — the open point from POWER, now answered
+## 4. Power sequencing: the open point from POWER, now answered
 
 DS181 (*Power-On/Off Power Supply Sequencing*):
 

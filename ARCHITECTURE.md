@@ -1,4 +1,4 @@
-# KV260-IAS2RF — System Architecture
+# KV260-IAS2RF: System Architecture
 
 > **Current Hardware & Gateware Baseline (`main`):** **8-layer `JLC08161H-2116C`** RF front-end adapter PCB, **dedicated-pin `RTL8211FSI` 1000BASE-T Ethernet + dual-lane `IAS1` (`2.94 Gb/s` aggregate)**, active **Enclosure v2** with filtered thermal management (`HS1`–`HS5`), and **complete dual-FPGA Vivado 2026.1 gateware** ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)). Earlier architectural decisions and revision milestones (`rev01`–`rev06`) are archived in [`docs/history/README.md`](docs/history/README.md).
 
@@ -59,10 +59,10 @@ forces a fundamental change: **a front-end FPGA on the adapter board**.
 
 | Connector | Differential pairs | Single-ended | Destination |
 |---|---|---|---|
-| **J8 — IAS1** | **5** (4 data + 1 clock) | ~4 (I2C, PWDN, GPIO) | **HPA bank, direct to the SOM** |
-| **J9 — RPi camera** | **3** (2 data + 1 clock) | ~2 | **HPA bank, direct to the SOM** |
-| **J2 — Pmod** | — | **8** at 3.3 V, 100 mA | HD bank |
-| ~~J7 — IAS0~~ | ~~4~~ | — | **Ends at the AP1302 ISP** |
+| **J8 (IAS1)** | **5** (4 data + 1 clock) | ~4 (I2C, PWDN, GPIO) | **HPA bank, direct to the SOM** |
+| **J9 (RPi camera)** | **3** (2 data + 1 clock) | ~2 | **HPA bank, direct to the SOM** |
+| **J2 (Pmod)** | — | **8** at 3.3 V, 100 mA | HD bank |
+| ~~J7 (IAS0)~~ | ~~4~~ | — | **Ends at the AP1302 ISP** |
 | **Total** | **8 pairs** | **~14** | |
 
 Three facts worth keeping in mind:
@@ -129,7 +129,7 @@ architecture could not close.
 
 ### 2.2 Choosing the FPGA
 
-**Recommendation: XC7A50T-2FTG256I** — exactly the part AERIS-10 uses `[V]`.
+**Recommendation: XC7A50T-2FTG256I**, exactly the part AERIS-10 uses `[V]`.
 
 The deciding argument is not technical but about risk: **the AERIS-10 modules this board keeps on
 the front-end FPGA run on that part unported**, on the same balls. Those are the AD9484 capture at
@@ -158,7 +158,7 @@ Two scope decisions came with it:
 - **The radar is AERIS-10**, for surveillance at range. It is understood as a project rather than
   something that will be operated on air; the licensing position is in
   [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) R-06.
-- **Obstacle detection leaves this board.** It will be a commercial automotive radar over USB —
+- **Obstacle detection leaves this board.** It will be a commercial automotive radar over USB:
   cheaper, licence-free at 76–77 GHz and purpose-built. Nothing in this schematic has to account
   for it.
 
@@ -177,7 +177,7 @@ connectors, and the ADAR1000 fan-out unsolved. I do not recommend it.
 
 ## 3. How 400 MSPS gets sampled
 
-Yes, with the funnel board — and there are two ways to do it.
+Yes, with the funnel board, and there are two ways to do it.
 
 ### 3.1 Dumb funnel: serialise and forward
 
@@ -187,7 +187,7 @@ The FPGA captures the AD9484's 10 pairs and re-serialises towards the Kria.
 |---|---|
 | Raw rate, 1 channel | 8 bits × 400 MSPS = **3.2 Gbps** |
 | Pairs available to the Kria (IAS1) | 4 data + 1 clock |
-| Rate per pair | 3.2 / 4 = **800 Mbps** `[E]` — comfortable for LVDS on an HP bank |
+| Rate per pair | 3.2 / 4 = **800 Mbps** `[E]`, comfortable for LVDS on an HP bank |
 
 **One channel at 400 MSPS fits raw.** Two channels would be 6.4 Gbps, that is 1.6 Gbps per pair: at
 the limit, with no margin.
@@ -268,7 +268,7 @@ deserialises it with `ISERDESE3`.
 ### 5.1 ADC
 
 **Recommendation: AD9484BCPZ-500**, the same one AERIS-10 uses `[V]`. 8 bits, up to 500 MSPS,
-parallel LVDS output on 10 pairs (`D0..D7`, `DCO`, `OR`) `[V — net names from the AERIS schematic]`.
+parallel LVDS output on 10 pairs (`D0..D7`, `DCO`, `OR`) `[V: net names from the AERIS schematic]`.
 
 Eight bits looks thin until you remember that pulse compression recovers the dynamic range: it is
 the choice of a 10.5 GHz radar that works.
@@ -317,14 +317,14 @@ account in [docs/CLOCK_SPEC.md](docs/CLOCK_SPEC.md). What is drawn:
 the references for the ADC, the DAC and both ADF4382 synthesisers. Duplicating it would break that
 alignment, which is precisely what has to be preserved for a coherent radar.
 
-Every LVPECL output needs **coupling capacitors and a bias network** — what was missing in Rev01,
+Every LVPECL output needs **coupling capacitors and a bias network**, what was missing in Rev01,
 where the BOM listed only *"R_term 100 Ω ×4"*.
 
 ---
 
 ## 6. Frequency plan
 
-### 6.1 Radar — 120 MHz IF
+### 6.1 Radar: 120 MHz IF
 
 `[V]` **AERIS-10's IF is 120 MHz** (`ddc_400m.v`, parameter `IF_FREQ = 120_000_000`), sampled at
 400 MSPS. Since 120 < 200 MHz it falls in the first Nyquist zone: direct sampling, no tricks.
@@ -337,13 +337,13 @@ to modify, and the IF is a free parameter should it need changing.
 
 Two paths, on the SDR front-end board:
 
-**Path 1 — HF by direct sampling, 0.1–30 MHz**
+**Path 1: HF by direct sampling, 0.1–30 MHz**
 ```
 Antenna - Limiter - T/R switch - 30 MHz LPF - Attenuator - LNA --> SDR ADC
 ```
 Covers LW/MW, shortwave, **CB (26.9–27.4)** and 10 m.
 
-**Path 2 — VHF/UHF by conversion**
+**Path 2: VHF/UHF by conversion**
 
 | Sub-band | LO (IF = 20 MHz) | Bands |
 |---|---|---|
@@ -370,7 +370,7 @@ synthesiser** (Rev01 brought it in from outside over an SMA).
 | ADAR1000s, ADTR1107s, array, LTC5552 mixers, ADF4382 synthesisers, AD9523 clock | **Reused as-is** |
 | The Main Board's AD9484 and AD9708 | Replicated on the adapter board, next to the FPGA |
 | XC7A50T and its firmware | **Part and firmware both kept**, now on the adapter board |
-| STM32F746 (housekeeping) | **Kept** on AERIS — see §7.3 |
+| STM32F746 (housekeeping) | **Kept** on AERIS (see §7.3) |
 
 ### 7.2 ADAR1000 control
 
@@ -408,7 +408,7 @@ timing requirement:
 ### 7.4 Routing switches
 
 `[V]` **B-03, corrected:** the `M3SWA2-34DR+` is an absorptive GaAs SPDT with an internal driver,
-DC–30 GHz — but its datasheet requires **VDD +3.3 V *and* VEE −3.3 V**. The control logic is
+DC–30 GHz, but its datasheet requires **VDD +3.3 V *and* VEE −3.3 V**. The control logic is
 positive (`VCTRL` 0 to +3.6 V), which is not the same as a single-rail supply, and an earlier
 reading conflated the two. **The charge-pump inverter stays in the power tree.** The draw is
 negligible: 1.8 mA maximum per switch, 7.2 mA for four. See

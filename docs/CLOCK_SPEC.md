@@ -1,4 +1,4 @@
-# CLOCK sheet — specification and review guide
+# CLOCK sheet: specification and review guide
 
 *23 September 2026 · first sheet drawn for Rev03 · pilot for the drawing method · **reviewed and accepted 24 September 2026***
 
@@ -72,7 +72,7 @@ datasheet page 12.
 |---|---|---|
 | ADCLK948 output pull-downs (R404–R411) | 200 Ω | Datasheet Figure 17, AC-coupled LVPECL |
 | Output series capacitors (C414–C421) | 100 pF | Figure 17: "0.1 nF" |
-| **Receiver** termination | 100 Ω across each pair | Figure 17 — drawn on the **consuming** sheet, next to the receiver |
+| **Receiver** termination | 100 Ω across each pair | Figure 17; drawn on the **consuming** sheet, next to the receiver |
 | Unused outputs Q4–Q7 | left open | Output stage is an open emitter (Figure 13): no pull-down, no current |
 | CLK1 input (Si549) | series 100 nF, VT1 tied to VREF1, 100 nF to ground | Figure 21, AC-coupled differential input |
 | CLK0 input (SMA) | series 100 nF; CLK0-bar, VT0 and VREF0 tied, 100 nF to ground | Figure 22, AC-coupled single-ended input |
@@ -99,7 +99,7 @@ datasheet page 12.
 | Check | Result |
 |---|---|
 | `_work/check_sheet.py clock`: all 30 specified nets exist with **exactly** their pins; interface nets carry their labels; the 10 no-connects are alone; all 119 pins of the 41 parts accounted for; no part missing or extra | **PASS** |
-| The same check with one wire deleted on purpose | Fails, naming the pin: `CLK1_P: not connected: ['U401.5']` — the check can see an error |
+| The same check with one wire deleted on purpose | Fails, naming the pin: `CLK1_P: not connected: ['U401.5']`: the check can see an error |
 | KiCad ERC on the sheet | 2 errors, both "power input not driven" on `+3V3_D` and `GND`: nothing drives them until the POWER sheet exists. 6 warnings, `isolated_pin_label` on the clock outputs, until the receiving sheets are drawn |
 | Pin tables of the two new symbols | Si549 agrees with KiCad's stock Si570 pin for pin. The ADCLK948 has **no independent second source**, only its datasheet's own Figure 2 and Table 7, which agree |
 

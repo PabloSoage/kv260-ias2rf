@@ -1,4 +1,4 @@
-# Signal and power integrity — 8-layer JLC08161H-2116C review
+# Signal and power integrity: 8-layer JLC08161H-2116C review
 
 *Current `main` baseline: `CSI2-KRIA-KV260_Rev01.kicad_pcb` (8-layer `JLC08161H-2116C` stackup) · figures and their data in [`docs/sim/`](sim/)*
 

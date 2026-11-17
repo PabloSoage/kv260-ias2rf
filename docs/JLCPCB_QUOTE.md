@@ -1,4 +1,4 @@
-# JLCPCB order — quote
+# JLCPCB order: quote
 
 *10 November 2026, bare boards re-quoted on 8 layers on 12 November, parts, assembly and bare boards for the Ethernet option (140 × 132 mm) on 13 November · board CSI2-KRIA-KV260_Rev01 · not ordered yet*
 

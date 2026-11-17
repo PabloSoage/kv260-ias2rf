@@ -88,7 +88,7 @@ Linux kernel `bonding` (`mode=0` `balance-rr`, `mode=1` `active-backup`, `mode=4
   - `IAS1` failure: `fpga_irq` + Clause 49 `l0_block_lock` / `crc_err` triggers within **`~1–10 µs`** (`3.4 µs` for 64 consecutive invalid sync headers).
   - `ETH` failure: PHY MDIO link-down polling takes `10–100 ms`; in-band `seq_num` watchdog / UDP keepalive timeout in Kria PS or Artix RX heartbeat detects link stall in **`1–10 ms`**.
 - **Switch-over packet loss vs BRAM buffering:** At `1.0 Gb/s` (`125 MB/s`), `10 ms` of blind flight equals `1.25 MB` (larger than `XC7A50T`'s `75 × 36 Kb = 337.5 KB` total BRAM). However:
-  - For `IAS1` → `ETH` failover (`10 µs` fault detection via `FPGA_IRQ` / local TX monitoring if `LINK_RX_D1` / `K26` back-channels faults via `ETH` or `Pmod`), a **`64 KB` BRAM elastic buffer** (`~15 × 36 Kb` BRAM, `20%` of chip) holds **`512 µs`** of `1 Gb/s` data — sufficient for **zero-loss** fast switchover on `IAS1` link glitches.
+  - For `IAS1` → `ETH` failover (`10 µs` fault detection via `FPGA_IRQ` / local TX monitoring if `LINK_RX_D1` / `K26` back-channels faults via `ETH` or `Pmod`), a **`64 KB` BRAM elastic buffer** (`~15 × 36 Kb` BRAM, `20%` of chip) holds **`512 µs`** of `1 Gb/s` data, sufficient for **zero-loss** fast switchover on `IAS1` link glitches.
   - For **`0`-packet-loss against sudden `RJ45` unplug (`1–10 ms` timeout)**, **Policy 4 (`1+1` Active-Active Hitless Duplication)** sends identical packets (`<= 950 Mb/s`) across both links; the Kria PS deduplicates on `seq_num`, guaranteeing **zero dropped frames** at the cost of no rate aggregation.
 - **Load-Balancing Policies:**
   1. **Active-Backup (`Hot Standby`):** `IAS1 D1` primary (`0.95–1.19 Gb/s`), `ETH` warm standby (carries `K→A` control + keepalive). Minimal jitter, simple failover (`1–10 ms` gap).
@@ -121,7 +121,7 @@ From `fpga/artix/reports/utilization.rpt`, `fpga/eth/test/reports/utilization.rp
 |---|---|---|---|---|---|---|
 | **LUTs** | `32,600` | `4,441` (`13.6%`) | `287` (`0.88%`) | `~1,800–3,500` | **`~6,528–8,228` (`20.0%–25.2%`)** | `4,278 / 117,120` (`3.65%`) |
 | **Flip-Flops** | `65,200` | `6,311` (`9.7%`) | `364` (`0.56%`) | `~1,800–3,000` | **`~8,475–9,675` (`13.0%–14.8%`)** | `6,817 / 234,240` (`2.91%`) |
-| **`36 Kb` BRAM** | `75` (`337.5 KB`) | `0` (`0%`) | `0` (`0%`) | `~18–22` (`2–6` MAC/UDP + `15` for `64 KB` buffer) | **`~18–22` (`24.0%–29.3%`)** | — (`PS GEM3` uses PS DDR) |
+| **`36 Kb` BRAM** | `75` (`337.5 KB`) | `0` (`0%`) | `0` (`0%`) | `~18–22` (`2–6` MAC/UDP + `15` for `64 KB` buffer) | **`~18–22` (`24.0%–29.3%`)** | none (`PS GEM3` uses PS DDR) |
 | **DSP48E1** | `120` | `87` (`72.5%`) | `0` | `0` | **`87` (`72.5%`)** | — |
 | **MMCM** | `5` | `2` (`40%`) | `1` (or shared) | `0` | **`3` (`60%`)** | — |
 
@@ -163,7 +163,7 @@ Putting `ETH_SGTX/SGRX` in **Bank 34 Tile `T1` (`R2/R1`, `R3/T2`)**:
 | **`CSG325`** | `325` | **`4` GTP lanes** (`MGTPRX0..3 / MGTPTX0..3`) | Vivado `xc7a50t_csg325.pkg` (`23` MGT pins), `get_parts xc7a50tcsg325-2` |
 | **`FGG484`** | `484` | **`4` GTP lanes** (`MGTPRX0..3 / MGTPTX0..3`) | Vivado `xc7a50t_fgg484.pkg` (`23` MGT pins), `get_parts xc7a50tfgg484-2` |
 
-Per `DS181 Table 52`, Artix-7 GTPs run `0.500–6.25 Gb/s` on `-2` (`3.75 Gb/s` on `-1`), with `1250 Mb/s` Gigabit Ethernet jitter limits in `Table 59`. However, switching from `FTG256` to `CSG325` (`0.8 mm` pitch) or `FGG484` requires re-fanout of the entire BGA, adding **`1.0 V MGTAVCC`** and **`1.2 V MGTAVTT`** linear/filtered supplies and a dedicated differential `125 MHz MGTREFCLK` — unnecessary when Bank 34 `LVDS_25` SelectIO already achieves `1.25 Gb/s` SGMII cleanly on **`XC7A50T-2FTG256I`**.
+Per `DS181 Table 52`, Artix-7 GTPs run `0.500–6.25 Gb/s` on `-2` (`3.75 Gb/s` on `-1`), with `1250 Mb/s` Gigabit Ethernet jitter limits in `Table 59`. However, switching from `FTG256` to `CSG325` (`0.8 mm` pitch) or `FGG484` requires re-fanout of the entire BGA, adding **`1.0 V MGTAVCC`** and **`1.2 V MGTAVTT`** linear/filtered supplies and a dedicated differential `125 MHz MGTREFCLK`, unnecessary when Bank 34 `LVDS_25` SelectIO already achieves `1.25 Gb/s` SGMII cleanly on **`XC7A50T-2FTG256I`**.
 
 ---
 

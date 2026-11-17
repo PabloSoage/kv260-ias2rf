@@ -56,13 +56,13 @@ WIN_FONTS_DIR = Path("C:/Windows/Fonts")
 
 PARTS: list[tuple[str, list[tuple[str, str]]]] = [
     (
-        "Part I — Board Overview",
+        "Part I: Board Overview",
         [
             ("Project Overview", "README.md"),
         ],
     ),
     (
-        "Part II — Dual-FPGA Gateware & XSim Verification",
+        "Part II: Dual-FPGA Gateware & XSim Verification",
         [
             ("Dual-FPGA Gateware & Vivado Implementation", "docs/FPGA_GATEWARE.md"),
             ("FPGA Gateware Directory & Build Scripts", "fpga/README.md"),
@@ -77,7 +77,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
         ],
     ),
     (
-        "Part III — Schematic Subsystem Specifications",
+        "Part III: Schematic Subsystem Specifications",
         [
             ("IAS1 High-Speed Link Sheet", "docs/IAS_LINK_SPEC.md"),
             ("Clock Tree & LVPECL Distribution (Si549 + ADCLK948)", "docs/CLOCK_SPEC.md"),
@@ -92,7 +92,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
         ],
     ),
     (
-        "Part IV — 8-Layer PCB Layout & Signal/Power Integrity",
+        "Part IV: 8-Layer PCB Layout & Signal/Power Integrity",
         [
             ("8-Layer PCB Layout & Rules (JLC08161H-2116C)", "docs/LAYOUT.md"),
             ("Signal Integrity, openEMS, ngspice & Thermal Maps", "docs/SIGNAL_INTEGRITY.md"),
@@ -100,7 +100,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
         ],
     ),
     (
-        "Part V — Mechanical Integration, Heatsinks & Enclosure v2",
+        "Part V: Mechanical Integration, Heatsinks & Enclosure v2",
         [
             ("Mechanical Base & KV260 Mounting", "docs/MECHANICAL.md"),
             ("Enclosure v2 CAD & 3-D Shock/Vibration FEA", "docs/ENCLOSURE.md"),
@@ -108,7 +108,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
         ],
     ),
     (
-        "Part VI — Fabrication & Costing",
+        "Part VI: Fabrication & Costing",
         [
             ("JLCPCB Fabrication & Impedance Order Guide", "docs/FABRICATION.md"),
             ("JLCPCB Assembly & Component Quote", "docs/JLCPCB_QUOTE.md"),
@@ -138,14 +138,14 @@ def drop_excluded_lines(md_text: str) -> str:
 
 
 SHOWCASE_4K_RENDERS: list[tuple[str, str]] = [
-    ("Adapter PCB — 4K Isometric Raytrace", "docs/img/highres/renders/board_iso_4k.png"),
-    ("Adapter PCB — 4K Top Copper & Assembly", "docs/img/highres/renders/board_top_4k.png"),
-    ("Adapter PCB — 4K Bottom Copper & Assembly", "docs/img/highres/renders/board_bottom_4k.png"),
+    ("Adapter PCB: 4K Isometric Raytrace", "docs/img/highres/renders/board_iso_4k.png"),
+    ("Adapter PCB: 4K Top Copper & Assembly", "docs/img/highres/renders/board_top_4k.png"),
+    ("Adapter PCB: 4K Bottom Copper & Assembly", "docs/img/highres/renders/board_bottom_4k.png"),
     ("Heatsink Placement Overview (HS1–HS5 + 50 mm Fan Wireframe)", "docs/img/highres/renders/board_heatsinks_4k.jpg"),
     ("Heatsink Macro Close-Up (4.0 mm Thermal Gap U401/Y401)", "docs/img/highres/renders/board_heatsinks_closeup_4k.jpg"),
-    ("Enclosure v2 — Closed Assembly with Filtered Intake & TPU Bumpers", "docs/img/highres/renders/case_v2_closed_4k.jpg"),
-    ("Enclosure v2 — Open Tray with Kria K26 + RF Adapter Seated", "docs/img/highres/renders/case_v2_open_4k.jpg"),
-    ("Enclosure v2 — Longitudinal Cross-Section (Fan Duct, SMAs & K26 Cooler)", "docs/img/highres/renders/case_v2_section_4k.jpg"),
+    ("Enclosure v2: Closed Assembly with Filtered Intake & TPU Bumpers", "docs/img/highres/renders/case_v2_closed_4k.jpg"),
+    ("Enclosure v2: Open Tray with Kria K26 + RF Adapter Seated", "docs/img/highres/renders/case_v2_open_4k.jpg"),
+    ("Enclosure v2: Longitudinal Cross-Section (Fan Duct, SMAs & K26 Cooler)", "docs/img/highres/renders/case_v2_section_4k.jpg"),
 ]
 
 VECTOR_FPGA_PDFS: list[tuple[str, str]] = [
@@ -289,7 +289,8 @@ table.tbl-med th {{ padding: 2.5pt 3pt; }}
 table.tbl-med td {{ padding: 2.2pt 3pt; }}
 table.tbl-wide th {{ padding: 2pt 2.4pt; }}
 table.tbl-wide td {{ padding: 1.8pt 2.4pt; }}
-tr:nth-child(even) td {{ background-color: #f8fafc; }}
+tr.alt td {{ background-color: #f8fafc; }}
+table.cont {{ margin-top: 0; }}
 tr {{ page-break-inside: avoid; }}
 hr {{ border: none; border-top: 0.6pt solid #cbd5e1; margin: 9pt 0; }}
 figure {{
@@ -847,18 +848,16 @@ def md_to_html(md_text: str, md_path: Path, packer: AssetPacker) -> str:
             ncols = max(1, len(headers))
             tbl_cls = "tbl-std" if ncols <= 5 else ("tbl-med" if ncols <= 8 else "tbl-wide")
             empty_hdr = all(not h.strip() for h in headers)
-            thead_html = ""
+            th_html = None
             if not empty_hdr:
                 th_html = "".join(f"<th>{inline_md(h, base_dir, packer, table_cols=ncols)}</th>" for h in headers)
-                thead_html = f"<thead><tr>{th_html}</tr></thead>"
             body_html: list[str] = []
             for r in rows:
                 padded = r + [""] * max(0, ncols - len(r))
-                tds = "".join(
+                body_html.append("".join(
                     f"<td>{inline_md(c, base_dir, packer, table_cols=ncols)}</td>" for c in padded[:ncols]
-                )
-                body_html.append(f"<tr>{tds}</tr>")
-            out.append(f'<table class="{tbl_cls}">{thead_html}<tbody>{"".join(body_html)}</tbody></table>')
+                ))
+            out.append(register_table(tbl_cls, th_html, body_html))
             continue
 
         # Unordered / ordered list
@@ -953,22 +952,106 @@ def _stamp_page_footer(page: fitz.Page, page_num: int, total_pages: int) -> None
     )
 
 
-def render_html_pages(html_body: str, tmp_dir: Path, doc_label: str, user_css: str, has_ttf: bool) -> fitz.Document:
-    """Render an HTML fragment to A4 portrait PDF pages via PyMuPDF Story + DocumentWriter."""
-    header_tag = f"<div class='doc-path'>Source: {html.escape(doc_label)}</div>" if doc_label else ""
-    full_html = f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>{header_tag}{html_body}</body></html>"
-    arch = _open_story_archive(tmp_dir, has_ttf)
+# Tables are paginated here, not by MuPDF's Story: when Story breaks a table across pages it repeats the
+# header where an earlier layout pass split it (a navy band in the middle of a page) and its cells stop lining
+# up with their rows. md_to_html registers each table and leaves a token; render_html_pages lays the document
+# out, finds the rows that start a new page, splits the table there into complete tables that each begin with
+# the header row, and lays it out again until the split points stop moving. Every chunk then fits on its page.
+_TABLES: dict[int, tuple[str, str | None, list[str]]] = {}
+_TABLE_TOKEN = re.compile(r"@@TBL(\d+)@@")
+ALT = " class='alt'"
+TABLE_REPORT: list[str] = []
+
+
+def register_table(tbl_cls: str, header_cells: str | None, rows_cells: list[str]) -> str:
+    k = len(_TABLES)
+    _TABLES[k] = (tbl_cls, header_cells, rows_cells)
+    return f"@@TBL{k}@@"
+
+
+def _table_html(k: int, splits: dict[int, set[int]], spacers: dict[tuple[int, int], float]) -> str:
+    tbl_cls, header_cells, rows = _TABLES[k]
+    cuts = [0] + sorted(s for s in splits.get(k, ()) if 0 < s < len(rows)) + [len(rows)]
+    chunks = []
+    for a, b in zip(cuts, cuts[1:]):
+        if (k, a) in spacers:  # fills the foot of the page, so the header moves down with its first row
+            chunks.append(f"<div style='height:{spacers[(k, a)]:.1f}pt'></div>")
+        trs = [f"<tr id='t{k}h{a}' class='hdr'>{header_cells}</tr>"] if header_cells else []
+        trs += [f"<tr id='t{k}r{j}'{ALT if j % 2 else ''}>{rows[j]}</tr>" for j in range(a, b)]
+        cont = " cont" if a else ""
+        chunks.append(f"<table class='{tbl_cls}{cont}'>{''.join(trs)}</table>")
+    return "".join(chunks)
+
+
+def _layout(full_html: str, user_css: str, arch: fitz.Archive) -> tuple[bytes, dict[str, tuple[int, float]]]:
+    """One Story layout; returns the PDF bytes and the page and top of every element with an id."""
     story = fitz.Story(html=full_html, user_css=user_css, archive=arch)
     buf = io.BytesIO()
     writer = fitz.DocumentWriter(buf)
-    more = 1
+    pages: dict[str, tuple[int, float]] = {}
+
+    def where(pos) -> None:
+        if pos.id and pos.id not in pages:
+            pages[pos.id] = (pos.page, pos.rect[1])
+
+    more, pno = 1, 0
     while more:
         dev = writer.begin_page(fitz.Rect(0, 0, A4_W, A4_H))
         more, _ = story.place(CONTENT_RECT)
+        story.element_positions(where, {"page": pno})
         story.draw(dev, None)
         writer.end_page()
+        pno += 1
     writer.close()
-    doc = fitz.open("pdf", buf.getvalue())
+    return buf.getvalue(), pages
+
+
+def render_html_pages(html_body: str, tmp_dir: Path, doc_label: str, user_css: str, has_ttf: bool) -> fitz.Document:
+    """Render an HTML fragment to A4 portrait PDF pages via PyMuPDF Story + DocumentWriter."""
+    header_tag = f"<div class='doc-path'>Source: {html.escape(doc_label)}</div>" if doc_label else ""
+    arch = _open_story_archive(tmp_dir, has_ttf)
+    tables = [int(m) for m in _TABLE_TOKEN.findall(html_body)]
+    splits: dict[int, set[int]] = {}
+    spacers: dict[tuple[int, int], float] = {}
+    # Each pass fixes only the first problem in reading order, so everything above it is final: a row
+    # that starts a page without a split, a split that is no longer at a page top, or a header left alone
+    # at the foot of a page. Story lays out the rows of a table that runs over a page taller than they
+    # are, so the row it puts at the top of the next page often fits once the table is cut there; such a
+    # split moves down one row at a time until its row really starts the next page.
+    for _ in range(3000):
+        body = _TABLE_TOKEN.sub(lambda m: _table_html(int(m.group(1)), splits, spacers), html_body)
+        full_html = f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>{header_tag}{body}</body></html>"
+        pdf_bytes, pages = _layout(full_html, user_css, arch)
+        issues: list[tuple[int, float, str, int, int]] = []
+        for k in tables:
+            cuts = splits.get(k, set())
+            for j in range(1, len(_TABLES[k][2])):
+                cur, prev = pages.get(f"t{k}r{j}"), pages.get(f"t{k}r{j - 1}")
+                if cur is None or prev is None:
+                    continue
+                if cur[0] != prev[0] and j not in cuts:
+                    issues.append((cur[0], cur[1], "split", k, j))
+                elif cur[0] == prev[0] and j in cuts:
+                    issues.append((cur[0], cur[1], "unsplit", k, j))
+            if _TABLES[k][1]:
+                for a in {0} | cuts:
+                    h, r = pages.get(f"t{k}h{a}"), pages.get(f"t{k}r{a}")
+                    if h is not None and r is not None and h[0] != r[0] and (k, a) not in spacers:
+                        issues.append((h[0], h[1], "orphan", k, a))
+        if not issues:
+            break
+        _, y, kind, k, j = min(issues)
+        if kind == "split":
+            splits.setdefault(k, set()).add(j)
+        elif kind == "unsplit":
+            splits[k].discard(j)
+            if j + 1 < len(_TABLES[k][2]):
+                splits[k].add(j + 1)
+        else:
+            spacers[(k, j)] = CONTENT_RECT.y1 - y - 1.0
+    else:
+        TABLE_REPORT.append(f"{doc_label}: table layout did not settle")
+    doc = fitz.open("pdf", pdf_bytes)
     lbl = doc_label or "Table of Contents"
     for p in doc:
         _stamp_page_header(p, lbl)
@@ -1187,10 +1270,10 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
     summary = [(p, len(docs)) for p, docs in PARTS]
     if include_vectors:
         summary.extend([
-            ("Appendix A — Vector Vivado FPGA Silicon Floorplans & Schematics", len(VECTOR_FPGA_PDFS)),
-            ("Appendix B — Vector Heatsink Mechanical Map", 1),
-            ("Appendix C — Vector 11-Sheet Hierarchical KiCad Schematic", 11),
-            ("Appendix D — Vector 10-Sheet 8-Layer PCB Layout", 10),
+            ("Appendix A: Vector Vivado FPGA Silicon Floorplans & Schematics", len(VECTOR_FPGA_PDFS)),
+            ("Appendix B: Vector Heatsink Mechanical Map", 1),
+            ("Appendix C: Vector 11-Sheet Hierarchical KiCad Schematic", 11),
+            ("Appendix D: Vector 10-Sheet 8-Layer PCB Layout", 10),
         ])
     add_cover_page(master)
     add_summary_page(master, summary)
@@ -1219,7 +1302,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
                 rendered.close()
                 toc.append([2, doc_title, start_page])
 
-            if part_title.startswith("Part V —"):
+            if part_title.startswith("Part V:"):
                 sub_toc = add_showcase_pages(master, packer, tmp_dir, user_css, has_ttf)
                 for lvl, ttl, pg in sub_toc:
                     toc.append([lvl, ttl, pg])
@@ -1227,19 +1310,19 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
         if include_vectors:
             pnum = add_section_divider(
                 master,
-                "Appendix A — Vivado FPGA Silicon & Schematics",
+                "Appendix A: Vivado FPGA Silicon & Schematics",
                 "Lossless vector Artix-7 XC7A50T & Kria K26 floorplans and post-route circuit diagrams",
             )
-            toc.append([1, "Appendix A — Vector Vivado FPGA Floorplans & Schematics", pnum])
+            toc.append([1, "Appendix A: Vector Vivado FPGA Floorplans & Schematics", pnum])
             for title, rel in VECTOR_FPGA_PDFS:
                 insert_vector_pdf(master, REPO_ROOT / rel, toc, 2, title)
 
             pnum = add_section_divider(
                 master,
-                "Appendix B — Heatsink Mechanical Keep-Out Drawing",
+                "Appendix B: Heatsink Mechanical Keep-Out Drawing",
                 "Lossless vector dimensions, clearances & HS1-HS5 thermal zones",
             )
-            toc.append([1, "Appendix B — Vector Heatsink Mechanical Map", pnum])
+            toc.append([1, "Appendix B: Vector Heatsink Mechanical Map", pnum])
             insert_vector_svg(
                 master,
                 REPO_ROOT / "docs/img/highres/renders/heatsink_mechanical_map.svg",
@@ -1250,10 +1333,10 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
 
             pnum = add_section_divider(
                 master,
-                "Appendix C — 11-Sheet Hierarchical KiCad Schematic",
+                "Appendix C: 11-Sheet Hierarchical KiCad Schematic",
                 "Complete connected overview + all 10 hierarchical schematic sheets (11 vector sheets)",
             )
-            toc.append([1, "Appendix C — Vector 11-Sheet Hierarchical KiCad Schematic", pnum])
+            toc.append([1, "Appendix C: Vector 11-Sheet Hierarchical KiCad Schematic", pnum])
             sch_start = len(master) + 1
             insert_vector_pdf(
                 master,
@@ -1282,10 +1365,10 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
 
             pnum = add_section_divider(
                 master,
-                "Appendix D — 8-Layer PCB Layout (JLC08161H-2116C)",
+                "Appendix D: 8-Layer PCB Layout (JLC08161H-2116C)",
                 "L1..L8 individual copper layers, all 8 layers combined & transparent signal routing (vector)",
             )
-            toc.append([1, "Appendix D — Vector 8-Layer PCB Layout", pnum])
+            toc.append([1, "Appendix D: Vector 8-Layer PCB Layout", pnum])
             layout_start = len(master) + 1
             insert_vector_pdf(
                 master,
@@ -1358,7 +1441,9 @@ def main() -> int:
     parser.add_argument("--skip-vectors", action="store_true", help="Skip appending Vivado/KiCad vector PDF appendices")
     args = parser.parse_args()
     build_documentation_pdf(args.out, args.max_img_width, args.jpeg_quality, not args.skip_vectors)
-    return 0
+    for line in TABLE_REPORT:
+        print(f"[table] {line}", file=sys.stderr)
+    return 1 if TABLE_REPORT else 0
 
 
 if __name__ == "__main__":
