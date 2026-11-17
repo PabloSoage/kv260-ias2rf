@@ -24,7 +24,7 @@ This folder contains the complete synthesizable Verilog gateware, Vivado 2026.1 
 
 | Target Device | Top / Wrapper | Slice LUTs | FFs | BRAM36 eq. | DSP | WNS | WHS | DRC |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `17,450 / 32,600` (`53.5%`) | `19,029 / 65,200` (`29.2%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | `+0.071 ns` (`clk_400m_unbuf`; AD9484 closed at `400 MSPS` only, `AD9253` `2.0/2.5 ns` MET) | `+0.014 ns` | `0` Err |
+| **`XC7A50T-FTG256-2`** | `artix_top` (`ENABLE_ETH=1`) | `24,958 / 32,600` (`76.6%`) | `28,901 / 65,200` (`44.3%`) | `18.0 / 75` (`24.0%`) | `119 / 120` (`99.2%`) | `+0.141 ns` (`clk_400m_unbuf`, both `CLK_FPGA` modes; AD9484 at `400 MSPS` through AERIS and at `500 MSPS` through D2) | `+0.048 ns` | `0` Err |
 | **`XCK26-SFVC784-2LV-c`** | `ias2rf_k26_bd_wrapper` (BD) | `36,393 / 117,120` (`31.1%`) | `36,562 / 234,240` (`15.6%`) | `32.5 / 144` (`22.6%`) | `106 / 1,248` (`8.5%`) | `+0.874 ns` | `+0.010 ns` | `0` Err |
 
 ---
