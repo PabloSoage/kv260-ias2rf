@@ -1,5 +1,6 @@
 """Generate high-resolution (4K PNG) and 100% vector (SVG + PDF) Vivado silicon floorplans and circuit schematics."""
 import json
+import re
 import math
 import os
 import numpy as np
@@ -131,27 +132,57 @@ def classify_artix_group(grp):
 
 
 KRIA_GROUPS = [
-    ("u_pcs_rx",   "IAS1 2-Lane AM Deskew + 64b/66b RX PCS", "#1565C0"),
-    ("u_train_fsm","512-Tap IDELAYE3 Eye Trainer",          "#00897B"),
-    ("u_pcs_dl_tx","IAS1 Downlink 64b/66b TX PCS",          "#7B1FA2"),
-    ("u_link_axis","AXI4-Stream + AXI-Lite DMA Bridge",     "#D84315"),
-    ("u_fifo",     "CDC FIFOs (RX/TX/AXI Domains)",         "#F57C00"),
-    ("other",      "Bank 66 HP SERDES / Clocking / EMIO",   "#546E7A"),
+    ("ps_dma",     "PS8 interface, two AXI DMAs + SmartConnect", "#546E7A"),
+    ("link",       "IAS1 link: SERDES, eye trainer, PCS, FIFOs",  "#1565C0"),
+    ("ch_rx",      "DSP suite: channel receivers",               "#00897B"),
+    ("radar",      "DSP suite: radar processor",                 "#C62828"),
+    ("adsb",       "DSP suite: ADS-B receiver",                  "#7B1FA2"),
+    ("tx_mod",     "DSP suite: transmit modulator, queue",       "#F57C00"),
+    ("bev",        "Fusion grid (kria_bev_0)",                   "#2E7D32"),
+    ("pps",        "GPS PPS (kria_pps_0)",                       "#D84315"),
+    ("other",      "Clocking / I/O",                             "#90A4AE"),
 ]
 
 
 def classify_kria_group(grp):
-    if grp == "u_pcs_rx":
-        return "u_pcs_rx"
-    if grp == "u_train_fsm":
-        return "u_train_fsm"
-    if grp == "u_pcs_dl_tx":
-        return "u_pcs_dl_tx"
-    if grp == "u_link_axis":
-        return "u_link_axis"
-    if grp.startswith("u_fifo"):
-        return "u_fifo"
+    """Groups from export_vivado_views.tcl on the routed block design: the IP instance, kria_pl_link_0/<block>,
+    or u_dsp_suite/<block>."""
+    if grp.startswith("u_dsp_suite/"):
+        sub = grp.split("/", 1)[1]
+        if sub.startswith("u_ch_rx"):
+            return "ch_rx"
+        if sub.startswith("u_radar"):
+            return "radar"
+        if sub.startswith("u_adsb"):
+            return "adsb"
+        return "tx_mod"
+    if grp.startswith("kria_pl_link_0"):
+        return "link"
+    if grp.startswith("kria_bev"):
+        return "bev"
+    if grp.startswith("kria_pps"):
+        return "pps"
+    if grp.startswith(("ps8", "axi_", "rst_", "xlslice", "xlconcat")):
+        return "ps_dma"
     return "other"
+
+
+REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+REPORTS = {"artix": os.path.join(REPO, "fpga", "artix", "reports_rev06"), "kria": os.path.join(REPO, "fpga", "kria", "reports")}
+
+
+def report_numbers(which):
+    """Totals and timing of the build, read from its Vivado reports (the figures quote the reports, never a
+    number typed in here)."""
+    d = REPORTS[which]
+    util = open(os.path.join(d, "utilization.rpt"), encoding="utf-8", errors="replace").read()
+    hdr = [c.strip() for c in re.search(r"^\|\s*Instance\s*\|.*$", util, re.M).group(0).strip("|").split("|")]
+    row = [c.strip() for c in re.search(r"^\|\s*(artix_top|ias2rf_k26_bd_wrapper)\s*\|.*$", util, re.M).group(0).strip("|").split("|")]
+    u = dict(zip(hdr, row))
+    tim = open(os.path.join(d, "timing_summary.rpt"), encoding="utf-8", errors="replace").read()
+    m = re.search(r"WNS\(ns\)\s+TNS\(ns\).*?\n\s*-+.*?\n\s*([-\d.]+)\s+[-\d.]+\s+\d+\s+\d+\s+([-\d.]+)", tim, re.S)
+    return {"LUT": int(u["Total LUTs"]), "FF": int(u["FFs"]), "RAMB36": int(u["RAMB36"]), "RAMB18": int(u["RAMB18"]),
+            "DSP": int(u["DSP Blocks"]), "WNS": float(m.group(1)), "WHS": float(m.group(2))}
 
 
 def render_die_floorplan(json_path, stem, title, is_kria=False):
@@ -245,12 +276,19 @@ def render_die_floorplan(json_path, stem, title, is_kria=False):
     counts_by_grp = {k: {"LUT": 0, "FF": 0, "BRAM": 0, "DSP": 0, "ALL": 0} for k, _, _ in groups_cfg}
     totals = {"LUT": 0, "FF": 0, "BRAM": 0, "DSP": 0, "SERDES": 0, "CLK": 0}
 
+    # An UltraScale+ DSP48E2 is placed as several leaf primitives (DSP_ALU, DSP_M_DATA, ...) on one
+    # site, so DSPs are counted by unique site rather than by leaf cell.
+    dsp_sites = set()
     rng = np.random.default_rng(42)
     for grp, kind, rf, loc, gx, gy in cells:
         bkey = clf(grp)
         # Small sub-tile jitter so dense slices show fill density cleanly
         buckets[bkey].append((gx + rng.uniform(-0.32, 0.32), fy(gy) + rng.uniform(-0.32, 0.32)))
         counts_by_grp[bkey]["ALL"] += 1
+        if kind == "DSP":
+            if loc in dsp_sites:
+                continue
+            dsp_sites.add(loc)
         if kind in counts_by_grp[bkey]:
             counts_by_grp[bkey][kind] += 1
         if kind in totals:
@@ -286,7 +324,8 @@ def render_die_floorplan(json_path, stem, title, is_kria=False):
     )
 
     # Right Panel: Resource Breakdown by Subsystem & Silicon Occupancy Table
-    active_grps = [g for g in groups_cfg if counts_by_grp[g[0]]["ALL"] > 0]
+    active_grps = [g for g in groups_cfg
+                   if counts_by_grp[g[0]]["LUT"] + counts_by_grp[g[0]]["FF"] + counts_by_grp[g[0]]["DSP"] > 0]
     y_pos = np.arange(len(active_grps))
     luts = [counts_by_grp[g[0]]["LUT"] for g in active_grps]
     ffs = [counts_by_grp[g[0]]["FF"] for g in active_grps]
@@ -310,29 +349,24 @@ def render_die_floorplan(json_path, stem, title, is_kria=False):
         extra = f" | {ds} DSP" if ds else ""
         ax_stat.text(max(lu, ff) + xmax * 0.015, i, f"{lu:,} LUT / {ff:,} FF{extra}", va="center", fontsize=7.6)
 
-    # Occupancy Card below bar chart
+    # Occupancy card below the bar chart: the build's own reports
+    r = report_numbers("kria" if is_kria else "artix")
+    bram = r["RAMB36"] + r["RAMB18"] / 2
     if not is_kria:
         cap = {"LUT": 32600, "FF": 65200, "BRAM": 75, "DSP": 120}
-        card = (
-            f"Device: XC7A50T-FTG256-2 (Artix-7)\n"
-            f"Top: artix_top (ENABLE_ETH=1, Post-Route Vivado 2026.1)\n"
-            f"Slice LUTs: 15,416 / {cap['LUT']:,} (47.3%)  [{totals['LUT']:,} leaf LUT1..6]\n"
-            f"FFs:        {totals['FF']:,} / {cap['FF']:,} ({100*totals['FF']/cap['FF']:.1f}%)\n"
-            f"DSP48E1:    {totals['DSP']} / {cap['DSP']} ({100*totals['DSP']/cap['DSP']:.1f}%)\n"
-            f"BRAM36 eq.: 16.0 / {cap['BRAM']} (21.3%: 13 RAMB36 + 6 RAMB18)\n"
-            f"Timing:     WNS = +{data['wns_ns']:.3f} ns | WHS = +{data['whs_ns']:.3f} ns (ALL MET)"
-        )
+        dev, top = "XC7A50T-FTG256-2 (Artix-7)", "artix_top (ENABLE_ETH=1), post-route, Vivado 2026.1"
     else:
         cap = {"LUT": 117120, "FF": 234240, "BRAM": 144, "DSP": 1248}
-        card = (
-            f"Device: XCK26-SFVC784-2LV-c (Kria KV260 Zynq US+)\n"
-            f"1) kria_top PL Link Core: {totals['LUT']:,} LUTs ({100*totals['LUT']/cap['LUT']:.1f}%), "
-            f"{totals['FF']:,} FFs ({100*totals['FF']/cap['FF']:.1f}%), WNS = +{data['wns_ns']:.3f} ns\n"
-            f"2) Full Vivado BD (ias2rf_k26_bd_wrapper incl. PS8+DMA+SMC):\n"
-            f"   11,034 / {cap['LUT']:,} LUTs (9.4%) | 18,212 / {cap['FF']:,} FFs (7.8%)\n"
-            f"   3.0 / {cap['BRAM']} BRAM36 (2.1%) | 0 DSP48E2 | WNS = +1.291 ns\n"
-            f">90% K26 PL silicon free for on-SOM CFAR / Range-Doppler / Demod"
-        )
+        dev, top = "XCK26-SFVC784-2LV-c (Kria K26)", "ias2rf_k26_bd_wrapper (full block design), post-route"
+    card = (
+        f"Device: {dev}\n"
+        f"Top: {top}\n"
+        f"Slice LUTs: {r['LUT']:,} / {cap['LUT']:,} ({100 * r['LUT'] / cap['LUT']:.1f}%)\n"
+        f"FFs:        {r['FF']:,} / {cap['FF']:,} ({100 * r['FF'] / cap['FF']:.1f}%)\n"
+        f"DSP:        {r['DSP']} / {cap['DSP']} ({100 * r['DSP'] / cap['DSP']:.1f}%)\n"
+        f"BRAM36 eq.: {bram:g} / {cap['BRAM']} ({100 * bram / cap['BRAM']:.1f}%: {r['RAMB36']} RAMB36 + {r['RAMB18']} RAMB18)\n"
+        f"Timing:     WNS = {r['WNS']:+.3f} ns | WHS = {r['WHS']:+.3f} ns"
+    )
     ax_stat.text(
         0.02, -0.14, card, transform=ax_stat.transAxes, va="top", ha="left",
         fontsize=8.0, family="DejaVu Sans Mono",
@@ -358,7 +392,7 @@ def plot_artix7_schematic(artix_json):
     ax.set_ylim(0, 15)
     ax.axis("off")
 
-    ax.text(12, 14.65, "Artix-7 XC7A50T-FTG256-2 (artix_top) — Vivado Post-Route Hierarchical Circuit Schematic",
+    ax.text(12, 14.65, "Artix-7 XC7A50T-FTG256-2 (artix_top): Vivado Post-Route Hierarchical Circuit Schematic",
             ha="center", va="center", fontsize=13.5, fontweight="bold", color="#0F172A")
     ax.text(12, 14.25, f"Clock Domains: fpga_clk 400/500M | dac_clk 100/125M (no MMCM) | link_clk 125M | tx_clk_ddr 500M | clk_400m 400M | clk_625 625M | cfgmclk   |   WNS = +{d['wns_ns']:.3f} ns, WHS = +{d['whs_ns']:.3f} ns",
             ha="center", va="center", fontsize=9.0, color="#334155")
@@ -449,65 +483,73 @@ def plot_kria_bd_schematic(kria_json):
     ax.set_ylim(0, 14.8)
     ax.axis("off")
 
-    ax.text(12, 14.45, "Kria KV260 XCK26-SFVC784-2LV-c — Vivado IPI Block Design (ias2rf_k26_bd) & PL Link Circuit",
+    ax.text(12, 14.45, "Kria KV260 XCK26-SFVC784-2LV-c: Vivado IPI Block Design (ias2rf_k26_bd) & PL Link Circuit",
             ha="center", va="center", fontsize=13.2, fontweight="bold", color="#0F172A")
-    ax.text(12, 14.05, f"PS8 (Quad Cortex-A53 + GEM3 RJ45 + DDR4) + HP0 DMA + kria_pl_link (5x Oversampled DRU + 64b/66b PCS)   |   BD WNS = +1.291 ns, kria_top WNS = +{d['wns_ns']:.3f} ns",
+    ax.text(12, 14.05, f"PS8 + kria_pl_link (link, DSP suite) + kria_pps + kria_bev (fusion grid) + two AXI DMAs into DDR4   |   "
+            f"BD WNS = {d['wns_ns']:+.3f} ns, WHS = {d['whs_ns']:+.3f} ns",
             ha="center", va="center", fontsize=9.0, color="#334155")
 
     # Left: J8 Connector + PHY Front-end
     draw_module(ax, 0.4, 8.8, 3.3, 4.4, "KV260 J8 (IAS1)", "Bank 66 HP (1.2V DIFF_SSTL12)",
                 ["LINK_RX_CLK (C1/B1)", "LINK_RX_D0  (A2/A1)", "LINK_RX_D1  (B3/A3)", "  ODT = RTT_48 int.", "LINK_TX_CLK (D4/C4)", "LINK_TX_D0  (B4/A4)", "HK_SCL/SDA/IRQ/PROG"],
                 hdr_col="#1E293B", fill_col="#F1F5F9", badge="2.0 Gb/s UL")
-    draw_module(ax, 0.4, 1.2, 3.3, 3.4, "KV260 J2 Pmod + J10 RJ45", "Carriers Side Interfaces",
-                ["J2 Bank 45 LVCMOS33:", "  pmod_cs_n/mosi/miso/sclk", "  beam_strobe / pps_sync", "J10 Carrier RJ45:", "  PS GEM3 RGMII (DP83867)", "  Receives Artix U1201 UDP"],
+    draw_module(ax, 0.4, 4.4, 3.3, 3.6, "KV260 J2 Pmod + J9", "Carrier-side interfaces",
+                ["J2 Bank 45 LVCMOS33:", "  pmod_cs_n/mosi/miso/sclk", "  beam_strobe / PPS_SYNC", "J9 pin 12 (HDA10, J12):", "  GPS 1-PPS -> kria_pps", "J10 RJ45: PS GEM3"],
                 hdr_col="#334155", fill_col="#F8FAFC")
 
-    # Center-Left: Exploded kria_pl_link_0
-    ax.add_patch(Rectangle((4.3, 5.2), 8.2, 8.2, facecolor="#F0F9FF", edgecolor="#0284C7", lw=1.6, ls="--", zorder=1))
-    ax.text(4.5, 13.15, "kria_pl_link_0 (Custom Verilog Module in ias2rf_k26_bd)", fontsize=9.2, fontweight="bold", color="#0369A1")
-
-    draw_module(ax, 4.6, 9.6, 3.6, 3.1, "HP Bank 66 SERDES & Clock", "MMCME4 + IDELAYCTRL + 2x ISERDESE3",
-                ["MMCME4_ADV: 250M->500M DDR", "IDELAYE3 VAR_LOAD (512 taps", "  @ 4 ps) + BISC EN_VTC ctrl", "link_rx_train_fsm eye scan", "2x OSERDESE3 -> Downlink TX"],
+    # Centre: kria_pl_link_0 (link and DSP suite)
+    ax.add_patch(Rectangle((4.3, 4.2), 8.4, 9.3, facecolor="#F0F9FF", edgecolor="#0284C7", lw=1.6, ls="--", zorder=1))
+    ax.text(4.5, 13.25, "kria_pl_link_0 (RTL module in ias2rf_k26_bd), CSRs at 0x8000_0000", fontsize=9.0,
+            fontweight="bold", color="#0369A1")
+    draw_module(ax, 4.6, 10.2, 3.8, 2.8, "Bank 66 SERDES + trainer", "MMCME4 + IDELAYE3 + ISERDESE3",
+                ["250 -> 500 MHz DDR sampling", "512-tap eye trainer", "OSERDESE3 downlink TX"],
                 hdr_col="#0369A1", fill_col="white")
-    draw_module(ax, 4.6, 5.6, 3.6, 3.4, "2-Lane 64b/66b RX/TX PCS", "link_pcs_rx + link_pcs_tx",
-                ["link_gearbox_rx (8:66) +", "  Clause 49 block_lock (x2)", "link_64b66b_dec (G=1+x^39+x^58)", "link_rx_lanes (AM deskew FIFO)", "link_deframer + CRC-32 verify"],
+    draw_module(ax, 8.6, 10.2, 3.8, 2.8, "2-lane 64b/66b PCS", "link_pcs_rx + link_pcs_tx",
+                ["gearbox, block lock, descrambler", "AM deskew, deframer, CRC-32", "link_axis + CDC FIFOs"],
                 hdr_col="#0284C7", fill_col="white")
-    draw_module(ax, 8.6, 9.4, 3.6, 3.3, "AXI4-Stream Bridge", "link_axis + Dual-Clk Async FIFO",
-                ["rx_clkdiv (125M) <-> pl_clk 100M", "m_axis_rx (64b TLAST TID TUSER)", "s_axis_tx (64b MM2S -> /S/ /T/)", "PPS-disciplined 64b ts_cnt_rx", "256x64 RX / 128x64 TX FIFOs"],
-                hdr_col="#0F766E", fill_col="white")
-    draw_module(ax, 8.6, 5.6, 3.6, 3.3, "AXI4-Lite CSR & EMIO Mux", "s_axi @ 0x8000_0000 (64K)",
-                ["CSRs 0x00..0x34 (status/eye)", "PPS GPIO + EMIO I2C0 -> HK", "EMIO SPI0 -> J2 Pmod failsafe", "irq_fpga + irq_link_up out", "Watchdog timeout guard"],
-                hdr_col="#475569", fill_col="white")
+    draw_module(ax, 4.6, 4.5, 7.8, 5.3, "u_dsp_suite (kria_dsp_suite)", "106 DSP48E2, 12 BRAM36 (FPGA_GATEWARE 5.5)",
+                ["channel receivers: mixer, CIC, FIR, CORDIC demodulators, SSB, CTCSS, RDS",
+                 "ADS-B receiver: preamble, PPM slicer, CRC, frame arbiter",
+                 "radar processor: range FFT, corner turn, Doppler FFT, power map, CA-CFAR;",
+                 "  RADAR_STAT[31:26] counts CPIs",
+                 "transmit modulator: AM/FM/SSB from the DMA's audio, to the Artix DAC",
+                 "input queue: one 64-bit stream from the link, one to the DMA"],
+                hdr_col="#0F766E", fill_col="white", badge="pl_clk0 100 MHz")
 
-    # Center-Right: Vivado BD Infrastructure (DMA + SmartConnects)
-    draw_module(ax, 13.3, 9.4, 4.1, 3.9, "axi_dma_0", "Xilinx AXI DMA v7.1 (64-bit Simple)",
-                ["S_AXIS_S2MM <- kria_pl_link RX", "M_AXIS_MM2S -> kria_pl_link TX", "MM2S & S2MM DRE enabled", "Max burst length = 64 x 64b", "S_AXI_LITE @ 0x8001_0000", "s2mm_introut / mm2s_introut"],
-                hdr_col="#C2410C", fill_col="#FFF7ED", badge="No SG / DRE")
-    draw_module(ax, 13.3, 6.2, 4.1, 2.7, "axi_smc_hp0 + axi_smc_ctrl", "2x Xilinx AXI SmartConnect",
-                ["axi_smc_hp0 (2 SI -> 1 MI): DDR", "  combines MM2S + S2MM 64-bit", "axi_smc_ctrl (1 SI -> 2 MI):", "  PS HPM0 -> PL Link + DMA CSRs"],
+    # Right of centre: the block design's IP
+    draw_module(ax, 13.2, 10.9, 4.4, 2.6, "axi_dma_0 (0x8001_0000)", "AXI DMA, 64-bit, simple mode",
+                ["S2MM <- kria_pl_link m_axis_rx", "MM2S -> kria_pl_link s_axis_tx", "IRQ In2 (S2MM), In3 (MM2S)"],
+                hdr_col="#C2410C", fill_col="#FFF7ED")
+    draw_module(ax, 13.2, 8.3, 4.4, 2.3, "axi_dma_1 (0x8004_0000)", "AXI DMA, S2MM only",
+                ["S2MM <- kria_bev_0 m_axis (grid frames)", "IRQ In5 (SPI 94)"],
+                hdr_col="#B45309", fill_col="#FFFBEB")
+    draw_module(ax, 13.2, 5.9, 4.4, 2.1, "kria_bev_0 (0x8003_0000)", "Fusion occupancy grid, 256 x 256",
+                ["detections in over AXI-Lite (DET_XY/CMD)", "16 BRAM36; frames out on m_axis"],
+                hdr_col="#2E7D32", fill_col="#F0FDF4")
+    draw_module(ax, 13.2, 3.6, 4.4, 2.0, "kria_pps_0 (0x8002_0000)", "GPS PPS capture + disciplined PPS",
+                ["drives PPS_SYNC and pps_ref", "IRQ In4"],
+                hdr_col="#D84315", fill_col="#FFF7ED")
+    draw_module(ax, 13.2, 0.9, 4.4, 2.4, "axi_smc_ctrl / axi_smc_hp0", "AXI SmartConnects, reset, IRQ concat",
+                ["ctrl: HPM0_LPD -> 5 slaves above", "hp0: 3 DMA masters -> S_AXI_HP0_FPD", "xlconcat_0 [5:0] -> pl_ps_irq0"],
                 hdr_col="#7E22CE", fill_col="#FAF5FF")
-    draw_module(ax, 13.3, 2.6, 4.1, 3.1, "rst_ps8_100M + xlconcat_0", "Reset & 4-bit Interrupt Combine",
-                ["proc_sys_reset on pl_clk0 (100M)", "xlconcat_0 [3:0] -> pl_ps_irq0:", "  [0] irq_fpga  [1] irq_link_up", "  [2] s2mm_irq  [3] mm2s_irq"],
-                hdr_col="#334155", fill_col="#F8FAFC")
 
-    # Right: PS8 Hardened Zynq UltraScale+ Block
-    draw_module(ax, 18.4, 1.8, 5.1, 11.5, "ps8 (zynq_ultra_ps_e_0)", "Hardened Zynq UltraScale+ MPSoC Silicon",
-                ["ARM Quad Cortex-A53 @ 1.33 GHz", "64-bit DDR4-2400 Controller (4 GB)", "", "AXI High-Performance & Control:", "  S_AXI_HP0_FPD (64-bit, DMA -> DDR)", "  M_AXI_HPM0_LPD (32-bit CSRs)", "", "Clocks & Interrupts:", "  pl_clk0 = 100 MHz (IOPLL)", "  pl_resetn0 -> rst_ps8_100M", "  pl_ps_irq0[3:0] <- xlconcat_0", "", "PS EMIO Peripherals:", "  EMIO I2C0 -> HK_SCL / HK_SDA", "  EMIO SPI0 -> J2 Pmod SPI", "  EMIO GPIO[7:0] -> PPS / PROG_B", "", "PS MIO 64-77 GEM3 -> KV260 J10 RJ45", "  Ingests Artix U1201 SGMII UDP!", "", "PetaLinux User-Space Zero-Copy:", "  uio + udmabuf / AF_XDP merge"],
+    # Right: PS8
+    draw_module(ax, 18.4, 0.9, 5.1, 12.6, "ps8 (zynq_ultra_ps_e)", "Zynq UltraScale+ MPSoC",
+                ["Quad Cortex-A53 (Linux)", "Dual Cortex-R5F:", "  core 0 AGC, front end, PPS", "  core 1 radar beam scan, grid", "DDR4 controller (4 GB)", "",
+                 "S_AXI_HP0_FPD <- both DMAs", "M_AXI_HPM0_LPD -> CSRs", "pl_clk0 = 100 MHz", "pl_ps_irq0[5:0] <- xlconcat_0", "",
+                 "EMIO: UART1 (Pmod), I2C0 (HK),", "  SPI0 (Pmod), GPIO (PPS, PROG_B)", "MIO GEM3 -> J10 RJ45", "DisplayPort -> HMI"],
                 hdr_col="#991B1B", fill_col="#FEF2F2", badge="Hard IP")
 
     # Connections
     draw_wire(ax, [(3.7, 11.4), (4.6, 11.4)], "#0369A1", 2.0, "2x 1.0G LVDS")
-    draw_wire(ax, [(4.6, 10.2), (3.7, 10.2)], "#0284C7", 1.6, "1.0G DL")
-    draw_wire(ax, [(6.4, 9.6), (6.4, 9.0)], "#0284C7", 1.8, "rx_bytes[15:0]")
-    draw_wire(ax, [(8.2, 7.3), (8.6, 10.8)], "#0F766E", 1.8, "64b Pkts")
-    draw_wire(ax, [(12.2, 11.6), (13.3, 11.6)], "#C2410C", 2.0, "m_axis_rx (64b)")
-    draw_wire(ax, [(13.3, 10.2), (12.2, 10.2)], "#C2410C", 1.7, "s_axis_tx (64b)")
-    draw_wire(ax, [(15.35, 9.4), (15.35, 8.9)], "#7E22CE", 2.0, "MM2S+S2MM")
-    draw_wire(ax, [(17.4, 7.8), (18.4, 7.8)], "#991B1B", 2.2, "S_AXI_HP0_FPD")
-    draw_wire(ax, [(18.4, 6.7), (17.4, 6.7)], "#7E22CE", 1.6, "M_AXI_HPM0_LPD")
-    draw_wire(ax, [(13.3, 7.1), (12.2, 7.1)], "#475569", 1.4, "0x8000_0000")
-    draw_wire(ax, [(17.4, 4.1), (18.4, 4.1)], "#991B1B", 1.5, "pl_ps_irq0[3:0]")
-    draw_wire(ax, [(3.7, 2.8), (18.4, 2.8)], "#475569", 1.4, "J2 Pmod EMIO SPI + J10 GEM3 Ethernet UDP", (11.0, 2.15))
+    draw_wire(ax, [(4.6, 10.6), (3.7, 10.6)], "#0284C7", 1.6, "1.0G DL")
+    draw_wire(ax, [(8.4, 11.6), (8.6, 11.6)], "#0284C7", 1.8)
+    draw_wire(ax, [(10.5, 10.2), (10.5, 9.8)], "#0F766E", 1.8, "64b packets")
+    draw_wire(ax, [(12.4, 12.2), (13.2, 12.2)], "#C2410C", 2.0, "m_axis_rx")
+    draw_wire(ax, [(13.2, 11.4), (12.4, 11.4)], "#C2410C", 1.7, "s_axis_tx")
+    draw_wire(ax, [(15.4, 7.95), (15.4, 8.3)], "#2E7D32", 1.8, "m_axis grid")
+    draw_wire(ax, [(17.6, 2.6), (18.4, 2.6)], "#991B1B", 2.2, "HP0_FPD")
+    draw_wire(ax, [(18.4, 1.6), (17.6, 1.6)], "#7E22CE", 1.6, "HPM0_LPD")
 
     fig.tight_layout()
     save_outputs(fig, "kria_k26_vivado_bd_schematic")

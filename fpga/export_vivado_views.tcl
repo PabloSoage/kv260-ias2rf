@@ -98,6 +98,14 @@ proc export_die_json {json_path top_name part_name} {
         set h0 [lindex $parts 0]
         if {[llength $parts] > 2 && ($h0 eq "g_eth" || $h0 eq "u_adc" || $h0 eq "u_adcs")} {
             set grp "$h0/[lindex $parts 1]"
+        } elseif {$h0 eq "ias2rf_k26_bd_i" && [llength $parts] > 2} {
+            # the K26 block design: the IP instance, the PL link's blocks, and the DSP suite's blocks
+            set p [lsearch -all -inline -not -exact [lrange $parts 1 end] "inst"]
+            set grp [lindex $p 0]
+            if {$grp eq "kria_pl_link_0" && [llength $p] > 2} {
+                set grp "kria_pl_link_0/[lindex $p 1]"
+                if {[lindex $p 1] eq "u_dsp_suite" && [llength $p] > 3} { set grp "u_dsp_suite/[lindex $p 2]" }
+            }
         } elseif {[llength $parts] > 1} {
             set grp $h0
         } else {
@@ -184,52 +192,26 @@ proc export_die_json {json_path top_name part_name} {
 }
 
 # ==============================================================================
-# 1. Artix-7 XC7A50T-FTG256-2 (artix_top, ENABLE_ETH=1)
+# 1. Artix-7 XC7A50T-FTG256-2 (artix_top, ENABLE_ETH=1): the routed checkpoint build_rev06.tcl writes, the same
+#    netlist and placement as reports_rev06
 # ==============================================================================
 if {$run_mode eq "all" || $run_mode eq "artix"} {
-    set artix_dir [file join $script_dir "artix"]
-    set_part xc7a50t-ftg256-2
-    read_verilog [glob [file join $script_dir "third_party" "aeris" "*.v"]]
-    read_verilog [glob [file join $script_dir "link" "*.v"]]
-    read_verilog [glob [file join $artix_dir "*.v"]]
-    read_xdc     [file join $artix_dir "xc7a50t.xdc"]
-
-    synth_design -top artix_top -part xc7a50t-ftg256-2 -flatten_hierarchy rebuilt -generic ENABLE_ETH=1'b1
-    opt_design
-    place_design
-    phys_opt_design
-    route_design
-    phys_opt_design                                ;# as build_rev06.tcl: the same netlist and WNS as the reports
-
+    set dcp [file join $script_dir "artix" ".build_rev06" "artix_top_routed.dcp"]
+    if {![file exists $dcp]} { error "no routed Artix checkpoint: run fpga/artix/build_rev06.tcl first ($dcp)" }
+    open_checkpoint $dcp
     export_die_json [file join $out_dir "artix7_die_data.json"] "artix_top" "xc7a50t-ftg256-2"
     close_design
 }
 
 # ==============================================================================
-# 2. Kria K26 XCK26-SFVC784-2LV-c (kria_top)
+# 2. Kria K26 XCK26-SFVC784-2LV-c: the routed block design of fpga/kria/build.tcl (ias2rf_k26_bd_wrapper), the
+#    design that is built and shipped, not the PL core on its own
 # ==============================================================================
 if {$run_mode eq "all" || $run_mode eq "kria"} {
-    set kria_dir [file join $script_dir "kria"]
-    read_verilog [list \
-        [file join $script_dir "link" "link_crc32.v"] \
-        [file join $script_dir "link" "link_scrambler.v"] \
-        [file join $script_dir "link" "link_gearbox.v"] \
-        [file join $script_dir "link" "link_framer.v"] \
-        [file join $script_dir "link" "link_lanes.v"] \
-        [file join $script_dir "link" "link_rx_train_fsm.v"] \
-        [file join $script_dir "link" "link_top.v"] \
-        [file join $kria_dir "link_axis.v"] \
-        [file join $kria_dir "top.v"] \
-    ]
-    read_xdc [file join $kria_dir "xck26.xdc"]
-
-    synth_design -top kria_top -part xck26-sfvc784-2LV-c -flatten_hierarchy rebuilt
-    opt_design
-    place_design
-    phys_opt_design
-    route_design
-
-    export_die_json [file join $out_dir "kria_k26_die_data.json"] "kria_top" "xck26-sfvc784-2LV-c"
+    set dcp [file join $script_dir "kria" ".bd_proj" "kria_bd.runs" "impl_1" "ias2rf_k26_bd_wrapper_routed.dcp"]
+    if {![file exists $dcp]} { error "no routed K26 checkpoint: run fpga/kria/build.tcl first ($dcp)" }
+    open_checkpoint $dcp
+    export_die_json [file join $out_dir "kria_k26_die_data.json"] "ias2rf_k26_bd_wrapper" "xck26-sfvc784-2LV-c"
     close_design
 }
 puts "VIVADO_VIEWS_EXPORT_COMPLETE"

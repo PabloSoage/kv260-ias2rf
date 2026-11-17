@@ -46,11 +46,11 @@ Every copper layer of the **JLC08161H-2116C** 8-layer stackup, plus composite vi
 
 Generated directly from post-route Vivado 2026.1 checkpoints ([`docs/FPGA_GATEWARE.md`](../../FPGA_GATEWARE.md)):
 
-- **Artix-7 `XC7A50T-FTG256-2` Silicon Die Floorplan (`18,045` packed LUT primitives / `15,416` Slice LUTs, `17,445` FFs, `110` DSP48E1, `16` BRAM36 eq.):**
+- **Artix-7 `XC7A50T-FTG256-2` Silicon Die Floorplan (`25,068` Slice LUTs, `28,881` FFs, `119` DSP48E1, `18` BRAM36 eq.):**
   - [`artix7_silicon_floorplan.pdf`](fpga/artix7_silicon_floorplan.pdf) · [`artix7_silicon_floorplan.svg`](fpga/artix7_silicon_floorplan.svg) · [`artix7_silicon_floorplan_4k.png`](fpga/artix7_silicon_floorplan_4k.png)
 - **Artix-7 `artix_top` Post-Route Circuit Schematic:**
   - [`artix7_vivado_schematic.pdf`](fpga/artix7_vivado_schematic.pdf) · [`artix7_vivado_schematic.svg`](fpga/artix7_vivado_schematic.svg) · [`artix7_vivado_schematic_4k.png`](fpga/artix7_vivado_schematic_4k.png)
-- **Kria K26 `XCK26-SFVC784-2LV-c` Silicon Die Floorplan (`12,428` placed `kria_top` PL cells / `11,034` Slice LUTs full BD):**
+- **Kria K26 `XCK26-SFVC784-2LV-c` Silicon Die Floorplan (full `ias2rf_k26_bd` block design: `36,393` Slice LUTs, `36,562` FFs, `106` DSP48E2, `32.5` BRAM36 eq.):**
   - [`kria_k26_silicon_floorplan.pdf`](fpga/kria_k26_silicon_floorplan.pdf) · [`kria_k26_silicon_floorplan.svg`](fpga/kria_k26_silicon_floorplan.svg) · [`kria_k26_silicon_floorplan_4k.png`](fpga/kria_k26_silicon_floorplan_4k.png)
 - **Kria K26 PS + PL `ias2rf_k26_bd` Block Design & PL Circuit Schematic:**
   - [`kria_k26_vivado_bd_schematic.pdf`](fpga/kria_k26_vivado_bd_schematic.pdf) · [`kria_k26_vivado_bd_schematic.svg`](fpga/kria_k26_vivado_bd_schematic.svg) · [`kria_k26_vivado_bd_schematic_4k.png`](fpga/kria_k26_vivado_bd_schematic_4k.png)

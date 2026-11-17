@@ -35,10 +35,11 @@ route_design
 # post-route: the 400 MHz AERIS CIC comb sits within +/-0.05 ns of the cycle and moves with placement
 phys_opt_design -directive AggressiveExplore
 # 17 Nov: with the beam scan mode in adar_ctrl the placement left the SGMII PHY's 312.5 MHz transmit path at
-# -0.021 ns after this pass. While setup still fails, more post-route passes with other directives (each keeps
-# what it gains; none runs on a design that already meets timing).
+# -0.021 ns after this pass, and a later build closed at exactly 0.000 ns. While setup slack is below a 50 ps
+# margin, more post-route passes with other directives (each keeps what it gains; none runs on a design that
+# already has that margin).
 foreach dir {AlternateFlowWithRetiming AggressiveFanoutOpt Explore} {
-    if {[get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]] >= 0} { break }
+    if {[get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]] >= 0.050} { break }
     puts "post-route phys_opt_design -directive $dir"
     phys_opt_design -directive $dir
 }
@@ -53,4 +54,7 @@ report_cdc               -details -file [file join $rpt_dir "cdc.rpt"]
 
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
 set whs [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -hold]]
+# the routed design, for export_vivado_views.tcl (floorplan figures); git-ignored
+file mkdir [file join $fpga_dir "artix" ".build_rev06"]
+write_checkpoint -force [file join $fpga_dir "artix" ".build_rev06" "artix_top_routed.dcp"]
 puts [format "ARTIX_REV06_BUILD_DONE WNS=%s ns WHS=%s ns" $wns $whs]

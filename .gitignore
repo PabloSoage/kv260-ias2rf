@@ -38,3 +38,6 @@ clockInfo.txt
 *.jou
 *.log.bak
 _scratch/
+
+# Vivado routed checkpoints for the floorplan export
+fpga/artix/.build_rev06/

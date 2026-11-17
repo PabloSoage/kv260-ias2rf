@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Tue Nov 17 19:29:15 2026
+| Date         : Tue Nov 17 19:52:34 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_drc -file fpga/artix/reports_rev06/drc.rpt
 | Design       : artix_top
@@ -59,12 +59,12 @@ Related violations: <none>
 
 DPIP-1#1 Warning
 Input pipelining  
-DSP u_d2/p_0_out input u_d2/p_0_out/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+DSP u_d2/p_0_out__4 input u_d2/p_0_out__4/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
 Related violations: <none>
 
 DPIP-1#2 Warning
 Input pipelining  
-DSP u_d2/p_0_out__5 input u_d2/p_0_out__5/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+DSP u_d2/p_0_out__6 input u_d2/p_0_out__6/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
 Related violations: <none>
 
 DPIP-1#3 Warning
@@ -379,7 +379,7 @@ Related violations: <none>
 
 REQP-1839#16 Warning
 RAMB36 async control check  
-The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/ENBWREN (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_2__0_n_0) which is driven by a register (sys_rst_reg) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+The RAMB36E1 gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0 has an input control pin gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0/ENBWREN (net: gen_rev06_eth.u_dual_mux/u_fifo_eth/meta_mem_reg_0_i_2_n_0) which is driven by a register (sys_rst_reg) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
 Related violations: <none>
 
 REQP-1839#17 Warning
