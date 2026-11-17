@@ -116,8 +116,13 @@ module tb_artix_top;
 
     reg dco_true = 1'b0;
     initial begin dco_true = 1'b0; #1.750; forever #2.500 dco_true = ~dco_true; end
+    // Rev08 G-7: at 500 MHz the AD9484 runs from the master clock (500 MSPS, DCO = master / 2), as on the board
+    wire tb_500 = (fpga_clk_half == 1.000);
+    reg  dco_500 = 1'b0;
+    always @(posedge fpga_clk_100m) dco_500 <= ~dco_500;
+    wire dco_src = tb_500 ? dco_500 : dco_true;
     reg dco_board_del = 1'b0;
-    always @(dco_true) dco_board_del <= #0.250 dco_true;
+    always @(dco_src) dco_board_del <= #0.250 dco_src;
 
     reg [1:0] kria_tx_div = 2'b00;
     reg       kria_tx_clk = 1'b0;
@@ -129,7 +134,8 @@ module tb_artix_top;
 
     // AD9484 alternating 0xAA / 0x55 (matching tb_adc_ddc polarity & board delay) -> continuous stream 8'h01 traffic
     reg [7:0] adcr_samp = 8'h55;
-    always @(posedge adcr_clk_400m) adcr_samp <= (adcr_samp == 8'hAA) ? 8'h55 : 8'hAA;
+    wire adcr_samp_clk = tb_500 ? fpga_clk_100m : adcr_clk_400m;
+    always @(posedge adcr_samp_clk) adcr_samp <= (adcr_samp == 8'hAA) ? 8'h55 : 8'hAA;
     reg [7:0] adcr_d_del = 8'h55;
     always @(adcr_samp) adcr_d_del <= #0.200 adcr_samp;
     wire [7:0] adcr_d_p =  adcr_d_del;
@@ -484,9 +490,14 @@ module tb_artix_top;
     reg [15:0] resp_addr_cap   = 16'd0;
     reg [31:0] resp_data_cap   = 32'd0;
 
+    reg signed [15:0] d2_i_cap = 16'sd0, d2_q_cap = 16'sd0;   // first sample of the last stream 0x01 packet
     always @(posedge rx_clkdiv) begin
         if (rx_out_v && rx_out_sop) begin
             active_pkt_sid <= rx_out_sid;
+            if (rx_out_sid == 8'h01) begin
+                d2_i_cap <= rx_out_data[15:0];
+                d2_q_cap <= rx_out_data[31:16];
+            end
             if (rx_out_sid == 8'h11) begin
                 resp_valid_flag <= 1'b1;
                 resp_addr_cap   <= rx_out_data[47:32];
@@ -676,6 +687,53 @@ module tb_artix_top;
             if (!rval[0] || (cnt_01 != 0)) begin
                 $display("FAIL: tb_artix_top 500M A-1 leak 0xE8=0x%08h cnt_01=%0d", rval, cnt_01);
                 $finish;
+            end
+            // Rev08 G-7: D2 CSRs (D2 left off: this bench's AD9484 model runs at 400 MSPS only)
+            wr_reg(16'h0104, 32'h1234_5678);
+            rd_reg(16'h0104, rval);
+            if (rval !== 32'h1234_5678) begin
+                $display("FAIL: tb_artix_top D2_FTW readback 0x%08h", rval); $finish;
+            end
+            wr_reg(16'h0100, 32'h0000_0002);
+            rd_reg(16'h0100, rval);
+            if (rval !== 32'h0000_0002) begin
+                $display("FAIL: tb_artix_top D2_CTRL readback 0x%08h", rval); $finish;
+            end
+            rd_reg(16'h0108, rval);
+            if (rval[4] !== 1'b1 || rval[0] !== 1'b0 || cnt_01 != 0) begin
+                $display("FAIL: tb_artix_top D2_STAT 0x%08h (exp 500 MHz, not running) cnt_01=%0d", rval, cnt_01);
+                $finish;
+            end
+            // D2 on at 250 MHz: the 0xAA / 0x55 pattern (codes 170 / 85, i.e. +/-85 as odd 9-bit numbers) is a
+            // tone at f_S / 2, mixed to DC: |I| = 85 * 4095 / 32 * 3125 / 4096 = 8299, Q = 0
+            wr_reg(16'h0104, 32'h8000_0000);
+            wr_reg(16'h0100, 32'h0000_0001);
+            wait_c = 0; rval = 32'd0;
+            while ((rval[1:0] !== 2'b11) && wait_c < 100) begin
+                repeat (200) @(posedge kria_tx_clk);
+                rd_reg(16'h0108, rval);
+                wait_c = wait_c + 1;
+            end
+            begin : d2_pkts
+                integer c0;
+                c0 = cnt_01;
+                wait_c = 0;
+                while (cnt_01 < c0 + 6 && wait_c < 20000) begin @(posedge rx_clkdiv); wait_c = wait_c + 1; end
+            end
+            rd_reg(16'h0108, rval);
+            $display("[G7] D2_STAT 0x%08h, stream 0x01 packets %0d, first sample I %0d Q %0d", rval, cnt_01,
+                     d2_i_cap, d2_q_cap);
+            if (rval[3:0] !== 4'b0011 || rval[13:8] < 6'd4 || cnt_01 < 6 ||
+                (d2_i_cap > -16'sd8200 && d2_i_cap < 16'sd8200) || d2_i_cap > 16'sd8400 || d2_i_cap < -16'sd8400 ||
+                d2_q_cap > 16'sd100 || d2_q_cap < -16'sd100) begin
+                $display("FAIL: tb_artix_top D2 at 500 MSPS"); $finish;
+            end
+            // D2 off (mid-packet, likely): stream 0x01 must let go, or the readback below and the rest hang
+            wr_reg(16'h0100, 32'h0000_0000);
+            repeat (400) @(posedge kria_tx_clk);
+            rd_reg(16'h0108, rval);
+            if (rval[0] !== 1'b0) begin
+                $display("FAIL: tb_artix_top D2_STAT 0x%08h after D2 off", rval); $finish;
             end
         end else begin
             if (rval[0]) begin

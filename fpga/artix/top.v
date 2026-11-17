@@ -5,6 +5,7 @@
 //   - CLK_FPGA (N11/N12, 100 MHz LVDS_25) MMCM -> 125 MHz link_clk, 500 MHz DDR TX, 200 MHz IDELAYCTRL refclk
 //   - AD9484 400 MSPS DDR LVDS ADC capture (adc_capture, inverted DCO N14/P14)
 //   - AERIS 400->100 MSPS DDC + post-decimation + async packetizer (ddc_wrapper)
+//   - Rev08 G-7: D2, the 500 MSPS capture and DDC on link_clk (adc_capture mode_500, ddc_500), CSRs 0x100..0x10C
 //   - 2-Lane 64b/66b TX PCS (link_pcs_tx) -> 8:1 DDR OSERDESE2 -> Bank 34 LINK_RX_*
 //   - 1-Lane Downlink RX (Bank 14 LINK_TX_* -> IBUFDS -> BUFIO/BUFR -> IDELAYE2 -> ISERDESE2 -> train FSM + PCS)
 //   - Pmod J1102 SPI slave & fallback DDC FIFO (pmod_spi, Bank 15 LVCMOS33)
@@ -279,12 +280,37 @@ module artix_top #(
         .RST    (ref_rst)
     );
 
+    // Rev08 G-7: D2 CSRs (page 1, 0x100..0x10C) and its run condition (D2_CTRL[0] and the master clock settled at
+    // 500 MHz). With D2 running the capture stays out of reset at 500 MHz in mode_500; a change of mode goes
+    // through 16 refclk cycles of capture reset, mode_500 changing in the middle.
+    reg  [31:0] reg_d2_ctrl;              // 0x100 D2_CTRL: [0] enable, [1] conjugate; [2] retrain, [3] clear (pulses)
+    reg  [31:0] reg_d2_ftw;               // 0x104 D2_FTW: f_NCO = FTW * 500 MHz / 2^32
+    reg         reg_d2_retrain_p, reg_d2_clr_p;
+    wire        d2_run_link;
+
     (* ASYNC_REG = "TRUE" *) reg [1:0] radar_dis_ref_s = 2'b11;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] d2_run_ref_s = 2'b00;
+    reg       d2_mode_ref    = 1'b0;      // adc_capture mode_500
+    reg [3:0] d2_chg_ref     = 4'd0;
+    reg       adcr_cap_rst_r = 1'b1;
     always @(posedge refclk_200m or posedge ref_rst) begin
-        if (ref_rst) radar_dis_ref_s <= 2'b11;
-        else         radar_dis_ref_s <= {radar_dis_ref_s[0], xo_radar_dis_cfg};
+        if (ref_rst) begin
+            radar_dis_ref_s <= 2'b11;
+            d2_run_ref_s    <= 2'b00;
+            d2_mode_ref     <= 1'b0;
+            d2_chg_ref      <= 4'd0;
+            adcr_cap_rst_r  <= 1'b1;
+        end else begin
+            radar_dis_ref_s <= {radar_dis_ref_s[0], xo_radar_dis_cfg};
+            d2_run_ref_s    <= {d2_run_ref_s[0], d2_run_link};
+            if (d2_chg_ref != 4'd0)                  d2_chg_ref <= d2_chg_ref - 4'd1;
+            else if (d2_run_ref_s[1] != d2_mode_ref) d2_chg_ref <= 4'd15;
+            if (d2_chg_ref == 4'd8)                  d2_mode_ref <= d2_run_ref_s[1];
+            adcr_cap_rst_r <= (radar_dis_ref_s[1] & ~d2_mode_ref) | (d2_chg_ref != 4'd0) |
+                              (d2_run_ref_s[1] != d2_mode_ref);
+        end
     end
-    wire adcr_cap_rst_ref = ref_rst | radar_dis_ref_s[1];
+    wire adcr_cap_rst_ref = ref_rst | adcr_cap_rst_r;
 
     (* ASYNC_REG = "TRUE" *) reg [1:0] radar_dis_link_s = 2'b11;
     always @(posedge link_clk) begin
@@ -374,6 +400,30 @@ module artix_top #(
         end
     end
 
+    // G-7: D2 training trigger (link_clk): about 65 us after D2 starts (ADC_AUTO_TRAIN), on a D2_CTRL[2] write or
+    // on the Pmod retrain; held 16 cycles for the trainer's synchroniser
+    reg  [12:0] d2_tr_cnt;
+    reg  [4:0]  d2_tr_hold;
+    reg         d2_train_link;
+    always @(posedge link_clk) begin
+        if (link_rst || !d2_run_link) begin
+            d2_tr_cnt     <= 13'd0;
+            d2_tr_hold    <= 5'd0;
+            d2_train_link <= 1'b0;
+        end else begin
+            if (d2_tr_cnt != 13'h1FFF) d2_tr_cnt <= d2_tr_cnt + 13'd1;
+            if (reg_d2_retrain_p || spi_ctrl_retrain_pulse || (ADC_AUTO_TRAIN && d2_tr_cnt == 13'h1FF0))
+                d2_tr_hold <= 5'd16;
+            else if (d2_tr_hold != 5'd0)
+                d2_tr_hold <= d2_tr_hold - 5'd1;
+            d2_train_link <= (d2_tr_hold != 5'd0);
+        end
+    end
+
+    wire [35:0] d2_word;
+    wire        d2_word_valid, d2_slip;
+    wire        d2_link_rst = link_rst | ~d2_run_link;
+
     adc_capture #(
         .DCO_INVERT      (1'b1),
         .DCO_PERIOD_NS   (5.000),
@@ -388,8 +438,15 @@ module artix_top #(
         .adcr_or_n        (adcr_or_n),
         .adcr_dco_n_pin   (adcr_dco_n),
         .adcr_dco_p_pin   (adcr_dco_p),
-        .train_start      (adc_train_start_100),
+        .train_start      (d2_mode_ref ? d2_train_link : adc_train_start_100),
         .train_pattern_en (1'b1),
+        .mode_500         (d2_mode_ref),
+        .link_clk         (link_clk),
+        .d2_link_rst      (d2_link_rst),
+        .d2_slip_clr      (reg_d2_clr_p),
+        .d2_word          (d2_word),
+        .d2_valid         (d2_word_valid),
+        .d2_slip          (d2_slip),
         .clk_400m         (adc_clk_400m),
         .clk_100m         (adc_clk_100m),
         .mmcm_locked      (adc_mmcm_locked),
@@ -430,6 +487,13 @@ module artix_top #(
     wire [31:0]        tx_pkt_seq;
     wire [63:0]        tx_pkt_timestamp, tx_pkt_data;
     wire [23:0]        tx_dropped_cnt;
+    // stream 0x01 comes from the radar DDC (400 MSPS) or from D2 (500 MSPS)
+    wire               rad_pkt_valid, rad_pkt_ready, rad_pkt_sop, rad_pkt_eop;
+    wire [7:0]         rad_pkt_stream_id;
+    wire [15:0]        rad_pkt_len;
+    wire [31:0]        rad_pkt_seq;
+    wire [63:0]        rad_pkt_timestamp, rad_pkt_data;
+    wire [23:0]        rad_dropped_cnt;
 
     (* ASYNC_REG = "TRUE" *) reg [1:0] adc_tr_100_sync, rad_en_100_sync;
     always @(posedge adc_clk_100m) begin
@@ -485,17 +549,101 @@ module artix_top #(
         .link_clk         (link_clk),
         .link_rst         (link_rst | radar_dis_link),
         .timestamp_cnt    (timestamp_cnt),
-        .pkt_valid        (tx_pkt_valid),
-        .pkt_ready        (tx_pkt_ready),
-        .pkt_sop          (tx_pkt_sop),
-        .pkt_eop          (tx_pkt_eop),
-        .pkt_stream_id    (tx_pkt_stream_id),
-        .pkt_len          (tx_pkt_len),
-        .pkt_seq          (tx_pkt_seq),
-        .pkt_timestamp    (tx_pkt_timestamp),
-        .pkt_data         (tx_pkt_data),
-        .dropped_cnt      (tx_dropped_cnt)
+        .pkt_valid        (rad_pkt_valid),
+        .pkt_ready        (rad_pkt_ready),
+        .pkt_sop          (rad_pkt_sop),
+        .pkt_eop          (rad_pkt_eop),
+        .pkt_stream_id    (rad_pkt_stream_id),
+        .pkt_len          (rad_pkt_len),
+        .pkt_seq          (rad_pkt_seq),
+        .pkt_timestamp    (rad_pkt_timestamp),
+        .pkt_data         (rad_pkt_data),
+        .dropped_cnt      (rad_dropped_cnt)
     );
+
+    // -------------------------------------------------------------------------
+    // Rev08 G-7: D2, the 500 MSPS DDC (link_clk). It runs once the capture has trained in mode_500; stream 0x01
+    // switches to it while D2 runs and until its last packet has gone.
+    // -------------------------------------------------------------------------
+    (* ASYNC_REG = "TRUE" *) reg [1:0] d2_tr_s, d2_err_s;
+    (* ASYNC_REG = "TRUE" *) reg [5:0] d2_eye_s1, d2_eye_s2;
+    always @(posedge link_clk) begin
+        if (d2_link_rst) begin
+            d2_tr_s <= 2'b00; d2_err_s <= 2'b00; d2_eye_s1 <= 6'd0; d2_eye_s2 <= 6'd0;
+        end else begin
+            d2_tr_s   <= {d2_tr_s[0], adc_trained};
+            d2_err_s  <= {d2_err_s[0], adc_dco_phase_err};
+            d2_eye_s1 <= adc_eye_width_min;
+            d2_eye_s2 <= d2_eye_s1;
+        end
+    end
+    wire        d2_en = d2_run_link & d2_tr_s[1];
+    wire [7:0]  d2_pk_code;
+    wire        d2_pk_or, d2_pk_valid;
+    wire        d2_pkt_valid, d2_pkt_ready, d2_pkt_sop, d2_pkt_eop, d2_pkt_busy;
+    wire [7:0]  d2_pkt_stream_id;
+    wire [15:0] d2_pkt_len;
+    wire [31:0] d2_pkt_seq;
+    wire [63:0] d2_pkt_timestamp, d2_pkt_data;
+    wire [23:0] d2_dropped_cnt;
+
+    ddc_500 #(
+        .PKT_WORDS (64),
+        .FIFO_AW   (7),
+        .STREAM_ID (8'h01)
+    ) u_d2 (
+        .clk           (link_clk),
+        .rst           (link_rst),
+        .en            (d2_en),
+        .ftw           (reg_d2_ftw),
+        .conj          (reg_d2_ctrl[1]),
+        .word          (d2_word),
+        .word_valid    (d2_word_valid),
+        .pk_code       (d2_pk_code),
+        .pk_or         (d2_pk_or),
+        .pk_valid      (d2_pk_valid),
+        .bb_valid      (),
+        .bb_i          (),
+        .bb_q          (),
+        .timestamp_cnt (timestamp_cnt),
+        .pkt_valid     (d2_pkt_valid),
+        .pkt_ready     (d2_pkt_ready),
+        .pkt_sop       (d2_pkt_sop),
+        .pkt_eop       (d2_pkt_eop),
+        .pkt_stream_id (d2_pkt_stream_id),
+        .pkt_len       (d2_pkt_len),
+        .pkt_seq       (d2_pkt_seq),
+        .pkt_timestamp (d2_pkt_timestamp),
+        .pkt_data      (d2_pkt_data),
+        .dropped_cnt   (d2_dropped_cnt),
+        .pkt_busy      (d2_pkt_busy)
+    );
+
+    wire d2_sel = d2_run_link | d2_pkt_busy;
+    assign tx_pkt_valid     = d2_sel ? d2_pkt_valid     : rad_pkt_valid;
+    assign tx_pkt_sop       = d2_sel ? d2_pkt_sop       : rad_pkt_sop;
+    assign tx_pkt_eop       = d2_sel ? d2_pkt_eop       : rad_pkt_eop;
+    assign tx_pkt_stream_id = d2_sel ? d2_pkt_stream_id : rad_pkt_stream_id;
+    assign tx_pkt_len       = d2_sel ? d2_pkt_len       : rad_pkt_len;
+    assign tx_pkt_seq       = d2_sel ? d2_pkt_seq       : rad_pkt_seq;
+    assign tx_pkt_timestamp = d2_sel ? d2_pkt_timestamp : rad_pkt_timestamp;
+    assign tx_pkt_data      = d2_sel ? d2_pkt_data      : rad_pkt_data;
+    assign tx_dropped_cnt   = d2_sel ? d2_dropped_cnt   : rad_dropped_cnt;
+    assign d2_pkt_ready     =  d2_sel & tx_pkt_ready;
+    assign rad_pkt_ready    = ~d2_sel & tx_pkt_ready;
+
+    // D2's band peak for fe_agc (2^14 words = 65536 samples, 131 us, as the 400 MSPS window's 164 us)
+    wire         d2_pk_tog;
+    wire [127:0] d2_pk_set;
+    adc_peak #(.WIN_LOG2(14)) u_d2_peak (
+        .clk(link_clk), .rst(~d2_en), .code(d2_pk_code), .valid(d2_pk_valid), .ovr(d2_pk_or),
+        .peak_tog(d2_pk_tog), .peak_set(d2_pk_set));
+
+    reg d2_slip_seen;
+    always @(posedge link_clk) begin
+        if (link_rst || reg_d2_clr_p) d2_slip_seen <= 1'b0;
+        else if (d2_slip)             d2_slip_seen <= 1'b1;
+    end
 
     // CDC fallback DDC baseband sample + sticky status from clk_100m/clk_200m -> link_clk
     reg [15:0] fb_i_hold_100, fb_q_hold_100;
@@ -2150,6 +2298,11 @@ module artix_top #(
     wire        xo_raw_req_ready, xo_raw_resp_valid, xo_raw_resp_err;
     wire [7:0]  xo_raw_resp_rdata;
     wire        xo_busy, xo_prog_done, xo_active_500m, xo_ack_err;
+    assign d2_run_link = reg_d2_ctrl[0] & xo_active_500m & ~xo_busy;     // G-7
+    // 0x108 D2_STAT: [0] running, [1] trained, [2] training failed, [3] FIFO slip (sticky), [4] at 500 MHz,
+    // [13:8] narrowest eye in taps
+    wire [31:0] d2_stat = {18'd0, d2_eye_s2, 3'd0, xo_active_500m, d2_slip_seen, d2_err_s[1], d2_tr_s[1],
+                           d2_run_link};
     wire        xo_boot_done, xo_boot_err, xo_delta_clamped, xo_use_ext_clk_sync, xo_req_500m_sync;
     wire [15:0] xo_ack_err_cnt;
     wire        clk_sel_t, xo_scl_t, xo_scl_in, xo_sda_t, xo_sda_in;
@@ -2273,8 +2426,9 @@ module artix_top #(
         .clk(adc_clk_400m), .rst(adcr_pk_rst_s[1]), .code(adc_data), .valid(adc_valid), .ovr(adc_or),
         .peak_tog(adcr_pk_tog), .peak_set(adcr_pk));
     fe_agc #(.CYC_PER_MS(LINK_CYC_PER_MS)) u_fe_agc (
-        .clk(link_clk), .rst(link_rst), .ctrl(reg_fe_agc_ctrl), .peak_tog_async(adcr_pk_tog),
-        .peak_set_async(adcr_pk), .exp_sw(fe_exp_sw), .att_sw(fe_att_sw), .fe_busy(fe_busy),
+        .clk(link_clk), .rst(link_rst), .ctrl(reg_fe_agc_ctrl),
+        .peak_tog_async(d2_run_link ? d2_pk_tog : adcr_pk_tog),            // G-7: D2's peak at 500 MSPS
+        .peak_set_async(d2_run_link ? d2_pk_set : adcr_pk), .exp_sw(fe_exp_sw), .att_sw(fe_att_sw), .fe_busy(fe_busy),
         .cmd_block(reg_fe_cmd_p | fe_csr_wr), .cmd_p(fe_agc_p), .cmd_word(fe_agc_word), .stat(fe_agc_stat),
         .pending(fe_agc_pending));
 
@@ -2284,6 +2438,10 @@ module artix_top #(
         begin
             if (addr[15:8] == 8'h01) begin
                 case (addr[7:2])
+                    6'h00: reg_rd_word = {30'd0, reg_d2_ctrl[1:0]};                     // 0x100 D2_CTRL
+                    6'h01: reg_rd_word = reg_d2_ftw;                                    // 0x104 D2_FTW
+                    6'h02: reg_rd_word = d2_stat;                                       // 0x108 D2_STAT
+                    6'h03: reg_rd_word = {8'd0, tx_dropped_cnt};                        // 0x10C D2_DROP
                     6'h04: reg_rd_word = reg_fe_cmd;                                    // 0x110 FE_CMD
                     6'h05: reg_rd_word = {fe_stat[31:29], fe_busy, fe_stat[27:0]};       // 0x114 FE_STAT
                     6'h06: reg_rd_word = {16'd0, fe_rffc};                              // 0x118 FE_RFFC
@@ -2510,6 +2668,10 @@ module artix_top #(
             reg_xo_raw_cmd         <= 32'd0;
             reg_fe_cmd             <= 32'd0;
             reg_fe_cmd_p           <= 1'b0;
+            reg_d2_ctrl            <= 32'd0;             // D2 off
+            reg_d2_ftw             <= 32'd0;
+            reg_d2_retrain_p       <= 1'b0;
+            reg_d2_clr_p           <= 1'b0;
             reg_fe_led_ctrl        <= 32'h0000_0001;     // LED auto-map on
             reg_fe_agc_ctrl        <= 32'd0;             // AGC off
             fe_exp_sw              <= 16'h2080;          // INIT's values: RESETX high, bias tee off
@@ -2541,6 +2703,8 @@ module artix_top #(
             reg_xo_delta_p       <= 1'b0;
             reg_xo_raw_p         <= 1'b0;
             reg_fe_cmd_p         <= 1'b0;
+            reg_d2_retrain_p     <= 1'b0;
+            reg_d2_clr_p         <= 1'b0;
             reg_pps_clear_p      <= 1'b0;
             reg_clip_ovf_clr_p   <= 1'b0;
             reg_uart_force_stat_p<= 1'b0;
@@ -2619,6 +2783,12 @@ module artix_top #(
 
             if (reg_wr_en && reg_wr_addr[15:8] == 8'h01) begin
                 case (reg_wr_addr[7:2])
+                    6'h00: begin // 0x100 D2_CTRL
+                        reg_d2_ctrl      <= {30'd0, reg_wr_wdata[1:0]};
+                        reg_d2_retrain_p <= reg_wr_wdata[2];
+                        reg_d2_clr_p     <= reg_wr_wdata[3];
+                    end
+                    6'h01: reg_d2_ftw <= reg_wr_wdata; // 0x104 D2_FTW
                     6'h04: begin // 0x110 FE_CMD
                         reg_fe_cmd   <= reg_wr_wdata;
                         reg_fe_cmd_p <= 1'b1;

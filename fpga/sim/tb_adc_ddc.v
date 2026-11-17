@@ -138,6 +138,13 @@ module tb_adc_ddc;
         .adcr_dco_p_pin   (adcr_dco_p_pin),
         .train_start      (train_start),
         .train_pattern_en (train_pattern_en),
+        .mode_500         (1'b0),          // Rev08 G-7: 400 MSPS only
+        .link_clk         (1'b0),
+        .d2_link_rst      (1'b1),
+        .d2_slip_clr      (1'b0),
+        .d2_word          (),
+        .d2_valid         (),
+        .d2_slip          (),
         .clk_400m         (clk_400m_cap),
         .clk_100m         (clk_100m_cap),
         .mmcm_locked      (mmcm_locked),

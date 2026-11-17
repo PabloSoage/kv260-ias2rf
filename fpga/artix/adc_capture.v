@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 // AD9484 8-bit LVDS DDR capture with per-bit IDELAYE2 and DCO eye-scan training.
 //
+// Rev08 G-7: with mode_500 = 1 (master clock at 500 MHz, D2 enabled) the DCO MMCM stays in reset (A-1: its
+// 400 MHz output would run at 500), the IDELAYs and the trainer run on refclk_200m through the BUFGCTRL that
+// otherwise carries clk_200m, the trainer samples the IDDR pairs through a two-flop synchroniser (the training
+// pattern is static, so no FIFO is needed), and the IDDR pairs of two DCO cycles (250 MHz) are packed into
+// one word of four samples and cross into link_clk through an 8-word Gray FIFO (d2_word, 125 MHz = 500 MSPS / 4,
+// frequency-locked to the DCO, so the FIFO's fill stays put once started). With mode_500 = 0 nothing changes.
+//
 // PINMAP: AD9484 (U501) -> XC7A50T-2FTG256I (U1101) Bank 14 (VCCO = 3.3 V)
 // Standard: LVDS_25 inputs, DIFF_TERM = FALSE (external 100 ohm R1101..R1110).
 // Data-to-DCO routed skew: -90 to +5 ps (docs/SIGNAL_INTEGRITY.md).
@@ -48,6 +55,15 @@ module adc_capture #(
     // Training control
     input  wire        train_start,
     input  wire        train_pattern_en,
+
+    // Rev08 G-7: 500 MSPS mode (quasi-static; change it only with rst held) and its four-sample words
+    input  wire        mode_500,
+    input  wire        link_clk,
+    input  wire        d2_link_rst,
+    input  wire        d2_slip_clr,
+    output reg  [35:0] d2_word,        // 4 x {or, code[7:0]}, [8:0] the earliest sample
+    output reg         d2_valid,
+    output reg         d2_slip,        // sticky: the FIFO ran empty or near full after the start
 
     // Recovered synchronous ADC clocks (from DCO MMCM)
     output wire        clk_400m,
@@ -156,7 +172,7 @@ module adc_capture #(
         .CLKOUT6      (),
         .LOCKED       (mmcm_locked),
         .PWRDWN       (1'b0),
-        .RST          (rst),
+        .RST          (rst | mode_500),
         .DADDR        (7'd0),
         .DCLK         (1'b0),
         .DEN          (1'b0),
@@ -175,13 +191,31 @@ module adc_capture #(
     BUFG u_bufg_fb   (.I(clk_fb_unbuf),   .O(clk_fb_bufg));
     BUFG u_bufg_400m (.I(clk_400m_unbuf), .O(clk_400m));
     BUFG u_bufg_100m (.I(clk_100m_unbuf), .O(clk_100m));
-    BUFG u_bufg_200m (.I(clk_200m_unbuf), .O(clk_200m));
+    // clk_200m: the IDELAYs' and the trainer's clock; refclk_200m in 500 MSPS mode (the MMCM is held in reset).
+    // IGNORE on both inputs: the select changes only with the capture in reset, and one input may be stopped.
+    BUFGCTRL #(
+        .INIT_OUT     (0),
+        .PRESELECT_I0 ("TRUE"),
+        .PRESELECT_I1 ("FALSE")
+    ) u_bufg_200m (
+        .O       (clk_200m),
+        .I0      (clk_200m_unbuf),
+        .I1      (refclk_200m),
+        .S0      (~mode_500),
+        .S1      (mode_500),
+        .CE0     (1'b1),
+        .CE1     (1'b1),
+        .IGNORE0 (1'b1),
+        .IGNORE1 (1'b1)
+    );
 
-    // Synchronized reset in clk_200m domain (holds until MMCM & IDELAYCTRL ready)
+    // Synchronized reset in clk_200m domain (holds until MMCM & IDELAYCTRL ready; in 500 MSPS mode the MMCM's
+    // lock is not needed)
     (* ASYNC_REG = "TRUE" *) reg [1:0] rst_sync_200;
-    wire rst_src = rst | ~mmcm_locked | ~idelay_rdy;
-    always @(posedge clk_200m or posedge rst_src) begin
-        if (rst_src)
+    wire rst_src    = rst | ~mmcm_locked | ~idelay_rdy;
+    wire rst_tr_src = rst | ~idelay_rdy | (~mode_500 & ~mmcm_locked);
+    always @(posedge clk_200m or posedge rst_tr_src) begin
+        if (rst_tr_src)
             rst_sync_200 <= 2'b11;
         else
             rst_sync_200 <= {rst_sync_200[0], 1'b0};
@@ -264,8 +298,8 @@ module adc_capture #(
 
     // Synchronized reset in dco_bufr domain for IDDR -> FIFO write side
     (* ASYNC_REG = "TRUE" *) reg [1:0] rst_sync_bufr;
-    always @(posedge dco_bufr or posedge rst_src) begin
-        if (rst_src)
+    always @(posedge dco_bufr or posedge rst_tr_src) begin
+        if (rst_tr_src)
             rst_sync_bufr <= 2'b11;
         else
             rst_sync_bufr <= {rst_sync_bufr[0], 1'b0};
@@ -320,6 +354,13 @@ module adc_capture #(
     (* ASYNC_REG = "TRUE" *) reg [1:0] tr_start_sync, tr_pat_sync;
     wire train_start_200  = tr_start_sync[1];
     wire train_pat_en_200 = tr_pat_sync[1];
+    // G-7: in 500 MSPS mode the trainer sees the IDDR pairs through two flops (static pattern, slower clock)
+    (* ASYNC_REG = "TRUE" *) reg [1:0] mode_sync_200;
+    (* ASYNC_REG = "TRUE" *) reg [8:0] q_rise_s1, q_fall_s1, q_rise_s2, q_fall_s2;
+    always @(posedge clk_200m) begin
+        q_rise_s1 <= q_rise_pipe; q_rise_s2 <= q_rise_s1;
+        q_fall_s1 <= q_fall_pipe; q_fall_s2 <= q_fall_s1;
+    end
 
     always @(posedge clk_200m) begin
         if (rst_200m) begin
@@ -333,13 +374,18 @@ module adc_capture #(
             tog_200        <= 1'b0;
             tr_start_sync  <= 2'b00;
             tr_pat_sync    <= 2'b00;
+            mode_sync_200  <= 2'b00;
         end else begin
             wp_gray_sync1 <= wp_bufr_gray;
             wp_gray_sync2 <= wp_gray_sync1;
             tr_start_sync <= {tr_start_sync[0], train_start};
             tr_pat_sync   <= {tr_pat_sync[0], train_pattern_en};
+            mode_sync_200 <= {mode_sync_200[0], mode_500};
 
-            if (!dco_rd_started) begin
+            if (mode_sync_200[1]) begin
+                q_rise_r <= q_rise_s2;
+                q_fall_r <= q_fall_s2;
+            end else if (!dco_rd_started) begin
                 if (dco_fifo_fill >= 3'd2) begin
                     dco_rd_started <= 1'b1;
                     q_rise_r       <= dco_fifo_mem[rp_200_bin[1:0]][8:0];
@@ -354,6 +400,89 @@ module adc_capture #(
                 tog_200     <= ~tog_200;
                 rp_200_bin  <= rp_200_bin + 3'd1;
                 rp_200_gray <= b2g3(rp_200_bin + 3'd1);
+            end
+        end
+    end
+
+    // -------------------------------------------------------------------------
+    // G-7: 500 MSPS words. Two IDDR pairs (four samples) per word, every other dco_bufr cycle (125 MHz), into
+    // an 8-word Gray FIFO read on link_clk. The reader starts at a fill of 4 and then takes a word every cycle.
+    // -------------------------------------------------------------------------
+    (* ASYNC_REG = "TRUE" *) reg [1:0] rst_sync_d2;
+    wire rst_d2_src = rst_tr_src | ~mode_500;
+    always @(posedge dco_bufr or posedge rst_d2_src) begin
+        if (rst_d2_src) rst_sync_d2 <= 2'b11;
+        else            rst_sync_d2 <= {rst_sync_d2[0], 1'b0};
+    end
+    wire rst_d2 = rst_sync_d2[1];
+
+    function [3:0] b2g4;
+        input [3:0] b;
+        b2g4 = b ^ (b >> 1);
+    endfunction
+
+    reg [35:0] d2_mem [0:7];
+    reg [17:0] d2_lo;
+    reg        d2_ph;
+    reg [3:0]  d2_wp_bin, d2_wp_gray;
+    always @(posedge dco_bufr) begin
+        if (rst_d2) begin
+            d2_ph      <= 1'b0;
+            d2_wp_bin  <= 4'd0;
+            d2_wp_gray <= 4'd0;
+        end else if (q_pipe_valid) begin
+            d2_ph <= ~d2_ph;
+            if (!d2_ph) begin
+                d2_lo <= {q_fall_pipe, q_rise_pipe};
+            end else begin
+`ifdef MUTATE_D2_WORD_ORDER
+                d2_mem[d2_wp_bin[2:0]] <= {d2_lo, q_fall_pipe, q_rise_pipe};
+`else
+                d2_mem[d2_wp_bin[2:0]] <= {q_fall_pipe, q_rise_pipe, d2_lo};
+`endif
+                d2_wp_bin  <= d2_wp_bin + 4'd1;
+                d2_wp_gray <= b2g4(d2_wp_bin + 4'd1);
+            end
+        end
+    end
+
+    (* ASYNC_REG = "TRUE" *) reg [3:0] d2_wg_s1, d2_wg_s2;
+    reg  [3:0] d2_rp_bin;
+    reg        d2_started;
+    reg  [3:0] d2_wp_sync_bin;
+    always @* begin
+        d2_wp_sync_bin[3] = d2_wg_s2[3];
+        d2_wp_sync_bin[2] = d2_wp_sync_bin[3] ^ d2_wg_s2[2];
+        d2_wp_sync_bin[1] = d2_wp_sync_bin[2] ^ d2_wg_s2[1];
+        d2_wp_sync_bin[0] = d2_wp_sync_bin[1] ^ d2_wg_s2[0];
+    end
+    wire [3:0] d2_fill = d2_wp_sync_bin - d2_rp_bin;
+    always @(posedge link_clk) begin
+        if (d2_link_rst) begin
+            d2_wg_s1   <= 4'd0;
+            d2_wg_s2   <= 4'd0;
+            d2_rp_bin  <= 4'd0;
+            d2_started <= 1'b0;
+            d2_valid   <= 1'b0;
+            d2_slip    <= 1'b0;
+            d2_word    <= 36'd0;
+        end else begin
+            d2_wg_s1 <= d2_wp_gray;
+            d2_wg_s2 <= d2_wg_s1;
+            d2_valid <= 1'b0;
+            if (d2_slip_clr) d2_slip <= 1'b0;
+            if (!d2_started) begin
+                d2_started <= (d2_fill >= 4'd4) && (d2_fill <= 4'd8);
+            end else begin
+                if (d2_fill == 4'd0 || d2_fill > 4'd7) begin
+                    d2_slip <= 1'b1;                      // ran empty or about to overrun: restart at 4
+                    d2_started <= 1'b0;
+                    d2_rp_bin  <= d2_wp_sync_bin - 4'd4;
+                end else begin
+                    d2_word   <= d2_mem[d2_rp_bin[2:0]];
+                    d2_valid  <= 1'b1;
+                    d2_rp_bin <= d2_rp_bin + 4'd1;
+                end
             end
         end
     end
