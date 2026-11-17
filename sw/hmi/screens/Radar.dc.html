@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HMI radar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#E6EDF3;text-decoration:none}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; background: #0B0F14; color: #E6EDF3; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 1px solid #243243">
+    <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.02em">IAS2RF</div>
+    <div style="font-size: 16px; color: #9FB0C0">Radar 10.5 GHz</div>
+    <div style="flex-grow: 1"></div>
+    <div style="display: flex; gap: 8px; font-size: 14px">
+      <span style="padding: 6px 12px; border-radius: 16px; background: #13261D; color: #7EE2B0">CPI sync on</span>
+      <span style="padding: 6px 12px; border-radius: 16px; background: #182330; color: #9FB0C0">16 chirps × 64 samples</span>
+    </div>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; gap: 16px; padding: 16px 24px; min-height: 0">
+    <section style="flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; min-width: 0">
+      <div style="display: flex; justify-content: space-between; font-size: 15px; color: #9FB0C0"><span>Range-Doppler map, last CPI</span><span>Range bin 0 to 63 →</span></div>
+      <div style="display: flex; gap: 8px; flex-grow: 1; min-height: 0">
+        <div style="display: flex; flex-direction: column; justify-content: space-between; font-size: 13px; color: #9FB0C0; padding: 4px 0"><span>+7</span><span>0</span><span>−8</span></div>
+        <div style="flex-grow: 1; display: grid; grid-template-columns: repeat(64, minmax(0, 1fr)); border-radius: 10px; overflow: hidden; border: 1px solid #243243" role="img" aria-label="Range-Doppler power map with two detections">
+          <sc-for list="{{map}}" as="c" hint-placeholder-count="64"><span style="{{c}}"></span></sc-for>
+        </div>
+      </div>
+      <div style="display: flex; gap: 16px; font-size: 15px; color: #9FB0C0"><span>Doppler bin ↑</span><span>White outline: CA-CFAR detection</span></div>
+    </section>
+
+    <aside style="width: 340px; display: flex; flex-direction: column; gap: 12px">
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">Detections</span>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); font-family: 'JetBrains Mono', monospace; font-size: 18px; row-gap: 6px">
+          <span style="color: #9FB0C0; font-family: Inter, sans-serif; font-size: 13px">Range</span><span style="color: #9FB0C0; font-family: Inter, sans-serif; font-size: 13px">Doppler</span><span style="color: #9FB0C0; font-family: Inter, sans-serif; font-size: 13px">Power</span>
+          <span>12</span><span>+3</span><span>81.4 dB</span>
+          <span>40</span><span>−4</span><span>55.2 dB</span>
+        </div>
+      </div>
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <label for="beam" style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">Beam (8× ADAR1000)</label>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <button type="button" aria-label="Steer left" style="width: 56px; height: 56px; border-radius: 28px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-size: 24px">‹</button>
+          <output id="beam" style="flex-grow: 1; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 700">0°</output>
+          <button type="button" aria-label="Steer right" style="width: 56px; height: 56px; border-radius: 28px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-size: 24px">›</button>
+        </div>
+        <button type="button" style="height: 52px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 17px">Scan −45° to +45°</button>
+      </div>
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 17px">
+        <span style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">CA-CFAR</span>
+        <div style="display: flex; justify-content: space-between"><span>Threshold factor</span><span style="font-family: 'JetBrains Mono', monospace">6.0×</span></div>
+        <div style="display: flex; justify-content: space-between"><span>Power floor</span><span style="font-family: 'JetBrains Mono', monospace">20000</span></div>
+        <div style="display: flex; justify-content: space-between"><span>Window</span><span style="font-family: 'JetBrains Mono', monospace">Hann</span></div>
+      </div>
+    </aside>
+  </main>
+
+  <nav aria-label="Screens" style="height: 88px; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-top: 1px solid #243243; background: #0E141B">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+      <a href="{{n.href}}" style="{{n.style}}">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg>
+        <span style="font-size: 14px">{{n.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const items = [
+      ['Home', 'Main.dc.html', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'],
+      ['Vehicle', 'Vehicle.dc.html', 'M3 13l2-6h14l2 6v5h-3v-2H6v2H3zM7 13h2M15 13h2'],
+      ['Radio', 'Radio.dc.html', 'M4 9h16v11H4zM8 4l8 5M8 14h2M14 14a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
+      ['Spectrum', 'Spectrum.dc.html', 'M3 20h18M4 16l3-7 3 5 3-9 3 8 2-3 2 6'],
+      ['ADS-B', 'Adsb.dc.html', 'M12 2l2 7 7 3-7 2-2 8-2-8-7-2 7-3z'],
+      ['Radar', 'Radar.dc.html', 'M12 12l7-7M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5'],
+      ['Transmit', 'Transmit.dc.html', 'M12 13v8M8 21h8M12 13a2 2 0 1 0 0-4a2 2 0 1 0 0 4M7 6a7 7 0 0 0 0 10M17 6a7 7 0 0 1 0 10'],
+      ['System', 'System.dc.html', 'M12 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6M19 12h2M3 12h2M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4']
+    ];
+    const nav = items.map(([label, href, icon]) => ({ label, href, icon,
+      style: 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; ' +
+        (label === 'Radar' ? 'color: #F5A524; background: #1A1710; border-top: 3px solid #F5A524' : 'color: #9FB0C0; border-top: 3px solid transparent') }));
+    const T = [[12, 3, 1.0], [40, -4, 0.62]];
+    const map = [];
+    for (let row = 0; row < 16; row++) {
+      const d = 7 - row;
+      for (let r = 0; r < 64; r++) {
+        let v = 0.10 + 0.07 * Math.abs(Math.sin(r * 1.3 + row * 2.1) * Math.cos(r * 0.37 + row));
+        let det = false;
+        for (const [tr, td, a] of T) { const e = Math.exp(-((r - tr) ** 2) / 1.2 - ((d - td) ** 2) / 0.7); v += a * e; if (r === tr && d === td) det = true; }
+        if (d === 0) v += 0.08;
+        v = Math.min(1, v);
+        const stops = [[0, [11, 18, 28]], [0.3, [20, 48, 82]], [0.55, [38, 120, 170]], [0.8, [245, 196, 107]], [1, [255, 236, 196]]];
+        let i = 0; while (i < stops.length - 2 && v > stops[i + 1][0]) i++;
+        const t = Math.max(0, Math.min(1, (v - stops[i][0]) / (stops[i + 1][0] - stops[i][0])));
+        const c = stops[i][1].map((x, k) => Math.round(x + (stops[i + 1][1][k] - x) * t));
+        map.push('background: rgb(' + c.join(',') + ')' + (det ? '; outline: 3px solid #FFFFFF; outline-offset: -3px' : ''));
+      }
+    }
+    return { nav, map };
+  }
+}
+</script>
+</body>
+</html>

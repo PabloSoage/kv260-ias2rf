@@ -26,6 +26,16 @@ module tb_kria_channel_rx;
     wire               pilot_locked, ctcss_valid, ctcss_detected, rds_bit_valid, rds_bit;
     wire [31:0]        ctcss_power;
 
+    // One input sample every PACE clocks: the demodulator takes a sample in six steps (G-8 timing closure), and in
+    // the system the channel is always decimated by at least 50. Outputs are latched for the per-sample checks.
+    localparam integer PACE = 8;
+    reg               a_v = 1'b0, c_hit = 1'b0;
+    reg signed [15:0] a_l = 16'sd0, a_m = 16'sd0;
+    always @(posedge clk) begin
+        if (audio_valid) begin a_v <= 1'b1; a_l <= audio_l; a_m <= audio_mono; end
+        if (ctcss_valid && ctcss_detected) c_hit <= 1'b1;
+    end
+
     kria_channel_rx dut (
         .clk               (clk),
         .rst               (rst),
@@ -81,13 +91,13 @@ module tb_kria_channel_rx;
             for (s_idx = 0; s_idx < 300; s_idx = s_idx + 1) begin
                 mod_s = $sin(2.0 * PI * 1000.0 * s_idx / 48000.0);
                 env = 12000.0 * (1.0 + 0.6 * mod_s);
-                @(negedge clk);
+                @(negedge clk); a_v = 1'b0; c_hit = 1'b0;
                 in_valid = 1'b1;
                 in_i = $rtoi(env * $cos(0.35 * s_idx));
                 in_q = $rtoi(env * $sin(0.35 * s_idx));
-                @(posedge clk); #1;
-                if (audio_valid && s_idx > 120) begin
-                    am_rms = am_rms + (audio_l * 1.0) * (audio_l * 1.0);
+                @(posedge clk); #1; in_valid = 1'b0; repeat (PACE - 1) @(posedge clk); #1;
+                if (a_v && s_idx > 120) begin
+                    am_rms = am_rms + (a_l * 1.0) * (a_l * 1.0);
                     cnt = cnt + 1;
                 end
             end
@@ -113,13 +123,13 @@ module tb_kria_channel_rx;
             reset_dut();
             usb_rms = 0.0; cnt = 0;
             for (s_idx = 0; s_idx < 250; s_idx = s_idx + 1) begin
-                @(negedge clk);
+                @(negedge clk); a_v = 1'b0; c_hit = 1'b0;
                 in_valid = 1'b1;
                 in_i = $rtoi(16000.0 * $cos(w_tone * s_idx));
                 in_q = $rtoi(16000.0 * $sin(w_tone * s_idx));
-                @(posedge clk); #1;
-                if (audio_valid && s_idx > 40) begin
-                    usb_rms = usb_rms + (audio_l * 1.0) * (audio_l * 1.0);
+                @(posedge clk); #1; in_valid = 1'b0; repeat (PACE - 1) @(posedge clk); #1;
+                if (a_v && s_idx > 40) begin
+                    usb_rms = usb_rms + (a_l * 1.0) * (a_l * 1.0);
                     cnt = cnt + 1;
                 end
             end
@@ -130,13 +140,13 @@ module tb_kria_channel_rx;
             reset_dut();
             lsb_reject_rms = 0.0; cnt = 0;
             for (s_idx = 0; s_idx < 250; s_idx = s_idx + 1) begin
-                @(negedge clk);
+                @(negedge clk); a_v = 1'b0; c_hit = 1'b0;
                 in_valid = 1'b1;
                 in_i = $rtoi(16000.0 * $cos(w_tone * s_idx));
                 in_q = $rtoi(16000.0 * $sin(w_tone * s_idx));
-                @(posedge clk); #1;
-                if (audio_valid && s_idx > 40) begin
-                    lsb_reject_rms = lsb_reject_rms + (audio_l * 1.0) * (audio_l * 1.0);
+                @(posedge clk); #1; in_valid = 1'b0; repeat (PACE - 1) @(posedge clk); #1;
+                if (a_v && s_idx > 40) begin
+                    lsb_reject_rms = lsb_reject_rms + (a_l * 1.0) * (a_l * 1.0);
                     cnt = cnt + 1;
                 end
             end
@@ -168,14 +178,14 @@ module tb_kria_channel_rx;
                 inst_f = 2500.0 * $sin(2.0 * PI * 1000.0 * s_idx / fs_ch)
                        +  600.0 * $sin(2.0 * PI *  100.0 * s_idx / fs_ch);
                 ph = ph + 2.0 * PI * inst_f / fs_ch;
-                @(negedge clk);
+                @(negedge clk); a_v = 1'b0; c_hit = 1'b0;
                 in_valid = 1'b1;
                 in_i = $rtoi(16000.0 * $cos(ph));
                 in_q = $rtoi(16000.0 * $sin(ph));
-                @(posedge clk); #1;
-                if (ctcss_valid && ctcss_detected) ctcss_hits = ctcss_hits + 1;
-                if (audio_valid && s_idx > 100) begin
-                    fm_rms = fm_rms + (audio_l * 1.0) * (audio_l * 1.0);
+                @(posedge clk); #1; in_valid = 1'b0; repeat (PACE - 1) @(posedge clk); #1;
+                if (c_hit) ctcss_hits = ctcss_hits + 1;
+                if (a_v && s_idx > 100) begin
+                    fm_rms = fm_rms + (a_l * 1.0) * (a_l * 1.0);
                     cnt = cnt + 1;
                 end
             end
@@ -208,14 +218,14 @@ module tb_kria_channel_rx;
                     + 0.10 * $cos(2.0 * PI * 19000.0 * s_idx / fs_ch)
                     + 0.45 * (L - R) * $cos(2.0 * PI * 38000.0 * s_idx / fs_ch);
                 ph = ph + 2.0 * PI * (75000.0 * mpx) / fs_ch;
-                @(negedge clk);
+                @(negedge clk); a_v = 1'b0; c_hit = 1'b0;
                 in_valid = 1'b1;
                 in_i = $rtoi(16000.0 * $cos(ph));
                 in_q = $rtoi(16000.0 * $sin(ph));
-                @(posedge clk); #1;
+                @(posedge clk); #1; in_valid = 1'b0; repeat (PACE - 1) @(posedge clk); #1;
                 if (pilot_locked) saw_pilot_lock = 1;
-                if (audio_valid && s_idx > 200) begin
-                    fm_rms = fm_rms + (audio_mono * 1.0) * (audio_mono * 1.0);
+                if (a_v && s_idx > 200) begin
+                    fm_rms = fm_rms + (a_m * 1.0) * (a_m * 1.0);
                     cnt = cnt + 1;
                 end
             end

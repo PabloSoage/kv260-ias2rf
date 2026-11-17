@@ -206,9 +206,12 @@ context, training and a community.
 
 ### 3.6 OBD2 / CAN
 
-**The Scanmatik 3 is no use on board.** It is a J2534/RP1210 interface with software for **Windows
-and Android**; there is no Linux support, let alone aarch64. It is an excellent diagnostic tool —
-for the laptop, in the garage.
+**The Scanmatik 3 is no use on board with its own software.** It is a J2534/RP1210 interface with
+software for **Windows and Android**; there is no Linux support, let alone aarch64. *Update, 17
+November 2026:* [opendash](https://github.com/PabloSoage/opendash) now speaks the SM3's protocol
+directly, over its Wi-Fi TCP port, from a protocol core in Rust with no I/O that builds for aarch64.
+So the SM3 can feed the KV260 after all, at 100 Hz per streamed packet: measured, and the
+alternatives compared, in [INTEGRATIONS.md §4](INTEGRATIONS.md).
 
 **For permanent logging on the Kria:** a **SocketCAN-compatible USB-CAN adapter** (CANable,
 PCAN-USB or similar). SocketCAN is in the Linux kernel, it is stable, and `can-utils` gives you

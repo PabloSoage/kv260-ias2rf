@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HMI radio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#E6EDF3;text-decoration:none}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; background: #0B0F14; color: #E6EDF3; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 1px solid #243243">
+    <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.02em">IAS2RF</div>
+    <div style="font-size: 16px; color: #9FB0C0">Radio</div>
+    <div style="flex-grow: 1"></div>
+    <div style="display: flex; gap: 8px; font-size: 14px">
+      <span style="padding: 6px 12px; border-radius: 16px; background: #182330; color: #9FB0C0">Source: AD9484 · VHF/UHF</span>
+      <span style="padding: 6px 12px; border-radius: 16px; background: #182330; color: #9FB0C0">AGC −12 dB</span>
+    </div>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; gap: 16px; padding: 16px 24px; min-height: 0">
+    <section style="flex: 1 1 0; display: flex; flex-direction: column; gap: 14px; min-width: 0">
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 16px">
+          <button type="button" aria-label="Tune down" style="width: 64px; height: 64px; border-radius: 32px; border: 1px solid #36485C; background: #182330; color: #E6EDF3; font-size: 30px">−</button>
+          <div style="flex-grow: 1; text-align: center">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 96px; font-weight: 700; line-height: 1">{{freq}}</span>
+            <span style="font-size: 28px; color: #9FB0C0"> MHz</span>
+          </div>
+          <button type="button" aria-label="Tune up" style="width: 64px; height: 64px; border-radius: 32px; border: 1px solid #36485C; background: #182330; color: #E6EDF3; font-size: 30px">+</button>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 24px; font-size: 18px; color: #9FB0C0">
+          <span>Step 25 kHz</span><span>Squelch −110 dBm</span><span style="color: #F5C46B">{{tag}}</span>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: flex-end; height: 36px; justify-content: center">
+          <sc-for list="{{meter}}" as="b" hint-placeholder-count="30"><span style="{{b.style}}"></span></sc-for>
+        </div>
+      </div>
+
+      <div role="group" aria-label="Mode" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{modes}}" as="m" hint-placeholder-count="5">
+          <button type="button" onClick="{{m.pick}}" style="{{m.style}}">{{m.label}}</button>
+        </sc-for>
+      </div>
+
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 12px 16px; flex-grow: 1; display: flex; flex-direction: column; gap: 6px; min-height: 0">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #9FB0C0"><span>Channel ±100 kHz</span><span>Audio 48 kS/s</span></div>
+        <svg width="100%" height="120" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="270" y="0" width="60" height="120" fill="#1A1710"></rect>
+          <line x1="300" y1="0" x2="300" y2="120" stroke="#F5A524" stroke-width="1"></line>
+          <polyline points="{{spec}}" fill="none" stroke="#5AB0FF" stroke-width="2"></polyline>
+        </svg>
+      </div>
+    </section>
+
+    <aside style="width: 360px; display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 15px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">Presets</div>
+      <sc-for list="{{presets}}" as="p" hint-placeholder-count="7">
+        <button type="button" onClick="{{p.pick}}" style="{{p.style}}">
+          <span style="font-size: 18px; font-weight: 600">{{p.name}}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 16px; color: #9FB0C0">{{p.f}} · {{p.mode}}</span>
+        </button>
+      </sc-for>
+    </aside>
+  </main>
+
+  <nav aria-label="Screens" style="height: 88px; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-top: 1px solid #243243; background: #0E141B">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+      <a href="{{n.href}}" style="{{n.style}}">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg>
+        <span style="font-size: 14px">{{n.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { preset: 2 }; }
+  renderVals() {
+    const items = [
+      ['Home', 'Main.dc.html', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'],
+      ['Vehicle', 'Vehicle.dc.html', 'M3 13l2-6h14l2 6v5h-3v-2H6v2H3zM7 13h2M15 13h2'],
+      ['Radio', 'Radio.dc.html', 'M4 9h16v11H4zM8 4l8 5M8 14h2M14 14a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
+      ['Spectrum', 'Spectrum.dc.html', 'M3 20h18M4 16l3-7 3 5 3-9 3 8 2-3 2 6'],
+      ['ADS-B', 'Adsb.dc.html', 'M12 2l2 7 7 3-7 2-2 8-2-8-7-2 7-3z'],
+      ['Radar', 'Radar.dc.html', 'M12 12l7-7M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5'],
+      ['Transmit', 'Transmit.dc.html', 'M12 13v8M8 21h8M12 13a2 2 0 1 0 0-4a2 2 0 1 0 0 4M7 6a7 7 0 0 0 0 10M17 6a7 7 0 0 1 0 10'],
+      ['System', 'System.dc.html', 'M12 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6M19 12h2M3 12h2M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4']
+    ];
+    const nav = items.map(([label, href, icon]) => ({ label, href, icon,
+      style: 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; ' +
+        (label === 'Radio' ? 'color: #F5A524; background: #1A1710; border-top: 3px solid #F5A524' : 'color: #9FB0C0; border-top: 3px solid transparent') }));
+    const P = [
+      { name: 'FM broadcast', f: '98.300', mode: 'WBFM', tag: 'RDS RADIO 3 · stereo' },
+      { name: 'HF AM', f: '7.200', mode: 'AM', tag: 'AD9253 channel A' },
+      { name: 'Airband', f: '118.700', mode: 'AM', tag: 'Tower · 8.33 kHz raster off' },
+      { name: 'Marine ch16', f: '156.800', mode: 'NBFM', tag: 'Squelch closed' },
+      { name: '2 m repeater', f: '145.600', mode: 'NBFM', tag: 'CTCSS 88.5 Hz detected' },
+      { name: 'PMR446 ch1', f: '446.006', mode: 'NBFM', tag: 'CTCSS off' },
+      { name: '20 m SSB', f: '14.200', mode: 'USB', tag: 'AD9253 channel A' }
+    ];
+    const cur = P[this.state.preset];
+    const presets = P.map((p, i) => ({ ...p, pick: () => this.setState({ preset: i }),
+      style: 'display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 16px; min-height: 56px; border-radius: 12px; font-family: inherit; text-align: left; ' +
+        (i === this.state.preset ? 'background: #1A1710; border: 2px solid #F5A524; color: #E6EDF3' : 'background: #121A23; border: 1px solid #243243; color: #E6EDF3') }));
+    const ML = ['AM', 'USB', 'LSB', 'NBFM', 'WBFM'];
+    const modes = ML.map((m) => ({ label: m, pick: () => {},
+      style: 'height: 60px; border-radius: 12px; font-family: inherit; font-size: 20px; font-weight: 600; ' +
+        (m === cur.mode ? 'background: #F5A524; color: #14100A; border: none' : 'background: #121A23; color: #E6EDF3; border: 1px solid #36485C') }));
+    const lv = [2,3,5,7,9,11,12,13,14,15,16,16,17,17,18,18,17,17,16,15,14,12,10,8,6,5,4,3,2,2];
+    const meter = lv.map((v, i) => ({ style: 'width: 10px; border-radius: 2px; height: ' + (v * 2) + 'px; background: ' + (i < 20 ? '#F5A524' : '#3A3220') }));
+    let pts = [];
+    for (let x = 0; x <= 600; x += 5) {
+      const d = (x - 300) / 22;
+      const y = 104 - 78 * Math.exp(-d * d) - 5 * Math.sin(x / 7) * Math.sin(x / 31);
+      pts.push(x + ',' + y.toFixed(1));
+    }
+    return { nav, presets, modes, meter, freq: cur.f, tag: cur.tag, spec: pts.join(' ') };
+  }
+}
+</script>
+</body>
+</html>
