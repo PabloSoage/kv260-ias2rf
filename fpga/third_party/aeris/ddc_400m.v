@@ -1,7 +1,8 @@
 // Source: https://github.com/NawfalMotii79/PLFM_RADAR (9_Firmware/9_2_FPGA/ddc_400m.v)
 // Upstream commit: 62d4c556508927a4192acca24422bd16a979c7dc
 // License: MIT (see fpga/third_party/aeris/README.md)
-// Adaptation for kv260-ias2rf: wired cic_i_inst/cic_q_inst monitor ports and split 400 MHz reset tree.
+// Adaptation for kv260-ias2rf: wired cic_i_inst/cic_q_inst monitor ports and split 400 MHz reset tree; NCO phase
+// dither from a 23-bit LFSR in place of the FTW low-byte dither (see nco_400m_enhanced.v).
 `timescale 1ns / 1ps
 
 module ddc_400m_enhanced (
@@ -151,8 +152,9 @@ reg baseband_valid_reg;
 // ============================================================================
 // Phase Dithering Signals
 // ============================================================================
-wire [7:0] phase_dither_bits;
-reg [31:0] phase_inc_dithered;
+reg  [22:0] dith_lfsr;     // x^23 + x^18 + 1, eight steps per clock
+wire [7:0]  phase_dither_bits = dith_lfsr[7:0];
+reg  [31:0] phase_inc_dithered;
 
 
 
@@ -197,14 +199,20 @@ end
 // ============================================================================
 // Enhanced Phase Dithering Instance
 // ============================================================================
-lfsr_dither_enhanced #(
-    .DITHER_WIDTH(8)
-) phase_dither_gen (
-    .clk(clk_400m),
-    .reset_n(rst_n_400_nco),
-    .enable(nco_ready),
-    .dither_out(phase_dither_bits)
-);
+// kv260-ias2rf: the upstream lfsr_dither_enhanced (8 bits, one step per clock) added its byte to the FTW's low
+// byte, which only moves the LO by ~12 Hz and never reaches the 8 address bits. The NCO now adds a random byte
+// to the accumulator just below its address bits. A Fibonacci LFSR advanced eight steps per clock gives eight
+// new bits each cycle: bit n = bit n-23 ^ bit n-18, all eight taken from bits already in the register.
+always @(posedge clk_400m) begin
+    if (rst_400_nco)
+        dith_lfsr <= 23'h7FFFFF;
+    else
+        dith_lfsr <= {dith_lfsr[14:0],
+                      dith_lfsr[22] ^ dith_lfsr[17], dith_lfsr[21] ^ dith_lfsr[16],
+                      dith_lfsr[20] ^ dith_lfsr[15], dith_lfsr[19] ^ dith_lfsr[14],
+                      dith_lfsr[18] ^ dith_lfsr[13], dith_lfsr[17] ^ dith_lfsr[12],
+                      dith_lfsr[16] ^ dith_lfsr[11], dith_lfsr[15] ^ dith_lfsr[10]};
+end
 
 // ============================================================================
 // Phase Increment Calculation with Dithering
@@ -214,11 +222,8 @@ localparam PHASE_INC_120MHZ = 32'h4CCCCCCD;
 (* ASYNC_REG = "TRUE" *) reg [31:0] ftw_ovrd_s1, ftw_ovrd_s2;
 reg [31:0] ftw_ovrd_s3, ftw_sel;   // Rev08 G-4: compare, select and add each get a 400 MHz register stage
 reg        ftw_stable, ftw_nz;
-reg [8:0]  inc_lo;
-reg [23:0] inc_hi, inc_hi_p1;
-reg [12:0] inc_mid_p1;     // ftw_sel[19:8] + 1 with its carry, the first half of inc_hi + 1
 
-// Apply dithering to reduce spurious tones (registered for 400 MHz timing)
+// FTW select (registered for 400 MHz timing); the dither now goes to the NCO's phase, not to its FTW
 always @(posedge clk_400m) begin
     if (rst_400_nco) begin
         ftw_ovrd_s1        <= 32'd0;
@@ -227,10 +232,6 @@ always @(posedge clk_400m) begin
         ftw_stable         <= 1'b0;
         ftw_nz             <= 1'b0;
         ftw_sel            <= PHASE_INC_120MHZ;
-        inc_lo             <= {1'b0, PHASE_INC_120MHZ[7:0]};
-        inc_hi             <= PHASE_INC_120MHZ[31:8];
-        inc_mid_p1         <= {1'b0, PHASE_INC_120MHZ[19:8]} + 13'd1;
-        inc_hi_p1          <= PHASE_INC_120MHZ[31:8] + 24'd1;
         phase_inc_dithered <= PHASE_INC_120MHZ;
     end else begin
         ftw_ovrd_s1        <= ftw_override;
@@ -242,14 +243,7 @@ always @(posedge clk_400m) begin
         ftw_nz             <= (ftw_ovrd_s2 != 32'd0);
         if (ftw_stable)
             ftw_sel        <= ftw_nz ? ftw_ovrd_s3 : PHASE_INC_120MHZ;
-        // the 8-bit dither goes into the low byte first; its carry then selects the upper 24 bits or the upper
-        // 24 bits + 1, both prepared from ftw_sel in 12-bit halves (a 24-bit carry chain after the carry missed
-        // 400 MHz by 64 ps). ftw_sel is quasi-static, so the extra cycle of inc_hi_p1 never shows.
-        inc_lo             <= {1'b0, ftw_sel[7:0]} + {1'b0, phase_dither_bits};
-        inc_hi             <= ftw_sel[31:8];
-        inc_mid_p1         <= {1'b0, ftw_sel[19:8]} + 13'd1;
-        inc_hi_p1          <= {ftw_sel[31:20] + {11'd0, inc_mid_p1[12]}, inc_mid_p1[11:0]};
-        phase_inc_dithered <= {inc_lo[8] ? inc_hi_p1 : inc_hi, inc_lo[7:0]};
+        phase_inc_dithered <= ftw_sel;
     end
 end
 
@@ -262,6 +256,7 @@ nco_400m_enhanced nco_core (
     .frequency_tuning_word(phase_inc_dithered),
     .phase_valid(mixers_enable_sync),
     .phase_offset(16'h0000),
+    .phase_dither(phase_dither_bits),
     .sin_out(sin_out),
     .cos_out(cos_out),
     .dds_ready(nco_ready)

@@ -27,3 +27,10 @@ Note: the hardware files of `PLFM_RADAR` use CERN-OHL-P v2 (in upstream root `Li
 | `fir_lowpass.v` | `9_Firmware/9_2_FPGA/fir_lowpass.v` | `fir_lowpass_parallel_enhanced` 32-tap symmetric low-pass FIR compensation filter (100 MHz) |
 | `cdc_modules.v` | `9_Firmware/9_2_FPGA/cdc_modules.v` | `cdc_adc_to_processing`, `cdc_single_bit`, `cdc_handshake` Gray/handshake CDC helpers |
 | `ddc_input_interface.v` | `9_Firmware/9_2_FPGA/ddc_input_interface.v` | `ddc_input_interface` 18-bit to 16-bit convergent rounding + saturation |
+
+## Local changes
+
+Timing and reset changes for 400 MHz at 77 % LUT are marked in each file. Two changes alter the NCO's output (`tb_nco_image`):
+
+- `nco_400m_enhanced.v`: the quarter-wave table is `round(32767 * sin(2 pi (k + 0.5) / 256))`. The upstream table, sampled at `k`, put `cos` (or `sin`, in odd quadrants) one step away from the other output under the `63 - k` fold, so the image of the input around the LO was about 52 dB down.
+- `ddc_400m.v` and `nco_400m_enhanced.v`: a byte from a 23-bit LFSR (x^23 + x^18 + 1, eight steps per clock) is added to accumulator bits `[23:16]` before the 8-bit truncation. The upstream 8-bit LFSR dithered the FTW's low byte instead, which left the truncation error periodic at a 120 MHz LO and its image between 46 and 61 dB down.

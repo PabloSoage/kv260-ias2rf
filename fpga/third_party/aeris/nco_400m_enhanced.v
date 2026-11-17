@@ -9,6 +9,7 @@ module nco_400m_enhanced (
     input wire [31:0] frequency_tuning_word,
     input wire phase_valid,
     input wire [15:0] phase_offset,
+    input wire [7:0] phase_dither,   // kv260-ias2rf: random byte added below the 8 address bits (see Stage 2)
     output reg signed [15:0] sin_out,
     output reg signed [15:0] cos_out,
     output reg dds_ready
@@ -65,6 +66,17 @@ reg [5:0] valid_pipe;
 // Use only the top 8 bits for LUT addressing (256-entry LUT equivalent)
 wire [7:0] lut_address = phase_with_offset[31:24];
 
+// kv260-ias2rf: phase dither. The LUT address truncates 24 accumulator bits; at the 120 MHz LO (0.3 cycles per
+// sample) the accumulator visits 10 phases, so the truncation error repeats every 5 samples and has a component
+// at the conjugate LO, which mirrors the input around the LO (image -46 to -61 dB, set by where the accumulator
+// sits). Adding a fresh random byte to bits [23:16] before the truncation turns that error into white phase noise.
+wire [8:0] dith_sum   = {1'b0, phase_accum_reg[23:16]} + {1'b0, phase_dither};
+`ifdef MUTATE_NCO_NO_PHASE_DITHER
+wire       dith_carry = 1'b0;
+`else
+wire       dith_carry = dith_sum[8];
+`endif
+
 // Quarter-wave sine LUT (0-90 degrees only)
 // Force distributed RAM (LUTRAM) — the 64x16 LUT is only 1024 bits, far too
 // small for BRAM. BRAM CLK→DOADO delay (2.454ns) + downstream negation logic
@@ -81,8 +93,12 @@ initial begin
     end
     
     // Initialize quarter-wave sine LUT (0-90 degrees)
-    // LUT[k] = round(32767 * sin(pi/2 * k / 64)), monotonically increasing
-    // FIX: Original LUT peaked at index 42 then decreased — broke cos=sin[63-k] quadrature
+    // kv260-ias2rf: LUT[k] = round(32767 * sin(2*pi * (k + 0.5) / 256)). The quadrant fold reads cos as
+    // LUT[63 - k] and folds odd quadrants with ~k = 63 - k, which is exact only for a table sampled half a step
+    // off zero; the upstream table, sampled at k, put cos (or sin, in odd quadrants) one step (1/256 cycle) away
+    // from the other output: an I/Q phase error that left the image of a 121.5625 MHz tone at -52 dB.
+    // The half-step table adds a constant pi/256 to the LO phase and nothing else.
+`ifdef MUTATE_NCO_INT_LUT
     sin_lut[0] = 16'h0000; sin_lut[1] = 16'h0324; sin_lut[2] = 16'h0648; sin_lut[3] = 16'h096A;
     sin_lut[4] = 16'h0C8C; sin_lut[5] = 16'h0FAB; sin_lut[6] = 16'h12C8; sin_lut[7] = 16'h15E2;
     sin_lut[8] = 16'h18F9; sin_lut[9] = 16'h1C0B; sin_lut[10] = 16'h1F1A; sin_lut[11] = 16'h2223;
@@ -99,6 +115,24 @@ initial begin
     sin_lut[52] = 16'h7A7C; sin_lut[53] = 16'h7B5C; sin_lut[54] = 16'h7C29; sin_lut[55] = 16'h7CE3;
     sin_lut[56] = 16'h7D89; sin_lut[57] = 16'h7E1D; sin_lut[58] = 16'h7E9C; sin_lut[59] = 16'h7F09;
     sin_lut[60] = 16'h7F61; sin_lut[61] = 16'h7FA6; sin_lut[62] = 16'h7FD8; sin_lut[63] = 16'h7FF5;
+`else
+    sin_lut[0] = 16'h0192; sin_lut[1] = 16'h04B6; sin_lut[2] = 16'h07D9; sin_lut[3] = 16'h0AFB;
+    sin_lut[4] = 16'h0E1C; sin_lut[5] = 16'h113A; sin_lut[6] = 16'h1455; sin_lut[7] = 16'h176E;
+    sin_lut[8] = 16'h1A82; sin_lut[9] = 16'h1D93; sin_lut[10] = 16'h209F; sin_lut[11] = 16'h23A6;
+    sin_lut[12] = 16'h26A8; sin_lut[13] = 16'h29A3; sin_lut[14] = 16'h2C99; sin_lut[15] = 16'h2F87;
+    sin_lut[16] = 16'h326E; sin_lut[17] = 16'h354D; sin_lut[18] = 16'h3824; sin_lut[19] = 16'h3AF2;
+    sin_lut[20] = 16'h3DB8; sin_lut[21] = 16'h4073; sin_lut[22] = 16'h4325; sin_lut[23] = 16'h45CD;
+    sin_lut[24] = 16'h4869; sin_lut[25] = 16'h4AFB; sin_lut[26] = 16'h4D81; sin_lut[27] = 16'h4FFB;
+    sin_lut[28] = 16'h5268; sin_lut[29] = 16'h54C9; sin_lut[30] = 16'h571D; sin_lut[31] = 16'h5964;
+    sin_lut[32] = 16'h5B9C; sin_lut[33] = 16'h5DC7; sin_lut[34] = 16'h5FE3; sin_lut[35] = 16'h61F0;
+    sin_lut[36] = 16'h63EE; sin_lut[37] = 16'h65DD; sin_lut[38] = 16'h67BC; sin_lut[39] = 16'h698B;
+    sin_lut[40] = 16'h6B4A; sin_lut[41] = 16'h6CF8; sin_lut[42] = 16'h6E96; sin_lut[43] = 16'h7022;
+    sin_lut[44] = 16'h719D; sin_lut[45] = 16'h7307; sin_lut[46] = 16'h745F; sin_lut[47] = 16'h75A5;
+    sin_lut[48] = 16'h76D8; sin_lut[49] = 16'h77FA; sin_lut[50] = 16'h7909; sin_lut[51] = 16'h7A05;
+    sin_lut[52] = 16'h7AEE; sin_lut[53] = 16'h7BC5; sin_lut[54] = 16'h7C88; sin_lut[55] = 16'h7D39;
+    sin_lut[56] = 16'h7DD5; sin_lut[57] = 16'h7E5F; sin_lut[58] = 16'h7ED5; sin_lut[59] = 16'h7F37;
+    sin_lut[60] = 16'h7F86; sin_lut[61] = 16'h7FC1; sin_lut[62] = 16'h7FE9; sin_lut[63] = 16'h7FFD;
+`endif
 end
 
 // Combinational: quadrant determination and LUT index (feeds Stage 3a registers)
@@ -151,7 +185,7 @@ always @(posedge clk_400m or negedge reset_n) begin
         phase_accumulator <= phase_accumulator + frequency_tuning_word;
         phase_accum_reg   <= phase_accumulator;
         // Stage 2: offset addition (uses previous cycle's phase_accum_reg)
-        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8], 24'd0};
+        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8] + {7'd0, dith_carry}, 24'd0};
     end
 end
 
@@ -259,7 +293,7 @@ always @(posedge clk_400m or negedge reset_n) begin
         // Stage 1: just capture DSP output (no CARRY4 chain)
         phase_accum_reg   <= phase_accum_p[31:0];
         // Stage 2: offset add (CARRY4 chain from registered fabric→fabric, easy timing)
-        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8], 24'd0};
+        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8] + {7'd0, dith_carry}, 24'd0};
     end
 end
 
