@@ -45,6 +45,7 @@ module nco_400m_enhanced (
 // In simulation: behavioral reg. In synthesis: DSP48E1 P[31:0].
 reg [31:0] phase_accum_reg;     // Stage 1 output: registered DSP48E1 P[31:0]
 reg [31:0] phase_with_offset;   // Stage 2 output: phase_accum_reg + offset
+reg        dith_c_r;            // Stage 2 output: the dither's carry into the address bits
 
 // Stage 3a pipeline registers: registered LUT address + quadrant
 reg [5:0] lut_index_pipe_sin;
@@ -64,7 +65,9 @@ reg [1:0] quadrant_reg2;                 // Pass-through for Stage 5 MUX
 reg [5:0] valid_pipe;
 
 // Use only the top 8 bits for LUT addressing (256-entry LUT equivalent)
-wire [7:0] lut_address = phase_with_offset[31:24];
+// the dither's carry (registered in Stage 2, from the low byte's add) is added here, in Stage 3a, so that
+// neither stage holds the 16-bit carry chain (as one stage it missed 400 MHz by 0.66 ns)
+wire [7:0] lut_address = phase_with_offset[31:24] + {7'd0, dith_c_r};
 
 // kv260-ias2rf: phase dither. The LUT address truncates 24 accumulator bits; at the 120 MHz LO (0.3 cycles per
 // sample) the accumulator visits 10 phases, so the truncation error repeats every 5 samples and has a component
@@ -180,12 +183,14 @@ always @(posedge clk_400m or negedge reset_n) begin
         phase_accumulator <= 32'h00000000;
         phase_accum_reg   <= 32'h00000000;
         phase_with_offset <= 32'h00000000;
+        dith_c_r          <= 1'b0;
     end else if (phase_valid) begin
         // Stage 1: accumulate + capture
         phase_accumulator <= phase_accumulator + frequency_tuning_word;
         phase_accum_reg   <= phase_accumulator;
         // Stage 2: offset addition (uses previous cycle's phase_accum_reg)
-        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8] + {7'd0, dith_carry}, 24'd0};
+        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8], 24'd0};
+        dith_c_r          <= dith_carry;
     end
 end
 
@@ -289,11 +294,13 @@ always @(posedge clk_400m or negedge reset_n) begin
     if (!reset_n) begin
         phase_accum_reg   <= 32'h00000000;
         phase_with_offset <= 32'h00000000;
+        dith_c_r          <= 1'b0;
     end else if (phase_valid) begin
         // Stage 1: just capture DSP output (no CARRY4 chain)
         phase_accum_reg   <= phase_accum_p[31:0];
         // Stage 2: offset add (CARRY4 chain from registered fabric→fabric, easy timing)
-        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8] + {7'd0, dith_carry}, 24'd0};
+        phase_with_offset <= {phase_accum_reg[31:24] + phase_offset[15:8], 24'd0};
+        dith_c_r          <= dith_carry;
     end
 end
 
