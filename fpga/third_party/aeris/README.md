@@ -34,3 +34,11 @@ Timing and reset changes for 400 MHz at 77 % LUT are marked in each file. Two ch
 
 - `nco_400m_enhanced.v`: the quarter-wave table is `round(32767 * sin(2 pi (k + 0.5) / 256))`. The upstream table, sampled at `k`, put `cos` (or `sin`, in odd quadrants) one step away from the other output under the `63 - k` fold, so the image of the input around the LO was about 52 dB down.
 - `ddc_400m.v` and `nco_400m_enhanced.v`: a byte from a 23-bit LFSR (x^23 + x^18 + 1, eight steps per clock) is added to accumulator bits `[23:16]` before the 8-bit truncation. The upstream 8-bit LFSR dithered the FTW's low byte instead, which left the truncation error periodic at a 120 MHz LO and its image between 46 and 61 dB down.
+
+Both were sent upstream on 17 November 2026, together with the quadrant-fold fix that this copy also carries (`lut_index` on `quadrant[0]`, marked in the file):
+- issue [NawfalMotii79/PLFM_RADAR#213](https://github.com/NawfalMotii79/PLFM_RADAR/issues/213);
+- pull request [#214](https://github.com/NawfalMotii79/PLFM_RADAR/pull/214) against `develop`, with a new `tb_nco_image` in upstream's regression (28/28) and upstream's full CI run locally.
+
+The owner's fork carries the fix on `develop` and on `main`.
+
+The upstream port uses a slightly different pipeline: the dither byte and the offset's low byte are added in one stage, their carry into the address in the next, and the address in the stage after that. That keeps one short carry chain per stage at upstream's 2.5 ns, and the latency stays at six cycles. The version here adds the carry one stage later still, which the Artix build at 77 % LUT needed.

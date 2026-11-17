@@ -1,0 +1,19 @@
+[package]
+name = "kria-r5f"
+description = "R5F core 0 firmware: PPS discipline of kria_pps and the transmit interlock, from kria-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
+kria-core = { path = "../core" }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+debug = true
+
+[profile.dev]
+panic = "abort"

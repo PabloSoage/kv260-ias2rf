@@ -70,3 +70,11 @@ set_property PULLUP TRUE [get_ports pmod_spare2]
 # Async / low-rate control I/Os
 set_false_path -from [get_ports {fpga_irq hk_scl hk_sda pmod_miso pmod_spare2}]
 set_false_path -to   [get_ports {fpga_prog_b hk_scl hk_sda pmod_cs_n pmod_mosi pmod_sclk pmod_beam_strobe pmod_pps_sync pmod_spare1}]
+
+# GPS 1-PPS in: KV260 J9 (Raspberry Pi camera connector) pin 12 = HDA10 = SOM240_1 A16 = ball J12,
+# bank 45 HD 3.3 V, routed straight from the SOM connector (XTP682 p13; k26c part0_pins). Unused by
+# this design otherwise (no Raspberry Pi camera). Pulled down so an unplugged cable reads as no PPS.
+set_property PACKAGE_PIN J12 [get_ports gps_pps]
+set_property IOSTANDARD LVCMOS33 [get_ports gps_pps]
+set_property PULLDOWN TRUE [get_ports gps_pps]
+set_false_path -from [get_ports gps_pps]

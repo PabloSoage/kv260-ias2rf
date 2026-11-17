@@ -270,7 +270,8 @@ module tb_system_signals;
         .pmod_beam_strobe (kria_beam_strobe),
         .pmod_pps_sync    (kria_pps_sync),
         .pmod_spare1      (kria_spare1),
-        .pmod_spare2      (kria_spare2)
+        .pmod_spare2      (kria_spare2),
+        .pps_ref          (emio_gpio_o[2])   // kria_pps mode 0
     );
 
     // Peripheral & ADC/DAC Board Models

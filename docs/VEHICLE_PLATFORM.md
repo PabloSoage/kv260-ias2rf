@@ -13,7 +13,7 @@ operate far from coverage and infrastructure:
 |---|---|
 | **LiDAR** | See in fog and at night, and know the terrain under the vehicle. 3D render and route mapping |
 | **SDR RX** | Listen to HF, AM, FM, airband and walkies, and detect emissions (drones at 5.8 GHz, control links at 2.4 GHz) |
-| **SDR — location finding** | Work out where a signal comes from, by interferometry and by triangulating as the vehicle moves |
+| **SDR: location finding** | Work out where a signal comes from, by interferometry and by triangulating as the vehicle moves |
 | **SDR TX** | Communicate on amateur bands when there is no coverage |
 | **Radar** | Detection and location of targets at range (AERIS-10, 10.5 GHz, beamforming) |
 | **OBD2 / CAN** | Vehicle telemetry, and **odometry for LiDAR fusion** |
@@ -37,7 +37,7 @@ Each subsystem carries its own risk, schedule and learning curve. Attempting the
 the most reliable way to finish none of them. §6 proposes an order, and it is not the order they
 appear in on the wish list.
 
-### 2.2 The LiDAR needs no custom hardware — it can start today
+### 2.2 The LiDAR needs no custom hardware: it can start today
 
 It connects over USB or Ethernet. The KV260 has 4× USB 3.0 and Gigabit Ethernet. **No boards
 designed, no soldering.** By a distance it has the best value-to-effort ratio in the whole project,
@@ -51,8 +51,8 @@ For **listening, scanning and locating**, an SDR driven by the KV260 is the righ
 **talking to someone when you are genuinely in trouble**, the right tool is a commercial
 type-approved transceiver, with physical controls, its own battery and no computer in the path.
 
-If the day you need to call for help you are depending on a prototype — a serial link you wrote, a
-Linux that boots, an FPGA that configures — you have a single point of failure exactly where you
+If the day you need to call for help you are depending on a prototype (a serial link you wrote, a
+Linux that boots, an FPGA that configures), you have a single point of failure exactly where you
 cannot afford one. **In a safety context, redundancy is worth more than integration.** An FT-891 or
 a dual-band mobile costs less than the board being designed here, and works with the engine off and
 the laptop shut.
@@ -81,7 +81,7 @@ Forward LiDAR (sweeps 2–10 m ahead)
   "What is under you now, you scanned three metres back"
 ```
 
-This makes odometry a functional requirement rather than a luxury — and it is what **ties the
+This makes odometry a functional requirement rather than a luxury, and it is what **ties the
 OBD/CAN subsystem to the LiDAR one**. The two things that looked independent are not.
 
 **Candidates:** Livox Mid-360 (360° × 59°, Ethernet, official ROS2 driver, widely used in mobile
@@ -92,13 +92,13 @@ similar).
 classification, and detection of ruts and rocks. That is inference, and it is what the board was
 bought for.
 
-**Caveat `[E]`:** LiDAR degrades in thick fog and heavy rain — droplets scatter the infrared. It is
+**Caveat `[E]`:** LiDAR degrades in thick fog and heavy rain: droplets scatter the infrared. It is
 far better than human night vision, but it is not magic. The sensor that genuinely penetrates fog is
 radar, specifically at 77 GHz (§3.4).
 
 ---
 
-### 3.2 SDR — reception and location finding
+### 3.2 SDR: reception and location finding
 
 This is the highest-value subsystem among those that do depend on the custom board.
 
@@ -123,7 +123,7 @@ This is the highest-value subsystem among those that do depend on the custom boa
 | 4 – 5 | Real direction finding, unambiguous (what a KrakenSDR does with 5) |
 
 The AD9253 is a **quad** ADC. Using all four coherently is the natural direction-finding
-configuration — but it does not fit through IAS1: four channels in 1-lane mode are 4 data lanes +
+configuration, but it does not fit through IAS1: four channels in 1-lane mode are 4 data lanes +
 `DCO` + `FCO` = **6 pairs**, and IAS1 has 5.
 
 → **Direction finding is a second argument for the front-end FPGA**, alongside the radar.
@@ -144,7 +144,7 @@ options exist. **Detecting** drone emissions is passive reception: legal anywher
 
 ---
 
-### 3.4 Radar — the important correction
+### 3.4 Radar: the important correction
 
 **I believe the radar being built is the wrong one for the job described.**
 
@@ -159,7 +159,7 @@ vehicle"* or *"seeing in fog"*, the tool industry builds for exactly that is **a
 | Legality in the EU | Amateur **secondary** in 10.45–10.5, special authorisation | **76–77 GHz allocated to vehicular radar, no licence** |
 | Hardware | 3 boards + array + front-end FPGA | **One chip with antenna on package** (TI AWR1843AOP and similar) |
 | Cost and effort | Very high | Affordable evaluation module |
-| Fog, dust, rain | Good | Good — it is its reason for existing |
+| Fog, dust, rain | Good | Good: it is its reason for existing |
 
 **These are two different radars for two different jobs.** The question to answer before going
 further is: *is the radar for seeing obstacles while driving, or for detecting things far away
@@ -174,13 +174,13 @@ further is: *is the radar for seeing obstacles while driving, or for detecting t
 On the legality of AERIS, piece by piece: in Spain the 10.45 – 10.5 GHz segment is allocated to the
 amateur service on a **secondary** basis, and use of 10.0 – 10.5 GHz requires **special
 authorisation**. A formal mechanism for *temporary and experimental use* exists. So **there is a
-legal route** — it is not a dead end, but it is paperwork, it is secondary (you may not cause
+legal route**: it is not a dead end, but it is paperwork, it is secondary (you may not cause
 interference to primary services) and it leaves **50 MHz** of room, which limits the sweep and
 therefore range resolution to about 3 m.
 
 ---
 
-### 3.5 SDR — transmission
+### 3.5 SDR: transmission
 
 Two things that look alike need separating here.
 
@@ -197,7 +197,7 @@ legal communication in the same part of the spectrum and with the same antenna.
 regulation) permit using any means to call for help. That is a right in a distress situation, not a
 licence to operate out of band the rest of the time.
 
-**Recommended route:** get the licence — the exam is not hard and the paperwork takes months, so
+**Recommended route:** get the licence: the exam is not hard and the paperwork takes months, so
 **start now, in parallel with the hardware**. And look at **REMER** (the Spanish civil protection
 emergency radio network): it is a volunteer network that fits this use case exactly and brings
 context, training and a community.
@@ -216,14 +216,14 @@ alternatives compared, in [INTEGRATIONS.md §4](INTEGRATIONS.md).
 **For permanent logging on the Kria:** a **SocketCAN-compatible USB-CAN adapter** (CANable,
 PCAN-USB or similar). SocketCAN is in the Linux kernel, it is stable, and `can-utils` gives you
 capture and decoding immediately. The Euro 4 V80 carries CAN on the OBD port (ISO 15765-4)
-`[E — confirm on the vehicle]`.
+`[E: confirm on the vehicle]`.
 
 **And remember this is not just telemetry:** wheel speed over CAN is the odometry the LiDAR SLAM
 needs (§3.1). It is a sensor, not an ornament.
 
 ---
 
-## 4. Power and environment — what a bench design ignores
+## 4. Power and environment: what a bench design ignores
 
 A vehicle is a hostile electrical environment and this affects **every** board in the project.
 
@@ -241,7 +241,7 @@ A vehicle is a hostile electrical environment and this affects **every** board i
 | Consumer | Power |
 |---|---|
 | KV260 | **~10 W** `[E]`. 36 W is only the brick's rating. **Measured** `[V]` by [scanner64](https://github.com/PabloSoage/scanner64) with the carrier's INA260: **3.24 W idle, 4.30 W** with the PL processing 64 channels at 100 MSPS. That INA260 sits on a 5 V rail, so it excludes the 12 V input stage, the fan and USB peripherals, hence the margin |
-| This adapter board | **8.8 W** `[V/E]` at 12 V, 11.4 W with 30 % margin — [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
+| This adapter board | **8.8 W** `[V/E]` at 12 V, 11.4 W with 30 % margin, [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1 |
 | LiDAR | 10 – 20 W |
 | SDR (RX) | 10 – 15 W |
 | AERIS Extended radar | **Very high**: 16 GaN amplifiers of 10 W. Pulsed, but the peak drives the sizing |
@@ -308,15 +308,15 @@ every stage leaves something usable even if you abandon the next one.
 
 ### Why stage 0 is the most important
 
-**Do not design a board to find out what you need.** A bladeRF 2.0 micro covers 47 MHz to 6 GHz —
-including the 5.8 GHz of drones — in full duplex with two coherent channels, and an RSPdx-R2 covers
+**Do not design a board to find out what you need.** A bladeRF 2.0 micro covers 47 MHz to 6 GHz
+(including the 5.8 GHz of drones) in full duplex with two coherent channels, and an RSPdx-R2 covers
 1 kHz to 2 GHz with better sensitivity; together they cost less than a prototype run. A KrakenSDR
 does 5-channel direction finding out of the box. All three go over USB to the KV260 and work today.
 Choice and alternatives: [SHOPPING_LIST.md](SHOPPING_LIST.md#choosing-the-stage-0-sdrs).
 
 Drive with that for six months. You will discover that half your requirements were wrong and that
 there are three you had not anticipated. **Then** design the board, to solve what actually limits
-you — which is what justifies a custom board: integration, a clock shared with the radar, and
+you, which is what justifies a custom board: integration, a clock shared with the radar, and
 transmit power, not basic capability.
 
 ---

@@ -212,7 +212,11 @@ module kria_pl_link (
     output wire        pmod_beam_strobe,
     output wire        pmod_pps_sync,
     output wire        pmod_spare1,
-    input  wire        pmod_spare2
+    input  wire        pmod_spare2,
+
+    // The second, from kria_pps: the software GPIO by default, or the GPS /
+    // disciplined pulse. Drives PPS_SYNC and the link timestamps' seconds.
+    input  wire        pps_ref
 );
 
     // -------------------------------------------------------------------------
@@ -673,7 +677,7 @@ module kria_pl_link (
             pps_rx_prev <= 1'b0;
             ts_cnt_rx   <= 64'd0;
         end else begin
-            pps_rx_sync <= {pps_rx_sync[0], emio_gpio_o[2]};
+            pps_rx_sync <= {pps_rx_sync[0], pps_ref};
             pps_rx_prev <= pps_rx_sync[1];
             if (pps_rx_sync[1] && !pps_rx_prev)
                 ts_cnt_rx <= {ts_cnt_rx[63:32] + 32'd1, 32'd0};
@@ -952,7 +956,7 @@ module kria_pl_link (
     assign pmod_sclk        = emio_spi_sclk;
     assign emio_spi_mi      = pmod_miso;
     assign pmod_beam_strobe = emio_gpio_o[1];
-    assign pmod_pps_sync    = emio_gpio_o[2];
+    assign pmod_pps_sync    = pps_ref;
     assign pmod_spare1      = emio_uart1_txd;
     assign emio_uart1_rxd   = pmod_spare2;
 

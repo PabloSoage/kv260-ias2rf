@@ -1,0 +1,9 @@
+[package]
+name = "kria-vehicled"
+description = "A53 daemon: reads the ECU stream from opendash, keeps the vehicle state, and hands speed to R5F core 0"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kria-core = { path = "../core" }

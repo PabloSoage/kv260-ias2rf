@@ -22,6 +22,7 @@ add_files -norecurse [file join $script_dir "kria_tx_mod.v"]
 add_files -norecurse [file join $script_dir "kria_radar_proc.v"]
 add_files -norecurse [file join $script_dir "kria_dsp_suite.v"]
 add_files -norecurse [file join $script_dir "kria_pl_link.v"]
+add_files -norecurse [file join $script_dir "kria_pps.v"]
 update_compile_order -fileset sources_1
 
 # ------------------------------------------------------------------------------
@@ -59,6 +60,11 @@ set_property -dict [list \
 
 set rst_sys [create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps8_100M]
 set link_pl [create_bd_cell -type module -reference kria_pl_link kria_pl_link_0]
+# GPS PPS capture and disciplined PPS generator (fpga/kria/kria_pps.v)
+set pps_blk [create_bd_cell -type module -reference kria_pps kria_pps_0]
+# EMIO GPIO[2], the software PPS, into kria_pps (mode 0 keeps the old behaviour)
+set gpio2 [create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice xlslice_gpio2]
+set_property -dict [list CONFIG.DIN_WIDTH {8} CONFIG.DIN_FROM {2} CONFIG.DIN_TO {2}] $gpio2
 
 set dma0 [create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma axi_dma_0]
 set_property -dict [list \
@@ -76,20 +82,20 @@ set_property -dict [list \
 ] $dma0
 
 set smc_ctrl [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc_ctrl]
-set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {2}] $smc_ctrl
+set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {3}] $smc_ctrl
 
 set smc_hp0 [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc_hp0]
 set_property -dict [list CONFIG.NUM_SI {2} CONFIG.NUM_MI {1}] $smc_hp0
 
 set irqc [create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat xlconcat_0]
-set_property -dict [list CONFIG.NUM_PORTS {4}] $irqc
+set_property -dict [list CONFIG.NUM_PORTS {5}] $irqc
 
 # Clocks & Reset
 connect_bd_net [get_bd_pins ps8/pl_clk0] \
     [get_bd_pins ps8/maxihpm0_lpd_aclk] \
     [get_bd_pins ps8/saxihp0_fpd_aclk] \
     [get_bd_pins rst_ps8_100M/slowest_sync_clk] \
-    [get_bd_pins kria_pl_link_0/pl_clk_100m] \
+    [get_bd_pins kria_pl_link_0/pl_clk_100m]     [get_bd_pins kria_pps_0/clk] \
     [get_bd_pins axi_dma_0/s_axi_lite_aclk] \
     [get_bd_pins axi_dma_0/m_axi_mm2s_aclk] \
     [get_bd_pins axi_dma_0/m_axi_s2mm_aclk] \
@@ -98,7 +104,7 @@ connect_bd_net [get_bd_pins ps8/pl_clk0] \
 
 connect_bd_net [get_bd_pins ps8/pl_resetn0] [get_bd_pins rst_ps8_100M/ext_reset_in]
 connect_bd_net [get_bd_pins rst_ps8_100M/peripheral_aresetn] \
-    [get_bd_pins kria_pl_link_0/pl_resetn] \
+    [get_bd_pins kria_pl_link_0/pl_resetn]     [get_bd_pins kria_pps_0/resetn] \
     [get_bd_pins axi_dma_0/axi_resetn] \
     [get_bd_pins axi_smc_ctrl/aresetn] \
     [get_bd_pins axi_smc_hp0/aresetn]
@@ -107,6 +113,7 @@ connect_bd_net [get_bd_pins rst_ps8_100M/peripheral_aresetn] \
 connect_bd_intf_net [get_bd_intf_pins ps8/M_AXI_HPM0_LPD] [get_bd_intf_pins axi_smc_ctrl/S00_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M00_AXI] [get_bd_intf_pins kria_pl_link_0/s_axi]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M01_AXI] [get_bd_intf_pins axi_dma_0/S_AXI_LITE]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M02_AXI] [get_bd_intf_pins kria_pps_0/s_axi]
 
 # AXI4 High-Performance Data Plane (axi_dma S2MM/MM2S <-> PS S_AXI_HP0_FPD)
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_MM2S] [get_bd_intf_pins axi_smc_hp0/S00_AXI]
@@ -122,6 +129,7 @@ connect_bd_net [get_bd_pins kria_pl_link_0/irq_fpga]    [get_bd_pins xlconcat_0/
 connect_bd_net [get_bd_pins kria_pl_link_0/irq_link_up] [get_bd_pins xlconcat_0/In1]
 connect_bd_net [get_bd_pins axi_dma_0/s2mm_introut]     [get_bd_pins xlconcat_0/In2]
 connect_bd_net [get_bd_pins axi_dma_0/mm2s_introut]     [get_bd_pins xlconcat_0/In3]
+connect_bd_net [get_bd_pins kria_pps_0/irq]             [get_bd_pins xlconcat_0/In4]
 connect_bd_net [get_bd_pins xlconcat_0/dout]            [get_bd_pins ps8/pl_ps_irq0]
 
 # PS EMIO Sideband -> kria_pl_link_0
@@ -137,7 +145,11 @@ connect_bd_net [get_bd_pins ps8/emio_spi0_sclk_o] [get_bd_pins kria_pl_link_0/em
 connect_bd_net [get_bd_pins ps8/emio_spi0_ss_o_n] [get_bd_pins kria_pl_link_0/emio_spi_ssn]
 connect_bd_net [get_bd_pins ps8/emio_spi0_m_i]    [get_bd_pins kria_pl_link_0/emio_spi_mi]
 
-connect_bd_net [get_bd_pins ps8/emio_gpio_o] [get_bd_pins kria_pl_link_0/emio_gpio_o]
+connect_bd_net [get_bd_pins ps8/emio_gpio_o] [get_bd_pins kria_pl_link_0/emio_gpio_o] [get_bd_pins xlslice_gpio2/Din]
+connect_bd_net [get_bd_pins xlslice_gpio2/Dout] [get_bd_pins kria_pps_0/sw_pps]
+connect_bd_net [get_bd_pins kria_pps_0/pps_out] [get_bd_pins kria_pl_link_0/pps_ref]
+create_bd_port -dir I gps_pps
+connect_bd_net [get_bd_ports gps_pps] [get_bd_pins kria_pps_0/gps_pps]
 connect_bd_net [get_bd_pins ps8/emio_gpio_t] [get_bd_pins kria_pl_link_0/emio_gpio_t]
 connect_bd_net [get_bd_pins ps8/emio_gpio_i] [get_bd_pins kria_pl_link_0/emio_gpio_i]
 
@@ -162,6 +174,8 @@ set_property offset 0x80000000 [get_bd_addr_segs {ps8/Data/SEG_kria_pl_link_0_re
 set_property range  64K        [get_bd_addr_segs {ps8/Data/SEG_kria_pl_link_0_reg0}]
 set_property offset 0x80010000 [get_bd_addr_segs {ps8/Data/SEG_axi_dma_0_Reg}]
 set_property range  64K        [get_bd_addr_segs {ps8/Data/SEG_axi_dma_0_Reg}]
+set_property offset 0x80020000 [get_bd_addr_segs {ps8/Data/SEG_kria_pps_0_reg0}]
+set_property range  64K        [get_bd_addr_segs {ps8/Data/SEG_kria_pps_0_reg0}]
 
 validate_bd_design
 save_bd_design

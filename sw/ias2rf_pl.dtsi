@@ -47,6 +47,34 @@
                     xlnx,device-id = <0x0>;
                 };
             };
+
+            /* GPS PPS capture and disciplined PPS generator (fpga/kria/kria_pps.v).
+             * R5F core 0 owns it (sw/kria/r5f); Linux maps it read-only in practice,
+             * for NOW (the PL clock both sides stamp the mailbox with). pl_ps_irq0[4]. */
+            ias2rf_pps: ias2rf_pps@80020000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80020000 0x0 0x10000>;
+                interrupt-parent = <&gic>;
+                interrupts = <0 93 4>;
+                interrupt-names = "pps";
+                status = "okay";
+            };
+        };
+    };
+
+    /* Mailbox between Linux and R5F core 0 (sw/kria/core/src/mailbox.rs): 4 KiB at 0x3EE00000,
+     * kept out of the kernel's memory map so /dev/mem may write it and the R5F (caches off) and
+     * the A53s see the same bytes. Placed above the OpenAMP vrings Xilinx images use at
+     * 0x3ED00000-0x3ED7FFFF. */
+    fragment@4 {
+        target-path = "/reserved-memory";
+        __overlay__ {
+            #address-cells = <2>;
+            #size-cells = <2>;
+            rpu_mailbox: rpu_mailbox@3ee00000 {
+                no-map;
+                reg = <0x0 0x3ee00000 0x0 0x1000>;
+            };
         };
     };
 

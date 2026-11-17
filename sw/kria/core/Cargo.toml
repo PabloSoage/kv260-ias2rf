@@ -1,0 +1,8 @@
+[package]
+name = "kria-core"
+description = "I/O-free logic shared by the KV260's A53 daemons and its R5F firmware: PPS discipline, transmit interlock, vehicle telemetry protocol, mailbox layout"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]

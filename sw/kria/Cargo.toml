@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = ["core", "vehicled"]
+# The R5F firmware builds for armv7r-none-eabihf only; it is its own workspace
+# so `cargo test` here stays a host build. See r5f/README.md.
+exclude = ["r5f"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

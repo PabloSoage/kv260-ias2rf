@@ -5,21 +5,28 @@ Zynq UltraScale+ PL bitstream (`fpga/kria/bd.tcl` + `fpga/kria/kria_pl_link.v`).
 
 ## Files
 
-- `ias2rf_pl.dtsi` — Device Tree overlay fragment for Ubuntu/PetaLinux (`xmutil`
+- `ias2rf_pl.dtsi`: Device Tree overlay fragment for Ubuntu/PetaLinux (`xmutil`
   or `configfs` DT overlay), exposing:
   - `ias2rf_link@80000000` (`kria_pl_link` AXI4-Lite CSRs `0x00..0x34`, interrupts `irq_fpga` / `irq_link_up`)
   - `axi_dma_0@80010000` (Direct-register 64-bit AXI DMA S2MM uplink + MM2S downlink)
+  - `ias2rf_pps@80020000` (`kria_pps`, GPS PPS capture and generator, interrupt `pps`) and the `rpu_mailbox`
+    reservation at `0x3EE00000` for R5F core 0
   - `i2c0` (EMIO I2C to Artix/board `HK_SCL`/`HK_SDA`)
   - `spi0` (EMIO SPI over KV260 Pmod J2)
   - `uart1` (EMIO UART to the front-end FPGA's debug console over the two Pmod spare lines: `/dev/ttyPS1`,
     115200 8N1; `screen /dev/ttyPS1 115200` shows the boot banner and the 1 Hz `STAT` line, and `h` lists the
     commands, [FPGA_GATEWARE §5.4](../docs/FPGA_GATEWARE.md))
-- `ias2rf_dma_test.c` — Standalone C smoke test (`mmap` `/dev/mem` + optional `u-dma-buf` `/dev/udmabuf0`):
+- `ias2rf_dma_test.c`: Standalone C smoke test (`mmap` `/dev/mem` + optional `u-dma-buf` `/dev/udmabuf0`):
   - Prints all IAS1 link CSRs (`0x00..0x34`) and flags `0xDEAD_C10C` if the Artix `LINK_RX_CLK` is not yet running.
   - Supports `--retrain` (pulses `LINK_CTRL[2]`) and `--rd-adcs` (sends a Stream `0x10` register-read request for Artix `0x0038 ADCS_STATUS` via `MM2S`, then captures 4 KB of uplink frames via `S2MM`).
   - Artix registers through the same command channel: `--rd ADDR`, `--wr ADDR VALUE`, and for the radar path
     `--radar-en 0|1` (`RADAR_CTRL[0]`, `0xE4`) and `--radar-status` (`RADAR_STATUS`, `0xE8`; bit 5 is "link up and
     ADC trained"). Since Rev08 these replace the two Pmod spare GPIOs, which now carry the debug UART.
+
+- [`kria/`](kria/README.md): Rust for the K26's processors: `kria-core` (shared, `no_std`), `kria-vehicled` (A53:
+  engine data from opendash) and `kria-r5f` (R5F core 0: GPS PPS discipline and the transmit lock).
+- [`hmi/`](hmi/): the in-car screens ([docs/HMI.md](../docs/HMI.md)).
+- [`integrations/`](integrations/): simulations and figures for [docs/INTEGRATIONS.md](../docs/INTEGRATIONS.md).
 
 ## Build & Run on KV260 (Linux)
 

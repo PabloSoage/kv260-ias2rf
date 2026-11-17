@@ -92,7 +92,7 @@ The post-route floorplan below is plotted directly from Vivado 2026.1 placed lea
 
 ## 3. Kria KV260 Zynq UltraScale+ PL & Block Design (`XCK26-SFVC784-2LV-c`)
 
-Sources: [`fpga/kria/top.v`](../fpga/kria/top.v), [`fpga/kria/kria_pl_link.v`](../fpga/kria/kria_pl_link.v), [`fpga/kria/link_axis.v`](../fpga/kria/link_axis.v), [`fpga/kria/bd.tcl`](../fpga/kria/bd.tcl), [`fpga/kria/xck26.xdc`](../fpga/kria/xck26.xdc).
+Sources: [`fpga/kria/top.v`](../fpga/kria/top.v), [`fpga/kria/kria_pl_link.v`](../fpga/kria/kria_pl_link.v), [`fpga/kria/kria_pps.v`](../fpga/kria/kria_pps.v), [`fpga/kria/link_axis.v`](../fpga/kria/link_axis.v), [`fpga/kria/bd.tcl`](../fpga/kria/bd.tcl), [`fpga/kria/xck26.xdc`](../fpga/kria/xck26.xdc).
 
 ### 3.1 Kria K26 Silicon Die Floorplan & Occupancy
 
@@ -110,13 +110,14 @@ Sources: [`fpga/kria/top.v`](../fpga/kria/top.v), [`fpga/kria/kria_pl_link.v`](.
 
 | Instance / Subsystem | Module | Slice LUTs | FFs | BRAM36 | BRAM18 | DSP48E2 | Purpose |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **`ias2rf_k26_bd_wrapper` (Full BD)** | **`ias2rf_k26_bd`** | **`33,300` (`28.4%`)** | **`32,852` (`14.0%`)** | **`14`** | **`2`** (`15 eq, 10.4%`) | **`106` (`8.5%`)** | Full PS8 + DMA + SmartConnect + PL link + DSP suite + EMIO `UART1` |
-| `kria_pl_link_0` (link only) | `kria_pl_link` | `6,677` | `12,459` | `0` | `0` | `0` | Bank 66 HP SERDES + `512`-tap eye trainer + `64b/66b` PCS + `link_axis` |
-| `u_dsp_suite` (in `kria_pl_link`) | `kria_dsp_suite` | `22,240` | `14,307` | `12` | `0` | `106` | Input queue (`1`), channel receiver (`6,654` LUT, `80` DSP), ADS-B (`4,158` LUT), radar (`10,575` LUT, `11` BRAM36, `14` DSP), transmit modulator (`493` LUT, `12` DSP) |
-| `axi_dma_0` + `axi_smc_*` + `rst` | Xilinx IP | `4,383` | `6,086` | `2` | `2` | `0` | `64`-bit `MM2S`/`S2MM` DMA into `PS8 HP0_FPD` DDR4 |
-| **Free K26 PL Silicon** | — | **`83,820` (`71.6%`)** | **`201,388` (`86.0%`)** | **`129` (`89.6%`)** | — | **`1,142` (`91.5%`)** | Available for on-SOM pulse compression, tracking and more channels |
+| **`ias2rf_k26_bd_wrapper` (Full BD)** | **`ias2rf_k26_bd`** | **`33,876` (`28.9%`)** | **`33,605` (`14.3%`)** | **`14`** | **`2`** (`15 eq, 10.4%`) | **`106` (`8.5%`)** | Full PS8 + DMA + SmartConnect + PL link + DSP suite + GPS PPS + EMIO `UART1` |
+| `kria_pl_link_0` (link only) | `kria_pl_link` | `6,680` | `12,459` | `0` | `0` | `0` | Bank 66 HP SERDES + `512`-tap eye trainer + `64b/66b` PCS + `link_axis` |
+| `u_dsp_suite` (in `kria_pl_link`) | `kria_dsp_suite` | `22,243` | `14,307` | `12` | `0` | `106` | Input queue (`1`), channel receiver (`6,654` LUT, `80` DSP), ADS-B (`4,158` LUT), radar (`10,575` LUT, `11` BRAM36, `14` DSP), transmit modulator (`493` LUT, `12` DSP) |
+| `kria_pps_0` | `kria_pps` | `568` | `744` | `0` | `0` | `0` | GPS PPS capture, disciplined PPS generator, `PPS_SYNC` source (section 5.6) |
+| `axi_dma_0` + `axi_smc_*` + `rst` + `xlslice` | Xilinx IP | `4,385` | `6,095` | `2` | `2` | `0` | `64`-bit `MM2S`/`S2MM` DMA into `PS8 HP0_FPD` DDR4 |
+| **Free K26 PL Silicon** | — | **`83,244` (`71.1%`)** | **`200,635` (`85.7%`)** | **`129` (`89.6%`)** | — | **`1,142` (`91.5%`)** | Available for on-SOM pulse compression, tracking and more channels |
 
-- **Timing (`fpga/kria/reports/timing_summary.rpt` & `cdc.rpt`):** Full BD `WNS = +0.772 ns` (`0 / 103,079` failing setup; the worst path is an asynchronous reset recovery check inside `clk_300_u`; per clock `clk_pl_0` `+1.951 ns` (an ADS-B divider stage), `rx_clkdiv` `+2.070 ns`, `tx_clk_div` `+3.243 ns`, `clk_300_u` `+2.931 ns`), `WHS = +0.010 ns` (`0 / 103,079` failing hold), `WPWS = +0.000 ns` (`0 / 34,819` failing pulse-width); `0` DRC errors (DSP pipelining advisories and two BRAM collision advisories only). `cdc.rpt` reports `160` `CDC-1`, `6` `CDC-3`, `6` `CDC-6`, `1` `CDC-10`, `376` `CDC-13`, `1` `CDC-14`, `390` `CDC-15`. Without the pipelining described in section 5.5 the same build missed `clk_pl_0` by `13.8 ns`.
+- **Timing (`fpga/kria/reports/timing_summary.rpt` & `cdc.rpt`):** Full BD `WNS = +1.121 ns` (`0 / 105,235` failing setup; the worst path is an asynchronous reset recovery check inside `clk_300_u` (the `IDELAYCTRL` reset); per clock `clk_pl_0` `+1.848 ns`, `rx_clkdiv` `+2.435 ns`, `tx_clk_div` `+3.342 ns`, `clk_300_u` `+2.821 ns`), `WHS = +0.010 ns` (`0 / 105,235` failing hold), `WPWS = +0.000 ns`; `0` DRC errors (DSP pipelining advisories, one clock-placer check and two BRAM collision advisories only, as before). `cdc.rpt` reports `160` `CDC-1`, `7` `CDC-3` (one more: the `gps_pps` synchroniser), `6` `CDC-6`, `1` `CDC-10`, `374` `CDC-13`, `2` `CDC-14`, `390` `CDC-15`. Build of 17 November with `kria_pps`; the build before it, without the block, gave `WNS = +0.772 ns` at `33,300` LUT. Without the pipelining described in section 5.5 the same build missed `clk_pl_0` by `13.8 ns`.
 - **UltraScale+ Bank 66 Training & PS `UART1` EMIO:** Uses component-mode `IDELAYE3` (`VAR_LOAD`, `512` taps @ ~`4 ps`, BISC `EN_VTC` handshaking) + `ISERDESE3` at `125 MHz` `CLKDIV` / `500 MHz` `CLK` (`MMCME4_ADV` from `250 MHz` forwarded `LINK_RX_CLK`) and `ODT = RTT_48` internal `DIFF_SSTL12` termination at `1.2 V`. `bd.tcl` enables PS `UART1` on EMIO so Linux exposes `/dev/ttyPS1` @ `115,200` baud directly across KV260 Pmod `J2` (`D11` -> `pmod_spare1`, `B11` <- `pmod_spare2` with `PULLUP TRUE`).
 
 ---
@@ -312,6 +313,34 @@ Timing on the K26. The G-8 suite was written as single-clock arithmetic and veri
 
 ---
 
+### 5.6 Kria GPS PPS (`kria_pps`, AXI-Lite at `0x8002_0000`, Rev08)
+
+[`fpga/kria/kria_pps.v`](../fpga/kria/kria_pps.v) takes a GPS receiver's 1-PPS on `gps_pps`, which is KV260 `J9` (Raspberry Pi camera connector) pin 12, `HDA10`, ball `J12`, LVCMOS33 with a pull-down. It runs on `clk_pl_0`, the same 100 MHz as the AXI port.
+
+What it does:
+- Timestamps each GPS edge on a free-running 64-bit counter, after a 1 µs high-time qualification.
+- Generates a disciplined second from a fractional period.
+- Chooses what drives `PPS_SYNC` on the Pmod and the seconds of the link time stamps (`kria_pl_link` input `pps_ref`).
+- Raises `pl_ps_irq0[4]` (GIC SPI 93).
+
+R5F core 0 owns it ([`sw/kria/r5f`](../sw/kria/r5f/src/main.rs)); the loop is described in [INTEGRATIONS.md §2.1](INTEGRATIONS.md). At reset it is in mode 0, so `PPS_SYNC` is the software GPIO (`EMIO GPIO[2]`) exactly as before the block existed.
+
+| Offset | Register | Fields |
+|---|---|---|
+| `0x00` | `CTRL` | `[1:0]` source of `PPS_SYNC` (`0` software GPIO, `1` GPS pulse after qualification, `2` generated), `[2]` IRQ enable, `[3]` generator on, `[4]` restart (W1, self-clearing: next generated edge at `NOW + PERIOD`) |
+| `0x04` | `STATUS` | `[0]` capture pending (W1C), `[1]` GPS missing (no edge for 1.25 s), `[2]` glitch seen (W1C), `[3]` generated edge pending (W1C), `[31:16]` GPS edge count. Clear only the bits that were read |
+| `0x08`, `0x0C` | `CAP_LO`, `CAP_HI` | Tick count of the last accepted GPS edge |
+| `0x10` | `CAP_PERIOD` | Ticks between the last two accepted edges |
+| `0x14`, `0x18` | `GEN_PERIOD_INT`, `GEN_PERIOD_FRAC` | Generator period: whole ticks and a 32-bit fraction |
+| `0x1C` | `GEN_ADJUST` | Signed ticks added once to the next generated period |
+| `0x20`, `0x24` | `GEN_LO`, `GEN_HI` | Tick count of the last generated edge |
+| `0x28` | `WIDTH` | Output pulse width in ticks (reset 100 ms) |
+| `0x2C`, `0x30` | `NOW_LO`, `NOW_HI` | Free-running counter; reading `NOW_LO` latches `NOW_HI`. Linux and the R5F stamp the shared mailbox with it |
+| `0x34` | `ID` | `0x50505331` (`"PPS1"`) |
+
+Bench: `tb_kria_pps` (section 6), with the mutation `pps_no_filter`. Cost and timing: section 3.3.
+
+
 ## 6. XSim & Full-System Verification Suite (`fpga/sim/`)
 
 Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado 2026.1`) with unified primitive models (`unisims_ver`, `secureip`, `glbl`) and behavioral hardware board/IC models (`fpga/sim/models/`):
@@ -332,6 +361,7 @@ Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado
 | Bench | Scope Verified |
 | :--- | :--- |
 | `tb_system.v` | Full end-to-end co-simulation at both `500 MHz` (`453.23 s`) and `400 MHz` (`516.44 s`), including A-1 `500 MHz` reset gating, `500->400 MHz` unlock & retrain, and PS `UART1` EMIO `0xE8` readback |
+| `tb_kria_pps.v` | `kria_pps` over AXI-Lite with 10,000-tick seconds: ID, mode 0 forwarding, captures and IRQ, capture period, mode 1 after qualification, a 5-tick glitch (flagged, not captured or forwarded), missing GPS, the fractional generator (8 s of 10,000.25 ticks = 80,002), one-shot adjust, a closed loop holding the generator within 1 tick of a 10,000.37-tick GPS second, and holdover; mutation `pps_no_filter` (exit `1`) |
 | `tb_dbg_uart.v` | G-1 `dbg_uart` boot banner, periodic `STAT`, `r`/`w`/`s`/`h` CLI, 4-master CSR collision arbitration, `BREAK` recovery (`500 MHz` & `400 MHz`) + mutations `wrong_divisor` & `drop_monitor_write` (exit `1`) |
 | `tb_clk_mode_switch.v` | Safe-boot Si549 `500 MHz` init, A-1 radar path reset/retrain on `500<->400 MHz` switch, and `±50 ppm` `ADPLL_DELTA_M` Ethernet clamp (`500 MHz` & `400 MHz`, `+` `-Mutate no_delta_clamp`) |
 | `tb_dual_path_drain.v` | `dual_path_sf_fifo` drain while the IAS1 uplink is closed: bulk dropped whole on both sides, `0x11` kept and sent first, a started packet never cut, a started discard runs to its `eop` (`-Mutate drain_started_pkt`, `drain_all_sid`, `drain_release`, `drain_no_wskip`) |

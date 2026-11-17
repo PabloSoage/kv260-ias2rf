@@ -1,6 +1,6 @@
 # Possible integrations: GPS, 77 GHz radar, vehicle telemetry, LiDAR and fusion on the PL
 
-*17 November 2026 · analysis and simulation; nothing here is built yet*
+*17 November 2026 · analysis, simulation and end-to-end tests on the bench; no vehicle hardware yet*
 
 Four devices could be connected to the KV260 alongside this board in the owner's vehicle (a Mitsubishi Montero V80, [VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md)):
 - a USB GPS;
@@ -8,15 +8,20 @@ Four devices could be connected to the KV260 alongside this board in the owner's
 - the engine's live data through opendash;
 - a 3D LiDAR on a USB-to-Ethernet adapter.
 
-None of them needs a change to this board or to its gateware. This document gives each one's link, data rate and processing, what it adds to the system, and the simulations behind the numbers. It ends with a fusion core for the K26's PL, built and verified in simulation, which combines the LiDAR and the radar into one occupancy grid. [HMI.md](HMI.md) shows the screens that display them.
+None of them needs a change to this board. This document gives each one's link, data rate and processing, what it adds to the system, and the simulations and tests behind the numbers. Three pieces are built and tested end to end:
+- the GPS's pulse-per-second on a free PL pin, disciplined by an R5F core (§2);
+- the engine's live data from opendash into a daemon on the A53s, which feeds the transmit lock on the R5F (§4);
+- a fusion core for the PL that combines the LiDAR and the radar into one occupancy grid (§6).
+
+The software that runs on the K26's processors is in Rust, with its logic in one I/O-free crate shared by the A53s and the R5F cores (§7). [HMI.md](HMI.md) shows the screens that display all of it.
 
 ## 1. Summary
 
 | Device | Link to the KV260 | Data | Processing | Status |
 |---|---|---|---|---|
-| USB GPS (NMEA or UBX) | USB, `gpsd` | 1 to 10 fixes/s, under 2 kB/s | A53: position, time, heading | Analysed (§2) |
-| 77 GHz radar, CAN output | USB-CAN adapter (SocketCAN) on its own CAN bus | Object list, about 14 Hz, up to a few hundred kbit/s (§3) | A53 or R5F: decode the list; PL: into the grid | Fog performance simulated (§3, §6) |
-| Engine live data (opendash) | Scanmatik SM3 over Wi-Fi (USB Wi-Fi adapter), or SocketCAN on the OBD port | 700 frames/s, about 3,500 values/s | A53: client, decoding, recording | Stream measured against an emulated ECU (§4) |
+| GPS receiver with PPS | USB (or UART) for position and time; its PPS on KV260 `J9` pin 12, a free PL pin | 1 to 10 fixes/s; one pulse a second | PL: `kria_pps` timestamps it to 10 ns; R5F 0: disciplines the PPS sent to the front end | RTL bench and K26 build; loop simulated (§2) |
+| 77 GHz radar | Its own CAN FD bus (USB-CAN FD adapter), or 100BASE-T1 Ethernet through a media converter | Object list or detections at about 20 Hz; classic CAN is too small for either (§3) | A53 or R5F 1: decode; PL: into the grid | Bus load and fog performance simulated (§3, §6) |
+| Engine live data (opendash) | opendash's telemetry server on the phone (Wi-Fi), or the SM3 directly | Up to 40 identifiers at 100 Hz, about 3,500 values/s | A53: `kria-vehicled`; R5F 0: road speed into the transmit lock | End to end against an emulated ECU (§4) |
 | 3D LiDAR, Ethernet | USB 3.0 to Gigabit Ethernet adapter | 0.2 to 1.3 Mpoints/s, 20 to 70 Mbit/s | A53: driver, SLAM; PL: occupancy grid | Fog performance simulated (§5, §6) |
 | Fusion grid | Inside the PL | 100 M cell updates/s | PL core `kria_bev_grid` | RTL, bit-exact against its model, K26 timing (§6) |
 
@@ -30,24 +35,113 @@ The KV260's own Gigabit port (`J10`) already carries this board's Ethernet link,
 - **Heading and speed.** Used when the vehicle is not moving fast enough for the ECU speed to be useful. They are the fallback for the transmit lock ([HMI.md §2](HMI.md)).
 - **Odometry.** It is weaker than wheel speed, but useful for the SLAM when the wheel signal is missing.
 
-**Limits.** A USB GPS has no pulse-per-second line. Its time over USB carries some milliseconds of latency and jitter `[E]`. That is enough for logs and ADS-B, but not for sub-millisecond time stamps on the radar. If that is wanted, a GPS module's PPS output would go to a spare PL input (if a Pmod pin stays free on `J2` `[E]`), where a counter on `clk_pl_0` stamps it to 10 ns.
+**Limits of USB alone.** A USB GPS has no pulse-per-second line. Its time over USB carries some milliseconds of latency and jitter `[E]`. That is enough for logs and ADS-B positions, not for the things below.
+
+### 2.1 The PPS on a free PL pin
+
+**What the PPS is for.**
+- **The sample clock.** The front end already disciplines its `Si549` (the converters' clock) to the pulse on Pmod `PPS_SYNC`, through `hk_xadc_pps` on the Artix ([CLOCK_SPEC.md](CLOCK_SPEC.md)). Until now that pulse was a PS GPIO toggled by software, with the timing of whatever Linux was doing. With the GPS second behind it, the oscillator's error goes from its own tolerance (tens of ppm, kHz at 100 MHz) to the GPS's, and every tuned frequency with it.
+- **Absolute time stamps.** The link's packet time stamps count seconds on the same pulse (`kria_pl_link`), so recordings, ADS-B frames and radar CPIs carry GPS time to tens of nanoseconds. That is what ADS-B multilateration with other receivers needs, and what lines the radar's detections up with the vehicle's position.
+- **A pulse that keeps going.** When the receiver loses its fix (a tunnel, a garage), the generated second carries on from the learnt frequency instead of stopping.
+
+**The pin.** The KV260 has no free Pmod pin: `J2`'s eight lines carry the SPI, the beam strobe, `PPS_SYNC` and the debug UART. The Raspberry Pi camera connector `J9` is unused by this design, and one of its pins is wired straight to the SOM:
+- **`J9` pin 12 is `HDA10`**, SOM240 `A16`, ball `J12`, bank 45 at 3.3 V `[V]`. The source is the KV260 schematic (XTP682 rev 2, page 13), with the ball from AMD's K26 board file `part0_pins.xml`.
+- Pin 11 next to it goes through a reset supervisor and is not usable.
+
+A 15-way 1 mm FFC breakout takes the receiver's 3.3 V PPS to pin 12 and ground to pin 10 `[E: the ground pin is from the Raspberry Pi pinout; check with a meter]`. Any GPS module with a PPS output works, and it can share the USB link for its position and time.
+
+**`kria_pps`** ([`fpga/kria/kria_pps.v`](../fpga/kria/kria_pps.v)) is an AXI-Lite slave at `0x8002_0000`:
+- It timestamps each GPS edge on a 64-bit counter at `clk_pl_0` (10 ns). The pulse must first stay high for 1 µs, so a glitch is flagged and never captured.
+- It measures the interval between edges and flags a missing pulse after 1.25 s.
+- It generates its own second from a fractional period (32 + 32 bits), with a one-shot phase adjustment.
+- It drives `PPS_SYNC` from one of three sources: the software GPIO (mode 0, the reset default, as before), the GPS pulse (mode 1) or the generated pulse (mode 2).
+- It raises `pl_ps_irq0[4]` on each capture.
+
+The register map is in [FPGA_GATEWARE.md §5.6](FPGA_GATEWARE.md).
+
+**The loop on R5F core 0** (`kria_core::pps`, §7). Once a second it reads the GPS edge and the generated edge and computes three things:
+- the frequency over a window of up to 1,024 s, which averages out the receiver's jitter;
+- a phase correction of half the error;
+- an integral term, which removes the lag of the windowed estimate while the oscillator warms up.
+
+It rejects any interval more than 200 ppm off, or more than 2 µs off the estimate once locked. In holdover it changes nothing.
+
+The simulation runs the same Rust code against a model of `kria_pps`, with:
+- an oscillator 37 ppm fast that warms by 0.6 ppm over ten minutes;
+- ±20 ns of receiver jitter;
+- a false pulse 250 µs early;
+- 120 s with no GPS.
+
+![PPS discipline](img/integrations/pps_discipline.png)
+
+| | Result |
+|---|---|
+| Locked after | 31 s |
+| Phase error while locked | 41 ns worst, against the true GPS second |
+| False pulse | rejected, lock kept |
+| After 120 s of holdover | 7.3 µs off, almost all of it the warm-up that went on during the outage |
+| Locked again after the GPS returns | 21 s |
+
+Without the integral term, the warm-up showed up as a constant 300 ns error. The simulation found it, and the term went in. Source: `cargo run --example pps_sim` in [`sw/kria`](../sw/kria/README.md); the figure is drawn by [`sw/integrations/kria_sw_figures.py`](../sw/integrations/kria_sw_figures.py).
+
+**Verification of the RTL.** [`fpga/sim/tb_kria_pps.v`](../fpga/sim/tb_kria_pps.v) runs with 10,000-tick "seconds", so a run covers dozens of them. It checks:
+- the ID, mode 0 forwarding, and captures with the IRQ and its clearing;
+- the capture period, and mode 1 forwarding after qualification;
+- a 5-tick glitch: flagged, not counted, not captured, not forwarded;
+- the missing flag and its clearing;
+- the fractional generator: eight seconds of 10,000.25 ticks total 80,002;
+- the one-shot adjustment;
+- a closed loop shaped like the R5F's, which holds the generator within 1 tick of a GPS second of 10,000.37 ticks with ±1 tick of jitter;
+- five seconds of holdover.
+
+It passes, and the mutation `pps_no_filter` (no glitch filter) fails three checks. The bench also set a rule for the firmware: clear only the status bits that were read, or a capture that lands between the read and the clear is lost.
 
 ## 3. 77 GHz radar over CAN
 
 **Why it is worth adding.** [VEHICLE_PLATFORM.md §3.4](VEHICLE_PLATFORM.md) already makes the case. AERIS-10 is a 10.5 GHz surveillance radar for targets at kilometres. A 77 GHz automotive radar is the sensor built for obstacles in front of a vehicle, legal in 76 to 77 GHz without a licence, and unaffected by fog. The simulation below puts a number on that last point.
 
-**Link.** Radars with a CAN output send an object list: each object is one or a few 8-byte frames with range, lateral position, closing speed, class and quality. A cluster list is longer. The message layout comes from the sensor's own DBC file. A USB-CAN adapter (gs_usb or PCAN class) appears as a SocketCAN interface, and `can-utils` and a DBC decoder read it with no kernel work. **The radar goes on its own CAN bus, never on the vehicle's**: a sensor that floods a bus does not belong on the one the engine uses.
+**What a radar sends.** Two kinds of output, often both:
+- an **object list**: tracked targets, each with range, lateral position, closing speed, class and quality, typically three 8-byte CAN frames per object;
+- a **detection list**: the raw point cloud before tracking, about 8 bytes per point and hundreds to thousands of points per cycle on the newer imaging radars.
 
-**Bus load.** One 8-byte standard frame is at most about 135 bits on the wire, with stuffing and the interframe space, so 500 kbit/s carries at most about 3,700 frames/s `[E: CAN 2.0A worst case]`. For a cycle of 72 ms (about 14 Hz, a common radar cycle `[E]`):
+The message layout comes from the sensor's own DBC file or interface document. **The radar goes on its own bus, never on the vehicle's**: a sensor that floods a bus does not belong on the one the engine uses.
 
-| Objects | Frames per object | Frames/s | Load at 500 kbit/s |
-|---|---|---|---|
-| 32 | 1 | 470 | 13 % |
-| 64 | 1 | 920 | 25 % |
-| 100 | 1 | 1,420 | 38 % |
-| 100 | 3 (with quality and extended data) | 4,200 | over capacity |
+**Classic CAN is too small.** One 8-byte standard frame is at most about 135 bits on the wire, so 500 kbit/s carries at most about 3,700 frames a second. At 20 Hz with three frames per object, that is 40 objects at 70 % load. The figure and the table compare the buses:
 
-So a long object list with all its extra messages needs CAN FD or fewer messages per object. Either way the stream is small for the KV260: decoding it takes negligible CPU, and R5F core 1 could own it ([HMI.md §4](HMI.md)).
+![Radar bus load](img/integrations/radar_bus_load.png)
+
+| Per 50 ms cycle | CAN 500 kbit/s | CAN FD, 2 Mbit/s data | CAN FD, 5 Mbit/s data | 100BASE-T1 |
+|---|---|---|---|---|
+| 32 objects | 52 % | 9 % | 5 % | 0.1 % |
+| 64 objects | 104 % | 18 % | 9 % | 0.3 % |
+| 100 objects | 163 % | 27 % | 14 % | 0.4 % |
+| 256 objects | 415 % | 69 % | 35 % | 1.0 % |
+| 500 detections | 271 % | 45 % | 22 % | 0.7 % |
+| 1,000 detections | 541 % | 90 % | 45 % | 1.3 % |
+| 2,000 detections | 1,081 % | 178 % | 89 % | 2.7 % |
+
+The model:
+- **Classic CAN:** worst-case stuffing on every frame.
+- **CAN FD:** 64-byte frames, about 30 bits at the 500 kbit/s arbitration rate and 590 at the data rate.
+- **100BASE-T1:** UDP in 1,472-byte payloads with all headers, preamble and gap.
+
+Source: [`sw/integrations/kria_sw_figures.py`](../sw/integrations/kria_sw_figures.py).
+
+**The alternatives:**
+- **CAN FD.** A radar with a CAN FD output, 2 to 5 Mbit/s in the data phase, carries a full object list with room to spare, and a modest detection list.
+  - On the KV260 it needs a USB CAN FD adapter (gs_usb or PCAN-USB FD class, SocketCAN).
+  - The Zynq UltraScale+ PS's own CAN controllers are CAN 2.0 only `[V, Zynq UltraScale+ TRM]`, so they cannot do it.
+  - A CAN FD controller in the PL would be another way, at the cost of a PL pin pair and a transceiver.
+- **Automotive Ethernet, 100BASE-T1.** Imaging radars and some long-range ones send their detections over 100BASE-T1, a single twisted pair `[E: e.g. Continental ARS548]`. It carries 2,000 detections at under 3 %.
+  - The KV260's own Ethernet port is taken by this board's link.
+  - So the path is a 100BASE-T1 to 100BASE-TX media converter into a USB 3.0 Ethernet adapter, the same kind as the LiDAR's (§5). The radar then arrives as UDP, decoded on the A53s.
+- **Development radars** (TI AWR-class evaluation boards) give a USB serial stream, or CAN FD and Ethernet on the automotive parts `[E]`. They are useful on the bench, not as the vehicle's sensor.
+
+**Which to choose:**
+- **100BASE-T1** if the point cloud is wanted for the fusion grid (§6).
+- **CAN FD** if only tracked objects are.
+
+Either way the stream is small for the KV260: decoding it takes negligible CPU, and R5F core 1 could own it ([HMI.md §4](HMI.md)).
 
 **Fog.** Two-way attenuation in fog follows ITU-R P.840. The liquid-water coefficient comes from the double-Debye permittivity of water. The fog's liquid water content comes from its visibility (Eldridge, `V = 0.024 M^-0.65` km). The LiDAR's extinction uses Koschmieder's `sigma = 3.912 / V` on both ways. Each sensor is scaled from its clear-air range: a radar's return falls as `1/R^4`, a LiDAR's on an extended target as `1/R^2`:
 
@@ -101,6 +195,49 @@ The emulator ran the ECU at 2.85 times real time on this machine (`sh705x bench`
 - **Ego speed for the radars.** A stationary target's Doppler is `v cos(theta)`, so speed separates moving targets from the ground.
 - **The transmit lock.**
 
+### 4.1 The integration, end to end
+
+The stream reaches the board through opendash's **telemetry output**, added to opendash for this (its `docs/telemetry.md`):
+- The app sends every live value it receives as one JSON line (`opendash-telemetry/1`) to any client on TCP port 35001.
+- It takes back a **selection**: the rows to read, by identifier, including the rows that must ride in every round (road speed).
+
+A selection sent while streaming replaces the one on the phone's live screen exactly as a preset does. The app stops the module's packets, declares the new ones and starts them again. This is opendash's rotation mechanism, which already cycles through rounds when more than 40 identifiers are selected. So the car's screen can ask for any parameter the ECU has, at the cost of a couple of seconds per change.
+
+On the board, **`kria-vehicled`** ([`sw/kria/vehicled`](../sw/kria/vehicled/src/main.rs), Rust) does the rest:
+- It connects to that port and sends the selection.
+- It keeps the latest value of every row.
+- Every 50 ms it writes road speed to R5F core 0 through the shared mailbox, stamped with the PL clock both sides read.
+- The transmit lock on the R5F (§7) runs on that speed.
+
+**Tested end to end on the workstation**, with only the ECU emulated. The chain was:
+- the Astra J's ECU in `sh705x-emu` (its own flash image), behind the emulator's SM3;
+- a bench bridge that speaks the SM3 protocol and serves `opendash-telemetry/1` exactly as the app does (not in this repository);
+- `kria-vehicled`, with the interlock also running on the PC.
+
+The daemon asked for 12 identifiers with road speed always on. After 14 s it changed to 4, as a screen changing page would:
+
+![ECU stream end to end](img/integrations/telemetry_e2e.png)
+
+| | Measured |
+|---|---|
+| 12 identifiers | 1,200 values/s (100 Hz each) |
+| 4 identifiers | 400 values/s |
+| Gap when the selection changes | 2.5 s with no values |
+| Transmit lock through that gap | locked 1.1 s into the gap (speed older than 1 s); allowed again 4.5 s later (the 2.5 s gap, then 3 s parked) |
+
+The gap is the declaration: each `2C` with more than two identifiers is a multi-frame ISO-TP exchange with flow control. The bridge alone measured 2.4 to 3.7 s per change, with 1 to 6 packets. Two consequences follow:
+- **A screen should change the selection only when it needs to**, not on every page.
+- **The GPS fallback matters.** Without it, every selection change locks the transmitter for about four seconds. With a fresh GPS speed (under 2 s old), the interlock switches source instead; the core test `falls_back_to_gps_then_fails_safe` covers this.
+
+To rerun, with the emulator and a server on port 35001:
+
+```
+cargo run --release -p kria-vehicled -- --server 127.0.0.1:35001 --select 0x000D,0x000C,0x0005,0x000B,0x0004,0x0010,0x000F,0x0023,0x308A,0x1A2D,0x303A,0x131F --always 0x000D --licensed --interlock --seconds 26 --then-after 14 --then-select 0x000D,0x000C,0x0023,0x308A --csv run.csv
+python sw/integrations/kria_sw_figures.py --telemetry-csv run.csv
+```
+
+The figure plots only rates and interlock states. The engine values come from the owner's own ECU image and stay out of the repository.
+
 ## 5. 3D LiDAR on a USB-Ethernet adapter
 
 [VEHICLE_PLATFORM.md §3.1](VEHICLE_PLATFORM.md) names the candidates: the Livox Mid-360 (360° × 59°, about 200,000 points/s) or the Unitree L2. A 64-beam spinning LiDAR is the upper end, at up to 1.3 million points/s (64 × 2,048 × 10 Hz). On the wire that is roughly 20 to 70 Mbit/s of UDP `[E, from the point formats]`. A USB 3.0 Gigabit adapter (RTL8153 or AX88179 class) carries it with room to spare. Its time stamps come from PTP over the adapter (software time stamping) or from the GPS (§2).
@@ -151,7 +288,7 @@ To rerun: first `python sw/integrations/bev_fusion_sim.py` (writes `fpga/sim/out
 | DSP48E2 | 0 | 0 |
 | Timing at 100 MHz (`clk_pl_0`) | WNS +2.361 ns, WHS +0.057 ns | |
 
-With the DSP suite (33,300 LUT, 15 BRAM) it would fit with most of the device still free. The 64 K × 8 memory is cascaded over 16 block RAMs, so the read-modify-write path is about 6.5 ns. The core closes at 100 MHz but not at 250 MHz (−2.5 ns). A registered RAM output, with one more forwarding stage, would be the way up if it were needed.
+With the DSP suite and the PPS block (33,876 LUT, 15 BRAM) it would fit with most of the device still free. The 64 K × 8 memory is cascaded over 16 block RAMs, so the read-modify-write path is about 6.5 ns. The core closes at 100 MHz but not at 250 MHz (−2.5 ns). A registered RAM output, with one more forwarding stage, would be the way up if it were needed.
 
 **Does it need the PL?** One cell update per clock is 100 million per second. A Mid-360's 200,000 points/s with 60-cell rays is 12 million cell updates per second, which one A53 core can probably keep up with `[E]`. A 1.3 Mpoint/s LiDAR is 78 million, scattered across 64 KB, which is where a core that never misses its cache and never waits for Linux pays off. Doing it in the PL also leaves the A53s for the SLAM.
 
@@ -160,14 +297,56 @@ With the DSP suite (33,300 LUT, 15 BRAM) it would fit with most of the device st
 - **AXI wrapper.** An AXI-Lite wrapper for the configuration and a DMA channel for the dump.
 - **Real data.** Real point clouds and object lists.
 
-## 7. What it would take, in order
+## 7. Software on the K26's processors
 
-1. **GPS and opendash on the KV260.** Software only:
-   - `gpsd` and `chrony`;
-   - opendash's core built for aarch64;
-   - a small client using it, as the app does.
+Code that runs on the Kria's ARM cores is written in Rust, with its logic in an I/O-free core, as in opendash. [`sw/kria`](../sw/kria/README.md) holds it:
+
+| Crate | Runs on | What it does |
+|---|---|---|
+| [`kria-core`](../sw/kria/core/src/lib.rs) | A53 and R5F (`no_std`, no allocation, no `unsafe`) | `pps` (the loop of §2.1), `interlock` (the transmit lock), `telemetry` (`opendash-telemetry/1` lines), `mailbox` (the shared block's layout and seqlock) |
+| [`kria-vehicled`](../sw/kria/vehicled/src/main.rs) | A53, Linux | §4.1 |
+| [`kria-r5f`](../sw/kria/r5f/src/main.rs) | R5F core 0, from TCM, started by remoteproc | At 1 kHz: the PPS loop on `kria_pps`, the transmit lock (it owns `DSP_CTRL[1]`), and status back to Linux |
+
+**The transmit lock** (`kria_core::interlock`) runs on R5F core 0 every millisecond:
+- **Speed source:** the ECU's road speed first, while fresh (1 s), then the GPS's (2 s).
+- **Moving or parked:** 3 km/h or more is moving. Parked needs under 1 km/h for 3 s, with hysteresis in between.
+- **Licence:** the flag must be set.
+- **Time-out:** at most 180 s of continuous transmission, then a 10 s cooldown after the button is released.
+- **Fail-safe:** no fresh speed from either source, or Linux silent for 0.5 s, means locked.
+
+On the R5F it holds while Linux is busy or restarting. Linux never writes the transmit-enable bit; it asks through the mailbox.
+
+**The mailbox:**
+- **Where:** 128 bytes in a 4 KiB `reserved-memory` region at `0x3EE0_0000` ([`sw/ias2rf_pl.dtsi`](../sw/ias2rf_pl.dtsi)).
+- **Who writes:** one writer per half, and each half is a seqlock.
+- **Time base:** `kria_pps`'s `NOW`, the PL clock that both sides read.
+
+RPMsg (OpenAMP) is the general-purpose alternative. For a few numbers a millisecond, a fixed block with no driver is enough.
+
+**Tests:**
+- **`kria-core`:** 16 tests on the host.
+  - PPS: lock with a fast and a slow oscillator, a frequency step, a false pulse, holdover and reacquisition, a counter that wraps.
+  - Interlock: settling, creeping, GPS fallback and fail-safe, licence, time-out and cooldown.
+  - Telemetry: lines exactly as opendash writes them, and junk.
+  - Mailbox: round trip and seqlock.
+- **Cross-builds:** the core builds for `armv7r-none-eabihf` and `aarch64-unknown-linux-gnu`.
+- **The R5F firmware:** links into ATCM (6.5 KB of code) and BTCM.
+- **The daemon:** builds for the A53s, and ran the end-to-end test of §4.1.
+
+None of it has run on a KV260 yet.
+
+## 8. What it would take, in order
+
+1. **On a KV260:**
+   - the bitstream with `kria_pps`;
+   - the overlay with the PPS node and the mailbox;
+   - `kria-r5f` loaded through remoteproc;
+   - `kria-vehicled` against opendash on the phone;
+   - `gpsd` and `chrony` for the GPS's position and time, and its PPS on `J9` pin 12.
+
+   Everything here is built and tested on the bench. Only the board is missing.
 2. **The LiDAR on its USB adapter.** Its ROS 2 driver and a SLAM (FAST-LIO2 or similar), fed with the wheel speed from step 1.
-3. **The 77 GHz radar on its own CAN adapter.** Its DBC and a decoder, with its objects on the Vehicle screen.
+3. **The 77 GHz radar on its own CAN FD adapter or 100BASE-T1 converter (§3).** Its DBC or interface document and a decoder, with its objects on the Vehicle screen.
 4. **`kria_bev_grid` in the block design:**
    - an AXI-Stream input from a DMA channel;
    - an AXI-Lite wrapper for the weights and origins;
