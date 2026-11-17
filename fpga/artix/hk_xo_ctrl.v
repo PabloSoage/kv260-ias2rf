@@ -274,11 +274,16 @@ module hk_xo_ctrl #(
                         gen_resp_valid <= 1'b1;
                         gen_resp_rdata <= core_resp_rdata;
                         gen_resp_err   <= core_resp_ack_err;
+                        // A NACK on the client port (fe_ctrl's expanders) is fe_ctrl's to report (FE_STAT[31]); it
+                        // does not touch ack_err / ack_err_cnt (XO_CTRL[11], [31:16]), so a missing or unpowered RX_VU
+                        // board does not flag the clock XO
+`ifdef MUTATE_GEN_NACK_TO_XO
                         if (core_resp_ack_err) begin
                             ack_err <= 1'b1;
                             if (ack_err_cnt != 16'hFFFF)
                                 ack_err_cnt <= ack_err_cnt + 16'd1;
                         end
+`endif
                         state <= ST_IDLE;
                     end
                 end

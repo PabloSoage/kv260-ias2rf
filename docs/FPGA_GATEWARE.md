@@ -250,7 +250,9 @@ The two `TCA6416A` expanders (`U1313` at `0x20` on `RX_VU`, `U1501` at `0x21` on
 - **AGC (G-5)**: `adc_peak` takes the largest `|code − 128|` of the AD9484 per `65,536`-sample window (over-range counts as full scale); `fe_agc` adds `3 dB` above the high threshold, removes `0.5 dB` after each quiet hold-off period, bypasses the LNA only at `31.5 dB`, and puts it back `18 dB` under the low threshold. Command priority: software, then AGC, then LEDs. With the AGC on, software must not send `ATT`. The AD9484 path runs in the `400 MHz` mode only (A-1), so the AGC does too.
 - **G-4** (tunable DDC): the AERIS NCO is a register through `RADAR_CTRL[2]` and `[31:8]`, default unchanged; the second decimation stage down to channel bandwidths is in the Kria PL (`kria_channel_rx`, section 4), where DSP slices are plentiful, instead of in the Artix (one DSP48 left free since G-7).
 
-Benches: `tb_fe_ctrl` (models of the `TCA6416A`, the `RFFC5072` port and the `PE4312`; 25 checks; mutations `le_high`, `no_shadow`, `lsb_first`), `tb_fe_agc` (closed loop with a tone; mutation `no_holdoff`), and `tb_artix_top` (CSR page 1, no aliasing).
+Bus errors: a NACK on `fe_ctrl`'s transactions sets `FE_STAT[31]` (and so the ERR LED) and makes the next command start with INIT. It does not set `XO_CTRL[11]` `xo_ack_err` or count in `XO_CTRL[31:16]`, which stay for the `Si549` and raw accesses, so a missing or unpowered RX_VU board never marks the clock XO as faulty.
+
+Benches: `tb_fe_ctrl` (models of the `TCA6416A`, the `RFFC5072` port and the `PE4312`, plus a second `hk_xo_ctrl` and `fe_ctrl` on a bus with no devices; 28 checks; mutations `le_high`, `no_shadow`, `lsb_first`, `gen_nack_to_xo`), `tb_fe_agc` (closed loop with a tone; mutation `no_holdoff`), and `tb_artix_top` (CSR page 1, no aliasing).
 
 ### 5.3 Kria `kria_pl_link` AXI4-Lite Slave (`s_axi` at `0x8000_0000`)
 

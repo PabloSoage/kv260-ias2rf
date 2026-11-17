@@ -5,7 +5,9 @@
 // Checks: implicit INIT before the first command; ATT_LE low before any SCLK edge (the attenuator holds 31.5 dB
 // through RFFC5072 traffic); RFFC5072 register write and read-back, device ID; attenuator word; write-on-change
 // of EXP_OUT and LED; lock detect through POLL; command overrun flag; raw access to 0x21 through hk_xo_ctrl.
-// Mutations: le_high, no_shadow, lsb_first (fe_ctrl.v header) each fail a check.
+// A second hk_xo_ctrl + fe_ctrl pair on a bus with no devices: fe_ctrl's NACKs set FE_STAT[31] but leave
+// XO_CTRL[11] ack_err and ack_err_cnt at 0, while a NACK from the Si549 address still sets them.
+// Mutations: le_high, no_shadow, lsb_first (fe_ctrl.v header), gen_nack_to_xo (hk_xo_ctrl.v) each fail a check.
 
 `timescale 1ns/1ps
 `include "models/fe_models.v"
@@ -63,6 +65,46 @@ module tb_fe_ctrl;
         .gen_req_valid(g_valid), .gen_req_ready(g_ready), .gen_req_dev(g_dev), .gen_req_wr_len(g_wl),
         .gen_req_wdata(g_wd), .gen_req_rd_len(g_rl), .gen_resp_valid(g_rvalid), .gen_resp_rdata(g_rd),
         .gen_resp_err(g_rerr)
+    );
+
+    // ------------------------------------------------------------- second pair on an empty bus (no RX_VU board)
+    wire scl2_t, sda2_t;
+    wire scl2 = scl2_t ? 1'b1 : 1'b0;
+    wire sda2 = sda2_t ? 1'b1 : 1'b0;             // nothing on the bus: every address byte is a NACK
+    reg         cmd2_p = 0;
+    reg  [31:0] cmd2_word = 0;
+    wire        busy2;
+    wire [31:0] stat2;
+    wire        g2_valid, g2_ready, g2_rvalid, g2_rerr;
+    wire [6:0]  g2_dev;
+    wire [2:0]  g2_wl;
+    wire [31:0] g2_wd;
+    wire [1:0]  g2_rl;
+    wire [15:0] g2_rd;
+    reg         raw2_v = 0;
+    wire        raw2_ready, raw2_rv, raw2_rerr;
+    wire        xo2_ack_err;
+    wire [15:0] xo2_ack_cnt;
+    hk_xo_ctrl #(.CLK_DIV(4), .FCAL_WAIT_CYC(10)) u_xo2 (
+        .clk(cfg_clk), .rst(cfg_rst), .use_ext_clk(1'b0), .clk_sel_t(),
+        .prog_start(1'b0), .prog_freq_500m(1'b0), .delta_start(1'b0), .delta_m(24'd0),
+        .raw_req_valid(raw2_v), .raw_req_dev(7'd0), .raw_req_ready(raw2_ready), .raw_req_rw(1'b1),
+        .raw_req_reg(8'd7), .raw_req_wdata(8'd0), .raw_resp_valid(raw2_rv), .raw_resp_rdata(),
+        .raw_resp_err(raw2_rerr),
+        .gen_req_valid(g2_valid), .gen_req_ready(g2_ready), .gen_req_dev(g2_dev), .gen_req_wr_len(g2_wl),
+        .gen_req_wdata(g2_wd), .gen_req_rd_len(g2_rl), .gen_resp_valid(g2_rvalid), .gen_resp_rdata(g2_rd),
+        .gen_resp_err(g2_rerr),
+        .busy(), .prog_done(), .active_freq_500m(), .ack_err(xo2_ack_err), .ack_err_cnt(xo2_ack_cnt),
+        .delta_clamped(),
+        .xo_scl_t(scl2_t), .xo_scl_in(scl2), .xo_sda_t(sda2_t), .xo_sda_in(sda2)
+    );
+    fe_ctrl dut2 (
+        .link_clk(link_clk), .link_rst(link_rst), .cmd_p(cmd2_p), .cmd_word(cmd2_word),
+        .busy_link(busy2), .stat_link(stat2), .rffc_link(),
+        .clk(cfg_clk), .rst(cfg_rst),
+        .gen_req_valid(g2_valid), .gen_req_ready(g2_ready), .gen_req_dev(g2_dev), .gen_req_wr_len(g2_wl),
+        .gen_req_wdata(g2_wd), .gen_req_rd_len(g2_rl), .gen_resp_valid(g2_rvalid), .gen_resp_rdata(g2_rd),
+        .gen_resp_err(g2_rerr)
     );
 
     // ------------------------------------------------------------- U1313 and what hangs on its pins
@@ -189,6 +231,17 @@ module tb_fe_ctrl;
         wait (raw_ready); @(posedge cfg_clk); raw_v <= 0;
         wait (raw_rv); @(posedge cfg_clk);
         check(raw_rd == 8'h00 && !raw_rerr, "raw read of 0x21 register 6 through hk_xo_ctrl");
+
+        // no RX_VU board: fe_ctrl's NACKs stay in FE_STAT[31], the clock XO's ack_err is not touched
+        @(posedge link_clk); cmd2_word <= {4'h7, 20'd0, 8'h3C}; cmd2_p <= 1;
+        @(posedge link_clk); cmd2_p <= 0;
+        repeat (4) @(posedge link_clk); wait (!busy2); repeat (2) @(posedge link_clk);
+        check(stat2[31] == 1'b1, "empty bus: fe_ctrl reports its NACK in FE_STAT[31]");
+        check(xo2_ack_err == 1'b0 && xo2_ack_cnt == 16'd0, "empty bus: fe_ctrl NACK leaves XO ack_err/cnt at 0");
+        @(posedge cfg_clk); raw2_v <= 1;
+        wait (raw2_ready); @(posedge cfg_clk); raw2_v <= 0;
+        wait (raw2_rv); @(posedge cfg_clk); @(posedge cfg_clk);
+        check(raw2_rerr && xo2_ack_err == 1'b1 && xo2_ack_cnt == 16'd1, "empty bus: a Si549 NACK still sets ack_err");
 
         if (errors == 0) $display("PASS: tb_fe_ctrl");
         else $display("FAIL: tb_fe_ctrl, %0d errors", errors);
