@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // Devicetree overlay fragment for KV260 IAS1 PL Bitstream
 // Exposes kria_pl_link CSRs via UIO, AXI DMA S2MM/MM2S via u-dma-buf / UIO,
-// and PS EMIO I2C0 / SPI0 / GPIO0 buses routed to the IAS2RF adapter & Pmod J2.
+// PS EMIO I2C0 / SPI0 buses routed to the IAS2RF adapter and Pmod J2, and PS UART1 on EMIO to the
+// front-end FPGA's debug console (dbg_uart) over the two Pmod spare lines: /dev/ttyPS1, 115200 8N1.
 
 /dts-v1/;
 /plugin/;
@@ -55,6 +56,17 @@
         __overlay__ {
             status = "okay";
             clock-frequency = <100000>;
+        };
+    };
+
+    /* EMIO UART1 -> Pmod J2 spare lines -> Artix dbg_uart (Rev08 G-1): /dev/ttyPS1.
+     * The spare lines carry no GPIO any more: the radar DDC enable and the link/ADC ready flag
+     * they used to carry are CSRs RADAR_CTRL[0] (0xE4) and RADAR_STATUS[5] (0xE8). */
+    fragment@3 {
+        target = <&uart1>;
+        __overlay__ {
+            status = "okay";
+            current-speed = <115200>;
         };
     };
 

@@ -47604,4 +47604,46 @@
 			)
 		)
 	)
+	(wire
+		(pts
+			(xy 284.48 233.68) (xy 299.72 233.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7540c7e2-4b23-4c42-b8dd-ebf88469f95c")
+	)
+	(hierarchical_label "PMOD_SPARE1"
+		(shape input)
+		(at 299.72 233.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5200b91f-54a2-48d5-a375-c982b35f3f53")
+	)
+	(wire
+		(pts
+			(xy 284.48 236.22) (xy 299.72 236.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f3e89c37-9a90-4e8e-9699-571bcedc45d9")
+	)
+	(hierarchical_label "PMOD_SPARE2"
+		(shape output)
+		(at 299.72 236.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a57a1b45-a648-4e66-9c71-4854a27e0952")
+	)
 )

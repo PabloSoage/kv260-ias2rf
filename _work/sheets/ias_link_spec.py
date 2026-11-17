@@ -93,3 +93,19 @@ for name, (pin, _) in SINGLE.items():
 
 NO_CONNECT = [f"J101.{p}" for p in NC_PINS] + [
     f"J102.{p}" for p in range(1, 35) if p not in GND_PINS]
+
+# ---- Rev08 (REV08_PLAN 4.3, _work/rev08_schematic.py): J103, the camera pass-through receptacle on the top face.
+# Every contact of J102 (IAS0, the carrier's J7) goes to the same contact of J103, so an IAS camera module plugged
+# into J103 sees the carrier exactly as on the bare KV260. Nothing else on the adapter touches these nets.
+PARTS["J103"] = ("Connector_Generic_MountingPin:Conn_02x17_Odd_Even_MountingPin", "BM20B(0.8)-34DS-0.4V(51)",
+                 "kv260-ias2rf:CONN-SMD_34P-P0.40_BM20B-0.8-34DS-0.4V-51",
+                 "IAS0 camera pass-through receptacle, contact for contact with J102")
+IAS0 = {1: "IAS0_P1", 4: "IAS0_D0_4", 5: "IAS0_D0_5", 7: "IAS0_CLK_7", 8: "IAS0_CLK_8", 10: "IAS0_D3_10",
+        11: "IAS0_D3_11", 13: "IAS0_PL_1V8", 14: "IAS0_SCL", 15: "IAS0_FLASH", 17: "IAS0_2V75", 18: "IAS0_2V75",
+        20: "IAS0_TRIGGER", 21: "IAS0_RESET", 22: "IAS0_SDA", 23: "IAS0_PL_1V2", 24: "IAS0_PL_1V2",
+        26: "IAS0_D2_26", 27: "IAS0_D2_27", 29: "IAS0_D1_29", 30: "IAS0_D1_30", 32: "IAS0_EXTCLK",
+        34: "IAS0_VDD_AF2V8"}
+for _p, _n in IAS0.items():
+    NETS.setdefault(_n, []).extend([f"J102.{_p}", f"J103.{_p}"])
+NETS["GND"] += [f"J103.{p}" for p in GND_PINS] + ["J103.MP"]
+NO_CONNECT = [p for p in NO_CONNECT if not (p.startswith("J102.") and int(p[5:]) in IAS0)]
