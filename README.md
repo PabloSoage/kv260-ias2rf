@@ -337,7 +337,7 @@ All electromagnetic, transient SPICE, thermal, and power integrity checks are ru
 
 ![Clock ferrite filter FB401](docs/sim/fb401_filter.png)
 
-![2-D PCB thermal map (7.5 W in still air)](docs/sim/board_thermal.png)
+![2-D PCB thermal map (8.2 W in still air)](docs/sim/board_thermal.png)
 
 ![Five cooling configurations compared](docs/sim/board_cooling.png)
 
