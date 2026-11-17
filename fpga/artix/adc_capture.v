@@ -76,10 +76,13 @@ module adc_capture #(
     output reg         adc_valid,
 
     // Diagnostics / training status (clk_200m domain, steady after training)
-    output reg         adc_trained,
-    output reg         dco_phase_err,
+    // power-up values: these are sampled on link_clk before the trainer's clock has run (its reset is synchronous;
+    // through the G-7 BUFGCTRL, clk_200m starts only once the MMCM runs), and an unknown status word would
+    // otherwise reach the uplink scrambler in simulation
+    output reg         adc_trained   = 1'b0,
+    output reg         dco_phase_err = 1'b0,
     output wire [39:0] tap_flat,       // 8 x 5-bit per-bit IDELAYE2 taps
-    output reg  [5:0]  eye_width_min
+    output reg  [5:0]  eye_width_min = 6'd0
 );
 
 `ifdef MUTATE_WRONG_DCO_PHASE

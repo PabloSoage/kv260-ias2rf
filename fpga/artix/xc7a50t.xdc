@@ -284,6 +284,10 @@ set_false_path -to   [get_ports {eth_sgtx_p eth_sgtx_n eth_mdc eth_mdio eth_rst_
 # Async-assert reset synchronizers and Gray-code / toggle CDC crossings
 set_false_path -to [get_pins -quiet -hier -filter {NAME =~ *rst*sync*/PRE || NAME =~ *rst*sync*/CLR}]
 set_max_delay -datapath_only 3.500 -from [get_clocks clk_adcr_dco] -to [get_clocks clk_200m_unbuf]
+# G-7: the AERIS CIC's comb stages 1-4 take one sample per 4 clk_400m cycles and load each register 4 cycles
+# after the registers it reads (cic_decimator_4x_enhanced.v)
+set_multicycle_path -setup 4 -from [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/cic_*_inst/comb_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/comb_delay_reg*}] -to [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/cic_*_inst/comb_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/comb_delay_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/temp_scaled_output_reg*}]
+set_multicycle_path -hold 3 -from [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/cic_*_inst/comb_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/comb_delay_reg*}] -to [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/cic_*_inst/comb_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/comb_delay_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/temp_scaled_output_reg*}]
 # G-7: D2's Gray FIFO (dco_bufr -> link_clk) and the trainer's two-flop sampler (dco_bufr -> refclk_200m through
 # u_adc_cap/u_bufg_200m); the BUFGCTRL's select changes only with the capture in reset; the training status
 # into link_clk (D2_STAT, D2's enable)
