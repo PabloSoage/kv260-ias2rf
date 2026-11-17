@@ -555,7 +555,9 @@ module dual_path_sf_fifo #(
     reg        out_valid_r;
     reg [65:0] bram_q;
     reg [119:0] hdr_q;
-    reg        hdr_bulk_q;   // head packet's stream id != KEEP_SID
+    // Head packet's stream id != KEEP_SID, from the registered header (a second, asynchronous read of meta_mem
+    // would turn it from block RAM into 160 LUTRAMs)
+    wire       hdr_bulk_q = (hdr_q[119:112] != KEEP_SID);
     reg        disc;         // discarding the head packet (out_valid held low)
 `ifdef MUTATE_DRAIN_STARTED_PKT
     wire       disc_start = drain && pop_state && !disc && hdr_bulk_q;                 // also cuts a started packet
@@ -590,7 +592,6 @@ module dual_path_sf_fifo #(
             out_valid_r  <= 1'b0;
             bram_q       <= 66'd0;
             hdr_q        <= 120'd0;
-            hdr_bulk_q   <= 1'b0;
             disc         <= 1'b0;
         end else begin
             // Ingress write / abort
@@ -617,7 +618,6 @@ module dual_path_sf_fifo #(
                 if (!meta_empty) begin
                     bram_q      <= data_mem[rd_ptr[DATA_ADDR_W-1:0]];
                     hdr_q       <= meta_mem[meta_rd_ptr[META_ADDR_W-1:0]];
-                    hdr_bulk_q  <= (meta_mem[meta_rd_ptr[META_ADDR_W-1:0]][119:112] != KEEP_SID);
                     rd_ptr      <= rd_ptr + {{DATA_ADDR_W{1'b0}}, 1'b1};
                     pop_state   <= 1'b1;
                     out_valid_r <= 1'b1;
