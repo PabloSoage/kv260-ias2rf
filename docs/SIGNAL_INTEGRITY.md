@@ -359,7 +359,7 @@ tracks, fixed on 12 Nov (§9.1), and what is still open there (§9.2–9.4).
 | Input | 12 V: PTC, SMCJ33CA, back-to-back 100 V N-FETs under an LM74502-Q1 (reverse battery to −65 V, overvoltage cut-off 18.3 V), SMBJ18CA on +12V: POWER_SPEC §1.1 (13 Nov, after the RF review) |
 | Mechanics | Five M3 holes (two through the KV260, three to standoffs); edge SMAs soldered and through the board. For vibration: staking of the SMAs and the 7343 capacitor, or a conformal coat, at assembly |
 | EMI | Ground planes next to every signal layer, edge fence, power plane pulled back, return vias (§5) |
-| ESD | Every external connector: a PESD5V0F1BL (0.4 pF, bidirectional, IEC 61000-4-2) on each of the 12 SMAs, 2.15 mm from the SMA pad and tuned out by 0.1 mm line sections either side; TPD4E05U06DQAR four-channel arrays (0.5 pF) on the Pmod (U1108, U1109) and JTAG (U1110) next to their headers. Each ground pad has its own GND via (0.4–1 mm). The 12 V input already has its SMBJ15CA. §7.1 |
+| ESD | Every external connector: a PESD5V0F1BL (0.4 pF, bidirectional, IEC 61000-4-2) on each of the 12 edge SMAs (and, since Rev08, D1301 on `J961`, §9.10), 2.15 mm from the SMA pad and tuned out by 0.1 mm line sections either side; TPD4E05U06DQAR four-channel arrays (0.5 pF) on the Pmod (U1108, U1109) and JTAG (U1110) next to their headers. Each ground pad has its own GND via (0.4–1 mm). The 12 V input already has its SMBJ15CA. §7.1 |
 
 ### 7.1 ESD on the SMAs
 

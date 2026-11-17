@@ -10,7 +10,7 @@ their SMAs.
 | Switch | Converter | RF1 (control low, **default**) | RF2 (control high) | What RF2 enables |
 |---|---|---|---|---|
 | SW1 (U901) | `IF_RX_A`, AD9253 ch A | `SDR_RX_A` | `AERIS_IF_A` | Radar IF sampled at 14 bits |
-| SW2 (U902) | `IF_RX_B`, AD9484 | `AERIS_IF` | `SDR_RX_WB` | Wideband SDR at 400/500 MSPS, 8 bits |
+| SW2 (U902) | `IF_RX_B`, AD9484 | `AERIS_IF` | `SDR_RX_WB`; since Rev08 the VHF/UHF front end (§1.2) | Wideband SDR at 400/500 MSPS, 8 bits |
 | SW3 (U903) | `IF_TX_A`, AD9767 DAC1 | `SDR_TX_A` | `AERIS_TX_A` | Chirp from the 14-bit DAC |
 | SW4 (U904) | `IF_TX_B`, AD9708 | `AERIS_TX` | `SDR_TX_WB` | SDR transmit from the fast 8-bit DAC |
 | — | `IF_RX_C`, AD9253 ch B | `SDR_RX_C` (J951) | — | — |
@@ -35,6 +35,10 @@ path. Between C951 and the sheet's `IF_RX_C` output there is now a 7th-order ell
 30 MHz and at least 60 dB down from 50 MHz (C953–C959, L951–L953; values and response in SIGNAL_INTEGRITY §9.9,
 design in `_work/sim/aaf_lpf.py`, drawn by `_work/rev07_aaf.py`). C951's side of the filter is the local net
 `IF_RX_C_AAF`. `IF_RX_A` stays unfiltered: SW1's RF2 throw brings the radar IF to the same ADC.
+
+### 1.2 Rev08: the VHF/UHF front end on SW2's second throw (16 November)
+
+SW2's RF2 throw (`U902` pin 10) has two 0402 footprints: `C926` to `J922` (`SDR_RX_WB`) and `C927` to `IF_VU`, the output of the VHF/UHF front end ([RX_VU_SPEC](RX_VU_SPEC.md)), which comes in on its own SMA, `J961`, on the back wall. **As built `C927` is fitted and `C926` is not**, so `J922` is unconnected; swapping the two capacitors restores it. `IF_VU` runs 142.3 mm on L6 as stripline (REV08_PLAN §11.6).
 
 ---
 

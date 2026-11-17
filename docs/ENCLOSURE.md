@@ -56,7 +56,7 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     barrel to seat.
   - **Ribbon to AERIS-10's ADAR1000 boards:** a 54 × 2.6 mm slot in the lid right above the IDC header J1103, for
     the 40-way ribbon. The plug is fitted before the lid goes on.
-  - **The twelve SMA notches.**
+  - **The twelve SMA notches** in the front wall; the thirteenth SMA, `J961`, has its own notch in the back wall (Rev08, below).
   - **Left inside:** JTAG, Pmod and the fan header, which are reached with the lid off.
   - The rear lug beside J1001 moved from X −40 to −20 to clear it, and in Rev08 to −27 (below).
 - **Rev08 (17 Nov, [REV08_PLAN](REV08_PLAN.md) §9).**
@@ -91,7 +91,11 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
   - In the lid, clamp posts press each board down through 1 mm TPU 95A pads, compressed about 0.2 mm. They sit
     over the mounting holes H1–H5, the carrier's corners and the RJ45.
   - Each clamp is notched around taller parts. `_work/mech/check_case.py` checks the shells against every
-    board mesh: the only contacts left are the intended honeycomb-to-board ones.
+    board mesh. Re-run on the Rev08 build (17 Nov): 15 contacts for v1, 16 for v2, all intended. They are the
+    honeycomb under both boards (five board-layer meshes), the lid clamp on the RJ45 `J1201`, the four TPU
+    bumpers over the corners (tray and lid each), the v2 lid's fan, and `Z4`, a 0.6 × 0.3 mm feature 30 µm thick
+    on the carrier's underside that touches the tray floor. None involves a Rev08 part (camera module, `J961`,
+    the LEDs).
 - **Label.** "KV260 · IAS2RF" debossed 0.6 mm in the lid, behind the ribbon slot (Y 96).
 
 ---

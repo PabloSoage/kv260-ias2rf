@@ -8,7 +8,7 @@ The Rev03 board exists. It has:
 - design rules and net classes;
 - the two ground planes and the split power layer;
 - **every one of the 479 parts with its nets**, linked to its symbol (472 until the housekeeping
-  devices were added on 2 October);
+  devices were added on 2 October; 771 footprints since Rev08, §6.7);
 - the holes and fiducials;
 - a placement with every passive at its pin, and a readable silkscreen.
 
@@ -424,3 +424,19 @@ DRC on 12 Nov: 0 violations of any kind, 0 unconnected, 0 schematic-parity probl
 DRC on 12 Nov: 0 violations, 0 unconnected, 0 schematic-parity problems. Eyes, PDN, return vias
 unchanged (mean eye loss −8 mV, worst LINK_RX_D0 −52 mV; 0 of 95 layer changes without a GND via
 within 3 mm); other pairs' legs within 0.25 mm 65.8 mm (was 69.3).
+
+### 6.7 The board as of Rev08 (17 November 2026)
+
+Since §6.6 the board grew twice, and every check above was re-run on the final file:
+
+| Change | Where it is described |
+|---|---|
+| Rev06 (13–14 Nov): the Ethernet tab on the east edge (bounding box **140 × 132 mm**, §1), the PHY on its own FPGA pins, the fan header | CONTROL_SPEC §7, POWER_SPEC |
+| Rev07 (15 Nov): the 30 MHz anti-alias low-pass on `J951`'s line | ROUTING_SPEC §1.1, SIGNAL_INTEGRITY §9.9 |
+| Rev08 (16 Nov): the `RX_VU` front end in two shield frames, `J961` on the back wall, the `STATUS` LEDs and the debug USB-C on the IAS0 tongue, `J103` over `J102`: 183 footprints (588 to 771), 2,631 mm of track, 336 vias | REV08_PLAN §11.6, SIGNAL_INTEGRITY §9.10 |
+
+The final board: 771 footprints, 13,479 track segments and 5 arcs, 2,562 vias, 765 of them inside an SMD pad. `make_fab.py` on 17 November: DRC with the zones
+refilled and schematic parity, **0 violations, 0 unconnected pads, 0 footprint errors**. `lvds_skew.py` gives
+the same delay, skew, stub and coupling for all 29 pairs as `_work/sim/lvds_skew_8layer.json` (§6.6 and
+SIGNAL_INTEGRITY §8), field for field: Rev08 moved no LVDS copper. Every part, connector and LED with its use is in
+the [board manual](BOARD_MANUAL.md).

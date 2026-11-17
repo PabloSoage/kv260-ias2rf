@@ -115257,6 +115257,17 @@
 			(uuid "6d45caaf-421b-4d2c-8265-3d7c3a653a36")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/CONN-SMD_34P-P0.40_BM20B-0.8-34DS-0.4V-51.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(layer "F.Cu")
@@ -120592,6 +120603,17 @@
 			(uuid "87b0ec18-b402-4405-943c-1a893fd65eb5")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/FILTER-SMD_6P-L3.8-W3.8-P1.27-TL-3.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:FILTER-SMD_1206-4P-L3.2-W1.6-L"
 		(layer "F.Cu")
@@ -120828,6 +120850,17 @@
 			(uuid "efef070d-ffe9-4518-8d14-73d246598c2f")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/FILTER-SMD_1206-4P-L3.2-W1.6-H0.9-L.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:FILTER-SMD_1206-4P-L3.2-W1.6-L"
 		(layer "F.Cu")
@@ -121064,6 +121097,17 @@
 			(uuid "96742e63-1517-4cf7-85a7-7be0f0299c3c")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/FILTER-SMD_1206-4P-L3.2-W1.6-H0.9-L.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Connector_Coaxial:SMA_Samtec_SMA-J-P-H-ST-EM1_EdgeMount"
 		(layer "F.Cu")
@@ -123919,6 +123963,17 @@
 			(uuid "894504c7-6cc7-41dd-8b34-e531b0ba6105")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/XFMR-SMD_TC1-1TX.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:XFMR-SMD_TC1-1TX"
 		(layer "F.Cu")
@@ -124164,6 +124219,17 @@
 			(uuid "b6fda137-990b-41bf-b1b3-6c0ccfe42481")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/XFMR-SMD_TC1-1TX.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SOT343_L2.0-W1.3-P1.30-LS2.1-BL"
 		(layer "F.Cu")
@@ -124362,6 +124428,17 @@
 			(uuid "2065d017-17a2-41da-8d29-6839542d8a4d")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SOT343_L2.0-W1.3-H0.9-P1.30-LS2.1-BL.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 		(layer "F.Cu")
@@ -124574,6 +124651,17 @@
 			(uuid "be821f8f-b1c5-48b3-9e9e-545ec68375f2")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SC-70-6_L2.0-W1.3-H1.0-P0.65.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 		(layer "F.Cu")
@@ -124786,6 +124874,17 @@
 			(uuid "a4814e51-50a1-4097-a0a3-bd7883a73330")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SC-70-6_L2.0-W1.3-H1.0-P0.65.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:QFN-24_L4.0-W4.0-P0.50-BL-EP2.8"
 		(layer "F.Cu")
@@ -125192,6 +125291,17 @@
 			(uuid "d51406eb-4729-4ddd-8373-0ed8c267527c")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/QFN-24_L4.0-W4.0-P0.50-BL-EP2.8.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:QFN-24_L4.0-W4.0-P0.50-BL-EP2.8"
 		(layer "F.Cu")
@@ -125598,6 +125708,17 @@
 			(uuid "388392de-0a9f-4693-a9ec-c1778cf46d45")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/QFN-24_L4.0-W4.0-P0.50-BL-EP2.8.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:QFN-14_L2.0-W2.0-P0.45-BL-EP"
 		(layer "F.Cu")
@@ -125933,6 +126054,17 @@
 			(uuid "19e5dc86-33b6-4023-828e-a1a8bd6ab391")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/QFN-14_L2.0-W2.0-H0.5-P0.45-BL-EP.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:QFN-14_L2.0-W2.0-P0.45-BL-EP"
 		(layer "F.Cu")
@@ -126268,6 +126400,17 @@
 			(uuid "3be9a44d-bdde-4467-a6e1-6e2a6ed82d7a")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/QFN-14_L2.0-W2.0-H0.5-P0.45-BL-EP.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 		(layer "F.Cu")
@@ -126480,6 +126623,17 @@
 			(uuid "b0327d7d-5b05-4e8d-bf53-b434651b7b11")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SC-70-6_L2.0-W1.3-H1.0-P0.65.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"
 		(layer "F.Cu")
@@ -126692,6 +126846,17 @@
 			(uuid "5a37bc56-1ead-4a01-9886-9ca7d3222b55")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SC-70-6_L2.0-W1.3-H1.0-P0.65.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SOT343_L2.0-W1.3-P1.30-LS2.1-BL"
 		(layer "B.Cu")
@@ -126896,6 +127061,17 @@
 			(uuid "ba1d7526-3e00-427c-931b-6b53c4c39d7f")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SOT343_L2.0-W1.3-H0.9-P1.30-LS2.1-BL.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:QFN-20_L4.0-W4.0-P0.50-BL-EP2.2"
 		(layer "B.Cu")
@@ -127279,6 +127455,17 @@
 			(uuid "6afebe6b-4ee8-4550-a680-7f11816873ee")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/QFN-20_L4.0-W4.0-H0.8-P0.50.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm"
 		(layer "F.Cu")
@@ -128373,6 +128560,17 @@
 			(uuid "05e6f86f-1f52-4d76-a019-d6867a38cecc")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/WQFN-24_L4.0-W4.0-H0.8-P0.50.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 90)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"
 		(layer "F.Cu")
@@ -128586,6 +128784,17 @@
 			(uuid "9523f63d-c787-4303-ad16-fe351f614805")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/SOT-23-6_L2.9-W1.6-H1.5-LS2.8-P0.95.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 270)
+			)
+		)
 	)
 	(footprint "Package_TO_SOT_SMD:SOT-23-5"
 		(layer "B.Cu")
@@ -129167,6 +129376,17 @@
 			(uuid "1299e845-6503-4340-9d24-86b1a902248c")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/OSC-SMD_4P-L2.0-W1.6-H0.8.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "LED_SMD:LED_0402_1005Metric"
 		(layer "F.Cu")
@@ -133940,6 +134160,17 @@
 			(uuid "19762b28-66f5-49e7-9a7a-55b747443ba1")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/WQFN-24_L4.0-W4.0-H0.8-P0.50.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 90)
+			)
+		)
 	)
 	(footprint "kv260-ias2rf:MSOP-10_L3.0-W3.0-P0.50-LS5.0-BL"
 		(layer "F.Cu")
@@ -134211,6 +134442,17 @@
 			(uuid "d299aae5-ba9c-4fea-b8e6-c0a08a1b4326")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/_work/mech/cache/models3d/MSOP-10_L3.0-W3.0-H1.1-LS5.0-P0.50.wrl"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Package_TO_SOT_SMD:SOT-23-6"
 		(layer "F.Cu")

@@ -17,12 +17,14 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ### 1.1 The tree
 
 ```
-As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September; loads as of 2 October:
+As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September; loads as of 2 October, Rev08's front end, LEDs and
+expanders added 17 November:
 
-12 V in  (733 mA, 8.8 W)
-  └── LMR33630 buck → +5V0   1584 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
-        ├── TPS562201 → +3V3_D   1128 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches
-        │     ├── TPS7A8300 → +1V8_D  332 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD, housekeeping
+12 V in  (802 mA, 9.6 W)
+  └── LMR33630 buck → +5V0   1730 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
+        ├── TPS562201 → +3V3_D   1326 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches, LEDs
+        │     ├── LP5907 → +3V0_FE    180 mA   Rev08 VHF/UHF front end: RFFC5072, two SPF5043Z, switches, attenuator
+        │     ├── TPS7A8300 → +1V8_D  333 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD, housekeeping
         │     └── LM2663 → −3V3        8 mA   RF switch VEE
         ├── TPS7A8300 → +3V3_A    100 mA   DAC AVDD (no pre-regulator needed any more)
         ├── TPS562201 → +2V5      601 mA   FPGA bank 34 (link outputs), and:
@@ -77,17 +79,21 @@ With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1584 mA | buck | +12V | 0.88 W | ≥ 2.06 A |
-| `+3V3_D` | 3.3 | 1128 mA | buck | +5V0 | 0.41 W | ≥ 1.47 A |
+| `+5V0` | 5.0 | 1730 mA | buck | +12V | 0.96 W | ≥ 2.25 A |
+| `+3V3_D` | 3.3 | 1326 mA | buck | +5V0 | 0.49 W | ≥ 1.72 A |
+| `+3V0_FE` (Rev08) | 3.0 | 180 mA | LDO (LP5907, 250 mA) | +3V3_D | 0.05 W | ≥ 0.23 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
 | `+2V5` | 2.5 | 601 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
 | `+3V3_A` | 3.3 | 100 mA | LDO | +5V0 | 0.17 W | ≥ 0.13 A |
-| `+1V8_D` | 1.8 | 332 mA | LDO | +3V3_D | **0.50 W** | ≥ 0.43 A, thermal pad |
+| `+1V8_D` | 1.8 | 333 mA | LDO | +3V3_D | **0.50 W** | ≥ 0.43 A, thermal pad |
 | `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | — |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Input: 733 mA at 12 V = 8.8 W.** With margin, 0.95 A and 11.4 W. (2 October: 755 mA before
+**Input: 802 mA at 12 V = 9.6 W.** With margin, 1.04 A and 12.5 W, inside the jack's and the input protection's
+1 A. Rev08 (17 November) added 0.8 W: the front end's 180 mA on `+3V0_FE`, the LEDs and the two I/O expanders;
+the bias tee's external load (100 mA at most, off by default) and the USB bridge (powered by the cable) are not
+counted. Before Rev08: 733 mA, 8.8 W. (2 October: 755 mA before
 the flash, translator and housekeeping estimates were replaced by their datasheets.) The rise since the first
 budget is the clock, as drawn: the ADCLK948 (330 mA max) and the Si549 (153 mA) replaced an
 ADCLK944 (165 mA) and a TCXO (20 mA), see [CLOCK_SPEC.md](CLOCK_SPEC.md). Then, when the radar

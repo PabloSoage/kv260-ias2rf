@@ -12,9 +12,9 @@ An adapter board for the **AMD Kria KV260 Vision AI Starter Kit**. It plugs into
 camera connector and carries the converters, a common clock and a front-end FPGA. It serves two
 signal chains:
 
-- **Software-defined radio**: HF to 30 MHz directly; FM, airband, VHF/UHF amateur bands and PMR446 through
-  an external converter until the Rev08 receive front end ([plan](docs/REV08_PLAN.md)). Receive, and
-  transmit on the bands a licence covers.
+- **Software-defined radio**: HF to 30 MHz directly; FM, airband, VHF/UHF amateur bands, PMR446 and ADS-B
+  through the on-board VHF/UHF front end on its own SMA, 30 MHz to 3 GHz ([RX_VU_SPEC](docs/RX_VU_SPEC.md)).
+  Receive, and transmit on the bands a licence covers.
 - **Radar at 10.5 GHz**: the IF of the X-band chain from the open
   [AERIS-10 / PLFM_RADAR](https://github.com/NawfalMotii79/PLFM_RADAR) project, with ADAR1000
   beamforming. The 10.5 GHz chain itself is reused from AERIS-10, not redesigned here. The board
@@ -47,7 +47,7 @@ signal chains:
 | Radar DAC | AD9708, with reconstruction filter and balun |
 | SDR DAC | AD9767, dual 14 bit, two output chains |
 | Clock | Si549 programmable XO (400 or 500 MHz, GPS-disciplinable) into an ADCLK948 LVPECL fan-out |
-| RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs. The HF ports J951 (receive, through an on-board 30 MHz 7th-order elliptic anti-alias filter) and J952 (transmit) have no switch in their path ([SIGNAL_INTEGRITY §9.9](docs/SIGNAL_INTEGRITY.md)) |
+| RF routing | Four M3SWA2-34DR+ SPDT switches and ten edge SMAs, plus two clock SMAs and the VHF/UHF antenna SMA `J961` on the back wall: thirteen in all. The HF ports J951 (receive, through an on-board 30 MHz 7th-order elliptic anti-alias filter) and J952 (transmit) have no switch in their path ([SIGNAL_INTEGRITY §9.9](docs/SIGNAL_INTEGRITY.md)) |
 | Link to the Kria | IAS1 (Hirose BM20B), five LVDS pairs at up to 1 Gb/s each, AC-coupled; the Pmod J2 for control |
 | Ethernet | Gigabit RJ45 through an RTL8211FSI SGMII PHY on its own FPGA pins, so it runs alongside IAS1 ([CONTROL_SPEC §8](docs/CONTROL_SPEC.md)) |
 | To AERIS-10 | 2×20 IDC ribbon for eight ADAR1000s |
@@ -70,8 +70,62 @@ flowchart LR
 |---|---|
 | ![Top](docs/img/board_top.png) | ![Bottom](docs/img/board_bottom.png) |
 
-The renders come from KiCad. Some parts have no 3D model, so they show only their pads (the FPGA's
-BGA, for one).
+The renders come from KiCad. Two things show only their pads: the debug USB-C `J1501`, for which no
+model exists, and the shield frames' walls ([3D_MODELS](docs/3D_MODELS.md)).
+
+---
+
+<!-- board-manual:start -->
+## Board manual
+
+Every connector, LED, switch and chip, numbered as in the drawing; the bottom side, the switches, the chips, troubleshooting and typical uses are in [docs/BOARD_MANUAL.md](docs/BOARD_MANUAL.md). Generated with the tables from the board file by `_work/manual/board_manual.py`.
+
+![Board manual, top side](docs/img/manual/board_top.png)
+
+| No. | Ref | Side | Name | What it is for |
+|---|---|---|---|---|
+| 1 | `J101` | bottom | BM20B(0.8)-34DP | IAS1 to the KV260 (its `J8`), underneath: five LVDS pairs at up to 1 Gb/s each (three data lanes, two clocks), the housekeeping I2C (temperature sensor, ID EEPROM) and the FPGA's interrupt. The board's only data link to the Kria |
+| 2 | `J102` | bottom | BM20B(0.8)-34DP | IAS0 to the KV260 (its `J7`), underneath. Every pin is passed through to `J103`; the board uses none |
+| 3 | `J103` | top | BM20B(0.8)-34DS-0.4V(51) | IAS0 pass-through receptacle on the tongue's top face, pin for pin with `J102`: an IAS camera module plugs in here as it would on the carrier |
+| 4 | `J401` | top | CLK_REF_IN | Reference clock input (SMA) to the ADCLK948, 0.4-3.4 V p-p differential range, 50 ohm on chip. Leave open to run from the on-board Si549 |
+| 5 | `J402` | top | CLK_OUT | Clock output (SMA), ADCLK948 Q3, LVPECL: to share the master clock with an instrument |
+| 6 | `J911` | top | SDR_RX_A | SDR receive A (SMA): through SW1's default throw to the AD9253 channel A. Full scale about -2.4 dBm; DC-blocked |
+| 7 | `J912` | top | AERIS_IF_A | Radar IF into the 14-bit AD9253 (SMA), through SW1's second throw |
+| 8 | `J921` | top | AERIS_IF | Radar IF from AERIS-10 (SMA): through SW2's default throw to the 500 MSPS AD9484. Full scale about -17.6 dBm |
+| 9 | `J922` | top | SDR_RX_WB | Wideband SDR receive (SMA), SW2's second throw. Not connected as built: `C926` is not fitted and the VHF/UHF front end takes the throw (`C927`); swap the two 0402s to use this port |
+| 10 | `J931` | top | SDR_TX_A | SDR transmit A (SMA): AD9767 DAC1 through SW3's default throw, 10 mA full scale |
+| 11 | `J932` | top | AERIS_TX_A | Radar chirp from the 14-bit AD9767 DAC1 (SMA), SW3's second throw |
+| 12 | `J941` | top | AERIS_TX | Radar chirp to AERIS-10 (SMA): the AD9708 through SW4's default throw, 20 mA full scale into a 2:1 balun |
+| 13 | `J942` | top | SDR_TX_WB | Wideband SDR transmit from the AD9708 (SMA), SW4's second throw |
+| 14 | `J951` | top | SDR_RX_C | HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input |
+| 15 | `J952` | top | SDR_TX_C | HF transmit (SMA), no switch: AD9767 DAC2. The default HF output |
+| 16 | `J961` | top | VU_ANT | VHF/UHF antenna (SMA, back wall): the Rev08 front end, 30 MHz-3 GHz (direct below 170 MHz, converted above), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed |
+| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.6 W, 12.5 W with margin |
+| 18 | `J1002` | top | FAN 5V | Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND |
+| 19 | `J1101` | top | JTAG 2x7 2mm | Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter) |
+| 20 | `J1102` | top | Pmod | Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below |
+| 21 | `J1103` | top | AERIS ADAR | AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines |
+| 22 | `J1201` | top | HR911130C | Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone |
+| 23 | `J1501` | top | HX-TYPE-C 16P 180 LT H10.0 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
+
+| No. | LED | Meaning when lit |
+|---|---|---|
+| 27 | `D1501` CFG green | FPGA configured and the clock sequencer finished |
+| 27 | `D1502` CLK yellow | Master clock mode: on 500 MHz, off 400 MHz |
+| 27 | `D1503` LINK green | IAS1 link to the Kria trained |
+| 27 | `D1504` ADCR red | The radar ADC (AD9484) clipped since the last read (sticky) |
+| 27 | `D1505` ADCS red | The SDR ADC (AD9253) clipped since the last read (sticky) |
+| 27 | `D1506` LO green | The RFFC5072 synthesiser is locked |
+| 27 | `D1507` TX red | A DAC is driving an SMA |
+| 27 | `D1508` ERR red | Any sticky error: CRC, FIFO overflow, I2C no-acknowledge, over-temperature |
+| 27 | `D1509` HB blue | Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second |
+| 28 | `D1520` +12V green | +12V present (after the input protection) |
+| 28 | `D1521` +5V0 green | +5V0 present |
+| 28 | `D1522` +3V3_D green | +3V3_D present |
+| 28 | `D1523` +1V8_D green | +1V8_D present (switched from +3V3_D by `Q1520`) |
+| 28 | `D1524` +1V0 green | +1V0 (FPGA core) present (switched from +3V3_D by `Q1521`) |
+| 29 | `D1101` green | DONE: the FPGA has loaded a bitstream |
+<!-- board-manual:end -->
 
 ---
 
@@ -109,11 +163,12 @@ BGA, for one).
 | Check | Result |
 |---|---|
 | ERC | 0 errors; 7 warnings, all explained: configuration and XADC pins tied to power on purpose ([CONTROL_SPEC §5](docs/CONTROL_SPEC.md)) |
-| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board (re-run 15 Nov; one warning: D1003's footprint differs from its library copy) |
+| DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board with the Rev08 parts, 771 footprints (re-run 17 Nov by `make_fab.py`) |
 | Signal and power integrity | Full-wave openEMS + ngspice verification ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch `S11 = -30.9 dB` at 1 GHz (`-13.7 dB` at 3 GHz) with ESD diode, LVDS eyes within `1–26 mV` of ideal except `LINK_RX_D0` (`-52 mV`), worst intra-pair skew `9 ps`, `VCCINT` impedance `41 / 63 mΩ` (`target 120 mΩ`), ESD protection on every SMA, Pmod and JTAG, GND via within `3 mm` of all `89` LVDS layer changes |
 | Planes | L2, L5, and L7 carry solid ground; L4 carries split power islands (`_work/layout/planechk.py`) |
 | Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `25,068` LUTs (`76.9%`), `28,881` FFs (`44.3%`), `18.0` BRAM36 (`24.0%`), `119` DSP48E1 (`99.2%`), `WNS = +0.076 ns` over every clock of both `CLK_FPGA` modes (`400` and `500 MHz`); `ias2rf_k26_bd` with the DSP suite, the GPS PPS block and the fusion grid uses `36,393` Slice LUTs (`31.1%`), `36,562` FFs (`15.6%`), `32.5` BRAM36 (`22.6%`), `106` DSP48E2 (`8.5%`), `WNS = +0.874 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
 | Final RF review (15 Nov) | Five limits found ([SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md)) and addressed ([§9.9](docs/SIGNAL_INTEGRITY.md)): a 30 MHz 7th-order anti-alias filter on the HF input J951 (≥ 60 dB from 50 MHz); the switch-free J951/J952 as the default HF ports; DAC clocks from `CLK_FPGA` ÷ 4 without an MMCM (clock uncertainty `0.165 → 0.035 ns`); no transmit copper within 1.5 mm of any receive line; the enclosure's honest rating below. Still to measure on the first board: TX→RX isolation, the RF switches at 1–5 MHz, the filter above 700 MHz, switcher spurs |
+| Rev08 front end and diagnostics (16–17 Nov) | VHF/UHF receive on `J961`, 30 MHz to 3 GHz: noise figure 2.0 dB and full scale −52 dBm at maximum gain in the direct VHF path, FM-reject ≥ 40 dB with real tolerances; `J961` launch `S11 ≤ −18.1 dB` to 1.1 GHz with its ESD diode and bias tee; no front-end copper within 1.5 mm of either ADC input or the clock tree ([REV08_PLAN §5.5, §11.7](docs/REV08_PLAN.md), [SIGNAL_INTEGRITY §9.10](docs/SIGNAL_INTEGRITY.md)). 14 status and rail LEDs, a USB-C debug console, the IAS0 camera pass-through, and the [board manual](docs/BOARD_MANUAL.md) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: mounting holes land within `5 µm` ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
 **Design & verification highlights** ([docs/LAYOUT.md](docs/LAYOUT.md), [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)):
@@ -126,7 +181,7 @@ BGA, for one).
 6. **3-D full-wave EM, RF cascade & thermal envelope.** openEMS 3-D sub-models cover L1–L6 vias (`S11 < -29 dB`), BGA escapes (`< -24 dB`), adjacent-pair NEXT (`1.9%`), and `J101` launch (`< -25 dB`). Receive cascades (`cascade.py`) give `NF = 26.8 dB` (radar) / `22 dB` (SDR). Enclosure v2 (`50 × 50 × 15 mm` filtered lid fan + `HS1`–`HS3` heatsinks) is rated for `56 °C` ambient with the stock KV260, whose commercial K26 is the limit (`Tj` `85 °C`), and `70 °C` with an industrial K26I SOM, unchanged by Rev08's front end and camera ([ENCLOSURE_V2_THERMAL.md §8](docs/ENCLOSURE_V2_THERMAL.md)).
 7. **Dual-FPGA Vivado 2026.1 gateware & XSim verification.** Full RTL, constraints, Vivado post-route floorplans/schematics, and XSim end-to-end testbenches live in `fpga/` ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)). *(Design evolution history is archived in [docs/history/README.md](docs/history/README.md).)*
 
-**Estimated cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md)): about **$2,125 for two assembled boards** and **$4,310 for five** (parts + assembly + `JLC08161H-2116C` bare boards).
+**Estimated cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md)): about **$2,417 for two assembled boards** and **$4,804 for five** (Rev08, 17 Nov) (parts + assembly + `JLC08161H-2116C` bare boards).
 
 ---
 
@@ -134,6 +189,7 @@ BGA, for one).
 
 | Document | Contents |
 |---|---|
+| **[docs/BOARD_MANUAL.md](docs/BOARD_MANUAL.md)** | **Board manual.** Every connector, LED, switch, jumper, test point and chip, with drawings of both sides, the Pmod pin-out, troubleshooting by LED and typical uses |
 | **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** Complete vehicle platform: LiDAR, SDR, radar, OBD2 |
 | [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | **Dual-FPGA Gateware.** Artix-7 + Kria K26 RTL, Vivado 2026.1 utilization/timing/floorplans/schematics, CSR map, wideband SDR & AERIS-10 radar DSP, and XSim e2e simulation |
 | [docs/HMI.md](docs/HMI.md) | **In-car HMI.** The eight touchscreen screens (receiver, spectrum, ADS-B, radar, transmit, vehicle, system), the KV260's display path and which job runs on the PL, the A53s, the R5F cores, the GPU and the VCU |
@@ -216,7 +272,7 @@ adapter board.** If that is what you want, use the original project.
 
 Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to-end mixed-signal/digital XSim co-simulation ([`fpga/`](fpga/), full specification in [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)):
 
-- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct HF/CB bypass path (`stream_id = 8'h03`; first Nyquist zone `0–31.25 MHz` at `62.5 MSPS`, `0–25 MHz` at `50 MSPS`, and `0–30 MHz` on `J951` behind its low-pass) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`); `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`) and `UHF` reach it only as the IF of an external converter until Rev08, paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
+- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct HF/CB bypass path (`stream_id = 8'h03`; first Nyquist zone `0–31.25 MHz` at `62.5 MSPS`, `0–25 MHz` at `50 MSPS`, and `0–30 MHz` on `J951` behind its low-pass) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`); `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`), `UHF` and ADS-B come from the Rev08 front end on `J961` into the AD9484 (radar ADC) path through SW2, not into this one; paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
 - **AERIS-10 X-Band Radar (`10.5 GHz` / `20 km` / `8× ADAR1000`):** `400 MSPS` `AD9484` IF capture into the verbatim `AERIS-10 / PLFM_RADAR` (`62d4c55`) 400 -> 100 MSPS I/Q DDC (`stream_id = 8'h01`), `AD9708` chirp DAC (`DAC_RADAR`), `ADF4382` LO + `8× ADAR1000` beamformer SPI controller (`u_adar_ctrl`), and `u_rf_switch` T/R sequencing.
 - **High-Speed Interconnect:** Dual-lane Clause-49 `64B/66B` `IAS1` LVDS (`1.0–1.25 Gb/s` per lane, `2.0–2.5 Gb/s` uplink + `0.5–1.0 Gb/s` downlink) plus dedicated-pin `1000BASE-T` SGMII/UDP over `U1201 RTL8211FSI` (`~2.94 Gb/s` combined).
 

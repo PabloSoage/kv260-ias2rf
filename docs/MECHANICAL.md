@@ -5,7 +5,7 @@
 The adapter plugs into the KV260's two IAS connectors (Hirose BM20B, 0.8 mm mated height), screws
 through the carrier's two corner holes beside them (H1, H2), and overhangs the carrier's side by
 97 mm, where three supports (H3–H5) carry it. A 0.8 mm connector stack and two screws do not make a
-rigid assembly for a board with twelve SMAs and an RJ45 on a tab. This is a printed base that holds
+rigid assembly for a board with thirteen SMAs and an RJ45 on a tab. This is a printed base that holds
 the KV260 and the adapter together, takes the connectors' forces, and stands on the bench.
 
 ![The KV260 and the adapter on the printed base](img/mount_iso.jpg)

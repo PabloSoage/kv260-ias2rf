@@ -16,6 +16,8 @@ single-ended   single-ended in,  differential,    8 bits,
 
 ---
 
+**Rev08 (16 November 2026).** The AD9484 now has a third source: SW2's second throw carries the VHF/UHF front end's IF from `J961` ([ROUTING_SPEC](ROUTING_SPEC.md) §1.2, [RX_VU_SPEC](RX_VU_SPEC.md)). Nothing on this sheet changed. In the 500 MHz mode the G-7 path D2 samples it at 500 MSPS ([FPGA_GATEWARE](FPGA_GATEWARE.md) §4.3).
+
 ## 1. What drawing it changed
 
 ### 1.1 CONVERTERS became four sheets

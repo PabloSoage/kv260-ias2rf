@@ -124,7 +124,7 @@ Eight signals at 3.3 V, 100 mA on the supply pin `[V: UG1089]`.
 | `SPI_CS` | 1 | Chip select for the FPGA's register file |
 | `BEAM_STROBE` | 1 | Synchronous apply of a loaded beam across all ADAR1000s |
 | `PPS_SYNC` | 1 | Timing reference in, for correlating detections with GPS |
-| *spare* | 2 | Reserved |
+| *spare* | 2 | The debug UART since Rev08 (G-1): `PMOD_SPARE1` Kria to FPGA, `PMOD_SPARE2` FPGA to Kria, PS UART1 on EMIO ([BOARD_MANUAL](BOARD_MANUAL.md) §1.1) |
 
 **The 100 mA limit means the Pmod supply pin is for signalling only.** The adapter takes its power
 from its own 12 V jack.

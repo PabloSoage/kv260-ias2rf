@@ -118,6 +118,27 @@ LOADS = [
      "TMP1075 85 uA max converting (its 6.5); M24C02-F 0.8 mA max reading "
      "(DS9398 Table 14); 74LVC1G07 10 uA; HK_ALERT, WC and the two HK pull-ups "
      "at 10k draw 0.18 mA each when low. Sum 1.6 mA, rounded up"),
+
+    # ---- Rev08 (docs/REV08_PLAN.md sections 3 and 9) ---------------------
+    # The VHF/UHF front end on its own 3.0 V rail (LP5907 from +3V3_D, 250 mA).
+    ("+3V0_FE", "RFFC5072 mixer and synthesiser", 3.0, 125, "E",
+     "REV08_PLAN section 9: 125 mA with the PLL and the mixer on"),
+    ("+3V0_FE", "SPF5043Z LNA and IF amplifier, x2", 3.0, 50, "E",
+     "REV08_PLAN section 9: 25 mA each at the bias the front end uses"),
+    ("+3V0_FE", "Preselector and bypass switches, attenuator, rest", 3.0, 5, "E",
+     "PE4259 x4, PE42442 x2, SKY13418 x2, PE4312: tens of uA each; 5 mA "
+     "allowed for the bias networks"),
+    ("+3V3_D", "Status LEDs and TCA6416A expanders, x2", 3.3, 15, "E",
+     "REV08_PLAN section 3.1: 8 status LEDs written on change, at most a "
+     "few lit; expanders 1.5 uA idle"),
+    ("+3V3_D", "Rail LED on +3V3_D", 3.3, 1, "V", "REV08_PLAN 3.1: 1 mA each"),
+    ("+5V0", "Rail LED on +5V0", 5.0, 1, "V", "REV08_PLAN 3.1: 1 mA each"),
+    ("+1V8_D", "Rail LED on +1V8_D", 1.8, 1, "V", "REV08_PLAN 3.1: 1 mA each"),
+    ("+12V", "Rail LED on +12V", 12.0, 1, "V", "REV08_PLAN 3.1: 1 mA each"),
+    ("+3V3_D", "Rail LED on +1V0 (through its transistor, from +3V3_D)", 3.3, 1, "E",
+     "REV08_PLAN 3.1: +1V0 is below an LED's forward voltage"),
+    # Not counted: the bias tee's external load (AP22652, limited to 100 mA,
+    # off by default) and the CH340X, which draws from the USB cable.
 ]
 
 # rail -> (source rail, converter type, efficiency or dropout)
@@ -142,11 +163,12 @@ TREE = {
     # Charge-pump inverter. Reinstated after B-03 was reopened: the RF switches
     # need VEE = -3.3 V. A few milliamps, so a small pump is plenty.
     "-3V3":   ("+3V3_D", "pump", 0.80),
+    "+3V0_FE": ("+3V3_D", "ldo",  None),  # LP5907MFX-3.0 (Rev08 front end)
 }
 
 VOLTS = {"+12V": 12.0, "+5V0": 5.0, "+3V6": 3.6, "+3V3_D": 3.3, "+3V3_A": 3.3,
          "+2V5": 2.5, "+1V8_A": 1.8, "+1V8_D": 1.8, "+1V2": 1.2, "+1V0": 1.0,
-         "-3V3": -3.3}
+         "-3V3": -3.3, "+3V0_FE": 3.0}
 
 MARGIN = 1.30          # design margin on every rail
 
@@ -170,7 +192,7 @@ def main():
         print()
 
     # Propagate loads up the tree, innermost first.
-    order = ["-3V3", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A",
+    order = ["-3V3", "+3V0_FE", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A",
              "+3V3_D", "+5V0", "+12V"]
     load = {r: direct.get(r, 0) for r in VOLTS}
     diss = {}

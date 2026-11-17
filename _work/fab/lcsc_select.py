@@ -152,7 +152,7 @@ RULES = {
     ("LM2663M", "SOIC-8_3.9x4.9mm_P1.27mm"): ("P", "LM2663M", r"^LM2663MX?/NOPB"),
     ("XC7A50T-2FTG256I", "Xilinx_FTG256"): ("P", "XC7A50T-2FTG256I", r"^XC7A50T-2FTG256I"),
     ("MT25QL128ABA1ESE", "SOIC-8_5.3x5.3mm_P1.27mm"): ("P", "MT25QL128ABA1ESE", r"^MT25QL128ABA1ESE"),
-    ("74LVC1G07", "SOT-23-5"): ("P", "SN74LVC1G07DBVR", r"^SN74LVC1G07DBV"),
+    ("74LVC1G07", "SOT-23-5"): ("P", "SN74LVC1G07DBVR", r"^SN74LVC1G07DBVR$"),   # TI's, not a "-JSM" second source
     ("TMP1075DR", "SOIC-8_3.9x4.9mm_P1.27mm"): ("P", "TMP1075DR", r"^TMP1075DR"),
     ("M24C02-FMN6TP", "SOIC-8_3.9x4.9mm_P1.27mm"): ("P", "M24C02-FMN6TP", r"^M24C02-FMN6TP"),
     # the Ethernet PHY (13 Nov 2026, CONTROL_SPEC section 7)
@@ -162,20 +162,68 @@ RULES = {
     # the PHY's 1.0 V buck (< 0.3 A): a power inductor by name; the L rule picked a 50 mA signal part
     ("2.2u", "L_0805_2012Metric"): ("P", "DFE201210U-2R2M", r"^DFE201210U-2R2M"),
     ("4.7u", "C_0402_1005Metric"): ("C", "4.7u", "0402", 6.3, XR),    # PHYRSTB delay, +3V3_D
+    # Rev08 (17 Nov 2026): the VHF/UHF receiver (RX_VU_SPEC) and the STATUS sheet.
+    # The filters' inductors are Murata LQW wirewounds, 2 % (Q 40-45, what rev08_filters_mc.py assumed).
+    ("16n", "L_0402_1005Metric"): ("P", "LQW15AN16NG", r"^LQW15AN16NG"),
+    ("22n", "L_0402_1005Metric"): ("P", "LQW15AN22NG", r"^LQW15AN22NG"),
+    ("27n", "L_0402_1005Metric"): ("P", "LQW15AN27NG", r"^LQW15AN27NG"),
+    ("56n", "L_0402_1005Metric"): ("P", "LQW15AN56NG", r"^LQW15AN56NG"),
+    ("62n", "L_0402_1005Metric"): ("P", "LQW15AN62NG", r"^LQW15AN62NG"),
+    ("68n", "L_0402_1005Metric"): ("P", "LQW15AN68NG", r"^LQW15AN68NG"),
+    ("75n", "L_0402_1005Metric"): ("P", "LQW15AN75NG", r"^LQW15AN75NG"),
+    ("82n", "L_0402_1005Metric"): ("P", "LQW15AN82NG", r"^LQW15AN82NG"),
+    ("100n", "L_0402_1005Metric"): ("P", "LQW15ANR10J", r"^LQW15ANR10J00D"),   # the 2 % part is not stocked
+    ("0.47u", "C_0402_1005Metric"): ("C", "470n", "0402", 10, XR),
+    ("PESD5V0F1BL", "D_SOD-882"): ("P", "PESD5V0F1BL", r"^PESD5V0F1BL"),
+    ("TPD4E05U06DQAR", "USON-10_2.5x1.0mm_P0.5mm"): ("P", "TPD4E05U06DQAR", r"^TPD4E05U06DQAR"),
+    ("220n", "L_0603_1608Metric"): ("P", "LQW18ANR22G", r"^LQW18ANR22G"),
+    ("390n", "L_0603_1608Metric"): ("P", "LQW18ANR39G", r"^LQW18ANR39G"),
+    ("TA1090EC", "FILTER-SMD_6P-L3.8-W3.8-P1.27-TL-3"): ("P", "TA1090EC", r"^TA1090EC"),
+    ("HFCN-1000+", "FILTER-SMD_1206-4P-L3.2-W1.6-L"): ("P", "HFCN-1000+", r"^HFCN-1000"),
+    ("LFCN-1000+", "FILTER-SMD_1206-4P-L3.2-W1.6-L"): ("P", "LFCN-1000+", r"^LFCN-1000"),
+    ("TC1-1-13M+", "XFMR-SMD_TC1-1TX"): (
+        "X", "Mini-Circuits TC1-1-13M+ only: LCSC's H3-TC1-1-13M+ clone has another pin-out (RX_VU_SPEC); consign it"),
+    ("TC4-1W+", "XFMR-SMD_TC1-1TX"): ("P", "TC4-1W+", r"^TC4-1W"),
+    ("SPF5043Z", "SOT343_L2.0-W1.3-P1.30-LS2.1-BL"): ("P", "SPF5043Z", r"^SPF5043Z"),
+    ("PE4259", "SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL"): ("P", "PE4259", r"^PE4259"),
+    ("PE42442", "QFN-24_L4.0-W4.0-P0.50-BL-EP2.8"): ("P", "PE42442", r"^PE42442"),
+    ("SKY13418-485LF", "QFN-14_L2.0-W2.0-P0.45-BL-EP"): ("P", "SKY13418-485LF", r"^SKY13418-485LF"),
+    ("PE4312", "QFN-20_L4.0-W4.0-P0.50-BL-EP2.2"): ("P", "PE4312", r"^PE4312"),
+    ("RFFC5072", "QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm"): ("P", "RFFC5072", r"^RFFC5072"),
+    ("26MHz 1XXD26000MAA", "OSC-SMD_4P-L2.0-W1.6-BL"): ("P", "1XXD26000MAA", r"^1XXD26000MAA"),
+    ("TCA6416ARTWR", "WQFN-24_L4.0-W4.0-P0.50-TL-EP2.5"): ("P", "TCA6416ARTWR", r"^TCA6416ARTWR"),
+    ("AP22652W6-7", "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"): ("P", "AP22652W6-7", r"^AP22652W6-7"),
+    ("LP5907MFX-3.0", "SOT-23-5"): ("P", "LP5907MFX-3.0", r"^LP5907MFX-3\.0"),
+    ("LP5907MFX-3.3", "SOT-23-5"): ("P", "LP5907MFX-3.3", r"^LP5907MFX-3\.3"),
+    ("BM20B(0.8)-34DS-0.4V(51)", "CONN-SMD_34P-P0.40_BM20B-0.8-34DS-0.4V-51"): (
+        "P", "BM20B(0.8)-34DS-0.4V", r"^BM20B\(0\.8\)-34DS-0\.4V"),
+    ("HX-TYPE-C 16P 180 LT H10.0", "USB_C_HX_16P_180_LT_H10"): (
+        "P", "HX-TYPE-C 16P 180 LT H10.0", r"^HX-TYPE-C 16P 180 LT H10"),
+    ("CH340X", "MSOP-10_L3.0-W3.0-P0.50-LS5.0-BL"): ("P", "CH340X", r"^CH340X$"),
+    ("USBLC6-2SC6", "SOT-23-6"): ("P", "USBLC6-2SC6", r"^USBLC6-2SC6"),
+    ("MMBT3904", "SOT-23"): ("P", "MMBT3904", r"^MMBT3904(LT1G|-7-F|,215|$)"),
     ("Si549 LVPECL 3V3 pinout C", "Oscillator_SMD_SI570_SI571_Standard"): (
         "X", "Si549 ordering codes are built per configuration at Skyworks; not a catalogue part"),
 }
 # Where the part is not the drawn value, and why. Copied into the CSV's Note.
 NOTES = {
+    ("100n", "L_0402_1005Metric"): "LQW15ANR10G (2 %) is not stocked; the 5 % part, as rev08_filters_mc.py allowed for the 390 nH",
     ("330u", "CP_EIA-7343-20_Kemet-V"): "UG483 names T520V337M2R5ATE025 (2.5 V); the 6.3 V of the same "
                                         "series and case is what JLCPCB stocks",
 }
-SMA_NAMES = ("CLK_REF_IN", "CLK_OUT", "SDR_", "AERIS_")
+SMA_NAMES = ("CLK_REF_IN", "CLK_OUT", "SDR_", "AERIS_", "VU_")
+LED_COLOURS = ("green", "yellow", "red", "blue")
 
 
 def rule_for(comment, fp):
     if fp.startswith("SMA_") and comment.startswith(SMA_NAMES):
         return RULES[("SMA", fp)]
+    if fp == "LED_0402_1005Metric" and comment.split()[-1] in LED_COLOURS:
+        return ("LED", comment.split()[-1], "0402")      # STATUS sheet: "<name> <colour>"
+    if fp == "C_0402_1005Metric" and re.match(r"^[\d.]+p$", comment) and (comment, fp) not in RULES:
+        return ("C", comment, "0402", 25, C0G)            # any small capacitor: C0G
+    if comment == "0" and fp.startswith("R_0402"):
+        return ("J", "0402")
     if fp.startswith("R_0402") and comment != "4x22":
         return ("R", comment.split()[0], "0402")
     if fp.startswith("R_0603"):
@@ -263,6 +311,19 @@ def pick(rule):
             if package_of(c) == pkg and close(zz, z, 0.01) and i is not None and i >= min_i:
                 ok.append(c)
         why = f"no {z} ohm {pkg} bead >= {min_i} A"
+    elif kind == "LED":
+        _, colour, pkg = rule
+        ok = [c for c in search(f"{pkg} LED", pages=4)          # the colour in the keyword returns other parts
+              if package_of(c) == pkg and (attrs(c).get("Illumination Color") or "").lower() == colour]
+        if colour == "green":   # AlGaInP yellow-green (about 2 V), not InGaN (about 3 V): the rail LEDs and the
+            # status LEDs run from 3.3 V through a resistor, and +1V8_D's from 1.8 V (REV08_PLAN section 3.1)
+            ok = [c for c in ok if (num(attrs(c).get("Wavelength - Dominant") or "", "nm") or 0) >= 560e0]
+        why = f"no {pkg} {colour} LED"
+    elif kind == "J":
+        _, pkg = rule
+        ok = [c for c in search(f"0Ω {pkg} resistor")
+              if package_of(c) == pkg and num(attrs(c).get("Resistance", "") or "x", "Ω") == 0]
+        why = f"no {pkg} 0 ohm jumper"
     else:                                           # P
         kw, pat, desc = rule[1], rule[2], (rule[3] if len(rule) > 3 else ".")
         ok = [c for c in search(kw, pages=1, size=50)

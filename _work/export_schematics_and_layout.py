@@ -77,7 +77,7 @@ def identify_sch_pages(doc):
 
 def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
     """
-    Create an A0-landscape 100% vector composite containing all 9 sub-circuits
+    Create an A0-landscape 100% vector composite containing all 11 sub-circuits
     arranged in signal-flow order and linked by color-coded inter-sheet bus trunks.
     """
     W, H = 3370.39, 2383.94  # A0 Landscape in pt (1189 x 841 mm)
@@ -90,7 +90,7 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
 
     p.insert_text(
         (36, 40),
-        "KV260-IAS2RF — COMPLETE CONNECTED SYSTEM SCHEMATIC (ALL 9 HIERARCHICAL CIRCUITS + INTER-SHEET BUSES)",
+        "KV260-IAS2RF — COMPLETE CONNECTED SYSTEM SCHEMATIC (ALL 11 HIERARCHICAL CIRCUITS + INTER-SHEET BUSES)",
         fontsize=24, fontname="helv", color=(1, 1, 1),
     )
     p.insert_text(
@@ -120,11 +120,11 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
         p.insert_text((lx + 46, 117), label, fontsize=10.5, fontname="helv", color=(0.12, 0.16, 0.22))
         lx += 48 + len(label) * 6.0 + 30
 
-    # 3x3 grid layout of all 9 sheets with gutters for trunk buses
+    # 3x4 grid layout of all 11 sheets with gutters for trunk buses (Rev08: STATUS and RX_VU in a fourth column)
     grid = [
-        ["IAS_LINK", "CONTROL", "CLOCK"],
-        ["ADC_RADAR", "DAC_RADAR", "ROUTING"],
-        ["ADC_SDR", "DAC_SDR", "POWER"],
+        ["IAS_LINK", "CONTROL", "CLOCK", "STATUS"],
+        ["ADC_RADAR", "DAC_RADAR", "ROUTING", "RX_VU"],
+        ["ADC_SDR", "DAC_SDR", "POWER", None],
     ]
     titles = {
         "IAS_LINK": "1. IAS1 KV260 CONNECTOR + RJ45 1000BASE-T",
@@ -136,17 +136,21 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
         "ADC_SDR": "7. SDR RX: AD9253 (QUAD 14-BIT 125 MSPS) + AD8352 DRIVERS",
         "DAC_SDR": "8. SDR TX: AD9767 (DUAL 14-BIT 125 MSPS) + FILTERS & BALUNS",
         "POWER": "9. POWER: 12V LM74502 ORing + LMR33630/TPS562201 BUCKS + TPS7A8300 LDOs",
+        "RX_VU": "10. VHF/UHF FRONT END (J961): LNA + PRESELECTOR + RFFC5072 + IF CHAIN",
+        "STATUS": "11. STATUS: TCA6416A + LEDs + CH340X USB-C DEBUG UART",
     }
 
     margin_x, margin_top, margin_bot = 34, 152, 26
     gap_x, gap_y = 66, 56
-    cell_w = (W - 2 * margin_x - 2 * gap_x) / 3.0
+    cell_w = (W - 2 * margin_x - 3 * gap_x) / 4.0
     cell_h = (H - margin_top - margin_bot - 2 * gap_y) / 3.0
     header_h = 24
 
     boxes = {}
     for r, row in enumerate(grid):
         for c, sname in enumerate(row):
+            if sname is None:
+                continue
             x0 = margin_x + c * (cell_w + gap_x)
             y0 = margin_top + r * (cell_h + gap_y)
             x1 = x0 + cell_w
@@ -250,6 +254,19 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
     draw_bus([mid_t("POWER", 0.50), (mid_t("POWER", 0.50)[0], gy12), (boxes["ADC_SDR"].x0 + 60, gy12)], "#B7791F", 3.8, "12V -> 5V / 3V3 / 2V5 / 1V8 / 1V0 / -3V3 POWER", (boxes["DAC_SDR"].x0 + 20, gy12 - 6))
     draw_bus([mid_l("POWER", 0.50), mid_r("DAC_SDR", 0.50)], "#B7791F", 3.2)
 
+    # 6. Rev08: the VHF/UHF front end's IF into ROUTING's SW2, its +3V0_FE from +3V3_D, and the STATUS sheet on
+    #    the FPGA's I2C bus and debug UART
+    draw_bus([mid_l("RX_VU", 0.40), mid_r("ROUTING", 0.40)], "#00838F", 4.0, "IF_VU -> SW2",
+             (boxes["ROUTING"].x1 + 8, mid_r("ROUTING", 0.40)[1] - 10))
+    rv_b = mid_b("RX_VU", 0.50)
+    draw_bus([rv_b, (rv_b[0], mid_r("POWER", 0.30)[1]), mid_r("POWER", 0.30)], "#B7791F", 3.2, "+3V3_D -> +3V0_FE",
+             (rv_b[0] + 8, mid_r("POWER", 0.30)[1] - 10))
+    top_y = boxes["CONTROL"].y0 - 14
+    draw_bus([mid_t("CONTROL", 0.80), (mid_t("CONTROL", 0.80)[0], top_y), (mid_t("STATUS", 0.30)[0], top_y), mid_t("STATUS", 0.30)],
+             "#1565C0", 3.2, "XO I2C (TCA6416A x2) + DEBUG UART", (mid_t("CLOCK", 0.30)[0], top_y - 6))
+    st_b = mid_b("STATUS", 0.50)
+    draw_bus([st_b, mid_t("RX_VU", 0.50)], "#1565C0", 3.0, "FE control lines", (st_b[0] + 8, (st_b[1] + mid_t("RX_VU", 0.5)[1]) / 2))
+
     comp.save(out_pdf, garbage=4, deflate=True)
     # Save pure SVG version as well
     svg_txt = p.get_svg_image(text_as_path=False)
@@ -276,11 +293,11 @@ def export_schematics():
     # Build ordered KV260-IAS2RF_schematic.pdf:
     # Page 1: Root Connected Hierarchy
     # Page 2: Full Connected All-Sheets Circuit Composite (A0 Vector)
-    # Pages 3..11: 9 individual sub-sheets
+    # Pages 3..13: 11 individual sub-sheets
     out_doc = pymupdf.open()
     ordered_sheets = [
         "IAS_LINK", "CONTROL", "CLOCK", "ADC_RADAR", "ADC_SDR",
-        "DAC_RADAR", "DAC_SDR", "ROUTING", "POWER",
+        "DAC_RADAR", "DAC_SDR", "ROUTING", "POWER", "RX_VU", "STATUS",
     ]
     out_doc.insert_pdf(raw_doc, from_page=page_map["ROOT"], to_page=page_map["ROOT"])
     out_doc.insert_pdf(full_doc, from_page=0, to_page=0)
@@ -290,7 +307,7 @@ def export_schematics():
 
     toc = [
         [1, "1. Root — Connected System Architecture", 1],
-        [1, "2. Complete Connected Circuit Composite (All 9 Sheets)", 2],
+        [1, "2. Complete Connected Circuit Composite (All 11 Sheets)", 2],
     ]
     for pno, s in enumerate(ordered_sheets, start=3):
         toc.append([1, f"{pno}. {s}", pno])
@@ -319,7 +336,7 @@ def export_schematics():
     out_doc.close()
     os.remove(raw_pdf)
     sz_mb = os.path.getsize(SCH_PDF) / (1024 * 1024)
-    print(f"   Saved {SCH_PDF} ({sz_mb:.2f} MB, 11 vector pages)")
+    print(f"   Saved {SCH_PDF} ({sz_mb:.2f} MB, 13 vector pages)")
 
 
 # ---------------------------------------------------------------------------
@@ -383,11 +400,10 @@ def strip_copper_zones_from_pcb(pcb_text: str, target_layers: set[str] | None = 
 
 
 def find_layers_with_segments(pcb_text: str) -> list[str]:
-    layers = re.findall(r'\(segment\b[^\)]*?\(layer\s+"([^"]+)"\)', pcb_text, flags=re.DOTALL)
-    # Fallback line scan in case sub-sexprs occur before (layer ...)
-    found = set(layers)
-    for m in re.finditer(r'\(segment\b.*?\(layer\s+"([^"]+)"\)', pcb_text):
-        found.add(m.group(1))
+    # A segment's (start ...) and (end ...) come before its (layer ...), so match up to the layer
+    # without crossing into the next top-level item (segments and arcs are one block each).
+    found = set(re.findall(r'\((?:segment|arc)\b(?:(?!\n\t\().)*?\(layer\s+"([^"]+)"\)', pcb_text,
+                           flags=re.DOTALL))
     order = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu"]
     return [ly for ly in order if ly in found]
 

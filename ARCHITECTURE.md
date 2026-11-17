@@ -345,6 +345,8 @@ Covers LW/MW, shortwave, **CB (26.9–27.4)** and 10 m.
 
 **Path 2: VHF/UHF by conversion**
 
+> Rev08 built a different version of this path on the board itself: direct sampling below 170 MHz on the AD9484 and a single RFFC5072 conversion above, 30 MHz to 3 GHz, on its own SMA `J961` ([RX_VU_SPEC](docs/RX_VU_SPEC.md), [REV08_PLAN §5](docs/REV08_PLAN.md)). The table below is the original plan.
+
 | Sub-band | LO (IF = 20 MHz) | Bands |
 |---|---|---|
 | 50–70 MHz | 30–50 MHz | 6 m |

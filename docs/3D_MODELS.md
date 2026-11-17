@@ -1,6 +1,18 @@
 # 3D Model Audit & Mapping (`CSI2-KRIA-KV260_Rev01.kicad_pcb`)
 
 ## 1. Audit Summary
+
+> **Rev08 (17 November 2026).** The board now has **771** footprints. The Rev08 parts' land patterns came from LCSC
+> through easyeda2kicad (`_work/rev08_footprints.py`), with EasyEDA models that the library copy had dropped.
+> `_work/rev08_models.py` writes them back into the board as text: **22 parts** now have their model (`J103`, the
+> front end's `U1301`–`U1311`, `U1313`, `U1314`, `FL1301`–`FL1303`, `T1301`, `T1302`, `Y1301`, and `U1501`, `U1502`),
+> from `_work/mech/cache/models3d` (outside git, like the other EasyEDA models). EasyEDA paints ceramic bodies pure
+> white and the filters a light grey that the top view burns out, so the script gives both an off-white ceramic tone
+> (0.62, 0.60, 0.55). Still without a model, counted on the final file: the 28 intentionally unmodelled items
+> (6 fiducials, 5 mounting holes, 15 test points, 2 solder jumpers), `J1501` (EasyEDA has no model of the HX
+> vertical USB-C and KiCad's library has no vertical receptacle; no placeholder box is used) and the shield frames'
+> copper walls `SH1`, `SH2`. The audit below is the Rev06 one (570 footprints).
+
 An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (KiCad's stock `share/kicad/3dmodels` library) identified:
 
 - **Total footprints:** 570

@@ -11,8 +11,8 @@ for the tree as drawn.
 ```
 12 V jack ─ PTC ─ SMCJ33CA ─ Q1001 ┐ back-to-back N-FETs, LM74502-Q1 (U1009): reverse battery,
                               Q1003 ┘ overvoltage cut-off at 18.3 V ─ SMBJ18CA ─► +12V   (§1.1, Rev05)
-+12V   ─ U1001 LMR33630  buck ─► +5V0    1605 mA   (3 A part)
-+5V0   ─ U1002 TPS562201 buck ─► +3V3_D  1157 mA   (2 A part)
++12V   ─ U1001 LMR33630  buck ─► +5V0    1730 mA   (3 A part)
++5V0   ─ U1002 TPS562201 buck ─► +3V3_D  1326 mA   (2 A part)
        ─ U1003 TPS562201 buck ─► +2V5     601 mA   FPGA LVDS banks, and feeds +1V8_A
        ─ U1004 TPS562201 buck ─► +1V0     700 mA   FPGA VCCINT
        ─ U1007 TPS7A8300 LDO  ─► +3V3_A   100 mA   DACs' AVDD
@@ -20,9 +20,10 @@ for the tree as drawn.
        ─ divider              ─► +1V2       1 mA   link termination bias
 +3V3_D ─ U1006 TPS7A8300 LDO  ─► +1V8_D   300 mA   FPGA VCCAUX, ADCs' DRVDD
        ─ U1008 LM2663         ─► −3V3       8 mA   RF switches' VEE
+       ─ U1315 LP5907 LDO     ─► +3V0_FE  180 mA   Rev08 VHF/UHF front end (RX_VU sheet)
 ```
 
-Input: **733 mA at 12 V, 8.8 W**; 0.95 A and 11.4 W with the 30 % margin (with CONTROL drawn and its small parts at their datasheet figures, 2 October).
+Input: **802 mA at 12 V, 9.6 W**; 1.04 A and 12.5 W with the 30 % margin (Rev08's front end, LEDs and expanders added, 17 November; 733 mA and 8.8 W before).
 
 ---
 

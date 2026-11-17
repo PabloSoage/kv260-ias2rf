@@ -464,6 +464,19 @@ Board: nothing new that needs a change. The findings are in the gateware constra
 
 A-1 to A-6 need no board change and are independent of everything else here.
 
+**State at the end of phase 9 (17 November 2026), checked against the files:**
+
+| # | State |
+|---|---|
+| A-1 | Done. The AD9484 path is held in reset at 500 MHz (`clk_mode_ctrl`, `RADAR_STATUS[0]`); `xc7a50t.xdc` declares `clk_adcr_dco_500` (4.000 ns) beside the 5.000 ns clock; the documents say "closed at 400 MSPS". G-7 (path D2, FPGA_GATEWARE §4.3) then added a real 500 MSPS path |
+| A-2 | Done. `clk_adcs_dco_500` (2.000 ns) and `clk_adcs_dco_400` (2.500 ns, `-add`), exclusive groups; rebuilt (25,068 LUT, WNS +0.076 ns, WHS +0.049 ns) |
+| A-3 | Done. The NCO is a register (`RADAR_CTRL[2]`, `[31:8]`, G-4), default unchanged; and the two NCO fixes of 17 November (table half-step, dither into the address bits), also sent upstream (section 14) |
+| A-4 | Done. FPGA_GATEWARE §4.1 has the 62.5 / 50 MSPS rates, the 31.25 / 25 MHz first zone, the 0.01455 Hz step and `J911`, `J951`, `J952` |
+| A-5 | Done. The README no longer claims 0–62.5 MHz |
+| A-6 | Done, and overtaken: the VHF/UHF bands now have their own front end on `J961` |
+| A-7 | Info, still true and tighter: 119 of 120 DSP48E1 with G-7 |
+| A-8 | Done by WP1 and WP2: 14 LEDs, the debug console on the Pmod and on USB-C |
+
 ---
 
 ## 9. Power, heat and the enclosure
@@ -758,6 +771,11 @@ Details, tables and figures: SIGNAL_INTEGRITY 9.10. Every check ran on a copy of
 | 5 | Buying parts | **Nothing is bought now**: the board is being designed. Parts that are useful and fit go in; their stock is re-checked at order time |
 | 6 | Starting the work | **Not yet.** First the analysis and this document; phase 1 starts when the owner says so |
 | — | Clock mode for the new receiver | Follows from 1: 400 MSPS first (G-4), the 500 MSPS path (G-7) in scope after it |
+
+**State at the end of phase 9 (17 November 2026).** 1: done, WP1–WP7 and G-1 to G-8 all built. 2: done, `J961` on the
+back wall with its enclosure notch. 3: done, `J103` fitted. 4: done, the HX vertical USB-C placed (no header
+needed). 5: still in force, nothing bought; stock re-checked on 17 November (FABRICATION §3). 6: superseded, the owner
+started the work on 16 November. Clock mode: both done, G-4 at 400 MSPS and G-7's D2 at 500 MSPS.
 
 ---
 

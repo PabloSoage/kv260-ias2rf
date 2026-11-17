@@ -79,7 +79,7 @@ the FPGA's constraint file.
 | **JTAG on the Xilinx 2 × 7, 2 mm header** | DS593 Figure 14: 2 VREF, 4 TMS, 6 TCK, 8 TDO, 10 TDI; 3–11 GND, 13 PGND; 1, 12, 14 unused. Direct to the FPGA, as UG470 Figure 2-14 | Digilent 1 × 6 |
 | **The AERIS ribbon: an IDC 2 × 20.** Pins 1–32 carry CS, TX_LOAD, RX_LOAD and TR for each of the 8 ADAR1000s. Pins 33/35/37 carry the SPI (SCLK, SDIO, SDO), each next to a ground. 34, 36 and 38–40 are grounds | ARCHITECTURE §7.2, sized for 8 chips. **Only five grounds for 35 lines**: acceptable for static control lines and a few-MHz SPI, with `SLEW = SLOW` in the constraints | A 2 × 25 with a ground beside every signal |
 | **No pull resistors on the ADAR lines here** | AERIS keeps them next to the chips (4.7 kΩ on LOAD, 22.1 kΩ on TR and SPI, 22.1 kΩ up on CS). **The AERIS end of this cable does not exist yet**: its Main Board has no such connector, because its own U42 drives these nets | Duplicate them here |
-| **Pmod pinout** | Pmod pins 1–4 CS, MOSI, MISO, SCLK (INTERFACE_SPEC §4.2); 7 BEAM_STROBE, 8 PPS_SYNC, 9–10 spare. GND 5/11. The KV260's 3.3 V (6/12) is left open: the adapter takes no power from the Pmod. On an odd/even header Pmod pin *k* is pad 2*k*−1 and pin *k*+6 is pad 2*k* | — |
+| **Pmod pinout** | Pmod pins 1–4 CS, MOSI, MISO, SCLK (INTERFACE_SPEC §4.2); 7 BEAM_STROBE, 8 PPS_SYNC, 9–10 spare (the debug UART since Rev08, section 9). GND 5/11. The KV260's 3.3 V (6/12) is left open: the adapter takes no power from the Pmod. On an odd/even header Pmod pin *k* is pad 2*k*−1 and pin *k*+6 is pad 2*k* | — |
 | **HK I²C pull-ups 10 kΩ to 1.8 V**, fitted (4.7 kΩ until 2 October) | The carrier already has 2.21 kΩ to `PL_1V8` (XTP682 sheet 8). With both, the bus sees 1.81 kΩ: 1.0 mA at 1.8 V. That is what the EEPROM must sink, and the M24C02 is specified at 0.7 mA for 0.2 V at 1.8 V (DS9398 Table 14); scaling that up gives about 0.3 V, under the 0.54 V (0.3 × V<sub>DD</sub>) a 1.8 V input reads as low. 4.7 kΩ would ask 1.2 mA. Kept so the bus idles high on the bench without a carrier: 10 kΩ alone is fast enough for 100 kHz | 4.7 kΩ; or none, relying on the carrier |
 | **FPGA_IRQ on J8 pin 15, active high, 47 kΩ pull-down (R1133)** | Pin 15 is the only single-ended pin that goes **into** the SOM, through the carrier's SN74AVC4T245 at 1.8 V. The pin first allocated, 32, is the carrier's 48 MHz camera clock (INTERFACE_SPEC §4.3). With PUDC_B high the FPGA's pin floats until configured; the pull-down holds the translator's input at "no interrupt" | Pin 32, which would fight the carrier's clock |
 | **The HK bus's addresses are free** | The carrier's TCA9546A channel 1 reaches only J8: `IAS1_I2C_SCK/SDA` appear on XTP682 sheets 8 (the switch) and 13 (J8) and nowhere else. So 0x48 and 0x50 are this board's | — |
@@ -330,3 +330,16 @@ the gap between a Y401 via and ETH_MDC, which is too narrow.
 
 **Also on Rev06:** J1002, a 5 V fan header for enclosure v2 (POWER sheet; docs/ENCLOSURE.md section 6).
 
+---
+
+## 9. Rev08: what changed around this sheet (16–17 November 2026)
+
+The CONTROL sheet itself kept its parts; Rev08 added two sheets that hang off it ([REV08_PLAN](REV08_PLAN.md)):
+
+| What | Where | Effect on CONTROL |
+|---|---|---|
+| Debug UART (G-1) | `PMOD_SPARE1` (Kria to FPGA, `G15`) and `PMOD_SPARE2` (FPGA to Kria, `G11`), the Pmod's two spare lines, renamed in phase 4 | The two lines' old soft functions moved to register bits. The STATUS sheet's CH340X drives `PMOD_SPARE1` through 1 kΩ, so the Kria wins when the Pmod cable is fitted; `PMOD_SPARE2` also lights the heartbeat LED |
+| Two TCA6416A expanders on the Si549's I²C (`XO_SCL`, `XO_SDA`, G-2) | `U1313` at 0x20 (`RX_VU`: switches, bias tee, converter control), `U1501` at 0x21 (`STATUS`: the nine status LEDs) | `hk_xo_ctrl` became a shared I²C master; no traffic while receiving except on request |
+| The VHF/UHF front end's IF | `IF_VU` into `SW2`'s second throw ([ROUTING_SPEC](ROUTING_SPEC.md) §1.2) | `SW_CTRL1` now selects between AERIS's IF and the front end |
+
+Every connector, LED and chip of the board, with its use: [BOARD_MANUAL](BOARD_MANUAL.md).

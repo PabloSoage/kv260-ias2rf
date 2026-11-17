@@ -59,6 +59,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
         "Part I: Board Overview",
         [
             ("Project Overview", "README.md"),
+            ("Board Manual: Connectors, LEDs, Switches & Chips", "docs/BOARD_MANUAL.md"),
         ],
     ),
     (

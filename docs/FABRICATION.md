@@ -27,11 +27,11 @@ lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 | Step | How | Why |
 |---|---|---|
 | **Check the board** | `kicad-cli pcb drc --refill-zones --schematic-parity` on a copy in `fab/_work/` | Any error or unrouted connection makes the output a DRAFT. The zones are filled on the copy only; the board in git stays unfilled |
-| **Gerbers** | L1–L6, paste, silkscreen, mask, outline. Protel extensions, soldermask subtracted from silkscreen, zones checked | JLCPCB's KiCad guide, point by point |
+| **Gerbers** | L1–L8, paste, silkscreen, mask, outline. Protel extensions, soldermask subtracted from silkscreen, zones checked | JLCPCB's KiCad guide, point by point |
 | **Drill** | Excellon, mm, decimal, absolute origin, alternate mode for oval holes, plus a PDF drill map | Same guide |
 | **Zip** | Gerbers + drill in one zip, spaces in the layer names replaced by `_` | The zip is what is uploaded |
-| **BOM** | `Comment, Designator, Footprint, LCSC Part #, Quantity`, one line per value and footprint: 110 lines, 478 parts | JLCPCB's BOM columns |
-| **CPL** | `Designator, Mid X, Mid Y, Layer, Rotation`, from KiCad's position file: 478 placements (fiducials, holes and the solder jumper JP1101 left out: they are copper only) | JLCPCB's CPL columns |
+| **BOM** | `Comment, Designator, Footprint, LCSC Part #, Quantity`, one line per value and footprint: 214 lines, 739 parts (17 Nov 2026) | JLCPCB's BOM columns |
+| **CPL** | `Designator, Mid X, Mid Y, Layer, Rotation`, from KiCad's position file: 739 placements (fiducials, holes and the solder jumper JP1101 left out: they are copper only) | JLCPCB's CPL columns |
 | **ORDER.txt** | The order form's values, and the DRC result | So the order is entered the same way every time |
 
 ---
@@ -44,7 +44,7 @@ lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 | Thickness | 1.6 mm | |
 | **Impedance control** | **Yes, JLC08161H-2116C** (8 layers; JLC06161H-2116A until 12 Nov) | The stack the widths were solved for (`_work/field_solver8.py`). Any other stack changes every impedance |
 | Copper | 1 oz outer, 0.5 oz inner | The stack's own |
-| **Via covering** | **Epoxy filled & capped (POFV)** | 543 vias sit in pads since 11 Nov (0402 passives, butted decoupling vias, every IC's exposed pad, five in L1030's output pad). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. Most of the BGA's fan-out vias sit between its balls; 29 sit in ball pads (LAYOUT §6.1) |
+| **Via covering** | **Epoxy filled & capped (POFV)** | 765 vias sit in pads on the Rev08 board (543 on 11 Nov: 0402 passives, butted decoupling vias, every IC's exposed pad, five in L1030's output pad). JLCPCB fills and caps them free, and by default, on 6–20-layer boards. Most of the BGA's fan-out vias sit between its balls; 29 sit in ball pads (LAYOUT §6.1) |
 | Min via | 0.20 mm hole, 0.45 mm pad | Within JLCPCB's 8-layer capability |
 | Min track / space | **0.09** / 0.10 mm | Inner LVDS pairs 0.10 / 0.15 mm, 0.09 / 0.12 mm under the FPGA (110 segments at 0.09 mm); L1 pairs 0.117 / 0.150 mm |
 | **Surface finish** | **ENIG** | Flat pads for the 1.0 mm BGA and the LFCSPs; HASL is not flat enough |
@@ -68,7 +68,7 @@ chosen on 2 October 2026 by `_work/fab/lcsc_select.py` from JLCPCB's own parts s
 Stock changes daily: run `py _work/fab/lcsc_select.py` again before ordering and read the diff of the
 CSV, then `python _work/fab/quote.py` for today's prices ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)). On 10 Nov
 two lines were re-selected because their part ran out: the 22.6 kΩ (now C100316) and the PROG switch
-(now TL3342F450QG). **109 of 110 lines have a code.** Three are not the drawn value, because that value is not made
+(now TL3342F450QG). **Re-run on 17 November for Rev08: 212 of 214 lines have a code** (187 distinct). The rules gained the front end's parts by name (the Murata LQW15/LQW18 wirewounds the filter Monte Carlo assumed, Q 40–45, ±2 %), any small capacitor as C0G, and the LEDs by colour; green is AlGaInP (≥ 560 nm, about 2 V), because the rail and status LEDs run from 3.3 V through a resistor. The `74LVC1G07` rule now takes only TI's part, not a second source of the same name. Four are not the drawn value, because that value is not made
 (the CSV's Note column says so):
 
 | Line | Drawn | Fitted | Effect |
@@ -76,9 +76,12 @@ two lines were re-selected because their part ran out: the 22.6 kΩ (now C100316
 | C710, C814, C834 | 106 pF (AERIS C141) | 110 pF C0G | +3.8 % on one element of the DAC reconstruction filter. Or 100 pF plus 5.6 pF by hand |
 | L701–L704, L811–L834 | 107.3 nH (AERIS L22) | 110 nH ±2 %, Murata LQW18 | +2.5 %, same filter |
 | C1110 | T520V337M2R5ATE025 (UG483) | T520V337M006ATE025 | Same series and case, 6.3 V instead of 2.5 V |
+| L1423 | 100 nH ±2 % | LQW15ANR10J, ±5 % | The 2 % part is not stocked; the same tolerance the Monte Carlo gave the 390 nH |
 
 **Not stocked, or not catalogue parts:** the Si549 (Y401) has no code, because Skyworks builds its
-ordering code per configuration: order it from Skyworks or a distributor and consign it. Several codes
+ordering code per configuration: order it from Skyworks or a distributor and consign it. The TC1-1-13M+ (T1301) is
+Mini-Circuits' only: LCSC's part of that name is a clone with another pin-out, so it is consigned too. On 17 November
+nine lines were short for two boards (JLCPCB_QUOTE §1), the SMA among them (5 in stock for 26). Several codes
 exist but showed **zero stock** on 2 October: ADCLK948, AD9484, AD9708, M3SWA2-34DR+. Others are
 very short (XC7A50T 73, AD8352 9, AD9253 2, ADT2-1T+ 7). JLCPCB's "global sourcing" or consignment
 covers them.
@@ -110,6 +113,6 @@ RF lines off 50 Ω.
 
 | Check | Result |
 |---|---|
-| Script run on the placed board | 15 files in the zip (6 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 110 lines / 478 parts, CPL 478 placements, DRC 0 errors (2 October) |
-| CPL against BOM | The same 478 references in both |
+| Script run on the placed board | 17 files in the zip (8 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 214 lines / 739 parts, CPL 739 placements, DRC 0 violations, 0 unconnected pads, 0 footprint errors (17 November, the Rev08 board; 15 files and 110 / 478 on 2 October) |
+| CPL against BOM | The same 739 references in both (17 Nov) |
 | Settings against JLCPCB's KiCad guide | Protel extensions, subtract soldermask, zone check; Excellon mm, decimal, absolute, alternate oval mode, all as the guide lists |
