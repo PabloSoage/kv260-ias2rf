@@ -233,6 +233,11 @@ create_clock -period 5.000  -name clk_adcr_dco     [get_ports adcr_dco_n]
 # registers and D2's packer; it is stopped at the DCO MMCM, which stays in reset in that mode.
 create_clock -period 4.000  -name clk_adcr_dco_500 -add [get_ports adcr_dco_n]
 set_clock_sense -stop_propagation -clocks [get_clocks clk_adcr_dco_500] [get_pins u_adc_cap/u_mmcm_adc/CLKIN1]
+# G-7: the AD9484 trainer's clock is a BUFGCTRL of clk_200m (400 MSPS) and refclk_200m (500 MSPS); the select changes
+# only with the capture in reset, so the two are separate, exclusive clocks at its output
+create_generated_clock -name clk_trn_400 -divide_by 1 -add -source [get_pins u_adc_cap/u_bufg_200m/I0] -master_clock [get_clocks clk_200m_unbuf] [get_pins u_adc_cap/u_bufg_200m/O]
+create_generated_clock -name clk_trn_500 -divide_by 1 -add -source [get_pins u_adc_cap/u_bufg_200m/I1] -master_clock [get_clocks refclk_200m_unbuf] [get_pins u_adc_cap/u_bufg_200m/O]
+set_clock_groups -physically_exclusive -group [get_clocks clk_trn_400] -group [get_clocks clk_trn_500]
 
 # A-2 (docs/REV08_PLAN.md): AD9253 runs 1-lane 16-bit DDR (DCO = 8 * f_S):
 #   - 500 MHz master (f_S = 62.5 MSPS) -> 500 MHz DCO (2.000 ns), BUFR(DIV4) clk_div = 125 MHz (8.000 ns)
@@ -283,7 +288,7 @@ set_false_path -to   [get_ports {eth_sgtx_p eth_sgtx_n eth_mdc eth_mdio eth_rst_
 
 # Async-assert reset synchronizers and Gray-code / toggle CDC crossings
 set_false_path -to [get_pins -quiet -hier -filter {NAME =~ *rst*sync*/PRE || NAME =~ *rst*sync*/CLR}]
-set_max_delay -datapath_only 3.500 -from [get_clocks clk_adcr_dco] -to [get_clocks clk_200m_unbuf]
+set_max_delay -datapath_only 3.500 -from [get_clocks clk_adcr_dco] -to [get_clocks {clk_200m_unbuf clk_trn_400}]
 # G-7: the AERIS CIC's comb stages 1-4 take one sample per 4 clk_400m cycles and load each register 4 cycles
 # after the registers it reads (cic_decimator_4x_enhanced.v)
 set_multicycle_path -setup 4 -from [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/cic_*_inst/comb_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/comb_delay_reg*}] -to [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/cic_*_inst/comb_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/comb_delay_reg* || NAME =~ u_ddc/u_ddc/cic_*_inst/temp_scaled_output_reg*}]
@@ -292,6 +297,7 @@ set_multicycle_path -hold 3 -from [get_cells -hier -filter {NAME =~ u_ddc/u_ddc/
 # u_adc_cap/u_bufg_200m); the BUFGCTRL's select changes only with the capture in reset; the training status
 # into link_clk (D2_STAT, D2's enable)
 set_max_delay -datapath_only 4.000 -from [get_clocks clk_adcr_dco_500] -to [get_clocks -of_objects [get_pins {u_mmcm_sys/CLKOUT0 u_mmcm_sys/CLKOUT2}]]
+set_max_delay -datapath_only 4.000 -from [get_clocks clk_adcr_dco_500] -to [get_clocks clk_trn_500]
 set_false_path -to [get_pins {u_adc_cap/u_bufg_200m/S0 u_adc_cap/u_bufg_200m/S1}]
 # the OR pin's IDDR (M6/N6, far from the DCO's BUFR) is not used at 500 MSPS: D2 takes codes 0 and 255 as over-range
 set_false_path -from [get_clocks clk_adcr_dco_500] -through [get_pins {u_adc_cap/g_adc_bits[8].u_iddr_d/Q1 u_adc_cap/g_adc_bits[8].u_iddr_d/Q2}]
@@ -302,7 +308,7 @@ set_max_delay -datapath_only 4.000 -from [get_clocks -of_objects [get_pins u_mmc
 set_max_delay -datapath_only 2.400 -from [get_clocks clk_100m_unbuf] -to [get_clocks clk_400m_unbuf]
 set_max_delay -datapath_only 2.400 -from [get_clocks clk_400m_unbuf] -to [get_clocks clk_100m_unbuf]
 set_max_delay -datapath_only 2.400 -from [get_clocks link_clk_unbuf] -to [get_cells -quiet -hier -filter {NAME =~ *tr_start_sync_reg[0]* || NAME =~ *tr_pat_sync_reg[0]*}]
-set_max_delay -datapath_only 3.500 -from [get_clocks clk_200m_unbuf] -to [get_pins -quiet adc_tr_100_sync_reg[0]/D]
+set_max_delay -datapath_only 3.500 -from [get_clocks {clk_200m_unbuf clk_trn_400}] -to [get_pins -quiet adc_tr_100_sync_reg[0]/D]
 set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]]
 set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]]
 set_max_delay -quiet -datapath_only 6.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT3]]

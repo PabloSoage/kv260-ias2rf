@@ -566,19 +566,21 @@ module artix_top #(
     // Rev08 G-7: D2, the 500 MSPS DDC (link_clk). It runs once the capture has trained in mode_500; stream 0x01
     // switches to it while D2 runs and until its last packet has gone.
     // -------------------------------------------------------------------------
-    (* ASYNC_REG = "TRUE" *) reg [1:0] d2_tr_s, d2_err_s;
-    (* ASYNC_REG = "TRUE" *) reg [5:0] d2_eye_s1, d2_eye_s2;
+    // The AD9484 trainer's results (trainer clock: clk_200m at 400 MSPS, refclk_200m at 500) into link_clk through
+    // one synchroniser each; the 400 MSPS status bits (adc_*_sync, reset at 500 MHz) and D2's are copies of it
+    (* ASYNC_REG = "TRUE" *) reg [1:0] cap_tr_s, cap_err_s;
+    (* ASYNC_REG = "TRUE" *) reg [5:0] cap_eye_s1, cap_eye_s2;
     always @(posedge link_clk) begin
-        if (d2_link_rst) begin
-            d2_tr_s <= 2'b00; d2_err_s <= 2'b00; d2_eye_s1 <= 6'd0; d2_eye_s2 <= 6'd0;
+        if (link_rst) begin
+            cap_tr_s <= 2'b00; cap_err_s <= 2'b00; cap_eye_s1 <= 6'd0; cap_eye_s2 <= 6'd0;
         end else begin
-            d2_tr_s   <= {d2_tr_s[0], adc_trained};
-            d2_err_s  <= {d2_err_s[0], adc_dco_phase_err};
-            d2_eye_s1 <= adc_eye_width_min;
-            d2_eye_s2 <= d2_eye_s1;
+            cap_tr_s   <= {cap_tr_s[0], adc_trained};
+            cap_err_s  <= {cap_err_s[0], adc_dco_phase_err};
+            cap_eye_s1 <= adc_eye_width_min;
+            cap_eye_s2 <= cap_eye_s1;
         end
     end
-    wire        d2_en = d2_run_link & d2_tr_s[1];
+    wire        d2_en = d2_run_link & cap_tr_s[1];
     wire [7:0]  d2_pk_code;
     wire        d2_pk_or, d2_pk_valid;
     wire        d2_pkt_valid, d2_pkt_ready, d2_pkt_sop, d2_pkt_eop, d2_pkt_busy;
@@ -665,8 +667,9 @@ module artix_top #(
     end
 
     (* ASYNC_REG = "TRUE" *) reg [2:0] fb_tog_sync, adcr_or_tog_sync;
-    (* ASYNC_REG = "TRUE" *) reg [1:0] adc_tr_sync, adc_err_sync, sat_sync, ovf_sync, adcr_mmcm_s;
-    (* ASYNC_REG = "TRUE" *) reg [5:0] adc_eye_s1, adc_eye_s2;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] sat_sync, ovf_sync, adcr_mmcm_s;
+    reg [1:0] adc_tr_sync, adc_err_sync;   // G-7: copies of cap_tr_s / cap_err_s (one synchroniser per signal)
+    reg [5:0] adc_eye_s1, adc_eye_s2;
     (* ASYNC_REG = "TRUE" *) reg [1:0] ddc_stat_s1, ddc_stat_s2;
     reg [15:0] fb_ddc_i_link, fb_ddc_q_link;
     reg        fb_ddc_valid_link;
@@ -696,12 +699,12 @@ module artix_top #(
                 fb_ddc_i_link <= fb_i_hold_100;
                 fb_ddc_q_link <= fb_q_hold_100;
             end
-            adc_tr_sync  <= {adc_tr_sync[0], adc_trained};
-            adc_err_sync <= {adc_err_sync[0], adc_dco_phase_err};
+            adc_tr_sync  <= {adc_tr_sync[0], cap_tr_s[1]};
+            adc_err_sync <= {adc_err_sync[0], cap_err_s[1]};
             sat_sync     <= {sat_sync[0], mixer_saturation};
             ovf_sync     <= {ovf_sync[0], filter_overflow};
             adcr_mmcm_s  <= {adcr_mmcm_s[0], adc_mmcm_locked};
-            adc_eye_s1   <= adc_eye_width_min;
+            adc_eye_s1   <= cap_eye_s2;
             adc_eye_s2   <= adc_eye_s1;
             ddc_stat_s1  <= ddc_status;
             ddc_stat_s2  <= ddc_stat_s1;
@@ -2305,7 +2308,7 @@ module artix_top #(
     assign d2_run_link = reg_d2_ctrl[0] & xo_active_500m & ~xo_busy;     // G-7
     // 0x108 D2_STAT: [0] running, [1] trained, [2] training failed, [3] FIFO slip (sticky), [4] at 500 MHz,
     // [13:8] narrowest eye in taps
-    wire [31:0] d2_stat = {18'd0, d2_eye_s2, 3'd0, xo_active_500m, d2_slip_seen, d2_err_s[1], d2_tr_s[1],
+    wire [31:0] d2_stat = {18'd0, cap_eye_s2, 3'd0, xo_active_500m, d2_slip_seen, cap_err_s[1], cap_tr_s[1],
                            d2_run_link};
     wire        xo_boot_done, xo_boot_err, xo_delta_clamped, xo_use_ext_clk_sync, xo_req_500m_sync;
     wire [15:0] xo_ack_err_cnt;
