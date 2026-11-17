@@ -289,7 +289,13 @@ def parts():
             if c.type == "MESH":
                 vs += [c.matrix_world @ Vector(b) / MM for b in c.bound_box]
         if vs:
-            yield g.name, [min(v[i] for v in vs) for i in range(3)], [max(v[i] for v in vs) for i in range(3)], k >= n_kv
+            lo, hi = [min(v[i] for v in vs) for i in range(3)], [max(v[i] for v in vs) for i in range(3)]
+            # Rev08: the board's own layer meshes (unnamed STEP nodes, e.g. the adapter's back layers at z 0.7,
+            # 86 x 116 mm) are not parts. Taken as one, they lowered the honeycomb under the whole adapter by
+            # 0.67 mm and left it resting on the slab's rims only (found by the 3-D FEA's adapter bow).
+            if hi[0] - lo[0] >= 60 and hi[1] - lo[1] >= 60:
+                continue
+            yield g.name, lo, hi, k >= n_kv
 
 
 def leaves():
@@ -344,7 +350,10 @@ cut(hc, join(inserts, "inserts"), self_ix=True)
 union(bottom, hc)
 
 # ---- lugs: lid and tray close on them; vehicle ears ------------------------------------------------------
-LUG_X = {"front": [-95.0, 70.0, 127.0], "back": [-95.0, -20.0, 127.0]}   # clear of the I/O openings and J1001
+# Rev08: the back-wall lug moved from X -20 to -27, west of J961's notch (X -17.4 to -10.7) and east of the 12 V
+# jack's opening (to -36.8): 2.6 mm of wall each side. East of the notch the gap to the KV260's J12 opening is 11.5 mm,
+# too narrow for a 14 mm lug.
+LUG_X = {"front": [-95.0, 70.0, 127.0], "back": [-95.0, -27.0, 127.0]}   # clear of the I/O openings and J1001
 Y_OUT = {"front": OUTER[0][1], "back": OUTER[6][1]}
 LUG_W, LUG_D = 14.0, 10.0
 LUG_HOLE = 4.4                        # M4 clearance; the snap pins are 4.1
@@ -677,6 +686,14 @@ for name, lo, hi in PARTS:
 ys = [(lo[1] + hi[1]) / 2 for name, lo, hi in PARTS if name.startswith(("J4", "J9")) and lo[0] < -110]
 zc = [hi[2] - 3.175 for name, lo, hi in PARTS if name.startswith(("J4", "J9")) and lo[0] < -110][0]
 sma.append(box("cb_band", OUTER[7][0] - 1.0, OUTER[7][0] + 1.0, min(ys) - 4.8, max(ys) + 4.8, zc - 4.8, zc + 4.8))
+# Rev08: the thirteenth SMA, J961 (VHF/UHF antenna), comes out of the back wall. Its notch is split at the SMA's
+# centre line like the other twelve, so the two shells clamp its square body, with the coupling nut's 1 mm recess
+for name, lo, hi in PARTS:
+    if name == "J961":
+        xc, zc = (lo[0] + hi[0]) / 2, hi[2] - 3.175
+        sma.append(box("sma961", xc - 3.35, xc + 3.35, INNER[6][1] - 1, OUTER[6][1] + 1, zc - 3.35, zc + 3.35))
+        sma.append(box("cb961", xc - 4.8, xc + 4.8, OUTER[6][1] - 1.0, OUTER[6][1] + 1.0, zc - 4.8, zc + 4.8))
+        print("J961 notch at x", round(xc, 2), "z", round(zc, 2))
 print("SMA notches", len([o for o in sma if o.name.startswith("sma")]))
 cbs = [o for o in sma if o.name.startswith("cb")]
 notches = [o for o in sma if not o.name.startswith("cb")]
@@ -687,6 +704,43 @@ for group in (openings + notches, cbs):
     sc.collection.objects.link(b)
     cut(bottom, a)
     cut(lid, b)
+
+# ---- Rev08: LED windows and the camera on the tongue ------------------------------------------------------------
+# Two slots in the lid over the board's LEDs (REV08_PLAN 3.1): the nine status LEDs in a row north of J961
+# (KiCad x 100.085, y 108.85-116.45) and the five rail LEDs on the tongue (KiCad y 104.545, x 131.6-136.0).
+# 1.6 mm wide: the status slot passes 1.3 mm from the clamp over the carrier's corner screw at (-5, 104).
+sx0, sy0 = k2m(100.085, 116.45)
+sx1, sy1 = k2m(100.085, 108.85)
+led_win = [box("led_status", sx0 - 0.8, sx1 + 0.8, sy0 - 0.8, sy0 + 0.8, Z_TOP_IN - 6, Z_TOP + 1)]
+rx0, ry0 = k2m(136.0, 104.545)
+rx1, ry1 = k2m(131.6, 104.545)
+led_win.append(box("led_rail", rx0 - 0.8, rx0 + 0.8, ry0 - 0.8, ry1 + 0.8, Z_TOP_IN - 6, Z_TOP + 1))
+cut(lid, join(led_win, "led_windows"))
+print("LED windows: status x", round(sx0 - 0.8, 1), "..", round(sx1 + 0.8, 1), "y", round(sy0, 1),
+      "| rail x", round(rx0, 1), "y", round(ry0 - 0.8, 1), "..", round(ry1 + 0.8, 1))
+# The IAS camera module on J103 (REV08_PLAN 4.3). Its drawing was not available: the outline is the catalogue's
+# 8.74 x 24.18 mm, long side along the tongue; its PCB sits on the mated BM20 pair, 0.8 mm over the adapter. Centred
+# on the connector it would sit on the carrier's jumper J18 (y 49.0-54.1, pins to z 7.5), here and on the bare
+# carrier alike, so the connector is taken at one end and the module runs towards +y, where nothing on the carrier
+# stands above z 3 (2.3 mm clear of J18). A 10 x 17 mm window for the lens over the rest, and two clamps on the
+# module's ends, each stopping PAD above its PCB for a TPU pad, as the enclosure's other clamps. To be checked
+# against a module in hand before the lid is printed (risk register).
+CAM_C = k2m(135.981, 85.6036)
+CAM_W, CAM_L, CAM_Z0, CAM_T = 8.74, 24.18, ADAPTER_TOP + 0.8, 1.0
+cx, cy = CAM_C[0], CAM_C[1] - 5.6 + CAM_L / 2
+cut(lid, box("lens_window", cx - 5.0, cx + 5.0, cy - 8.5, cy + 8.5, Z_TOP_IN - 6, Z_TOP + 1))
+cam_clamps, cam_pads = [], []
+for s in (-1, 1):
+    ya, yb = sorted((cy + s * (CAM_L / 2 - 3.0), cy + s * CAM_L / 2))
+    cam_clamps.append(box("cam_clamp", cx - 3.6, cx + 3.6, ya, yb, CAM_Z0 + CAM_T + PAD, Z_TOP_IN + 0.2))
+    cam_pads.append(box("cam_pad", cx - 3.6, cx + 3.6, ya, yb, CAM_Z0 + CAM_T, CAM_Z0 + CAM_T + PAD, TPU))
+union(lid, join(cam_clamps, "cam_clamps"))
+CAMM = mat("camera PCB (estimated outline)", (0.02, 0.18, 0.06), 0.45)
+cam_vis = [box("camera_module_estimate", cx - CAM_W / 2, cx + CAM_W / 2, cy - CAM_L / 2, cy + CAM_L / 2,
+               CAM_Z0, CAM_Z0 + CAM_T, CAMM)]
+print("camera module x", round(cx - CAM_W / 2, 2), "..", round(cx + CAM_W / 2, 2), "y", round(cy - CAM_L / 2, 2), "..",
+      round(cy + CAM_L / 2, 2), "| lens window x", round(cx - 5, 1), "..", round(cx + 5, 1), "y", round(cy - 8.5, 1),
+      "..", round(cy + 8.5, 1))
 
 # label, debossed 0.6 mm in the lid
 # clear of the ribbon slot over J1103 (x -75.7, y 26-80) and of v2's grille
@@ -836,6 +890,7 @@ if "--stl" in argv:
     p0.location, p0.rotation_euler = loc, (0, 0, 0)
     stl([pads[0]], os.path.join(out, "case_pad_ring.stl"))
     stl([pads[-1]], os.path.join(out, "case_pad_rj45.stl"))
+    stl([cam_pads[0]], os.path.join(out, "case_pad_camera.stl"))
     for b in bumpers:
         stl([b], os.path.join(out, f"case_{b.name.lower()}.stl"))
     for o in (bottom, lid):

@@ -523,7 +523,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | **Done 16 November** (section 11.6): 0 errors, 0 unconnected, 0 parity errors |
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **Done 17 November** (section 11.7): G3 passed; `J961` brought to the other SMAs' standard, bias tee and LNA bias fixed, DRC 0 / 0 / 0 |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
-| 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | — |
+| 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | **Done 17 November**: rated 56.1 °C stock, 71.1 °C K26I (ENCLOSURE_V2_THERMAL §8); 50 g FEA SF 8.3 / 5.0, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE §5.3) |
 | 9 | Regenerate every output and review every document (section 11.1); draw the board manual (section 11.3) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done** |
 | 10 | Tag `rev08`, push | — | — |
 

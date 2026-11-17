@@ -1,6 +1,6 @@
 # KV260-IAS2RF Enclosure v2: 3D Conjugate Heat Transfer (CHT) CFD Report
 
-**Date:** 2026-11-14  
+**Date:** 2026-11-14, Rev08 re-run 2026-11-17 (section 8)  
 **Solver:** OpenFOAM v2412 `chtMultiRegionSimpleFoam` (steady-state compressible buoyant CHT, `kOmegaSST` RAS turbulence, coupled air + solid PCB/heatsink/spreader regions)  
 **Scripts & Data:** [`mech/v2_cfd/run_cfd.py`](../mech/v2_cfd/run_cfd.py), [`mech/v2_cfd/make_plots.py`](../mech/v2_cfd/make_plots.py), [`mech/v2_cfd/results.json`](../mech/v2_cfd/results.json)
 
@@ -301,6 +301,64 @@ This subsection verifies the exact printable **PETG-CF / ASA (`k = 0.25 W/m·K`,
 | **Adapter silicon `Tj`-only limits (`U1101 <= 100`, `U1001/Y401 <= 125`)** | `U1101_XC7A50T` (`100`), `U1001_LMR33630` (`125`), `Y401_Si549` (`125`) | `72.6 / 94.5 / 79.9` | `87.8 / 109.8 / 95.1` | **`82.1 °C`** (`U1101`) / `85.0 °C` (`LMR`) / `99.6 °C` (`Y401`) |
 
 - **Adopted upgrade conclusion:** Even strictly inside printable **PETG-CF/ASA** (no aluminium lid, no pads), every silicon junction passes **`70 °C` clean AND `2×` clogged** when paired with the industrial **`K26I` SOM** (`99.08 °C` clean, `99.06 °C` clogged, `LMR33630 = 109.76 °C` vs `125 °C`, `Y401 = 95.06 °C` vs `125 °C`, `XC7A50T = 87.78 °C` vs `100 °C`), while holding `+5.25 Pa` (`+4.80 Pa` clogged) positive enclosure overpressure. With a stock commercial **`KV260` (`XCK26-C`)**, the continuous ambient rating increases from `51.3 °C` (as first built) to **`56.0 °C`** (`63.4 °C` under strict `T_board <= 85 °C` on all `TA`-rated adapter parts).
+
+### 8. Rev08 (17 Nov): the front end, the camera and the new openings
+
+The adopted enclosure of section 7, re-run on the same fine mesh with the Rev08 board (`rev08_*` in
+`mech/v2_cfd/run_built_v2_cfd.py`, `results_built_v2.json`). What changed in the model:
+
+- **The adapter's outline.** The model's board was the main body up to X = −10 mm. Rev08 puts parts east of it,
+  so the board now follows the Edge.Cuts polygon: the free block to X = 0, the tongue to X = 24.5 and the strips
+  beside the carrier's connectors.
+- **New heat, 0.8 W at the 12 V input (REV08_PLAN §9), placed on the parts' footprints:**
+
+| Source | Power | Where (enclosure X, Y) |
+|---|---|---|
+| `U1312` RFFC5072 mixer and synthesiser | 0.375 W | −7.4, 61.6 |
+| `U1301` SPF5043Z LNA, `U1310` SPF5043Z IF amplifier | 0.075 W each | −15.4, 87.4 / −13.8, 56.7 |
+| `U1315` LP5907 3.0 V LDO (0.3 V × 180 mA) | 0.054 W | −11.8, 100.1 |
+| LEDs and I/O expanders (15 mA at 3.3 V) | 0.05 W | at `U1501`, −16.4, 93.8 |
+| Conversion loss: the 3V3_D buck `U1002`, the LMR33630 (9 % more current) | +0.07 W, +0.08 W | at the parts |
+| IAS camera module on `J103` (carrier rails, estimated) | 0.35 W | the tongue under it, 18, 62 |
+
+- **New openings in the lid:** the lens window, 10 × 17 mm, and the two LED slots, 1.6 mm wide. They take 0.24
+  to 0.38 CFM out of the box; the cavity stays at +5.2 Pa (+4.8 Pa clogged). `J961`'s notch is closed by the
+  SMA's body, as the other twelve.
+
+**Results (fine mesh, 428,139 air cells):**
+
+| Case | Fan | `K26` Tj | LMR33630 Tj | ADCLK948 Tb / Tj | XC7A50T Tj | RFFC5072 Tb / Tj | Camera (board under it) |
+|---|---|---|---|---|---|---|---|
+| 45 °C clean | 7.39 CFM | 73.8 | 87.5 | 65.7 / 72.1 | 62.8 | 59.6 / 64.1 | 62.1 |
+| 55 °C clean | 7.45 CFM | 83.9 | 97.7 | 75.8 / 82.2 | 72.9 | 69.7 / 74.2 | 72.2 |
+| 70 °C clean | 7.60 CFM | 98.9 | 113.4 | 90.9 / 97.2 | 88.2 | 85.2 / 89.7 | 87.6 |
+| 70 °C, filter clogged twice | 6.77 CFM | 99.2 | 113.5 | 91.4 / 97.7 | 88.4 | 85.0 / 89.5 | 87.3 |
+| Section 7, 70 °C clean, for comparison | 7.52 CFM | 99.1 | 109.8 | 91.7 / 98.0 | 87.8 | — | — |
+
+![Rev08 adapter board at 70 °C and its change against Rev06/07](sim/rev08_thermal_70c.png)
+
+**Rated ambient (interpolated between the 55 and 70 °C runs):**
+
+| Limit | Governing part | Rated ambient | Section 7 |
+|---|---|---|---|
+| Stock KV260, commercial K26 (Tj ≤ 85 °C) | `K26` | **56.1 °C** | 56.0 °C |
+| `TA`-rated adapter parts on their board temperature (Tb ≤ 85 °C) | `U401` ADCLK948; the new parts follow at 66.7 °C (LEDs and expanders) and 69.8 °C (RFFC5072) | **64.1 °C** | 63.4 °C |
+| `TA`-rated parts on the local cavity air (≤ 85 °C) | the LEDs and expanders at `U1501` | 80.1 °C | 81.3 °C |
+| Adapter junctions | `U1001` LMR33630 (125 °C) | 81.1 °C | 85.0 °C |
+| Industrial K26I (Tj ≤ 100 °C) | `K26` | **71.1 °C** (passes 70 °C clogged at 99.2 °C) | 70.9 °C |
+
+**What it shows.**
+- **The rating does not move.** The K26 sets it, and it sits 0.1 to 0.2 °C cooler than before: the lens window
+  lets a little warm air out over the tongue and the KV260's fan draws 0.2 CFM more.
+- **The front end warms its own corner.** The board around the RFFC5072 rises by up to 5.9 K. The RFFC5072 is
+  at 89.7 °C junction at 70 °C, far from its limit; its board temperature reaches its 85 °C rating at 69.8 °C
+  ambient, above the rating the K26 already sets.
+- **The front edge cools.** With the board now running east of X = −10, the Ethernet PHY's and the clock's corner
+  spreads into it: the board there falls by up to 4.9 K.
+- **The LMR33630** carries 9 % more current and rises from 109.8 to 113.4 °C at 70 °C, 11.6 °C under its limit.
+- **The camera.** The board under the module sits about 17 °C above ambient. The module's own rating is the
+  sensor's, typically 70 °C operating, so the camera, not the board, is the first to run out of margin in a hot
+  vehicle: at 45 °C ambient it sees about 62 °C.
 
 ---
 

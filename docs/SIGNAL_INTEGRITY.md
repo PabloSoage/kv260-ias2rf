@@ -1128,7 +1128,8 @@ was wrong: its junction limit is 125 °C and its rating is 85 °C *ambient* (dat
 85 °C junction (UG1090). Enclosure v2 now has a 50 × 50 × 15 mm fan, nine more exhaust slots in the back wall
 and taller heatsinks (ENCLOSURE.md §6). Fine-mesh CFD of what is built: **rated 56 °C ambient with the stock
 KV260, 63 °C by the adapter's own parts, 70.9 °C with an industrial K26I SOM**. "70 °C" in this
-documentation now means with a K26I.
+documentation now means with a K26I. With Rev08's front end and camera: 56.1, 64.1 and 71.1 °C
+(ENCLOSURE_V2_THERMAL §8).
 
 ### 9.10 Rev08: the VHF/UHF front end's copper (phase 6, 17 November)
 

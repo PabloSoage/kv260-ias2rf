@@ -208,6 +208,9 @@ VIEWS = {   # name: (target mm, camera mm, lens mm)
     "kria":        ((55, 118, 4), (170, 400, 95), 50),
     "power":       ((-43, 116, 8), (-160, 330, 110), 55),
     "fan":         ((-10, 78, 48), (150, -350, 240), 37),     # v2: the lid hinged open at the back, fan facing us
+    "camera":      ((6, 75, 34), (150, -80, 230), 55),        # Rev08: the lens window and the LED slots in the lid
+    "tongue":      ((12, 70, 4), (120, -40, 120), 60),        # Rev08: the camera module on the tongue, lid off
+    "j961":        ((-14, 112, 4), (-70, 320, 90), 70),       # Rev08: J961's notch and the moved lug, back wall
 }
 PREFIX = argv[argv.index("--prefix") + 1] if "--prefix" in argv else "case_"
 LIDX = [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame"))]
@@ -246,6 +249,10 @@ for v in views:
                             @ Matrix.Translation(-piv) @ lid.matrix_world)
         for p in pins + bumpers:
             p.hide_render = True
+    elif v == "tongue":
+        lid.hide_render = True
+        for o in LIDX + pins + pads + bumpers:
+            o.hide_render = True
     elif v == "section":
         for b in bumpers:
             b.hide_render = True

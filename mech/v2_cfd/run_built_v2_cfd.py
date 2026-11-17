@@ -119,6 +119,49 @@ COMPONENTS: List[ComponentSpec] = [
 
 R402_R403_EXT_W = 0.06  # External 130 ohm LVPECL pull-downs (R402/R403) between Y401 & U401
 
+# Rev08 (docs/REV08_PLAN.md section 9): the VHF/UHF front end in the free block adds 0.8 W at the 12 V input.
+# Positions are the footprints' in the enclosure frame (k2m of the KiCad board). The 3.0 V front-end rail: RFFC5072
+# 125 mA, two SPF5043Z at 25 mA; the LP5907's drop, 0.3 V x 180 mA; the LEDs and I/O expanders, 15 mA at 3.3 V
+# (0.63 W in all). The rest is conversion loss: the 3V3_D buck U1002 (+0.07 W) and the LMR33630, whose current rises
+# 9 % (+0.08 W). The IAS camera module on J103 draws from the carrier's rails, estimated at 0.35 W, and is taken as
+# a source in the tongue under it (its own rating is the sensor's, not the board's).
+REV08_COMPONENTS: List[ComponentSpec] = [
+    ComponentSpec("U1312_RFFC5072",   -7.35,  61.60,  5.0, 0.375, 12.0, 25.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U1301_SPF5043Z",  -15.35,  87.36,  2.0, 0.075, 60.0, 90.0, 150.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U1310_SPF5043Z",  -13.76,  56.65,  2.0, 0.075, 60.0, 90.0, 150.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("U1315_LP5907",    -11.80, 100.14,  2.0, 0.054, 51.0, 90.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1501_TCA6416A_LEDs", -16.35, 93.80, 4.0, 0.05, 20.0, 40.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
+    ComponentSpec("CAM_IAS_module",   18.00,  62.00,  8.0, 0.35, 10.0, 20.0, 85.0, rating_type="camera", ta_max_c=None),
+]
+REV08_POWER_W = {"U1001_LMR33630": 0.96, "U1002_TPS562201": 0.48}
+BASE_COMPONENTS: List[ComponentSpec] = list(COMPONENTS)
+
+# Rev08 adapter outline east of x = -10 mm (the main body is ADAPTER_X0..X1): the free block, the tongue and the
+# strips beside the carrier's connectors, as boxes (x0, x1, y0, y1) in mm, from the board's Edge.Cuts polygon.
+REV08_ADAPTER_EXT_MM = [
+    (-10.0,  0.0, 68.1, 108.7),
+    (-10.0, 24.5, 55.6,  68.1),
+    (-10.0, -5.0, 24.7,  55.6),
+    (-10.0, 11.0, 18.6,  24.7),
+    (-10.0, 24.5,  5.0,  18.6),
+    (-10.0,  5.0, -9.7,   5.0),
+]
+# Rev08 lid openings (build_case.py): the lens window 10 x 17 mm over the camera, the two LED slots 1.6 mm wide.
+REV08_LID_OPENINGS_MM = [
+    (16.6, 26.6, 60.0, 77.0),
+    (-10.0, -0.8, 97.1, 98.7),
+    (1.9, 3.5, 61.2, 67.2),
+]
+
+
+def set_components(cfg: "BuiltCaseConfig") -> None:
+    """COMPONENTS is read by generate_case and run_case: the Rev06 list, or the Rev08 one."""
+    from dataclasses import replace
+    comps = list(BASE_COMPONENTS)
+    if cfg.rev08:
+        comps = [replace(c, power_w=REV08_POWER_W.get(c.name, c.power_w)) for c in comps] + REV08_COMPONENTS
+    COMPONENTS[:] = comps
+
 KV260_CARRIER_W = 2.0
 K26_SOM_W = 9.0
 K26_R_JC = 1.4
@@ -189,6 +232,7 @@ class BuiltCaseConfig:
     adopted_back_slots: bool = False   # 15 Nov adopted upgrade: 9 printed back-wall 3.5x18 mm slots (567 mm^2) clearing J1001
     tall_hs: bool = False            # 15 Nov study: taller decoupled sinks (U401/Y401 9x7x8 mm, U501 14x14x8.5 mm)
     pad_to_lid: bool = False         # 15 Nov study: 5 W/mK thermal pad from U1001 & K26 perimeter rails to Al lid plate
+    rev08: bool = False              # Rev08: front-end sources, camera, adapter outline, lens window and LED slots
     keep_vtk: bool = False
 
 
@@ -552,9 +596,41 @@ boundary
         set f_back_vents;
     }""")
 
+    if cfg.rev08:
+        acts = []
+        for i, (x0, x1, y0, y1) in enumerate(REV08_LID_OPENINGS_MM):
+            acts.append(f"""
+    {{
+        name    f_lid_open;
+        type    faceSet;
+        action  {"new" if i == 0 else "add"};
+        source  boxToFace;
+        box     ({x0 * 1e-3:.5f} {y0 * 1e-3:.5f} {CAV_Z1 - 0.002:.5f}) ({x1 * 1e-3:.5f} {y1 * 1e-3:.5f} {CAV_Z1 + 0.002:.5f});
+    }}""")
+        acts.append("""
+    {
+        name    f_lid_open;
+        type    faceSet;
+        action  subset;
+        source  patchToFace;
+        patch   wall_top;
+    }""")
+        top_actions.extend(acts)
+        create_patches.append("""
+    {
+        name lid_openings;
+        patchInfo { type patch; }
+        constructFrom set;
+        set f_lid_open;
+    }""")
+
     # Solid cellZones
     solid_actions = []
     solid_actions.append(box_src("adapter_pcb", ad_box, "new"))
+    if cfg.rev08:
+        for x0, x1, y0, y1 in REV08_ADAPTER_EXT_MM:
+            eb = nearest_grid_box(x0 * 1e-3, x1 * 1e-3, y0 * 1e-3, y1 * 1e-3, ADAPTER_Z0, ADAPTER_Z1, xs, ys, zs)
+            solid_actions.append(box_src("adapter_pcb", eb, "add"))
     solid_actions.append(box_src("kv260_carrier", ca_box, "new"))
     solid_actions.append(box_src("k26_sink", sb_box, "new"))
     for fb in fin_boxes:
@@ -1012,6 +1088,8 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     open_patches = ["kv_grille", "adapter_opening", "right_vents"]
     if cfg.extra_exhaust_slots or cfg.adopted_back_slots:
         open_patches.append("back_vents")
+    if cfg.rev08:
+        open_patches.append("lid_openings")
 
     u_txt = foam_file("volVectorField", "U", "0/air") + "dimensions [0 1 -1 0 0 0 0];\ninternalField uniform (0 0 0);\nboundaryField\n{\n    #includeEtc \"caseDicts/setConstraintTypes\"\n"
     for w in ["wall_bottom", "wall_top", "wall_left", "wall_right", "wall_front", "wall_back"]:
@@ -1057,6 +1135,8 @@ mixture {{ specie {{ molWeight 50; }} transport {{ kappa {solid_k[sreg]}; }} the
     else:
         rv_bc = "    right_vents { type totalPressure; p0 uniform 101325; value $internalField; }"
     bv_bc = "    back_vents  { type totalPressure; p0 uniform 101325; value $internalField; }\n" if (cfg.extra_exhaust_slots or cfg.adopted_back_slots) else ""
+    if cfg.rev08:
+        bv_bc += "    lid_openings { type totalPressure; p0 uniform 101325; value $internalField; }\n"
     pr_txt += f"""    kv_grille {{ type totalPressure; p0 uniform 101325; value $internalField; }}
 {rv_bc}
 {bv_bc}    adapter_opening
@@ -1359,6 +1439,7 @@ p_{op}
         "adopted_back_slots": cfg.adopted_back_slots,
         "tall_hs": cfg.tall_hs,
         "pad_to_lid": cfg.pad_to_lid,
+        "rev08": cfg.rev08,
         "cells_air": int(len(T_air)),
         "cells_solid": int(len(T_ad) + len(T_k26)),
         "T_air_mean_C": round(float(np.mean(T_air)), 2),
@@ -1406,6 +1487,12 @@ def build_suite() -> List[BuiltCaseConfig]:
         BuiltCaseConfig("v2_adopted_clean_fine_55C", ambient_c=55.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
         BuiltCaseConfig("v2_adopted_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, keep_vtk=True),
         BuiltCaseConfig("v2_adopted_clogged_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=2.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
+        # Rev08 (REV08_PLAN phase 8): the adopted enclosure with J961's notch, the lens window and LED slots, the
+        # front end's 0.8 W and the camera module
+        BuiltCaseConfig("rev08_clean_fine_45C", ambient_c=45.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
+        BuiltCaseConfig("rev08_clean_fine_55C", ambient_c=55.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
+        BuiltCaseConfig("rev08_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True, keep_vtk=True),
+        BuiltCaseConfig("rev08_clogged_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=2.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
     ]
 
 
@@ -1437,6 +1524,7 @@ def main() -> None:
 
     for cfg in suite:
         print(f"=== Running {cfg.name} (Ta={cfg.ambient_c}C, hs={cfg.with_heatsinks}, clog={cfg.filter_clog_factor}, mesh={cfg.mesh_level}) ===", flush=True)
+        set_components(cfg)
         res = run_case(cfg, scratch, slices_dir, nprocs=args.nprocs)
         existing[cfg.name] = res
         res_file.write_text(json.dumps(list(existing.values()), indent=2))

@@ -58,7 +58,25 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     the 40-way ribbon. The plug is fitted before the lid goes on.
   - **The twelve SMA notches.**
   - **Left inside:** JTAG, Pmod and the fan header, which are reached with the lid off.
-  - The rear lug beside J1001 moved from X −40 to −20 to clear it.
+  - The rear lug beside J1001 moved from X −40 to −20 to clear it, and in Rev08 to −27 (below).
+- **Rev08 (17 Nov, [REV08_PLAN](REV08_PLAN.md) §9).**
+  - **`J961`**, the thirteenth SMA (VHF/UHF antenna), comes out of the back wall at X −14.05. Its notch is split
+    at the SMA's centre line like the other twelve, so the two shells clamp its body.
+  - **The back-wall lug** moves from X −20, where the notch now is, to −27: 2.6 mm of wall to the notch on one
+    side and to the 12 V jack's opening on the other. East of the notch the gap to the KV260's opening is 11.5 mm,
+    too narrow for a 14 mm lug. The lug's face is 6 mm from `J961`'s axis: the plug's coupling nut turns by hand,
+    and a spanner goes on from the east side. The nine back-wall slots stay where they were, above the notch.
+  - **Two LED slots in the lid**, 1.6 mm wide: one over the nine status LEDs north of `J961`, one over the five
+    rail LEDs on the tongue.
+  - **The camera on the tongue.** An IAS camera module plugs into `J103`. The lid has a 10 × 17 mm window for its
+    lens and two clamps on the module's ends, each with a TPU pad (`case_pad_camera.stl`, 2 off). The module's
+    outline is the catalogue's 8.74 × 24.18 mm, taken from the connector at one end towards +Y, clear of the
+    carrier's `J18`; check it against a module in hand before printing the lid.
+
+| | |
+|---|---|
+| ![Rev08: J961's notch and the lug at X −27](img/case_v2_j961.jpg) | ![Rev08: the lens window and the LED slots](img/case_v2_camera.jpg) |
+| ![Rev08: the camera module on the tongue, lid off](img/case_v2_tongue.jpg) | |
 - **Cooling.**
   - A hex grille over the KV260's fan (r 27 mm).
   - 9 vent slots in the right wall beside the fan-sink.
@@ -66,6 +84,9 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
 - **Board support, no play.**
   - The tray's floor is a honeycomb (10 mm cells, 1.6 mm walls) that touches the underside of both boards.
   - The honeycomb is pocketed 0.8 mm clear of every part that hangs below a board, 0.6 mm deeper than the part.
+  - Until Rev08 the adapter's own back layers were taken for one more such part, and the honeycomb under the
+    whole adapter sat 0.67 mm low: the adapter rested on the slab's rims only. Found by the 3-D FEA (§5.3), fixed
+    on 17 Nov: the adapter now rests on 3,950 mm² of honeycomb, four times the area it had.
   - That includes the adapter's Rev05 input protection on its underside ([POWER_SPEC.md](POWER_SPEC.md) §1.1).
   - In the lid, clamp posts press each board down through 1 mm TPU 95A pads, compressed about 0.2 mm. They sit
     over the mounting holes H1–H5, the carrier's corners and the RJ45.
@@ -173,7 +194,7 @@ What this says:
   - PETG-CF passes cold and falls just short (0.9) hot.
   - A drop is a handling event, normally not at 70 °C.
 
-### 5.3 3-D model of the case as built, with both boards in it (14 Nov)
+### 5.3 3-D model of the case as built, with both boards in it (14 Nov, Rev08 17 Nov)
 
 The model above simplifies the shells to check every material. This one meshes the printed geometry, with every
 rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards themselves.
@@ -193,9 +214,10 @@ rib, honeycomb, lug, clamp post, vent and cut-out, together with the boards them
 
 | Load case | Case, 99.7th pct / peak | Safety factor 23 °C / 70 °C | Adapter / carrier strain, 99.7th pct | At the BGAs (U1101, U501, U601) | Max displacement |
 |---|---|---|---|---|---|
-| v2, 50 g down | 3.5 / 9.3 MPa | 8.3 / 5.0 | 431 / 344 µε | 162 / 162 / 127 µε | 0.25 mm |
-| v2, 50 g sideways (X) | 2.2 / 5.6 MPa | 13.4 / 8.0 | 103 / 238 µε | 15 / 16 / 14 µε | 0.09 mm |
-| v2, 50 g fore-aft (Y) | 2.0 / 3.5 MPa | 14.8 / 8.9 | 106 / 102 µε | 10 / 8 / 10 µε | 0.09 mm |
+| v2 Rev08, 50 g down | 3.5 / 9.6 MPa | 8.3 / 5.0 | 168 / 394 µε | 80 / 96 / 69 µε | 0.25 mm |
+| v2 Rev08, 50 g sideways (X) | 2.2 / 5.2 MPa | 13.2 / 7.9 | 81 / 199 µε | 38 / 63 / 27 µε | 0.08 mm |
+| v2 Rev08, 50 g fore-aft (Y) | 1.9 / 3.5 MPa | 15.5 / 9.3 | 95 / 101 µε | 48 / 50 / 52 µε | 0.12 mm |
+| v2 Rev07, 50 g down (adapter on the rims only) | 3.5 / 9.3 MPa | 8.3 / 5.0 | 431 / 344 µε | 162 / 162 / 127 µε | 0.25 mm |
 | v1, 50 g down | 3.5 / 9.2 MPa | 8.3 / 5.0 | 417 / 326 µε | 159 / 159 / 130 µε | 0.22 mm |
 
 The two maps rendered on the parts themselves (Cycles; colours are the solver's, scale as in the plots below):
@@ -219,17 +241,19 @@ v1 for comparison: [down](sim/case3d_v1_Zm.png), [sideways](sim/case3d_v1_Xp.png
   - The load goes into the vehicle through the four ears.
   - The part that works hardest is the rear wall above the right-rear ear: the ribs between the KV260's RJ45 and
     USB cut-outs carry the load into the ear.
-  - Its peak, about 9 MPa, is a sharp inside corner: the real corners are rounded and the value is
+  - Its peak, about 9.6 MPa, is a sharp inside corner: the real corners are rounded and the value is
     mesh-dependent.
-  - Even that peak leaves a safety factor of 3.1 at 23 °C and 1.9 at 70 °C. The 99.7th percentile leaves 8 and 5.
+  - Even that peak leaves a safety factor of 3.0 at 23 °C and 1.8 at 70 °C. The 99.7th percentile leaves 8 and 5.
+  - Rev08's notch, moved lug, LED slots, lens window and camera clamps change nothing measurable either.
   - The fan duct, the open spoke intake, the 17 right-wall and (since 15 Nov, re-run) 9 back-wall exhaust slots
     of v2 change nothing measurable.
 - **The boards.**
   - Down is the worst direction.
-  - Both boards bend over the honeycomb by 0.1–0.16 mm.
-  - The strain stays at or under 162 µε at every BGA, a third of the guide.
-  - Higher values, up to 770–1400 µε, sit only where a board's bonded edge meets a honeycomb wall or a post (the
-    adapter's SMA corner, the carrier's rear edge). That is a modelling singularity of the bonded contact, away
+  - Both boards bend over the honeycomb by about 0.1 mm (adapter 0.11, carrier 0.09 mm).
+  - The strain stays at or under 96 µε at every BGA, a fifth of the guide. Before the Rev08 honeycomb fix (§2)
+    the adapter rested on its rims only: 162 µε at the BGAs and 431 µε across the adapter, now 168 µε.
+  - Higher values, up to about 1000 µε, sit only where a board's bonded edge meets a honeycomb wall or a post (the
+    carrier's rear edge). That is a modelling singularity of the bonded contact, away
     from any part. The real TPU-padded contact spreads it.
 - **The mesh.** fTetWild's 0.45 mm envelope smooths features finer than that, and the boards are one or two
   elements thick. This model ranks and locates; §5's material table remains the reference for fatigue and drop.
@@ -336,6 +360,11 @@ screws and 4 × M2.5 × 6.
   (99.1 °C at 70 °C, also with the filter clogged twice over). At 70 °C the adapter's hottest junctions are the
   LMR33630 at 109.8 °C (of 125), the ADCLK948 at 98.0 °C, the Si549 at 95.1 °C (of 125) and the XC7A50T at
   87.8 °C (of 100). The aluminium-lid study (pads from U1001 and the K26 to a metal top) is in the report, not built.
+- **Rev08 (17 Nov, [ENCLOSURE_V2_THERMAL §8](ENCLOSURE_V2_THERMAL.md)):** re-run with the front end's 0.8 W, the
+  camera module (0.35 W, estimated), the adapter's real outline and the lens window and LED slots. **The rating does
+  not move: 56.1 °C with the stock KV260, 64.1 °C by the adapter's own parts, 71.1 °C with a K26I.** At 70 °C the
+  LMR33630 rises to 113.4 °C (of 125) and the RFFC5072 runs at 89.7 °C junction. The camera module sits about
+  17 °C above ambient, so a sensor rated 70 °C sets its own, lower limit.
 
 ![Built v2 at 70 °C: no heatsinks, touching sinks, and the changes](sim/v2_thermal_3d_heatsinks_compare.png)
 
