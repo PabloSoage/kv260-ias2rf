@@ -316,3 +316,8 @@ set_max_delay -quiet -datapath_only 6.000 -from [get_clocks -of_objects [get_pin
 set_max_delay -quiet -datapath_only 6.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks {clk_dac_500 clk_dac_400}]
 set_max_delay -quiet -datapath_only 6.000 -from [get_clocks {clk_dac_500 clk_dac_400}] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]]
 set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_clocks -quiet -of_objects [get_pins -quiet gen_rev06_eth.u_mmcm_eth/CLKOUT2]]
+
+# Rev08 G-8: fe_ctrl's step table (19 logic levels at CFGMCLK's 100 MHz worst case). Its inputs change only on the
+# transition into S_PREP, and S_ISSUE comes two cycles later (S_PREP, S_PREP2), so the decode has two cycles.
+set_multicycle_path -setup 2 -from [get_cells -hier -filter {NAME =~ *u_fe_ctrl/k_reg* || NAME =~ *u_fe_ctrl/op_reg* || NAME =~ *u_fe_ctrl/pre_init_reg* || NAME =~ *u_fe_ctrl/arg_reg* || NAME =~ *u_fe_ctrl/p0_sh_reg* || NAME =~ *u_fe_ctrl/p1_user_reg* || NAME =~ *u_fe_ctrl/led_sh_reg*}] -to [get_cells -hier -filter {NAME =~ *u_fe_ctrl/kind_reg* || NAME =~ *u_fe_ctrl/val_reg* || NAME =~ *u_fe_ctrl/dev_reg* || NAME =~ *u_fe_ctrl/wr3_reg*}]
+set_multicycle_path -hold 1 -from [get_cells -hier -filter {NAME =~ *u_fe_ctrl/k_reg* || NAME =~ *u_fe_ctrl/op_reg* || NAME =~ *u_fe_ctrl/pre_init_reg* || NAME =~ *u_fe_ctrl/arg_reg* || NAME =~ *u_fe_ctrl/p0_sh_reg* || NAME =~ *u_fe_ctrl/p1_user_reg* || NAME =~ *u_fe_ctrl/led_sh_reg*}] -to [get_cells -hier -filter {NAME =~ *u_fe_ctrl/kind_reg* || NAME =~ *u_fe_ctrl/val_reg* || NAME =~ *u_fe_ctrl/dev_reg* || NAME =~ *u_fe_ctrl/wr3_reg*}]

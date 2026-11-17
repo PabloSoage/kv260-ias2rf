@@ -121,7 +121,7 @@ module fe_ctrl #(
     wire cmd_edge = cmd_tog_s[2] ^ cmd_tog_s[1];
 
     // ------------------------------------------------------------------ cfg side: sequencer
-    localparam [2:0] S_IDLE = 3'd0, S_ISSUE = 3'd1, S_WAIT = 3'd2, S_DONE = 3'd3, S_PREP = 3'd4;
+    localparam [2:0] S_IDLE = 3'd0, S_ISSUE = 3'd1, S_WAIT = 3'd2, S_DONE = 3'd3, S_PREP = 3'd4, S_PREP2 = 3'd5;
     reg [2:0]  st;
     reg [3:0]  op;            // command being run
     reg        pre_init;      // INIT runs first
@@ -330,7 +330,11 @@ module fe_ctrl #(
                     end
                 end
 
-                S_PREP: st <= S_ISSUE;           // the registered step catches up with op, k, pre_init
+                // The registered step catches up with op, k, pre_init, arg and the shadows. Two cycles: the step
+                // table is a 19-level decode that passed or failed at CFGMCLK's 100 MHz worst case from build to
+                // build, so it is a 2-cycle multicycle path (xc7a50t.xdc); its inputs change only on the way here.
+                S_PREP:  st <= S_PREP2;
+                S_PREP2: st <= S_ISSUE;
 
                 default: begin   // S_DONE
                     if (op == OP_RFR && !res_err) res_rffc <= rd_shift;
