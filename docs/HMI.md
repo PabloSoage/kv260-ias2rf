@@ -1,8 +1,8 @@
 # In-car HMI: screens and processing partition for the KV260 (Rev08)
 
-*17 November 2026 · design, not yet built*
+*17 November 2026, Bearing and Wideband added 18 November · design, not yet built*
 
-These are the screens that would drive and display the whole system on a touchscreen in the car, once a prototype exists. The document also says which part of the K26 does each job. It covers this board's functions (receiver, spectrum, ADS-B, radar, transmitter, system health). It also covers the vehicle integrations analysed in [INTEGRATIONS.md](INTEGRATIONS.md) (vehicle telemetry, GPS, a 77 GHz radar and a LiDAR). The screens are design mock-ups. Every value on them is a demo state taken from the G-8 test cases or the integration simulations, not live data.
+These are the screens that would drive and display the whole system on a touchscreen in the car, once a prototype exists. The document also says which part of the K26 does each job. It covers this board's functions (receiver, spectrum, ADS-B, radar, transmitter, system health). It also covers the vehicle integrations analysed in [INTEGRATIONS.md](INTEGRATIONS.md) (vehicle telemetry, GPS, a 77 GHz radar, a LiDAR, a KrakenSDR and a HackRF Pro). The screens are design mock-ups. Every value on them is a demo state taken from the G-8 test cases or the integration simulations, not live data. The Bearing and Wideband screens draw the output of their end-to-end runs ([INTEGRATIONS.md §9, §10](INTEGRATIONS.md)), which `kria-sdrd` writes to `sw/hmi/screens/data/`.
 
 Sources: [`sw/hmi/screens/`](../sw/hmi/screens/) holds one file per screen. Each opens directly in a browser. [`sw/hmi/render.sh`](../sw/hmi/render.sh) regenerates the images below with headless Chrome.
 
@@ -25,7 +25,7 @@ The PL is therefore **not in the display path**, and the gateware does not chang
 - **Glanceable while driving.** One main number per card, in 48 to 96 px figures. Every touch target is at least 56 px, and the bottom bar is 88 px.
 - **Night theme by default.** The ground is near-black and text is light grey with at least 4.5:1 contrast. A single amber accent marks the selected item and alerts. Spectra and maps use a dark-to-amber colour scale, so a strong signal is bright and the background stays dark.
 - **Transmit is locked while the vehicle moves**, and also while the licence flag in System is not set. Vehicle speed comes from the ECU stream, with GPS as the fallback ([INTEGRATIONS.md §4](INTEGRATIONS.md)). Transmitting with home-built equipment needs an amateur licence and stays inside the amateur bands.
-- **The same bottom bar on every screen:** Home, Vehicle, Radio, Spectrum, ADS-B, Radar, Transmit, System.
+- **The same bottom bar on every screen:** Home, Vehicle, Radio, Spectrum, Wideband, Bearing, ADS-B, Radar, Transmit, System. Ten items of 128 px each at 1280 px.
 
 ## 3. The screens
 
@@ -52,6 +52,18 @@ Frequency with large step buttons, the five demodulator modes of `kria_channel_r
 ![HMI spectrum screen](img/hmi/hmi_spectrum.png)
 
 The wideband view of HF A, HF B (the two AD9253 channels) or VHF/UHF (the AD9484), with a marker, "listen at marker" (which opens Radio on that frequency) and IQ recording to an SSD. The FFT and the 60 s waterfall run on the A53s from the DMA stream and are drawn by the GPU.
+
+### 3.4a Wideband (HackRF Pro)
+
+![HMI wideband screen](img/hmi/hmi_wideband.png)
+
+One sweep of a HackRF Pro from 0 to 7.2 GHz ([INTEGRATIONS.md §10](INTEGRATIONS.md)): the band this board covers shaded green, what the HackRF adds shaded blue, the strongest signals the A53's detector found, and the transmit gate's state for four test carriers (keyed, or blocked by the interlock or by the licence's bands). The trace is the maximum per MHz of `kria_sweep`'s 78 kHz bins; "Tune here" opens Spectrum on the marker's band. Shown: the end-to-end run's output, 25 signals of a car's radio environment.
+
+### 3.4b Bearing (KrakenSDR)
+
+![HMI bearing screen](img/hmi/hmi_bearing.png)
+
+Direction finding with a KrakenSDR ([INTEGRATIONS.md §9](INTEGRATIONS.md)): a polar plot with the vehicle's nose up and bearings clockwise, the Bartlett spectrum from `kria_doa` in blue and the MUSIC spectrum in amber, the sources with their bearings, R's eigenvalues (the sources above the noise floor in amber), and the calibration from the noise source (the five streams' offsets and phases). "Log fix" stores the bearing with the GPS position for triangulation. Shown: the end-to-end run's output, two emitters at 446 MHz.
 
 ### 3.5 ADS-B
 
@@ -81,8 +93,8 @@ The IAS1 link, clocks, temperatures, front end, the A53 cluster, the two R5F cor
 
 | Unit | Jobs | Why there |
 |---|---|---|
-| **PL** (`kria_pl_link`, `kria_dsp_suite`, `kria_bev_axi`) | Link, packet streams, channel demodulation, ADS-B decoding, radar FFT and CFAR, transmit modulation, the fusion grid ([INTEGRATIONS.md §6](INTEGRATIONS.md)) | Fixed rates up to 100 MS/s per stream, one sample per clock |
-| **A53 × 4** (Linux) | HMI, wideband FFT and waterfall, CPR position decoding, recording, telemetry client, LiDAR driver and SLAM, the Ethernet and USB devices | General-purpose code, drivers and the GPU |
+| **PL** (`kria_pl_link`, `kria_dsp_suite`, `kria_bev_axi`, `kria_doa`, `kria_sweep`) | Link, packet streams, channel demodulation, ADS-B decoding, radar FFT and CFAR, transmit modulation, the fusion grid ([INTEGRATIONS.md §6](INTEGRATIONS.md)), the KrakenSDR's covariance and Bartlett scan, the HackRF's sweep FFT (§9, §10) | Fixed rates up to 100 MS/s per stream, one sample per clock |
+| **A53 × 4** (Linux) | HMI, wideband FFT and waterfall, CPR position decoding, recording, telemetry client, LiDAR driver and SLAM, the Ethernet and USB devices; `kria-sdrd`: the KrakenSDR's calibration and MUSIC, the HackRF's panorama and transmit gate | General-purpose code, drivers and the GPU |
 | **R5F core 0** | 1 kHz loop, **written** ([`kria-r5f0`](../sw/kria/r5f/src/bin/core0.rs), Rust): the GPS PPS discipline of `kria_pps`, the watchdog on the IAS1 link (retrain with a back-off), and the transmit interlock (vehicle speed, licence, time-out, link up), which owns `DSP_CTRL[1]`. The AGC needs no core: it runs in the Artix fabric (`fe_agc`) | Must keep running when Linux is busy or restarting; deterministic latency |
 | **R5F core 1** | 10 kHz loop, **written** ([`kria-r5f1`](../sw/kria/r5f/src/bin/core1.rs), Rust): the 10.5 GHz radar's beam scan, one step per CPI with a longer dwell where there are detections, `BEAM_STROBE` into the Artix's scan mode; the fusion grid's only command writer (its detections and Linux's ring) and its frames; optionally the PS's own CAN controller for the 77 GHz radar | Timing tied to the CPI, about 0.4 ms, independent of Linux |
 | **Mali-400** | Waterfall, maps and grids in the HMI | OpenGL ES 2.0 |

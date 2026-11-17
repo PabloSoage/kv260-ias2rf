@@ -365,6 +365,37 @@ Change the configuration only while `STATUS` shows the queue empty and the core 
 Bench: `tb_kria_bev_axi` (section 6), with the mutation `bev_axi_no_stage`. Cost and timing: section 3.3.
 
 
+### 5.8 Kria KrakenSDR direction finding (`kria_doa`, AXI-Lite at `0x8005_0000`, and `axi_dma_2` at `0x8006_0000`, 18 Nov)
+
+[`fpga/kria/integrations/kria_doa.v`](../fpga/kria/integrations/kria_doa.v) takes a KrakenSDR's five aligned channels from the A53s ([INTEGRATIONS.md §9](INTEGRATIONS.md)) through `axi_dma_2` (MM2S only, 64-bit), one snapshot of five signed 8-bit I/Q pairs per two beats, and:
+- multiplies each channel by its calibration weight (complex Q2.14), `y = (w x) >>> 10`;
+- accumulates the covariance `R = Σ y yᴴ` over `2^N_LOG2` snapshots (15 entries, 48 bits each);
+- scans 360 bearings, one per clock, `P(θ) = Σ R_ii + 2 Σ Re(b_ij(θ) R_ij)`, from a table of steering cross-products in ten 512 × 32 block RAMs that the A53s write for the array and the frequency.
+
+The A53s read R back for MUSIC. `kria-sdrd` reads R's diagonal after the CPI, sets `SHIFT` so the largest entry fits 25 bits, and asks for a scan of the held R (`CTRL[2]`). Registers: [INTEGRATIONS.md §9.1](INTEGRATIONS.md). `axi_dma_2`'s `mm2s_introut` is `pl_ps_irq0[6]` (GIC SPI 95).
+
+Bench: `tb_kria_doa` (section 6) against the A53's bit-exact model, with the mutation `doa_no_conj`. Cost and timing: section 3.3.
+
+### 5.9 Kria HackRF Pro sweep (`kria_sweep`, AXI-Lite at `0x8007_0000`, and `axi_dma_3` at `0x8008_0000`, 18 Nov)
+
+[`fpga/kria/integrations/kria_sweep.v`](../fpga/kria/integrations/kria_sweep.v) takes a HackRF Pro's sweep transfers as libhackrf delivers them ([INTEGRATIONS.md §10](INTEGRATIONS.md)) through `axi_dma_3`'s MM2S, 2,048 beats per 16 KiB block, and per block:
+- checks the header (`0x7F 0x7F`) and keeps the 64-bit frequency; a bad block is dropped and counted (`BAD`);
+- keeps the block's last 1,024 beats in block RAM and transforms the last `2^NSEG_LOG2` segments of 256 samples (default 8): Hann window from a table, radix-2 FFT with 1/2 per stage (22-bit data, Q1.15 twiddles from a table), power summed bin by bin;
+- sends the frequency and 128 powers (bins 161 to 224 and 33 to 96, the two quarter bands) back through `axi_dma_3`'s S2MM, 65 beats with `tlast`.
+
+| Offset | Register |
+|---|---|
+| `0x000` | ID `SWP1` |
+| `0x004` | STATUS: `[0]` busy |
+| `0x008`, `0x00C` | BLOCKS, BAD |
+| `0x010`, `0x014` | PSHIFT (output = sum >> PSHIFT, saturated to 32 bits), NSEG_LOG2 (0 to 4) |
+| `0x400` + 4i | window, 256 entries, Q1.15 |
+| `0x800` + 4k | twiddles `exp(-j 2π k / 256)`, 128 entries: `[15:0]` cos, `[31:16]` −sin |
+
+One block takes about 30,000 clocks with 8 segments, 0.3 ms at 100 MHz, against 0.82 ms between blocks of a sweep; `tready` is low while a block is processed. `axi_dma_3`'s `s2mm_introut` is `pl_ps_irq0[7]` (GIC SPI 96); its MM2S completion is polled, as the eight interrupt lines of `pl_ps_irq0` are all used.
+
+Bench: `tb_kria_sweep` (section 6) against the A53's bit-exact model, with the mutation `sweep_twiddle_conj`. Cost and timing: section 3.3.
+
 ## 6. XSim & Full-System Verification Suite (`fpga/sim/`)
 
 Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado 2026.1`) with unified primitive models (`unisims_ver`, `secureip`, `glbl`) and behavioral hardware board/IC models (`fpga/sim/models/`):
@@ -389,6 +420,8 @@ Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado
 | `tb_system.v` | Full end-to-end co-simulation at both `500 MHz` (`453.23 s`) and `400 MHz` (`516.44 s`), including A-1 `500 MHz` reset gating, `500->400 MHz` unlock & retrain, and PS `UART1` EMIO `0xE8` readback |
 | `tb_kria_bev_axi.v` | `kria_bev_axi` against the bit-exact grid model: ID, reset values, configuration read-back; the fog run's 974 commands (or, with `+BEV_DIR=../radar_grid`, the 2,705 that R5F core 1's code produced in `examples/radar_grid.rs`) sent in blocks of 64 alternating between `DET_XY`/`DET_CMD` and `s_axis_det` with random gaps, the dump compared cell by cell under random backpressure; `COUNT`; with the sink stalled during a second dump, 513 pushes leave the queue full at 512 with `STATUS.overflow` set, cleared by W1C; mutation `bev_axi_no_stage` (exit `1`) |
 | `tb_kria_pps.v` | `kria_pps` over AXI-Lite with 10,000-tick seconds: ID, mode 0 forwarding, captures and IRQ, capture period, mode 1 after qualification, a 5-tick glitch (flagged, not captured or forwarded), missing GPS, the fractional generator (8 s of 10,000.25 ticks = 80,002), one-shot adjust, a closed loop holding the generator within 1 tick of a 10,000.37-tick GPS second, and holdover; mutation `pps_no_filter` (exit `1`) |
+| `tb_kria_doa.v` | `kria_doa_axi` from the A53's own files (`kria-sdrd kraken-pre`, `+DOA_DIR`): ID, the driver's 3,606 register writes (weights, steering table, `N_LOG2`), a CPI of 32,768 snapshots with gaps in `tvalid`, R's diagonal read back and `SHIFT` chosen from it as the driver does, the rescan; all 15 entries of R and all 360 bearings of P equal the bit-exact model; `DROPPED` = 0; writes `doa_rtl.txt` for `kraken-post`; mutation `doa_no_conj` (exit `1`) |
+| `tb_kria_sweep.v` | `kria_sweep_axi` from the A53's own files (`kria-sdrd hackrf-pre`, `+SWEEP_DIR`): ID, window, twiddles, `PSHIFT` and `NSEG_LOG2`; one 720-block sweep from 0 to 7.2 GHz (1.47 M beats, random gaps in `tvalid`) with one corrupted header; every one of the 46,735 output beats and its `tlast` equals the bit-exact model under random back-pressure; `BLOCKS` = 719, `BAD` = 1; writes `sweep_rtl.hex` for `hackrf-post`; mutation `sweep_twiddle_conj` (exit `1`) |
 | `tb_dbg_uart.v` | G-1 `dbg_uart` boot banner, periodic `STAT`, `r`/`w`/`s`/`h` CLI, 4-master CSR collision arbitration, `BREAK` recovery (`500 MHz` & `400 MHz`) + mutations `wrong_divisor` & `drop_monitor_write` (exit `1`) |
 | `tb_clk_mode_switch.v` | Safe-boot Si549 `500 MHz` init, A-1 radar path reset/retrain on `500<->400 MHz` switch, and `±50 ppm` `ADPLL_DELTA_M` Ethernet clamp (`500 MHz` & `400 MHz`, `+` `-Mutate no_delta_clamp`) |
 | `tb_dual_path_drain.v` | `dual_path_sf_fifo` drain while the IAS1 uplink is closed: bulk dropped whole on both sides, `0x11` kept and sent first, a started packet never cut, a started discard runs to its `eop` (`-Mutate drain_started_pkt`, `drain_all_sid`, `drain_release`, `drain_no_wskip`) |

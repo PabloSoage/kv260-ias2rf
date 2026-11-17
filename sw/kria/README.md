@@ -6,6 +6,7 @@ Rust, with the logic in one crate that has no I/O, so that it runs on the A53s a
 |---|---|---|
 | `core` (`kria-core`) | any; `no_std`, no allocation, no `unsafe` | `pps` (GPS PPS discipline of `kria_pps`), `interlock` (transmit lock), `link` (IAS1 link watchdog), `radar` (the 10.5 GHz beam scan), `bev` (the PL grid's commands and coordinates), `ring` (Linux's grid commands for core 1), `telemetry` (`opendash-telemetry/1`), `mailbox` (the shared blocks) |
 | `vehicled` (`kria-vehicled`) | A53, `aarch64-unknown-linux-gnu` | The ECU stream from opendash into the mailbox |
+| `sdr` (`kria-sdr`, `kria-sdrd`) | A53, `aarch64-unknown-linux-gnu` | The KrakenSDR (alignment, calibration, `kria_doa`, MUSIC) and the HackRF Pro (`kria_sweep`, panorama, transmit gate); the USB libraries and `/dev/mem` behind feature `hw` |
 | `r5f`: `kria-r5f0` | R5F core 0, `armv7r-none-eabihf` | 1 kHz loop: PPS discipline, IAS1 link watchdog, transmit interlock, status |
 | `r5f`: `kria-r5f1` | R5F core 1, `armv7r-none-eabihf` | 10 kHz loop: radar beam scan, the fusion grid's command port and frames, status |
 
@@ -22,6 +23,23 @@ cd r5f && cargo build --release               # r5f/target/armv7r-none-eabihf/re
 ```
 
 After `radar_grid`, `python sw/integrations/radar_grid_replay.py` writes the expected grid and the figure, and `fpga/sim/run.ps1 tb_kria_bev_axi -PlusArg BEV_DIR=../radar_grid` runs the commands through the RTL.
+
+The KrakenSDR and HackRF Pro chains (docs/INTEGRATIONS.md §9 and §10), from the repository root:
+
+```
+python sw/integrations/kraken_sim.py                       # five RTL streams into fpga/sim/out/kraken
+cargo run --release -p kria-sdr --bin kria-sdrd -- kraken-pre fpga/sim/out/kraken   # from sw/kria, path ../../...
+fpga/sim/run.ps1 tb_kria_doa                               # kria_doa against the A53's model
+cargo run --release -p kria-sdr --bin kria-sdrd -- kraken-post fpga/sim/out/kraken  # MUSIC, kraken_doa.json/.js
+python sw/integrations/hackrf_sim.py                       # one sweep, 0 to 7.2 GHz, into fpga/sim/out/hackrf
+cargo run --release -p kria-sdr --bin kria-sdrd -- hackrf-pre fpga/sim/out/hackrf
+fpga/sim/run.ps1 tb_kria_sweep
+cargo run --release -p kria-sdr --bin kria-sdrd -- hackrf-post fpga/sim/out/hackrf  # panorama, hackrf_sweep.json/.js
+cp fpga/sim/out/kraken/kraken_doa.js fpga/sim/out/hackrf/hackrf_sweep.js sw/hmi/screens/data/
+sw/hmi/render.sh; python sw/integrations/usb_sdr_figures.py
+```
+
+`cargo test -p kria-sdr` runs its 6 host tests. On the KV260, `cargo build --release -p kria-sdr --features hw --target aarch64-unknown-linux-gnu` needs KrakenRF's librtlsdr and libhackrf in the sysroot; that build and the `hw` paths have not been run.
 
 Targets: `rustup target add armv7r-none-eabihf aarch64-unknown-linux-gnu`.
 
