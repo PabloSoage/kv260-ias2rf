@@ -350,7 +350,7 @@ Each receive case runs in three steps, all on the RTL:
 
 Each case also runs at least one **mutation** (`run.ps1 -Mutate`): a deliberate fault in the RTL that its checks must catch. No result has a fallback value; an empty or missing output stops the run.
 
-Results on the RTL of this revision (`fpga/sim/signals/results.json`, 17 November 2026). Levels are at the antenna connector; "reference" is the floating-point demodulator on the same input. In every receive case the noise density at the Kria's input is within 1.3 dB of the cascade's prediction and the tuning error is under 20 Hz; on the AD9484 path the DDC's mirror is 55 to 61 dB down.
+Results on the RTL of this revision (`fpga/sim/signals/results.json`, 17 November 2026). Levels are at the antenna connector; "reference" is the floating-point demodulator on the same input. In every receive case the noise density at the Kria's input is within 1.3 dB of the cascade's prediction and the tuning error is under 20 Hz; on the AD9484 path the DDC's mirror is 52 to 69 dB down. The AD9484 cases (FM, airband, VHF/UHF NBFM, ADS-B, radar) were run again on the NCO fix of 17 November (`results_nco.json`, figures regenerated), and all pass. That mirror figure is the capture's noise, not the NCO: in 300 us of capture, the least-squares fit of the mirror bottoms out at 56 to 60 dB below the tone for these carrier-to-noise ratios, and its spread is that of noise. The NCO's own image is `-81 dB` or lower (`tb_nco_image`).
 
 | Case | Path | Result (RTL vs reference) | Scene, full chain | Mutations caught | Checks |
 | :--- | :--- | :--- | :--- | :--- | :---: |
