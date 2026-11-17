@@ -113,7 +113,7 @@ Rather than tunneling AERIS's legacy 11-byte (`0xAA .. 0x55`) UART/FTDI USB reco
 
 | `stream_id` | Direction | Payload Contents (Reference: AERIS `radar_protocol.py`) | Typical `pkt_len` |
 | :---: | :---: | :--- | :---: |
-| `8'h01` | Artix -> Kria | Raw DDC / ADC I/Q chirp samples (interleaved `int16 I, int16 Q` per chirp; `seq_num = chirp_id`) | `512 .. 4096` B |
+| `8'h01` | Artix -> Kria | Raw DDC / ADC I/Q chirp samples (interleaved `int16 I, int16 Q` per chirp; `seq_num = chirp_id`). With `RADAR_CTRL[3]` set, `I[0]` is a CPI mark: 1 on the first sample of every 16th chirp, 0 elsewhere (Rev08 G-8) | `512 .. 4096` B |
 | `8'h02` | Artix -> Kria | Pre-processed range profile / CFAR vector (or `int16` range FFT bins) | `256 .. 1024` B |
 | `8'h03` | Artix -> Kria | Range-Doppler cell tiles (each 9 B AERIS cell `{range_q[15:0], range_i[15:0], dop_re[15:0], dop_im[15:0], det[7:0]}` packed into 12 B or 16 B records, up to 4096 B) | `<= 4096` B |
 | `8'h10` | Kria -> Artix | Host register write command matching `radar_protocol.Opcode` (`{opcode[7:0], addr[7:0], value[15:0]}` for radar mode `0x01`, trigger `0x02`, CFAR `0x21–0x27`, AGC `0x28–0x2C`, chirp timings `0x10–0x16`, status request `0xFF`) | `4 .. 16` B |
@@ -189,7 +189,7 @@ Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h
 | `0xA4` | `HK_TEMP_ERR` | RO | `0x0000_0000` | `[15:0]` `tmp_raw` (TMP1075 `[15:4]*0.0625 C`); `[31:16]` `ack_err_cnt` |
 | `0xA8` | `XO_CTRL` | R/W | `0x0000_0000` | `[0]` `use_ext_clk` (`CLK_SEL` `D8`: `0=Si549 Z`, `1=SMA 0`); `[1]` `prog_freq_500m` (`0=400MHz,1=500MHz`, triggers safe `clk_mode_ctrl` MMCM DRP + Si549 switch); `[2]` `prog_start` (W1P); `[3]` `delta_start` (W1P); `[8]` `xo_busy` (RO); `[9]` `xo_prog_done` (RO); `[10]` `xo_active_freq_500m` (RO); `[11]` `xo_ack_err` (RO); `[12]` `xo_boot_err` (RO); `[13]` `xo_delta_clamped` (RO); `[14]` `xo_boot_done` (RO); `[31:16]` `xo_ack_err_cnt` (RO) |
 | `0xAC` | `XO_DELTA_M` | R/W | `0x0000_0000` | Signed `[23:0]` Si549 `ADPLL_DELTA_M` (Regs `231..233`); clamped to `±429553` (`±50.0 ppm` @ `0.0001164 ppm/LSB`) when `ENABLE_ETH=1` (unclamped `±950 ppm` otherwise) |
-| `0xB0` | `XO_RAW_CMD` | R/W | `0x0000_0000` | `[7:0]` Si549 `reg_addr`; `[15:8]` `wdata`; `[16]` `rw` (`0=W,1=R`); `[31]` Trigger (W1P) |
+| `0xB0` | `XO_RAW_CMD` | R/W | `0x0000_0000` | `[7:0]` `reg_addr`; `[15:8]` `wdata`; `[16]` `rw` (`0=W,1=R`); `[23:17]` I2C device address (`0` = the Si549 at `0x55`; `0x20`/`0x21` reach the TCA6416A expanders, Rev08 G-2); `[31]` Trigger (W1P) |
 | `0xB4` | `XO_RAW_RDATA` | RO | `0x0000_0000` | `[7:0]` `raw_resp_rdata`; `[8]` `raw_resp_valid_sticky`; `[9]` `raw_req_ready`; `[10]` `raw_resp_err` |
 | `0xB8` | `XADC_TEMPV` | RO | `0x0000_0000` | `[11:0]` `xadc_temp_raw`; `[23:12]` `xadc_vccint_raw`; `[24]` `xadc_valid`; `[25]` `xadc_overtemp` |
 | `0xBC` | `XADC_VCCAUX` | RO | `0x0000_0000` | `[11:0]` `xadc_vccaux_raw` |

@@ -12,7 +12,8 @@ An adapter board for the **AMD Kria KV260 Vision AI Starter Kit**. It plugs into
 camera connector and carries the converters, a common clock and a front-end FPGA. It serves two
 signal chains:
 
-- **Software-defined radio**: HF, AM, FM, airband, amateur bands and PMR446. Receive, and
+- **Software-defined radio**: HF to 30 MHz directly; FM, airband, VHF/UHF amateur bands and PMR446 through
+  an external converter until the Rev08 receive front end ([plan](docs/REV08_PLAN.md)). Receive, and
   transmit on the bands a licence covers.
 - **Radar at 10.5 GHz**: the IF of the X-band chain from the open
   [AERIS-10 / PLFM_RADAR](https://github.com/NawfalMotii79/PLFM_RADAR) project, with ADAR1000
@@ -111,7 +112,7 @@ BGA, for one).
 | DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board (re-run 15 Nov; one warning: D1003's footprint differs from its library copy) |
 | Signal and power integrity | Full-wave openEMS + ngspice verification ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch `S11 = -30.9 dB` at 1 GHz (`-13.7 dB` at 3 GHz) with ESD diode, LVDS eyes within `1–26 mV` of ideal except `LINK_RX_D0` (`-52 mV`), worst intra-pair skew `9 ps`, `VCCINT` impedance `41 / 63 mΩ` (`target 120 mΩ`), ESD protection on every SMA, Pmod and JTAG, GND via within `3 mm` of all `89` LVDS layer changes |
 | Planes | L2, L5, and L7 carry solid ground; L4 carries split power islands (`_work/layout/planechk.py`) |
-| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `15,681` LUTs (`48.1%`), `18,084` FFs (`27.7%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.111 ns` with `CLK_FPGA` constrained at both `400` and `500 MHz`; `ias2rf_k26_bd` uses `11,034` Slice LUTs (`9.4%`), `18,212` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +1.291 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
+| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `17,450` LUTs (`53.5%`), `19,029` FFs (`29.2%`), `16.0` BRAM36 (`21.3%`), `110` DSP48E1 (`91.7%`), `WNS = +0.071 ns` over every clock of both `CLK_FPGA` modes (`400` and `500 MHz`); the AD9484 radar domain is closed at `400 MSPS` only and held in reset in `500 MHz` mode; `ias2rf_k26_bd` uses `11,038` Slice LUTs (`9.4%`), `18,210` FFs (`7.8%`), `3.0` BRAM36 (`2.1%`), `WNS = +0.814 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
 | Final RF review (15 Nov) | Five limits found ([SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md)) and addressed ([§9.9](docs/SIGNAL_INTEGRITY.md)): a 30 MHz 7th-order anti-alias filter on the HF input J951 (≥ 60 dB from 50 MHz); the switch-free J951/J952 as the default HF ports; DAC clocks from `CLK_FPGA` ÷ 4 without an MMCM (clock uncertainty `0.165 → 0.035 ns`); no transmit copper within 1.5 mm of any receive line; the enclosure's honest rating below. Still to measure on the first board: TX→RX isolation, the RF switches at 1–5 MHz, the filter above 700 MHz, switcher spurs |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: mounting holes land within `5 µm` ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
@@ -213,14 +214,14 @@ adapter board.** If that is what you want, use the original project.
 
 Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to-end mixed-signal/digital XSim co-simulation ([`fpga/`](fpga/), full specification in [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)):
 
-- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct `0–62.5 MHz` HF/CB bypass path (`stream_id = 8'h03`) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`) for `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`), and `UHF` IF segments, paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
+- **Wideband SDR (Front-End Artix-7):** Dual 14-bit `62.5 MSPS` ADC channels (`AD9253`) feeding a direct HF/CB bypass path (`stream_id = 8'h03`; first Nyquist zone `0–31.25 MHz` at `62.5 MSPS`, `0–25 MHz` at `50 MSPS`, and `0–30 MHz` on `J951` behind its low-pass) plus a tunable NCO + CIC + FIR DDC (`stream_id = 8'h02`); `VHF`, `FM`, walkie-talkie (`PMR446` / `GMRS`) and `UHF` reach it only as the IF of an external converter until Rev08, paired with the `14-bit 125 MSPS` `AD9767` TX DAC (`DAC_SDR`).
 - **AERIS-10 X-Band Radar (`10.5 GHz` / `20 km` / `8× ADAR1000`):** `400 MSPS` `AD9484` IF capture into the verbatim `AERIS-10 / PLFM_RADAR` (`62d4c55`) 400 -> 100 MSPS I/Q DDC (`stream_id = 8'h01`), `AD9708` chirp DAC (`DAC_RADAR`), `ADF4382` LO + `8× ADAR1000` beamformer SPI controller (`u_adar_ctrl`), and `u_rf_switch` T/R sequencing.
 - **High-Speed Interconnect:** Dual-lane Clause-49 `64B/66B` `IAS1` LVDS (`1.0–1.25 Gb/s` per lane, `2.0–2.5 Gb/s` uplink + `0.5–1.0 Gb/s` downlink) plus dedicated-pin `1000BASE-T` SGMII/UDP over `U1201 RTL8211FSI` (`~2.94 Gb/s` combined).
 
 | Target FPGA (`Vivado 2026.1`) | Slice LUTs | Flip-Flops | BRAM36 eq. | DSP48 | Timing (`WNS` / `WHS`) |
 |---|---|---|---|---|---|
-| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `15,681 / 32,600` (`48.1%`) | `18,084 / 65,200` (`27.7%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.111 ns` / `+0.016 ns`** (`CLK_FPGA` at `400` and `500 MHz`) |
-| **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,034 / 117,120` (`9.4%`) | `18,212 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+1.291 ns` / `+0.010 ns`** (`kria_top` alone: `+1.008 ns` / `+0.017 ns`) |
+| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `17,450 / 32,600` (`53.5%`) | `19,029 / 65,200` (`29.2%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.071 ns` / `+0.014 ns`** (all clocks of both `CLK_FPGA` modes; AD9484 domain at `400 MSPS` only) |
+| **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,038 / 117,120` (`9.4%`) | `18,210 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+0.814 ns` / `+0.011 ns`** |
 
 | Artix-7 Silicon Die Floorplan (`XC7A50T`) | Artix-7 Post-Route Vivado Circuit Schematic |
 |---|---|

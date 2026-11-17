@@ -202,6 +202,7 @@ module tb_adc_ddc;
         .sync_error       (sync_err),
         .link_clk         (link_clk),
         .link_rst         (link_rst),
+        .link_flush       (1'b0),
         .timestamp_cnt    (ts_cnt),
         .pkt_valid        (pkt_valid),
         .pkt_ready        (pkt_ready),

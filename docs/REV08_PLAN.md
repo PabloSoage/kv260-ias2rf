@@ -33,6 +33,7 @@ basis. Stock and prices are JLCPCB's parts API on 16 November 2026.
 | WP4 | VHF receive front end, 30–170 MHz, direct sampling on the AD9484: own SMA (the thirteenth), bias tee, LNA, three preselector paths, anti-alias filter, IF amplifier, step attenuator | **Approved** | 430 mm² | $32 | Medium |
 | WP5 | Converter for 170 MHz – 3 GHz: RFFC5072 mixer and synthesiser, second preselector | **Approved**, behind a bypass switch so the board works without it | 260 mm² | $34 | Medium–high |
 | WP6 | Corrections from the audit (section 8): two timing-constraint errors, a hard-coded NCO, documentation | **Approved**, first; independent of the board | — | — | Low |
+| WP7 | Board manual: a motherboard-manual style layout diagram of the final board, every connector, header, chip, LED, SMA, switch and test point labelled with its use (section 11.3) | **Approved** (owner, 16 November) | — | — | Low |
 
 Totals: about 820 mm² of the 1,090 mm² that is free in one block (section 1), about $68 of parts per board in
 some 17 new part types, and 0.8 W more at 12 V (+9 %).
@@ -120,9 +121,9 @@ Today the board has `D1101` (DONE) and the two LEDs in the RJ45 [V].
 Activity is shown by the UART's transmit line: one LED on `PMOD_SPARE2` blinks with every status line the FPGA
 prints, once a second. That is the heartbeat, and it costs no bus traffic.
 
-Placement: a row at the left edge, just south of `J961` (KiCad y 125–131), so they show through a 2 mm slot in
-the back wall beside the antenna connector. Parts: KT-0603R class LEDs (basic part, 5.7 M in stock),
-TCA6416ARTWR (33 k in stock, $0.82).
+Placement (revised by the trial, section 11.4): the 9 status LEDs in a column north of `J961`, x 99.4–103.5,
+y 107.8–117.2, seen through a small window in the lid; the five rail LEDs beside their regulators. Parts:
+0402 LEDs, TCA6416ARTWR (33 k in stock, $0.82).
 
 ### 3.2 Debug serial
 
@@ -149,9 +150,9 @@ TCA6416ARTWR (33 k in stock, $0.82).
   lid's fan (enclosure X −65 to −15; the tongue is at X 0–24.5) and of the KV260's own fan. But the tongue lies
   over the carrier, 0.8 mm above it: **the connector must be surface-mount only, shell tabs included**. A
   vertical USB-C is about 10 mm tall, which leaves 20 mm to the lid.
-- Candidates in stock today [V]: U262-161N-4BVC11 (XKB, 35 k, $0.41; its second source SH-U262-161N-4BVC11,
-  18 k), JS16L-TYPE-C423-H100 (Jushuo, 1.7 k), HX-TYPE-C 16P 180 H10.0 (3.6 k). Their drawings decide: any with
-  through-hole shell legs is out. Fallback if none places: a 1 × 4 header for a USB-TTL cable, same position.
+- Chosen after the trial (section 11.4): **HX-TYPE-C 16P 180 LT H10.0** (LCSC C49261569, 3,635 in stock),
+  surface-mount legs and two locating pegs. `U262-161N-4BVC11` was rejected: through-hole shell legs and not a
+  vertical part. Fallback if the pegs do not clear the carrier: a 1 × 4 header for a USB-TTL cable, same position.
 
 Stock: CH340X 43 k ($0.66), USBLC6-2SC6 38 k.
 
@@ -283,16 +284,21 @@ J961 ─ ESD ─ DC block ─┬─ LNA ─┬─ preselector ─┬─ RFFC5072
 | LNA and IF amplifier | SPF5043Z × 2, at 3.0 V | 5,923, $3.39 | 50–4000 MHz; 22.6 dB and NF 0.60 dB at 100 MHz, 18 dB at 900 MHz, 25 mA at 3 V |
 | Bypass switches | PE4259 × 4 | 14.7 k, $1.19 | 10 MHz – 3 GHz SPDT |
 | Preselector A, 30 MHz up | PE42442 × 2 (SP4T, 30 MHz – 6 GHz) | 245, $4.95 | Paths: straight, FM band-pass, FM-reject high-pass, to preselector B |
-| Preselector B, 170 MHz up | SKY13418-485LF × 2 (SP8T, 0.1–3.8 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
-| Converter | **RFFC5072** | **64**, $14.62 | LO 85–4200 MHz, mixer 30–6000 MHz, gain −2 dB, NF 10–13 dB, IIP3 +23 dBm, 125 mA at 2.7–3.3 V, reference 10–104 MHz |
-| Baluns | TC1-1-13M+ × 2 | 239, $2.12 | 4.5–3000 MHz |
+| Preselector B, 170 MHz up | SKY13418-485LF × 2 (SP8T, 0.1–6.0 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
+| Converter | **RFFC5072** (RFFC5072TR13) | **64**, $14.62 | LO 85–4200 MHz, mixer 30–6000 MHz in, 30–4500 MHz out; gain −2 dB into a 4:1 balun (−7 dB into a 1:1); NF 10 dB (low current) to 13 dB (high linearity); IIP3 +10 / +23 dBm; 100–125 mA at 2.7–3.3 V; reference 10–104 MHz, 0.5–1.5 V p-p AC-coupled; logic high ≥ VDD/1.5 |
+| Baluns | Input TC1-1-13M+ (1:1, 4.5–3000 MHz; the LCSC listing, 239 at $2.12, is HLT's 5-pad clone with other pin numbers, so the genuine Mini-Circuits part is ordered: RX_VU_SPEC §1.4); output **TC4-1W+** (1:4, 3–800 MHz, 2,136 in stock), the data sheet's 4:1 output arrangement, same 3.8 × 3.8 mm body | — | Mixer input 100 Ω differential |
 | Reference | 26 MHz TCXO (KDS 1XXD26000MAA) | 15.7 k, $0.61 | Not locked to the Si549: section 5.9 |
 | Anti-alias filter | 7th-order elliptic, 0402 | — | Section 5.4 |
 | Step attenuator | PE4312 | 1,557, $2.84 | 0–31.5 dB in 0.5 dB steps, serial |
 | Supply | LP5907-3.0 from `+3V3_D` through a ferrite | 32 k, $0.28 | One 3.0 V rail for the whole block |
 
-The frequency ranges of the PE42442, PE4259, PE4312 and TC1-1-13M+ are quoted from memory of their data
-sheets [E] and are confirmed when the schematic is drawn; the others were read today.
+Read from the data sheets on 16 November (phase 3) [V]: PE42442 30 MHz–6 GHz, logic high ≥ 1.17 V, internal
+negative supply; PE4259 10 MHz–3 GHz, logic high ≥ 0.7·VDD; PE4312 1 MHz–4 GHz, 1.8 V logic; SKY13418
+0.1–6.0 GHz, logic high ≥ 1.35 V; SPF5043Z 50–4000 MHz; AP22652 enable high ≥ 1.5 V. Everything is driven from
+the expander at 3.0 V, so all levels are met. **Correction:** the RFFC5072's −2 dB is with a 4:1 output
+balun; the output balun becomes a TC4-1W+ (it was a 1:1). **Loop filter:** the data sheet's wideband
+application schematic (26 MHz reference, active filter on LFILT1–3) is used as is; its phase noise is
+checked in phase 6.
 
 ### 5.4 The three filters the plan depends on
 
@@ -305,9 +311,22 @@ Each was optimised as a 7th-order elliptic ladder with lossy inductors, the meth
 | FM reject, for airband and VHF | 118–170 MHz | 87–108 MHz | 55 | 0.5–3.2 dB | **≥ 44.9 dB** |
 | UHF image filter | 400–480 MHz | from 660 MHz | 60 | 0.5–1.4 dB | **≥ 50.4 dB** |
 
-All three meet their masks. Not done yet: snapping to catalogue values and the tolerance Monte Carlo. The
-FM-reject filter has a 9 % transition (108 → 118 MHz) and will be the sensitive one; it sits after the LNA,
-where 3 dB of loss costs nothing.
+All three meet their masks with ideal values. **Phase 3 (16 November): catalogue values and tolerance Monte Carlo**
+(`_work/sim/rev08_filters_mc.py`, 2,000 samples, L ±2 % LQW15AN/LQW18AN, C0G ±0.1 pF below 10 pF and ±2 % above,
+pads 0.10 ± 0.05 pF) [V arithmetic on E parts data]:
+
+| Filter | Parts | Loss in band, p99 | Rejection, p1 | Verdict |
+|---|---|---|---|---|
+| Anti-alias, 7th order | 11 pF, 56 nH ‖ 5.6 pF, 22 pF, 62 nH ‖ 7.5 pF, 24 pF, 75 nH ‖ 1.2 pF, 20 pF | 2.2 dB (at 170 MHz) | **56.0 dB** (mask 55) | Pass; 0.7 dB more edge loss than the ideal, after the mixer where it costs nothing |
+| UHF image, 7th order | 6.2 pF, 22 nH ‖ 1.8 pF, 6.8 pF, 27 nH ‖ 2 pF, 6.8 pF, 22 nH ‖ 0.4 pF, 1.3 pF | 2.4 dB | **50.7 dB** (mask 50) | Pass, 90 % yield; needs the ±0.1 pF parts (with ±0.25 pF: 45 dB) |
+| FM reject, 7th order | — | 7.3 dB | 34.4 dB | **Fails G2**: a 9 % transition does not survive ±2 % parts |
+| **FM reject, 9th order (adopted)** | 18 pF, 68 nH + 110 pF, 13 pF, 82 nH + 36 pF, 18 pF, 100 nH + 24 pF, 24 pF, 220 nH + 10 pF, 91 pF | ≤ 3.1 dB from 121.5 MHz up; 4.1–6.7 dB at 118–120 MHz | **42.5 dB** (gate 40) | **G2 passed.** 13 parts instead of 10. The edge costs about 1 dB of noise figure on the lowest 2 MHz of the airband in a worst-case unit |
+| FM band-pass, 3 poles (added in phase 5) | 16 nH ‖ 160 pF, 390 nH + 6.8 pF, 16 nH ‖ 160 pF | 3.1 dB | **24.3 dB** at 70 and 137 MHz (mask 21) | Pass; re-chosen from the first drawing's values (3.4 dB, 21.1 dB) |
+
+No commercial FM band-stop filter is stocked (searched 16 November); higher inductor Q does not help, since the
+tolerances, not the losses, set the edge.
+
+![Filters with catalogue parts and Monte Carlo](img/rev08_filters_mc.png)
 
 ### 5.5 Sensitivity and range
 
@@ -372,7 +391,7 @@ converter works behind the UHF low-pass; below 390 MHz its image rejection falls
 
 | Point | Why it is open | How it closes |
 |---|---|---|
-| RFFC5072 logic thresholds and serial timing | The data sheet could not be fetched today (Qorvo and Mouser refused the requests); the figures above are from Qorvo's product page and search extracts | Read the data sheet before the schematic. The expander runs at 3.0 V, the part's own supply, so levels are not expected to be an issue |
+| RFFC5072 logic thresholds and serial timing | **Closed 16 November**: data sheet read (through JLC's copy). Input high ≥ VDD/1.5 = 2.0 V at 3.0 V; proprietary 3-wire bus with read-back (register map in Qorvo's programming guide, still to be fetched for G-3) | — |
 | RFFC5072 stock | 64 units today, and the A version has none. Nothing is bought during the design | Designed in as the RFFC5072; re-check stock when the board is ordered. Fallback, kept in the schematic as a note: MAX2871 (3,065) with an ADE-1+ mixer (139), about 60 mm² more |
 | Switches below their specified band | SKY13418 is specified from 100 MHz, so it only carries paths from 170 MHz up. PE42442 is specified from 30 MHz | Bench check of loss at 30–100 MHz on the first board |
 | Reference not locked to the ADC clock | A separate TCXO: the LO and the sample clock drift apart by a few ppm. Harmless for voice and data reception; not for phase-coherent work | Option: feed the synthesiser's reference from `J401`'s 10 MHz when one is connected |
@@ -424,6 +443,7 @@ the 500 MHz master and a polyphase rewrite of the capture and first DDC stage (t
 | Item | What | Notes |
 |---|---|---|
 | G-7 | **500 MSPS radar/VHF capture**: the AD9484 path at 500 MHz as two samples per 250 MHz clock (polyphase NCO and CIC), so that HF to 30 MHz on the AD9253 (62.5 MSPS) and VHF/UHF on the AD9484 run at the same time | In scope (full scope approved). The largest gateware item: the AERIS DDC is verbatim third-party code and stays as it is for 400 MSPS; G-7 is a second, selectable path. Its DSP48 cost decides whether it replaces G-4's second stage. Until it exists, A-1's gating holds |
+| G-8 | **Signal-level verification with realistic synthetic data, receive and transmit** (owner, 16 November). Receive: for every band the board claims (HF AM and SSB, CB, FM broadcast, airband AM, 2 m and marine NBFM, PMR446 and other handheld NBFM, 70 cm, ADS-B 1090 MHz PPM), a generator writes realistic signals (modulated audio or data, fading, adjacent strong carriers, noise at the figures of section 5.5) through the front-end, ADC and clock models into the gateware; the received output is demodulated and compared with what was sent (audio SNR/SINAD, bit/packet error rate, ADS-B messages decoded). Where no demodulator or decoder exists, it is written in Verilog (AM envelope, FM discriminator with de-emphasis, SSB, ADS-B preamble and Mode-S CRC), within the DSP48 budget or on the Kria PL. Transmit: AM, NBFM, SSB and a test chirp through `dac_sdr`/`dac_radar` and the DAC and filter models; spectrum, occupied bandwidth, spurious and EVM against the bands' masks. Radar: synthetic scenes (point targets at known range, speed and angle, clutter, noise) through the ADAR1000 array and AD9484 models into the AERIS chain; range, Doppler and beam detected and compared with the truth. Every case produces figures (spectra, waterfalls, constellations, eye/audio traces, range–Doppler maps) that go into the documents and the PDF | Board-independent except the Rev08 front-end model; a bench per case with a mutation; part of 11.1 |
 
 ---
 
@@ -497,14 +517,14 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 |---|---|---|---|
 | 0 | Decisions (section 12) | — | Done, 16 November |
 | 1 | Audit corrections A-1 to A-6, and G-1 (debug UART) | Rebuild: timing with the corrected clocks; the existing benches at both clock modes; a new bench for the UART with a mutation; documents and PDF regenerated | Independent of the rest; can be merged as Rev07 gateware |
-| 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work** |
-| 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances** |
-| 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | — |
-| 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | — |
+| 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work.** Passed 16 November (section 11.4) |
+| 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances.** Passed 16 November with a 9th-order filter (section 5.4); the RFFC5072 data sheet and loop filter are still open |
+| 4 | Schematic: new sheet `RX_VU`; LEDs, expanders and UART bridge on CONTROL; `J103` wired pin for pin to `J102` on IAS_LINK; power additions | ERC unchanged in warnings; `check_sheet` for the new sheet | **Done 16 November** (section 11.5): ERC 7 warnings as before, `check_sheet` PASS for `RX_VU`, `STATUS`, `IAS_LINK` |
+| 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | **Done 16 November** (section 11.6): 0 errors, 0 unconnected, 0 parity errors |
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **G3: LO and IF-line coupling into either ADC below the Rev07 isolation figure** |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
 | 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | — |
-| 9 | Regenerate every output and review every document (section 11.1) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done** |
+| 9 | Regenerate every output and review every document (section 11.1); draw the board manual (section 11.3) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done** |
 | 10 | Tag `rev08`, push | — | — |
 
 Phases 1 and 2 can run in parallel. Nothing in phases 4–10 starts before G1.
@@ -522,11 +542,13 @@ editing numbers into a document. Before Rev08 is called finished:
 | Power | `power_budget.py` with every new load; regulator dissipation; rail LED currents |
 | Thermal | Board thermal maps; the enclosure CFD at the rated ambients (stock K26 and K26I), with the new heat sources and openings; heatsink map; rated ambient recomputed |
 | Mechanical strength | The 3-D FEA of the enclosure (50 g in three axes), with the new notch, slots, lug, lens window and camera clamp; BGA strain; safety factors at 23 and 70 °C |
-| Gateware | Vivado build at both clock modes with the corrected constraints; utilisation, timing, pulse-width, methodology and CDC reports; every bench and its mutations, old and new; the floorplan, schematic and pipeline figures (`render_fpga_views.py`) |
+| Gateware | Vivado build at both clock modes with the corrected constraints; utilisation, timing, pulse-width, methodology and CDC reports; every bench and its mutations, old and new; the floorplan, schematic and pipeline figures (`render_fpga_views.py`) **The full end-to-end simulation must pass again**: `tb_system` with both FPGAs, the board's channel models between them, the IAS1 link and Ethernet carrying traffic together (about 3 Gb/s aggregate), at both clock modes, plus the Vivado builds of both FPGAs; the G-8 synthetic-signal campaign (receive, transmit, radar) re-run and its figures regenerated |
 | Renders and 3-D | Board renders (top, iso, 4K), case and mount renders, heatsink renders, FEA images, camera module on the tongue; each checked against the render rules before upload |
 | Fabrication | BOM and placement files, LCSC selection with live stock, the quote, the fab package |
 | Documents | **Every document reviewed against the final design**, not only the ones the work touched: README, ARCHITECTURE, every `*_SPEC.md`, LAYOUT, SIGNAL_INTEGRITY, POWER, ENCLOSURE and its thermal study, MECHANICAL, FABRICATION, JLCPCB_QUOTE, FPGA_GATEWARE, `fpga/` and `sw/` documents, LINK_PROTOCOL's register map, PINMAP. Numbers checked against the regenerated outputs; no stale part reference, sample rate, connector name or count (thirteen SMAs). Then the schematic, layout and documentation PDFs regenerated and read through |
 | Documentation PDF layout | The visual defects of the current book fixed (section 11.2), and every page of the regenerated PDFs inspected as an image, not only searched as text |
+| Board manual | Section 11.3, drawn from the final Rev08 board files, in the README and in the documentation PDF |
+| Design history | [`docs/history/README.md`](history/README.md) gets a Rev08 row describing what changed against Rev07 (Rev07's row was added on 16 November 2026) |
 | This plan | Each item of sections 8 and 12 marked done or explicitly deferred, with the reason |
 
 ### 11.2 Known defect in the documentation PDF (reported 16 November 2026)
@@ -557,6 +579,121 @@ The choice is made when the work is done; either is acceptable as long as the de
 script that renders every page and flags (a) a header-coloured band with no text in it, (b) a cell whose bottom
 edge crosses the next row's top, (c) a table continuing from the previous page without a header row; it must
 report zero, and the pages it would have flagged are checked by eye as well.
+
+### 11.3 Board manual (requested 16 November 2026)
+
+A reference page in the style of a PC motherboard manual, so that someone holding the board can tell what every
+part is for without the schematic. It goes in the README (image plus tables) and as its own chapter near the
+front of the documentation PDF.
+
+- **Layout diagram**, top and bottom, generated from the final `.kicad_pcb` (positions and outlines from the
+  file, never drawn by hand), clean line art with numbered callouts; a photo-like render beside it for
+  orientation. Re-generated by a script, so it cannot drift from the board.
+- **Connectors**: the thirteen SMAs (name, band, direction, what to connect, level limits), `J102` IAS1 and
+  `J103` IAS0 pass-through, Pmod `J1102` pin by pin (SPI, beam strobe, PPS, debug UART), JTAG `J1101`, fan
+  `J1002`, the debug USB-C, the 12 V input, the RJ45, `J401` reference input, every test point.
+- **Chips**: each IC with its function in one line and the sheet it lives on.
+- **LEDs**: every LED, its colour, what on/off/blinking means, and the patterns (heartbeat on the UART line,
+  boot sequence, error states), with a short troubleshooting table ("`+1V0` off: …").
+- **Jumpers, assembly options and switches**: the `C926` source selection (section 5.7), BOM options
+  (Ethernet), clock mode, the RF switch paths.
+- **Typical uses**: radar, HF SDR, VHF/UHF reception, transmit, camera pass-through, standalone over Ethernet,
+  each as "connect this, set that".
+- Acceptance: every designator in the callouts exists on the board and every connector, LED and IC of the
+  board appears in the tables (checked by script); the pages are inspected as images like the rest of the PDF.
+
+### 11.4 Phase 2 result: placement trial (16 November 2026) — gate G1 passed
+
+Every block of sections 3–5 was placed on a scratch copy of the Rev07 board with its real land pattern (EasyEDA
+footprints for the LCSC parts, KiCad's for the generic ones), two shield-can frames as copper rings, and KiCad's
+DRC run on the copy with the zones refilled [V].
+
+![Placement trial](img/rev08_placement_trial.png)
+
+| Item | Result |
+|---|---|
+| Parts | 164 new footprints: 18 ICs, 4 connectors (`J961`, `J1002` moved, `J103`, `J104`), 3 RF filters, 2 baluns, TCXO, 9 LEDs, 3 resistor arrays, about 120 passives. 119 on the top, **45 on the bottom**, only where the board is not over the carrier (y > 117.75): decoupling, bias chokes, the LED expander and the 3.0 V LDO. The board already has bottom-side assembly |
+| Shield frames | **A** (LNA, bypass, preselectors A and B): 20.7 × 19.2 mm at x 103.8–124.5. **B** (converter): 16.7 × 16.0 mm at x 124.9–141.6. The IF chain (anti-alias filter, IF amplifier, `PE4312`) at x 142–151 needs no can at 30–170 MHz: a via fence |
+| DRC on the copy | **0 conflicts between new parts, 0 with any existing signal net.** What remains is with existing ground: 26 stitching vias, 14 short ground tracks and 3 pads to move (on the tongue and in the block), and the `FAN_5V` track, which is re-routed with `J1002` |
+| `J103` vias | The 34 vias in two staggered ranks clear `J102`'s bottom pads: no violation. The tongue's ground stitching vias under them move |
+| IF line | Routed on L6 from the IF chain to `C926`: **143.8 mm**, 2W from all L6 copper and vias, 1.5 mm from the DAC2 outputs; about 0.5 dB at 170 MHz [E]. It takes a diagonal between the via fields, not the left edge |
+
+![IF line on L6](img/rev08_if_route.png)
+
+**What the trial changed in this plan:**
+- **`J1002` (fan header, through-hole) sat where `J961` goes.** It moves 5 mm south, under `J961`, off the carrier;
+  `F1002` and `C1092` stay.
+- **13 LEDs do not fit at y 125–131.** The 9 status LEDs (the 8 of section 3.1 and the UART heartbeat), with three
+  resistor arrays, go in a column north of `J961`, x 99.4–103.5, y 107.8–117.2, beside `H1`'s clamp. They are seen
+  through a small window in the lid, not through the back wall (the clamp is in the way); section 9's back-wall
+  slot is dropped. The five rail LEDs go beside their regulators.
+- **The debug USB-C changes.** `U262-161N-4BVC11` has through-hole shell legs and is a mid-mount, not a vertical
+  part: rejected. **HX-TYPE-C 16P 180 LT H10.0** (LCSC C49261569, 3,635 in stock) has surface-mount legs and two
+  plastic locating pegs into 0.9 mm non-plated holes [V: maker's drawing]. It sits rotated on the tongue at
+  x 130–136, y 89.6–102.4. Open point: the pegs' length against the board (1.54 mm) and the 0.8 mm gap to the
+  carrier, read off the drawing before the footprint is made.
+- The RF expander (0x20) is on the tongue with the CH340X and the ESD array; the LED expander (0x21) is on the
+  bottom near the LEDs.
+- **Pin numbering of `J102` and `J103`.** The board's `J102` footprint numbers the contacts along each row
+  (1–17 on one row), the BM20 receptacle footprint numbers them odd/even across the rows. "Pin for pin" is a
+  physical contact-to-contact mapping and is drawn from the Hirose drawings in phase 4, not from the numbers.
+- Not yet tested by the trial: routing inside the blocks (fill is about 60 % in frame A), the ground-via fences, and
+  the exact passive count, which the schematic fixes. They are phase 4 and 5 work.
+
+### 11.5 Phase 4 result: schematic (16 November 2026)
+
+Two new sheets, `RX_VU` (the front end, its expander and LDO) and `STATUS` (LEDs, LED expander, USB bridge), and
+edits to `IAS_LINK` (`J103`), `ROUTING` (`C927`, `IF_VU`), `CONTROL` (two sheet pins) and the root. Details,
+control-line map and values: [RX_VU_SPEC.md](RX_VU_SPEC.md). ERC: the same 7 warnings as Rev07, no error;
+`check_sheet` passes for `RX_VU` (131 parts, 95 nets), `STATUS` and `IAS_LINK` [V].
+
+What drawing it changed in this plan:
+- **The AP22652's enable is active low** (section 5.3 said high): pulled up, so the bias tee is off until written.
+- **The bias tee's low option is 3.3 V from `+3V3_D`**, not the 3.0 V rail, which has 70 mA of headroom.
+- **An FM band-pass was missing** from phase 3 (section 5.4 covered three filters, the preselector needs four):
+  3-pole band-pass, shunt 16 nH ‖ 160 pF, series 390 nH + 6.8 pF, shunt 16 nH ‖ 160 pF. Phase 5 added it to
+  `rev08_filters_mc.py` (`--fmbp`): the first drawing (24 nH ‖ 110 pF, 560 nH + 4.7 pF) gave 3.4 dB in band and
+  only 21.1 dB at p1, so the values were re-searched over catalogue parts: **loss 2.2 dB nominal, 3.1 dB p99;
+  ≥ 24.3 dB at 70 and 137 MHz at p1** (mask 21) [V arithmetic, 2,000 samples, inductor Q 40-45].
+- **The mixer's bias current flows through the TC4-1W+'s centre tap**, rated 30 mA: G-3 keeps `MIX2_IDD` ≤ 3.
+- **The LEDs and the USB bridge are on their own sheet**, not on `CONTROL` (no legible room on that A1 sheet).
+  `+1V8_D`'s LED gets a transistor as well as `+1V0`'s.
+- **The vertical USB-C's land pattern** was redrawn from the maker's layout: 1.00 mm pitch and no soldered shell
+  tabs; the trial's provisional pattern (0.5 mm, four tabs) was wrong. Placement is unaffected (same outline).
+- **`SW2` is built with the front end**: `C927` fitted, `C926` (`J922`) DNP; swapping the two restores `J922`.
+
+### 11.6 Phase 5 result: layout (16 November 2026)
+
+The two new sheets are on the board: 183 footprints (588 to 771), 2,631 mm of new track and 336 vias. DRC with
+the zones refilled: **0 errors, 0 unconnected, 0 schematic-parity errors** [V, kicad-cli 10.0]. The copper of
+every net that existed before Rev08 is unchanged, checked item by item against Rev07 (the LVDS pairs, the DAC
+outputs, Ethernet); only `FAN_5V` (reconnected) and the two Pmod spare lines (renamed in phase 4) differ.
+
+What the layout settled:
+- **`J103` mapping.** The 34-pin footprint numbered its contacts in a different order from `J102`'s; it is now
+  renumbered by position (`_work/rev08_footprints.py`), so contact *n* of `J103` sits over contact *n* of `J102`
+  and the pass-through vias are straight.
+- **Frames.** Frame A holds the LNA, the bypass and preselector A; preselector B moved into frame B beside the
+  converter. The IF chain (anti-alias filter, IF amplifier, `PE4312`) is on the bottom east of frame B.
+- **`U1313`** (the front end's expander) is on the bottom, south of frame B, with every pin fanned out to a
+  via so the control lines leave in all directions. `R1340`, `R1341` and `R1345` are on the bottom by the
+  converter; the rail LEDs are on the tongue.
+- **Decoupling.** The RFFC5072's six decaps sit on their supply pins; `C1310`, `C1312` and `C1313` (switch
+  supplies) were turned so that the switches' control pins are not walled in. `U1501`'s decaps sit south of
+  frame A's wall, where vias are allowed.
+- **`JP1301`** moved 0.15 mm west so that `U1501`'s pin 4 has its 0.15 mm clearance to the 3.3 V pad.
+- **IF line `IF_VU`**: 142.3 mm of 0.151 mm stripline on L6 between the L5 and L7 ground planes, a via at each
+  end; at least 0.3 mm (2W) from all other L6 copper and vias, at least 1.5 mm from the DAC2 output tracks,
+  and at least 0.575 mm from the DAC output vias that cross L6 (a via is a short vertical, not a parallel run).
+  About 0.47 dB at 170 MHz [E: 0.33 dB/100 mm].
+- **`VU_PSB_OUT`** (preselector B to preselector A, up to 1.1 GHz) crosses the wall between the two frames
+  as 0.12 mm stripline: 21 mm on L3 and 9 mm on L6, three vias, about 55 ohm [E]. Phase 6 simulates it.
+- **Fiducials** moved to (130.6, 125.2) on the top and (122.6, 132.0) on the bottom, clear of the new parts.
+- References of the new parts are on the assembly (Fab) drawing: the blocks are too dense for legible silkscreen.
+
+Left as warnings (no error): 10 dangling track ends and 7 vias left by the router (inert copper), 13
+silkscreen-over-pad warnings from footprint outlines (the fab clips silkscreen on pads), and one hole-to-hole
+warning between two vias of the same net.
 
 ### Risk register
 

@@ -7911,7 +7911,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "aa4e8d57-6751-50ec-b21a-9e3c8697fc8f")
 		(property "Reference" "C926"
 			(at 251.46 82.55 90)
@@ -15178,5 +15178,154 @@
 			(justify left bottom)
 		)
 		(uuid "091f0979-a835-4fcd-8719-81511c63cf05")
+	)
+	(junction
+		(at 247.65 86.36)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c8307d72-c7a9-4e3c-a6db-70a11ef0981f")
+	)
+	(wire
+		(pts
+			(xy 247.65 86.36) (xy 247.65 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e76b2049-46c3-4a6e-98ff-e9355af2f1d8")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 247.65 107.95 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3be33530-af71-4ee4-b92e-e74cae2f0196")
+		(property "Reference" "C927"
+			(at 250.19 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100n"
+			(at 250.19 110.49 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 247.65 107.95 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 247.65 107.95 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 247.65 107.95 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5677c353-97e7-45bf-9ab2-fad4e1852f5a")
+		)
+		(pin "2"
+			(uuid "f21c3c8f-41a4-4010-912f-2127c56c6126")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/388f8fcb-a039-5966-b84c-c0dd05bb2489"
+					(reference "C927")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 247.65 111.76) (xy 247.65 114.30)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e8d0701e-c05f-4b70-ba0d-603c416b868c")
+	)
+	(wire
+		(pts
+			(xy 247.65 114.30) (xy 250.19 114.30)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1209030b-a170-496a-9122-e5ec30863f56")
+	)
+	(hierarchical_label "IF_VU"
+		(shape input)
+		(at 250.19 114.30 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c3bde0b0-f3c6-4337-8aca-0d43a5efb588")
+	)
+	(text "Rev08 (REV08_PLAN 5.7): two sources for SW2's RF2 throw."
+		(exclude_from_sim no)
+		(at 215.90 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b9ba0efd-4bf3-40b5-8c03-4b7244191c4b")
+	)
+	(text "As built C927 is fitted (IF_VU from RX_VU over the L6 line)"
+		(exclude_from_sim no)
+		(at 215.90 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "762d4d73-0a97-45f4-aeb9-f0ca95beb811")
+	)
+	(text "and C926 (J922) is DNP; swap them for the Rev07 J922 input."
+		(exclude_from_sim no)
+		(at 215.90 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ab2d84c8-822b-4fcf-abe5-209dfc80d768")
 	)
 )

@@ -44,6 +44,11 @@ module ddc_wrapper #(
     // Packet interface toward link_pcs_tx (link_clk domain)
     input  wire        link_clk,
     input  wire        link_rst,
+    // Soft disable of the link side (the radar path's A-1 disable): it takes effect between packets, so a packet
+    // already started (store and forward: it is whole in the FIFO) still goes out to its eop. A reset in the middle
+    // of a packet left the uplink arbiter waiting for an eop that never came, and every later register read-back
+    // with it (tb_clk_mode_switch, 500 <-> 400 MHz switch with 64-word packets).
+    input  wire        link_flush,
     input  wire [63:0] timestamp_cnt,
     output wire        pkt_valid,
     input  wire        pkt_ready,
@@ -266,15 +271,16 @@ module ddc_wrapper #(
     // than before), and the pointer arithmetic is out of the uplink arbiter's path to the SDR FIFOs.
     reg             pkt_avail_r;
     wire            pkt_avail  = pkt_avail_r;
+    reg             pkt_active;
+    wire            lrst       = link_rst || (link_flush && !pkt_active);
 
     (* ASYNC_REG = "TRUE" *) reg [23:0] drop_sync1, drop_sync2;
 
     reg [15:0] word_idx;
-    reg        pkt_active;
 
     assign pkt_stream_id = STREAM_ID;
     assign pkt_len       = PKT_WORDS * 16'd8;
-    assign pkt_valid     = pkt_active | pkt_avail_r;
+    assign pkt_valid     = pkt_active | (pkt_avail_r && !lrst);
     assign pkt_sop       = (word_idx == 16'd0);
     assign pkt_eop       = pkt_valid && (word_idx == PKT_WORDS - 1);
     assign pkt_data      = fifo_mem[rd_ptr_bin[ADDR_W-1:0]];
@@ -283,7 +289,7 @@ module ddc_wrapper #(
     wire [ADDR_W:0] rd_next_gray = bin2gray(rd_next_bin);
 
     always @(posedge link_clk) begin
-        if (link_rst) begin
+        if (lrst) begin
             rd_ptr_bin        <= {(ADDR_W+1){1'b0}};
             rd_ptr_gray       <= {(ADDR_W+1){1'b0}};
             wr_gray_sync1     <= {(ADDR_W+1){1'b0}};
