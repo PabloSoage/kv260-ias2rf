@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HMI spectrum</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#E6EDF3;text-decoration:none}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; background: #0B0F14; color: #E6EDF3; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="height: 64px; display: flex; align-items: center; gap: 16px; padding: 0 24px; border-bottom: 1px solid #243243">
+    <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.02em">IAS2RF</div>
+    <div style="font-size: 16px; color: #9FB0C0">Spectrum</div>
+    <div style="flex-grow: 1"></div>
+    <div role="group" aria-label="Source" style="display: flex; gap: 8px">
+      <sc-for list="{{srcs}}" as="s" hint-placeholder-count="3">
+        <button type="button" onClick="{{s.pick}}" style="{{s.style}}">{{s.label}}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex-grow: 1; display: flex; gap: 16px; padding: 16px 24px; min-height: 0">
+    <section style="flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; min-width: 0">
+      <div style="display: flex; justify-content: space-between; font-size: 15px; color: #9FB0C0">
+        <span>{{range}}</span><span>RBW {{rbw}} · 8 averages</span>
+      </div>
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 12px; padding: 8px; position: relative">
+        <svg width="100%" height="200" viewBox="0 0 800 200" preserveAspectRatio="none" role="img" aria-label="Spectrum trace">
+          <line x1="0" y1="50" x2="800" y2="50" stroke="#1E2A37"></line>
+          <line x1="0" y1="100" x2="800" y2="100" stroke="#1E2A37"></line>
+          <line x1="0" y1="150" x2="800" y2="150" stroke="#1E2A37"></line>
+          <line x1="{{mx}}" y1="0" x2="{{mx}}" y2="200" stroke="#F5A524" stroke-dasharray="4 4"></line>
+          <polyline points="{{trace}}" fill="none" stroke="#5AB0FF" stroke-width="1.6"></polyline>
+        </svg>
+      </div>
+      <div style="flex-grow: 1; display: grid; grid-template-columns: repeat(80, minmax(0, 1fr)); border-radius: 12px; overflow: hidden; border: 1px solid #243243" role="img" aria-label="Waterfall">
+        <sc-for list="{{wf}}" as="c" hint-placeholder-count="80"><span style="{{c}}"></span></sc-for>
+      </div>
+    </section>
+
+    <aside style="width: 300px; display: flex; flex-direction: column; gap: 12px">
+      <div style="background: #121A23; border: 1px solid #243243; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 14px; color: #9FB0C0; text-transform: uppercase; letter-spacing: 0.08em">Marker</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700">{{mf}}</span>
+        <span style="font-size: 18px">{{mp}}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Span −</button>
+        <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Span +</button>
+        <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Peak</button>
+        <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Hold</button>
+      </div>
+      <a href="Radio.dc.html" style="height: 64px; border-radius: 12px; background: #F5A524; color: #14100A; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center">Listen at marker</a>
+      <button type="button" style="height: 60px; border-radius: 12px; background: #182330; border: 1px solid #36485C; color: #E6EDF3; font-family: inherit; font-size: 18px">Record IQ to SSD</button>
+      <div style="font-size: 14px; color: #9FB0C0; line-height: 1.5">FFT on the A53s from the DMA stream; waterfall kept 60 s, GPU-drawn.</div>
+    </aside>
+  </main>
+
+  <nav aria-label="Screens" style="height: 88px; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-top: 1px solid #243243; background: #0E141B">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+      <a href="{{n.href}}" style="{{n.style}}">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.icon}}"></path></svg>
+        <span style="font-size: 14px">{{n.label}}</span>
+      </a>
+    </sc-for>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { src: 0 }; }
+  renderVals() {
+    const items = [
+      ['Home', 'Main.dc.html', 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'],
+      ['Vehicle', 'Vehicle.dc.html', 'M3 13l2-6h14l2 6v5h-3v-2H6v2H3zM7 13h2M15 13h2'],
+      ['Radio', 'Radio.dc.html', 'M4 9h16v11H4zM8 4l8 5M8 14h2M14 14a2 2 0 1 0 4 0a2 2 0 1 0-4 0'],
+      ['Spectrum', 'Spectrum.dc.html', 'M3 20h18M4 16l3-7 3 5 3-9 3 8 2-3 2 6'],
+      ['ADS-B', 'Adsb.dc.html', 'M12 2l2 7 7 3-7 2-2 8-2-8-7-2 7-3z'],
+      ['Radar', 'Radar.dc.html', 'M12 12l7-7M12 3a9 9 0 1 0 9 9M12 7a5 5 0 1 0 5 5'],
+      ['Transmit', 'Transmit.dc.html', 'M12 13v8M8 21h8M12 13a2 2 0 1 0 0-4a2 2 0 1 0 0 4M7 6a7 7 0 0 0 0 10M17 6a7 7 0 0 1 0 10'],
+      ['System', 'System.dc.html', 'M12 15a3 3 0 1 0 0-6a3 3 0 1 0 0 6M19 12h2M3 12h2M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4']
+    ];
+    const nav = items.map(([label, href, icon]) => ({ label, href, icon,
+      style: 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; ' +
+        (label === 'Spectrum' ? 'color: #F5A524; background: #1A1710; border-top: 3px solid #F5A524' : 'color: #9FB0C0; border-top: 3px solid transparent') }));
+    const S = [
+      { label: 'HF A', range: '0 to 25 MHz · AD9253 channel A, 50 MS/s', rbw: '6.1 kHz', peaks: [[0.29, 0.75], [0.56, 0.55], [0.72, 0.45]], mf: '7.200 MHz', mp: '−62 dBm · AM broadcast' },
+      { label: 'HF B', range: '0 to 25 MHz · AD9253 channel B, 50 MS/s', rbw: '6.1 kHz', peaks: [[0.57, 0.6], [0.4, 0.4]], mf: '14.200 MHz', mp: '−88 dBm · USB voice' },
+      { label: 'VHF/UHF', range: '88 to 108 MHz · AD9484 through RX_VU', rbw: '24 kHz', peaks: [[0.18, 0.8], [0.42, 0.7], [0.51, 0.9], [0.77, 0.6]], mf: '98.300 MHz', mp: '−41 dBm · WBFM stereo' }
+    ];
+    const cur = S[this.state.src];
+    const srcs = S.map((s, i) => ({ label: s.label, pick: () => this.setState({ src: i }),
+      style: 'height: 44px; padding: 0 18px; border-radius: 22px; font-family: inherit; font-size: 16px; font-weight: 600; ' +
+        (i === this.state.src ? 'background: #F5A524; color: #14100A; border: none' : 'background: #182330; color: #E6EDF3; border: 1px solid #36485C') }));
+    const lvl = (u) => { let v = 0.12 + 0.03 * Math.sin(u * 91) * Math.sin(u * 17); for (const [c, a] of cur.peaks) { const d = (u - c) / 0.008; v += a * Math.exp(-d * d); } return Math.min(v, 1); };
+    let pts = [];
+    for (let x = 0; x <= 800; x += 4) pts.push(x + ',' + (190 - 175 * lvl(x / 800)).toFixed(1));
+    const stops = [[0, [11, 18, 28]], [0.3, [20, 48, 82]], [0.55, [38, 120, 170]], [0.8, [245, 196, 107]], [1, [255, 236, 196]]];
+    const col = (v) => { let i = 0; while (i < stops.length - 2 && v > stops[i + 1][0]) i++; const [a, ca] = stops[i], [b, cb] = stops[i + 1]; const t = Math.max(0, Math.min(1, (v - a) / (b - a))); const c = ca.map((x, k) => Math.round(x + (cb[k] - x) * t)); return 'background: rgb(' + c.join(',') + ')'; };
+    let wf = [];
+    for (let r = 0; r < 26; r++) for (let c = 0; c < 80; c++) { const u = (c + 0.5) / 80; const jit = 0.05 * Math.sin(r * 1.7 + c * 0.9); wf.push(col(Math.max(0, Math.min(1, lvl(u) * (r % 7 === 3 && c % 11 === 5 ? 0.4 : 1) + jit)))); }
+    return { nav, srcs, range: cur.range, rbw: cur.rbw, trace: pts.join(' '), wf, mf: cur.mf, mp: cur.mp, mx: Math.round(cur.peaks[0][0] * 800) };
+  }
+}
+</script>
+</body>
+</html>

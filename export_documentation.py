@@ -72,6 +72,8 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
             ("Dedicated-Pin 1000BASE-T Ethernet Architecture", "fpga/eth/REV06.md"),
             ("Ethernet Load-Balancing & Failover Policies", "fpga/eth/REDUNDANCY.md"),
             ("Host Software & PS Bring-Up", "sw/README.md"),
+            ("In-Car HMI & Processing Partition", "docs/HMI.md"),
+            ("Possible Integrations: GPS, 77 GHz Radar, Telemetry, LiDAR & PL Fusion", "docs/INTEGRATIONS.md"),
         ],
     ),
     (

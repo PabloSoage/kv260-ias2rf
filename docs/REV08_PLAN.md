@@ -736,3 +736,16 @@ warning between two vias of the same net.
 | Timing and utilisation | `fpga/artix/reports_rev06/`, `fpga/artix/xc7a50t.xdc`, the RTL |
 | Converter and connector data | AD9484, AD8352 and AD9253 data sheets in `_work/datasheets/`; Hirose BM20 catalogue (land patterns, p.3); Qorvo's SPF5043Z data sheet figures and RFFC5072 product page; Skyworks SKY13418-485LF data sheet figures |
 | Not obtained | The RFFC5072 data sheet itself, and onsemi's IAS module drawing |
+
+---
+
+## 14. Additions of 17 November 2026
+
+The owner added four items before the `rev08` tag. Each is documentation and verification work, not a board change, and each falls under section 11.1 like everything else.
+
+| Item | What | Where | State |
+|---|---|---|---|
+| K26 timing with the G-8 DSP suite | The suite (G-8) missed `clk_pl_0` by 13.8 ns on the K26. Every block is now pipelined as a pure time shift, and the corner-turn and power-map memories moved to block RAM. The K26 closes at `WNS +0.772 ns` with 33,300 LUT | [FPGA_GATEWARE.md §3.3, §5.5](FPGA_GATEWARE.md) | Done; G-8 rerun gives the same results |
+| AERIS NCO fix upstream | The image-rejection fix in the AERIS NCO, ported to the upstream code: issue NawfalMotii79/PLFM_RADAR#213 and pull request #214 against `develop`, from the owner's fork (branch `develop`) | Upstream repository | Draft PR, for the owner to review and mark ready |
+| In-car HMI and processing partition | Eight screens for a car touchscreen, the KV260's display path (PS DisplayPort controller, both connectors), and which job runs on the PL, the A53s, the two R5F cores, the GPU and the VCU | [HMI.md](HMI.md) | Designed; application and R5F firmware not written |
+| Possible integrations | USB GPS, a 77 GHz radar over CAN, engine live data through opendash, a 3D LiDAR, their fog performance, and `kria_bev_grid`, a fusion grid for the PL | [INTEGRATIONS.md](INTEGRATIONS.md) | Analysed and simulated; the grid core is verified bit-exact and timed on the K26, not in the build |
