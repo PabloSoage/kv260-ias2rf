@@ -416,7 +416,11 @@ module tb_clk_mode_switch;
             @(posedge rx_clkdiv); resp_valid_flag <= 1'b0;
             dl_send_word(8'h10, 16'd8, {8'h02, 8'h00, addr, 32'd0});
             tmo = 0;
-            while ((!resp_valid_flag || (resp_addr_cap != addr)) && tmo < 4000) begin
+            // 10,000 rx_clkdiv cycles (80 us at 125 MHz). Right after a 500 <-> 400 MHz switch the uplink retrains
+            // while the radar and SDR streams keep filling dual_path_mux's 1024-word store-and-forward FIFO; the
+            // read-back then waits behind that backlog, about 40 us at the 400 MHz mode's link rate (G-8: 36 us
+            // measured with the radar's 512-byte packets, just over the former 32 us limit).
+            while ((!resp_valid_flag || (resp_addr_cap != addr)) && tmo < 10000) begin
                 @(posedge rx_clkdiv);
                 tmo = tmo + 1;
             end
