@@ -217,7 +217,7 @@ At 500 MHz the AD9484 runs at 500 MSPS and its DCO at 250 MHz. The AERIS DDC sta
 | `0x44`–`0x50` | `SDR_DDC_NCO_A/B`, `DECIM`, `STAT` | R/W | Independent 32-bit NCO FTWs for Ch A (`0x44`) & Ch B (`0x48`), `[15:0]` CIC3 decim ratio & `[25:16]` words/pkt (`0x4C`), dropped sample counter (`0x50`) |
 | `0x54`–`0x6C` | `DACR_*` (Radar LFM Chirp TX) | R/W | Enable/trigger & `amp_scale` (`0x54`), start FTW `f0` (`0x58`), chirp slope `df` (`0x5C`), `pulse_len` (`0x60`), `pri_len` (`0x64`), `chirp_active` (`0x68`), `pulse_cnt` (`0x6C`) |
 | `0x70`–`0x78` | `DACS_*` (SDR IQ DAC TX) | R/W | `tx_enable` (`[0]`), `~hf_dac2_mode` (`[1]`, default `0` = primary `I` on `DAC2 / IF_TX_C J952`), `dac1_mute` (`[2]`) (`0x70`); underflow counter (`0x74`); async TX FIFO level (`0x78`) |
-| `0x7C`–`0x90` | `ADAR_*` & RF Switches | R/W | `active_beam_id[4:0]`, soft T/R, `sw_req[11:8]`, `auto_tr_chirp[12]`, `soft_load` (`0x7C`); `guard_pre/post` (`0x80`); `sw_settle` (`0x84`); 32-beam RAM write (`0x88`); raw ADAR SPI (`0x8C`); status (`0x90`) |
+| `0x7C`–`0x90` | `ADAR_*` & RF Switches | R/W | `active_beam_id[4:0]`, soft T/R, `sw_req[11:8]`, `auto_tr_chirp[12]`, `soft_load`, scan mode `[13]` with its last beam `[20:16]` (each `BEAM_STROBE` loads the next of beams `0..scan_last`, from 0; Rev08) (`0x7C`); `guard_pre/post` (`0x80`); `sw_settle` (`0x84`); 32-beam RAM write (`0x88`); raw ADAR SPI (`0x8C`); status (`0x90`) |
 | `0x94`–`0xA4` | `HK_I2C_*` & `HK_TEMP_ERR` | R/W | Open-drain I2C controller for `TMP1075` (`0x48`) & `CAT24C02` (`0x50`) temperature & EEPROM polling |
 | `0xA8`–`0xB4` | `XO_CTRL`, `XO_DELTA_M`, `XO_RAW` | R/W | `Si549` fractional N-delta (`±50 ppm` `ENABLE_ETH` clamp, `0xAC`), raw I2C (`0xB0`/`0xB4`; `0xB0[23:17]` device address, `0` = the `Si549`, Rev08), `CLK_SEL` + safe-boot/`400<->500 MHz` DRP switch (`xo_boot_err[12]`, `xo_delta_clamped[13]`, `xo_boot_done[14]`) |
 | `0xB8`–`0xBC` | `XADC_TEMP_VCCINT` / `VCCAUX` | R | On-die Artix-7 XADC 12-bit temperature, `VCCINT`, `VCCAUX`, and overtemp flag |
@@ -289,7 +289,7 @@ The suite sits in `kria_pl_link` on `pl_clk_100m` and takes the stream selected 
 | `0x64` | `ADSB_CFG` | `[7:0]` samples per 0.5 µs chip (`[7]` adds one on every other chip: `0x8C` = 12.5 at 25 MSPS), `[23:8]` floor on the four preamble pulses' summed chip averages |
 | `0x68`, `0x6C` | ADS-B status (RO) | `{CRC errors, CRC good}` frame counters; low word of the last good frame |
 | `0x70`–`0x78` | `TX_CAR`, `TX_TONE`, `TX_CFG` | Carrier and test-tone frequency words; `[15:0]` modulation parameter, `[31:16]` amplitude |
-| `0x7C` | `RADAR_ALPHA` (W) / `RADAR_STAT` (R) | Write: `[15:0]` CFAR factor, Q8 (`1536` = 6.0), `[31:16]` absolute power floor in units of 16 (`0` keeps the former fixed `20000`); read: `{detections in the last CPI, peak Doppler bin, peak range bin}` |
+| `0x7C` | `RADAR_ALPHA` (W) / `RADAR_STAT` (R) | Write: `[15:0]` CFAR factor, Q8 (`1536` = 6.0), `[31:16]` absolute power floor in units of 16 (`0` keeps the former fixed `20000`); read: `[31:26]` CPIs completed modulo 64 (Rev08, for R5F core 1's scan), `[25:10]` detections in the last CPI, `[9:6]` peak Doppler bin, `[5:0]` peak range bin |
 
 What G-8 changed, and why:
 
@@ -340,6 +340,28 @@ R5F core 0 owns it ([`sw/kria/r5f`](../sw/kria/r5f/src/main.rs)); the loop is de
 
 Bench: `tb_kria_pps` (section 6), with the mutation `pps_no_filter`. Cost and timing: section 3.3.
 
+### 5.7 Kria fusion grid (`kria_bev_axi`, AXI-Lite at `0x8003_0000`, and `axi_dma_1` at `0x8004_0000`, Rev08)
+
+`kria_bev_axi` puts the bird's-eye-view grid core (`fpga/kria/integrations/kria_bev_grid.v`, [INTEGRATIONS.md §6](INTEGRATIONS.md)) on the K26's buses. It has three ports:
+- **Registers** (below), including a command port. R5F core 1 is its only writer: a command is two writes, so two writers could pair one's position with the other's command.
+- **`s_axis_det`:** a stream input, one 36-bit command in the low bits of each 64-bit beat, for a LiDAR DMA. It is unconnected for now, so Vivado ties its `tvalid` to 0. The register queue has priority over it.
+- **`m_axis`:** the dump, eight cells per beat with `tlast` on the 8,192nd, into `axi_dma_1`. That DMA is S2MM only, its interrupt is on `pl_ps_irq0[5]` (GIC SPI 94), and it writes the 64 KiB frame into one of two buffers at `0x3EE1_0000`.
+
+| Offset | Register | Fields |
+| :---: | :--- | :--- |
+| `0x00` | `ID` | `0x42455631` (`"BEV1"`) |
+| `0x04` | `STATUS` | `[0]` core busy (ray, decay or dump), `[1]` queue full, `[2]` overflow (W1C: a `DET_CMD` write found the queue full and was dropped), `[3]` queue empty, `[25:16]` queue level (512 entries) |
+| `0x08`, `0x0C` | `ORIGIN_X`, `ORIGIN_Y` | `[8k+7:8k]`: sensor `k`'s origin cell, `128` the centre (reset `0x80808080`) |
+| `0x10`, `0x14` | `HIT`, `MISS` | `[7k+6:7k]`: sensor `k`'s detection increment and ray decrement (reset 0) |
+| `0x18` | `RAY` | `[3:0]`: ray casting for sensor `k` (reset 0) |
+| `0x1C` | `DET_XY` | `[15:0]` x, `[31:16]` y, signed Q8.8 cells from the centre; staged, read back |
+| `0x20` | `DET_CMD` | Write: `[1:0]` sensor, `[3:2]` command (`0` detection, `1` decay pass, `2` dump); pushes `{DET_CMD[3:0], DET_XY}` |
+| `0x24` | `COUNT` | Commands the core has accepted from both inputs (wraps) |
+
+Change the configuration only while `STATUS` shows the queue empty and the core idle.
+
+Bench: `tb_kria_bev_axi` (section 6), with the mutation `bev_axi_no_stage`. Cost and timing: section 3.3.
+
 
 ## 6. XSim & Full-System Verification Suite (`fpga/sim/`)
 
@@ -363,6 +385,7 @@ Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado
 | Bench | Scope Verified |
 | :--- | :--- |
 | `tb_system.v` | Full end-to-end co-simulation at both `500 MHz` (`453.23 s`) and `400 MHz` (`516.44 s`), including A-1 `500 MHz` reset gating, `500->400 MHz` unlock & retrain, and PS `UART1` EMIO `0xE8` readback |
+| `tb_kria_bev_axi.v` | `kria_bev_axi` against the bit-exact grid model: ID, reset values, configuration read-back; the fog run's 974 commands (or, with `+BEV_DIR=../radar_grid`, the 2,705 that R5F core 1's code produced in `examples/radar_grid.rs`) sent in blocks of 64 alternating between `DET_XY`/`DET_CMD` and `s_axis_det` with random gaps, the dump compared cell by cell under random backpressure; `COUNT`; with the sink stalled during a second dump, 513 pushes leave the queue full at 512 with `STATUS.overflow` set, cleared by W1C; mutation `bev_axi_no_stage` (exit `1`) |
 | `tb_kria_pps.v` | `kria_pps` over AXI-Lite with 10,000-tick seconds: ID, mode 0 forwarding, captures and IRQ, capture period, mode 1 after qualification, a 5-tick glitch (flagged, not captured or forwarded), missing GPS, the fractional generator (8 s of 10,000.25 ticks = 80,002), one-shot adjust, a closed loop holding the generator within 1 tick of a 10,000.37-tick GPS second, and holdover; mutation `pps_no_filter` (exit `1`) |
 | `tb_dbg_uart.v` | G-1 `dbg_uart` boot banner, periodic `STAT`, `r`/`w`/`s`/`h` CLI, 4-master CSR collision arbitration, `BREAK` recovery (`500 MHz` & `400 MHz`) + mutations `wrong_divisor` & `drop_monitor_write` (exit `1`) |
 | `tb_clk_mode_switch.v` | Safe-boot Si549 `500 MHz` init, A-1 radar path reset/retrain on `500<->400 MHz` switch, and `±50 ppm` `ADPLL_DELTA_M` Ethernet clamp (`500 MHz` & `400 MHz`, `+` `-Mutate no_delta_clamp`) |
@@ -374,7 +397,7 @@ Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado
 | `tb_adc_cap500` | `adc_capture` in `mode_500` with a 250 MHz DCO (skew -90..+5 ps, +/-80 ps edges): training on `refclk_200m` with the MMCM in reset (eye 22 taps); a 4000-word ramp arrives in order with no gap or slip; then 400 MSPS training still works (eye 29 taps); mutations `d2_word_order` |
 | `tb_artix_top` (500 MHz boot) | D2 CSR readback; D2 on at 250 MHz with the AD9484 model on the master clock: trained, stream `0x01` packets, first sample `I` = 8322 (8299 expected), `Q` = -6; D2 off mid-stream releases the uplink |
 | `tb_adcs_capture.v`, `tb_adc_ddc.v` | AD9253 1-lane 16-bit DDR FCO bitslip alignment (`500`/`400 MHz` DCO -> `62.5`/`50.0 MSPS`) + Dual-Ch SDR DDC & AD9484 IDELAY auto-training (`500 MHz` & `400 MHz`) |
-| `tb_dac_tx.v`, `tb_adar_ctrl.v`, `tb_hk.v`, `tb_pmod_spi.v`, `tb_link_*`, `tb_pcs_*`, `tb_serdes*` | Non-MMCM `÷4` `dac_clk` LFM chirp & `hf_dac2_mode` TX, 8-chip ADAR1000 SPI & guard bands, TMP1075/Si549 I2C, XADC/PPS, Pmod SPI, 2-lane PCS deskew & `IDELAYE3` eye centering (all 19 benches pass at `500 MHz` & `400 MHz`) |
+| `tb_dac_tx.v`, `tb_adar_ctrl.v`, `tb_hk.v`, `tb_pmod_spi.v`, `tb_link_*`, `tb_pcs_*`, `tb_serdes*` | Non-MMCM `÷4` `dac_clk` LFM chirp & `hf_dac2_mode` TX, 8-chip ADAR1000 SPI & guard bands, the Rev08 scan mode (five strobes load beams 0, 1, 2, 0, 1 with their own weights; mutation `scan_ignored`), TMP1075/Si549 I2C, XADC/PPS, Pmod SPI, 2-lane PCS deskew & `IDELAYE3` eye centering (all 19 benches pass at `500 MHz` & `400 MHz`) |
 
 *(See [`SYSTEM_SIM.md`](../fpga/SYSTEM_SIM.md) for the complete recorded output logs of every testbench.)*
 

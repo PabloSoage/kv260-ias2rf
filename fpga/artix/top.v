@@ -2230,6 +2230,8 @@ module artix_top #(
         .beam_strobe     (beam_strobe),
         .soft_load       (reg_adar_load_p),
         .active_beam_id  (reg_adar_ctrl[4:0]),
+        .scan_en         (reg_adar_ctrl[13]),
+        .scan_last       (reg_adar_ctrl[20:16]),
         .tr_req          (adar_tr_eff),
         .guard_pre       (reg_adar_guard[15:0]),
         .guard_post      (reg_adar_guard[31:16]),
@@ -2511,7 +2513,7 @@ module artix_top #(
                 6'h1C: reg_rd_word = {29'd0, reg_dacs_ctrl[2:0]};                             // 0x70
                 6'h1D: reg_rd_word = dacs_underflow_cnt;                                    // 0x74
                 6'h1E: reg_rd_word = {22'd0, dacs_fifo_lvl_link};                           // 0x78
-                6'h1F: reg_rd_word = {19'd0, reg_adar_ctrl[12:8], 2'd0, reg_adar_ctrl[5:0]}; // 0x7C
+                6'h1F: reg_rd_word = {11'd0, reg_adar_ctrl[20:16], 2'd0, reg_adar_ctrl[13:8], 2'd0, reg_adar_ctrl[5:0]}; // 0x7C
                 6'h20: reg_rd_word = reg_adar_guard;                                        // 0x80
                 6'h21: reg_rd_word = {16'd0, reg_adar_sw_settle};                           // 0x84
                 6'h22: reg_rd_word = 32'd0;                                                 // 0x88 WO

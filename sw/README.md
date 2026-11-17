@@ -24,7 +24,7 @@ Zynq UltraScale+ PL bitstream (`fpga/kria/bd.tcl` + `fpga/kria/kria_pl_link.v`).
     ADC trained"). Since Rev08 these replace the two Pmod spare GPIOs, which now carry the debug UART.
 
 - [`kria/`](kria/README.md): Rust for the K26's processors: `kria-core` (shared, `no_std`), `kria-vehicled` (A53:
-  engine data from opendash) and `kria-r5f` (R5F core 0: GPS PPS discipline and the transmit lock).
+  engine data from opendash), `kria-r5f0` (R5F core 0: GPS PPS discipline, IAS1 link watchdog, transmit lock) and `kria-r5f1` (R5F core 1: radar beam scan and the PL fusion grid).
 - [`hmi/`](hmi/): the in-car screens ([docs/HMI.md](../docs/HMI.md)).
 - [`integrations/`](integrations/): simulations and figures for [docs/INTEGRATIONS.md](../docs/INTEGRATIONS.md).
 

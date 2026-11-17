@@ -30,6 +30,8 @@ module tb_adar_ctrl;
     reg         beam_strobe    = 1'b0;
     reg         soft_load      = 1'b0;
     reg  [4:0]  active_beam_id = 5'd0;
+    reg         scan_en        = 1'b0;
+    reg  [4:0]  scan_last      = 5'd0;
     reg         tr_req         = 1'b0;
     reg  [15:0] guard_pre      = 16'd10;
     reg  [15:0] guard_post     = 16'd12;
@@ -67,6 +69,8 @@ module tb_adar_ctrl;
         .beam_strobe     (beam_strobe),
         .soft_load       (soft_load),
         .active_beam_id  (active_beam_id),
+        .scan_en         (scan_en),
+        .scan_last       (scan_last),
         .tr_req          (tr_req),
         .guard_pre       (guard_pre),
         .guard_post      (guard_post),
@@ -388,12 +392,44 @@ module tb_adar_ctrl;
             $fatal(1, "FAIL host SPI readback");
         end
 
+        // 7) Scan mode: beams 0..2 in the table, scan_last = 2; five strobes must load 0, 1, 2, 0, 1 whatever
+        //    active_beam_id says (left at 7), each with its own registers.
+        write_beam_bram(5'd0);
+        write_beam_bram(5'd1);
+        write_beam_bram(5'd2);
+        @(posedge clk);
+        scan_last <= 5'd2;
+        scan_en   <= 1'b1;
+        begin : scan_seq
+            integer n, t;
+            reg [4:0] want;
+            for (n = 0; n < 5; n = n + 1) begin
+                want = n % 3;
+                @(posedge clk);
+                beam_strobe <= 1'b1;
+                repeat (5) @(posedge clk);
+                beam_strobe <= 1'b0;
+                repeat (4) @(posedge clk);
+                t = 0;
+                while ((load_busy || (current_beam_id != want)) && (t < 20000)) begin
+                    @(posedge clk);
+                    t = t + 1;
+                end
+                if (load_busy || (current_beam_id != want)) begin
+                    $display("FAIL scan strobe %0d: beam %0d, expected %0d (busy=%b)", n, current_beam_id, want, load_busy);
+                    $fatal(1, "FAIL scan sequence");
+                end
+                verify_active_beam(want);
+            end
+        end
+        scan_en <= 1'b0;
+
         if (tr_violations > 0) begin
             $display("FAIL tr_violations=%0d", tr_violations);
             $fatal(1, "FAIL TR violations");
         end
 
-        $display("PASS tb_adar_ctrl: init_ok=1 max_burst=%0d beam3_8x24=OK beam7_8x24=OK sw_ctrl=0x%h tr_viol=0",
+        $display("PASS tb_adar_ctrl: init_ok=1 max_burst=%0d beam3_8x24=OK beam7_8x24=OK scan=0,1,2,0,1 sw_ctrl=0x%h tr_viol=0",
                  max_burst[0], sw_ctrl);
         $finish;
     end

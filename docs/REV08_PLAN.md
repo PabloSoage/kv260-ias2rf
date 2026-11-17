@@ -1,4 +1,4 @@
-# Rev08 — plan and analysis
+# Rev08: plan and analysis
 
 *16 November 2026 · analysis and plan only: nothing in the schematic, the board or the gateware has changed*
 
@@ -101,7 +101,7 @@ would stop working when the board runs from Ethernet without the Kria.
 
 ---
 
-## 3. WP1 and WP2 — LEDs and a debug serial port
+## 3. WP1 and WP2: LEDs and a debug serial port
 
 ### 3.1 LEDs
 
@@ -158,7 +158,7 @@ Stock: CH340X 43 k ($0.66), USBLC6-2SC6 38 k.
 
 ---
 
-## 4. WP3 — IAS0
+## 4. WP3: IAS0
 
 ### 4.1 What IAS0 carries on the carrier
 
@@ -240,7 +240,7 @@ the lid is printed (risk register).
 
 ---
 
-## 5. WP4 and WP5 — VHF/UHF receive front end
+## 5. WP4 and WP5: VHF/UHF receive front end
 
 ### 5.1 What is there, and why it is not enough
 
@@ -546,12 +546,14 @@ editing numbers into a document. Before Rev08 is called finished:
 | Renders and 3-D | Board renders (top, iso, 4K), case and mount renders, heatsink renders, FEA images, camera module on the tongue; each checked against the render rules before upload |
 | Fabrication | BOM and placement files, LCSC selection with live stock, the quote, the fab package |
 | Documents | **Every document reviewed against the final design**, not only the ones the work touched: README, ARCHITECTURE, every `*_SPEC.md`, LAYOUT, SIGNAL_INTEGRITY, POWER, ENCLOSURE and its thermal study, MECHANICAL, FABRICATION, JLCPCB_QUOTE, FPGA_GATEWARE, `fpga/` and `sw/` documents, LINK_PROTOCOL's register map, PINMAP. Numbers checked against the regenerated outputs; no stale part reference, sample rate, connector name or count (thirteen SMAs). Then the schematic, layout and documentation PDFs regenerated and read through |
-| Documentation PDF layout | The visual defects of the current book fixed (section 11.2), and every page of the regenerated PDFs inspected as an image, not only searched as text |
+| Documentation PDF layout | The visual defects of the current book fixed (section 11.2), and every page of the regenerated PDFs inspected as an image, not only searched as text. **Done 17 November** for the table breaks; the book is regenerated again at the end of phase 9 |
 | Board manual | Section 11.3, drawn from the final Rev08 board files, in the README and in the documentation PDF |
 | Design history | [`docs/history/README.md`](history/README.md) gets a Rev08 row describing what changed against Rev07 (Rev07's row was added on 16 November 2026) |
 | This plan | Each item of sections 8 and 12 marked done or explicitly deferred, with the reason |
 
 ### 11.2 Known defect in the documentation PDF (reported 16 November 2026)
+
+**Fixed 17 November 2026** (route 1, below). `export_documentation.py` now cuts every table into complete tables, each starting with its header row, at the rows where the page really breaks, and puts a spacer under a header that would be orphaned at a page foot. `_work/pdf_table_check.py` checks the drawn PDF. The Rev07 book had 3 empty header bands and 199 text-over-border crossings on 14 pages; the regenerated book (225 pages, each inspected as an image) has none. What follows is the defect as reported.
 
 In `docs/KV260-IAS2RF_Documentation.pdf` as built for Rev07, long tables that break across pages are drawn
 wrongly. Seen on pages 162–163 (the LCSC parts table of JLCPCB_QUOTE) and page 38 (the register map of
@@ -602,7 +604,7 @@ front of the documentation PDF.
 - Acceptance: every designator in the callouts exists on the board and every connector, LED and IC of the
   board appears in the tables (checked by script); the pages are inspected as images like the rest of the PDF.
 
-### 11.4 Phase 2 result: placement trial (16 November 2026) — gate G1 passed
+### 11.4 Phase 2 result: placement trial (16 November 2026); gate G1 passed
 
 Every block of sections 3–5 was placed on a scratch copy of the Rev07 board with its real land pattern (EasyEDA
 footprints for the LCSC parts, KiCad's for the generic ones), two shield-can frames as copper rings, and KiCad's
@@ -781,8 +783,8 @@ The owner added these items before the `rev08` tag. Each is documentation and ve
 |---|---|---|---|
 | K26 timing with the G-8 DSP suite | The suite (G-8) missed `clk_pl_0` by 13.8 ns on the K26. Every block is now pipelined as a pure time shift, and the corner-turn and power-map memories moved to block RAM. The K26 closes at `WNS +0.772 ns` with 33,300 LUT | [FPGA_GATEWARE.md §3.3, §5.5](FPGA_GATEWARE.md) | Done; G-8 rerun gives the same results |
 | AERIS NCO fix upstream | The image-rejection fix in the AERIS NCO, ported to the upstream code: issue NawfalMotii79/PLFM_RADAR#213 and pull request #214 against `develop`, from the owner's fork (branch `develop`) | Upstream repository; the fork's `main` and `develop` | Ready for review: full upstream CI run locally (regression 28/28, MCU tests, cross-layer and GUI tests); the fork's `main` carries the fix too, adapted to its asynchronous-reset NCO |
-| In-car HMI and processing partition | Eight screens for a car touchscreen, the KV260's display path (PS DisplayPort controller, both connectors), and which job runs on the PL, the A53s, the two R5F cores, the GPU and the VCU | [HMI.md](HMI.md) | Designed; R5F core 0 firmware written (PPS and interlock), the application not |
-| Possible integrations | GPS with PPS, a 77 GHz radar (CAN FD or 100BASE-T1, with the bus loads), engine live data through opendash, a 3D LiDAR, their fog performance, and `kria_bev_grid`, a fusion grid for the PL | [INTEGRATIONS.md](INTEGRATIONS.md) | Analysed and simulated; the grid core is verified bit-exact and timed on the K26, not in the build |
+| In-car HMI and processing partition | Eight screens for a car touchscreen, the KV260's display path (PS DisplayPort controller, both connectors), and which job runs on the PL, the A53s, the two R5F cores, the GPU and the VCU | [HMI.md](HMI.md) | Designed; both R5F cores' firmware written, the application not |
+| Possible integrations | GPS with PPS, a 77 GHz radar (CAN FD or 100BASE-T1, with the bus loads), engine live data through opendash, a 3D LiDAR, their fog performance, and `kria_bev_grid`, a fusion grid for the PL | [INTEGRATIONS.md](INTEGRATIONS.md) | Analysed and simulated; the grid is in the K26 build with its DMA, fed by R5F core 1, verified end to end through the RTL |
 | GPS PPS on a free PL pin | `kria_pps` on KV260 `J9` pin 12 (`HDA10`, ball `J12`): GPS edge timestamps, glitch filter, a disciplined PPS generator with holdover, and the source of `PPS_SYNC`; in the K26 build at 568 LUT, `WNS +1.121 ns` | [INTEGRATIONS.md §2.1](INTEGRATIONS.md), [FPGA_GATEWARE.md §5.6](FPGA_GATEWARE.md) | Done: `tb_kria_pps` passes, mutation fails; loop simulated with the Rust core |
 | Engine data integration | opendash's telemetry output (`opendash-telemetry/1`, in opendash), and `kria-vehicled` on the A53s feeding road speed to the transmit lock | [INTEGRATIONS.md §4.1](INTEGRATIONS.md) | Done and tested end to end against the emulated ECU |
-| Software on the Kria's cores | Rust: `kria-core` (no_std; PPS loop, interlock, telemetry, mailbox), `kria-vehicled` (A53), `kria-r5f` (R5F core 0) | [INTEGRATIONS.md §7](INTEGRATIONS.md), [`sw/kria`](../sw/kria/README.md) | Built and host-tested (16 tests); not run on a KV260 |
+| Software on the Kria's cores | Rust: `kria-core` (no_std; PPS loop, interlock, link watchdog, radar scan, grid, ring, telemetry, mailbox), `kria-vehicled` (A53), `kria-r5f0` and `kria-r5f1` (the two R5F cores) | [INTEGRATIONS.md §7](INTEGRATIONS.md), [`sw/kria`](../sw/kria/README.md) | Built and host-tested (29 tests), core 1 end to end through the grid's RTL; not run on a KV260 |

@@ -238,6 +238,12 @@ module kria_dsp_suite (
     wire [3:0]  mon_rd_dbin, mon_peak_dbin;
     wire [31:0] mon_rd_pwr, mon_peak_pwr;
     wire [15:0] mon_cpi_det_cnt;
+    // CPIs completed, modulo 64, in RADAR_STAT[31:26]: R5F core 1 polls it to run one step per CPI.
+    reg  [5:0]  mon_cpi_cnt;
+    always @(posedge clk) begin
+        if (rst || !radar_en) mon_cpi_cnt <= 6'd0;
+        else if (mon_cpi_done) mon_cpi_cnt <= mon_cpi_cnt + 6'd1;
+    end
 
     kria_radar_proc #(.RANGE_N(64), .DOPPLER_M(16)) u_radar_proc (
         .clk               (clk),
@@ -340,7 +346,7 @@ module kria_dsp_suite (
             6'h1C: csr_rd_rdata = reg_tx_car_ftw;
             6'h1D: csr_rd_rdata = reg_tx_tone_ftw;
             6'h1E: csr_rd_rdata = reg_tx_cfg;
-            6'h1F: csr_rd_rdata = {6'd0, mon_cpi_det_cnt, mon_peak_dbin, mon_peak_rbin};
+            6'h1F: csr_rd_rdata = {mon_cpi_cnt, mon_cpi_det_cnt, mon_peak_dbin, mon_peak_rbin};
             default: csr_rd_rdata = 32'd0;
         endcase
     end

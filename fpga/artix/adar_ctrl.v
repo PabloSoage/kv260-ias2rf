@@ -34,6 +34,10 @@ module adar_ctrl #(
     input  wire        beam_strobe,   // External BEAM_STROBE trigger (synchronized internally)
     input  wire        soft_load,     // Host 1-cycle beam load request
     input  wire [4:0]  active_beam_id,
+    // Scan mode (Rev08): with scan_en, each BEAM_STROBE loads the next beam of 0..scan_last in turn, starting at 0,
+    // so a real-time core on the Kria steps a scan with the strobe alone. soft_load still loads active_beam_id.
+    input  wire        scan_en,
+    input  wire [4:0]  scan_last,
     input  wire        tr_req,        // Desired T/R state: 0 = RX, 1 = TX
     input  wire [15:0] guard_pre,     // Guard cycles before TX assert / beam load
     input  wire [15:0] guard_post,    // Guard cycles after load / TR switch before tr_ready
@@ -122,6 +126,7 @@ module adar_ctrl #(
     reg [15:0] guard_cnt;
     reg        beam_load_pending;
     reg [4:0]  pending_beam_id;
+    reg [4:0]  scan_next;
 
     // Active SPI transfer context
     reg [2:0]  spi_chip;
@@ -249,6 +254,7 @@ module adar_ctrl #(
             load_busy         <= 1'b0;
             beam_load_pending <= 1'b0;
             pending_beam_id   <= 5'd0;
+            scan_next         <= 5'd0;
             current_beam_id   <= 5'd0;
             guard_cnt         <= 16'd0;
             rd_beam           <= 5'd0;
@@ -278,8 +284,16 @@ module adar_ctrl #(
 
             if (strobe_rise || soft_load) begin
                 beam_load_pending <= 1'b1;
+`ifdef MUTATE_SCAN_IGNORED
                 pending_beam_id   <= active_beam_id;
+`else
+                pending_beam_id   <= (scan_en && strobe_rise && !soft_load) ? scan_next : active_beam_id;
+`endif
             end
+            if (!scan_en)
+                scan_next <= 5'd0;
+            else if (strobe_rise && !soft_load)
+                scan_next <= (scan_next >= scan_last) ? 5'd0 : scan_next + 5'd1;
 
             case (state)
                 ST_IDLE: begin

@@ -11,7 +11,7 @@ Four devices could be connected to the KV260 alongside this board in the owner's
 None of them needs a change to this board. This document gives each one's link, data rate and processing, what it adds to the system, and the simulations and tests behind the numbers. Three pieces are built and tested end to end:
 - the GPS's pulse-per-second on a free PL pin, disciplined by an R5F core (§2);
 - the engine's live data from opendash into a daemon on the A53s, which feeds the transmit lock on the R5F (§4);
-- a fusion core for the PL that combines the LiDAR and the radar into one occupancy grid (§6).
+- a fusion grid in the PL that combines the LiDAR and the radars into one occupancy grid, in the K26's block design with its own DMA, fed by R5F core 1, which also scans the board's 10.5 GHz radar beam by beam (§6).
 
 The software that runs on the K26's processors is in Rust, with its logic in one I/O-free crate shared by the A53s and the R5F cores (§7). [HMI.md](HMI.md) shows the screens that display all of it.
 
@@ -23,7 +23,7 @@ The software that runs on the K26's processors is in Rust, with its logic in one
 | 77 GHz radar | Its own CAN FD bus (USB-CAN FD adapter), or 100BASE-T1 Ethernet through a media converter | Object list or detections at about 20 Hz; classic CAN is too small for either (§3) | A53 or R5F 1: decode; PL: into the grid | Bus load and fog performance simulated (§3, §6) |
 | Engine live data (opendash) | opendash's telemetry server on the phone (Wi-Fi), or the SM3 directly | Up to 40 identifiers at 100 Hz, about 3,500 values/s | A53: `kria-vehicled`; R5F 0: road speed into the transmit lock | End to end against an emulated ECU (§4) |
 | 3D LiDAR, Ethernet | USB 3.0 to Gigabit Ethernet adapter | 0.2 to 1.3 Mpoints/s, 20 to 70 Mbit/s | A53: driver, SLAM; PL: occupancy grid | Fog performance simulated (§5, §6) |
-| Fusion grid | Inside the PL | 100 M cell updates/s | PL core `kria_bev_grid` | RTL, bit-exact against its model, K26 timing (§6) |
+| Fusion grid | Inside the PL | 100 M cell updates/s | PL: `kria_bev_grid` behind `kria_bev_axi`; R5F 1: its commands, the 10.5 GHz scan, the frames | RTL bit-exact against its model, in the K26 build; end to end from R5F 1's code through the RTL (§6.1) |
 
 The KV260's own Gigabit port (`J10`) already carries this board's Ethernet link, so the LiDAR needs the USB adapter. The four USB 3.0 ports take the GPS, the CAN adapter, the Wi-Fi adapter and the LiDAR's Ethernet adapter, with the touchscreen on a hub or on the HDMI display's own USB.
 
@@ -246,7 +246,7 @@ The LiDAR is the sharpest sensor in clear air and the weakest in fog (§3). Its 
 
 ## 6. Fusion on the PL: `kria_bev_grid`
 
-[`fpga/kria/integrations/kria_bev_grid.v`](../fpga/kria/integrations/kria_bev_grid.v) is a bird's-eye-view occupancy grid: 256 × 256 signed 8-bit log-odds cells around the vehicle. At 0.5 m cells it covers 128 m × 128 m. It is not part of the build (`bd.tcl` does not add it). It is a core ready to be placed beside the DSP suite on its own AXI-Stream.
+[`fpga/kria/integrations/kria_bev_grid.v`](../fpga/kria/integrations/kria_bev_grid.v) is a bird's-eye-view occupancy grid: 256 × 256 signed 8-bit log-odds cells around the vehicle. At 0.5 m cells it covers 128 m × 128 m. It is in the K26's block design behind an AXI wrapper, with a DMA channel for its frames, and R5F core 1 feeds it (§6.1).
 
 **What it does.**
 - **Detections.** The host sends detections already transformed to the vehicle frame (x and y in Q8.8 cells), each tagged with its sensor.
@@ -288,14 +288,60 @@ To rerun: first `python sw/integrations/bev_fusion_sim.py` (writes `fpga/sim/out
 | DSP48E2 | 0 | 0 |
 | Timing at 100 MHz (`clk_pl_0`) | WNS +2.361 ns, WHS +0.057 ns | |
 
-With the DSP suite and the PPS block (33,876 LUT, 15 BRAM) it would fit with most of the device still free. The 64 K × 8 memory is cascaded over 16 block RAMs, so the read-modify-write path is about 6.5 ns. The core closes at 100 MHz but not at 250 MHz (−2.5 ns). A registered RAM output, with one more forwarding stage, would be the way up if it were needed.
+In the full build it costs about what it costs alone (§6.1). The 64 K × 8 memory is cascaded over 16 block RAMs, so the read-modify-write path is about 6.5 ns. The core closes at 100 MHz but not at 250 MHz (−2.5 ns). A registered RAM output, with one more forwarding stage, would be the way up if it were needed.
 
 **Does it need the PL?** One cell update per clock is 100 million per second. A Mid-360's 200,000 points/s with 60-cell rays is 12 million cell updates per second, which one A53 core can probably keep up with `[E]`. A 1.3 Mpoint/s LiDAR is 78 million, scattered across 64 KB, which is where a core that never misses its cache and never waits for Linux pays off. Doing it in the PL also leaves the A53s for the SLAM.
 
 **Not done yet:**
 - **Ego-motion.** The grid is vehicle-centred, so as the vehicle moves the host has to shift it, or keep a world-anchored grid and recentre it.
-- **AXI wrapper.** An AXI-Lite wrapper for the configuration and a DMA channel for the dump.
+- **A LiDAR DMA.** The wrapper's stream input (`s_axis_det`) is there for a LiDAR's points at full rate; nothing drives it yet.
 - **Real data.** Real point clouds and object lists.
+
+### 6.1 On the K26: wrapper, DMA and R5F core 1
+
+**In the block design** ([`fpga/kria/bd.tcl`](../fpga/kria/bd.tcl)):
+- **`kria_bev_axi`** ([`fpga/kria/kria_bev_axi.v`](../fpga/kria/kria_bev_axi.v), AXI-Lite at `0x8003_0000`) holds the per-sensor origins, weights and ray-casting flags, and a command port: `DET_XY`, then `DET_CMD`, which pushes the command into a 512-entry queue. A second input, `s_axis_det`, takes commands as a stream for a LiDAR DMA; the queue has priority over it. The register map is in [FPGA_GATEWARE.md §5.7](FPGA_GATEWARE.md).
+- **`axi_dma_1`** (S2MM only, `0x8004_0000`, interrupt `pl_ps_irq0[5]`) writes each dump, 64 KiB, into one of two frame buffers after the mailbox region (`0x3EE1_0000`, `bev_frames` in [`sw/ias2rf_pl.dtsi`](../sw/ias2rf_pl.dtsi)), in about 82 µs.
+
+**R5F core 1 owns the command port.** A command is two register writes, so two writers would pair one's position with the other's command. Core 1 ([`sw/kria/r5f/src/bin/core1.rs`](../sw/kria/r5f/src/bin/core1.rs)) is the only writer. Every 100 µs it:
+- **Scans the 10.5 GHz radar.** It reads `RADAR_STAT` and steps `kria_core::radar::Scheduler` once per CPI. The scheduler dwells 2 CPIs on a beam, plus 2 more for each CPI with a detection, up to 8. It ignores the CPI that straddles a beam change and pulses `BEAM_STROBE` for the next beam. In the Artix's new scan mode (`ADAR_CTRL[13]`), each strobe loads the next of beams `0..scan_last`, so no register write is needed per beam. `RADAR_STAT[31:26]` now counts CPIs, which is how core 1 knows one has finished.
+- **Puts each detection in the grid.** The strongest cell of the CPI is converted back from the map's conjugate position, then from range and beam azimuth to vehicle coordinates (`bev::Mount`), and pushed as the 10.5 GHz radar's point.
+- **Drains Linux's ring.** The 77 GHz radar's objects (decoded on the A53s, §3), and anything else Linux wants in the grid, go through a ring in the shared region ([`kria_core::ring`](../sw/kria/core/src/ring.rs)), 64 per loop.
+- **Makes the frames.** Every `frame_ms` (100 ms by default) it arms the DMA on the free buffer, pushes a decay pass and a dump, and publishes the buffer in its status block when the DMA finishes.
+
+Linux sets the scan (beams, azimuths, dwell, range and Doppler per bin), the radar's mount and the frame cadence in the mailbox (`Core1Config`), and writes the grid's weights and origins once. Silent for a second, Linux stops core 1's scan and grid.
+
+**End to end.** [`sw/kria/core/examples/radar_grid.rs`](../sw/kria/core/examples/radar_grid.rs) runs core 1's code in core 1's order for 2 s. Around it are models of the Artix's beam scan, of `kria_radar_proc` (a CPI every 400 µs, three CFAR cells per target in the beam, the conjugate map) and of a scene: a car ahead closing at 2 m/s, a pedestrian, a cyclist crossing, and a parked van. The 77 GHz radar sees the same objects every 50 ms, through the ring. Its 2,705 commands then go through the RTL: [`tb_kria_bev_axi`](../fpga/sim/tb_kria_bev_axi.v) alternates them between the register port and the stream, and the dump matches the bit-exact model in all 65,536 cells.
+
+| | |
+|---|---|
+| CPIs in 2 s | 4,999, none missed |
+| Beam changes | 1,034; a full scan of 13 beams in about 25 ms |
+| CPIs with a detection | 2,525, every one on a real target's beam and range |
+| Commands | 2,525 radar detections, 160 objects through the ring (none dropped), 19 decay passes, 1 dump |
+
+![R5F core 1: the scan and the grid](img/integrations/radar_grid_e2e.png)
+
+On the left, the dwell grows on the four beams with a target. On the right, the grid after 2 s:
+- the car's trail as it closes;
+- the cyclist's track across the road;
+- the pedestrian and the van as fixed cells.
+
+To rerun:
+1. `cargo run --release --example radar_grid` in `sw/kria/core`;
+2. `python sw/integrations/radar_grid_replay.py`, which writes the expected grid and the figure;
+3. `fpga/sim/run.ps1 tb_kria_bev_axi -PlusArg BEV_DIR=../radar_grid`.
+
+**Verification of the wrapper.** [`tb_kria_bev_axi`](../fpga/sim/tb_kria_bev_axi.v) on the fog run of §6 (974 commands) checks:
+- the reset values;
+- the configuration read-back;
+- both command paths against the model;
+- the queue filling to 512 with `STATUS.overflow` set and cleared;
+- `COUNT`.
+
+The mutation `bev_axi_no_stage` (`DET_CMD` ignores `DET_XY`) fails it. The Artix's scan mode is in `tb_adar_ctrl`: five strobes load beams 0, 1, 2, 0 and 1, each with its own weights; the mutation `scan_ignored` fails it. The CPI count is checked by the system bench `tb_system_signals` in the G-8 radar case, which passes again with it.
+
+**Cost in the K26 build:** {K26_BEV_ROW}
 
 ## 7. Software on the K26's processors
 
@@ -303,9 +349,10 @@ Code that runs on the Kria's ARM cores is written in Rust, with its logic in an 
 
 | Crate | Runs on | What it does |
 |---|---|---|
-| [`kria-core`](../sw/kria/core/src/lib.rs) | A53 and R5F (`no_std`, no allocation, no `unsafe`) | `pps` (the loop of §2.1), `interlock` (the transmit lock), `telemetry` (`opendash-telemetry/1` lines), `mailbox` (the shared block's layout and seqlock) |
+| [`kria-core`](../sw/kria/core/src/lib.rs) | A53 and R5F (`no_std`, no allocation, no `unsafe`) | `pps` (the loop of §2.1), `interlock` (the transmit lock), `link` (the IAS1 link watchdog), `radar` (the beam scan), `bev` (the grid's commands and coordinates), `ring` (Linux's grid commands for core 1), `telemetry` (`opendash-telemetry/1` lines), `mailbox` (the shared blocks' layout and seqlock) |
 | [`kria-vehicled`](../sw/kria/vehicled/src/main.rs) | A53, Linux | §4.1 |
-| [`kria-r5f`](../sw/kria/r5f/src/main.rs) | R5F core 0, from TCM, started by remoteproc | At 1 kHz: the PPS loop on `kria_pps`, the transmit lock (it owns `DSP_CTRL[1]`), and status back to Linux |
+| [`kria-r5f0`](../sw/kria/r5f/src/bin/core0.rs) | R5F core 0, from TCM, started by remoteproc | At 1 kHz: the PPS loop on `kria_pps`, the IAS1 link watchdog, the transmit lock (it owns `DSP_CTRL[1]`), and status back to Linux |
+| [`kria-r5f1`](../sw/kria/r5f/src/bin/core1.rs) | R5F core 1, from its own TCM | At 10 kHz: the 10.5 GHz radar's beam scan, the fusion grid's command port and frames (§6.1) |
 
 **The transmit lock** (`kria_core::interlock`) runs on R5F core 0 every millisecond:
 - **Speed source:** the ECU's road speed first, while fresh (1 s), then the GPS's (2 s).
@@ -314,41 +361,60 @@ Code that runs on the Kria's ARM cores is written in Rust, with its logic in an 
 - **Time-out:** at most 180 s of continuous transmission, then a 10 s cooldown after the button is released.
 - **Fail-safe:** no fresh speed from either source, or Linux silent for 0.5 s, means locked.
 
-On the R5F it holds while Linux is busy or restarting. Linux never writes the transmit-enable bit; it asks through the mailbox.
+On the R5F it holds while Linux is busy or restarting. Linux never writes the transmit-enable bit; it asks through the mailbox. Core 0 also requires the IAS1 link to be up: with the link down the transmit samples do not reach the front end, and when it returns they should not resume on their own.
+
+**The IAS1 link watchdog** (`kria_core::link`), also on core 0 every millisecond:
+- **Down:** after 20 ms with `link_up` low, it pulses `LINK_CTRL[2]` to retrain. If the link stays down, it retrains again after 100 ms, then 200, 400 and so on up to 5 s, so a front end that is switched off is not hammered. The first training after start gets 3 s.
+- **Errors:** more than 100 CRC errors within a second of link time retrain it once.
+- **Health and counts:** go to Linux in the mailbox.
+
+A link register read can abort: `kria_pl_link` answers SLVERR when the link's receive clock is missing, which is when the link is down. The firmware's data-abort handler counts the abort and resumes at the next instruction, and the watchdog takes an aborted read as "down". A core that hung on that abort would leave the transmitter as it was.
+
+**AGC and front-end sequencing stay where they are.** The AGC loop already runs in the Artix fabric (`fe_agc`, Rev08 G-5): it reads the AD9484's peak every 131 µs and drives the `PE4312` and the LNA bypass with no processor in the loop. The front end's sequencing is a handful of Artix register writes at start-up and on a band change. The Kria reaches those registers only through the link's command stream (`0x10`), whose DMA Linux owns. So both stay as they are, with Linux setting the AGC's thresholds and doing the sequencing.
 
 **The mailbox:**
-- **Where:** 128 bytes in a 4 KiB `reserved-memory` region at `0x3EE0_0000` ([`sw/ias2rf_pl.dtsi`](../sw/ias2rf_pl.dtsi)).
-- **Who writes:** one writer per half, and each half is a seqlock.
-- **Time base:** `kria_pps`'s `NOW`, the PL clock that both sides read.
+- **Where:** a 64 KiB `reserved-memory` region at `0x3EE0_0000` ([`sw/ias2rf_pl.dtsi`](../sw/ias2rf_pl.dtsi)), with the grid's two frames right after it.
+- **Layout:**
+
+  | Offset | Block | Writer |
+  |---|---|---|
+  | `0x000` | speeds, licence, transmit request | Linux |
+  | `0x040` | PPS, interlock and link status | core 0 |
+  | `0x080` | scan and grid status, the latest frame | core 1 |
+  | `0x100` | scan and grid configuration | Linux |
+  | `0x1000` | grid command ring | Linux (head), core 1 (tail) |
+- **Who writes:** one writer per block, and each block is a seqlock.
+- **Time base:** `kria_pps`'s `NOW`, the PL clock that all three read. Reading `NOW_LO` latches `NOW_HI` for whoever reads it next, so each reader takes two pairs and keeps them only if they agree.
 
 RPMsg (OpenAMP) is the general-purpose alternative. For a few numbers a millisecond, a fixed block with no driver is enough.
 
 **Tests:**
-- **`kria-core`:** 16 tests on the host.
+- **`kria-core`:** 29 tests on the host.
   - PPS: lock with a fast and a slow oscillator, a frequency step, a false pulse, holdover and reacquisition, a counter that wraps.
   - Interlock: settling, creeping, GPS fallback and fail-safe, licence, time-out and cooldown.
+  - Link watchdog: power-up training, the back-off sequence and its reset, slow errors counted, a burst retrained once.
+  - Radar scan: dwell and beam order with nothing in view, a target holding the beam, the conjugate map, negative Doppler, CPIs missed across the counter's wrap.
+  - Grid: command words against the RTL layout, cell edges, sine and cosine within 2e-6, mounts, configuration words.
   - Telemetry: lines exactly as opendash writes them, and junk.
-  - Mailbox: round trip and seqlock.
+  - Mailbox and ring: round trips, seqlock, counters that wrap.
 - **Cross-builds:** the core builds for `armv7r-none-eabihf` and `aarch64-unknown-linux-gnu`.
-- **The R5F firmware:** links into ATCM (6.5 KB of code) and BTCM.
+- **The R5F firmware:** two images, each linked into its core's ATCM (7.5 KB and 7.8 KB of code) and BTCM.
 - **The daemon:** builds for the A53s, and ran the end-to-end test of §4.1.
+- **Core 1 end to end:** §6.1.
 
 None of it has run on a KV260 yet.
 
 ## 8. What it would take, in order
 
 1. **On a KV260:**
-   - the bitstream with `kria_pps`;
-   - the overlay with the PPS node and the mailbox;
-   - `kria-r5f` loaded through remoteproc;
+   - the bitstream with `kria_pps`, the grid and its DMA;
+   - the overlay with the PPS and grid nodes, the mailbox and the frame buffers;
+   - `kria-r5f0` and `kria-r5f1` loaded through remoteproc;
+   - the Artix's beam table loaded in scan order and `ADAR_CTRL[13]` set;
    - `kria-vehicled` against opendash on the phone;
    - `gpsd` and `chrony` for the GPS's position and time, and its PPS on `J9` pin 12.
 
    Everything here is built and tested on the bench. Only the board is missing.
 2. **The LiDAR on its USB adapter.** Its ROS 2 driver and a SLAM (FAST-LIO2 or similar), fed with the wheel speed from step 1.
 3. **The 77 GHz radar on its own CAN FD adapter or 100BASE-T1 converter (§3).** Its DBC or interface document and a decoder, with its objects on the Vehicle screen.
-4. **`kria_bev_grid` in the block design:**
-   - an AXI-Stream input from a DMA channel;
-   - an AXI-Lite wrapper for the weights and origins;
-   - the dump back to DDR for the HMI and the SLAM;
-   - one more Vivado build of the K26.
+4. **The LiDAR into the grid at full rate:** a DMA channel (MM2S) into `kria_bev_axi`'s `s_axis_det`, and the points converted to grid commands on the A53s.

@@ -23,6 +23,8 @@ add_files -norecurse [file join $script_dir "kria_radar_proc.v"]
 add_files -norecurse [file join $script_dir "kria_dsp_suite.v"]
 add_files -norecurse [file join $script_dir "kria_pl_link.v"]
 add_files -norecurse [file join $script_dir "kria_pps.v"]
+add_files -norecurse [file join $script_dir "integrations" "kria_bev_grid.v"]
+add_files -norecurse [file join $script_dir "kria_bev_axi.v"]
 update_compile_order -fileset sources_1
 
 # ------------------------------------------------------------------------------
@@ -66,6 +68,20 @@ set pps_blk [create_bd_cell -type module -reference kria_pps kria_pps_0]
 set gpio2 [create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice xlslice_gpio2]
 set_property -dict [list CONFIG.DIN_WIDTH {8} CONFIG.DIN_FROM {2} CONFIG.DIN_TO {2}] $gpio2
 
+# Bird's-eye-view fusion grid (fpga/kria/kria_bev_axi.v around integrations/kria_bev_grid.v) and an
+# S2MM-only DMA that writes its 64 KiB dumps to DDR
+set bev [create_bd_cell -type module -reference kria_bev_axi kria_bev_0]
+set dma1 [create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma axi_dma_1]
+set_property -dict [list \
+    CONFIG.c_include_sg {0} \
+    CONFIG.c_sg_include_stscntrl_strm {0} \
+    CONFIG.c_include_mm2s {0} \
+    CONFIG.c_sg_length_width {17} \
+    CONFIG.c_m_axi_s2mm_data_width {64} \
+    CONFIG.c_s_axis_s2mm_tdata_width {64} \
+    CONFIG.c_s2mm_burst_size {64} \
+] $dma1
+
 set dma0 [create_bd_cell -type ip -vlnv xilinx.com:ip:axi_dma axi_dma_0]
 set_property -dict [list \
     CONFIG.c_include_sg {0} \
@@ -82,13 +98,13 @@ set_property -dict [list \
 ] $dma0
 
 set smc_ctrl [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc_ctrl]
-set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {3}] $smc_ctrl
+set_property -dict [list CONFIG.NUM_SI {1} CONFIG.NUM_MI {5}] $smc_ctrl
 
 set smc_hp0 [create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect axi_smc_hp0]
-set_property -dict [list CONFIG.NUM_SI {2} CONFIG.NUM_MI {1}] $smc_hp0
+set_property -dict [list CONFIG.NUM_SI {3} CONFIG.NUM_MI {1}] $smc_hp0
 
 set irqc [create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat xlconcat_0]
-set_property -dict [list CONFIG.NUM_PORTS {5}] $irqc
+set_property -dict [list CONFIG.NUM_PORTS {6}] $irqc
 
 # Clocks & Reset
 connect_bd_net [get_bd_pins ps8/pl_clk0] \
@@ -99,6 +115,9 @@ connect_bd_net [get_bd_pins ps8/pl_clk0] \
     [get_bd_pins axi_dma_0/s_axi_lite_aclk] \
     [get_bd_pins axi_dma_0/m_axi_mm2s_aclk] \
     [get_bd_pins axi_dma_0/m_axi_s2mm_aclk] \
+    [get_bd_pins kria_bev_0/clk] \
+    [get_bd_pins axi_dma_1/s_axi_lite_aclk] \
+    [get_bd_pins axi_dma_1/m_axi_s2mm_aclk] \
     [get_bd_pins axi_smc_ctrl/aclk] \
     [get_bd_pins axi_smc_hp0/aclk]
 
@@ -106,6 +125,7 @@ connect_bd_net [get_bd_pins ps8/pl_resetn0] [get_bd_pins rst_ps8_100M/ext_reset_
 connect_bd_net [get_bd_pins rst_ps8_100M/peripheral_aresetn] \
     [get_bd_pins kria_pl_link_0/pl_resetn]     [get_bd_pins kria_pps_0/resetn] \
     [get_bd_pins axi_dma_0/axi_resetn] \
+    [get_bd_pins kria_bev_0/resetn] [get_bd_pins axi_dma_1/axi_resetn] \
     [get_bd_pins axi_smc_ctrl/aresetn] \
     [get_bd_pins axi_smc_hp0/aresetn]
 
@@ -114,22 +134,28 @@ connect_bd_intf_net [get_bd_intf_pins ps8/M_AXI_HPM0_LPD] [get_bd_intf_pins axi_
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M00_AXI] [get_bd_intf_pins kria_pl_link_0/s_axi]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M01_AXI] [get_bd_intf_pins axi_dma_0/S_AXI_LITE]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M02_AXI] [get_bd_intf_pins kria_pps_0/s_axi]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M03_AXI] [get_bd_intf_pins kria_bev_0/s_axi]
+connect_bd_intf_net [get_bd_intf_pins axi_smc_ctrl/M04_AXI] [get_bd_intf_pins axi_dma_1/S_AXI_LITE]
 
 # AXI4 High-Performance Data Plane (axi_dma S2MM/MM2S <-> PS S_AXI_HP0_FPD)
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_MM2S] [get_bd_intf_pins axi_smc_hp0/S00_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXI_S2MM] [get_bd_intf_pins axi_smc_hp0/S01_AXI]
+connect_bd_intf_net [get_bd_intf_pins axi_dma_1/M_AXI_S2MM] [get_bd_intf_pins axi_smc_hp0/S02_AXI]
 connect_bd_intf_net [get_bd_intf_pins axi_smc_hp0/M00_AXI]  [get_bd_intf_pins ps8/S_AXI_HP0_FPD]
 
 # AXI4-Stream Link <-> AXI DMA
 connect_bd_intf_net [get_bd_intf_pins kria_pl_link_0/m_axis_rx] [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM]
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S]   [get_bd_intf_pins kria_pl_link_0/s_axis_tx]
+# Grid dumps -> axi_dma_1. s_axis_det is kept for a LiDAR DMA; until then its tvalid is tied to 0
+connect_bd_intf_net [get_bd_intf_pins kria_bev_0/m_axis] [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM]
 
-# Interrupts -> PS pl_ps_irq0[3:0]
+# Interrupts -> PS pl_ps_irq0[5:0]
 connect_bd_net [get_bd_pins kria_pl_link_0/irq_fpga]    [get_bd_pins xlconcat_0/In0]
 connect_bd_net [get_bd_pins kria_pl_link_0/irq_link_up] [get_bd_pins xlconcat_0/In1]
 connect_bd_net [get_bd_pins axi_dma_0/s2mm_introut]     [get_bd_pins xlconcat_0/In2]
 connect_bd_net [get_bd_pins axi_dma_0/mm2s_introut]     [get_bd_pins xlconcat_0/In3]
 connect_bd_net [get_bd_pins kria_pps_0/irq]             [get_bd_pins xlconcat_0/In4]
+connect_bd_net [get_bd_pins axi_dma_1/s2mm_introut]     [get_bd_pins xlconcat_0/In5]
 connect_bd_net [get_bd_pins xlconcat_0/dout]            [get_bd_pins ps8/pl_ps_irq0]
 
 # PS EMIO Sideband -> kria_pl_link_0
@@ -169,13 +195,18 @@ foreach {dir p} {
 }
 
 # Address Map matching sw/ias2rf_pl.dtsi & sw/ias2rf_dma_test.c
+# Each slave at a fixed address (a blanket assign_bd_address picks its own order and collides)
+foreach {seg off} {
+    kria_pl_link_0/s_axi/reg0  0x80000000
+    axi_dma_0/S_AXI_LITE/Reg   0x80010000
+    kria_pps_0/s_axi/reg0      0x80020000
+    kria_bev_0/s_axi/reg0      0x80030000
+    axi_dma_1/S_AXI_LITE/Reg   0x80040000
+} {
+    assign_bd_address -target_address_space /ps8/Data -offset $off -range 64K [get_bd_addr_segs $seg]
+}
+# The DMAs' masters reach DDR
 assign_bd_address
-set_property offset 0x80000000 [get_bd_addr_segs {ps8/Data/SEG_kria_pl_link_0_reg0}]
-set_property range  64K        [get_bd_addr_segs {ps8/Data/SEG_kria_pl_link_0_reg0}]
-set_property offset 0x80010000 [get_bd_addr_segs {ps8/Data/SEG_axi_dma_0_Reg}]
-set_property range  64K        [get_bd_addr_segs {ps8/Data/SEG_axi_dma_0_Reg}]
-set_property offset 0x80020000 [get_bd_addr_segs {ps8/Data/SEG_kria_pps_0_reg0}]
-set_property range  64K        [get_bd_addr_segs {ps8/Data/SEG_kria_pps_0_reg0}]
 
 validate_bd_design
 save_bd_design

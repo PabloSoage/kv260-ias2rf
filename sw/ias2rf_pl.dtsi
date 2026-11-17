@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // Devicetree overlay fragment for KV260 IAS1 PL Bitstream
-// Exposes kria_pl_link CSRs via UIO, AXI DMA S2MM/MM2S via u-dma-buf / UIO,
+// Exposes kria_pl_link CSRs via UIO, AXI DMA S2MM/MM2S via u-dma-buf / UIO, kria_pps and the fusion grid via UIO,
 // PS EMIO I2C0 / SPI0 buses routed to the IAS2RF adapter and Pmod J2, and PS UART1 on EMIO to the
 // front-end FPGA's debug console (dbg_uart) over the two Pmod spare lines: /dev/ttyPS1, 115200 8N1.
 
@@ -59,6 +59,23 @@
                 interrupt-names = "pps";
                 status = "okay";
             };
+
+            /* Bird's-eye-view fusion grid (fpga/kria/kria_bev_axi.v): registers and command port. */
+            ias2rf_bev: ias2rf_bev@80030000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80030000 0x0 0x10000>;
+                status = "okay";
+            };
+
+            /* S2MM-only DMA for the grid's 64 KiB dumps, into bev_frames below. pl_ps_irq0[5]. */
+            axi_dma_1: dma@80040000 {
+                compatible = "generic-uio";
+                reg = <0x0 0x80040000 0x0 0x10000>;
+                interrupt-parent = <&gic>;
+                interrupts = <0 94 4>;
+                interrupt-names = "s2mm_introut";
+                status = "okay";
+            };
         };
     };
 
@@ -74,6 +91,11 @@
             rpu_mailbox: rpu_mailbox@3ee00000 {
                 no-map;
                 reg = <0x0 0x3ee00000 0x0 0x1000>;
+            };
+            /* Two 64 KiB frames for the fusion grid's dumps (axi_dma_1 writes, Linux reads). */
+            bev_frames: bev_frames@3ee10000 {
+                no-map;
+                reg = <0x0 0x3ee10000 0x0 0x20000>;
             };
         };
     };

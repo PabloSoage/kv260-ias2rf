@@ -410,8 +410,11 @@ module tb_system_signals;
         if (fd_adcs != 0 && dut_artix.u_sdr_ddc.sample_valid)
             $fwrite(fd_adcs, "%0d\n", dut_artix.u_sdr_ddc.sample_b);
     reg     cap_en = 1'b0;
-    integer cnt_ddc = 0, cnt_demod = 0, cnt_adsb = 0, cnt_tx_sdr = 0, cnt_tx_rad = 0, cnt_radar = 0;
+    integer cnt_ddc = 0, cnt_demod = 0, cnt_adsb = 0, cnt_tx_sdr = 0, cnt_tx_rad = 0, cnt_radar = 0, cnt_cpi = 0;
     reg [7:0] target_ddc_sid = 8'h05;
+    // CPIs since the radar was enabled (one case per run), for RADAR_STAT[31:26]
+    always @(posedge kria_pl_clk_100m)
+        if (dut_kria.u_dsp_suite.radar_en && dut_kria.u_dsp_suite.mon_cpi_done) cnt_cpi = cnt_cpi + 1;
 
     always @(posedge kria_pl_clk_100m) begin
         if (cap_en) begin
@@ -630,6 +633,13 @@ module tb_system_signals;
         $display("[SYS_SIG %0s] ddc=%0d demod=%0d adsb=%0d(ok=%0d) tx_s=%0d tx_r=%0d radar=%0d pk=(%0d,%0d) dacr_err=%0d tr_viol=%0d",
                  case_str, cnt_ddc, cnt_demod, cnt_adsb, rdv[15:0], cnt_tx_sdr, cnt_tx_rad,
                  cnt_radar, stat2[5:0], stat2[9:6], dacr_terrs, tr_viol);
+        if (k_ctrl[8]) begin
+            $display("[SYS_SIG %0s] CPIs %0d, RADAR_STAT[31:26] %0d", case_str, cnt_cpi, stat2[31:26]);
+            if (stat2[31:26] != (cnt_cpi % 64)) begin
+                $display("FAIL: tb_system_signals RADAR_STAT CPI count %0d, expected %0d", stat2[31:26], cnt_cpi % 64);
+                $finish;
+            end
+        end
         if (dacr_terrs != 0 || tr_viol != 0) begin
             $display("FAIL: tb_system_signals hardware timing/TR violation");
             $finish;

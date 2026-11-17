@@ -176,7 +176,7 @@ Because `link_rx_train_fsm` requires 6 consecutive clean descrambled `/I/` (`8'h
 | `0x70` | `DACS_CTRL` | R/W | `0x0000_0000` | `[0]` AD9767 `tx_enable`; `[1]` `~hf_dac2_mode` (`0`=switch-free HF primary `I` on `DAC2 / IF_TX_C J952`, `1`=legacy `Ch1/Ch2 I/Q`); `[2]` `dac1_mute` (`1`=clamp `DAC1` to midscale `14'h2000` when `hf_dac2_mode=1`) |
 | `0x74` | `DACS_UNDERFLOW` | RO | `0x0000_0000` | `[31:0]` AD9767 `underflow_cnt` |
 | `0x78` | `DACS_FIFO_LVL` | RO | `0x0000_0000` | `[9:0]` `dac_sdr.fifo_level_link` |
-| `0x7C` | `ADAR_CTRL` | R/W | `0x0000_0000` | **ADAR1000 + RF SW:** `[4:0]` `active_beam_id`; `[5]` `tr_req` (`0=RX,1=TX`); `[6]` `soft_load` (W1P); `[7]` `start_init` (W1P); `[11:8]` `rf_sw_req[3:0]`; `[12]` `auto_tr_chirp` (drive `tr_req` from `chirp_active`) |
+| `0x7C` | `ADAR_CTRL` | R/W | `0x0000_0000` | **ADAR1000 + RF SW:** `[4:0]` `active_beam_id`; `[5]` `tr_req` (`0=RX,1=TX`); `[6]` `soft_load` (W1P); `[7]` `start_init` (W1P); `[11:8]` `rf_sw_req[3:0]`; `[12]` `auto_tr_chirp` (drive `tr_req` from `chirp_active`); `[13]` `scan_en` (Rev08: each `BEAM_STROBE` loads the next of beams `0..scan_last`, starting at 0 whenever `scan_en` is set; `soft_load` still loads `active_beam_id`); `[20:16]` `scan_last` |
 | `0x80` | `ADAR_GUARD` | R/W | `0x000C_000A` | `[15:0]` `guard_pre` cycles; `[31:16]` `guard_post` cycles |
 | `0x84` | `ADAR_SW_SETTLE` | R/W | `0x0000_007D` | `[15:0]` `rf_switch.settle_cycles` (default `125` = `1 us @ 125 MHz`) |
 | `0x88` | `ADAR_TBL_WR` | WO | `0x0000_0000` | `[7:0]` `tbl_wdata`; `[12:8]` `byte_idx` (`0..23`); `[15:13]` `chip_id` (`0..7`); `[20:16]` `beam_id` (`0..31`); `[31]` Write strobe (W1P) |

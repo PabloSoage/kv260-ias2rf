@@ -1,9 +1,17 @@
 [package]
 name = "kria-r5f"
-description = "R5F core 0 firmware: PPS discipline of kria_pps and the transmit interlock, from kria-core"
+description = "R5F firmware: core 0 (PPS discipline, IAS1 link watchdog, transmit interlock) and core 1 (radar scan, fusion grid), from kria-core"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+
+[[bin]]
+name = "kria-r5f0"
+path = "src/bin/core0.rs"
+
+[[bin]]
+name = "kria-r5f1"
+path = "src/bin/core1.rs"
 
 [dependencies]
 kria-core = { path = "../core" }

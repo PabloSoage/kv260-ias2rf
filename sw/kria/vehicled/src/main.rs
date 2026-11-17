@@ -137,10 +137,18 @@ impl DevMem {
 #[cfg(unix)]
 impl Platform for DevMem {
     fn now(&mut self) -> u64 {
-        // Reading NOW_LO latches NOW_HI.
-        let lo = self.rd32(PPS_BASE + NOW_LO) as u64;
-        let hi = self.rd32(PPS_BASE + NOW_HI) as u64;
-        (hi << 32) | lo
+        // Reading NOW_LO latches NOW_HI, and both R5F cores read it too, so
+        // another reader's latch can land between ours: two pairs that agree,
+        // with no wrap of the low word between them, are consistent.
+        loop {
+            let lo = self.rd32(PPS_BASE + NOW_LO);
+            let hi = self.rd32(PPS_BASE + NOW_HI);
+            let lo2 = self.rd32(PPS_BASE + NOW_LO);
+            let hi2 = self.rd32(PPS_BASE + NOW_HI);
+            if hi == hi2 && lo2 >= lo {
+                return (hi as u64) << 32 | lo as u64;
+            }
+        }
     }
     fn write_mailbox(&mut self, half: &[u8; mailbox::HALF], seq_odd: u32, seq_even: u32) {
         use std::os::unix::fs::FileExt;
