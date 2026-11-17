@@ -17,6 +17,63 @@
 
 `timescale 1ns/1ps
 
+// Unsigned NW-bit / DW-bit division, pipelined: NW / STAGES quotient bits per stage, one result per clock,
+// STAGES clocks of latency. Restoring long division; the remainder stays under the divisor, so each step is a
+// DW+1-bit compare and subtract (G-8 timing closure: the former single-cycle divide was 80 logic levels).
+module kria_udiv_pipe #(
+    parameter integer NW     = 24,
+    parameter integer DW     = 7,
+    parameter integer STAGES = 4
+) (
+    input  wire          clk,
+    input  wire          in_valid,
+    input  wire [NW-1:0] in_num,
+    input  wire [DW-1:0] in_den,
+    output wire          out_valid,
+    output wire [NW-1:0] out_quo
+);
+    localparam integer BPS = NW / STAGES;
+    reg [NW-1:0] num [0:STAGES];
+    reg [NW-1:0] quo [0:STAGES];
+    reg [DW:0]   rem [0:STAGES];
+    reg [DW-1:0] den [0:STAGES];
+    reg          vld [0:STAGES];
+    integer st, b;
+    always @(*) begin
+        num[0] = in_num; quo[0] = {NW{1'b0}}; rem[0] = {(DW+1){1'b0}}; den[0] = in_den; vld[0] = in_valid;
+    end
+    genvar gs;
+    generate
+        for (gs = 0; gs < STAGES; gs = gs + 1) begin : g_st
+            reg [NW-1:0] n_r, q_r;
+            reg [DW:0]   r_r;
+            reg [DW-1:0] d_r;
+            reg          v_r;
+            always @(posedge clk) begin : blk
+                reg [NW-1:0] n, q;
+                reg [DW+1:0] r;
+                n = num[gs]; q = quo[gs]; r = {1'b0, rem[gs]};
+                for (b = 0; b < BPS; b = b + 1) begin
+                    r = {r[DW:0], n[NW-1]};
+                    n = {n[NW-2:0], 1'b0};
+                    q = {q[NW-2:0], 1'b0};
+                    if (r >= {2'b00, den[gs]}) begin
+                        r    = r - {2'b00, den[gs]};
+                        q[0] = 1'b1;
+                    end
+                end
+                n_r <= n; q_r <= q; r_r <= r[DW:0]; d_r <= den[gs]; v_r <= vld[gs];
+            end
+            always @(*) begin
+                num[gs+1] = n_r; quo[gs+1] = q_r; rem[gs+1] = r_r; den[gs+1] = d_r; vld[gs+1] = v_r;
+            end
+        end
+    endgenerate
+    assign out_valid = vld[STAGES];
+    assign out_quo   = quo[STAGES];
+endmodule
+
+
 module kria_adsb_phase #(
     parameter integer PHASE = 0              // grid offset in quarter chips
 ) (
@@ -48,8 +105,12 @@ module kria_adsb_phase #(
     reg [6:0]  osr_cnt;
     reg        osr_odd;
     reg [23:0] chip_acc;
-    reg        chip_valid;
-    reg [15:0] chip_amp;
+    reg        sum_valid;
+    reg [23:0] chip_sum;
+    reg [6:0]  chip_den;
+    wire       chip_valid;
+    wire [23:0] chip_quo;
+    wire [15:0] chip_amp = chip_quo[15:0];
     wire [6:0] osr_eff = osr_base + {6'd0, (cfg_chip_osr[7] & osr_odd)};
 
     always @(posedge clk) begin
@@ -57,12 +118,13 @@ module kria_adsb_phase #(
             osr_cnt    <= 7'd0;
             osr_odd    <= 1'b0;
             chip_acc   <= 24'd0;
-            chip_valid <= 1'b0;
-            chip_amp   <= 16'd0;
+            sum_valid  <= 1'b0;
+            chip_sum   <= 24'd0;
+            chip_den   <= 7'd1;
             start_cnt  <= 9'd0;
             started    <= (PHASE == 0);
         end else begin
-            chip_valid <= 1'b0;
+            sum_valid <= 1'b0;
             if (in_valid && !started) begin
                 start_cnt <= start_cnt + 9'd1;
                 if (start_cnt + 9'd1 >= start_at) started <= 1'b1;
@@ -70,9 +132,10 @@ module kria_adsb_phase #(
                 if (osr_cnt >= (osr_eff - 7'd1)) begin
                     osr_cnt    <= 7'd0;
                     osr_odd    <= ~osr_odd;
-                    chip_amp   <= (chip_acc + {{7{1'b0}}, env_inst}) / osr_eff;
+                    chip_sum   <= chip_acc + {{7{1'b0}}, env_inst};
+                    chip_den   <= osr_eff;
                     chip_acc   <= 24'd0;
-                    chip_valid <= 1'b1;
+                    sum_valid  <= 1'b1;
                 end else begin
                     osr_cnt  <= osr_cnt + 7'd1;
                     chip_acc <= chip_acc + {{7{1'b0}}, env_inst};
@@ -80,6 +143,11 @@ module kria_adsb_phase #(
             end
         end
     end
+
+    // chip average = sum / samples, DIV_LAT clocks after the sum (kria_adsb_rx delays its own sample count to match)
+    kria_udiv_pipe #(.NW(24), .DW(7), .STAGES(4)) u_div (
+        .clk(clk), .in_valid(sum_valid & ~rst), .in_num(chip_sum), .in_den(chip_den),
+        .out_valid(chip_valid), .out_quo(chip_quo));
 
     // 16-chip sliding preamble history: p[15] newest; with the current chip as slot 15 the preamble's slots
     // 0..14 are p[1..15]: high at slots 0, 2, 7, 9
@@ -226,7 +294,26 @@ module kria_adsb_rx (
     wire [15:0] abs_q = in_q[15] ? (~in_q + 16'd1) : in_q;
     wire [15:0] mag_max = (abs_i >= abs_q) ? abs_i : abs_q;
     wire [15:0] mag_min = (abs_i >= abs_q) ? abs_q : abs_i;
-    wire [16:0] env_inst = {1'b0, mag_max} + {2'b0, mag_min[15:1]} - {5'b0, mag_max[15:4]};
+    wire [16:0] env_comb = {1'b0, mag_max} + {2'b0, mag_min[15:1]} - {5'b0, mag_max[15:4]};
+
+    // G-8 timing closure: the envelope is registered, and each phase's chip average takes 4 more clocks in
+    // kria_udiv_pipe. The frame arbiter below counts samples on the phases' timeline (in_valid 5 clocks late),
+    // so the windows hold the same samples as before; every output is the former one, 5 clocks later.
+    reg  [16:0] env_inst;
+    reg         env_valid;
+    reg  [4:0]  vld_dly;
+    wire        smp_valid = vld_dly[4];
+    always @(posedge clk) begin
+        if (rst) begin
+            env_inst  <= 17'd0;
+            env_valid <= 1'b0;
+            vld_dly   <= 5'd0;
+        end else begin
+            env_inst  <= env_comb;
+            env_valid <= in_valid;
+            vld_dly   <= {vld_dly[3:0], in_valid};
+        end
+    end
 
     wire [NPH-1:0]   ph_pre, ph_done, ph_ok;
     wire [111:0]     ph_data [0:NPH-1];
@@ -236,7 +323,7 @@ module kria_adsb_rx (
     generate
         for (gi = 0; gi < NPH; gi = gi + 1) begin : g_ph
             kria_adsb_phase #(.PHASE(gi)) u_ph (
-                .clk(clk), .rst(rst), .in_valid(in_valid), .env_inst(env_inst),
+                .clk(clk), .rst(rst), .in_valid(env_valid), .env_inst(env_inst),
                 .cfg_chip_osr(cfg_chip_osr), .cfg_min_hi_sum(cfg_min_hi_sum),
                 .pre_hit_o(ph_pre[gi]), .done(ph_done[gi]), .crc_ok(ph_ok[gi]),
                 .data(ph_data[gi]), .snr_est(ph_snr[gi]));
@@ -281,13 +368,13 @@ module kria_adsb_rx (
             end
 
             // preambles: count one per frame
-            if (in_valid && pre_win != 10'd0) pre_win <= pre_win - 10'd1;
+            if (smp_valid && pre_win != 10'd0) pre_win <= pre_win - 10'd1;
             if (|ph_pre) begin
                 if (pre_win == 10'd0) preamble_cnt <= preamble_cnt + 32'd1;
                 pre_win <= win_samps;
             end
 
-            if (in_valid && done_win != 10'd0) done_win <= done_win - 10'd1;
+            if (smp_valid && done_win != 10'd0) done_win <= done_win - 10'd1;
             if (any_ok && !(done_win != 10'd0 && got_ok)) begin
                 // first good copy of this frame
                 msg_valid   <= 1'b1;

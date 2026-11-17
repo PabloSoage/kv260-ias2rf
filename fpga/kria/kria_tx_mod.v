@@ -148,10 +148,15 @@ module kria_tx_mod #(
         end
     endfunction
 
+    // G-8 timing closure: the modulator is a pipeline (t1..t9) that takes one sample per tick and computes what
+    // the former single-clock code did, in the same order: the tone phase advances at the tick, the carrier phase
+    // where the FM deviation is known (t3), and every value meets the same operands. The packed words go through
+    // an 8-word FIFO into m_axis; a tick is taken only while the samples in flight and in the FIFO fit (occ), so
+    // backpressure never loses one. The word stream is the former one; it starts 10 clocks later.
     reg [15:0]        div_cnt;
-    wire              tx_can_step = en && (!m_axis_tvalid || m_axis_tready);
-    wire              tick = tx_can_step &&
-                             (ext_aud_en ? ext_aud_valid : (div_cnt >= cfg_samp_div));
+    reg [4:0]         occ;                      // samples ticked whose word has not left m_axis
+    wire              room = (occ < 5'd14);
+    wire              tick = en && room && (ext_aud_en ? ext_aud_valid : (div_cnt >= cfg_samp_div));
 
     reg [31:0]        tone_ph, car_ph;
     reg signed [15:0] aud_dly [0:30];
@@ -164,9 +169,52 @@ module kria_tx_mod #(
     reg [15:0]        pkt_word_idx;
     wire [15:0]       pkt_words_eff = (cfg_pkt_words == 16'd0) ? 16'd32 : cfg_pkt_words;
 
+    // pipeline registers
+    reg               t1_v, t2_v, t3_v, t4_v, t5_v, t6_v, t7_v, t8_v, t9_v;
+    reg [31:0]        t1_ph;
+    reg               t1_ext, t2_ext;
+    reg signed [15:0] t1_xs, t2_xs;
+    reg signed [15:0] t2_c0, t2_c1, t2_s0, t2_s1;
+    reg [7:0]         t2_cf, t2_sf;
+    reg signed [15:0] t3_aud, t3_ausin;
+    reg signed [15:0] t4_aud, t4_ausin, t4_dly14;
+    reg [31:0]        t4_cph;
+    reg signed [36:0] t4_hp [0:7];
+    reg signed [36:0] t5_hs [0:1];
+    reg signed [15:0] t5_aud, t5_ausin, t5_dly14;
+    reg signed [15:0] t5_c0, t5_c1, t5_s0, t5_s1;
+    reg [7:0]         t5_cf, t5_sf;
+    reg signed [15:0] t6_aud, t6_ausin, t6_dly14, t6_hilbq, t6_cos, t6_sin;
+    reg signed [31:0] t7_ic, t7_qs, t7_is, t7_qc;
+    reg signed [31:0] t8_mi, t8_mq;
+    reg signed [15:0] t9_i, t9_q;
+
+    function automatic signed [15:0] lerp8;
+        input signed [15:0] v0, v1;
+        input [7:0] fr;
+        reg signed [25:0] d;
+        begin
+            d = ($signed({v1[15], v1}) - $signed({v0[15], v0})) * $signed({1'b0, fr});
+            lerp8 = v0 + (d >>> 8);
+        end
+    endfunction
+
+    // output FIFO
+    reg  [64:0]       ofifo [0:7];
+    reg  [3:0]        of_wp, of_rp;
+    wire              of_empty = (of_wp == of_rp);
+    reg               of_push;
+    reg  [64:0]       of_din;
+    wire              of_pop = !of_empty && (!m_axis_tvalid || m_axis_tready);
+    wire              word_out = m_axis_tvalid && m_axis_tready;
+
+    wire [31:0]       t1_ph_c = t1_ph + 32'h4000_0000;
+    wire [31:0]       t4_cph_c = t4_cph + 32'h4000_0000;
+
     always @(posedge clk) begin
         if (rst || !en) begin
             div_cnt      <= 16'd0;
+            occ          <= 5'd0;
             tone_ph      <= 32'd0;
             car_ph       <= 32'd0;
             for (hi = 0; hi < 31; hi = hi + 1)
@@ -180,54 +228,91 @@ module kria_tx_mod #(
             m_axis_tdata <= 64'd0;
             m_axis_tvalid<= 1'b0;
             m_axis_tlast <= 1'b0;
+            t1_v <= 1'b0; t2_v <= 1'b0; t3_v <= 1'b0; t4_v <= 1'b0; t5_v <= 1'b0;
+            t6_v <= 1'b0; t7_v <= 1'b0; t8_v <= 1'b0; t9_v <= 1'b0;
+            of_wp <= 4'd0; of_rp <= 4'd0; of_push <= 1'b0;
         end else begin
             iq_valid <= 1'b0;
-            if (m_axis_tvalid && m_axis_tready)
-                m_axis_tvalid <= 1'b0;
 
-            if (!ext_aud_en && tx_can_step) begin
+            if (!ext_aud_en && room) begin
                 if (div_cnt >= cfg_samp_div) div_cnt <= 16'd0;
                 else                         div_cnt <= div_cnt + 16'd1;
             end
+            occ <= occ + {4'd0, tick} - (word_out ? 5'd2 : 5'd0);
 
-            if (tick) begin : blk_mod
-                reg signed [15:0] aud_cur, aud_sin, c_cos, c_sin;
-                reg signed [15:0] bb_i, bb_q;
-                reg signed [31:0] am_env, nbfm_df, mix_i_w, mix_q_w;
-                reg signed [15:0] hilb_q, out_i_s, out_q_s;
-
-                aud_cur = ext_aud_en ? ext_aud_sample : lut_cos(tone_ph);
-                aud_sin = lut_sin(tone_ph);                 // the internal tone's quadrature (SSB)
+            // t1: the tick: tone phase, external sample
+            t1_v <= tick;
+            if (tick) begin
+                t1_ph   <= tone_ph;
+                t1_ext  <= ext_aud_en;
+                t1_xs   <= ext_aud_sample;
                 tone_ph <= tone_ph + cfg_tone_ftw;
-
+            end
+            // t2: tone table points
+            t2_v <= t1_v;
+            if (t1_v) begin
+                t2_ext <= t1_ext; t2_xs <= t1_xs;
+                t2_c0 <= lut_sin_grid(t1_ph_c[31:23]); t2_c1 <= lut_sin_grid(t1_ph_c[31:23] + 9'd1); t2_cf <= t1_ph_c[22:15];
+                t2_s0 <= lut_sin_grid(t1_ph[31:23]);   t2_s1 <= lut_sin_grid(t1_ph[31:23] + 9'd1);   t2_sf <= t1_ph[22:15];
+            end
+            // t3: audio sample and the tone's quadrature
+            t3_v <= t2_v;
+            if (t2_v) begin
+                t3_aud   <= t2_ext ? t2_xs : lerp8(t2_c0, t2_c1, t2_cf);
+                t3_ausin <= lerp8(t2_s0, t2_s1, t2_sf);
+            end
+            // t4: Hilbert products and delay line; carrier phase (FM adds the deviation to the step)
+            t4_v <= t3_v;
+            if (t3_v) begin : blk_t4
+                reg signed [31:0] nbfm_df;
                 for (hi = 30; hi > 0; hi = hi - 1)
                     aud_dly[hi] <= aud_dly[hi - 1];
-                aud_dly[0] <= aud_cur;
-
-                hilb_acc = ($signed(aud_dly[15]) - $signed(aud_dly[13])) * 37'sd20598
-                         + ($signed(aud_dly[17]) - $signed(aud_dly[11])) * 37'sd6416
-                         + ($signed(aud_dly[19]) - $signed(aud_dly[9]))  * 37'sd3328
-                         + ($signed(aud_dly[21]) - $signed(aud_dly[7]))  * 37'sd1858
-                         + ($signed(aud_dly[23]) - $signed(aud_dly[5]))  * 37'sd1002
-                         + ($signed(aud_dly[25]) - $signed(aud_dly[3]))  * 37'sd486
-                         + ($signed(aud_dly[27]) - $signed(aud_dly[1]))  * 37'sd204
-                         + ($signed(aud_dly[29]) - $signed(aud_cur))     * 37'sd168;
-                hilb_q = hilb_acc >>> 15;
-
-                // Carrier NCO phase update (FM adds instantaneous deviation to phase step)
-                nbfm_df = (cfg_mode == 3'd2) ? (($signed(aud_cur) * $signed({1'b0, cfg_mod_param})) >>> 2) : 32'sd0;
-                car_ph <= car_ph + cfg_carrier_ftw + nbfm_df;
-
-                c_cos = lut_cos(car_ph);
-                c_sin = lut_sin(car_ph);
-
+                aud_dly[0] <= t3_aud;
+                t4_hp[0] <= ($signed(aud_dly[15]) - $signed(aud_dly[13])) * 37'sd20598;
+                t4_hp[1] <= ($signed(aud_dly[17]) - $signed(aud_dly[11])) * 37'sd6416;
+                t4_hp[2] <= ($signed(aud_dly[19]) - $signed(aud_dly[9]))  * 37'sd3328;
+                t4_hp[3] <= ($signed(aud_dly[21]) - $signed(aud_dly[7]))  * 37'sd1858;
+                t4_hp[4] <= ($signed(aud_dly[23]) - $signed(aud_dly[5]))  * 37'sd1002;
+                t4_hp[5] <= ($signed(aud_dly[25]) - $signed(aud_dly[3]))  * 37'sd486;
+                t4_hp[6] <= ($signed(aud_dly[27]) - $signed(aud_dly[1]))  * 37'sd204;
+                t4_hp[7] <= ($signed(aud_dly[29]) - $signed(t3_aud))      * 37'sd168;
+                t4_dly14 <= aud_dly[14];
+                t4_aud   <= t3_aud;
+                t4_ausin <= t3_ausin;
+                nbfm_df = (cfg_mode == 3'd2) ? (($signed(t3_aud) * $signed({1'b0, cfg_mod_param})) >>> 2) : 32'sd0;
+                t4_cph  <= car_ph;
+                car_ph  <= car_ph + cfg_carrier_ftw + nbfm_df;
+            end
+            // t5: Hilbert partial sums; carrier table points
+            t5_v <= t4_v;
+            if (t4_v) begin
+                t5_hs[0] <= t4_hp[0] + t4_hp[1] + t4_hp[2] + t4_hp[3];
+                t5_hs[1] <= t4_hp[4] + t4_hp[5] + t4_hp[6] + t4_hp[7];
+                t5_aud <= t4_aud; t5_ausin <= t4_ausin; t5_dly14 <= t4_dly14;
+                t5_c0 <= lut_sin_grid(t4_cph_c[31:23]); t5_c1 <= lut_sin_grid(t4_cph_c[31:23] + 9'd1); t5_cf <= t4_cph_c[22:15];
+                t5_s0 <= lut_sin_grid(t4_cph[31:23]);   t5_s1 <= lut_sin_grid(t4_cph[31:23] + 9'd1);   t5_sf <= t4_cph[22:15];
+            end
+            // t6: Hilbert output; carrier cos/sin
+            t6_v <= t5_v;
+            if (t5_v) begin
+                hilb_acc  = t5_hs[0] + t5_hs[1];
+                t6_hilbq <= hilb_acc >>> 15;
+                t6_aud <= t5_aud; t6_ausin <= t5_ausin; t6_dly14 <= t5_dly14;
+                t6_cos <= lerp8(t5_c0, t5_c1, t5_cf);
+                t6_sin <= lerp8(t5_s0, t5_s1, t5_sf);
+            end
+            // t7: baseband by mode, mixer products
+            t7_v <= t6_v;
+            if (t6_v) begin : blk_t7
+                reg signed [15:0] bb_i, bb_q;
+                reg signed [31:0] am_env;
                 case (cfg_mode)
                     3'd0: begin // CW
                         bb_i = 16'sd16384;
                         bb_q = 16'sd0;
                     end
                     3'd1: begin // AM (carrier + m*aud, normalized so <= 1.0 peak)
-                        am_env = 32'sd16384 + (($signed(aud_cur) * $signed({1'b0, cfg_mod_param})) >>> 16);
+                        am_env = 32'sd16384 + (($signed(t6_aud) * $signed({1'b0, cfg_mod_param})) >>> 16);
                         bb_i   = am_env[15:0];
                         bb_q   = 16'sd0;
                     end
@@ -240,41 +325,64 @@ module kria_tx_mod #(
                     // through the 31-tap Hilbert (aud_dly[14] is its centre); at 25 MSPS that filter is flat to
                     // DC for any audio tone and would give double sideband, hence the split.
                     3'd3: begin // USB: m + j*H{m} -> +f_c + f_m
-                        bb_i = (ext_aud_en ? aud_dly[14] : aud_cur) >>> 1;
+                        bb_i = (ext_aud_en ? t6_dly14 : t6_aud) >>> 1;
 `ifdef MUTATE_FLIP_USB_Q
-                        bb_q = -((ext_aud_en ? hilb_q : aud_sin) >>> 1); // MUTATION: produces LSB instead of USB
+                        bb_q = -((ext_aud_en ? t6_hilbq : t6_ausin) >>> 1); // MUTATION: produces LSB instead of USB
 `else
-                        bb_q = (ext_aud_en ? hilb_q : aud_sin) >>> 1;
+                        bb_q = (ext_aud_en ? t6_hilbq : t6_ausin) >>> 1;
 `endif
                     end
                     default: begin // 3'd4 LSB: m - j*H{m} -> +f_c - f_m
-                        bb_i = (ext_aud_en ? aud_dly[14] : aud_cur) >>> 1;
-                        bb_q = -((ext_aud_en ? hilb_q : aud_sin) >>> 1);
+                        bb_i = (ext_aud_en ? t6_dly14 : t6_aud) >>> 1;
+                        bb_q = -((ext_aud_en ? t6_hilbq : t6_ausin) >>> 1);
                     end
                 endcase
-
-                mix_i_w = ($signed(bb_i) * $signed(c_cos) - $signed(bb_q) * $signed(c_sin)) >>> 15;
-                mix_q_w = ($signed(bb_i) * $signed(c_sin) + $signed(bb_q) * $signed(c_cos)) >>> 15;
-                out_i_s = (mix_i_w * $signed({1'b0, cfg_amp_scale})) >>> 14;
-                out_q_s = (mix_q_w * $signed({1'b0, cfg_amp_scale})) >>> 14;
-
+                t7_ic <= $signed(bb_i) * $signed(t6_cos);
+                t7_qs <= $signed(bb_q) * $signed(t6_sin);
+                t7_is <= $signed(bb_i) * $signed(t6_sin);
+                t7_qc <= $signed(bb_q) * $signed(t6_cos);
+            end
+            // t8: mixer sums
+            t8_v <= t7_v;
+            if (t7_v) begin
+                t8_mi <= (t7_ic - t7_qs) >>> 15;
+                t8_mq <= (t7_is + t7_qc) >>> 15;
+            end
+            // t9: output scale
+            t9_v <= t8_v;
+            if (t8_v) begin
+                t9_i <= (t8_mi * $signed({1'b0, cfg_amp_scale})) >>> 14;
+                t9_q <= (t8_mq * $signed({1'b0, cfg_amp_scale})) >>> 14;
+            end
+            // pack
+            of_push <= 1'b0;
+            if (t9_v) begin
                 iq_valid <= 1'b1;
-                iq_i     <= out_i_s;
-                iq_q     <= out_q_s;
-
+                iq_i     <= t9_i;
+                iq_q     <= t9_q;
                 if (!pair_half) begin
-                    first_pair <= {out_q_s, out_i_s};
+                    first_pair <= {t9_q, t9_i};
                     pair_half  <= 1'b1;
                 end else begin
-                    m_axis_tdata  <= {out_q_s, out_i_s, first_pair};
-                    m_axis_tvalid <= 1'b1;
-                    m_axis_tlast  <= (pkt_word_idx >= (pkt_words_eff - 16'd1));
-                    pair_half     <= 1'b0;
+                    of_push   <= 1'b1;
+                    of_din    <= {(pkt_word_idx >= (pkt_words_eff - 16'd1)), t9_q, t9_i, first_pair};
+                    pair_half <= 1'b0;
                     if (pkt_word_idx >= (pkt_words_eff - 16'd1))
                         pkt_word_idx <= 16'd0;
                     else
                         pkt_word_idx <= pkt_word_idx + 16'd1;
                 end
+            end
+            if (of_push) begin
+                ofifo[of_wp[2:0]] <= of_din;
+                of_wp <= of_wp + 4'd1;
+            end
+            if (word_out)
+                m_axis_tvalid <= 1'b0;
+            if (of_pop) begin
+                {m_axis_tlast, m_axis_tdata} <= ofifo[of_rp[2:0]];
+                m_axis_tvalid <= 1'b1;
+                of_rp <= of_rp + 4'd1;
             end
         end
     end

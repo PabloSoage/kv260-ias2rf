@@ -168,14 +168,37 @@ module kria_channel_rx (
         end
     endfunction
 
+    // G-8 timing closure: the mixer is a pipeline. m1 takes the sample with its LO phase (the phase advances by
+    // the FTW per sample, as before); m2 reads the two table points of each LO; m3 interpolates; the products and
+    // the rounding make mix_i/mix_q. Each sample meets the LO phase it met before, so the output is the former
+    // one, three clocks later.
     reg [31:0] mix_phase;
     reg        mix_valid;
     reg signed [15:0] mix_i, mix_q;
     reg signed [31:0] p_ic, p_qs, p_is, p_qc;
-    // lo_c/lo_s hold cos/sin of mix_phase: computed when the phase advances, so the interpolation's multiply is
-    // not in series with the mixer's (input samples may arrive on consecutive clocks)
     reg signed [15:0] lo_c, lo_s;
-    wire [31:0] mix_phase_nx = mix_phase + cfg_nco_ftw;
+
+    reg               m1_v, m1_byp;
+    reg signed [15:0] m1_i, m1_q;
+    reg        [31:0] m1_ph;
+    reg               m2_v, m2_byp;
+    reg signed [15:0] m2_i, m2_q;
+    reg signed [15:0] m2_c0, m2_c1, m2_s0, m2_s1;
+    reg        [7:0]  m2_cf, m2_sf;
+    reg               m3_v, m3_byp;
+    reg signed [15:0] m3_i, m3_q;
+
+    function automatic signed [15:0] lerp8;
+        input signed [15:0] v0, v1;
+        input [7:0] fr;
+        reg signed [25:0] d;
+        begin
+            d = ($signed({v1[15], v1}) - $signed({v0[15], v0})) * $signed({1'b0, fr});
+            lerp8 = v0 + (d >>> 8);
+        end
+    endfunction
+
+    wire [31:0] m1_ph_c = m1_ph + 32'h4000_0000;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -185,18 +208,62 @@ module kria_channel_rx (
             mix_q     <= 16'sd0;
             lo_c      <= 16'sd32767;
             lo_s      <= 16'sd0;
+            m1_v <= 1'b0; m2_v <= 1'b0; m3_v <= 1'b0;
+            m1_byp <= 1'b1; m2_byp <= 1'b1; m3_byp <= 1'b1;
+            m1_i <= 16'sd0; m1_q <= 16'sd0; m1_ph <= 32'd0;
+            m2_i <= 16'sd0; m2_q <= 16'sd0;
+            m2_c0 <= 16'sd0; m2_c1 <= 16'sd0; m2_s0 <= 16'sd0; m2_s1 <= 16'sd0; m2_cf <= 8'd0; m2_sf <= 8'd0;
+            m3_i <= 16'sd0; m3_q <= 16'sd0;
         end else begin
-            mix_valid <= in_valid;
+            // m1: the sample and the phase it is mixed with
+            m1_v <= in_valid;
             if (in_valid) begin
-                if (cfg_nco_ftw == 32'd0) begin
-                    mix_i <= in_i;
-                    mix_q <= in_q;
+                m1_i   <= in_i;
+                m1_q   <= in_q;
+                m1_byp <= (cfg_nco_ftw == 32'd0);
+                m1_ph  <= mix_phase;
+                if (cfg_nco_ftw != 32'd0) mix_phase <= mix_phase + cfg_nco_ftw;
+            end
+            // m2: table points
+            m2_v <= m1_v;
+            if (m1_v) begin
+                m2_i <= m1_i; m2_q <= m1_q; m2_byp <= m1_byp;
+`ifdef MUTATE_MIX_NCO_9BIT
+                m2_c0 <= lut_sin(m1_ph_c); m2_c1 <= 16'sd0; m2_cf <= 8'd0;
+                m2_s0 <= lut_sin(m1_ph);   m2_s1 <= 16'sd0; m2_sf <= 8'd0;
+`else
+                m2_c0 <= lut_sin({m1_ph_c[31:23], 23'd0});
+                m2_c1 <= lut_sin({m1_ph_c[31:23] + 9'd1, 23'd0});
+                m2_cf <= m1_ph_c[22:15];
+                m2_s0 <= lut_sin({m1_ph[31:23], 23'd0});
+                m2_s1 <= lut_sin({m1_ph[31:23] + 9'd1, 23'd0});
+                m2_sf <= m1_ph[22:15];
+`endif
+            end
+            // m3: interpolated LO
+            m3_v <= m2_v;
+            if (m2_v) begin
+                m3_i <= m2_i; m3_q <= m2_q; m3_byp <= m2_byp;
+`ifdef MUTATE_MIX_NCO_9BIT
+                lo_c <= m2_c0;
+                lo_s <= m2_s0;
+`else
+                lo_c <= lerp8(m2_c0, m2_c1, m2_cf);
+                lo_s <= lerp8(m2_s0, m2_s1, m2_sf);
+`endif
+            end
+            // m4: products, rounding
+            mix_valid <= m3_v;
+            if (m3_v) begin
+                if (m3_byp) begin
+                    mix_i <= m3_i;
+                    mix_q <= m3_q;
                 end else begin
                     // Downconvert: (I + jQ) * (cos - j*sin) = (I*cos + Q*sin) + j*(Q*cos - I*sin)
-                    p_ic  = $signed(in_i) * $signed(lo_c);
-                    p_qs  = $signed(in_q) * $signed(lo_s);
-                    p_qc  = $signed(in_q) * $signed(lo_c);
-                    p_is  = $signed(in_i) * $signed(lo_s);
+                    p_ic  = $signed(m3_i) * $signed(lo_c);
+                    p_qs  = $signed(m3_q) * $signed(lo_s);
+                    p_qc  = $signed(m3_q) * $signed(lo_c);
+                    p_is  = $signed(m3_i) * $signed(lo_s);
                     // rounded: a plain >>> 15 is a -0.5 LSB bias on every input sample, which the CIC's
                     // R^3 / 2^shift gain turns into a DC offset as large as the channel noise (NBFM lost 6.5 dB)
 `ifdef MUTATE_MIX_TRUNCATE
@@ -206,9 +273,6 @@ module kria_channel_rx (
                     mix_i <= (p_ic + p_qs + 32'sd16384) >>> 15;
                     mix_q <= (p_qc - p_is + 32'sd16384) >>> 15;
 `endif
-                    mix_phase <= mix_phase_nx;
-                    lo_c      <= lut_sin_i(mix_phase_nx + 32'h4000_0000);
-                    lo_s      <= lut_sin_i(mix_phase_nx);
                 end
             end
         end
@@ -233,6 +297,12 @@ module kria_channel_rx (
     reg signed [15:0] cic_out_i, cic_out_q;
     reg signed [47:0] c1_i, c2_i, c3_i, c1_q, c2_q, c3_q, sc_i, sc_q;
     reg signed [71:0] f1_i, f2_i, f3_i, f4_i, f5_i, f1_q, f2_q, f3_q, f4_q, f5_q, sf_i, sf_q;
+    // comb pipeline: k0 snapshot, k1..k5 one comb per clock (three-stage combs in k1..k3), k6 shift and saturate
+    reg               k0_v, k1_v, k2_v, k3_v, k4_v, k5_v;
+    reg signed [47:0] k0_s3_i, k0_s3_q, k1_c_i, k1_c_q, k2_c_i, k2_c_q, k3_c_i, k3_c_q, k4_c_i, k4_c_q, k5_c_i, k5_c_q;
+    reg signed [71:0] k0_s5_i, k0_s5_q, k1_f_i, k1_f_q, k2_f_i, k2_f_q, k3_f_i, k3_f_q, k4_f_i, k4_f_q, k5_f_i, k5_f_q;
+    reg               byp_v;
+    reg signed [15:0] byp_i, byp_q;
 
     function automatic signed [15:0] sat16_72;
         input signed [71:0] v;
@@ -256,21 +326,19 @@ module kria_channel_rx (
         if (rst) begin
             cic_i1_i <= 72'sd0; cic_i2_i <= 72'sd0; cic_i3_i <= 72'sd0; cic_i4_i <= 72'sd0; cic_i5_i <= 72'sd0;
             cic_i1_q <= 72'sd0; cic_i2_q <= 72'sd0; cic_i3_q <= 72'sd0; cic_i4_q <= 72'sd0; cic_i5_q <= 72'sd0;
-            cic_d1_i <= 48'sd0; cic_d2_i <= 48'sd0; cic_d3_i <= 48'sd0;
-            cic_d1_q <= 48'sd0; cic_d2_q <= 48'sd0; cic_d3_q <= 48'sd0;
-            cic_e1_i <= 72'sd0; cic_e2_i <= 72'sd0; cic_e3_i <= 72'sd0; cic_e4_i <= 72'sd0; cic_e5_i <= 72'sd0;
-            cic_e1_q <= 72'sd0; cic_e2_q <= 72'sd0; cic_e3_q <= 72'sd0; cic_e4_q <= 72'sd0; cic_e5_q <= 72'sd0;
             cic_cnt       <= 16'd0;
-            cic_out_valid <= 1'b0;
-            cic_out_i     <= 16'sd0;
-            cic_out_q     <= 16'sd0;
+            k0_v          <= 1'b0;
+            byp_v         <= 1'b0;
+            byp_i         <= 16'sd0;
+            byp_q         <= 16'sd0;
         end else begin
-            cic_out_valid <= 1'b0;
+            k0_v  <= 1'b0;
+            byp_v <= 1'b0;
             if (mix_valid) begin
                 if (cfg_cic_decim <= 16'd1) begin
-                    cic_out_valid <= 1'b1;
-                    cic_out_i     <= mix_i;
-                    cic_out_q     <= mix_q;
+                    byp_v <= 1'b1;
+                    byp_i <= mix_i;
+                    byp_q <= mix_q;
                 end else begin
                     cic_i1_i <= cic_i1_i + {{56{mix_i[15]}}, mix_i};
                     cic_i2_i <= cic_i2_i + cic_i1_i;
@@ -286,33 +354,71 @@ module kria_channel_rx (
 
                     if (cic_cnt >= (cfg_cic_decim - 16'd1)) begin
                         cic_cnt <= 16'd0;
-                        c1_i     = cic_i3_i[47:0] - cic_d1_i; cic_d1_i <= cic_i3_i[47:0];
-                        c2_i     = c1_i     - cic_d2_i; cic_d2_i <= c1_i;
-                        c3_i     = c2_i     - cic_d3_i; cic_d3_i <= c2_i;
-                        c1_q     = cic_i3_q[47:0] - cic_d1_q; cic_d1_q <= cic_i3_q[47:0];
-                        c2_q     = c1_q     - cic_d2_q; cic_d2_q <= c1_q;
-                        c3_q     = c2_q     - cic_d3_q; cic_d3_q <= c2_q;
-                        sc_i     = c3_i >>> cfg_cic_shift;
-                        sc_q     = c3_q >>> cfg_cic_shift;
-                        f1_i     = cic_i5_i - cic_e1_i; cic_e1_i <= cic_i5_i;
-                        f2_i     = f1_i     - cic_e2_i; cic_e2_i <= f1_i;
-                        f3_i     = f2_i     - cic_e3_i; cic_e3_i <= f2_i;
-                        f4_i     = f3_i     - cic_e4_i; cic_e4_i <= f3_i;
-                        f5_i     = f4_i     - cic_e5_i; cic_e5_i <= f4_i;
-                        f1_q     = cic_i5_q - cic_e1_q; cic_e1_q <= cic_i5_q;
-                        f2_q     = f1_q     - cic_e2_q; cic_e2_q <= f1_q;
-                        f3_q     = f2_q     - cic_e3_q; cic_e3_q <= f2_q;
-                        f4_q     = f3_q     - cic_e4_q; cic_e4_q <= f3_q;
-                        f5_q     = f4_q     - cic_e5_q; cic_e5_q <= f4_q;
-                        sf_i     = f5_i >>> cfg_cic_shift;
-                        sf_q     = f5_q >>> cfg_cic_shift;
-                        cic_out_i     <= cfg_cic_n5 ? sat16_72(sf_i) : sat16_48(sc_i);
-                        cic_out_q     <= cfg_cic_n5 ? sat16_72(sf_q) : sat16_48(sc_q);
-                        cic_out_valid <= 1'b1;
+                        // the combs run as a pipeline on this snapshot (G-8 timing closure, same arithmetic)
+                        k0_v    <= 1'b1;
+                        k0_s3_i <= cic_i3_i[47:0]; k0_s3_q <= cic_i3_q[47:0];
+                        k0_s5_i <= cic_i5_i;       k0_s5_q <= cic_i5_q;
                     end else begin
                         cic_cnt <= cic_cnt + 16'd1;
                     end
                 end
+            end
+        end
+    end
+
+    always @(posedge clk) begin
+        if (rst) begin
+            k1_v <= 1'b0; k2_v <= 1'b0; k3_v <= 1'b0; k4_v <= 1'b0; k5_v <= 1'b0;
+            cic_d1_i <= 48'sd0; cic_d2_i <= 48'sd0; cic_d3_i <= 48'sd0;
+            cic_d1_q <= 48'sd0; cic_d2_q <= 48'sd0; cic_d3_q <= 48'sd0;
+            cic_e1_i <= 72'sd0; cic_e2_i <= 72'sd0; cic_e3_i <= 72'sd0; cic_e4_i <= 72'sd0; cic_e5_i <= 72'sd0;
+            cic_e1_q <= 72'sd0; cic_e2_q <= 72'sd0; cic_e3_q <= 72'sd0; cic_e4_q <= 72'sd0; cic_e5_q <= 72'sd0;
+            cic_out_valid <= 1'b0;
+            cic_out_i     <= 16'sd0;
+            cic_out_q     <= 16'sd0;
+        end else begin
+            k1_v <= k0_v; k2_v <= k1_v; k3_v <= k2_v; k4_v <= k3_v; k5_v <= k4_v;
+            if (k0_v) begin
+                k1_c_i <= k0_s3_i - cic_d1_i; cic_d1_i <= k0_s3_i;
+                k1_c_q <= k0_s3_q - cic_d1_q; cic_d1_q <= k0_s3_q;
+                k1_f_i <= k0_s5_i - cic_e1_i; cic_e1_i <= k0_s5_i;
+                k1_f_q <= k0_s5_q - cic_e1_q; cic_e1_q <= k0_s5_q;
+            end
+            if (k1_v) begin
+                k2_c_i <= k1_c_i - cic_d2_i; cic_d2_i <= k1_c_i;
+                k2_c_q <= k1_c_q - cic_d2_q; cic_d2_q <= k1_c_q;
+                k2_f_i <= k1_f_i - cic_e2_i; cic_e2_i <= k1_f_i;
+                k2_f_q <= k1_f_q - cic_e2_q; cic_e2_q <= k1_f_q;
+            end
+            if (k2_v) begin
+                k3_c_i <= k2_c_i - cic_d3_i; cic_d3_i <= k2_c_i;
+                k3_c_q <= k2_c_q - cic_d3_q; cic_d3_q <= k2_c_q;
+                k3_f_i <= k2_f_i - cic_e3_i; cic_e3_i <= k2_f_i;
+                k3_f_q <= k2_f_q - cic_e3_q; cic_e3_q <= k2_f_q;
+            end
+            if (k3_v) begin
+                k4_c_i <= k3_c_i; k4_c_q <= k3_c_q;
+                k4_f_i <= k3_f_i - cic_e4_i; cic_e4_i <= k3_f_i;
+                k4_f_q <= k3_f_q - cic_e4_q; cic_e4_q <= k3_f_q;
+            end
+            if (k4_v) begin
+                k5_c_i <= k4_c_i; k5_c_q <= k4_c_q;
+                k5_f_i <= k4_f_i - cic_e5_i; cic_e5_i <= k4_f_i;
+                k5_f_q <= k4_f_q - cic_e5_q; cic_e5_q <= k4_f_q;
+            end
+            cic_out_valid <= 1'b0;
+            if (k5_v) begin
+                sc_i = k5_c_i >>> cfg_cic_shift;
+                sc_q = k5_c_q >>> cfg_cic_shift;
+                sf_i = k5_f_i >>> cfg_cic_shift;
+                sf_q = k5_f_q >>> cfg_cic_shift;
+                cic_out_i     <= cfg_cic_n5 ? sat16_72(sf_i) : sat16_48(sc_i);
+                cic_out_q     <= cfg_cic_n5 ? sat16_72(sf_q) : sat16_48(sc_q);
+                cic_out_valid <= 1'b1;
+            end else if (byp_v) begin
+                cic_out_i     <= byp_i;
+                cic_out_q     <= byp_q;
+                cic_out_valid <= 1'b1;
             end
         end
     end
@@ -386,6 +492,11 @@ module kria_channel_rx (
     reg signed [15:0] ch_i, ch_q;
     reg signed [37:0] acc_i, acc_q;
     integer           fi;
+    reg               fp_v, fs_v;
+    reg signed [37:0] fp_i [0:15];
+    reg signed [37:0] fp_q [0:15];
+    reg signed [37:0] fs_i [0:3];
+    reg signed [37:0] fs_q [0:3];
 
     always @(posedge clk) begin
         if (rst) begin
@@ -397,8 +508,25 @@ module kria_channel_rx (
             ch_valid    <= 1'b0;
             ch_i        <= 16'sd0;
             ch_q        <= 16'sd0;
+            fp_v        <= 1'b0;
+            fs_v        <= 1'b0;
         end else begin
             ch_valid <= 1'b0;
+            fp_v     <= 1'b0;
+            fs_v     <= fp_v;
+            if (fp_v) begin
+                for (fi = 0; fi < 4; fi = fi + 1) begin
+                    fs_i[fi] <= fp_i[4*fi] + fp_i[4*fi+1] + fp_i[4*fi+2] + fp_i[4*fi+3];
+                    fs_q[fi] <= fp_q[4*fi] + fp_q[4*fi+1] + fp_q[4*fi+2] + fp_q[4*fi+3];
+                end
+            end
+            if (fs_v) begin
+                acc_i = fs_i[0] + fs_i[1] + fs_i[2] + fs_i[3];
+                acc_q = fs_q[0] + fs_q[1] + fs_q[2] + fs_q[3];
+                ch_i     <= sat16_48($signed({{10{acc_i[37]}}, acc_i}) >>> 15);
+                ch_q     <= sat16_48($signed({{10{acc_q[37]}}, acc_q}) >>> 15);
+                ch_valid <= 1'b1;
+            end
             if (cic_out_valid) begin
                 if (cfg_fir_decim == 8'd0) begin
                     ch_valid <= 1'b1;
@@ -414,44 +542,17 @@ module kria_channel_rx (
 
                     if (fir_dec_cnt >= (cfg_fir_decim - 8'd1)) begin
                         fir_dec_cnt <= 8'd0;
-                        // 31-tap symmetric LPF evaluation using current sample at index 0
-                        acc_i = $signed(fir_i[14]) * $signed(ch_fir_c(4'd15))
-                              + fir_pair(cic_out_i, fir_i[29], ch_fir_c(4'd0))
-                              + fir_pair(fir_i[0],  fir_i[28], ch_fir_c(4'd1))
-                              + fir_pair(fir_i[1],  fir_i[27], ch_fir_c(4'd2))
-                              + fir_pair(fir_i[2],  fir_i[26], ch_fir_c(4'd3))
-                              + fir_pair(fir_i[3],  fir_i[25], ch_fir_c(4'd4))
-                              + fir_pair(fir_i[4],  fir_i[24], ch_fir_c(4'd5))
-                              + fir_pair(fir_i[5],  fir_i[23], ch_fir_c(4'd6))
-                              + fir_pair(fir_i[6],  fir_i[22], ch_fir_c(4'd7))
-                              + fir_pair(fir_i[7],  fir_i[21], ch_fir_c(4'd8))
-                              + fir_pair(fir_i[8],  fir_i[20], ch_fir_c(4'd9))
-                              + fir_pair(fir_i[9],  fir_i[19], ch_fir_c(4'd10))
-                              + fir_pair(fir_i[10], fir_i[18], ch_fir_c(4'd11))
-                              + fir_pair(fir_i[11], fir_i[17], ch_fir_c(4'd12))
-                              + fir_pair(fir_i[12], fir_i[16], ch_fir_c(4'd13))
-                              + fir_pair(fir_i[13], fir_i[15], ch_fir_c(4'd14));
-
-                        acc_q = $signed(fir_q[14]) * $signed(ch_fir_c(4'd15))
-                              + fir_pair(cic_out_q, fir_q[29], ch_fir_c(4'd0))
-                              + fir_pair(fir_q[0],  fir_q[28], ch_fir_c(4'd1))
-                              + fir_pair(fir_q[1],  fir_q[27], ch_fir_c(4'd2))
-                              + fir_pair(fir_q[2],  fir_q[26], ch_fir_c(4'd3))
-                              + fir_pair(fir_q[3],  fir_q[25], ch_fir_c(4'd4))
-                              + fir_pair(fir_q[4],  fir_q[24], ch_fir_c(4'd5))
-                              + fir_pair(fir_q[5],  fir_q[23], ch_fir_c(4'd6))
-                              + fir_pair(fir_q[6],  fir_q[22], ch_fir_c(4'd7))
-                              + fir_pair(fir_q[7],  fir_q[21], ch_fir_c(4'd8))
-                              + fir_pair(fir_q[8],  fir_q[20], ch_fir_c(4'd9))
-                              + fir_pair(fir_q[9],  fir_q[19], ch_fir_c(4'd10))
-                              + fir_pair(fir_q[10], fir_q[18], ch_fir_c(4'd11))
-                              + fir_pair(fir_q[11], fir_q[17], ch_fir_c(4'd12))
-                              + fir_pair(fir_q[12], fir_q[16], ch_fir_c(4'd13))
-                              + fir_pair(fir_q[13], fir_q[15], ch_fir_c(4'd14));
-
-                        ch_i     <= sat16_48($signed({{10{acc_i[37]}}, acc_i}) >>> 15);
-                        ch_q     <= sat16_48($signed({{10{acc_q[37]}}, acc_q}) >>> 15);
-                        ch_valid <= 1'b1;
+                        // 31-tap symmetric LPF on the current sample (index 0) and the taps before this shift:
+                        // the 16 products here, then two adder levels (G-8 timing closure, same 38-bit sums)
+                        fp_v     <= 1'b1;
+                        fp_i[15] <= $signed(fir_i[14]) * $signed(ch_fir_c(4'd15));
+                        fp_q[15] <= $signed(fir_q[14]) * $signed(ch_fir_c(4'd15));
+                        fp_i[0]  <= fir_pair(cic_out_i, fir_i[29], ch_fir_c(4'd0));
+                        fp_q[0]  <= fir_pair(cic_out_q, fir_q[29], ch_fir_c(4'd0));
+                        for (fi = 1; fi < 15; fi = fi + 1) begin
+                            fp_i[fi] <= fir_pair(fir_i[fi - 1], fir_i[29 - fi], ch_fir_c(fi[3:0]));
+                            fp_q[fi] <= fir_pair(fir_q[fi - 1], fir_q[29 - fi], ch_fir_c(fi[3:0]));
+                        end
                     end else begin
                         fir_dec_cnt <= fir_dec_cnt + 8'd1;
                     end
@@ -491,6 +592,10 @@ module kria_channel_rx (
     reg signed [36:0] hilb_acc;
     reg signed [16:0] ssb_sum;
     integer           si;
+    reg               hp_v, hs_v;
+    reg signed [36:0] hp [0:7];
+    reg signed [36:0] hs [0:1];
+    reg signed [15:0] hp_idly, hs_idly;
 
     // Hamming-windowed Type-III Hilbert coefficients Q15 (h[15-m] = -h[15+m]):
     // m=1: 20598, m=3: 6416, m=5: 3328, m=7: 1858, m=9: 1002, m=11: 486, m=13: 204, m=15: 168
@@ -502,8 +607,11 @@ module kria_channel_rx (
             end
             ssb_valid <= 1'b0;
             ssb_out   <= 16'sd0;
+            hp_v      <= 1'b0;
+            hs_v      <= 1'b0;
         end else begin
             ssb_valid <= 1'b0;
+            hp_v      <= 1'b0;
             if (ch_valid) begin
                 for (si = 30; si > 0; si = si - 1) begin
                     ssb_i_dly[si] <= ssb_i_dly[si - 1];
@@ -514,26 +622,37 @@ module kria_channel_rx (
 
                 // Asymmetric odd offsets m = 1..15 around tap index 14 (current ch_q is tap 0):
                 // h_hilbert[n] = (2/(pi*n))*w[n] -> y = sum_{m>0} h[m]*(x[n-m] - x[n+m])
-                hilb_acc = ($signed(ssb_q_dly[15]) - $signed(ssb_q_dly[13])) * 37'sd20598
-                         + ($signed(ssb_q_dly[17]) - $signed(ssb_q_dly[11])) * 37'sd6416
-                         + ($signed(ssb_q_dly[19]) - $signed(ssb_q_dly[9]))  * 37'sd3328
-                         + ($signed(ssb_q_dly[21]) - $signed(ssb_q_dly[7]))  * 37'sd1858
-                         + ($signed(ssb_q_dly[23]) - $signed(ssb_q_dly[5]))  * 37'sd1002
-                         + ($signed(ssb_q_dly[25]) - $signed(ssb_q_dly[3]))  * 37'sd486
-                         + ($signed(ssb_q_dly[27]) - $signed(ssb_q_dly[1]))  * 37'sd204
-                         + ($signed(ssb_q_dly[29]) - $signed(ch_q))          * 37'sd168;
-
+                // products here, two adder levels, then the sum (G-8 timing closure, same 37-bit arithmetic)
+                hp_v    <= 1'b1;
+                hp_idly <= ssb_i_dly[14];
+                hp[0] <= ($signed(ssb_q_dly[15]) - $signed(ssb_q_dly[13])) * 37'sd20598;
+                hp[1] <= ($signed(ssb_q_dly[17]) - $signed(ssb_q_dly[11])) * 37'sd6416;
+                hp[2] <= ($signed(ssb_q_dly[19]) - $signed(ssb_q_dly[9]))  * 37'sd3328;
+                hp[3] <= ($signed(ssb_q_dly[21]) - $signed(ssb_q_dly[7]))  * 37'sd1858;
+                hp[4] <= ($signed(ssb_q_dly[23]) - $signed(ssb_q_dly[5]))  * 37'sd1002;
+                hp[5] <= ($signed(ssb_q_dly[25]) - $signed(ssb_q_dly[3]))  * 37'sd486;
+                hp[6] <= ($signed(ssb_q_dly[27]) - $signed(ssb_q_dly[1]))  * 37'sd204;
+                hp[7] <= ($signed(ssb_q_dly[29]) - $signed(ch_q))          * 37'sd168;
+            end
+            hs_v <= hp_v;
+            if (hp_v) begin
+                hs[0]   <= hp[0] + hp[1] + hp[2] + hp[3];
+                hs[1]   <= hp[4] + hp[5] + hp[6] + hp[7];
+                hs_idly <= hp_idly;
+            end
+            if (hs_v) begin
+                hilb_acc = hs[0] + hs[1];
                 // USB = (I_dly - H{Q})/2, LSB = (I_dly + H{Q})/2
 `ifdef MUTATE_SWAP_USB_LSB
                 if (cfg_mode == 3'd1)
-                    ssb_sum = $signed(ssb_i_dly[14]) + $signed(hilb_acc >>> 15);
+                    ssb_sum = $signed(hs_idly) + $signed(hilb_acc >>> 15);
                 else
-                    ssb_sum = $signed(ssb_i_dly[14]) - $signed(hilb_acc >>> 15);
+                    ssb_sum = $signed(hs_idly) - $signed(hilb_acc >>> 15);
 `else
                 if (cfg_mode == 3'd1)
-                    ssb_sum = $signed(ssb_i_dly[14]) - $signed(hilb_acc >>> 15);
+                    ssb_sum = $signed(hs_idly) - $signed(hilb_acc >>> 15);
                 else
-                    ssb_sum = $signed(ssb_i_dly[14]) + $signed(hilb_acc >>> 15);
+                    ssb_sum = $signed(hs_idly) + $signed(hilb_acc >>> 15);
 `endif
                 ssb_out   <= ssb_sum >>> 1;
                 ssb_valid <= 1'b1;
@@ -582,6 +701,23 @@ module kria_channel_rx (
 
     wire signed [31:0] am_audio_w = am_dc_y >>> 15;
 
+    // demodulator steps (see the always block)
+    reg               dm_v1, dm_v2, dm_v3, dm_v4, dm_v5;
+    reg signed [15:0] dm_x, dm_mag, dm_p_sin, dm_p_cos, dm_c38, dm_c57;
+    reg signed [47:0] dm_am_d, dm_am_m, dm_tmp_dc, dm_g_p1, dm_g_p2, dm_g_s10, dm_g_p12;
+    reg signed [47:0] dm_bp_in, dm_bp_c, dm_bp_y2, dm_bp_pr, dm_bp_out;
+    reg signed [31:0] dm_de, dm_tmp_fm, dm_g_cs1, dm_g_s0, dm_lr_dm, dm_rds_mx, dm_de_lr, dm_err, dm_lock;
+    wire signed [47:0] dm_bp_sig = dm_bp_out >>> 8;
+    // synthesis translate_off
+    integer demod_overrun = 0;
+    always @(posedge clk)
+        if (!rst && cor_valid && (dm_v1 | dm_v2 | dm_v3 | dm_v4 | dm_v5)) begin
+            demod_overrun = demod_overrun + 1;
+            if (demod_overrun == 1)
+                $display("ERROR: kria_channel_rx: channel samples closer than 6 clocks (decimation too low) at %0t", $time);
+        end
+    // synthesis translate_on
+
     always @(posedge clk) begin
         if (rst) begin
             prev_ang       <= 16'sd0;
@@ -614,6 +750,7 @@ module kria_channel_rx (
             g_s1           <= 32'sd0;
             g_s2           <= 32'sd0;
             g_cnt          <= 16'd0;
+            dm_v1 <= 1'b0; dm_v2 <= 1'b0; dm_v3 <= 1'b0; dm_v4 <= 1'b0; dm_v5 <= 1'b0;
 
             audio_valid    <= 1'b0;
             audio_l        <= 16'sd0;
@@ -638,32 +775,76 @@ module kria_channel_rx (
                 audio_mono  <= ssb_out;
             end
 
-            if (cor_valid) begin : blk_demod
-                reg signed [15:0] cur_dphi;
-                reg signed [15:0] p_sin, p_cos, c38, c57;
-                reg signed [47:0] bp_in, bp_out, bp_sig;
+            // ---- G-8 timing closure: each demodulator sample runs in six steps. d0 (cor_valid) takes the
+            // discriminator's phase step and the magnitude; d1..d4 compute the products from the demodulator's
+            // state, which does not change until d5, where every state register and output is written exactly
+            // as the former single-clock code did. Outputs come 5 clocks later than before. The next sample may
+            // not arrive before d5: the channel is decimated by the CIC and the FIR (at least 50 in every
+            // configuration), and a sample that comes sooner is counted in demod_overrun (simulation).
+            dm_v1 <= cor_valid;
+            dm_v2 <= dm_v1;
+            dm_v3 <= dm_v2;
+            dm_v4 <= dm_v3;
+            dm_v5 <= dm_v4;
+
+            if (cor_valid) begin
+                dm_x     <= cor_ang - prev_ang;     // FM instantaneous frequency (wraps cleanly mod 2^16)
+                dm_mag   <= cor_mag;
+                prev_ang <= cor_ang;
+                dphi_s   <= cor_ang - prev_ang;
+            end
+
+            if (dm_v1) begin
+                dm_am_d  <= (($signed({{32{dm_mag[15]}}, dm_mag}) - $signed({{32{am_prev_mag[15]}}, am_prev_mag})) <<< 15);
+                dm_am_m  <= ((am_dc_y * 48'sd253) >>> 8);
+                dm_de    <= $signed(cfg_deemph_alpha) * ($signed(dm_x) - $signed(fm_de_y >>> 15));
+                dm_g_cs1 <= (($signed(cfg_ctcss_coeff) * g_s1) >>> 14);
+                dm_g_p1  <= $signed(g_s1) * $signed(g_s1);
+                dm_p_sin <= lut_sin(pilot_phase);
+                dm_p_cos <= lut_cos(pilot_phase);
+                dm_c38   <= lut_cos(pilot_phase << 1);
+                dm_c57   <= lut_cos((pilot_phase << 1) + pilot_phase);
+                dm_bp_in <= $signed({{32{dm_x[15]}}, dm_x}) - $signed({{32{pilot_bp_x2[15]}}, pilot_bp_x2});
+                dm_bp_c  <= (($signed({{32{cfg_ctcss_coeff[15]}}, cfg_ctcss_coeff}) * 48'sd123) >>> 7);
+                dm_bp_y2 <= ((pilot_bp_y2 * 48'sd118) >>> 7);
+            end
+
+            if (dm_v2) begin
+                dm_tmp_dc <= dm_am_d + dm_am_m;
+                dm_tmp_fm <= fm_de_y + dm_de;
+                dm_g_s0   <= ($signed(dm_x) >>> 4) + dm_g_cs1 - g_s2;
+                // the coefficient term is under 2^17 in magnitude: an 18-bit by 48-bit product, the same mod 2^48
+                dm_bp_pr  <= (($signed(dm_bp_c[17:0]) * pilot_bp_y1) >>> 14);
+                dm_lr_dm  <= ($signed(dm_x) * $signed(dm_c38)) >>> 14;
+                dm_rds_mx <= ($signed(dm_x) * $signed(dm_c57)) >>> 15;
+            end
+
+            if (dm_v3) begin
+                dm_bp_out <= (dm_bp_in <<< 3) + dm_bp_pr - dm_bp_y2;
+                dm_g_p2   <= $signed(dm_g_s0) * $signed(dm_g_s0);
+                dm_g_s10  <= (($signed(g_s1) * $signed(dm_g_s0)) >>> 14);
+                dm_de_lr  <= $signed(cfg_deemph_alpha) * ($signed(dm_lr_dm) - $signed(lr_lpf >>> 15));
+            end
+
+            if (dm_v4) begin
+                dm_err    <= ($signed(dm_bp_sig[15:0]) * $signed(-dm_p_sin)) >>> 15;
+                dm_lock   <= ($signed(dm_bp_sig[15:0]) * $signed(dm_p_cos)) >>> 15;
+                dm_g_p12  <= dm_g_s10 * $signed(cfg_ctcss_coeff);
+            end
+
+            if (dm_v5) begin : blk_demod
                 reg signed [31:0] err_ph, lock_iir, acc_half;
                 reg signed [31:0] rds_d, rds_e, rds_x;
                 reg signed [17:0] rds_nph, rds_spb, rds_rem;
                 reg signed [47:0] l_plus_r, l_minus_r;
-                reg signed [31:0] rds_mix, prop_corr;
-                reg signed [31:0] lr_demod, de_step;
+                reg signed [31:0] prop_corr;
 
                 // 1. AM Envelope + DC-Block (alpha = 253/256)
-                tmp_dc = (($signed({{32{cor_mag[15]}}, cor_mag}) - $signed({{32{am_prev_mag[15]}}, am_prev_mag})) <<< 15)
-                       + ((am_dc_y * 48'sd253) >>> 8);
-                am_dc_y     <= tmp_dc;
-                am_prev_mag <= cor_mag;
+                am_dc_y     <= dm_tmp_dc;
+                am_prev_mag <= dm_mag;
 
-                // 2. FM instantaneous frequency (phase delta wraps cleanly mod 2^16)
-                cur_dphi = cor_ang - prev_ang;
-                prev_ang <= cor_ang;
-                dphi_s   <= cur_dphi;
-
-                // De-emphasis / audio LPF: y <= y + alpha * (x - y)
-                de_step = $signed(cfg_deemph_alpha) * ($signed(cur_dphi) - $signed(fm_de_y >>> 15));
-                tmp_fm  = fm_de_y + de_step;
-                fm_de_y <= tmp_fm;
+                // 2. De-emphasis / audio LPF: y <= y + alpha * (x - y)
+                fm_de_y <= dm_tmp_fm;
 
                 if (cfg_mode == 3'd0) begin
                     audio_valid <= 1'b1;
@@ -673,19 +854,15 @@ module kria_channel_rx (
                 end else if (cfg_mode == 3'd3) begin
                     // NBFM audio + CTCSS Goertzel resonator
                     audio_valid <= 1'b1;
-                    audio_l     <= sat16_48({{16{tmp_fm[31]}}, (tmp_fm >>> 15)});
-                    audio_r     <= sat16_48({{16{tmp_fm[31]}}, (tmp_fm >>> 15)});
-                    audio_mono  <= sat16_48({{16{tmp_fm[31]}}, (tmp_fm >>> 15)});
+                    audio_l     <= sat16_48({{16{dm_tmp_fm[31]}}, (dm_tmp_fm >>> 15)});
+                    audio_r     <= sat16_48({{16{dm_tmp_fm[31]}}, (dm_tmp_fm >>> 15)});
+                    audio_mono  <= sat16_48({{16{dm_tmp_fm[31]}}, (dm_tmp_fm >>> 15)});
 
                     if (cfg_ctcss_n != 16'd0) begin
                         // g_s0 = x[n] + coeff * s1 - s2  (scaled Q8 sample)
-                        g_s0 = ($signed(cur_dphi) >>> 4) + (($signed(cfg_ctcss_coeff) * g_s1) >>> 14) - g_s2;
                         if (g_cnt >= (cfg_ctcss_n - 16'd1)) begin
                             // Power = s1^2 + s2^2 - coeff*s1*s2
-                            g_p1  = $signed(g_s1) * $signed(g_s1);
-                            g_p2  = $signed(g_s0) * $signed(g_s0);
-                            g_p12 = (($signed(g_s1) * $signed(g_s0)) >>> 14) * $signed(cfg_ctcss_coeff);
-                            g_pow = (g_p1 + g_p2 - g_p12) >>> 10;
+                            g_pow = (dm_g_p1 + dm_g_p2 - dm_g_p12) >>> 10;
                             ctcss_power    <= (g_pow > 48'sd0) ? g_pow[31:0] : 32'd0;
                             ctcss_detected <= (g_pow > $signed({1'b0, cfg_ctcss_thresh}));
                             ctcss_valid    <= 1'b1;
@@ -694,57 +871,42 @@ module kria_channel_rx (
                             g_cnt <= 16'd0;
                         end else begin
                             g_s2  <= g_s1;
-                            g_s1  <= g_s0;
+                            g_s1  <= dm_g_s0;
                             g_cnt <= g_cnt + 16'd1;
                         end
                     end
                 end else if (cfg_mode == 3'd4) begin
                     // WBFM Stereo + 19 kHz Pilot PLL + 38 kHz L-R + 57 kHz RDS BPSK
-                    p_sin = lut_sin(pilot_phase);
-                    p_cos = lut_cos(pilot_phase);
-                    c38   = lut_cos(pilot_phase << 1);
-                    c57   = lut_cos((pilot_phase << 1) + pilot_phase);
-
-                    // 2-pole resonator BPF around 19 kHz (r = 123/128, coeff = 2*cos(2*pi*19k/Fs_ch) Q14)
-                    // Keep internal state in Q8 so low-amplitude startup never quantizes to 0.
-                    bp_in  = $signed({{32{cur_dphi[15]}}, cur_dphi}) - $signed({{32{pilot_bp_x2[15]}}, pilot_bp_x2});
-                    bp_out = (bp_in <<< 3)
-                           + (((($signed({{32{cfg_ctcss_coeff[15]}}, cfg_ctcss_coeff}) * 48'sd123) >>> 7) * pilot_bp_y1) >>> 14)
-                           - ((pilot_bp_y2 * 48'sd118) >>> 7);
-                    bp_sig = bp_out >>> 8;
+                    // 2-pole resonator BPF around 19 kHz (r = 123/128, coeff = 2*cos(2*pi*19k/Fs_ch) Q14), Q8 state
                     pilot_bp_x2 <= pilot_bp_x1;
-                    pilot_bp_x1 <= cur_dphi;
+                    pilot_bp_x1 <= dm_x;
                     pilot_bp_y2 <= pilot_bp_y1;
-                    pilot_bp_y1 <= bp_out;
+                    pilot_bp_y1 <= dm_bp_out;
 
                     // Phase error when locking cos(pilot_phase) to bandpass pilot
-                    // Precompute signed loop terms separately so unsigned pilot_phase cannot coerce >>> to >>
-                    err_ph    = ($signed(bp_sig[15:0]) * $signed(-p_sin)) >>> 15;
+                    err_ph    = dm_err;
                     prop_corr = err_ph * 32'sd4096;
                     acc_half  = pilot_acc_err >>> 1;
                     pilot_acc_err <= pilot_acc_err + (err_ph * 32'sd8);
                     pilot_phase   <= pilot_phase + cfg_pilot_ftw + prop_corr + acc_half;
 
                     // Lock detector on I = bp_sig * cos(pilot_phase)
-                    lock_iir = ($signed(bp_sig[15:0]) * $signed(p_cos)) >>> 15;
+                    lock_iir = dm_lock;
                     pilot_lock_lpf <= pilot_lock_lpf + (((lock_iir > 0 ? lock_iir : -lock_iir) - pilot_lock_lpf) >>> 5);
                     pilot_locked   <= (pilot_lock_lpf > 32'sd48);
 
                     // Coherent L-R demod at 38 kHz + de-emphasis LPF
-                    lr_demod  = ($signed(cur_dphi) * $signed(c38)) >>> 14;
-                    de_step   = $signed(cfg_deemph_alpha) * ($signed(lr_demod) - $signed(lr_lpf >>> 15));
-                    lr_lpf    <= lr_lpf + de_step;
+                    lr_lpf    <= lr_lpf + dm_de_lr;
 
-                    l_plus_r  = $signed(tmp_fm) >>> 15;
-                    l_minus_r = ($signed(lr_lpf) + $signed(de_step)) >>> 15;
+                    l_plus_r  = $signed(dm_tmp_fm) >>> 15;
+                    l_minus_r = ($signed(lr_lpf) + $signed(dm_de_lr)) >>> 15;
                     audio_mono  <= sat16_48(l_plus_r);
                     audio_l     <= sat16_48(l_plus_r + l_minus_r);
                     audio_r     <= sat16_48(l_plus_r - l_minus_r);
                     audio_valid <= 1'b1;
 
                     // 57 kHz RDS: coherent product, low-pass, quarter integrals, bit clock with early-late gate
-                    rds_mix = ($signed(cur_dphi) * $signed(c57)) >>> 15;
-                    rds_lp1 <= rds_lp1 + ((($signed(rds_mix) <<< 8) - rds_lp1) >>> 4);
+                    rds_lp1 <= rds_lp1 + ((($signed(dm_rds_mx) <<< 8) - rds_lp1) >>> 4);
                     rds_lp2 <= rds_lp2 + ((rds_lp1 - rds_lp2) >>> 4);
                     rds_x    = rds_lp2 >>> 8;
                     rds_spb = $signed({2'b00, cfg_rds_sym_samps});
