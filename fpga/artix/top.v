@@ -619,18 +619,21 @@ module artix_top #(
         .pkt_busy      (d2_pkt_busy)
     );
 
+    // The radar DDC's link side is in reset at 500 MHz and D2 never runs at 400 MHz, so at most one of the two
+    // offers a packet: valid and eop are ORed and both see ready, which keeps a select out of the arbiter's
+    // critical path (radar FIFO -> valid -> arbiter -> ready -> SDR FIFO); the select only steers the fields.
     wire d2_sel = d2_run_link | d2_pkt_busy;
-    assign tx_pkt_valid     = d2_sel ? d2_pkt_valid     : rad_pkt_valid;
+    assign tx_pkt_valid     = rad_pkt_valid | d2_pkt_valid;
     assign tx_pkt_sop       = d2_sel ? d2_pkt_sop       : rad_pkt_sop;
-    assign tx_pkt_eop       = d2_sel ? d2_pkt_eop       : rad_pkt_eop;
+    assign tx_pkt_eop       = rad_pkt_eop | d2_pkt_eop;
     assign tx_pkt_stream_id = d2_sel ? d2_pkt_stream_id : rad_pkt_stream_id;
     assign tx_pkt_len       = d2_sel ? d2_pkt_len       : rad_pkt_len;
     assign tx_pkt_seq       = d2_sel ? d2_pkt_seq       : rad_pkt_seq;
     assign tx_pkt_timestamp = d2_sel ? d2_pkt_timestamp : rad_pkt_timestamp;
     assign tx_pkt_data      = d2_sel ? d2_pkt_data      : rad_pkt_data;
     assign tx_dropped_cnt   = d2_sel ? d2_dropped_cnt   : rad_dropped_cnt;
-    assign d2_pkt_ready     =  d2_sel & tx_pkt_ready;
-    assign rad_pkt_ready    = ~d2_sel & tx_pkt_ready;
+    assign d2_pkt_ready     = tx_pkt_ready;
+    assign rad_pkt_ready    = tx_pkt_ready;
 
     // D2's band peak for fe_agc (2^14 words = 65536 samples, 131 us, as the 400 MSPS window's 164 us)
     wire         d2_pk_tog;

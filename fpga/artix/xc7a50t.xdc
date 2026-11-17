@@ -289,7 +289,12 @@ set_max_delay -datapath_only 3.500 -from [get_clocks clk_adcr_dco] -to [get_cloc
 # into link_clk (D2_STAT, D2's enable)
 set_max_delay -datapath_only 4.000 -from [get_clocks clk_adcr_dco_500] -to [get_clocks -of_objects [get_pins {u_mmcm_sys/CLKOUT0 u_mmcm_sys/CLKOUT2}]]
 set_false_path -to [get_pins {u_adc_cap/u_bufg_200m/S0 u_adc_cap/u_bufg_200m/S1}]
-set_max_delay -datapath_only 4.000 -from [get_cells -quiet {u_adc_cap/adc_trained_reg u_adc_cap/dco_phase_err_reg u_adc_cap/eye_width_min_reg[*]}] -to [get_cells -quiet {d2_tr_s_reg[0] d2_err_s_reg[0] d2_eye_s1_reg[*]}]
+# the OR pin's IDDR (M6/N6, far from the DCO's BUFR) is not used at 500 MSPS: D2 takes codes 0 and 255 as over-range
+set_false_path -from [get_clocks clk_adcr_dco_500] -through [get_pins {u_adc_cap/g_adc_bits[8].u_iddr_d/Q1 u_adc_cap/g_adc_bits[8].u_iddr_d/Q2}]
+# the trainer's results (steady after training) run on refclk_200m in 500 MSPS mode: into link_clk (D2_STAT,
+# the tap readback, D2's enable) and the D2 run condition into refclk_200m
+set_max_delay -datapath_only 8.000 -from [get_cells -quiet {u_adc_cap/adc_trained_reg* u_adc_cap/dco_phase_err_reg* u_adc_cap/eye_width_min_reg* u_adc_cap/tap_val_reg*}] -to [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]]
+set_max_delay -datapath_only 4.000 -from [get_clocks -of_objects [get_pins u_mmcm_sys/CLKOUT0]] -to [get_cells -quiet {d2_run_ref_s_reg[0]}]
 set_max_delay -datapath_only 2.400 -from [get_clocks clk_100m_unbuf] -to [get_clocks clk_400m_unbuf]
 set_max_delay -datapath_only 2.400 -from [get_clocks clk_400m_unbuf] -to [get_clocks clk_100m_unbuf]
 set_max_delay -datapath_only 2.400 -from [get_clocks link_clk_unbuf] -to [get_cells -quiet -hier -filter {NAME =~ *tr_start_sync_reg[0]* || NAME =~ *tr_pat_sync_reg[0]*}]

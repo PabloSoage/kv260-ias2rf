@@ -261,7 +261,11 @@ module ddc_wrapper #(
     end
     wire [ADDR_W:0] fifo_fill  = wr_ptr_bin_sync_r - rd_ptr_bin;
     wire            fifo_empty = (rd_ptr_bin == wr_ptr_bin_sync_r);
-    wire            pkt_avail  = (fifo_fill >= PKT_WORDS);
+    // Rev08 G-7: pkt_valid from registers. A packet starts with PKT_WORDS in the FIFO (store and forward), so it
+    // cannot run empty during one: pkt_valid = pkt_active or a registered "a packet is ready" (one cycle later
+    // than before), and the pointer arithmetic is out of the uplink arbiter's path to the SDR FIFOs.
+    reg             pkt_avail_r;
+    wire            pkt_avail  = pkt_avail_r;
 
     (* ASYNC_REG = "TRUE" *) reg [23:0] drop_sync1, drop_sync2;
 
@@ -270,7 +274,7 @@ module ddc_wrapper #(
 
     assign pkt_stream_id = STREAM_ID;
     assign pkt_len       = PKT_WORDS * 16'd8;
-    assign pkt_valid     = pkt_active ? !fifo_empty : pkt_avail;
+    assign pkt_valid     = pkt_active | pkt_avail_r;
     assign pkt_sop       = (word_idx == 16'd0);
     assign pkt_eop       = pkt_valid && (word_idx == PKT_WORDS - 1);
     assign pkt_data      = fifo_mem[rd_ptr_bin[ADDR_W-1:0]];
@@ -290,9 +294,11 @@ module ddc_wrapper #(
             dropped_cnt       <= 24'd0;
             word_idx          <= 16'd0;
             pkt_active        <= 1'b0;
+            pkt_avail_r       <= 1'b0;
             pkt_seq           <= 32'd0;
             pkt_timestamp     <= 64'd0;
         end else begin
+            pkt_avail_r <= !pkt_active && !pkt_avail_r && (fifo_fill >= PKT_WORDS);
             wr_gray_sync1     <= wr_ptr_gray;
             wr_gray_sync2     <= wr_gray_sync1;
             wr_ptr_bin_sync_r <= wr_ptr_bin_sync;

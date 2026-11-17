@@ -2,14 +2,16 @@
 // Rev08 G-7: D2, the 500 MSPS DDC for the AD9484 (master clock at 500 MHz).
 //
 // adc_capture hands over four samples per link_clk cycle (125 MHz = 500 MSPS / 4, frequency-locked to the
-// AD9484's clock), so the whole path runs on link_clk with four lanes and no DSP48 (the Artix has 9 free):
+// AD9484's clock), so the whole path runs on link_clk with four lanes and 8 DSP48 (the Artix had 9 free):
 //   NCO     32-bit phase, lane i at acc + i * FTW, acc += 4 * FTW; 12-bit phase into a quarter-wave table of
 //           1024 x 12 bits (one dual-port RAMB18 per lane: the sine's and the cosine's index); worst phase
 //           truncation spur -72 dBc
-//   mixer   the code as an odd 9-bit number (2 * (code - 128) + 1, so mid-scale has no DC) times e^-j(theta),
-//           rounded to 16 bits; CONJ flips the spectrum (the AERIS DDC's output is the conjugate)
-//   CIC     5 stages, decimation 5, 500 -> 100 MSPS, 28-bit integrators in four-lane prefix form (one adder in
-//           each accumulator loop); what folds onto +/-10 MHz (100 MHz multiples +/- 10 MHz) at least 94 dB
+//   mixer   the code as an odd 9-bit number (2 * (code - 128) + 1, so mid-scale has no DC) times e^-j(theta)
+//           in one DSP48 per product, rounded to 15 bits; CONJ flips the spectrum (the AERIS DDC's output is
+//           the conjugate)
+//   CIC     5 stages, decimation 5, 500 -> 100 MSPS, integrators in four-lane prefix form (one adder in each
+//           accumulator loop), pruned (Hogenauer) from 28 bits to 27..21 in the integrators and 21..18 in the
+//           combs; what folds onto +/-10 MHz (100 MHz multiples +/- 10 MHz) at least 94 dB
 //           down, onto +/-12.5 MHz 83 dB; droop 0.69 dB at 10 MHz; gain 3125 / 4096
 //   ddc_hb4 the radar DDC's two half-bands, 100 -> 25 MSPS (flat to 0.07 dB up to 10 MHz, -49.6 dB from 15 to
 //           25 MHz); its input is valid 4 cycles in 5
@@ -24,7 +26,6 @@
 `timescale 1ns/1ps
 `default_nettype none
 
-(* use_dsp = "no" *)
 module ddc_500 #(
     parameter integer PKT_WORDS = 64,         // 64-bit words per packet (2 I/Q samples each)
     parameter integer FIFO_AW   = 7,          // log2 of the packet FIFO depth in 64-bit words (> PKT_WORDS)
@@ -85,7 +86,9 @@ module ddc_500 #(
     always @(posedge clk) begin
         pk_a   <= (mag7(lane_in[0][7:0]) >= mag7(lane_in[1][7:0])) ? lane_in[0][7:0] : lane_in[1][7:0];
         pk_b   <= (mag7(lane_in[2][7:0]) >= mag7(lane_in[3][7:0])) ? lane_in[2][7:0] : lane_in[3][7:0];
-        pk_ora <= lane_in[0][8] | lane_in[1][8] | lane_in[2][8] | lane_in[3][8];
+        // over-range as a full-scale code: the AD9484's OR pin is not timed at 250 MHz (xc7a50t.xdc)
+        pk_ora <= (&lane_in[0][7:0]) | ~(|lane_in[0][7:0]) | (&lane_in[1][7:0]) | ~(|lane_in[1][7:0]) |
+                  (&lane_in[2][7:0]) | ~(|lane_in[2][7:0]) | (&lane_in[3][7:0]) | ~(|lane_in[3][7:0]);
         pk_v1  <= word_valid && run;
         pk_code  <= (mag7(pk_a) >= mag7(pk_b)) ? pk_a : pk_b;
         pk_or    <= pk_ora;
@@ -151,103 +154,156 @@ module ddc_500 #(
     end
 
     // ---------------------------------------------------------------------------------------------------------
-    // P3: products (LUTs); P4: rounded to 16 bits
+    // P3: products (DSP48, one per product: 8 of the Artix's 9 free); P4: rounded to 15 bits (the CIC's input,
+    // LSB position 1 of its 28-bit scale)
     // ---------------------------------------------------------------------------------------------------------
     reg signed [21:0] pi4 [0:3], pq4 [0:3];
-    reg signed [15:0] mi [0:3], mq [0:3];
+    reg signed [14:0] mi [0:3], mq [0:3];
     reg               v3 = 1'b0, v4 = 1'b0;
+    wire              v4r = v4;
     always @(posedge clk) begin
         v3 <= v2; v4 <= v3;
         for (i = 0; i < 4; i = i + 1) begin
             pi4[i] <= x2[i] * lo_c[i];
             pq4[i] <= x2[i] * lo_s[i];
-            mi[i]  <= (pi4[i] + 22'sd16) >>> 5;                      // |x * lo| <= 255 * 4095: fits after >>> 5
-            mq[i]  <= (pq4[i] + 22'sd16) >>> 5;
+            mi[i]  <= (pi4[i] + 22'sd32) >>> 6;                      // |x * lo| <= 255 * 4095: 15 bits after >>> 6
+            mq[i]  <= (pq4[i] + 22'sd32) >>> 6;
         end
     end
 
     // ---------------------------------------------------------------------------------------------------------
-    // CIC integrators, four lanes per cycle. Stage s, word w: prefix sums p[k] = a[0] + .. + a[k] (registered),
-    // then b[k] = acc + p[k] and acc += p[3]. Two cycles per stage.
+    // CIC, four lanes per cycle, pruned (Hogenauer, 16 bits in and out): of the 28-bit full-precision value,
+    // integrator s keeps bits [27:LI(s)], LI = 1, 3, 5, 6, 7, and comb s bits [27:LC(s)], LC = 7, 8, 9, 10, 10.
+    // The truncations are plain shifts: a constant error entering after the first integrator meets more
+    // differentiators than integrators and leaves no DC; the one before it is the mixer's rounding to 15 bits
+    // (LSB position 1). Integrator stage s, word w: prefix sums
+    // p[k] = a[0] + .. + a[k] (registered), then b[k] = acc + p[k] and acc += p[3] (two cycles per stage).
     // ---------------------------------------------------------------------------------------------------------
-    reg signed [W-1:0] ia [0:5][0:3];     // ia[s]: stage s input lanes (ia[0] = mixer), ia[5]: last output
-    reg signed [W-1:0] ip [0:4][0:3];     // prefix sums of stage s
-    reg signed [W-1:0] iacc [0:4];
-    reg [5:0]          vi_a, vi_p;        // valid of ia[s] (bit s) and ip[s]
-    reg signed [W-1:0] qa [0:5][0:3];
-    reg signed [W-1:0] qp [0:4][0:3];
-    reg signed [W-1:0] qacc [0:4];
+    function automatic integer li(input integer s);
+        case (s) 0: li = 1; 1: li = 3; 2: li = 5; 3: li = 6; default: li = 7; endcase
+    endfunction
+    function automatic integer lc(input integer s);
+        case (s) 0: lc = 7; 1: lc = 8; 2: lc = 9; default: lc = 10; endcase
+    endfunction
 
-    always @(posedge clk) begin
-        for (i = 0; i < 4; i = i + 1) begin
-            ia[0][i] <= {{(W-16){mi[i][15]}}, mi[i]};
-            qa[0][i] <= {{(W-16){mq[i][15]}}, mq[i]};
+    // stage s's input lanes and valid; [5] = the last integrator's output (bits [27:7], 21 bits)
+    wire signed [W-1:0] ia_w [0:5][0:3];   // value kept in the low (W - lsb) bits, sign-extended to W
+    wire        [5:0]   via;
+    wire signed [W-1:0] qa_w [0:5][0:3];
+    genvar gs, gk;
+    generate
+        for (gk = 0; gk < 4; gk = gk + 1) begin : g_in
+            assign ia_w[0][gk] = {{(W-15){mi[gk][14]}}, mi[gk]};      // LSB position 1
+            assign qa_w[0][gk] = {{(W-15){mq[gk][14]}}, mq[gk]};
         end
-        if (!run) begin
-            vi_a <= 6'd0; vi_p <= 6'd0;
-            for (s = 0; s < 5; s = s + 1) begin iacc[s] <= {W{1'b0}}; qacc[s] <= {W{1'b0}}; end
-        end else begin
-            vi_a[0] <= v4;
-            for (s = 0; s < 5; s = s + 1) begin
-                vi_p[s] <= vi_a[s];
-                ip[s][0] <= ia[s][0];
-                ip[s][1] <= ia[s][0] + ia[s][1];
-                ip[s][2] <= ia[s][0] + ia[s][1] + ia[s][2];
-                ip[s][3] <= (ia[s][0] + ia[s][1]) + (ia[s][2] + ia[s][3]);
-                qp[s][0] <= qa[s][0];
-                qp[s][1] <= qa[s][0] + qa[s][1];
-                qp[s][2] <= qa[s][0] + qa[s][1] + qa[s][2];
-                qp[s][3] <= (qa[s][0] + qa[s][1]) + (qa[s][2] + qa[s][3]);
-                vi_a[s + 1] <= vi_p[s];
-                for (i = 0; i < 4; i = i + 1) begin
-                    ia[s + 1][i] <= iacc[s] + ip[s][i];
-                    qa[s + 1][i] <= qacc[s] + qp[s][i];
+        assign via[0] = v4r;
+        for (gs = 0; gs < 5; gs = gs + 1) begin : g_int
+            localparam integer L0 = (gs == 0) ? 1 : li(gs - 1);   // LSB position of the input
+            localparam integer L1 = li(gs);                        // LSB position kept here
+            localparam integer WS = W - L1;                        // width
+            reg signed [WS-1:0] a_i [0:3], a_q [0:3];             // input, truncated
+            reg signed [WS-1:0] p_i [0:3], p_q [0:3];
+            reg signed [WS-1:0] b_i [0:3], b_q [0:3];
+            reg signed [WS-1:0] acc_i, acc_q;
+            reg                 va, vp, vb;
+            integer k;
+            always @(posedge clk) begin
+                for (k = 0; k < 4; k = k + 1) begin
+                    a_i[k] <= ia_w[gs][k] >>> (L1 - L0);
+                    a_q[k] <= qa_w[gs][k] >>> (L1 - L0);
                 end
-                if (vi_p[s]) begin
-                    iacc[s] <= iacc[s] + ip[s][3];
-                    qacc[s] <= qacc[s] + qp[s][3];
+                // one chain of three adders (each partial sum reused), not six
+                begin : blk_pre
+                    reg signed [WS-1:0] s1i, s2i, s1q, s2q;
+                    s1i = a_i[0] + a_i[1]; s2i = s1i + a_i[2];
+                    s1q = a_q[0] + a_q[1]; s2q = s1q + a_q[2];
+                    p_i[0] <= a_i[0]; p_i[1] <= s1i; p_i[2] <= s2i; p_i[3] <= s2i + a_i[3];
+                    p_q[0] <= a_q[0]; p_q[1] <= s1q; p_q[2] <= s2q; p_q[3] <= s2q + a_q[3];
+                end
+                for (k = 0; k < 4; k = k + 1) begin
+                    b_i[k] <= acc_i + p_i[k];
+                    b_q[k] <= acc_q + p_q[k];
+                end
+                if (!run) begin
+                    va <= 1'b0; vp <= 1'b0; vb <= 1'b0;
+                    acc_i <= {WS{1'b0}}; acc_q <= {WS{1'b0}};
+                end else begin
+                    va <= via[gs]; vp <= va; vb <= vp;
+                    if (vp) begin
+                        acc_i <= acc_i + p_i[3];
+                        acc_q <= acc_q + p_q[3];
+                    end
                 end
             end
+            for (gk = 0; gk < 4; gk = gk + 1) begin : g_out
+                assign ia_w[gs + 1][gk] = {{L1{b_i[gk][WS-1]}}, b_i[gk]};
+                assign qa_w[gs + 1][gk] = {{L1{b_q[gk][WS-1]}}, b_q[gk]};
+            end
+            assign via[gs + 1] = vb;
         end
-    end
+    endgenerate
 
     // ---------------------------------------------------------------------------------------------------------
     // Decimation by 5: of words 0..4, take lane 0, 1, 2, 3 and none (samples 0, 5, 10, 15 of 20); five combs
     // ---------------------------------------------------------------------------------------------------------
     reg [2:0]          dph;
-    reg signed [W-1:0] ci [0:5], cq [0:5], zi [0:4], zq [0:4];
-    reg [5:0]          vc;
+    reg signed [W-1:0] c0_i, c0_q;        // LSB position 7
+    reg                c0_v;
     always @(posedge clk) begin
         if (!run) begin
-            dph <= 3'd0; vc <= 6'd0;
-            for (s = 0; s < 5; s = s + 1) begin zi[s] <= {W{1'b0}}; zq[s] <= {W{1'b0}}; end
+            dph <= 3'd0; c0_v <= 1'b0;
         end else begin
-            vc[0] <= 1'b0;
-            if (vi_a[5]) begin
+            c0_v <= 1'b0;
+            if (via[5]) begin
                 dph <= (dph == 3'd4) ? 3'd0 : dph + 3'd1;
                 if (dph != 3'd4) begin
-                    vc[0] <= 1'b1;
-                    ci[0] <= ia[5][dph[1:0]];
-                    cq[0] <= qa[5][dph[1:0]];
-                end
-            end
-            for (s = 0; s < 5; s = s + 1) begin
-                vc[s + 1] <= vc[s];
-                if (vc[s]) begin
-                    ci[s + 1] <= ci[s] - zi[s]; zi[s] <= ci[s];
-                    cq[s + 1] <= cq[s] - zq[s]; zq[s] <= cq[s];
+                    c0_v <= 1'b1;
+                    c0_i <= ia_w[5][dph[1:0]];
+                    c0_q <= qa_w[5][dph[1:0]];
                 end
             end
         end
     end
 
-    // gain 3125 / 4096; |comb output| <= 32632 * 3125 < 2^27, so no saturation
+    wire signed [W-1:0] cc_i [0:5], cc_q [0:5];
+    wire        [5:0]   vcc;
+    assign cc_i[0] = c0_i; assign cc_q[0] = c0_q; assign vcc[0] = c0_v;
+    generate
+        for (gs = 0; gs < 5; gs = gs + 1) begin : g_comb
+            localparam integer L0 = (gs == 0) ? li(4) : lc(gs - 1);
+            localparam integer L1 = lc(gs);
+            localparam integer WS = W - L1;
+            reg signed [WS-1:0] x_i, x_q, z_i, z_q, d_i, d_q;
+            reg                 vx, vd;
+            always @(posedge clk) begin
+                if (!run) begin
+                    vx <= 1'b0; vd <= 1'b0; z_i <= {WS{1'b0}}; z_q <= {WS{1'b0}};
+                end else begin
+                    vx <= vcc[gs];
+                    if (vcc[gs]) begin
+                        x_i <= cc_i[gs] >>> (L1 - L0);
+                        x_q <= cc_q[gs] >>> (L1 - L0);
+                    end
+                    vd <= vx;
+                    if (vx) begin
+                        d_i <= x_i - z_i; z_i <= x_i;
+                        d_q <= x_q - z_q; z_q <= x_q;
+                    end
+                end
+            end
+            assign cc_i[gs + 1] = {{L1{d_i[WS-1]}}, d_i};
+            assign cc_q[gs + 1] = {{L1{d_q[WS-1]}}, d_q};
+            assign vcc[gs + 1]  = vd;
+        end
+    endgenerate
+
+    // gain 3125 / 4096: the last comb's LSB is bit 10, the output's bit 12; |comb output| <= 32632 * 3125 < 2^27
     reg signed [15:0] c16_i, c16_q;
     reg               c16_v;
     always @(posedge clk) begin
-        c16_v <= run && vc[5];
-        c16_i <= (ci[5] + 28'sd2048) >>> 12;
-        c16_q <= (cq[5] + 28'sd2048) >>> 12;
+        c16_v <= run && vcc[5];
+        c16_i <= (cc_i[5] + 28'sd2) >>> 2;
+        c16_q <= (cc_q[5] + 28'sd2) >>> 2;
     end
 
     ddc_hb4 u_hb4 (.clk(clk), .rst(!run), .in_valid(c16_v), .in_i(c16_i), .in_q(c16_q),
@@ -266,11 +322,14 @@ module ddc_500 #(
     wire [FIFO_AW:0]  fill       = wr_ptr - rd_ptr;
     wire              fifo_full  = (fill == DEPTH);
     wire              fifo_empty = (fill == 0);
-    wire              pkt_avail  = (fill >= PKT_WORDS);
+    // store and forward: a packet starts with PKT_WORDS in the FIFO, so it never runs empty during one, and
+    // pkt_valid is a register (pkt_avail_r) or pkt_active, with no path from the uplink arbiter's ready
+    reg               pkt_avail_r;
+    wire              pkt_avail  = pkt_avail_r;
 
     assign pkt_stream_id = STREAM_ID;
     assign pkt_len       = PKT_WORDS * 16'd8;
-    assign pkt_valid     = pkt_active ? !fifo_empty : pkt_avail;
+    assign pkt_valid     = pkt_active | pkt_avail_r;
     assign pkt_sop       = (word_idx == 16'd0);
     assign pkt_eop       = pkt_valid && (word_idx == PKT_WORDS - 1);
     assign pkt_data      = fifo_mem[rd_ptr[FIFO_AW-1:0]];
@@ -287,8 +346,11 @@ module ddc_500 #(
         end
         if (rst || (!run && !pkt_active)) begin
             wr_ptr <= 0; rd_ptr <= 0; half_phase <= 1'b0; half_word <= 32'd0;
-            word_idx <= 16'd0; pkt_active <= 1'b0; pkt_timestamp <= 64'd0;
+            word_idx <= 16'd0; pkt_active <= 1'b0; pkt_timestamp <= 64'd0; pkt_avail_r <= 1'b0;
         end else begin
+            // offered from a register: outside a packet nothing is read, so the fill from the pointers as they
+            // stand is exact (a write this cycle only makes it one late); not again while a packet runs
+            pkt_avail_r <= run && !pkt_active && !pkt_avail_r && (fill >= PKT_WORDS);
             if (bb_valid && run) begin
                 half_phase <= ~half_phase;
                 if (!half_phase) half_word <= {bb_q, bb_i};
