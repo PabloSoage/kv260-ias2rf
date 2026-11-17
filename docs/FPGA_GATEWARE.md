@@ -17,7 +17,7 @@ Complete RTL, post-route Vivado 2026.1 implementation, and full-system XSim co-s
 |  · 8x ADAR1000 Beamformer + 4x M3SWA2-34DR+ SW    |     Dedicated 1000BASE-T Ethernet (U1201 -> J1201)   |                                                    |
 |  · Dual-Path Mux + Debug UART (115.2k 8N1 Pmod)   | ---------------------------------------------------> |  PS8 (Quad Cortex-A53 @ 1.33 GHz + 4 GB DDR4):     |
 |                                                   |  192.168.10.2 UDP Port 0x4952 -> KV260 J10 (GEM3)    |   · Pulse compression, Doppler FFT, CFAR, Tracking |
-| Post-Route: 20,254 LUT (62.1%), 111 DSP, WNS +0.064ns|  + Pmod J1102<->J2 EMIO UART1 (/dev/ttyPS1)          |   · SDR demodulation & Linux host IO               |
+| Post-Route: 25,000 LUT (76.7%), 119 DSP, WNS +0.125ns|  + Pmod J1102<->J2 EMIO UART1 (/dev/ttyPS1)          |   · SDR demodulation & Linux host IO               |
 +---------------------------------------------------+     Failsafe Pmod J1102 <-> Carrier J2 (EMIO SPI0)   +----------------------------------------------------+
 ```
 
@@ -66,26 +66,27 @@ The post-route floorplan below is plotted directly from Vivado 2026.1 placed lea
 
 | Hierarchy / Metric | Total LUTs | FFs | RAMB36 | RAMB18 | DSP48E1 | Role |
 | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **`artix_top` (Total, `XC7A50T-FTG256-2`)** | **`20,254` (`62.1%`)** | **`22,709` (`34.8%`)** | **`13`** | **`6`** (`21.3%` BRAM) | **`111` (`92.5%`)** | Full integrated RF/Radar/SDR + Ethernet + IAS1 + Debug UART + Rev08 front-end control design |
-| `u_sdr_ddc` | `5,676` | `3,754` | `2` | `4` | `30` | Dual-channel wideband SDR DDC (`62.5`/`50.0 MSPS`) |
-| `u_ddc` (`ddc_wrapper` + `PLFM_RADAR` + `ddc_hb4`) | `3,707` | `7,216` | `0` | `0` | `79` | 400 -> 100 -> 25 MSPS AERIS-10 radar DDC, tunable NCO (G-4), anti-alias half-bands and CPI mark (G-8) |
-| `u_dbg_uart` | `1,644` | `656` | `0` | `0` | `0` | G-1 8N1 debug UART monitor, banner, 1 Hz `STAT` & 4th CSR master |
-| `u_ul_pcs_tx` | `1,213` | `958` | `0` | `0` | `0` | 2-lane `64b/66b` IAS1 uplink PCS |
-| `u_fe_ctrl` + `u_fe_agc` + `u_adcr_peak` | `1,026` | `796` | `0` | `0` | `1` | Rev08 G-2 to G-6: expanders, RFFC5072/PE4312 sequencer, LEDs, AGC and its AD9484 peak detector |
-| `gen_rev06_eth.*` (`mux`, `mac`, `mdio`, `phy`, `gen`) | `2,038` | `1,795` | `8` | `1` | `0` | `1000BASE-T` SGMII + UDP MAC + Dual-Path Failover |
-| `u_dl_pcs_rx` + `u_dl_train_fsm` | `770` | `723` | `0` | `0` | `0` | 1-lane `1.0 Gb/s` IAS1 downlink + eye trainer |
-| `u_xadc_pps` + `u_hk_i2c` + `u_clk_mode_ctrl` (`u_hk_xo`) + `u_pmod_spi` | `2,122` | `2,040` | `0` | `0` | `0` | Safe-boot MMCM DRP/Si549, XADC, 1-PPS, I2C, Pmod SPI |
-| `u_adc_cap` + `u_adcs_cap` + `u_conv_spi` | `850` | `894` | `0` | `0` | `0` | High-speed LVDS ADC capture & 3-wire init |
-| `u_dac_radar` + `u_dac_sdr` + `u_adar_ctrl` + `u_rf_switch` | `912` | `619` | `3` | `1` | `1` | Non-MMCM DACs, `8x ADAR1000` beamformer, switches |
+| **`artix_top` (Total, `XC7A50T-FTG256-2`)** | **`25,000` (`76.7%`)** | **`28,885` (`44.3%`)** | **`13`** | **`10`** (`24.0%` BRAM) | **`119` (`99.2%`)** | Full integrated RF/Radar/SDR + Ethernet + IAS1 + Debug UART + Rev08 front-end control and the G-7 500 MSPS path |
+| `u_sdr_ddc` | `5,736` | `3,754` | `2` | `4` | `30` | Dual-channel wideband SDR DDC (`62.5`/`50.0 MSPS`) |
+| `u_ddc` (`ddc_wrapper` + `PLFM_RADAR` + `ddc_hb4`) | `3,434` | `6,549` | `0` | `0` | `79` | 400 -> 100 -> 25 MSPS AERIS-10 radar DDC, tunable NCO (G-4), anti-alias half-bands and CPI mark (G-8) |
+| `u_d2` + `u_d2_peak` | `4,383` | `6,649` | `0` | `4` | `8` | Rev08 G-7 D2: 500 MSPS AD9484 path (four-lane NCO, mixer, pruned CIC5, `ddc_hb4`) and its AGC peak detector |
+| `u_dbg_uart` | `1,671` | `655` | `0` | `0` | `0` | G-1 8N1 debug UART monitor, banner, 1 Hz `STAT` & 4th CSR master |
+| `u_ul_pcs_tx` | `1,226` | `958` | `0` | `0` | `0` | 2-lane `64b/66b` IAS1 uplink PCS |
+| `u_fe_ctrl` + `u_fe_agc` + `u_adcr_peak` | `1,021` | `795` | `0` | `0` | `1` | Rev08 G-2 to G-6: expanders, RFFC5072/PE4312 sequencer, LEDs, AGC and its AD9484 peak detector |
+| `gen_rev06_eth.*` (`mux`, `mac`, `mdio`, `phy`, `gen`) | `2,012` | `1,798` | `8` | `1` | `0` | `1000BASE-T` SGMII + UDP MAC + Dual-Path Failover |
+| `u_dl_pcs_rx` + `u_dl_train_fsm` | `801` | `723` | `0` | `0` | `0` | 1-lane `1.0 Gb/s` IAS1 downlink + eye trainer |
+| `u_xadc_pps` + `u_hk_i2c` + `u_clk_mode_ctrl` (`u_hk_xo`) + `u_pmod_spi` | `2,428` | `2,230` | `0` | `0` | `0` | Safe-boot MMCM DRP/Si549, XADC, 1-PPS, I2C, Pmod SPI |
+| `u_adc_cap` + `u_adcs_cap` + `u_conv_spi` | `952` | `1,007` | `0` | `0` | `0` | High-speed LVDS ADC capture & 3-wire init |
+| `u_dac_radar` + `u_dac_sdr` + `u_adar_ctrl` + `u_rf_switch` | `914` | `619` | `3` | `1` | `1` | Non-MMCM DACs, `8x ADAR1000` beamformer, switches |
 
-- **Timing (`fpga/artix/reports_rev06/timing_summary.rpt` & `pulse_width.rpt`, with post-route `phys_opt_design`):** Overall design worst slacks are `WNS = +0.064 ns` (`0 / 70,272` failing setup endpoints; the worst paths are `fe_ctrl`'s step table on `clk_cfgmclk`, constrained at `CFGMCLK`'s fastest `100 MHz`, and the AERIS FIR adder tree into `clk_100m_unbuf`), `WHS = +0.026 ns` (`0 / 69,818` failing hold endpoints), and `WPWS = +0.008 ns` (`0 / 23,325` failing pulse-width endpoints). Per-clock-group closure:
-  - **Build flow (`build_rev06.tcl`):** the post-place `phys_opt_design` runs an explicit pass list, `-fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime -shift_register_opt -bram_register_opt -hold_fix`, that is the default set without `-dsp_register_opt`. That pass pulled the AERIS mixer's `AREG` out of the DSP48 into a slice and left a fabric-to-multiplier path at `-0.146 ns` in the `2.5 ns` cycle. The post-route `phys_opt_design` runs with `-directive AggressiveExplore`: the AERIS CIC's combs sit within about `0.05 ns` of the `400 MHz` cycle and moved by that much between placements. `adc_peak`'s 128-bit window registers take power-up values and sit outside the reset branch (inside it, the reset still reached all 384 flip-flops as a hold condition). In the AERIS DDC the dither's carry selects between two upper halves prepared in 12-bit steps instead of driving a 24-bit carry chain, and the FIR output CDCs have their own reset copies.
-  - **AD9484 Radar Domain (`clk_adcr_dco` `5.000 ns` = `400 MSPS` only, Rev08 A-1):** Held in hardware reset when master clock is `500 MHz` (`RADAR_STATUS[0]`), so it is closed at `400 MSPS` (`clk_400m_unbuf` `2.500 ns`: `WNS = +0.075 ns`, `WHS = +0.042 ns`, `WPWS = +0.684 ns`; `clk_200m_unbuf`: `WNS = +0.293 ns`; `clk_100m_unbuf`: `WNS = +1.861 ns`; `clk_adcr_dco`: `WNS = +0.488 ns`).
+- **Timing (`fpga/artix/reports_rev06/timing_summary.rpt` & `pulse_width.rpt`, with post-route `phys_opt_design`):** Overall design worst slacks are `WNS = +0.125 ns` (`0 / 83,150` failing setup endpoints; the worst path is the AERIS CIC's sampled integrator into its first comb's DSP48 on `clk_400m_unbuf`), `WHS = +0.036 ns` (`0 / 82,665` failing hold endpoints), and `WPWS = +0.008 ns` (`0 / 29,749` failing pulse-width endpoints). Per-clock-group closure:
+  - **Build flow (`build_rev06.tcl`):** the post-place `phys_opt_design` runs an explicit pass list, `-fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime -shift_register_opt -bram_register_opt -hold_fix`, that is the default set without `-dsp_register_opt`. That pass pulled the AERIS mixer's `AREG` out of the DSP48 into a slice and left a fabric-to-multiplier path at `-0.146 ns` in the `2.5 ns` cycle. The post-route `phys_opt_design` runs with `-directive AggressiveExplore`: the AERIS CIC's combs sit within about `0.05 ns` of the `400 MHz` cycle and moved by that much between placements. `adc_peak`'s 128-bit window registers take power-up values and sit outside the reset branch (inside it, the reset still reached all 384 flip-flops as a hold condition). In the AERIS DDC the dither's carry selects between two upper halves prepared in 12-bit steps instead of driving a 24-bit carry chain, and the FIR output CDCs have their own reset copies. With G-7 the device is at 77 % of its LUTs and three more paths needed structure rather than placement luck: the AERIS CIC's comb stages 1 to 4 are whole 28-bit subtracts under a 4-cycle multicycle path (each loads once per output sample, 4 cycles after its source; bit-exact, 7 `clk_400m` cycles more latency), the AERIS DDC takes the ADC data through one more `clk_400m` register, and `fe_ctrl`'s step table has two cycles (`S_PREP2`, a 2-cycle multicycle path). The eye-scan trainer's clock comes through a `BUFGCTRL` from `clk_200m` (400 MHz mode) or `refclk_200m` (500 MHz, D2), declared as two generated clocks `clk_trn_400` and `clk_trn_500`, physically exclusive.
+  - **AD9484 Radar Domain (`clk_adcr_dco` `5.000 ns` = `400 MSPS` only, Rev08 A-1):** Held in hardware reset when master clock is `500 MHz` (`RADAR_STATUS[0]`), so it is closed at `400 MSPS` (`clk_400m_unbuf` `2.500 ns`: `WNS = +0.125 ns`, `WHS = +0.074 ns`, `WPWS = +0.396 ns`; the trainer's `clk_trn_400`: `WNS = +0.220 ns`; `clk_100m_unbuf`: `WNS = +0.505 ns`; `clk_adcr_dco`: `WNS = +0.662 ns`). At `500 MHz` the G-7 D2 path takes the AD9484 instead: `clk_adcr_dco_500` (`4.000 ns`) `WNS = +0.162 ns`, its trainer clock `clk_trn_500` `WNS = +0.213 ns`.
   - **AD9253 SDR Bit-Clock Domain (`clk_adcs_dco_500` `2.000 ns` & `clk_adcs_dco_400` `2.500 ns`, Rev08 A-2):** Constrained for both master modes as physically exclusive `500 MHz` (`62.5 MSPS`) and `400 MHz` (`50.0 MSPS`) DDR bit clocks: `clk_adcs_dco_500` `WPWS = +0.529 ns` (`adcs_clk_div_1` `8.000 ns`: `WNS = +1.970 ns`, `WHS = +0.109 ns`, `WPWS = +2.870 ns`); `clk_adcs_dco_400` `WPWS = +1.029 ns` (`adcs_clk_div` `10.000 ns`: `WNS = +3.970 ns`, `WHS = +0.109 ns`, `WPWS = +3.870 ns`).
-  - **Master / Ethernet / IAS1 Domains:** `clk_fpga_500` (`WNS = +1.401 ns`), `link_clk_unbuf` (`125 MHz`: `WNS = +0.197 ns`), `adcs_ddc_clk_unbuf` (`83.333 MHz`: `WNS = +1.021 ns`), `clk_dac_500` (`125 MHz`: `WNS = +0.542 ns`), `gen_rev06_eth.clk_312p5_u` (`WNS = +0.125 ns`), `gen_rev06_eth.clk_625_0_u`/`625_90_u` (`WPWS = +0.008 ns`), `clk_fpga_400` (`WNS = +1.901 ns`, `clk_dac_400` `WNS = +2.542 ns`), `dl_rx_clk` (`WNS = +1.258 ns`, `clk_link_tx` `WPWS = +0.529 ns`), `clk_cfgmclk` (`WNS = +0.064 ns`; constrained at the `100 MHz` worst case of `CFGMCLK`, where `fe_ctrl` sits). (`fpga/artix/reports/timing_summary.rpt` from `build.tcl` closes at `WNS = +0.119 ns`, `WHS = +0.036 ns`, `WPWS = +0.008 ns`.)
+  - **Master / Ethernet / IAS1 Domains:** `clk_fpga_500` (`WNS = +1.401 ns`), `link_clk_unbuf` (`125 MHz`, which also runs D2: `WNS = +0.126 ns`), `adcs_ddc_clk_unbuf` (`83.333 MHz`: `WNS = +0.430 ns`), `clk_dac_500` (`125 MHz`: `WNS = +0.506 ns`), `gen_rev06_eth.clk_312p5_u` (`WNS = +0.129 ns`), `gen_rev06_eth.clk_625_0_u`/`625_90_u` (`WPWS = +0.008 ns`), `clk_fpga_400` (`WNS = +1.901 ns`, `clk_dac_400` `WNS = +2.506 ns`), `dl_rx_clk` (`WNS = +0.968 ns`, `clk_link_tx` `WPWS = +0.529 ns`), `clk_cfgmclk` (`WNS = +1.639 ns`; constrained at the `100 MHz` worst case of `CFGMCLK`, where `fe_ctrl` sits). (`fpga/artix/reports/timing_summary.rpt` from `build.tcl` closes at `WNS = +0.119 ns`, `WHS = +0.036 ns`, `WPWS = +0.008 ns`.)
 - **Non-MMCM `÷4` DAC Clock Jitter Reduction:** Driving `dac_clk` (`125 MHz @ 500M` / `100 MHz @ 400M`) from a glitch-free 2-bit Johnson divider on `fpga_clk_bufg -> BUFG` instead of an MMCM `CLKOUT` cuts Vivado `Clock Uncertainty` from `0.165 ns` down to **`0.035 ns`** (`4.7x` improvement) and eliminates MMCM `Discrete Jitter` (`0.124 ns -> 0.000 ns`) and `Phase Error` (`0.099 ns -> 0.000 ns`).
 - **Safe-Boot & Live `400 <-> 500 MHz` Mode Switch (`clk_mode_ctrl`):** On POR, `STARTUPE2 CFGMCLK` holds `mmcm_rst = 1` while `Y401` (`Si549`) programs and settles (`>= 30.7 ms` FCAL wait), configures both MMCMs via DRP (`DIVCLK_DIVIDE = 5` for `500 MHz`, `4` for `400 MHz`), and releases `mmcm_rst` (`XO_CTRL[14] xo_boot_done`, `[12] xo_boot_err`). `clk_mode_ctrl` also drives `radar_dis_cfg` high whenever switching or operating at `500 MHz`, holding `u_adc_cap` and `u_ddc` safely in reset and automatically retraining AD9484 when returning to `400 MHz` (G-7 will later add a dedicated `500 MSPS` AD9484 path). Writing `XO_CTRL[2] prog_start` switches live between `500 MHz` and `400 MHz`; during the switch, `mmcm_rst` drops `link_clk`, so IAS1 link training and SGMII MAC/PHY reset and retrain cleanly, and `dac_rst` applies a glitchless reset to `dac_radar`/`dac_sdr`. `ADPLL_DELTA_M` writes to `XO_DELTA_M` are clamped to `±50.0 ppm` (`±429553`, latched in `XO_CTRL[13] xo_delta_clamped`) when `ENABLE_ETH=1`.
-- **DRC & CDC (`drc.rpt` & `cdc.rpt`):** `0` DRC errors (`0` Critical/Error timing or methodology failures). `cdc.rpt` (`reports_rev06/`) reports `191` `CDC-1`, `10` `CDC-2`, `62` `CDC-3`, `12` `CDC-5`, `29` `CDC-6`, `5` `CDC-7`, `2` `CDC-8`, `2` `CDC-9`, `52` `CDC-10`, `2` `CDC-11`, `146` `CDC-13`, `1` `CDC-14`, `641` `CDC-15` (covered by asynchronous clock groups & 2/3-stage Gray/toggle synchronizers across `link_clk`, `clk_cfgmclk`, `clk_adcr_dco`, `clk_adcs_dco_*`, and `clk_link_tx`). *(Top-level slice counts in `utilization.rpt` reflect Vivado cross-hierarchy LUT combining and `phys_opt_design` post-route optimization in `build.tcl` and `build_rev06.tcl`.)*
+- **DRC & CDC (`drc.rpt` & `cdc.rpt`):** `0` DRC errors (`0` Critical/Error timing or methodology failures). `cdc.rpt` (`reports_rev06/`) reports `192` `CDC-1`, `12` `CDC-2`, `65` `CDC-3`, `2` `CDC-4`, `12` `CDC-5`, `40` `CDC-6`, `1` `CDC-7`, `2` `CDC-8`, `2` `CDC-9`, `61` `CDC-10`, `2` `CDC-11`, `156` `CDC-13`, `1` `CDC-14`, `759` `CDC-15` (covered by asynchronous clock groups & 2/3-stage Gray/toggle synchronizers across `link_clk`, `clk_cfgmclk`, `clk_adcr_dco`, `clk_adcs_dco_*`, and `clk_link_tx`). *(Top-level slice counts in `utilization.rpt` reflect Vivado cross-hierarchy LUT combining and `phys_opt_design` post-route optimization in `build.tcl` and `build_rev06.tcl`.)*
 
 ---
 
@@ -148,6 +149,45 @@ All X-band front-end modules are sized and pin-mapped to drive the external `AER
 - **Beamforming Control (`adar_ctrl.v` & `rf_switch.v`):** Stores `32` beam tables × `8` chips × `24` bytes in Artix BRAM (`0x88`) and blasts phase/gain weights over `15.625 MHz` 4-wire SPI across `J1103` (`1.8 V` IDC ribbon) with synchronous `LOAD` and hardware `beam_strobe` pulses while guarding the four `M3SWA2-34DR+` SPDT switches (`J911`/`J912`, `J921`/`J922`, `J931`/`J932`, `J941`/`J942`).
 - **RX 400 MSPS Capture & DDC (`adc_capture.v` + `ddc_wrapper.v`):** Captures `8`-bit `400 MSPS` LVDS samples from `AD9484` (`J921` `AERIS_IF` / `J922` `SDR_RX_WB`), digitally down-converts the `120 MHz` IF to `100 MSPS` complex I/Q using `PLFM_RADAR` (`62d4c55`, MIT) DSP48E1 slices (`79` DSPs), decimates by 4 through the `ddc_hb4` anti-alias half-bands (`0.80 Gb/s` sustained), and streams stamped 512-byte `8'h01` packets to the Kria. The NCO defaults to `PHASE_INC_120MHZ = 32'h4CCCCCCD` (`0.3 * f_S`) in [`fpga/third_party/aeris/ddc_400m.v`](../fpga/third_party/aeris/ddc_400m.v); since G-4, `RADAR_CTRL[2]` and `[31:8]` override it. The path is held in reset in the `500 MHz` mode (A-1).
 
+### 4.3 D2: the 500 MSPS AD9484 path (Rev08 G-7)
+
+At 500 MHz the AD9484 runs at 500 MSPS and its DCO at 250 MHz. The AERIS DDC stays as it is and keeps running only at 400 MSPS (A-1). D2 is a second path, selected by `D2_CTRL[0]`, that runs whenever the master clock has settled at 500 MHz. HF on the AD9253 (62.5 MSPS) and VHF/UHF on the AD9484 then run at the same time. D2 takes 4,124 LUT, 6,241 FF, 4 RAMB18 and 8 DSP48 (119 of 120 used), plus 259 LUT for its AGC peak detector; the Artix goes from 20,254 to 25,000 LUT (77 %).
+
+**Capture (`adc_capture`, `mode_500`)**
+
+- The DCO MMCM stays in reset, because its 400 MHz output would run at 500 MHz.
+- The IDDRs keep their BUFIO, and the BUFR capture registers keep their BUFR, now at 250 MHz.
+- The IDELAYs and the eye-scan trainer move to `refclk_200m`. They are fed through the `BUFGCTRL` that otherwise carries the MMCM's `clk_200m`. The select changes only while the capture is in reset, so both inputs are set to IGNORE.
+- The trainer is unchanged. Because the training pattern is static, it samples the IDDR pairs through two flip-flops instead of the 400 MSPS FIFO.
+- Each pair of DCO cycles makes one word of four samples, `4 x {OR, D[7:0]}` with the earliest sample in `[8:0]`. The words cross into `link_clk` through an 8-word Gray FIFO.
+- `link_clk` is 500 MHz / 4. It is frequency-locked to the DCO because both come from the master clock. Once the reader starts at a fill of 4, the fill stays put. A drift trips `D2_STAT[3]` and the reader restarts at a fill of 4.
+- In `top.v`, a change of mode holds the capture in reset for 16 `refclk_200m` cycles. `mode_500` changes in the middle of that window.
+- Training starts about 65 us after D2 does (`ADC_AUTO_TRAIN`). It can be restarted with `D2_CTRL[2]` or the Pmod retrain.
+
+**DDC (`ddc_500.v`, `link_clk`, four lanes per clock)**
+
+| Stage | What it does | Result |
+|---|---|---|
+| NCO | 32-bit phase. Lane `i` runs at `acc + i * FTW`, and `acc` advances by `4 * FTW`. A 12-bit phase addresses a 1024 x 12-bit quarter-wave table (`ddc500_rom.v`, generated by `gen_ddc500_rom.py`): one dual-port RAMB18 per lane, one port for the sine's index and one for the cosine's | Worst phase-truncation spur -72 dBc |
+| Mixer | The code as an odd 9-bit number, `2 * (code - 128) + 1`, so mid-scale carries no DC, times `e^-j theta`, in one DSP48 per product, rounded to 15 bits. `D2_CTRL[1]` conjugates the output; the AERIS DDC's output is the conjugate spectrum | |
+| CIC | 5 stages, decimation by 5, 500 to 100 MSPS. Integrators in four-lane prefix form, with one adder in each accumulator loop, pruned (Hogenauer) from 28 bits to 27, 25, 23, 22 and 21 bits, and the combs to 21, 20, 19, 18 and 18. The truncations are plain shifts: a constant error entering after the first integrator leaves no DC, and the one before it is the mixer's rounding. Of every five words it keeps lanes 0, 1, 2, 3 and none (samples 0, 5, 10, 15 of 20). Gain 3125 / 4096 | What folds onto +/-10 MHz (100 MHz multiples +/- 10 MHz) at least 94 dB down, onto +/-12.5 MHz at least 83 dB; droop 0.69 dB at 10 MHz |
+| `ddc_hb4` | The radar path's two half-bands, unchanged, 100 to 25 MSPS. Their input is valid 4 cycles in 5 | Flat to 0.07 dB up to 10 MHz; -49.6 dB from 15 to 25 MHz |
+| Packets | 512-byte packets on stream `0x01`, as from `ddc_wrapper`, so the Kria sees the same stream in both clock modes. There is no CPI mark, because the X-band front end is off at 500 MHz. While D2 runs, `top.v` routes stream `0x01` from D2, and switches back only after D2's last packet has gone (`pkt_busy`), so the uplink arbiter never waits on a stopped source | |
+| Gain | A real tone of `A` codes at `f_NCO + d` gives `|bb| = 97.63 * A * droop(d)` | -8.4 dBFS at full scale |
+| AGC | The four lanes' largest-magnitude code goes to a second `adc_peak` (2^14 words, 131 us), which feeds `fe_agc` in place of the 400 MSPS peak. Over-range is a code of 0 or 255: the OR pin's IDDR is not timed at 250 MHz | |
+
+**Constraints (`xc7a50t.xdc`)**
+
+- `clk_adcr_dco_500` (4.000 ns, `-add`) is stopped at the DCO MMCM's `CLKIN1`. It is physically exclusive with `clk_adcr_dco` and with the 400 MHz clocks.
+- Its crossings into `link_clk` and `refclk_200m` take `set_max_delay -datapath_only 4.000`.
+- The `BUFGCTRL` select is a false path, and so is the OR pin's IDDR at 250 MHz.
+- The trainer's results reach `link_clk` under an 8 ns datapath limit, and the D2 run condition reaches `refclk_200m` under 4 ns.
+
+**Uplink (`top.v`, `ddc_wrapper.v`)**
+
+- The radar DDC and D2 never offer a stream `0x01` packet at the same time, so `valid` and `eop` are ORed and both see `ready`.
+- In both DDCs, `pkt_valid` comes from registers: `pkt_active`, or a registered `a packet is ready`. With store and forward the FIFO cannot run empty during a packet, and the pointer arithmetic leaves the uplink arbiter's path to the SDR FIFOs.
+
 ---
 
 ## 5. Complete Control, Stream & Register Map
@@ -164,7 +204,7 @@ All X-band front-end modules are sized and pin-mapped to drive the external `AER
 | **`8'h11`** | Artix -> Kria | `artix_top` Readback Engine | Register read response `{16'h0002, addr[47:32], rdata[31:0]}` |
 | **`8'h12`** | Kria -> Artix | `kria_pl_link` -> `dac_sdr` | AD9767 dual `14`-bit `I/Q` TX sample stream |
 
-### 5.2 Artix-7 Full CSR Space (`0x00..0xFC` and, since Rev08, `0x110..0x124` via IAS1 CMD `8'h10`, UDP Port `0x4952` or Debug UART; the Pmod SPI port reaches `0x00..0x7F` only)
+### 5.2 Artix-7 Full CSR Space (`0x00..0xFC` and, since Rev08, `0x100..0x124` via IAS1 CMD `8'h10`, UDP Port `0x4952` or Debug UART; the Pmod SPI port reaches `0x00..0x7F` only)
 
 | Offset | Register | Access | Fields & Function |
 | :---: | :--- | :---: | :--- |
@@ -186,13 +226,17 @@ All X-band front-end modules are sized and pin-mapped to drive the external `AER
 | `0xF0` | `DBG_UART_CTRL` | R/W | `[15:0]` `baud_div` (default `1085` = `115,207.4` baud on `125 MHz` `link_clk`), `[16]` `stat_periodic_dis`, `[17]` W1P `force_stat_p`, `[24]` `rx_idle_high`, `[25]` `tx_busy`, `[26]` `banner_done`, `[31:27]` `rx_ferr_cnt` |
 | `0xF4` | `DBG_UART_STAT_DIV` | R/W | `[31:0]` periodic `STAT` interval in `link_clk` cycles (default `125,000,000` = `1.000 s`) |
 | `0xF8`–`0xFC` | `BUILD_GIT_HASH` / `BUILD_TIMESTAMP` | RO | Injected `synth_design -generic` 8-hex git commit prefix (`0xF8`) and `{BUILD_DATE[15:0], BUILD_TIME[23:8]}` (`0xFC`) |
+| `0x100` | `D2_CTRL` | R/W | Rev08 G-7 500 MSPS path. `[0]` enable: D2 runs while the master clock is settled at 500 MHz. `[1]` conjugate the output. `[2]` restart AD9484 training (write 1; reads 0). `[3]` clear `D2_STAT[3]` (write 1; reads 0). Put the AD9484 in its `0xAA`/`0x55` test pattern before training, as at 400 MSPS |
+| `0x104` | `D2_FTW` | R/W | D2's NCO: f = `FTW * 500 MHz / 2^32` |
+| `0x108` | `D2_STAT` | R | `[0]` running, `[1]` trained, `[2]` training failed (eye under 4 taps or wrong pattern), `[3]` FIFO slip (sticky), `[4]` master clock at 500 MHz, `[13:8]` narrowest eye in IDELAY taps |
+| `0x10C` | `D2_DROP` | R | `[23:0]` stream `0x01` words dropped at the packet FIFO (D2's while it runs, else the radar DDC's) |
 | `0x110` | `FE_CMD` | R/W | Rev08 front-end command (`fe_ctrl.v`), `[31:28]` op: `1` INIT, `2` EXP_OUT `[15:0]` = `{port 1, port 0}` of `U1313` (software owns port 0, `RESETX` and `ENBL`; written on change), `3` POLL inputs, `4` RFFC5072 write `[22:16]` register `[15:0]` data, `5` RFFC5072 read, `6` PE4312 `[5:0]` in 0.5 dB steps, `7` LEDs `[7:0]` (written on change). Wait for `FE_STAT[28]` = 0 before the next write |
 | `0x114` | `FE_STAT` | RO | `[31]` I2C error, `[30]` expanders initialised, `[29]` overrun (a command written while busy, dropped), `[28]` busy, `[23:16]` I2C transactions of the last command, `[15:0]` `U1313` inputs at the last POLL (`[12]` = `VU_LD` lock detect, `[8]` = `VU_BIAS_FLT_N`) |
 | `0x118` | `FE_RFFC` | RO | `[15:0]` the last RFFC5072 register read |
 | `0x11C` | `FE_LED_CTRL` | R/W | `[0]` LED auto-map on (reset `1`), `[1]` show `[15:8]` instead, `[31:24]` RO what was last written to `U1501` |
 | `0x120` | `FE_AGC_CTRL` | R/W | Rev08 G-5 AGC (`fe_agc.v`), off at reset: `[0]` enable, `[1]` LNA bypass allowed, `[14:8]` high threshold (default `96` of `128`), `[22:16]` low threshold (default `24`), `[31:24]` hold-off in ms (default `50`) |
 | `0x124` | `FE_AGC_STAT` | RO | `[31]` LNA in, `[29:24]` attenuation code, `[22:16]` last peak of the AD9484 codes, `[15:0]` changes made |
-| `0x100`–`0x10C`, others | (reserved) | — | `0x100`–`0x10C` for G-7; any address from `0x100` not listed reads `0` and ignores writes; page 0 no longer aliases into `0x1xx` |
+| others from `0x100` | (reserved) | — | Any address from `0x100` not listed reads `0` and ignores writes; page 0 no longer aliases into `0x1xx` |
 | UDP `0x0000` / `0x0004` | `ETH_MUX_CTRL` / `ETH_MDIO` | R/W | Dual-path policy (`[1:0]`), SDR UDP gen enable (`[2]`), fault injection (`[4:3]`), AN restart (`[5]`), Clause 22 MDIO access to `RTL8211FSI` |
 
 ### 5.2a Front-end control (Rev08 G-2 to G-6)
@@ -204,7 +248,7 @@ The two `TCA6416A` expanders (`U1313` at `0x20` on `RX_VU`, `U1501` at `0x21` on
 - **PE4312**: six bits MSB first (`C16` first), then an `LE` pulse; about `5 ms`.
 - **LEDs (G-6)**: `D1501..D1508` = CFG (boot done), CLK (`500 MHz`), LINK (link up and ADC trained), ADC-R over-range, ADC-S clip (both sticky until `0xE4[1]`), LO lock (from the last `POLL`), TX (SDR DAC or radar chirp), ERR (I2C or ADC phase error). Written on change, at most once every `100 ms`; `FE_LED_CTRL[0]` = 0 stops them and the bus stays quiet.
 - **AGC (G-5)**: `adc_peak` takes the largest `|code − 128|` of the AD9484 per `65,536`-sample window (over-range counts as full scale); `fe_agc` adds `3 dB` above the high threshold, removes `0.5 dB` after each quiet hold-off period, bypasses the LNA only at `31.5 dB`, and puts it back `18 dB` under the low threshold. Command priority: software, then AGC, then LEDs. With the AGC on, software must not send `ATT`. The AD9484 path runs in the `400 MHz` mode only (A-1), so the AGC does too.
-- **G-4** (tunable DDC): the AERIS NCO is a register through `RADAR_CTRL[2]` and `[31:8]`, default unchanged; the second decimation stage down to channel bandwidths is in the Kria PL (`kria_channel_rx`, section 4), where DSP slices are plentiful, instead of in the Artix (10 free).
+- **G-4** (tunable DDC): the AERIS NCO is a register through `RADAR_CTRL[2]` and `[31:8]`, default unchanged; the second decimation stage down to channel bandwidths is in the Kria PL (`kria_channel_rx`, section 4), where DSP slices are plentiful, instead of in the Artix (one DSP48 left free since G-7).
 
 Benches: `tb_fe_ctrl` (models of the `TCA6416A`, the `RFFC5072` port and the `PE4312`; 25 checks; mutations `le_high`, `no_shadow`, `lsb_first`), `tb_fe_agc` (closed loop with a tone; mutation `no_holdoff`), and `tb_artix_top` (CSR page 1, no aliasing).
 
@@ -282,6 +326,9 @@ Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado
 | `tb_clk_mode_switch.v` | Safe-boot Si549 `500 MHz` init, A-1 radar path reset/retrain on `500<->400 MHz` switch, and `±50 ppm` `ADPLL_DELTA_M` Ethernet clamp (`500 MHz` & `400 MHz`, `+` `-Mutate no_delta_clamp`) |
 | `tb_rev06.v` | `1.25 Gb/s` SGMII `XAPP523` oversampler across `+100/-100 ppm` crystal drift, UDP CSR write, ARP/ICMP, failover `SPLIT`/`MIRROR`/`IAS_ONLY`/`ETH_ONLY` with `0` lost packets (`500 MHz` & `400 MHz`) |
 | `tb_e2e.v`, `tb_artix_top.v` | End-to-end AD9484 400 MSPS -> AERIS DDC (`500 MHz` A-1 isolation & `400 MHz` CW FFT), `64b/66b` IAS1 -> `kria_pl_link` (`0` CRC/seq/proto errors; verified at both `500 MHz` and `400 MHz`) |
+| `tb_ddc_500` | Gain within 0.25 dB of the model at +1, +5, +9 and -7 MHz (measured within 0.04 dB); image at least 60 dB down (79 to 93 measured); `CONJ`; alias rejection at +103 MHz (-88 dB) and +21 MHz (-59 dB); lane-order image at NCO 187.5 MHz (-96 dB); SNR at least 50 dB (55.2 measured for 0.4 LSB ADC noise); one output per 5 clocks; packet payload, sequence, no drops; mutations `d2_nco_lane0` (gain -12.5 dB), `d2_lane_swap` (lane-order image at -1.4 dB) |
+| `tb_adc_cap500` | `adc_capture` in `mode_500` with a 250 MHz DCO (skew -90..+5 ps, +/-80 ps edges): training on `refclk_200m` with the MMCM in reset (eye 22 taps); a 4000-word ramp arrives in order with no gap or slip; then 400 MSPS training still works (eye 29 taps); mutations `d2_word_order` |
+| `tb_artix_top` (500 MHz boot) | D2 CSR readback; D2 on at 250 MHz with the AD9484 model on the master clock: trained, stream `0x01` packets, first sample `I` = 8322 (8299 expected), `Q` = -6; D2 off mid-stream releases the uplink |
 | `tb_adcs_capture.v`, `tb_adc_ddc.v` | AD9253 1-lane 16-bit DDR FCO bitslip alignment (`500`/`400 MHz` DCO -> `62.5`/`50.0 MSPS`) + Dual-Ch SDR DDC & AD9484 IDELAY auto-training (`500 MHz` & `400 MHz`) |
 | `tb_dac_tx.v`, `tb_adar_ctrl.v`, `tb_hk.v`, `tb_pmod_spi.v`, `tb_link_*`, `tb_pcs_*`, `tb_serdes*` | Non-MMCM `÷4` `dac_clk` LFM chirp & `hf_dac2_mode` TX, 8-chip ADAR1000 SPI & guard bands, TMP1075/Si549 I2C, XADC/PPS, Pmod SPI, 2-lane PCS deskew & `IDELAYE3` eye centering (all 19 benches pass at `500 MHz` & `400 MHz`) |
 
@@ -307,7 +354,7 @@ Results on the RTL of this revision (`fpga/sim/signals/results.json`, 17 Novembe
 | HF SSB, 14.2 MHz USB | AD9253 B, `sdr_ddc`, USB | 10 dB SINAD at -118.4 dBm (-118.1); opposite sideband 56.0 dB down | Fading USB speech with QRN | `swap_usb_lsb` | 6 / 6 |
 | FM broadcast, 98.1 MHz | AD9484, AERIS DDC, WBFM | 30 dB SINAD at -108.5 dBm (-109.9); stereo separation 32.6 dB; RDS BER 0 from -100 dBm up | Pilot locked with a +60 dB blocker 2.2 MHz away | `rds_no_timing` | 9 / 9 |
 | Airband AM, 121.5 MHz | AD9484, AERIS DDC, AM, five-stage CIC | 10 dB SINAD at -113.9 dBm (-113.7); neighbours +25 dB at 8.33 kHz and +35 dB at 25 kHz cost 0 dB | 8.33 kHz channel plan | `mix_nco_9bit` (29.2 to 22.7 dB) | 7 / 7 |
-| PMR446 NBFM, 446.00625 MHz | Converter, AD9484, AERIS DDC, NBFM | 12 dB SINAD at -121.9 dBm (-121.8); CTCSS detected there, no false detection 20 dB higher; EN 300 296 neighbour +40 dB at 12.5 kHz costs 0.1 dB (reference 0.0) | NBFM, CTCSS and a +40 dB neighbour | `mix_truncate` (11.3 to 2.2 dB), `wrong_atan_lut` | 9 / 9 |
+| PMR446 NBFM, 446.00625 MHz | Converter, AD9484, AERIS DDC, NBFM | 12 dB SINAD at -121.9 dBm (-121.8); CTCSS detected there, no false detection 20 dB higher; EN 300 296 neighbour +40 dB at 12.5 kHz costs 0.1 dB (reference 0.0) | NBFM, CTCSS and a +40 dB neighbour | `mix_truncate` (11.3 to 2.1 dB), `wrong_atan_lut` | 9 / 9 |
 | ADS-B, 1090 MHz | Converter, AD9484, AERIS DDC, `kria_adsb_rx` | 90 % decode at -86.1 dBm (timing-aware reference -88.2) | 3 of 3 overlapping replies CRC-good | `unpack_no_queue` (0 of 3), `one_phase`, `strict_preamble` | 8 / 8 |
 | Radar, FMCW at 120 MHz IF | AD9484, AERIS DDC, CPI mark, `kria_radar_proc` | Pd 0.5 at -18.83 dB per sample (model -18.74); Pfa 1.99e-2 (model 2.00e-2) | Targets at 0, -10 and -30 dB all detected, none elsewhere; beam scan peaks at the target's -15 degrees | `wrong_twiddle_sign` | 7 / 7 |
 | Transmit | `kria_tx_mod`, link, `dac_sdr` / `dac_radar` | AM and NBFM SINAD 83 and 58 dB, adjacent channel -80 and -66 dBc; USB opposite sideband 49.9 dB, carrier 81 dB down; CW SFDR 66.7 dBc | AM at the AD9767 pins on a 3.125 MHz carrier, depth 0.80; 24 radar chirps at the programmed start and slope | `flip_usb_q` | 10 / 10 |
