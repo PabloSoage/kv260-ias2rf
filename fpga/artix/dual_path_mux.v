@@ -28,6 +28,10 @@ module dual_path_mux (
     input  wire [1:0]  policy,       // 0=STREAM_SPLIT, 1=MIRROR_1P1, 2=IAS_ONLY, 3=ETH_ONLY
     input  wire        ias_healthy,
     input  wire        eth_healthy,
+    // High while the IAS1 uplink cannot send (retrain after a link loss or a 400 <-> 500 MHz switch): whole bulk
+    // packets at the IAS FIFO's head are discarded instead of queued, so a register read-back (stream 0x11) does not
+    // wait behind stale data once the link is back. The ETH FIFO is not affected.
+    input  wire        ias_drain,
 
     // Stream 0 input (Radar, stream_id=0)
     input  wire        s0_valid,
@@ -137,6 +141,7 @@ module dual_path_mux (
         .push_data         (ias_fifo_push_data),
         .push_abort        (ias_fifo_abort),
         .push_ready        (ias_fifo_push_ready),
+        .drain             (ias_drain),
         .out_valid         (ias_pop_valid),
         .out_sop           (ias_pop_sop),
         .out_eop           (ias_pop_eop),
@@ -164,6 +169,7 @@ module dual_path_mux (
         .push_data         (eth_fifo_push_data),
         .push_abort        (eth_fifo_abort),
         .push_ready        (eth_fifo_push_ready),
+        .drain             (1'b0),
         .out_valid         (eth_pop_valid),
         .out_sop           (eth_pop_sop),
         .out_eop           (eth_pop_eop),
@@ -487,7 +493,8 @@ endmodule
 
 module dual_path_sf_fifo #(
     parameter integer DATA_ADDR_W = 10,
-    parameter integer META_ADDR_W = 5
+    parameter integer META_ADDR_W = 5,
+    parameter [7:0]   KEEP_SID    = 8'h11   // stream kept while draining (register read-back)
 ) (
     input  wire        clk,
     input  wire        rst,
@@ -501,7 +508,11 @@ module dual_path_sf_fifo #(
     input  wire [63:0] push_data,
     input  wire        push_abort,
     output wire        push_ready,
-    output reg         out_valid,
+    // While high, whole packets whose stream id is not KEEP_SID are dropped on both sides: a new one is not written
+    // (its words are accepted and discarded), and a queued one is popped without out_valid if the consumer has not
+    // taken its first word. A packet half-written or half-read when drain rises or falls is never cut.
+    input  wire        drain,
+    output wire        out_valid,
     output wire        out_sop,
     output wire        out_eop,
     output wire [7:0]  out_stream_id,
@@ -526,7 +537,14 @@ module dual_path_sf_fifo #(
 
     wire data_full = (data_used >= DATA_DEPTH[DATA_ADDR_W:0]);
     wire meta_full = (meta_used >= META_DEPTH[META_ADDR_W:0]);
-    assign push_ready = !data_full && !meta_full;
+    reg  wskip;                                      // dropping the packet being written (drain at its sop)
+`ifdef MUTATE_DRAIN_NO_WSKIP
+    wire wskip_start = 1'b0;
+`else
+    wire wskip_start = drain && push_sop && (push_stream_id != KEEP_SID);
+`endif
+    wire wskip_now   = wskip || wskip_start;
+    assign push_ready = (!data_full && !meta_full) || wskip;
 
     wire do_push = push_valid && push_ready;
     reg [119:0] in_hdr;
@@ -534,8 +552,24 @@ module dual_path_sf_fifo #(
     wire [119:0] commit_hdr = push_sop ? live_hdr : in_hdr;
 
     reg        pop_state;
+    reg        out_valid_r;
     reg [65:0] bram_q;
     reg [119:0] hdr_q;
+    reg        hdr_bulk_q;   // head packet's stream id != KEEP_SID
+    reg        disc;         // discarding the head packet (out_valid held low)
+`ifdef MUTATE_DRAIN_STARTED_PKT
+    wire       disc_start = drain && pop_state && !disc && hdr_bulk_q;                 // also cuts a started packet
+`elsif MUTATE_DRAIN_ALL_SID
+    wire       disc_start = drain && pop_state && !disc && bram_q[65];                 // drops 0x11 too
+`else
+    wire       disc_start = drain && pop_state && !disc && bram_q[65] && hdr_bulk_q;
+`endif
+`ifdef MUTATE_DRAIN_RELEASE
+    wire       disc_eff = disc && drain;                                               // tail leaks when drain falls
+`else
+    wire       disc_eff = disc;
+`endif
+    assign out_valid = out_valid_r && !disc_eff && !disc_start;
     wire meta_empty = (meta_wr_ptr == meta_rd_ptr);
 
     assign out_sop = bram_q[65];
@@ -548,17 +582,23 @@ module dual_path_sf_fifo #(
             wr_ptr       <= {(DATA_ADDR_W+1){1'b0}};
             rd_ptr       <= {(DATA_ADDR_W+1){1'b0}};
             pkt_base_ptr <= {(DATA_ADDR_W+1){1'b0}};
+            wskip        <= 1'b0;
             meta_wr_ptr  <= {(META_ADDR_W+1){1'b0}};
             meta_rd_ptr  <= {(META_ADDR_W+1){1'b0}};
             in_hdr       <= 120'd0;
             pop_state    <= 1'b0;
-            out_valid    <= 1'b0;
+            out_valid_r  <= 1'b0;
             bram_q       <= 66'd0;
             hdr_q        <= 120'd0;
+            hdr_bulk_q   <= 1'b0;
+            disc         <= 1'b0;
         end else begin
             // Ingress write / abort
             if (push_abort) begin
                 wr_ptr <= pkt_base_ptr;
+                wskip  <= 1'b0;
+            end else if (do_push && wskip_now) begin
+                wskip <= !push_eop;
             end else if (do_push) begin
                 data_mem[wr_ptr[DATA_ADDR_W-1:0]] <= {push_sop, push_eop, push_data};
                 wr_ptr <= wr_ptr + {{DATA_ADDR_W{1'b0}}, 1'b1};
@@ -573,22 +613,26 @@ module dual_path_sf_fifo #(
 
             // Egress store-and-forward pop
             if (!pop_state) begin
-                out_valid <= 1'b0;
+                out_valid_r <= 1'b0;
                 if (!meta_empty) begin
-                    bram_q    <= data_mem[rd_ptr[DATA_ADDR_W-1:0]];
-                    hdr_q     <= meta_mem[meta_rd_ptr[META_ADDR_W-1:0]];
-                    rd_ptr    <= rd_ptr + {{DATA_ADDR_W{1'b0}}, 1'b1};
-                    pop_state <= 1'b1;
-                    out_valid <= 1'b1;
+                    bram_q      <= data_mem[rd_ptr[DATA_ADDR_W-1:0]];
+                    hdr_q       <= meta_mem[meta_rd_ptr[META_ADDR_W-1:0]];
+                    hdr_bulk_q  <= (meta_mem[meta_rd_ptr[META_ADDR_W-1:0]][119:112] != KEEP_SID);
+                    rd_ptr      <= rd_ptr + {{DATA_ADDR_W{1'b0}}, 1'b1};
+                    pop_state   <= 1'b1;
+                    out_valid_r <= 1'b1;
                 end
-            end else if (out_ready) begin
+            end else if ((out_ready && out_valid) || disc_eff || disc_start) begin
                 if (bram_q[64]) begin
                     meta_rd_ptr <= meta_rd_ptr + {{META_ADDR_W{1'b0}}, 1'b1};
                     pop_state   <= 1'b0;
-                    out_valid   <= 1'b0;
+                    out_valid_r <= 1'b0;
+                    disc        <= 1'b0;
                 end else begin
                     bram_q <= data_mem[rd_ptr[DATA_ADDR_W-1:0]];
                     rd_ptr <= rd_ptr + {{DATA_ADDR_W{1'b0}}, 1'b1};
+                    if (disc_start)
+                        disc <= 1'b1;
                 end
             end
         end

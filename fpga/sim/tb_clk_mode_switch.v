@@ -410,17 +410,18 @@ module tb_clk_mode_switch;
         end
     endtask
 
+    integer rd_max_tmo = 0;   // longest read-back, rx_clkdiv cycles (reported in the PASS line)
     task automatic rd_reg(input [15:0] addr, output [31:0] data_o);
         integer tmo;
         begin
             @(posedge rx_clkdiv); resp_valid_flag <= 1'b0;
             dl_send_word(8'h10, 16'd8, {8'h02, 8'h00, addr, 32'd0});
             tmo = 0;
-            // 10,000 rx_clkdiv cycles (80 us at 125 MHz). Right after a 500 <-> 400 MHz switch the uplink retrains
-            // while the radar and SDR streams keep filling dual_path_mux's 1024-word store-and-forward FIFO; the
-            // read-back then waits behind that backlog, about 40 us at the 400 MHz mode's link rate (G-8: 36 us
-            // measured with the radar's 512-byte packets, just over the former 32 us limit).
-            while ((!resp_valid_flag || (resp_addr_cap != addr)) && tmo < 10000) begin
+            // 1,250 rx_clkdiv cycles (10 us at 125 MHz). While the uplink retrains after a 500 <-> 400 MHz switch,
+            // dual_path_mux drops the bulk packets meant for IAS1 (ias_drain) instead of queueing them in its
+            // 1024-word FIFO, so the first read-back does not wait behind a backlog (about 40 us before; 3.7 us now,
+            // reported as rd_max in the PASS line).
+            while ((!resp_valid_flag || (resp_addr_cap != addr)) && tmo < 1250) begin
                 @(posedge rx_clkdiv);
                 tmo = tmo + 1;
             end
@@ -428,6 +429,7 @@ module tb_clk_mode_switch;
                 $display("FAIL: tb_clk_mode_switch rd_reg timeout on 0x%04h", addr);
                 $finish;
             end
+            if (tmo > rd_max_tmo) rd_max_tmo = tmo;
             data_o = resp_data_cap;
         end
     endtask
@@ -636,8 +638,8 @@ module tb_clk_mode_switch;
             $finish;
         end
 
-        $display("PASS: tb_clk_mode_switch boot=500M dac_500=%0.3fns dac_400=%0.3fns dac_back=%0.3fns fcal_gaps=%0d clamp=+/-429553 hf_chb=%0d hf_dac2=0x%04h",
-                 dac_per_500_boot, dac_per_400, dac_per_500_back, fcal_gap_seen, cnt_05, dac2_last_nz);
+        $display("PASS: tb_clk_mode_switch boot=500M dac_500=%0.3fns dac_400=%0.3fns dac_back=%0.3fns fcal_gaps=%0d clamp=+/-429553 hf_chb=%0d hf_dac2=0x%04h rd_max=%0d",
+                 dac_per_500_boot, dac_per_400, dac_per_500_back, fcal_gap_seen, cnt_05, dac2_last_nz, rd_max_tmo);
         $finish;
     end
 

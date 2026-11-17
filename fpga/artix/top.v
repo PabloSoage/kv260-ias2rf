@@ -1067,6 +1067,7 @@ module artix_top #(
     wire [31:0] eth_ctrl_wdata;
 
     wire        ias_mux_valid, ias_mux_ready, ias_mux_sop, ias_mux_eop;
+    wire        ias_ul_drain;   // uplink closed (ul_tx_gate low): dual_path_mux drops queued bulk, keeps 0x11
     wire [7:0]  ias_mux_sid;
     wire [15:0] ias_mux_len;
     wire [31:0] ias_mux_seq;
@@ -1356,6 +1357,7 @@ module artix_top #(
                 .policy        (eth_policy),
                 .ias_healthy   (ias_path_ok),
                 .eth_healthy   (eth_path_ok),
+                .ias_drain     (ias_ul_drain),
                 .s0_valid      (s0_arb_valid),
                 .s0_ready      (s0_arb_ready),
                 .s0_sop        (s0_arb_sop),
@@ -1432,6 +1434,7 @@ module artix_top #(
     wire ul_tx_gate  = ul_tx_allow | ul_in_pkt;
     wire ul_tx_valid = ias_mux_valid & ul_tx_gate;
     assign ias_mux_ready = ul_tx_ready & ul_tx_gate;
+    assign ias_ul_drain  = ~ul_tx_gate;
 
     always @(posedge link_clk) begin
         if (link_rst) begin
