@@ -296,6 +296,12 @@ VCCINT's limit is ±5 %. With the TPS562201's ±1.5 % and 32 mV, the worst ball 
 at full estimated load: inside, with little to spare. If Vivado's power report comes in above
 700 mA, set the buck to 1.02 V (one feedback resistor).
 
+**Corrected by the Rev08 audit (18 November, [AUDIT_Rev08.md](AUDIT_Rev08.md) §2.2).** The TPS562201's reference is
+749-787 mV over temperature, ±2.5 %, not ±1.5 %, and Vivado now gives VCCINT 735 mA at 70 °C. `R1031` is 3.24 k:
++1V0 at 1.017 V, so the balls sit at about 0.983 V at full load. The worst-case linear stack (reference, 1 % resistors,
+ripple and step, 34 mV of drop) spans 0.933-1.067 V; the root-sum-square of the same terms stays inside 0.95-1.05 V.
+To measure on the first board; the XADC reports VCCINT in `XADC_TEMP_VCCINT`.
+
 ---
 
 ## 5. Other checks
@@ -785,6 +791,35 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
 | RFFC5072, junction (Rev08, 0.38 W, θJB 12 assumed) | 64 °C | 53 °C |
 | AD9767, junction (LQFP, only θJA 91 is given) | under 86 °C (board 58 + P × θJA, a bound) | under 76 °C |
 
+**Re-run with the audited powers (Rev08 audit, 18 November; [AUDIT_Rev08.md](AUDIT_Rev08.md) P6).** The table
+above takes the FPGA at 0.73 W. The re-run takes, at 25 °C typical:
+- the FPGA at Vivado's 1.20 W;
+- `U1006` at 0.82 W;
+- the LMR33630 at 1.17 W;
+- the TPS563201 for +3V3_D at 0.65 W;
+- the front end at 2.8 V;
+- the TCAN3403.
+
+That is 9.4 W in all. The map at the end of this list is that run.
+
+| At 25 °C ambient | Still air (h = 10) | Fan only (h = 25) | Before (8.2 W, still air) |
+|---|---|---|---|
+| Board, hottest / mean rise | +59 / +34 °C | +34 / +14 °C | +52 / +30 °C |
+| LMR33630 | **100 °C** | 75 °C | 87 °C |
+| TPS7A8300 for +1V8_D | 92 °C | 67 °C | 77 °C |
+| ADCLK948 | 88 °C | 64 °C | 85 °C |
+| TPS563201 for +3V3_D | 88 °C | 65 °C | not in the table |
+| Si549 | 81 °C | 58 °C | 78 °C |
+| XC7A50T | 77 °C | 55 °C | 65 °C |
+| AD9484 | 74 °C | 51 °C | 71 °C |
+| RTL8211FSI | 74 °C | 51 °C | 71 °C |
+| RFFC5072 | 68 °C | 45 °C | 64 °C |
+
+The FPGA's extra 0.5 W shows at its own junction, +12 °C in still air. The power corner gains the most: the LMR33630
+and the +1V8_D LDO, +13-15 °C. Bare in still air at 70 °C ambient, the LMR33630 would pass its 125 °C rating, so the
+vehicle install needs the enclosure's fan and sinks, as below. The enclosure's own rating comes from the CFD re-run
+with these powers ([ENCLOSURE_V2_THERMAL](ENCLOSURE_V2_THERMAL.md)), not from this 2-D sheet.
+
 **On the bench this is comfortable. In a vehicle it is not.**
 - **The cause.** The board is small (138 cm²) for 8.2 W. The 12 V buck, the clock buffer, the
   radar ADC and the four drivers share it. Since Rev08 the buck is the hottest junction, by 2 °C.
@@ -1258,7 +1293,7 @@ ground. A 56 nH in series with 100 pF is a short at 67 MHz, right on the LNA's o
 | As drawn: 56 nH, 100 pF to ground, 1 µH to the rail | 0.8 dB | 21 dB | 7.4 dB | 4.7 dB | 1.5 dB | 22.6 dB at 69 MHz |
 | **Now: `FB1304` BLM15HD102SN1, `C1305` not fitted, `L1303` 1 µH** | 0.06 dB | 0.03 dB | 0.03 dB | 0.03 dB | 0.02 dB | **0.23 dB** |
 
-The IF amplifier's choke `L1305` (1 µH straight to `+3V0_RF`) has no series capacitor. The rail's 100 nF puts
+The IF amplifier's choke `L1305` (1 µH straight to `+3V0_RF`, now `+2V8_RF`) has no series capacitor. The rail's 100 nF puts
 its series resonance near 0.5 MHz, so over the IF band (25-170 MHz) it costs 0.31 dB at most and is left as it
 is. The filters' inductors are the filters (`rev08_filters_mc.py`). The 0603 1 µH of `L1303` and `L1305` gets
 its own BOM rule, AHW1608F-1R0KTF (SRF 400 MHz, 330 mA).

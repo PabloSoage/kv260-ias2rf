@@ -93,7 +93,7 @@ The stackup is **JLCPCB's JLC08161H-2116C**: 8 layers, 1.54 mm (6 layers, JLC061
 | L5 In4.Cu | **GND plane** (new) | prepreg 0.3658, Er 4.29 |
 | L6 In5.Cu | SIG: LVDS pairs (ADCR, ADCS, LINK_RX_CLK), between two GND planes | core 0.130, Er 4.17 |
 | L7 In6.Cu | **GND plane** | 2116 prepreg 0.1194, Er 4.29 |
-| L8 B.Cu | SIG: slow nets, the 100 Ω terminations under the FPGA, VCCINT caps | — |
+| L8 B.Cu | SIG: slow nets, the 100 Ω terminations under the FPGA, VCCINT caps | none |
 
 The rules in the project file are for a standard 8-layer process, with a 0.2 mm drill for fanning
 out the 1.0 mm-pitch BGA:
@@ -479,7 +479,7 @@ in [INTEGRATIONS §2.1](INTEGRATIONS.md).
 below) and moved 0.6 mm east, because its wider west tab would have sat on
 `LINK_RX_D1_N`, which runs straight down x 189.65 on L1; the tab now clears it by 0.26 mm (the LVDS class asks for
 0.15) and has its own ground via, since that track cuts it off from the L1 pour. `F1501`'s `+3V3_D` via, now under
-the new pin 1, moved under the PTC's body. The transceiver `U1506` (TCAN330DCNT), the ESD diode `D1531`, `Q1530` and
+the new pin 1, moved under the PTC's body. The transceiver `U1506` (TCAN330DCNT; the TCAN3403DDFRQ1, same pins, since the Rev08 audit, section 6.9), the ESD diode `D1531`, `Q1530` and
 nine passives sit on the bottom south of the GPS circuit (x 186 to 194, y 115 to 128); `Q1531` and its two base
 resistors found room only east of the via field (x 203 to 207, y 120 to 127), so the FPC pin 10 line runs there and
 its collector comes back to `CAN_TXD`. The CAN signals use L1, L3, L6 and L8 only (`CANH`/`CANL` 0.2 mm, the GPS
@@ -499,3 +499,33 @@ segments, 2 vias, 17.2 mm). Script: `_work/rev08_j1503_vertical.py`; DRC identic
 The board after these changes: 795 footprints, 13,695 track segments, 2,613 vias. DRC with zones refilled and schematic
 parity: **0 violations, 0 unconnected pads, 0 footprint errors**; ERC 0 errors and the same 7 warnings. The warnings
 are those of the board before, plus three silkscreen overlaps between the new bottom-side passives.
+
+### 6.9 After the RF and power audit (18 November 2026)
+
+The fixes of [AUDIT_Rev08.md](AUDIT_Rev08.md) that touch the copper are text edits of the board
+(`_work/rev08_audit_pcb.py`, which reproduces them from the commit before, UUIDs aside):
+
+- **The 300 MHz high-pass ahead of preselector B (R1).** Seven 0402 parts in frame A, in the 2 mm between `U1304`'s
+  east pins and the frame's east wall.
+  - The series capacitors climb a spine at x 118.4: `C1441` and `C1443`.
+  - The two shunt branches sit at x 119.4: `L1441` + `C1442` and `L1442` + `C1444`. Each is grounded straight to
+    the wall, whose pad is ground, so the branches need no vias.
+  - `C1445` at x 117.35 ends on a via at (116.65, 116.5). That via sits where the two inner control lines
+    (`VU_PSA_V2` on L3, `VU_PSA_V1` on L6) leave 0.16 mm.
+  - From there `VU_PSB_HP` runs on L8 to the old crossing under the wall and on to `U1306`.
+  - `VU_PSB_IN`'s old stub, via and L8 diagonal went.
+- **`U1006` pin 5** (the 50 mV ANY-OUT pin) has a 0.2 mm stub to the exposed pad: +1V8_D at 1.85 V (P4).
+- **`U1506` pin 5** becomes the TCAN3403's VIO: its ground via went, and a 0.25 mm stub joins it to the +3V3_D track
+  0.45 mm below (P1).
+- **Values in the same footprints:**
+  - `U1002` TPS563201, `U1315` LP5907MFX-2.8;
+  - `F1001` PTC 2A hold (mSMD200-24V);
+  - `R1031` 3.24 k, `R1542`/`R1543` 330 Ω.
+- **The front end's rail** is `+2V8_RF` (it was `+3V0_RF`).
+
+A 2920 PTC was tried for `F1001` and dropped: its courtyard would overlap `J1001`, `Q1001`, `R1004` and `TP4`.
+
+The board now has 802 footprints, 13,709 track segments and 2,612 vias. DRC with zones refilled and schematic
+parity gives **the same report as before the edits**: 0 errors, 0 unconnected, 0 parity problems, and the same
+warnings category by category. `make_fab.py`: DRC 0 errors, 0 unrouted; BOM 224 lines and 770 parts. ERC: the same
+7 warnings.

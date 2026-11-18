@@ -31,13 +31,15 @@ recommended layout.
 J961 ─ D1301 ESD ─┬─ C1301 ─ U1302 ─┬─ U1301 LNA ─┬─ U1303 ─ U1304 ─┬─ straight ─────────────┬─ U1305 ─ U1308 ─┬─ T1301 ─ U1312 RFFC5072 ─ T1302 ─┬─ U1309 ─ AA LPF ─ U1310 IF amp ─ U1311 att ─ IF_VU
                   │                 └─ bypass ─────┘                 ├─ FM band-pass ─────────┤                 └─ bypass ─────────────────────────┘
  FB1302 + L1301 ──┘ (bias tee)                                       ├─ FM reject (9th) ──────┤
- U1314 AP22652, JP1301 5 V / 3.3 V                                   └─ U1306 ─┬─ UHF LPF ──┬─ U1307 ─┘
-                                                                               ├─ SAW 1090 ─┤
-                                                                               ├─ HPF 1 GHz ┤
-                                                                               └─ LPF 1 GHz ┘
+ U1314 AP22652, JP1301 5 V / 3.3 V                                   └─ HP 300 MHz ─ U1306 ─┬─ UHF LPF ──┬─ U1307 ─┘
+                                                                                            ├─ SAW 1090 ─┤
+                                                                                            ├─ HPF 1 GHz ┤
+                                                                                            └─ LPF 1 GHz ┘
 ```
 
-### 1.2 Control lines (U1313, TCA6416A at 0x20, ports at 3.0 V)
+The 300 MHz high-pass (`C1441`-`C1445`, `L1441`-`L1442`) was added by the Rev08 RF audit (section 1.5).
+
+### 1.2 Control lines (U1313, TCA6416A at 0x20, ports at 2.8 V)
 
 | Port | Net | Function | At power-up (pins are inputs) |
 |---|---|---|---|
@@ -46,11 +48,11 @@ J961 ─ D1301 ESD ─┬─ C1301 ─ U1302 ─┬─ U1301 LNA ─┬─ U1303
 | P05 | `VU_LNA_ON` | High: LNA in; low: bypassed | Floating |
 | P06 | `VU_CONV_ON` | High: through the converter; low: direct 30–170 MHz | Floating |
 | P07 | `VU_BIAS_EN_N` | Low: bias tee on (the AP22652's enable is active low) | High (R1360): bias **off** |
-| P10 | `VU_BIAS_FLT_N` | Input: bias-tee over-current or over-temperature | — |
+| P10 | `VU_BIAS_FLT_N` | Input: bias-tee over-current or over-temperature | n/a |
 | P11 | `VU_ENX` | RFFC5072 serial select | High (R1342): deselected |
 | P12 | `VU_SCLK` | Serial clock, RFFC5072 and PE4312 | Floating |
 | P13 | `VU_SDATA` | Serial data, bidirectional (RFFC5072 read-back); to the PE4312 through R1330 (10 k) | Floating |
-| P14 | `VU_LD` | Input: RFFC5072 lock detect (GPO4) | — |
+| P14 | `VU_LD` | Input: RFFC5072 lock detect (GPO4) | n/a |
 | P15 | `VU_RESETX` | RFFC5072 reset | High (R1344) |
 | P16 | `VU_ATT_LE` | PE4312 latch | High (internal pull-up) |
 | P17 | `VU_ENBL` | RFFC5072 enable (and VCO calibration trigger) | Low (R1343): converter **off** |
@@ -65,6 +67,7 @@ Register-level bring-up and the LO settings of every band: [RFFC5072_PROGRAMMING
 | Block | Values | Source |
 |---|---|---|
 | Anti-alias LPF | 11p, 56n‖5.6p, 22p, 62n‖7.5p, 24p, 75n‖1.2p, 20p | `rev08_filters_mc.py`, plan 5.4 |
+| **Preselector B high-pass (Rev08 audit)** | series 11p, shunt 24n + 36p, series 5.6p, shunt 22n + 91p, series 8.2p: 5th-order elliptic | `_work/sim/rev08_rf_audit.py`: ≤ 1.5 dB p99 from 300 MHz to 3 GHz, ≥ 51.7 dB p1 below 175 MHz (3,000 boards: L ±2 %, C ±0.1 pF or ±2 %, pads, Q 35-55, ESL) |
 | UHF image LPF | 6.2p, 22n‖1.8p, 6.8p, 27n‖2p, 6.8p, 22n‖0.4p, 1.3p | Same |
 | FM reject, 9th order | 18p, 68n+110p, 13p, 82n+36p, 18p, 100n+24p, 24p, 220n+10p, 91p | Same; G2 passed |
 | **FM band-pass (new in phase 4)** | shunt 16n‖160p, series 390n + 6.8p, shunt 16n‖160p: 3-pole band-pass, 88–108 MHz | `rev08_filters_mc.py --fmbp` (phase 5): 2.2 dB loss nominal with Q 40-45 inductors and pad capacitance, Monte Carlo (L ±2 % / ±5 % for the 390 nH, C ±2 % / ±0.1 pF, 2,000 runs) loss ≤ 3.1 dB p99, rejection ≥ 24.3 dB p1 at 70 and 137 MHz [V arithmetic]. Phase 4's first values (24n‖110p, 560n + 4.7p) modelled at 3.4 dB and 21.1 dB p1 once the pads and losses were in, so they were re-chosen |
@@ -79,7 +82,7 @@ Register-level bring-up and the LO settings of every band: [RFFC5072_PROGRAMMING
 | AP22652 enable | Active high | **Active low**, pulled high: bias off until written | Diodes DS41186: the AP22652 is the active-low part (AP22653 is active high) |
 | Bias-tee low voltage | 3.0 V | **3.3 V from `+3V3_D`** (JP1301 2-3) | The 3.0 V LDO has 70 mA of headroom; an active antenna can take 100 mA |
 | Mixer output balun | TC4-1W+ | TC4-1W+ with the mixer's bias through its centre tap | Rated 30 mA DC: the gateware must keep `MIX2_IDD` ≤ 3 (about 30 mA). Two RF chokes would lift the limit if high linearity is ever needed |
-| TCXO pin 1 | — | 10 k to its supply | KDS uses pin 1 as Vcont, ground or standby by variant; 10 k is correct for all three |
+| TCXO pin 1 | not specified | 10 k to its supply | KDS uses pin 1 as Vcont, ground or standby by variant; 10 k is correct for all three |
 | Mixer input balun source | TC1-1-13M+ | **Mini-Circuits TC1-1-13M+ only** (case AT224-1A, 6 pads: primary 6 / 4, secondary 1 / 3) | LCSC's C22383443 is HLT's H3-TC1-1-13M+, a clone in a 5-pad body numbered differently (1 primary dot, 2 primary, 3 secondary, 4 ground, 5 secondary dot): it does not fit the footprint. The BOM names the Mini-Circuits part; order it from a distributor if JLCPCB has none |
 | `SW2` source | "selects the source" | **C927 fitted (front end), C926 DNP** | The board is built for the front end; `J922` returns by swapping two 0402s |
 
@@ -113,3 +116,19 @@ draw 60 parts legibly; on their own sheet they are joined to `CONTROL` by two sh
 - Still open, for the first board: the shield-can frames' LCSC parts (their footprints are the walls placed on
   the board), the USB-C's locating pegs against the carrier, and the TA1090EC's pin-out against the maker's
   drawing (only LCSC's symbol was available).
+
+### 1.5 Rev08 RF and power audit (18 November 2026)
+
+[AUDIT_Rev08.md](AUDIT_Rev08.md) found that the converter had no IF rejection (R1). The UHF image filter is a
+low-pass, so FM broadcast, airband, 2 m, marine VHF and PMR, all inside the 100-170 MHz IF window, reached the mixer
+and leaked through it onto the UHF tuning. The 1 GHz low-pass path did the same. The changes:
+
+| Item | Before | Now | Why |
+|---|---|---|---|
+| Preselector B input | `VU_PSB_IN` straight to `U1306` | Through the 300 MHz high-pass (`VU_PSB_IN` to `VU_PSB_HP`) | IF rejection 31-46 dB becomes 84-99 dB; every B path (UHF, SAW, both LTCC) starts at 300 MHz |
+| Converted coverage | 170 MHz up | **300 MHz up**; 170-300 MHz not covered | A 135 MHz IF cannot reject signals at its own frequency near 170-300 MHz |
+| Front-end rail | `+3V0_RF`, LP5907MFX-3.0 | **`+2V8_RF`, LP5907MFX-2.8** | At the worst corner of +3V3_D the 3.0 V part reached dropout (26 mV of headroom against 180 mV); now 232 mV. The RFFC5072 runs from 2.7 V, the SPF5043Z, switches, PE4312, TCXO and expander port from lower |
+| `C1305` | DNP | DNP (kept by `rx_vu.py`'s `DNP` set; the generator used to drop it) | Phase 6 |
+
+The expander's ports follow the rail (2.8 V): the PE4259's 0.7 × VDD and the RFFC5072's VDD / 1.5 are the same rail,
+and the PE42442 and SKY13418 thresholds (1.17 V, 1.35 V) are far below it.

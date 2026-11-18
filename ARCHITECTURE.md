@@ -502,7 +502,7 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `Y401` | Programmable master XO, 400/500 MHz | Si549, LVPECL, 3.3 V, 5×7 mm, pinout C | C | Replaces the TCXO; GPS-disciplined through its ±950 ppm DCO |
 | `U901..U904` | Routing SPDTs | M3SWA2-34DR+ | C | Positive 3.3 V control, but **bipolar supply: VDD +3.3 V and VEE −3.3 V** (B-03). Drawn: rev03/ROUTING, with the datasheet's Figure 2 network each. Footprint from Mini-Circuits PL-768 |
 | `U1001` | 12 V → +5V0 buck, 3 A | LMR33630ADDA | C | Drawn: rev03/POWER |
-| `U1002..U1004` | +3V3_D, +2V5, +1V0 bucks | TPS562201 | C | Drawn: rev03/POWER |
+| `U1002..U1004` | +3V3_D, +2V5, +1V0 bucks | TPS563201 (U1002, 3 A, since the Rev08 audit), TPS562201 | C | Drawn: rev03/POWER |
 | `U1005..U1007` | +1V8_A, +1V8_D, +3V3_A LDOs | TPS7A8300RGR | C | Drawn: rev03/POWER |
 | `L1001`, `L1010..L1030` | Power inductors | Bourns SRP7028A-8R2M, -3R3M ×2, -2R2M | C | Isat 7.5–14 A |
 | `U1008` | −3.3 V charge-pump inverter | LM2663M | C | Drawn: rev03/POWER. **Reinstated.** VEE for the four RF switches, 8 mA. It had been dropped when B-03 was closed wrongly |

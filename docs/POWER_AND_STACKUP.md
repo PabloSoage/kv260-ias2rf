@@ -20,10 +20,10 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September; loads as of 2 October, Rev08's front end, LEDs and
 expanders added 17 November:
 
-12 V in  (823 mA, 9.9 W)
+12 V in  (1117 mA, 13.4 W worst case; 973 mA, 11.7 W typical: the Rev08 audit, AUDIT_Rev08.md §2.1)
   └── LMR33630 buck → +5V0   1775 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
         ├── TPS562201 → +3V3_D   1388 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches, LEDs
-        │     ├── LP5907 → +3V0_FE    180 mA   Rev08 VHF/UHF front end: RFFC5072, two SPF5043Z, switches, attenuator
+        │     ├── LP5907-2.8 → +2V8_RF 180 mA  Rev08 VHF/UHF front end: RFFC5072, two SPF5043Z, switches, attenuator
         │     ├── TPS7A8300 → +1V8_D  333 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD, housekeeping
         │     └── LM2663 → −3V3        8 mA   RF switch VEE
         ├── TPS7A8300 → +3V3_A    100 mA   DAC AVDD (no pre-regulator needed any more)
@@ -81,7 +81,7 @@ With 30 % margin:
 |---|---|---|---|---|---|---|
 | `+5V0` | 5.0 | 1775 mA | buck | +12V | 0.99 W | ≥ 2.31 A |
 | `+3V3_D` | 3.3 | 1388 mA | buck | +5V0 | 0.51 W | ≥ 1.80 A |
-| `+3V0_FE` (Rev08) | 3.0 | 180 mA | LDO (LP5907, 250 mA) | +3V3_D | 0.05 W | ≥ 0.23 A |
+| `+2V8_RF` (Rev08) | 2.8 | 180 mA | LDO (LP5907-2.8, 250 mA) | +3V3_D | 0.09 W | ≥ 0.23 A |
 | `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
 | `+2V5` | 2.5 | 601 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
 | `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
@@ -90,8 +90,13 @@ With 30 % margin:
 | `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | — |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
+**Superseded by the Rev08 audit (18 November, [AUDIT_Rev08.md](AUDIT_Rev08.md) §2.1):** the FPGA rails now come from
+Vivado's power report (VCCAUX 365 mA, not 100 mA), and the PHY, the CAN transceiver, the fan and the bias tee are
+counted. The worst case is 1.12 A at 12 V, 13.4 W; +3V3_D carries 1.89 A from a TPS563201 (3 A), and +1V8_D 629 mA,
+0.91 W in its LDO. `python _work/power_budget.py` prints the current table. The text below is the budget of 17 November.
+
 **Input: 823 mA at 12 V = 9.9 W.** With margin, 1.07 A and 12.8 W, inside the jack's and the input protection's
-1 A. Rev08 (17 November) added 0.8 W: the front end's 180 mA on `+3V0_FE`, the LEDs and the two I/O expanders;
+1 A. Rev08 (17 November) added 0.8 W: the front end's 180 mA on `+3V0_FE` (now `+2V8_RF`), the LEDs and the two I/O expanders;
 the bias tee's external load (100 mA at most, off by default) and the USB bridge (powered by the cable) are not
 counted. On 18 November the GPS receiver on `J1503` (60 mA estimated, module and active antenna) and its PPS buffer added 21 mA at 12 V, 0.25 W, most of it spent in the receiver, off the board. Before Rev08: 733 mA, 8.8 W. (2 October: 755 mA before
 the flash, translator and housekeeping estimates were replaced by their datasheets.) The rise since the first

@@ -97,6 +97,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
         [
             ("8-Layer PCB Layout & Rules (JLC08161H-2116C)", "docs/LAYOUT.md"),
             ("Signal Integrity, openEMS, ngspice & Thermal Maps", "docs/SIGNAL_INTEGRITY.md"),
+            ("Rev08 RF & Power Audit: Findings, Simulations and Fixes", "docs/AUDIT_Rev08.md"),
             ("3-D Component Model Mapping Audit", "docs/3D_MODELS.md"),
         ],
     ),

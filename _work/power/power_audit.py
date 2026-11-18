@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
 Rev08 power audit (18 November 2026): can anything on the board be damaged, or run outside its rating, by its own
-supplies, by the vehicle's supply, or by the boards it is wired to?
+supplies, by the vehicle's supply, or by the boards it is wired to? This version checks the board with the audit's
+fixes (docs/AUDIT_Rev08.md): U1002 TPS563201 (3 A), U1006 at 1.85 V, +1V0 at 1.017 V, +2V8_RF (LP5907-2.8), F1001
+2.0 A hold, U1506 TCAN3403-Q1, and the Pmod and FPGA_IRQ gated in the gateware.
 
     python _work/power/power_audit.py          # about 20 s; writes docs/sim/power_*.png and docs/sim/power_audit.json
 
@@ -53,12 +55,12 @@ TYPICAL_OVERRIDE = {
     "Bias tee on J961 at its current limit (JP1301 at 5 V, antenna shorted or a hungry LNA)": 0,
 }
 # rated output current of each rail's regulator [V, data sheets]
-RATING = {"+5V0": ("LMR33630ADDA", 3.0), "+3V3_D": ("TPS562201", 2.0), "+2V5": ("TPS562201", 2.0),
+RATING = {"+5V0": ("LMR33630ADDA", 3.0), "+3V3_D": ("TPS563201", 3.0), "+2V5": ("TPS562201", 2.0),
           "+1V0": ("TPS562201", 2.0), "+1V8_A": ("TPS7A8300", 2.0), "+1V8_D": ("TPS7A8300", 2.0),
-          "+3V3_A": ("TPS7A8300", 2.0), "+3V0_FE": ("LP5907MFX-3.0", 0.25), "-3V3": ("LM2663M", 0.2),
+          "+3V3_A": ("TPS7A8300", 2.0), "+2V8_RF": ("LP5907MFX-2.8", 0.25), "-3V3": ("LM2663M", 0.2),
           "+1V2": ("divider", 0.001)}
 # thermal resistance junction to board used by the board model (SIGNAL_INTEGRITY 9.6) [V/E as there]
-THETA_JB = {"+1V8_D": 12.3, "+1V8_A": 12.3, "+3V3_A": 12.3, "+3V0_FE": 51.0}
+THETA_JB = {"+1V8_D": 12.3, "+1V8_A": 12.3, "+3V3_A": 12.3, "+2V8_RF": 51.0}
 
 
 def chain(override=None, extra=None, tree=None):
@@ -73,7 +75,7 @@ def chain(override=None, extra=None, tree=None):
         direct[rail] = direct.get(rail, 0) + ma
     load = {r: direct.get(r, 0) for r in pb.VOLTS}
     diss = {}
-    order = ["-3V3", "+3V0_FE", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A", "+3V3_D", "+5V0", "+12V"]
+    order = ["-3V3", "+2V8_RF", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A", "+3V3_D", "+5V0", "+12V"]
     for rail in order:
         if rail not in tree:
             continue
@@ -96,7 +98,7 @@ def check_budget():
     _, lw, dw, i12w = chain()
     rows = []
     print("  %-8s %-14s %7s | %8s %8s %6s | %7s %7s" % ("rail", "regulator", "rating", "typ mA", "worst mA", "use", "typ W", "worst W"))
-    for rail in ("+5V0", "+3V3_D", "+2V5", "+1V0", "+1V8_A", "+1V8_D", "+3V3_A", "+3V0_FE", "-3V3"):
+    for rail in ("+5V0", "+3V3_D", "+2V5", "+1V0", "+1V8_A", "+1V8_D", "+3V3_A", "+2V8_RF", "-3V3"):
         part, amps = RATING[rail]
         use = lw[rail] / 1000 / amps
         flag = "  <-- over 80 % of rating" if use > 0.8 else ""
@@ -107,16 +109,8 @@ def check_budget():
         rows.append(dict(rail=rail, part=part, rating_a=amps, typ_ma=round(lt[rail]), worst_ma=round(lw[rail]),
                          use=round(use, 3), typ_w=round(dt.get(rail, 0), 3), worst_w=round(dw.get(rail, 0), 3)))
     print("  input at 12 V: %.0f mA typical (%.1f W), %.0f mA worst case (%.1f W)" % (i12t, 12 * i12t / 1000, i12w, 12 * i12w / 1000))
-    # The fix examined: +1V8_D's LDO fed from +2V5 instead of +3V3_D.
-    tree2 = dict(pb.TREE); tree2["+1V8_D"] = ("+2V5", "ldo", None)
-    pb.VOLTS_SAVE = dict(pb.VOLTS)
-    _, l2, d2, i12f = chain(tree=tree2)
-    print("  with U1006 fed from +2V5: +1V8_D LDO %.2f W (was %.2f), +2V5 %.0f mA (%.0f %%), +3V3_D %.0f mA (%.0f %%), input %.0f mA"
-          % (d2["+1V8_D"], dw["+1V8_D"], l2["+2V5"], l2["+2V5"] / 20, l2["+3V3_D"], l2["+3V3_D"] / 20, i12f))
-    RESULT["budget"] = dict(rows=rows, input_typ_ma=round(i12t), input_worst_ma=round(i12w),
-                            fix_1v8d_from_2v5=dict(ldo_w=round(d2["+1V8_D"], 3), v2v5_ma=round(l2["+2V5"]),
-                                                   v3v3_ma=round(l2["+3V3_D"]), input_ma=round(i12f)))
-    return lt, lw, i12t, i12w, l2
+    RESULT["budget"] = dict(rows=rows, input_typ_ma=round(i12t), input_worst_ma=round(i12w))
+    return lt, lw, i12t, i12w
 
 
 # ------------------------------------------------------------------------------------------------ 2. windows
@@ -131,16 +125,14 @@ RAILS = {
     "+5V0": divider(0.985, 1.0, 1.015, 100e3, 24.9e3) + (0.010, 0.0),       # LMR33630 VFB [V]; ripple 6 mV calc
     "+3V3_D": divider(0.749, 0.768, 0.787, 33.2e3, 10e3) + (0.040, 0.020),  # TPS562201 VFB [V]; D-CAP2 step [E]
     "+2V5": divider(0.749, 0.768, 0.787, 22.6e3, 10e3) + (0.030, 0.031),
-    "+1V0": divider(0.749, 0.768, 0.787, 3.09e3, 10e3) + (0.020, 0.034),    # drop: SI 4.4 scaled to 735 mA
+    "+1V0": divider(0.749, 0.768, 0.787, 3.24e3, 10e3) + (0.020, 0.034),    # R1031 3.24 k (P7); drop: SI 4.4 at 735 mA
     "+1V8_A": (1.85 * 0.99, 1.85, 1.85 * 1.01, 0.005, 0.100),               # TPS7A8300 1 % [V]; drop SI 9.1
-    # +1V8_D: SI 4.4's path to the FPGA balls is 184-263 mohm (single path, an upper bound); it now carries the
-    # FPGA's 426 mA (VCCAUX 365 + VCCADC 31 + VCCO_35 30) instead of the 150 mA it was sized for
-    "+1V8_D": (1.8 * 0.99, 1.8, 1.8 * 1.01, 0.005, 0.263 * 0.426),
-    "+1V8_D (ADC DRVDD branch)": (1.8 * 0.99, 1.8, 1.8 * 1.01, 0.005, 0.030),
-    "+1V8_D at 1.85 V (50 mV pin grounded)": (1.85 * 0.99, 1.85, 1.85 * 1.01, 0.005, 0.263 * 0.426),
-    "+1V8_D at 1.85 V, ADC branch": (1.85 * 0.99, 1.85, 1.85 * 1.01, 0.005, 0.030),
+    # +1V8_D at 1.85 V since the audit (P4: U1006's 50 mV pin grounded). SI 4.4's path to the FPGA balls is 184-263
+    # mohm (single path, an upper bound); it carries the FPGA's 426 mA (VCCAUX 365 + VCCADC 31 + VCCO_35 30)
+    "+1V8_D": (1.85 * 0.99, 1.85, 1.85 * 1.01, 0.005, 0.263 * 0.426),
+    "+1V8_D (ADC DRVDD branch)": (1.85 * 0.99, 1.85, 1.85 * 1.01, 0.005, 0.030),
     "+3V3_A": (3.3 * 0.99, 3.3, 3.3 * 1.01, 0.005, 0.010),
-    "+3V0_FE": (3.0 * 0.97, 3.0, 3.0 * 1.03, 0.005, 0.010),                 # LP5907 3 % over temperature [V]
+    "+2V8_RF": (2.8 * 0.97, 2.8, 2.8 * 1.03, 0.005, 0.010),                 # LP5907-2.8, 3 % over temperature [V]
     "-3V3": (-3.400 + 0.008 * 3.5, -3.318 + 0.008 * 3.5, -3.235 + 0.008 * 3.5, 0.010, 0.0),  # LM2663 follows +3V3_D
 }
 # part, rail, recommended min, max, absolute max (None where the data sheet gives none) [V unless marked]
@@ -152,18 +144,16 @@ WINDOWS = [
     ("AD9484 AVDD", "+1V8_A", 1.70, 1.90, 2.00),
     ("AD9253 AVDD", "+1V8_A", 1.70, 1.90, 2.00),
     ("AD9484 / AD9253 DRVDD", "+1V8_D (ADC DRVDD branch)", 1.70, 1.90, 2.00),
-    ("XC7A50T VCCAUX with U1006 set to 1.85 V", "+1V8_D at 1.85 V (50 mV pin grounded)", 1.71, 1.89, 2.00),
-    ("AD9484 / AD9253 DRVDD with U1006 set to 1.85 V", "+1V8_D at 1.85 V, ADC branch", 1.70, 1.90, 2.00),
     ("AD9767 / AD9708 AVDD", "+3V3_A", 2.70, 5.50, 6.50),
     ("AD8352 x4 (via ferrites)", "+5V0", 3.00, 5.25, 5.50),
     ("Si549 (via FB401)", "+3V3_D", 3.135, 3.465, 3.80),
     ("ADCLK948 (via FB401), 3.3 V +-10 %", "+3V3_D", 2.97, 3.63, 3.90),
     ("RTL8211FSI, 3.3 V +-5 % [E]", "+3V3_D", 3.135, 3.465, 3.63),
-    ("TCAN330", "+3V3_D", 3.00, 3.60, 5.00),
+    ("TCAN3403-Q1 (VCC and VIO)", "+3V3_D", 3.00, 3.60, 6.00),
     ("M3SWA2-34DR+ VDD", "+3V3_D", 3.00, 3.60, None),
-    ("RFFC5072", "+3V0_FE", 2.70, 3.30, 3.60),
-    ("SPF5043Z x2 (drain through 1 uH)", "+3V0_FE", 2.70, 5.25, 5.50),
-    ("PE4312, PE4259, PE42442, SKY13418 (2.3-3.6 V) [E]", "+3V0_FE", 2.30, 3.60, 4.00),
+    ("RFFC5072", "+2V8_RF", 2.70, 3.30, 3.60),
+    ("SPF5043Z x2 (drain through 1 uH)", "+2V8_RF", 2.70, 5.25, 5.50),
+    ("PE4312, PE4259, PE42442, SKY13418 (2.3-3.6 V) [E]", "+2V8_RF", 2.30, 3.60, 4.00),
 ]
 
 
@@ -195,10 +185,9 @@ def check_headroom():
     # (LDO, input rail, output rail, load mA, series R on the input (ohm), dropout max at its rated current, rated mA)
     cases = [
         ("U1005 +1V8_A", "+2V5", "+1V8_A", 500, 0.02, 0.200, 2000),
-        ("U1006 +1V8_D (as drawn, from +3V3_D)", "+3V3_D", "+1V8_D", 629, 0.02, 0.200, 2000),
-        ("U1006 +1V8_D (fed from +2V5)", "+2V5", "+1V8_D", 629, 0.02, 0.200, 2000),
+        ("U1006 +1V8_D (1.85 V, from +3V3_D)", "+3V3_D", "+1V8_D", 629, 0.02, 0.200, 2000),
         ("U1007 +3V3_A", "+5V0", "+3V3_A", 100, 0.02, 0.200, 2000),
-        ("U1315 +3V0_FE (through FB1301)", "+3V3_D", "+3V0_FE", 180, 0.15 + 0.02, 0.250, 250),
+        ("U1315 +2V8_RF (through FB1301)", "+3V3_D", "+2V8_RF", 180, 0.15 + 0.02, 0.250, 250),
     ]
     for name, rin, rout, ma, rser, vdo, irated in cases:
         lo_in = RAILS[rin][0] - RAILS[rin][3] - ma / 1000 * rser
@@ -219,36 +208,37 @@ def check_headroom():
 # generic and gives no table]. Ambient of the part itself: inside the enclosure, beside the jack.
 PTC_T = np.array([-40, -20, 0, 23, 40, 50, 60, 70, 85])
 PTC_K = np.array([1.47, 1.30, 1.15, 1.00, 0.88, 0.81, 0.74, 0.66, 0.55])
+PTC_HOLD = 2.0          # mSMD200-24V since the audit (P3); it was 1.5 A
 
 
-def check_input(i12t, i12w, i12fix):
-    hdr("4. INPUT CURRENT against the battery voltage, and F1001 (PTC 1.5 A hold) against its temperature")
+def check_input(i12t, i12w):
+    hdr("4. INPUT CURRENT against the battery voltage, and F1001 (PTC 2.0 A hold, mSMD200-24V) against its temperature")
     vin = np.linspace(9, 16, 71)
     # the input stage is a constant-power load above the LMR33630's dropout; the buck's efficiency improves a
     # little at low input [E], ignored (pessimistic at 16 V, slightly optimistic at 9 V)
     p_t, p_w = 12 * i12t / 1000, 12 * i12w / 1000
     it, iw = p_t / vin, p_w / vin
-    hold = 1.5 * np.interp([25, 40, 50, 56, 60, 70, 85], PTC_T, PTC_K)
+    hold = PTC_HOLD * np.interp([25, 40, 50, 56, 60, 70, 85], PTC_T, PTC_K)
     for T, h in zip([25, 40, 50, 56, 60, 70, 85], hold):
         print("  PTC at %2d C holds %.2f A   (board at 12 V: %.2f A typical, %.2f A worst; at 10.5 V: %.2f / %.2f A)"
               % (T, h, p_t / 12, p_w / 12, p_t / 10.5, p_w / 10.5))
     # temperature at which the PTC would trip, worst case at 12 V and at 10.5 V
     tt = np.linspace(-40, 85, 1251)
-    k = np.interp(tt, PTC_T, PTC_K) * 1.5
-    trip12 = tt[np.argmax(k < p_w / 12)] if (k < p_w / 12).any() else None
-    trip105 = tt[np.argmax(k < p_w / 10.5)] if (k < p_w / 10.5).any() else None
-    tripT = tt[np.argmax(k < p_t / 12)] if (k < p_t / 12).any() else None
-    print("  worst-case load trips the PTC above %.0f C at 12 V and above %.0f C at 10.5 V; typical load above %.0f C"
+    k = np.interp(tt, PTC_T, PTC_K) * PTC_HOLD
+    trip12 = float(tt[np.argmax(k < p_w / 12)]) if (k < p_w / 12).any() else 'never (85+)'
+    trip105 = float(tt[np.argmax(k < p_w / 10.5)]) if (k < p_w / 10.5).any() else 'never (85+)'
+    tripT = float(tt[np.argmax(k < p_t / 12)]) if (k < p_t / 12).any() else 'never (85+)'
+    print("  worst-case load trips the PTC above %s C at 12 V and above %s C at 10.5 V; typical load above %s C"
           % (trip12, trip105, tripT))
-    RESULT["input"] = dict(p_typ_w=round(p_t, 2), p_worst_w=round(p_w, 2), ptc_trip_c_worst_12v=float(trip12),
-                           ptc_trip_c_worst_10v5=float(trip105), ptc_trip_c_typ_12v=float(tripT))
+    RESULT["input"] = dict(p_typ_w=round(p_t, 2), p_worst_w=round(p_w, 2), ptc_hold_a=PTC_HOLD, ptc_trip_c_worst_12v=trip12,
+                           ptc_trip_c_worst_10v5=trip105, ptc_trip_c_typ_12v=tripT)
     return vin, it, iw
 
 
 # ------------------------------------------------------------------------------------------------ 5. start-up
 def startup(t_end=0.02, dt=1e-6, tss_lmr=4e-3, tss_tps=1.0e-3, i_nrss=6.2e-6):
     t = np.arange(0, t_end, dt)
-    v = {k: np.zeros_like(t) for k in ("+12V", "+5V0", "+3V3_D", "+2V5", "+1V0", "+1V8_A", "+1V8_D", "+3V3_A", "+3V0_FE", "-3V3", "+1V2")}
+    v = {k: np.zeros_like(t) for k in ("+12V", "+5V0", "+3V3_D", "+2V5", "+1V0", "+1V8_A", "+1V8_D", "+3V3_A", "+2V8_RF", "-3V3", "+1V2")}
     st = {"lmr": None, "3v3": None, "2v5": None, "1v0": None}
     ss = {"1V8_A": 0.0, "1V8_D": 0.0, "3V3_A": 0.0}
     c_ss = 10e-9
@@ -274,7 +264,7 @@ def startup(t_end=0.02, dt=1e-6, tss_lmr=4e-3, tss_tps=1.0e-3, i_nrss=6.2e-6):
             vout = vset * ss[key] / 0.8
             v[rout][k] = max(0.0, min(vout, vin - 0.05))
         vin = v["+3V3_D"][k]
-        v["+3V0_FE"][k] = max(0.0, min(3.0, vin - 0.1)) if vin > 2.2 else 0.0   # LP5907, fast start [V]
+        v["+2V8_RF"][k] = max(0.0, min(2.8, vin - 0.1)) if vin > 2.2 else 0.0   # LP5907-2.8, fast start [V]
         v["-3V3"][k] = -0.98 * v["+3V3_D"][k]
         v["+1V2"][k] = v["+2V5"][k] * 1.02 / 2.12
     return t, v
@@ -472,9 +462,9 @@ def check_faults():
         ("GPS supply J1503 pin 6 shorted", "F1501 JK-SMD0805-020 (0.2 A hold, 0.4 A trip)", "trips in under a second at 1 A; +3V3_D sags briefly",
          "+3V3_D buck current limit carries the trip current; C1540 1 uF", True),
         ("Fan J1002 shorted", "F1002 SMD1206P050TF (0.5 A hold, 1 A trip)", "trips; +5V0 holds (3 A buck)", "", True),
-        ("CAN bus shorted to +12-14.8 V (battery)", "none: PESD1CAN stands off 24 V", "TCAN330 CANH/CANL absolute maximum is +-14 V [V]",
-         "a charging alternator (14.4-14.8 V) or a 24 V jump start destroys U1506", False),
-        ("CAN bus shorted to ground", "TCAN330 driver current limit", "survives (rated)", "", True),
+        ("CAN bus shorted to +12-24 V (battery, jump start)", "TCAN3403-Q1: +-58 V bus fault protection [V]",
+         "survives; PESD1CAN clamps the transients above 24 V", "the TCAN330 (+-14 V) of the first audit would not have", True),
+        ("CAN bus shorted to ground", "TCAN3403 driver current limit", "survives (rated)", "", True),
         ("USB-C host on J1501 with the board off", "LP5907 from VBUS powers only the CH340X", "1 k (R1533) into the FPGA's PMOD_SPARE1: under 3 mA", "", True),
     ]
     for a, b, c, d, ok in rows:
@@ -490,15 +480,17 @@ def check_backpower():
     r_out, vclamp = 25.0, 0.6
     rows = []
     for line, path, r_series, v in (
-            ("Pmod (8 lines, 3.3 V, no series resistor on either board: KV260 R276-R283 are 0 ohm)",
+            ("Pmod, 8 lines, 0 ohm both ends: upper bound if a board drove into an unpowered one",
              "Artix bank 15 <-> K26 HDA bank", 0.0, 3.3),
+            ("Pmod as built: gateware gates both ends: no line driven high toward an unpowered board",
+             "kria_present / adapter_alive, SPARE2 open-drain", None, 0.0),
             ("PMOD_SPARE1 from the CH340X", "USB bridge -> Artix", 1000.0, 3.3),
             ("PMOD_SPARE2 to the CH340X", "Artix -> USB bridge", 1000.0, 3.3),
-            ("GPS PPS to J9 pin 12 (and its copy)", "U1505 -> K26 HDA10", 220.0, 3.3),
-            ("CAN RX to J9 pin 8, through 1.8 k / 1 k", "TCAN330 RXD -> K26 bank 66 (1.2 V)", 1800.0 * 1000 / 2800, 1.18),
+            ("GPS PPS to J9 pin 12 (and its copy), 330 ohm since the audit", "U1505 -> K26 HDA10", 330.0, 3.3),
+            ("CAN RX to J9 pin 8, through 1.8 k / 1 k", "TCAN3403 RXD -> K26 bank 66 (1.2 V)", 1800.0 * 1000 / 2800, 1.18),
             ("IAS1 LVDS pairs", "AC-coupled (C101-C110)", None, 0.0),
             ("IAS1 HK_SCL/HK_SDA (open drain) and PROG_B (74LVC1G07, Ioff)", "carrier 1.8 V <-> bank 35", None, 0.0),
-            ("IAS1 FPGA_IRQ, push-pull 1.8 V", "Artix bank 35 -> K26 HPA", 0.0, 1.8)):
+            ("IAS1 FPGA_IRQ, push-pull 1.8 V: driven only after link training", "Artix bank 35 -> K26 HPA", None, 0.0)):
         if r_series is None:
             i = 0.0
         else:
@@ -518,7 +510,7 @@ def figures(lt, lw, vin, it, iw, runs, traces):
 
     # budget bars
     fig, ax = plt.subplots(1, 2, figsize=(11, 4.2))
-    rails = ["+5V0", "+3V3_D", "+2V5", "+1V0", "+1V8_A", "+1V8_D", "+3V3_A", "+3V0_FE"]
+    rails = ["+5V0", "+3V3_D", "+2V5", "+1V0", "+1V8_A", "+1V8_D", "+3V3_A", "+2V8_RF"]
     x = np.arange(len(rails))
     ax[0].bar(x - 0.2, [lt[r] / 1000 / RATING[r][1] * 100 for r in rails], 0.4, label="typical (25 C)", color="#2a78b5")
     ax[0].bar(x + 0.2, [lw[r] / 1000 / RATING[r][1] * 100 for r in rails], 0.4, label="worst case (70 C, max process, bias tee, CAN)", color="#c0392b")
@@ -527,8 +519,8 @@ def figures(lt, lw, vin, it, iw, runs, traces):
     ax[0].set_ylabel("load / regulator rating (%)"); ax[0].set_title("Regulator use"); ax[0].legend(fontsize=7)
     ax[1].plot(vin, it, label="typical", c="#2a78b5"); ax[1].plot(vin, iw, label="worst case", c="#c0392b")
     for T, ls in ((25, "-"), (56, "--"), (70, ":")):
-        ax[1].axhline(1.5 * np.interp(T, PTC_T, PTC_K), c="k", ls=ls, lw=0.8)
-        ax[1].text(15.0, 1.5 * np.interp(T, PTC_T, PTC_K) + 0.02, f"PTC hold at {T} C", fontsize=7)
+        ax[1].axhline(PTC_HOLD * np.interp(T, PTC_T, PTC_K), c="k", ls=ls, lw=0.8)
+        ax[1].text(15.0, PTC_HOLD * np.interp(T, PTC_T, PTC_K) + 0.02, f"PTC hold at {T} C", fontsize=7)
     ax[1].set_xlabel("input voltage (V)"); ax[1].set_ylabel("input current (A)"); ax[1].set_title("Input current against F1001's hold current")
     ax[1].legend(fontsize=7); ax[1].grid(alpha=0.3)
     fig.tight_layout(); fig.savefig(os.path.join(OUT, "power_budget_ptc.png"), dpi=130); plt.close(fig)
@@ -537,7 +529,7 @@ def figures(lt, lw, vin, it, iw, runs, traces):
     t, v = runs["nominal"]
     fig, ax = plt.subplots(figsize=(9, 4.2))
     for r, c in (("+12V", "#7f8c8d"), ("+5V0", "#8e44ad"), ("+3V3_D", "#c0392b"), ("+2V5", "#d35400"), ("+1V0", "#27ae60"),
-                 ("+1V8_A", "#16a085"), ("+1V8_D", "#2980b9"), ("+3V3_A", "#e67e22"), ("+3V0_FE", "#f1c40f"), ("-3V3", "#34495e")):
+                 ("+1V8_A", "#16a085"), ("+1V8_D", "#2980b9"), ("+3V3_A", "#e67e22"), ("+2V8_RF", "#f1c40f"), ("-3V3", "#34495e")):
         ax.plot(t * 1e3, v[r], label=r, c=c, lw=1.2)
     ax.plot(t * 1e3, v["+3V3_D"] - v["+1V8_D"], c="k", ls="--", lw=0.9, label="VCCO(3.3) - VCCAUX")
     ax.axhline(2.625, c="k", ls=":", lw=0.8); ax.text(0.2, 2.7, "2.625 V (DS181: at most 300 ms)", fontsize=7)
@@ -564,10 +556,10 @@ def figures(lt, lw, vin, it, iw, runs, traces):
 
 
 def main():
-    lt, lw, i12t, i12w, l2 = check_budget()
+    lt, lw, i12t, i12w = check_budget()
     check_windows()
     check_headroom()
-    vin, it, iw = check_input(i12t, i12w, l2["+12V"])
+    vin, it, iw = check_input(i12t, i12w)
     runs = check_startup()
     traces = check_transients()
     check_faults()

@@ -16,19 +16,19 @@ STATUS sheet (Rev08) - the connection specification. See docs/REV08_PLAN.md sect
 * The GPS PPS path to the K26 (INTEGRATIONS 2.1): a JST-SH header for the GPS receiver (3.3 V through a PTC, PPS,
   ground), ESD, a Schmitt buffer, and a 15-way 1 mm FPC receptacle that a short FFC joins to the KV260's J9
   (the Raspberry Pi camera connector), whose pin 12 is HDA10, a PL pin. An FFC's two cable types reverse the pin
-  order (n to 16 - n), so the buffer drives both pin 12 and pin 4 through 220 ohm each, and only pins 6, 7, 9 and
+  order (n to 16 - n), so the buffer drives both pin 12 and pin 4 through 330 ohm each, and only pins 6, 7, 9 and
   10 are grounded: whichever way the cable maps, pin 12 of J9 gets the pulse, and the other copy lands on a ground
-  pin of J9 through 220 ohm (15 mA while the pulse is high). Ground lands on J9's 7 and 10 or 9 and 6; 6 and 9 are
+  pin of J9 through 330 ohm (10 mA while the pulse is high). Ground lands on J9's 7 and 10 or 9 and 6; 6 and 9 are
   MIPI receiver pins that the design leaves unused. Pins 11, 13, 14 and 15 of J9 (a reset supervisor, the I2C
   pair, 3.3 V) meet nothing either way.
 * The vehicle's CAN bus (18 November, INTEGRATIONS 2.2): the PS's CAN1 controller through EMIO, for R5F core 1.
   Two more J9 lines that the design leaves unused carry it, both in the K26's bank 66 at 1.2 V: pin 6 (DATA1_P) and
-  pin 8 (CLK_N). Pin 8 maps to itself with either cable type, so it brings RX in: the TCAN330's RXD through a
+  pin 8 (CLK_N). Pin 8 maps to itself with either cable type, so it brings RX in: the TCAN3403's RXD through a
   1.8 k / 1 k divider (3.3 V to 1.18 V). TX goes out on J9 pin 6, inverted by the PL; it reaches adapter pin 6 or
   pin 10 depending on the cable, and the other of the two lands on a ground pin of J9 (10 or 6). Each drives one
   NPN (MMBT3904, Q1530 and Q1531) through 2.2 k, with 4.7 k from base to emitter, collectors joined with a 2.2 k pull-up into
   TXD: TXD = NOR(pin 6, pin 10) = TX. An NPN stays off while the K26 is unconfigured, even against a weak
-  pull-up, so the bus stays recessive; the TCAN330 also times out a stuck dominant TXD. Pins 6 and 10 are therefore
+  pull-up, so the bus stays recessive; the TCAN3403 also times out a stuck dominant TXD. Pins 6 and 10 are therefore
   no longer grounds; 7 and 9 still are. The bus leaves on J1503, now a 6-way JST-SH shared with the GPS receiver
   (2 CANL, 3 CANH, 1 and 4 ground), behind a PESD1CAN. No termination: a tap on a car's bus must not terminate it.
 
@@ -61,8 +61,9 @@ PARTS = {
               "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
               "GPS receiver and vehicle CAN, vertical (plug from above): 1 = ground, 2 = CANL, 3 = CANH, 4 = ground, "
               "5 = PPS in, 6 = 3.3 V out"),
-    "U1506": ("Interface_CAN_LIN:TCAN330", "TCAN330DCNT", "Package_TO_SOT_SMD:SOT-23-8",
-              "Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode"),
+    "U1506": ("kv260-ias2rf:TCAN3403DDFRQ1", "TCAN3403DDFRQ1", "Package_TO_SOT_SMD:SOT-23-8",
+              "Vehicle CAN transceiver, 3.3 V, +-58 V bus fault protection (the TCAN330 until the Rev08 audit, P1: "
+              "+-14 V, which a CAN wire shorted to the battery exceeds); VIO at 3.3 V, STB low: normal mode"),
     "Q1530": ("Transistor_BJT:Q_NPN_BEC", "MMBT3904", "Package_TO_SOT_SMD:SOT-23",
               "CAN TX from FPC pin 6; with Q1531 a NOR into TXD (one of pins 6, 10 is a J9 ground)"),
     "Q1531": ("Transistor_BJT:Q_NPN_BEC", "MMBT3904", "Package_TO_SOT_SMD:SOT-23", "CAN TX from FPC pin 10"),
@@ -99,7 +100,7 @@ PINS = {
     "J1502": {"12": "J9_PPS12", "4": "J9_PPS4", "6": "J9_CAN_TX6", "10": "J9_CAN_TX10", "8": "J9_CAN_RX",
               "7": GND, "9": GND, "MP": GND, **{str(n): "NC" for n in (1, 2, 3, 5, 11, 13, 14, 15)}},
     "J1503": {"1": GND, "2": "CAN_L", "3": "CAN_H", "4": GND, "5": "GPS_PPS_IN", "6": "GPS_3V3", "MP": GND},
-    "U1506": {"1": "CAN_TXD", "2": GND, "3": V3D, "4": "CAN_RXD", "5": GND, "6": "CAN_L", "7": "CAN_H", "8": GND},
+    "U1506": {"1": "CAN_TXD", "2": GND, "3": V3D, "4": "CAN_RXD", "5": V3D, "6": "CAN_L", "7": "CAN_H", "8": GND},
     "Q1530": {"1": "CAN_TXB6", "2": GND, "3": "CAN_TXD"},
     "Q1531": {"1": "CAN_TXB10", "2": GND, "3": "CAN_TXD"},
     "D1531": {"1": "CAN_H", "2": "CAN_L", "3": GND},
@@ -152,8 +153,8 @@ two("C1533", C("100n", "CH340X VCC"), "+3V3_USB", GND)
 # GPS PPS to KV260 J9
 two("R1540", R("100", "PPS input series, with D1530"), "GPS_PPS_IN", "GPS_PPS_R")
 two("R1541", R("100k", "holds the buffer low with no receiver"), "GPS_PPS_R", GND)
-two("R1542", R("220", "PPS to J1502 pin 12 (J9 pin 12 with a straight cable)"), "GPS_PPS_Y", "J9_PPS12")
-two("R1543", R("220", "PPS to J1502 pin 4 (J9 pin 12 with a reversing cable)"), "GPS_PPS_Y", "J9_PPS4")
+two("R1542", R("330", "PPS to J1502 pin 12 (J9 pin 12 with a straight cable); 330 since the Rev08 audit: under 10 mA into an unpowered K26"), "GPS_PPS_Y", "J9_PPS12")
+two("R1543", R("330", "PPS to J1502 pin 4 (J9 pin 12 with a reversing cable)"), "GPS_PPS_Y", "J9_PPS4")
 two("C1540", C("1u", "GPS supply"), "GPS_3V3", GND)
 two("C1541", C("100n", "GPS supply"), "GPS_3V3", GND)
 two("C1542", C("100n", "U1505 VCC"), V3D, GND)

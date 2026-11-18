@@ -755,7 +755,7 @@ Each row of section 11.1, with what was redone and where the result is. The phas
 |---|---|
 | Board electrical checks | **Done.** ERC 0 errors, the same 7 warnings. DRC with zones refilled and schematic parity 0 / 0 / 0 (`make_fab`). LVDS skew table re-run: all 29 pairs identical to the 8-layer table (LAYOUT 6.7) |
 | Signal integrity | **Done in phase 6** (section 11.7, SIGNAL_INTEGRITY 9.10): `J961`'s launch, the IF line, coupling and isolation with the new aggressors, the bias tee and LNA feed; the three new filters' Monte Carlo in phase 3 (section 5.4) |
-| Power | **Done.** `power_budget.py` with every Rev08 load: 823 mA at 12 V, 9.9 W (1.07 A, 12.8 W with margin; the GPS receiver of 18 November included); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
+| Power | **Done.** (Revised by the RF and power audit, [AUDIT_Rev08.md](AUDIT_Rev08.md): 1.12 A, 13.4 W worst case.) `power_budget.py` with every Rev08 load: 823 mA at 12 V, 9.9 W (1.07 A, 12.8 W with margin; the GPS receiver of 18 November included); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
 | Thermal | **Done.** Enclosure CFD at the rated ambients with the front end and camera (phase 8: 56.1 °C stock, 71.1 °C K26I); the 2-D board map and the five cooling cases at 8.2 W (SIGNAL_INTEGRITY 9.6: the LMR33630 is now the hottest junction, 87 °C at 25 °C in still air; every junction under 92 °C at 70 °C with sink and fan); the heatsink map |
 | Mechanical strength | **Done in phase 8.** 50 g in three axes with the new notch, lug, slots, lens window and clamps; SF 8.3 / 5.0 at 23 / 70 °C, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE 5.3) |
 | Gateware | **Done.** Artix rebuilt with the corrected constraints (25,068 LUT, `WNS +0.076 ns`, `WHS +0.049 ns` over both clock modes); K26 rebuilt on 18 November with the integrations of section 14, `kria_ps_framer`, `TX_KEY` and PS `CAN1` EMIO (53,294 LUT, `45.5%`, 44.0 BRAM36 eq., 1 URAM, 229 DSP48E2, `WNS +0.991 ns`, `WHS +0.010 ns`, 0 new methodology or CDC warnings); utilisation, timing, pulse-width, methodology and CDC reports, floorplans and schematics regenerated from the routed designs. `tb_system` passes at both clock modes (S1..S7, `TX_KEY` mutation fails at S7); the G-8 campaign re-run on the final RTL passes all 8 cases (FPGA_GATEWARE 6.1, figures moved by 0.9 dB at most); the two new benches pass bit-exact and their mutations fail |
@@ -797,6 +797,27 @@ The owner asked for four things before `rev08`: lower skew on the two worst pair
 **The HMI.** The owner chose Slint for the screens: a Rust core, light, and the same code on the KV260 (Linux KMS), a PC and a phone's browser (WebAssembly), knowing that a binary for an embedded device is GPL-3.0. The screens' source stays MIT. Behind them: `kria-hmi-core` (the decoders and register plans, no I/O), `kria-hmid` (DMA, audio, registers, recording, WebSocket) and two PL blocks that bring the DSP suite's results to the A53s, which were missing (`kria_dsp_out`, `kria_ps_framer`). Writing it found two faults that the mock-ups could not: the HMI's default transmitter setting (145.5 MHz NBFM) is outside what the board transmits (HF below 12.5 MHz), and a whole-register write of `DSP_CTRL` from Linux would have cleared R5F core 0's transmit enable. Both are fixed and tested.
 
 **Transmit key and the vehicle's CAN bus.** Transmit enable moved out of `DSP_CTRL[1]` into its own register `TX_KEY` (`0x38` in `kria_pl_link`, clocked on `pl_clk_100m`), requiring `24'h4B4559` (`"KEY"`) in `[31:8]` and full byte strobes; `DSP_CTRL[1]` is now a read-only reflection of `TX_KEY[0]`, owned only by R5F core 0 and tested by `tb_system.v` S7 (`-Mutate tx_key_from_dsp_ctrl`). In parallel, PS `CAN1` (`0xFF07_0000`, classic CAN 2.0 up to `1 Mbit/s`) was routed through EMIO to KV260 `J9` pins 6 and 8 (`can1_txn` on ball `G6`, `can1_rx` on ball `D6`, Bank 66 `LVCMOS12`) and an un-terminated `TCAN330DCNT` + mirror-safe dual-`MMBT3904` adapter circuit (`STATUS` sheet, `J1502` pins 6, 8, 10 and 6-way `J1503`; placed and routed, [LAYOUT §6.8](LAYOUT.md)). R5F core 1 polls `CAN1` in listen-only snoop mode by default (`kria-core::can`, `kria-r5f1`, `kria-vehicled --can`), so core 0 keeps live vehicle speed even without Linux, Wi-Fi or the phone ([INTEGRATIONS.md §2.2](INTEGRATIONS.md)).
+
+### 11.10 The RF and power audit (18 November 2026)
+
+Before the tag, a full RF and power audit of the board: [AUDIT_Rev08.md](AUDIT_Rev08.md). It found and fixed:
+
+- **One design gap in this plan's converter (section 5.6).** The UHF image filter is a low-pass, so everything in
+  the 100-170 MHz IF window (FM broadcast, airband, 2 m, marine VHF, PMR) reached the mixer and leaked through it onto
+  the UHF tuning.
+  - A 300 MHz high-pass now sits ahead of preselector B.
+  - IF rejection goes from 31-46 dB to 84-99 dB.
+  - The converter covers **300 MHz up**; 170-300 MHz is not covered.
+  - The rows of section 6 that start at 170 MHz now start at 300 MHz.
+- **Three ways to damage parts:**
+  - the CAN transceiver against a CAN wire shorted to the battery (now a TCAN3403-Q1, ±58 V);
+  - the Pmod back-powering whichever board is unpowered (now gated in the gateware of both FPGAs);
+  - the GPS PPS into an unpowered K26 (330 Ω).
+- **A power budget 0.3 A short at 12 V.** Fixed with:
+  - a 3 A buck for +3V3_D;
+  - +1V8_D and +1V0 trimmed for their drop;
+  - a 2 A PTC;
+  - a 2.8 V front-end rail.
 
 ## 12. Decisions (16 November 2026)
 

@@ -16,7 +16,7 @@ import schgen                                                     # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(HERE))
 ROOT_UUID = "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 PROJECT = "CSI2-KRIA-KV260_Rev01"
-RAILS = {"+3V0_RF": "power:VCC", "+3V3_D": "power:+3V3", "+5V0": "power:+5V", "+12V": "power:+12V",
+RAILS = {"+2V8_RF": "power:VCC", "+3V3_D": "power:+3V3", "+5V0": "power:+5V", "+12V": "power:+12V",
          "+1V8_D": "power:+1V8", "+1V0": "power:+1V0", "+3V3_USB": "power:+3V3", "VBUS_USB": "power:VBUS"}
 s = S = None
 FLAGGED, flagged = set(), set()

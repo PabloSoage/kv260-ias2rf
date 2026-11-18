@@ -5073,7 +5073,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Interface_CAN_LIN:TCAN330"
+		(symbol "kv260-ias2rf:TCAN3403DDFRQ1"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -5090,7 +5090,7 @@
 					(justify left)
 				)
 			)
-			(property "Value" "TCAN330"
+			(property "Value" "TCAN3403DDFRQ1"
 				(at 2.54 8.89 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -5101,7 +5101,7 @@
 					(justify left)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-23-8"
 				(at 0 -12.7 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -5113,7 +5113,7 @@
 					)
 				)
 			)
-			(property "Datasheet" "http://www.ti.com/lit/ds/symlink/tcan337.pdf"
+			(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tcan3404-q1.pdf"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -5124,7 +5124,7 @@
 					)
 				)
 			)
-			(property "Description" "High-Speed CAN Transceiver, 1Mbps, 3.3V supply, silent mode, shutdown mode, SOT-23-8/SOIC-8"
+			(property "Description" "CAN FD transceiver, 3.3 V, +-58 V bus fault protection, VIO 1.7-5.5 V, standby mode, SOT-23-8 (DDF)"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -5157,7 +5157,7 @@
 					)
 				)
 			)
-			(symbol "TCAN330_0_1"
+			(symbol "TCAN3403DDFRQ1_0_1"
 				(rectangle
 					(start -10.16 7.62)
 					(end 10.16 -7.62)
@@ -5170,7 +5170,7 @@
 					)
 				)
 			)
-			(symbol "TCAN330_1_1"
+			(symbol "TCAN3403DDFRQ1_1_1"
 				(pin input line
 					(at -12.7 5.08 0)
 					(length 2.54)
@@ -5243,10 +5243,10 @@
 						)
 					)
 				)
-				(pin input line
+				(pin power_in line
 					(at -12.7 -2.54 0)
 					(length 2.54)
-					(name "SHDN"
+					(name "VIO"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -5300,7 +5300,7 @@
 				(pin input line
 					(at -12.7 -5.08 0)
 					(length 2.54)
-					(name "S"
+					(name "STB"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -5598,12 +5598,6 @@
 			)
 			(embedded_fonts no)
 		)
-	)
-	(junction
-		(at 36.83 265.43)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "c5abfa51-ca2d-5802-90d3-db34201a1b71")
 	)
 	(junction
 		(at 53.34 50.8)
@@ -8243,46 +8237,6 @@
 	)
 	(wire
 		(pts
-			(xy 41.91 262.89) (xy 36.83 262.89)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b871a96f-383f-52c1-ad60-7ea5af6b582b")
-	)
-	(wire
-		(pts
-			(xy 41.91 265.43) (xy 36.83 265.43)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6938a90e-89f8-5fcb-8f93-01cd52dcec13")
-	)
-	(wire
-		(pts
-			(xy 36.83 262.89) (xy 36.83 265.43)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7f7ab6c6-0e7f-53bf-a120-55b731d5ee08")
-	)
-	(wire
-		(pts
-			(xy 36.83 265.43) (xy 36.83 267.97)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9b34a7d2-d6f2-513f-aa60-12562cdadd3a")
-	)
-	(wire
-		(pts
 			(xy 41.91 255.27) (xy 39.37 255.27)
 		)
 		(stroke
@@ -8323,6 +8277,16 @@
 	)
 	(wire
 		(pts
+			(xy 41.91 262.89) (xy 39.37 262.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e17567ae-8d98-5aec-ace0-b01c35894db9")
+	)
+	(wire
+		(pts
 			(xy 67.31 262.89) (xy 69.85 262.89)
 		)
 		(stroke
@@ -8340,6 +8304,16 @@
 			(type default)
 		)
 		(uuid "92aa5483-7886-58c8-a550-c540da4b1af4")
+	)
+	(wire
+		(pts
+			(xy 41.91 265.43) (xy 39.37 265.43)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4af6c6ba-5c51-58e4-9fcb-d0f7241fa9b1")
 	)
 	(wire
 		(pts
@@ -18491,7 +18465,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "220"
+		(property "Value" "330"
 			(at 618.49 148.59 0)
 			(effects
 				(font
@@ -18562,7 +18536,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "220"
+		(property "Value" "330"
 			(at 641.35 148.59 0)
 			(effects
 				(font
@@ -18614,7 +18588,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Interface_CAN_LIN:TCAN330")
+		(lib_id "kv260-ias2rf:TCAN3403DDFRQ1")
 		(at 54.61 260.35 0)
 		(unit 1)
 		(body_style 1)
@@ -18633,7 +18607,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TCAN330DCNT"
+		(property "Value" "TCAN3403DDFRQ1"
 			(at 44.45 283.21 0)
 			(effects
 				(font
@@ -18704,7 +18678,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 36.83 267.97 0)
+		(at 54.61 273.05 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -18714,7 +18688,7 @@
 		(dnp no)
 		(uuid "06d4fd5b-d9ab-566a-a13e-45fd88f42047")
 		(property "Reference" "#PWR2462"
-			(at 36.83 271.78 0)
+			(at 54.61 276.86 0)
 			(hide yes)
 			(effects
 				(font
@@ -18723,7 +18697,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 36.83 271.78 0)
+			(at 54.61 276.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18731,7 +18705,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 36.83 267.97 0)
+			(at 54.61 273.05 0)
 			(hide yes)
 			(effects
 				(font
@@ -18740,7 +18714,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 36.83 267.97 0)
+			(at 54.61 273.05 0)
 			(hide yes)
 			(effects
 				(font
@@ -18749,7 +18723,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 36.83 267.97 0)
+			(at 54.61 273.05 0)
 			(hide yes)
 			(effects
 				(font
@@ -18770,73 +18744,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 54.61 273.05 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "b60f7bea-c9fa-5c03-8838-878a8c0c430a")
-		(property "Reference" "#PWR2463"
-			(at 54.61 276.86 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 54.61 276.86 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 54.61 273.05 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 54.61 273.05 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 54.61 273.05 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "c9541f32-672a-5e36-bec4-23958310d6c4")
-		)
-		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
-				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2463")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:+3V3")
 		(at 54.61 247.65 0)
 		(unit 1)
@@ -18846,8 +18753,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "4f6b0929-3ebb-5c6a-acae-6bc1c59891cc")
-		(property "Reference" "#PWR2464"
+		(uuid "b60f7bea-c9fa-5c03-8838-878a8c0c430a")
+		(property "Reference" "#PWR2463"
 			(at 54.61 251.46 0)
 			(hide yes)
 			(effects
@@ -18892,12 +18799,147 @@
 			)
 		)
 		(pin "1"
+			(uuid "c9541f32-672a-5e36-bec4-23958310d6c4")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
+					(reference "#PWR2463")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 39.37 262.89 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "4f6b0929-3ebb-5c6a-acae-6bc1c59891cc")
+		(property "Reference" "#PWR2464"
+			(at 39.37 266.7 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3V3_D"
+			(at 39.37 259.08 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 39.37 262.89 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 39.37 262.89 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 39.37 262.89 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
 			(uuid "8104cf45-cd89-59d8-8625-180f80b0f2cc")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
 					(reference "#PWR2464")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 39.37 265.43 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "b2be494c-4ead-5965-b6d8-0aa32ceb51ad")
+		(property "Reference" "#PWR2465"
+			(at 39.37 269.24 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 39.37 269.24 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 39.37 265.43 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 39.37 265.43 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 39.37 265.43 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5e98592d-8c77-5293-b9b5-293dd7fd4351")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
+					(reference "#PWR2465")
 					(unit 1)
 				)
 			)
@@ -18987,8 +19029,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "b2be494c-4ead-5965-b6d8-0aa32ceb51ad")
-		(property "Reference" "#PWR2465"
+		(uuid "67e6ccb3-4373-514a-a715-5fd037e0866f")
+		(property "Reference" "#PWR2466"
 			(at 124.46 266.7 0)
 			(hide yes)
 			(effects
@@ -19033,12 +19075,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5e98592d-8c77-5293-b9b5-293dd7fd4351")
+			(uuid "b8dd2c92-2af0-5425-972a-0de287c699d6")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2465")
+					(reference "#PWR2466")
 					(unit 1)
 				)
 			)
@@ -19128,8 +19170,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "67e6ccb3-4373-514a-a715-5fd037e0866f")
-		(property "Reference" "#PWR2466"
+		(uuid "bc3b86c9-2212-58d8-b521-e7e7f628c46e")
+		(property "Reference" "#PWR2467"
 			(at 181.61 266.7 0)
 			(hide yes)
 			(effects
@@ -19174,12 +19216,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b8dd2c92-2af0-5425-972a-0de287c699d6")
+			(uuid "8588c6e9-a48d-587b-baa2-392bd941a62c")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2466")
+					(reference "#PWR2467")
 					(unit 1)
 				)
 			)
@@ -19269,8 +19311,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "bc3b86c9-2212-58d8-b521-e7e7f628c46e")
-		(property "Reference" "#PWR2467"
+		(uuid "9e42b2bd-5701-502f-97b8-bdf2c811cf89")
+		(property "Reference" "#PWR2468"
 			(at 232.41 266.7 0)
 			(hide yes)
 			(effects
@@ -19315,12 +19357,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8588c6e9-a48d-587b-baa2-392bd941a62c")
+			(uuid "ec5bf7c5-d5ee-5134-a13c-808bd261348a")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2467")
+					(reference "#PWR2468")
 					(unit 1)
 				)
 			)
@@ -19549,8 +19591,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "9e42b2bd-5701-502f-97b8-bdf2c811cf89")
-		(property "Reference" "#PWR2468"
+		(uuid "8b277d96-d500-57b6-aa51-6a4ea2bd11e1")
+		(property "Reference" "#PWR2469"
 			(at 73.66 308.61 0)
 			(hide yes)
 			(effects
@@ -19595,12 +19637,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ec5bf7c5-d5ee-5134-a13c-808bd261348a")
+			(uuid "075f6249-03da-5e75-bbda-58718e656794")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2468")
+					(reference "#PWR2469")
 					(unit 1)
 				)
 			)
@@ -19687,8 +19729,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "8b277d96-d500-57b6-aa51-6a4ea2bd11e1")
-		(property "Reference" "#PWR2469"
+		(uuid "00392d17-d7fb-5924-8305-ddc08409e660")
+		(property "Reference" "#PWR2470"
 			(at 96.52 308.61 0)
 			(hide yes)
 			(effects
@@ -19733,12 +19775,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "075f6249-03da-5e75-bbda-58718e656794")
+			(uuid "037b070f-ad5b-540d-a24c-f0455cd209b0")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2469")
+					(reference "#PWR2470")
 					(unit 1)
 				)
 			)
@@ -19825,8 +19867,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "00392d17-d7fb-5924-8305-ddc08409e660")
-		(property "Reference" "#PWR2470"
+		(uuid "0eb64886-aee0-5ac9-ad54-63e85633995a")
+		(property "Reference" "#PWR2471"
 			(at 119.38 295.91 0)
 			(hide yes)
 			(effects
@@ -19871,12 +19913,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "037b070f-ad5b-540d-a24c-f0455cd209b0")
+			(uuid "59c32ca9-b5bf-5529-82a3-1d558dc8f00c")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2470")
+					(reference "#PWR2471")
 					(unit 1)
 				)
 			)
@@ -20034,8 +20076,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "0eb64886-aee0-5ac9-ad54-63e85633995a")
-		(property "Reference" "#PWR2471"
+		(uuid "130ce56d-e78a-53cf-a424-64f01979d0c5")
+		(property "Reference" "#PWR2472"
 			(at 165.1 308.61 0)
 			(hide yes)
 			(effects
@@ -20080,12 +20122,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "59c32ca9-b5bf-5529-82a3-1d558dc8f00c")
+			(uuid "16498560-9ee2-5e0d-9a4b-366b29d729b1")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2471")
+					(reference "#PWR2472")
 					(unit 1)
 				)
 			)
@@ -20172,8 +20214,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "130ce56d-e78a-53cf-a424-64f01979d0c5")
-		(property "Reference" "#PWR2472"
+		(uuid "6a45f961-5618-5173-847c-ad0ee3593406")
+		(property "Reference" "#PWR2473"
 			(at 187.96 295.91 0)
 			(hide yes)
 			(effects
@@ -20218,12 +20260,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "16498560-9ee2-5e0d-9a4b-366b29d729b1")
+			(uuid "31400daf-8f20-55e8-bb57-f37b2c87097e")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2472")
+					(reference "#PWR2473")
 					(unit 1)
 				)
 			)
@@ -20239,8 +20281,8 @@
 		(on_board no)
 		(in_pos_files no)
 		(dnp no)
-		(uuid "6a45f961-5618-5173-847c-ad0ee3593406")
-		(property "Reference" "#PWR2473"
+		(uuid "2a83210f-df8f-5731-9a61-d1b4dd94b0a8")
+		(property "Reference" "#PWR2474"
 			(at 187.96 308.61 0)
 			(hide yes)
 			(effects
@@ -20285,12 +20327,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "31400daf-8f20-55e8-bb57-f37b2c87097e")
+			(uuid "0e440577-c6ad-547e-9b4d-a00ac0b8d7eb")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/b9a2f118-1044-5470-8ad4-47f9640e7c61"
-					(reference "#PWR2473")
+					(reference "#PWR2474")
 					(unit 1)
 				)
 			)

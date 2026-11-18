@@ -130,11 +130,11 @@ LOADS = [
 
     # ---- Rev08 (docs/REV08_PLAN.md sections 3 and 9) ---------------------
     # The VHF/UHF front end on its own 3.0 V rail (LP5907 from +3V3_D, 250 mA).
-    ("+3V0_FE", "RFFC5072 mixer and synthesiser", 3.0, 125, "E",
+    ("+2V8_RF", "RFFC5072 mixer and synthesiser", 2.8, 125, "E",
      "REV08_PLAN section 9: 125 mA with the PLL and the mixer on"),
-    ("+3V0_FE", "SPF5043Z LNA and IF amplifier, x2", 3.0, 50, "E",
+    ("+2V8_RF", "SPF5043Z LNA and IF amplifier, x2", 2.8, 50, "E",
      "REV08_PLAN section 9: 25 mA each at the bias the front end uses"),
-    ("+3V0_FE", "Preselector and bypass switches, attenuator, rest", 3.0, 5, "E",
+    ("+2V8_RF", "Preselector and bypass switches, attenuator, rest", 2.8, 5, "E",
      "PE4259 x4, PE42442 x2, SKY13418 x2, PE4312: tens of uA each; 5 mA "
      "allowed for the bias networks"),
     ("+3V3_D", "Status LEDs and TCA6416A expanders, x2", 3.3, 15, "E",
@@ -148,8 +148,8 @@ LOADS = [
      "REV08_PLAN 3.1: +1V0 is below an LED's forward voltage"),
     ("+3V3_D", "GPS receiver on J1503 (module and active antenna; the PTC holds 200 mA)", 3.3, 60, "E",
      "u-blox NEO-M9N about 32 mA plus an active antenna about 20 mA; INTEGRATIONS 2.1 (18 Nov)"),
-    ("+3V3_D", "GPS PPS buffer SN74LVC1G17 and its two 220 ohm outputs (one into a J9 ground)", 3.3, 2, "E",
-     "15 mA while the pulse is high, 10 % duty: 1.5 mA mean"),
+    ("+3V3_D", "GPS PPS buffer SN74LVC1G17 and its two 330 ohm outputs (one into a J9 ground)", 3.3, 1, "E",
+     "10 mA while the pulse is high, 10 % duty: 1 mA mean"),
     # 18 Nov 2026 audit: loads that existed on the board but were missing from this table.
     ("+3V3_D", "RTL8211FSI Ethernet PHY, 1000BASE-T linked (internal 1.0 V switcher)", 3.3, 152, "E",
      "0.5 W, the figure the thermal model and ENCLOSURE_V2_THERMAL use for U1201 (13 Nov), at 3.3 V"),
@@ -175,22 +175,22 @@ LOADS = [
 # dissipates 0.17 W. +1V2 is a resistor divider (a "ldo" here: same sums).
 TREE = {
     "+5V0":   ("+12V",   "buck", 0.90),   # LMR33630
-    "+3V3_D": ("+5V0",   "buck", 0.90),   # TPS562201
+    "+3V3_D": ("+5V0",   "buck", 0.90),   # TPS563201, 3 A (a 2 A TPS562201 until the Rev08 audit, P5)
     "+3V3_A": ("+5V0",   "ldo",  None),   # TPS7A8300
     "+2V5":   ("+5V0",   "buck", 0.88),   # TPS562201; FPGA LVDS banks + feeds +1V8_A
     "+1V8_A": ("+2V5",   "ldo",  None),   # TPS7A8300
-    "+1V8_D": ("+3V3_D", "ldo",  None),   # TPS7A8300
+    "+1V8_D": ("+3V3_D", "ldo",  None),   # TPS7A8300 at 1.85 V since the Rev08 audit (P4)
     "+1V2":   ("+2V5",   "ldo",  None),   # divider
     "+1V0":   ("+5V0",   "buck", 0.88),
     # Charge-pump inverter. Reinstated after B-03 was reopened: the RF switches
     # need VEE = -3.3 V. A few milliamps, so a small pump is plenty.
     "-3V3":   ("+3V3_D", "pump", 0.80),
-    "+3V0_FE": ("+3V3_D", "ldo",  None),  # LP5907MFX-3.0 (Rev08 front end)
+    "+2V8_RF": ("+3V3_D", "ldo",  None),  # LP5907MFX-2.8 (Rev08 front end; 3.0 V until the audit, P8)
 }
 
 VOLTS = {"+12V": 12.0, "+5V0": 5.0, "+3V6": 3.6, "+3V3_D": 3.3, "+3V3_A": 3.3,
-         "+2V5": 2.5, "+1V8_A": 1.8, "+1V8_D": 1.8, "+1V2": 1.2, "+1V0": 1.0,
-         "-3V3": -3.3, "+3V0_FE": 3.0}
+         "+2V5": 2.5, "+1V8_A": 1.85, "+1V8_D": 1.85, "+1V2": 1.2, "+1V0": 1.017,
+         "-3V3": -3.3, "+2V8_RF": 2.8}
 
 MARGIN = 1.30          # design margin on every rail
 
@@ -214,7 +214,7 @@ def main():
         print()
 
     # Propagate loads up the tree, innermost first.
-    order = ["-3V3", "+3V0_FE", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A",
+    order = ["-3V3", "+2V8_RF", "+1V2", "+1V8_D", "+1V8_A", "+2V5", "+1V0", "+3V3_A",
              "+3V3_D", "+5V0", "+12V"]
     load = {r: direct.get(r, 0) for r in VOLTS}
     diss = {}
@@ -253,10 +253,10 @@ def main():
         need = i * MARGIN / 1000.0
         warn = ""
         if kind == "ldo" and d > 0.8:
-            warn = "  <-- too hot for an LDO, use a buck"
+            warn = "  <-- hot for an LDO: its junction is checked in the CFD"
         elif kind == "ldo" and d > 0.4:
             warn = "  <-- needs a thermal pad"
-        print(f"  {rail:8s} {VOLTS[rail]:5.1f}V {i:7.0f}mA {kind:>6s} {src:>8s} "
+        print(f"  {rail:8s} {VOLTS[rail]:5.2f}V {i:7.0f}mA {kind:>6s} {src:>8s} "
               f"{d:7.2f}W   >= {need:.2f} A{warn}")
 
     print()

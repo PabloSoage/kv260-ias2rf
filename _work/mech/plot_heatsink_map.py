@@ -36,7 +36,7 @@ def annotate_render():
         ("HS2_U401",  (0.03, 0.84), "HS2: U401 (ADCLK948 Fanout, 0.95 W)\n9 × 7 × 8 mm (-1 mm Y Shift)", "#60A5FA"),
         ("GAP_4MM",   (0.27, 0.90), "4.0 mm Thermal Isolation Air Gap\n(Prevents U401 Heat Transfer to Y401)", "#38BDF8"),
         ("HS3_Y401",  (0.55, 0.87), "HS3: Y401 (Si549 VCXO, 0.50 W)\n9 × 7 × 8 mm (+1 mm Y Shift, Tj ≤ 125 °C)", "#60A5FA"),
-        ("HS4_U1101", (0.27, 0.11), "HS4: U1101 (XC7A50T FPGA, 0.73 W typ)\n14 × 14 × 5 mm Optional Low-Profile Cu/Al", "#F59E0B"),
+        ("HS4_U1101", (0.27, 0.11), "HS4: U1101 (XC7A50T FPGA, 1.20 W typ, Vivado)\n14 × 14 × 5 mm Optional Low-Profile Cu/Al", "#F59E0B"),
         ("FAN_50MM",  (0.51, 0.11), "Enclosure v2 Fan Envelope (Wireframe)\n50 × 50 × 15 mm OD5015 @ (-40, +14) mm, z=13.75 mm", "#22D3EE"),
         ("HS5_K26",   (0.74, 0.12), "HS5: K26 SOM OEM Heatsink + Fan\n68 × 58 × 18 mm (9.0 W PS+PL Budget)", "#CBD5E1"),
     ]

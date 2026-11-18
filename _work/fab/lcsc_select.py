@@ -119,7 +119,7 @@ RULES = {
     ("LM74502-Q1", "SOT-23-8"): ("P", "LM74502QDDFRQ1", r"^LM74502QDDFRQ1"),
     ("100n 100V", "C_0603_1608Metric"): ("C", "100n", "0603", 100, XR),
     ("green", "LED_0603_1608Metric"): ("P", "KT-0603G", r"^KT-0603G$"),
-    ("PTC 1.5A hold", "Fuse_1812_4532Metric"): ("P", "1812 PTC 1.5A", r"(150|1\.5)"),
+    ("PTC 2A hold", "Fuse_1812_4532Metric"): ("P", "mSMD200-24V", r"^mSMD200-24V$"),     # Rev08 audit P3: 1.32 A at 70 C
     ("PTC 0.5A hold", "Fuse_1206_3216Metric"): ("P", "SMD1206P050TF", r"^(SMD1206P050|1206L050|BSMD1206-050)"),
     ("FAN 5V", "JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical"): ("P", "B2B-PH-K-S", r"^B2B-PH-K-S"),
     # FB401 was "600R@100MHz >=1A" until 14 Nov; it now shares the 220R@100MHz line (2 A, 0.1 ohm)
@@ -148,6 +148,7 @@ RULES = {
     ("M3SWA2-34DR+", "MiniCircuits_DQ3005"): ("P", "M3SWA2-34DR+", r"^M3SWA2-34DR"),
     ("LMR33630ADDA", "Texas_HSOP-8-1EP_3.9x4.9mm_P1.27mm"): ("P", "LMR33630ADDA", r"^LMR33630ADDA"),
     ("TPS562201", "SOT-23-6"): ("P", "TPS562201", r"^TPS562201DDC"),
+    ("TPS563201", "SOT-23-6"): ("P", "TPS563201", r"^TPS563201DDC"),            # Rev08 audit P5: U1002, 3 A
     ("TPS7A8300RGR", "QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm"): ("P", "TPS7A8300RGR", r"^TPS7A8300RGR"),
     ("LM2663M", "SOIC-8_3.9x4.9mm_P1.27mm"): ("P", "LM2663M", r"^LM2663MX?/NOPB"),
     ("XC7A50T-2FTG256I", "Xilinx_FTG256"): ("P", "XC7A50T-2FTG256I", r"^XC7A50T-2FTG256I"),
@@ -166,6 +167,7 @@ RULES = {
     # The filters' inductors are Murata LQW wirewounds, 2 % (Q 40-45, what rev08_filters_mc.py assumed).
     ("16n", "L_0402_1005Metric"): ("P", "LQW15AN16NG", r"^LQW15AN16NG"),
     ("22n", "L_0402_1005Metric"): ("P", "LQW15AN22NG", r"^LQW15AN22NG"),
+    ("24n", "L_0402_1005Metric"): ("P", "LQW15AN24NG", r"^LQW15AN24NG"),         # Rev08 audit R1: L1441
     ("27n", "L_0402_1005Metric"): ("P", "LQW15AN27NG", r"^LQW15AN27NG"),
     ("56n", "L_0402_1005Metric"): ("P", "LQW15AN56NG", r"^LQW15AN56NG"),
     ("62n", "L_0402_1005Metric"): ("P", "LQW15AN62NG", r"^LQW15AN62NG"),
@@ -193,7 +195,7 @@ RULES = {
     ("26MHz 1XXD26000MAA", "OSC-SMD_4P-L2.0-W1.6-BL"): ("P", "1XXD26000MAA", r"^1XXD26000MAA"),
     ("TCA6416ARTWR", "WQFN-24_L4.0-W4.0-P0.50-TL-EP2.5"): ("P", "TCA6416ARTWR", r"^TCA6416ARTWR"),
     ("AP22652W6-7", "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BL"): ("P", "AP22652W6-7", r"^AP22652W6-7"),
-    ("LP5907MFX-3.0", "SOT-23-5"): ("P", "LP5907MFX-3.0", r"^LP5907MFX-3\.0"),
+    ("LP5907MFX-2.8", "SOT-23-5"): ("P", "LP5907MFX-2.8", r"^LP5907MFX-2\.8/NOPB$"),   # Rev08 audit P8
     ("LP5907MFX-3.3", "SOT-23-5"): ("P", "LP5907MFX-3.3", r"^LP5907MFX-3\.3"),
     ("BM20B(0.8)-34DS-0.4V(51)", "CONN-SMD_34P-P0.40_BM20B-0.8-34DS-0.4V-51"): (
         "P", "BM20B(0.8)-34DS-0.4V", r"^BM20B\(0\.8\)-34DS-0\.4V"),
@@ -209,7 +211,7 @@ RULES = {
         "P", "SM06B-SRSS-TB", r"^SM06B-SRSS-TB\(LF\)\(SN\)$"),
     ("BM06B-SRSS-TB", "JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical"): (
         "P", "BM06B-SRSS-TB", r"^BM06B-SRSS-TB\(LF\)\(SN\)$"),
-    ("TCAN330DCNT", "SOT-23-8"): ("P", "TCAN330DCNT", r"^TCAN330DCN[TR]$"),
+    ("TCAN3403DDFRQ1", "SOT-23-8"): ("P", "TCAN3403DDFRQ1", r"^TCAN3403DDFRQ1$"),   # Rev08 audit P1: +-58 V bus
     ("PESD1CAN", "SOT-23"): ("P", "PESD1CAN", r"^PESD1CAN(,215|-U)?$"),
     ("PTC 0.2A hold", "Fuse_0805_2012Metric"): ("P", "JK-SMD0805-020", r"^JK-SMD0805-020"),
     ("CH340X", "MSOP-10_L3.0-W3.0-P0.50-LS5.0-BL"): ("P", "CH340X", r"^CH340X$"),

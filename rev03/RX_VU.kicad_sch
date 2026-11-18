@@ -633,6 +633,171 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:FerriteBead"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "FB"
+				(at -3.81 0.635 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "FerriteBead"
+				(at 3.81 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Ferrite bead"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "L ferrite bead inductor filter"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Inductor_* L_* *Ferrite*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "FerriteBead_0_1"
+				(polyline
+					(pts
+						(xy -2.7686 0.4064) (xy -1.7018 2.2606) (xy 2.7686 -0.3048) (xy 1.6764 -2.159) (xy -2.7686 0.4064)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.27) (xy 0 1.2954)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -1.27) (xy 0 -1.2192)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "FerriteBead_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.54)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:L"
 			(pin_numbers
 				(hide yes)
@@ -2156,7 +2321,7 @@
 				)
 			)
 		)
-		(symbol "Regulator_Linear:LP5907MFX-3.0"
+		(symbol "Regulator_Linear:LP5907MFX-2.8"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -2172,7 +2337,7 @@
 					)
 				)
 			)
-			(property "Value" "LP5907MFX-3.0"
+			(property "Value" "LP5907MFX-2.8"
 				(at 6.35 6.35 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2204,7 +2369,7 @@
 					)
 				)
 			)
-			(property "Description" "250-mA Ultra-Low-Noise Low-IQ LDO, 3.0V, SOT-23"
+			(property "Description" "250-mA Ultra-Low-Noise Low-IQ LDO, 2.8V, SOT-23"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2237,7 +2402,7 @@
 					)
 				)
 			)
-			(symbol "LP5907MFX-3.0_0_1"
+			(symbol "LP5907MFX-2.8_0_1"
 				(rectangle
 					(start -5.08 -5.08)
 					(end 5.08 5.08)
@@ -2333,171 +2498,6 @@
 						)
 					)
 					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Device:FerriteBead"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "FB"
-				(at -3.81 0.635 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "FerriteBead"
-				(at 3.81 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at -1.778 0 90)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Ferrite bead"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "L ferrite bead inductor filter"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Inductor_* L_* *Ferrite*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "FerriteBead_0_1"
-				(polyline
-					(pts
-						(xy -2.7686 0.4064) (xy -1.7018 2.2606) (xy 2.7686 -0.3048) (xy 1.6764 -2.159) (xy -2.7686 0.4064)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 1.27) (xy 0 1.2954)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 -1.27) (xy 0 -1.2192)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "FerriteBead_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 2.54)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -4368,6 +4368,12 @@
 		(uuid "9d053be5-8974-59e5-9786-903e35e0f124")
 	)
 	(junction
+		(at 447.04 497.84)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8b035722-c07f-5678-ad8d-219ecacec2a9")
+	)
+	(junction
 		(at 459.74 312.42)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4396,6 +4402,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "91772c35-1a2a-5312-8ac6-2b4315e89e1d")
+	)
+	(junction
+		(at 477.52 497.84)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c46b2a61-c1d2-591a-8e47-7262be4a84db")
 	)
 	(junction
 		(at 483.87 184.15)
@@ -10055,6 +10067,136 @@
 		)
 		(uuid "4aebfe0b-5437-5ec3-9e3f-c4c7fbd3cafd")
 	)
+	(wire
+		(pts
+			(xy 426.72 497.84) (xy 430.53 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4d83b90c-d1ea-50bd-ae49-5bd440b26375")
+	)
+	(wire
+		(pts
+			(xy 438.15 497.84) (xy 441.96 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0dccca48-656d-5a98-b460-5e441dbfc06e")
+	)
+	(wire
+		(pts
+			(xy 441.96 497.84) (xy 447.04 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c787a58f-4f24-5718-9b48-d64b367e0b36")
+	)
+	(wire
+		(pts
+			(xy 447.04 513.08) (xy 447.04 515.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "17c74567-add1-5c59-b127-9337e9d17c73")
+	)
+	(wire
+		(pts
+			(xy 447.04 497.84) (xy 457.2 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ff86f927-71c7-54cc-a1b1-198981b12dbb")
+	)
+	(wire
+		(pts
+			(xy 457.2 497.84) (xy 461.01 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e2fb3e74-23d2-5dbc-9960-2c13df1d4111")
+	)
+	(wire
+		(pts
+			(xy 468.63 497.84) (xy 472.44 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b59d8c8f-611e-5f84-8f2d-c82d2d7f2cdb")
+	)
+	(wire
+		(pts
+			(xy 472.44 497.84) (xy 477.52 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c2305a7-07b5-58d0-a8e6-ce3d89b44256")
+	)
+	(wire
+		(pts
+			(xy 477.52 513.08) (xy 477.52 515.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bfaafb19-bf15-5891-b090-134895d9f098")
+	)
+	(wire
+		(pts
+			(xy 477.52 497.84) (xy 487.68 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "33682c5b-124a-5099-a25f-02665bc2c116")
+	)
+	(wire
+		(pts
+			(xy 487.68 497.84) (xy 491.49 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a1a7b671-481b-5cb4-9438-1a49450a39dd")
+	)
+	(wire
+		(pts
+			(xy 499.11 497.84) (xy 502.92 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c425403b-8413-5a2e-b7a8-d8e3b078e414")
+	)
+	(wire
+		(pts
+			(xy 502.92 497.84) (xy 508 497.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1a764894-bcf4-5c43-8023-fe6243486759")
+	)
 	(label "VU_ANT"
 		(at 49.53 53.34 180)
 		(effects
@@ -10807,7 +10949,7 @@
 		)
 		(uuid "428051fe-fd32-5613-897e-338d3b8911a6")
 	)
-	(label "VU_PSB_IN"
+	(label "VU_PSB_HP"
 		(at 255.27 185.42 180)
 		(effects
 			(font
@@ -10815,7 +10957,7 @@
 			)
 			(justify right)
 		)
-		(uuid "0e12e94f-72a1-5855-81bf-7bacb33bfdde")
+		(uuid "815eda12-a5f1-54eb-8f1b-8569f1428c46")
 	)
 	(label "VU_PSB_V1"
 		(at 255.27 190.5 180)
@@ -11938,6 +12080,26 @@
 		)
 		(uuid "35fa4a06-1d2e-5aa8-9317-dbf67116f99f")
 	)
+	(label "VU_PSB_IN"
+		(at 426.72 497.84 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "98ed18e4-f052-57b6-8ab6-c42ab28f6cc5")
+	)
+	(label "VU_PSB_HP"
+		(at 508 497.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d5e5b412-f57e-5d1d-af9a-de05a3b82061")
+	)
 	(text "FM-reject high-pass, 9th order, 118-170 MHz pass, >= 40 dB at 87-108 MHz"
 		(exclude_from_sim no)
 		(at 30.48 480.06 0)
@@ -11982,6 +12144,17 @@
 		)
 		(uuid "e56de944-0ba2-5a67-ba32-f7ca10205fdf")
 	)
+	(text "Preselector B high-pass, 5th-order elliptic, pass from 300 MHz, >= 50 dB below 175 MHz"
+		(exclude_from_sim no)
+		(at 406.4 480.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8e113bfb-5faa-5c6d-a819-df68e8836da4")
+	)
 	(text "RX_VU - how this sheet works (REV08_PLAN section 5; RX_VU_SPEC)"
 		(exclude_from_sim no)
 		(at 529.59 485.14 0)
@@ -12015,7 +12188,7 @@
 		)
 		(uuid "b65a8d70-7979-5df4-be9c-d005196196a7")
 	)
-	(text "3. Preselector B (U1306/U1307, V1V2V3): 000 UHF low-pass 480 MHz, 001 SAW 1090 MHz, 010 HPF 1 GHz, 011 LPF 1 GHz, 1xx spare."
+	(text "3. Preselector B (U1306/U1307, V1V2V3), behind the 300 MHz high-pass C1441-C1445: 000 UHF low-pass 480 MHz, 001 SAW 1090 MHz, 010 HPF 1 GHz, 011 LPF 1 GHz, 1xx spare."
 		(exclude_from_sim no)
 		(at 529.59 497.84 0)
 		(effects
@@ -12024,7 +12197,7 @@
 			)
 			(justify left)
 		)
-		(uuid "6afc43a7-e308-5b8d-b244-2e7ad0d0838b")
+		(uuid "b41d7189-dd35-52a3-a2ee-410661611465")
 	)
 	(text "4. Converter bypass (U1308/U1309): CTRL high = through the RFFC5072 (LO 85-4200 MHz, IF 135 MHz), low = direct 30-170 MHz."
 		(exclude_from_sim no)
@@ -12081,7 +12254,7 @@
 		)
 		(uuid "83f06054-ac6e-57f6-868b-784225f3734c")
 	)
-	(text "7. +3V0_RF: U1315 LP5907-3.0 from +3V3_D through FB1301, 180 mA budgeted of 250. The mixer's current flows through T1302's"
+	(text "7. +2V8_RF: U1315 LP5907-2.8 from +3V3_D through FB1301, 180 mA budgeted of 250. The mixer's current flows through T1302's"
 		(exclude_from_sim no)
 		(at 529.59 524.51 0)
 		(effects
@@ -12090,7 +12263,7 @@
 			)
 			(justify left)
 		)
-		(uuid "e5294c7f-0cb1-5415-a24a-ce181ff0c208")
+		(uuid "e28b39b4-aa09-5dac-8fa5-7159c77e5f86")
 	)
 	(text "   centre tap: program MIX2_IDD <= 3 (TC4-1W+ rated 30 mA DC)."
 		(exclude_from_sim no)
@@ -12461,7 +12634,7 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(uuid "f3db2bae-b6b8-5b8e-a5d9-1df171230b48")
+		(uuid "d5755390-4ea0-52b2-a2c6-b130019e337b")
 		(property "Reference" "FB1302"
 			(at 63.5 85.09 0)
 			(effects
@@ -12508,10 +12681,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "8bcbc67e-231e-58c4-8570-73c8e1bd92f3")
+			(uuid "9628cda8-a40b-5f32-ae03-6e803f8cb734")
 		)
 		(pin "2"
-			(uuid "9224e7ee-c535-5ad0-a362-4e6ff03e531b")
+			(uuid "17072a96-11ca-5a52-a403-648d28dd2d5f")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
@@ -13386,7 +13559,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 201.93 90.17 0)
 			(effects
 				(font
@@ -13524,7 +13697,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 224.79 90.17 0)
 			(effects
 				(font
@@ -13812,7 +13985,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 317.5 46.99 0)
 			(effects
 				(font
@@ -14017,7 +14190,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 293.37 99.06 0)
 			(effects
 				(font
@@ -14508,7 +14681,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 415.29 85.09 0)
 			(effects
 				(font
@@ -14565,7 +14738,7 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(uuid "6ef86419-51b3-5eb2-9068-8279f29d210b")
+		(uuid "58834840-4f36-5fc0-84b5-2b013376737d")
 		(property "Reference" "FB1304"
 			(at 440.69 93.98 0)
 			(effects
@@ -14612,10 +14785,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "f8a313ec-208f-50f9-900b-57d969802ad7")
+			(uuid "7c8e2d09-222a-5e16-9b82-d809e718c395")
 		)
 		(pin "2"
-			(uuid "9af023a4-0b9e-5478-aff4-17777d95109b")
+			(uuid "1b2889da-8fa2-58f5-8c86-cd24d624fee5")
 		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
@@ -14717,7 +14890,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 461.01 85.09 0)
 			(effects
 				(font
@@ -15072,7 +15245,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 544.83 46.99 0)
 			(effects
 				(font
@@ -15277,7 +15450,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 519.43 99.06 0)
 			(effects
 				(font
@@ -15753,7 +15926,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 622.3 46.99 0)
 			(effects
 				(font
@@ -16234,7 +16407,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 642.62 127 0)
 			(effects
 				(font
@@ -16349,7 +16522,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Regulator_Linear:LP5907MFX-3.0")
+		(lib_id "Regulator_Linear:LP5907MFX-2.8")
 		(at 699.77 55.88 0)
 		(unit 1)
 		(body_style 1)
@@ -16368,7 +16541,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "LP5907MFX-3.0"
+		(property "Value" "LP5907MFX-2.8"
 			(at 694.69 76.2 0)
 			(effects
 				(font
@@ -16583,7 +16756,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 709.93 49.53 90)
 			(effects
 				(font
@@ -16997,7 +17170,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 701.04 81.28 0)
 			(effects
 				(font
@@ -17202,7 +17375,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 723.9 81.28 0)
 			(effects
 				(font
@@ -17610,7 +17783,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 74.93 167.64 0)
 			(effects
 				(font
@@ -17748,7 +17921,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 38.1 227.33 0)
 			(effects
 				(font
@@ -18156,7 +18329,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 177.8 167.64 0)
 			(effects
 				(font
@@ -18294,7 +18467,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 140.97 227.33 0)
 			(effects
 				(font
@@ -18538,7 +18711,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 267.97 167.64 0)
 			(effects
 				(font
@@ -18743,7 +18916,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 242.57 232.41 0)
 			(effects
 				(font
@@ -19425,7 +19598,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 560.07 167.64 0)
 			(effects
 				(font
@@ -19630,7 +19803,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 535.94 232.41 0)
 			(effects
 				(font
@@ -19847,7 +20020,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 637.54 167.64 0)
 			(effects
 				(font
@@ -20132,7 +20305,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 613.41 219.71 0)
 			(effects
 				(font
@@ -20639,7 +20812,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 69.85 274.32 0)
 			(effects
 				(font
@@ -21133,7 +21306,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 217.17 295.91 0)
 			(effects
 				(font
@@ -21271,7 +21444,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 38.1 367.03 0)
 			(effects
 				(font
@@ -21756,7 +21929,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 129.54 367.03 0)
 			(effects
 				(font
@@ -22103,7 +22276,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 198.12 367.03 0)
 			(effects
 				(font
@@ -22379,7 +22552,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 38.1 392.43 0)
 			(effects
 				(font
@@ -22517,7 +22690,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 60.96 392.43 0)
 			(effects
 				(font
@@ -24114,7 +24287,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 175.26 417.83 0)
 			(effects
 				(font
@@ -24319,7 +24492,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 198.12 417.83 0)
 			(effects
 				(font
@@ -24524,7 +24697,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 220.98 417.83 0)
 			(effects
 				(font
@@ -24729,7 +24902,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 38.1 443.23 0)
 			(effects
 				(font
@@ -24934,7 +25107,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 60.96 443.23 0)
 			(effects
 				(font
@@ -25139,7 +25312,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 83.82 443.23 0)
 			(effects
 				(font
@@ -25356,7 +25529,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 293.37 274.32 0)
 			(effects
 				(font
@@ -25561,7 +25734,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 269.24 326.39 0)
 			(effects
 				(font
@@ -25981,7 +26154,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 369.57 312.42 0)
 			(effects
 				(font
@@ -26119,7 +26292,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 392.43 312.42 0)
 			(effects
 				(font
@@ -26519,7 +26692,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 476.25 274.32 0)
 			(effects
 				(font
@@ -26653,7 +26826,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 490.22 290.83 0)
 			(effects
 				(font
@@ -26720,7 +26893,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 462.28 300.99 90)
 			(effects
 				(font
@@ -26929,7 +27102,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 473.71 344.17 0)
 			(effects
 				(font
@@ -27134,7 +27307,7 @@
 				)
 			)
 		)
-		(property "Value" "+3V0_RF"
+		(property "Value" "+2V8_RF"
 			(at 496.57 344.17 0)
 			(effects
 				(font
@@ -31046,6 +31219,631 @@
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
 					(reference "#PWR2136")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 434.34 497.84 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "aa20b287-3a61-568b-ab58-9da63bd707a4")
+		(property "Reference" "C1441"
+			(at 434.34 494.03 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "11p"
+			(at 434.34 501.65 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 434.34 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 434.34 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 434.34 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "36ce5c09-0ee1-5fd0-9dd6-1abf6c48ad8d")
+		)
+		(pin "2"
+			(uuid "434cef81-bc1e-52c0-b26c-e2ce53ed69a4")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "C1441")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:L")
+		(at 447.04 501.65 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "41433ecd-2a84-5f32-a16b-2f83f1c4e150")
+		(property "Reference" "L1441"
+			(at 449.58 500.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "24n"
+			(at 449.58 502.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Inductor_SMD:L_0402_1005Metric"
+			(at 447.04 501.65 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 447.04 501.65 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 447.04 501.65 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a558f77f-599b-58f6-a87c-f62ce7f757b1")
+		)
+		(pin "2"
+			(uuid "90f9e22e-06c3-5c34-b8e6-acdba1e4af01")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "L1441")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 447.04 509.27 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a38b4dc6-068d-56e5-a666-9953fb869c4e")
+		(property "Reference" "C1442"
+			(at 449.58 508 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "36p"
+			(at 449.58 510.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 447.04 509.27 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 447.04 509.27 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 447.04 509.27 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d178451d-27fc-55d3-bdae-b28595c70646")
+		)
+		(pin "2"
+			(uuid "177e197c-568a-5b99-8e32-39231ca40bf1")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "C1442")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 447.04 515.62 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "dccb50c9-c644-5954-bed1-c631a7291c84")
+		(property "Reference" "#PWR2137"
+			(at 447.04 519.43 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 447.04 519.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 447.04 515.62 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 447.04 515.62 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 447.04 515.62 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ee460e35-593f-57ae-98cf-ad34719ab17b")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "#PWR2137")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 464.82 497.84 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "93990aae-bc27-5641-aec6-05e57fec0c82")
+		(property "Reference" "C1443"
+			(at 464.82 494.03 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "5.6p"
+			(at 464.82 501.65 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 464.82 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 464.82 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 464.82 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e45f804c-bdd3-5a2b-ac62-68a6d18ad96a")
+		)
+		(pin "2"
+			(uuid "169b4d11-eca3-5a4e-81c8-7641834d743f")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "C1443")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:L")
+		(at 477.52 501.65 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "ad7e0606-b04b-59c7-bbf1-fb4aa90b33b7")
+		(property "Reference" "L1442"
+			(at 480.06 500.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "22n"
+			(at 480.06 502.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Inductor_SMD:L_0402_1005Metric"
+			(at 477.52 501.65 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 477.52 501.65 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 477.52 501.65 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3a039fde-2cf3-5a5e-bec9-908cf30a37ae")
+		)
+		(pin "2"
+			(uuid "604581be-c12c-558f-b482-78818be8efdb")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "L1442")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 477.52 509.27 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "59c11fd4-48a3-5ef2-a1c3-966f7974813f")
+		(property "Reference" "C1444"
+			(at 480.06 508 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "91p"
+			(at 480.06 510.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 477.52 509.27 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 477.52 509.27 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 477.52 509.27 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "657cf42c-7e84-5b52-ba94-7d0f467f27c3")
+		)
+		(pin "2"
+			(uuid "b6b598b5-d209-5cd8-b4c7-c84b6f22e761")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "C1444")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 477.52 515.62 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "6e8b284a-31bd-5881-a9f2-dbc40ca0bd70")
+		(property "Reference" "#PWR2138"
+			(at 477.52 519.43 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 477.52 519.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 477.52 515.62 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 477.52 515.62 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 477.52 515.62 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "58ef2036-8c65-558d-9645-3486bc88e48d")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "#PWR2138")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 495.3 497.84 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "ea898dbf-135e-585d-a37a-c88597103ee8")
+		(property "Reference" "C1445"
+			(at 495.3 494.03 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "8.2p"
+			(at 495.3 501.65 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 495.3 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 495.3 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 495.3 497.84 90)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "12bab76c-c07a-5fcb-b147-925998114cb0")
+		)
+		(pin "2"
+			(uuid "1862552d-1688-5404-a374-245d91e45a8a")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/d38d76a9-30ef-58e4-ab9c-851ccae32d35"
+					(reference "C1445")
 					(unit 1)
 				)
 			)

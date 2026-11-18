@@ -175,5 +175,12 @@ def rffc5072_regs(lo_hz, fref=26e6):
 | Device ID read-back | §3 step 3; record the value here |
 | Three-wire framing (leading clocks, turnaround) | A write then read-back of `0x0B` |
 | Lock at every LO of §4.1 | `P14` and read-back bit 15; 1 ms after `ENBL` |
-| Mixer current against `P2MIXIDD` | The 3.0 V rail's current |
+| Mixer current against `P2MIXIDD` | The 2.8 V rail's current (`+2V8_RF`) |
 | LO tone at the ADC | Spectrum at each band's LO, against the "LO as seen by the ADC" column |
+- **Coverage (Rev08 audit, [AUDIT_Rev08.md](AUDIT_Rev08.md) R1).** Every converted path now sits behind a 300 MHz
+  high-pass, so tune the converter only to 300 MHz and up. From 170 to 300 MHz nothing is covered: the direct path ends
+  at 170 MHz, and a 135 MHz IF cannot reject signals that close to its own frequency. The four rows of the table
+  above are all inside the new range.
+- **LNA on the 1 GHz low-pass path.** With the converter on and preselector B on the LFCN-1000+ (V1V2V3 = 011), the
+  gateware holds `VU_LNA_ON` high. The LNA's reverse isolation keeps the LO from leaving `J961` at about
+  −49 dBm, which is above a receiver's −57 dBm spurious limit.

@@ -11,19 +11,22 @@ for the tree as drawn.
 ```
 12 V jack ─ PTC ─ SMCJ33CA ─ Q1001 ┐ back-to-back N-FETs, LM74502-Q1 (U1009): reverse battery,
                               Q1003 ┘ overvoltage cut-off at 18.3 V ─ SMBJ18CA ─► +12V   (§1.1, Rev05)
-+12V   ─ U1001 LMR33630  buck ─► +5V0    1775 mA   (3 A part)
-+5V0   ─ U1002 TPS562201 buck ─► +3V3_D  1388 mA   (2 A part)
++12V   ─ U1001 LMR33630  buck ─► +5V0    2410 mA   (3 A part)
++5V0   ─ U1002 TPS563201 buck ─► +3V3_D  1891 mA   (3 A part; a 2 A TPS562201 until the Rev08 audit)
        ─ U1003 TPS562201 buck ─► +2V5     601 mA   FPGA LVDS banks, and feeds +1V8_A
-       ─ U1004 TPS562201 buck ─► +1V0     700 mA   FPGA VCCINT
+       ─ U1004 TPS562201 buck ─► +1V0     735 mA   FPGA VCCINT, at 1.017 V (R1031 3.24 k)
        ─ U1007 TPS7A8300 LDO  ─► +3V3_A   100 mA   DACs' AVDD
-+2V5   ─ U1005 TPS7A8300 LDO  ─► +1V8_A   500 mA   ADCs' AVDD
++2V5   ─ U1005 TPS7A8300 LDO  ─► +1V8_A   500 mA   ADCs' AVDD, at 1.85 V
        ─ divider              ─► +1V2       1 mA   link termination bias
-+3V3_D ─ U1006 TPS7A8300 LDO  ─► +1V8_D   300 mA   FPGA VCCAUX, ADCs' DRVDD
++3V3_D ─ U1006 TPS7A8300 LDO  ─► +1V8_D   629 mA   FPGA VCCAUX, ADCs' DRVDD, at 1.85 V (50 mV pin grounded)
        ─ U1008 LM2663         ─► −3V3       8 mA   RF switches' VEE
-       ─ U1315 LP5907 LDO     ─► +3V0_FE  180 mA   Rev08 VHF/UHF front end (RX_VU sheet)
+       ─ U1315 LP5907-2.8 LDO ─► +2V8_RF  180 mA   Rev08 VHF/UHF front end (RX_VU sheet)
 ```
 
-Input: **823 mA at 12 V, 9.9 W**; 1.07 A and 12.8 W with the 30 % margin (Rev08's front end, LEDs and expanders added, 17 November; the GPS receiver on `J1503`, 18 November; 733 mA and 8.8 W before).
+Input, worst case (70 °C, maximum process, bias tee at its limit, CAN dominant, fan on): **1.12 A at 12 V, 13.4 W**;
+typical 0.97 A, 11.7 W. The currents are worst-case figures. The FPGA rails come from Vivado's power report, which
+the budget lacked until the Rev08 audit of 18 November. Four loads were also added: the Ethernet PHY, the CAN
+transceiver, the fan and the bias tee ([AUDIT_Rev08.md](AUDIT_Rev08.md) §2.1). The budget used to say 823 mA and 9.9 W.
 
 ---
 
@@ -51,7 +54,7 @@ SNOSDE0A, Figure 10-1), oversized where the board allows it:
 
 | Part | Value | Why |
 |---|---|---|
-| F1001 | PTC 1.5 A hold, 24 V (unchanged) | Ahead of everything. Only a sustained input above the TVS breakdown (36.7 V) can trip it: an abnormal fault, see the limits below |
+| F1001 | PTC **2.0 A hold**, 24 V, mSMD200-24V (1.5 A until the Rev08 audit, P3: that one tripped above 60 °C at the audited load) | Ahead of everything. It holds 1.32 A at 70 °C, against 1.12 A worst case at 12 V and 1.28 A at 10.5 V ([AUDIT_Rev08.md](AUDIT_Rev08.md) §2.3). Only a sustained input above the TVS breakdown (36.7 V) can trip it: an abnormal fault, see the limits below |
 | D1003 | **SMCJ33CA**, bidirectional, 1500 W, at VIN_F | Breakdown ≥ 36.7 V: above the 24 V jump start and the 35 V suppressed load dump (ISO 16750-2 test B), as §10.2.3 requires; ≥ 16 V reverse battery. Clamps pulse 1 to about 47–53 V at 15 A. TI's design uses the 600 W SMBJ33CA; the SMC part doubles its energy rating |
 | Q1001, Q1003 | **DMT10H015LFG**, 100 V, 13.5 mΩ at 10 V, PowerDI3333-8 | Back to back, common source. With the TVS clamping pulse 1 at −53 V and the output held at +12 V by its capacitors, the blocking FET sees about 65 V: TI's 60 V example would have no margin. VGS(max) ±20 V > the 13.9 V gate drive (§10.2.2.2). Q1001 keeps its footprint |
 | U1009 | **LM74502-Q1** (SOT-23-8) | 3.2–65 V, −65 V reverse (Features), charge pump 12.4 V, 60 µA gate source, 2 A sink |

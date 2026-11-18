@@ -43,28 +43,41 @@ X0 = D.X0
 yl = y_ladders + 12.7
 for k, name in enumerate(("FMREJ", "FMBP", "AA", "UHF")):
     D.ladder(name, yl + 43.18 * (k // 2), X0 + 254.0 * (k % 2))
+D.ladder("HP300", yl, X0 + 375.92)          # Rev08 audit (R1): ahead of preselector B, right of the FM band-pass
 yl += 2 * 43.18
 notes = [
     "RX_VU - how this sheet works (REV08_PLAN section 5; RX_VU_SPEC)",
     "1. J961 -> ESD -> bias tee (U1314, JP1301: 5 V as built, 3.3 V by the jumper) -> LNA U1301 or its bypass (U1302/U1303).",
     "2. Preselector A (U1304/U1305, V2V1): 00 straight, 01 FM band-pass, 10 FM reject, 11 preselector B.",
-    "3. Preselector B (U1306/U1307, V1V2V3): 000 UHF low-pass 480 MHz, 001 SAW 1090 MHz, 010 HPF 1 GHz, 011 LPF 1 GHz, 1xx spare.",
+    "3. Preselector B (U1306/U1307, V1V2V3), behind the 300 MHz high-pass C1441-C1445: 000 UHF low-pass 480 MHz, 001 SAW 1090 MHz, 010 HPF 1 GHz, 011 LPF 1 GHz, 1xx spare.",
     "4. Converter bypass (U1308/U1309): CTRL high = through the RFFC5072 (LO 85-4200 MHz, IF 135 MHz), low = direct 30-170 MHz.",
     "5. Anti-alias 170 MHz, IF amplifier U1310, attenuator U1311 (0-31.5 dB, powers up at 31.5 dB) -> IF_VU -> SW2 (ROUTING, C927).",
     "6. Control: U1313 TCA6416A at 0x20 on XO_SCL/XO_SDA. P00-P01 PSA_V1-V2, P02-P04 PSB_V1-V3, P05 LNA_ON, P06 CONV_ON,",
     "   P07 BIAS_EN_N, P10 BIAS_FLT_N (in), P11 ENX, P12 SCLK, P13 SDATA (RFFC5072 and, through R1330, PE4312), P14 LD (in),",
     "   P15 RESETX, P16 ATT_LE, P17 ENBL. Pull resistors keep the bias off, the converter off and deselected until it is written.",
-    "7. +3V0_RF: U1315 LP5907-3.0 from +3V3_D through FB1301, 180 mA budgeted of 250. The mixer's current flows through T1302's",
+    "7. +2V8_RF: U1315 LP5907-2.8 from +3V3_D through FB1301, 180 mA budgeted of 250. The mixer's current flows through T1302's",
     "   centre tap: program MIX2_IDD <= 3 (TC4-1W+ rated 30 mA DC).",
 ]
 for i, t in enumerate(notes):
     s.text(t, (530.0, y_ladders + 4.5 * i), size=1.524 if i == 0 else 1.27)
 
 
+DNP = {"C1305"}          # phase 6 (SIGNAL_INTEGRITY 9.10): with FB1304 it would only add loss at 25-60 MHz
+
+
 def write():
+    import re
     n, w, j = s.write()
+    t = open(PATH, encoding="utf-8").read()
+    for ref in DNP:
+        i = t.find(f'(property "Reference" "{ref}"')
+        st = t.rfind("\n\t(symbol\n", 0, i)
+        blk = t[st:i]
+        assert "(dnp no)" in blk, ref
+        t = t[:st] + blk.replace("(dnp no)", "(dnp yes)", 1) + t[i:]
+    open(PATH, "w", encoding="utf-8").write(t)
     print(f"wrote {os.path.relpath(PATH, D.ROOT)}: {n} symbols, {w} wire segments, {j} junctions; "
-          f"ladders end at y {yl:.0f} of 594")
+          f"ladders end at y {yl:.0f} of 594; DNP {', '.join(sorted(DNP))}")
 
 
 if __name__ == "__main__":

@@ -6,18 +6,18 @@
     "part": "LMR33630ADDA",
     "rating_a": 3.0,
     "typ_ma": 2099,
-    "worst_ma": 2407,
-    "use": 0.802,
+    "worst_ma": 2409,
+    "use": 0.803,
     "typ_w": 1.166,
-    "worst_w": 1.337
+    "worst_w": 1.339
    },
    {
     "rail": "+3V3_D",
-    "part": "TPS562201",
-    "rating_a": 2.0,
-    "typ_ma": 1779,
-    "worst_ma": 1891,
-    "use": 0.946,
+    "part": "TPS563201",
+    "rating_a": 3.0,
+    "typ_ma": 1778,
+    "worst_ma": 1890,
+    "use": 0.63,
     "typ_w": 0.652,
     "worst_w": 0.693
    },
@@ -38,8 +38,8 @@
     "typ_ma": 420,
     "worst_ma": 735,
     "use": 0.367,
-    "typ_w": 0.057,
-    "worst_w": 0.1
+    "typ_w": 0.058,
+    "worst_w": 0.102
    },
    {
     "rail": "+1V8_A",
@@ -48,8 +48,8 @@
     "typ_ma": 500,
     "worst_ma": 500,
     "use": 0.25,
-    "typ_w": 0.35,
-    "worst_w": 0.35
+    "typ_w": 0.325,
+    "worst_w": 0.325
    },
    {
     "rail": "+1V8_D",
@@ -58,8 +58,8 @@
     "typ_ma": 567,
     "worst_ma": 629,
     "use": 0.315,
-    "typ_w": 0.85,
-    "worst_w": 0.943
+    "typ_w": 0.822,
+    "worst_w": 0.912
    },
    {
     "rail": "+3V3_A",
@@ -72,14 +72,14 @@
     "worst_w": 0.17
    },
    {
-    "rail": "+3V0_FE",
-    "part": "LP5907MFX-3.0",
+    "rail": "+2V8_RF",
+    "part": "LP5907MFX-2.8",
     "rating_a": 0.25,
     "typ_ma": 180,
     "worst_ma": 180,
     "use": 0.72,
-    "typ_w": 0.054,
-    "worst_w": 0.054
+    "typ_w": 0.09,
+    "worst_w": 0.09
    },
    {
     "rail": "-3V3",
@@ -93,20 +93,14 @@
    }
   ],
   "input_typ_ma": 973,
-  "input_worst_ma": 1115,
-  "fix_1v8d_from_2v5": {
-   "ldo_w": 0.44,
-   "v2v5_ma": 1230,
-   "v3v3_ma": 1262,
-   "input_ma": 1067
-  }
+  "input_worst_ma": 1116
  },
  "windows": [
   {
    "part": "XC7A50T VCCINT (DS181)",
    "rail": "+1V0",
-   "vmin": 0.922,
-   "vmax": 1.055,
+   "vmin": 0.933,
+   "vmax": 1.067,
    "rmin": 0.95,
    "rmax": 1.05,
    "absmax": 1.1,
@@ -116,12 +110,12 @@
   {
    "part": "XC7A50T VCCAUX, VCCO_35, VCCADC (DS181)",
    "rail": "+1V8_D",
-   "vmin": 1.665,
-   "vmax": 1.823,
+   "vmin": 1.714,
+   "vmax": 1.873,
    "rmin": 1.71,
    "rmax": 1.89,
    "absmax": 2.0,
-   "ok": false,
+   "ok": true,
    "abs_ok": true
   },
   {
@@ -171,28 +165,6 @@
   {
    "part": "AD9484 / AD9253 DRVDD",
    "rail": "+1V8_D (ADC DRVDD branch)",
-   "vmin": 1.747,
-   "vmax": 1.823,
-   "rmin": 1.7,
-   "rmax": 1.9,
-   "absmax": 2.0,
-   "ok": true,
-   "abs_ok": true
-  },
-  {
-   "part": "XC7A50T VCCAUX with U1006 set to 1.85 V",
-   "rail": "+1V8_D at 1.85 V (50 mV pin grounded)",
-   "vmin": 1.714,
-   "vmax": 1.873,
-   "rmin": 1.71,
-   "rmax": 1.89,
-   "absmax": 2.0,
-   "ok": true,
-   "abs_ok": true
-  },
-  {
-   "part": "AD9484 / AD9253 DRVDD with U1006 set to 1.85 V",
-   "rail": "+1V8_D at 1.85 V, ADC branch",
    "vmin": 1.797,
    "vmax": 1.873,
    "rmin": 1.7,
@@ -257,13 +229,13 @@
    "abs_ok": true
   },
   {
-   "part": "TCAN330",
+   "part": "TCAN3403-Q1 (VCC and VIO)",
    "rail": "+3V3_D",
    "vmin": 3.126,
    "vmax": 3.493,
    "rmin": 3.0,
    "rmax": 3.6,
-   "absmax": 5.0,
+   "absmax": 6.0,
    "ok": true,
    "abs_ok": true
   },
@@ -280,9 +252,9 @@
   },
   {
    "part": "RFFC5072",
-   "rail": "+3V0_FE",
-   "vmin": 2.895,
-   "vmax": 3.095,
+   "rail": "+2V8_RF",
+   "vmin": 2.701,
+   "vmax": 2.889,
    "rmin": 2.7,
    "rmax": 3.3,
    "absmax": 3.6,
@@ -291,9 +263,9 @@
   },
   {
    "part": "SPF5043Z x2 (drain through 1 uH)",
-   "rail": "+3V0_FE",
-   "vmin": 2.895,
-   "vmax": 3.095,
+   "rail": "+2V8_RF",
+   "vmin": 2.701,
+   "vmax": 2.889,
    "rmin": 2.7,
    "rmax": 5.25,
    "absmax": 5.5,
@@ -302,9 +274,9 @@
   },
   {
    "part": "PE4312, PE4259, PE42442, SKY13418 (2.3-3.6 V) [E]",
-   "rail": "+3V0_FE",
-   "vmin": 2.895,
-   "vmax": 3.095,
+   "rail": "+2V8_RF",
+   "vmin": 2.701,
+   "vmax": 2.889,
    "rmin": 2.3,
    "rmax": 3.6,
    "absmax": 4.0,
@@ -321,16 +293,9 @@
    "ok": true
   },
   {
-   "ldo": "U1006 +1V8_D (as drawn, from +3V3_D)",
-   "worst_headroom": 1.316,
-   "typ_headroom": 1.505,
-   "dropout": 0.063,
-   "ok": true
-  },
-  {
-   "ldo": "U1006 +1V8_D (fed from +2V5)",
-   "worst_headroom": 0.548,
-   "typ_headroom": 0.691,
+   "ldo": "U1006 +1V8_D (1.85 V, from +3V3_D)",
+   "worst_headroom": 1.265,
+   "typ_headroom": 1.455,
    "dropout": 0.063,
    "ok": true
   },
@@ -342,19 +307,20 @@
    "ok": true
   },
   {
-   "ldo": "U1315 +3V0_FE (through FB1301)",
-   "worst_headroom": 0.026,
-   "typ_headroom": 0.287,
+   "ldo": "U1315 +2V8_RF (through FB1301)",
+   "worst_headroom": 0.232,
+   "typ_headroom": 0.487,
    "dropout": 0.18,
-   "ok": false
+   "ok": true
   }
  ],
  "input": {
-  "p_typ_w": 11.67,
-  "p_worst_w": 13.39,
-  "ptc_trip_c_worst_12v": 59.5,
-  "ptc_trip_c_worst_10v5": 44.400000000000006,
-  "ptc_trip_c_typ_12v": 71.60000000000001
+  "p_typ_w": 11.68,
+  "p_worst_w": 13.4,
+  "ptc_hold_a": 2.0,
+  "ptc_trip_c_worst_12v": 83.9,
+  "ptc_trip_c_worst_10v5": 73.10000000000001,
+  "ptc_trip_c_typ_12v": "never (85+)"
  },
  "startup": {
   "nominal": {
@@ -554,15 +520,15 @@
    "ok": true
   },
   {
-   "fault": "CAN bus shorted to +12-14.8 V (battery)",
-   "limiter": "none: PESD1CAN stands off 24 V",
-   "result": "TCAN330 CANH/CANL absolute maximum is +-14 V [V]",
-   "note": "a charging alternator (14.4-14.8 V) or a 24 V jump start destroys U1506",
-   "ok": false
+   "fault": "CAN bus shorted to +12-24 V (battery, jump start)",
+   "limiter": "TCAN3403-Q1: +-58 V bus fault protection [V]",
+   "result": "survives; PESD1CAN clamps the transients above 24 V",
+   "note": "the TCAN330 (+-14 V) of the first audit would not have",
+   "ok": true
   },
   {
    "fault": "CAN bus shorted to ground",
-   "limiter": "TCAN330 driver current limit",
+   "limiter": "TCAN3403 driver current limit",
    "result": "survives (rated)",
    "note": "",
    "ok": true
@@ -577,9 +543,14 @@
  ],
  "backpower": [
   {
-   "line": "Pmod (8 lines, 3.3 V, no series resistor on either board: KV260 R276-R283 are 0 ohm)",
+   "line": "Pmod, 8 lines, 0 ohm both ends: upper bound if a board drove into an unpowered one",
    "path": "Artix bank 15 <-> K26 HDA bank",
    "i_ma": 108.0
+  },
+  {
+   "line": "Pmod as built: gateware gates both ends: no line driven high toward an unpowered board",
+   "path": "kria_present / adapter_alive, SPARE2 open-drain",
+   "i_ma": 0.0
   },
   {
    "line": "PMOD_SPARE1 from the CH340X",
@@ -592,13 +563,13 @@
    "i_ma": 2.6
   },
   {
-   "line": "GPS PPS to J9 pin 12 (and its copy)",
+   "line": "GPS PPS to J9 pin 12 (and its copy), 330 ohm since the audit",
    "path": "U1505 -> K26 HDA10",
-   "i_ma": 11.0
+   "i_ma": 7.6
   },
   {
    "line": "CAN RX to J9 pin 8, through 1.8 k / 1 k",
-   "path": "TCAN330 RXD -> K26 bank 66 (1.2 V)",
+   "path": "TCAN3403 RXD -> K26 bank 66 (1.2 V)",
    "i_ma": 0.9
   },
   {
@@ -612,9 +583,9 @@
    "i_ma": 0.0
   },
   {
-   "line": "IAS1 FPGA_IRQ, push-pull 1.8 V",
+   "line": "IAS1 FPGA_IRQ, push-pull 1.8 V: driven only after link training",
    "path": "Artix bank 35 -> K26 HPA",
-   "i_ma": 48.0
+   "i_ma": 0.0
   }
  ]
 }

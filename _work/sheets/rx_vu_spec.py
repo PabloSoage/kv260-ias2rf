@@ -62,7 +62,8 @@ PARTS = {
     "U1312": U("kv260-ias2rf:RFFC5072", "RFFC5072", "Synthesiser and mixer, LO 85-4200 MHz; down-converts to the 135 MHz IF"),
     "U1313": U("kv260-ias2rf:TCA6416ARTW", "TCA6416ARTWR", "I2C expander 0x20 (ADDR low) on XO_SCL/XO_SDA; ports at 3.0 V"),
     "U1314": U("kv260-ias2rf:AP22652W6", "AP22652W6-7", "Bias-tee switch, 125 mA limit (RLIM 210 k), active-low enable, fault flag"),
-    "U1315": U("Regulator_Linear:LP5907MFX-3.0", "LP5907MFX-3.0", "+3V0_RF for the whole block, 250 mA, low noise",
+    "U1315": U("Regulator_Linear:LP5907MFX-2.8", "LP5907MFX-2.8", "+2V8_RF for the whole block, 250 mA, low noise; 2.8 V "
+               "since the Rev08 audit (P8): the 3.0 V part could reach dropout at the worst corner of +3V3_D",
                "Package_TO_SOT_SMD:SOT-23-5"),
     "Y1301": U("kv260-ias2rf:TCXO_2016_4P", "26MHz 1XXD26000MAA", "RFFC5072 reference, 26 MHz +-1.5 ppm, clipped sine"),
     "T1301": U("kv260-ias2rf:TC1-1-13M+", "TC1-1-13M+", "Mixer input balun 1:1, 4.5-3000 MHz"),
@@ -77,7 +78,7 @@ PARTS = {
 }
 
 # ---------------------------------------------------------------- pins of the ICs and other multi-pin parts
-GND, V3, V3D, V5 = "GND", "+3V0_RF", "+3V3_D", "+5V0"
+GND, V3, V3D, V5 = "GND", "+2V8_RF", "+3V3_D", "+5V0"
 PINS = {
     "J961": {"1": "VU_ANT", "2": GND},
     "D1301": {"1": "VU_ANT", "2": GND},
@@ -90,7 +91,7 @@ PINS = {
               "17": "VU_PSA_V1", "18": "VU_PSA_V2", "19": GND, "20": GND, "16": V3},
     "U1305": {"22": "VU_PSA_OUT", "14": "VU_PSA_THRU", "11": "VU_FMBP_OUT", "8": "VU_FMREJ_OUT", "5": "VU_PSB_OUT",
               "17": "VU_PSA_V1", "18": "VU_PSA_V2", "19": GND, "20": GND, "16": V3},
-    "U1306": {"13": "VU_PSB_IN", "3": "VU_UHF_IN", "9": "VU_SAW_IN", "2": "VU_HP1G_IN", "10": "VU_LP1G_IN",
+    "U1306": {"13": "VU_PSB_HP", "3": "VU_UHF_IN", "9": "VU_SAW_IN", "2": "VU_HP1G_IN", "10": "VU_LP1G_IN",
               "1": "NC", "11": "NC", "14": "NC", "12": "NC", "8": "NC",
               "7": "VU_PSB_V1", "6": "VU_PSB_V2", "5": "VU_PSB_V3", "4": V3, "15": GND},
     "U1307": {"13": "VU_PSB_OUT", "3": "VU_UHF_OUT", "9": "VU_SAW_OUT", "2": "VU_HP1G_OUT", "10": "VU_LP1G_OUT",
@@ -230,6 +231,11 @@ FILTERS = {
         ("C", "C1421", "18p"), ("sLC", "L1421", "68n", "C1422", "110p"), ("C", "C1423", "13p"),
         ("sLC", "L1422", "82n", "C1424", "36p"), ("C", "C1425", "18p"), ("sLC", "L1423", "100n", "C1426", "24p"),
         ("C", "C1427", "24p"), ("sLC", "L1424", "220n", "C1428", "10p"), ("C", "C1429", "91p")]),
+    # Rev08 audit (R1): every converted path starts behind this high-pass, so nothing at the 100-170 MHz IF reaches
+    # the mixer; _work/sim/rev08_rf_audit.py --hpf: <= 1.5 dB p99 from 300 MHz to 3 GHz, >= 51.7 dB p1 below 175 MHz
+    "HP300": ("VU_PSB_IN", "VU_PSB_HP", "Preselector B high-pass, 5th-order elliptic, pass from 300 MHz, >= 50 dB below 175 MHz", [
+        ("C", "C1441", "11p"), ("sLC", "L1441", "24n", "C1442", "36p"), ("C", "C1443", "5.6p"),
+        ("sLC", "L1442", "22n", "C1444", "91p"), ("C", "C1445", "8.2p")]),
     "FMBP": ("VU_FMBP_IN", "VU_FMBP_OUT", "FM band-pass, 3-pole Butterworth, 84-113 MHz", [
         ("pLC", "L1431", "16n", "C1431", "160p"), ("LsC", "L1432", "390n", "C1432", "6.8p"),
         ("pLC", "L1433", "16n", "C1433", "160p")]),           # rev08_filters_mc.py --fmbp: 3.1 dB p99, 24 dB p1

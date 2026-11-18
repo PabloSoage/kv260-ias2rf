@@ -4447,10 +4447,6 @@
 		(uuid "0065bcef-5a70-56a7-bb4d-9f1c38afa6ea")
 	)
 	(no_connect
-		(at 238.76 280.67)
-		(uuid "0021487d-e19d-55fa-b757-0303601c4392")
-	)
-	(no_connect
 		(at 241.3 280.67)
 		(uuid "eb495d35-a2a9-54df-ab1a-46dd0ba16d1f")
 	)
@@ -6654,7 +6650,7 @@
 				)
 			)
 		)
-		(property "Value" "PTC 1.5A hold"
+		(property "Value" "PTC 2A hold"
 			(at 58.42 80.01 90)
 			(effects
 				(font
@@ -8889,7 +8885,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "TPS562201"
+		(property "Value" "TPS563201"
 			(at 85.09 158.75 0)
 			(effects
 				(font
@@ -12174,7 +12170,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "3.09k"
+		(property "Value" "3.24k"
 			(at 443.23 175.26 0)
 			(effects
 				(font
@@ -18061,6 +18057,73 @@
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1277")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 238.76 280.67 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files no)
+		(dnp no)
+		(uuid "07421f88-ae8c-410b-a90d-887479ee59d2")
+		(property "Reference" "#PWR1278"
+			(at 238.76 286.02 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 238.76 284.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 238.76 280.67 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 238.76 280.67 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 238.76 280.67 0)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d5f0d8b4-92d5-4165-b0bb-604c4abe12ac")
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
+					(reference "#PWR1278")
 					(unit 1)
 				)
 			)

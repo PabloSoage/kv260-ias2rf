@@ -29,8 +29,8 @@ The thirteen SMAs are on the front edge (`J401`-`J952`) and the back wall (`J961
 | 13 | `J942` | top | SDR_TX_WB | Wideband SDR transmit from the AD9708 (SMA), SW4's second throw |
 | 14 | `J951` | top | SDR_RX_C | HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input |
 | 15 | `J952` | top | SDR_TX_C | HF transmit (SMA), no switch: AD9767 DAC2. The default HF output |
-| 16 | `J961` | top | VU_ANT | VHF/UHF antenna (SMA, back wall): the Rev08 front end, 30 MHz-3 GHz (direct below 170 MHz, converted above), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed |
-| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.9 W, 12.8 W with margin (the GPS receiver included) |
+| 16 | `J961` | top | VU_ANT | VHF/UHF antenna (SMA, back wall): the Rev08 front end, direct 30-170 MHz and converted from 300 MHz to 3 GHz (170-300 MHz not covered: the converter's 300 MHz high-pass, AUDIT_Rev08 R1), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit; prefer 3.3 V where the antenna accepts it). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed. No limiter: keep it away from a transmitter on the same vehicle (+25 dBm destroys the LNA) |
+| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 11.7 W typical, 13.4 W worst case (docs/AUDIT_Rev08.md section 2.1) |
 | 18 | `J1002` | top | FAN 5V | Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND |
 | 19 | `J1101` | top | JTAG 2x7 2mm | Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter) |
 | 20 | `J1102` | top | Pmod | Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below |
@@ -151,7 +151,7 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | 52 | `U903` | top | M3SWA2-34DR+ | ROUTING | SW3: the AD9767 DAC1 to SDR_TX_A or AERIS_TX_A |
 | 53 | `U904` | top | M3SWA2-34DR+ | ROUTING | SW4: the AD9708 to AERIS_TX or SDR_TX_WB |
 | 54 | `U1001` | top | LMR33630ADDA | POWER | +12V to +5V0 buck, 3 A |
-| 55 | `U1002` | top | TPS562201 | POWER | +5V0 to +3V3_D buck |
+| 55 | `U1002` | top | TPS563201 | POWER | +5V0 to +3V3_D buck, 3 A (Rev08 audit, P5) |
 | 56 | `U1003` | top | TPS562201 | POWER | +5V0 to +2V5 buck (FPGA LVDS banks, feeds +1V8_A) |
 | 57 | `U1004` | top | TPS562201 | POWER | +5V0 to +1V0 buck (FPGA core) |
 | 58 | `U1005` | top | TPS7A8300RGR | POWER | +2V5 to +1V8_A LDO (the ADCs' analogue supply) |
@@ -173,13 +173,13 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | 74 | `U1312` | top | RFFC5072 | RX_VU | Synthesiser and mixer: converts 170 MHz-3 GHz down to the IF |
 | 75 | `U1313` | bottom | TCA6416ARTWR | RX_VU | I/O expander 0x20: the front end's switches, bias tee and converter control |
 | 76 | `U1314` | top | AP22652W6-7 | RX_VU | Bias-tee current limiter for `J961` (125 mA) |
-| 77 | `U1315` | bottom | LP5907MFX-3.0 | RX_VU | +3V0 LDO for the front end |
+| 77 | `U1315` | bottom | LP5907MFX-2.8 | RX_VU | +2V8_RF LDO for the front end (Rev08 audit, P8) |
 | 78 | `U1501` | bottom | TCA6416ARTWR | STATUS | I/O expander 0x21: the status LEDs |
 | 79 | `U1502` | top | CH340X | STATUS | USB to UART bridge for the debug console |
 | 80 | `U1503` | top | USBLC6-2SC6 | STATUS | ESD on the USB data lines |
 | 81 | `U1504` | top | LP5907MFX-3.3 | STATUS | 3.3 V LDO for the USB bridge, from the cable |
 | 82 | `U1505` | bottom | SN74LVC1G17DCKR | STATUS | GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4 |
-| 83 | `U1506` | bottom | TCAN330DCNT | STATUS | Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8 |
+| 83 | `U1506` | bottom | TCAN3403DDFRQ1 | STATUS | Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8 |
 | 84 | `Y401` | top | Si549 LVPECL 3V3 pinout C | CLOCK | Programmable master oscillator, 400 or 500 MHz |
 | 85 | `Y1201` | top | 25MHz | CONTROL | Crystal for the Ethernet PHY |
 | 86 | `Y1301` | top | 26MHz 1XXD26000MAA | RX_VU | TCXO, the RFFC5072's reference |
