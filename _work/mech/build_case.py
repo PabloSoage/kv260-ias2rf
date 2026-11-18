@@ -753,6 +753,8 @@ jx0, jy0 = k2m(198.9, 115.2)
 jx1, jy1 = k2m(189.9, 111.4)
 cut(lid, box("plug_room", jx0, jx1, jy0, jy1, ADAPTER_TOP, Z_TOP_IN + 0.1), self_ix=True)
 cut(lid, cyl("grommet_hole", GROM_C[0], GROM_C[1], Z_TOP_IN - 1, Z_TOP + 1, GROM_D, verts=48))
+# the 10 mm lip sits under the lid's inner face, where the corner clamp still has material: give it a 10.6 mm seat
+cut(lid, cyl("grommet_seat", GROM_C[0], GROM_C[1], Z_TOP_IN - 1.4, Z_TOP_IN + 0.05, 10.6, verts=48), self_ix=True)
 # drawn 0.1 mm clear of the lid all round (the TPU is squeezed into the hole); body 8.0 in the 8.2 mm hole
 grommet = cyl("grommet", GROM_C[0], GROM_C[1], Z_TOP_IN - 0.15, Z_TOP + 0.15, 8.0, TPU, verts=48)
 union(grommet, cyl("grommet_flange", GROM_C[0], GROM_C[1], Z_TOP + 0.1, Z_TOP + 1.3, 12.0, TPU, verts=48))

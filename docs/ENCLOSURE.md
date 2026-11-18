@@ -77,7 +77,7 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     and the cable rises straight to the lid, about 23 mm. It leaves through an 8.2 mm hole in the lid top, 2.9 mm
     from the plug's axis (X −3.5, Y 5.0), with a split TPU grommet (`case_grommet.stl`: 8 mm body, 12 mm flange
     outside, 10 mm lip inside, 3.2 mm bore for the six 28 AWG wires, a 0.8 mm slit to slip the crimped cable in
-    from the side). The hole clears the corner clamp at (−5, −5) and v2's filter recess (X −69 to −11). The clamp
+    from the side). The lip sits in a 10.6 mm seat, 1.4 mm deep, under the lid. The hole clears the corner clamp at (−5, −5) and v2's filter recess (X −69 to −11). The clamp
     gives way above the receptacle, where the plug stands. Fit the plug before the lid goes on, as the ribbon.
 
 | | |
