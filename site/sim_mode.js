@@ -459,7 +459,7 @@ export function createSimController(ctx) {
   }
 
   function stepAnimation(now) {
-    if (!enabled || domain !== "g8" || !g8PulseMesh || !g8PulseSegs.length) return;
+    if (!enabled || domain !== "g8" || !g8PulseMesh || !g8PulseSegs.length) return false;
     const count = g8PulseMesh.count;
     const speed = isReducedMotion() ? 0 : now * 0.0018;
     const m = new THREE.Matrix4();
@@ -471,6 +471,7 @@ export function createSimController(ctx) {
       g8PulseMesh.setMatrixAt(i, m);
     }
     g8PulseMesh.instanceMatrix.needsUpdate = true;
+    return true;
   }
 
   // -------------------------------------------------------------------------

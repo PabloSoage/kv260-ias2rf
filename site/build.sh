@@ -48,20 +48,26 @@ CLEAN_PCB_W="$(win_path "$CLEAN_PCB")"
 RAW_GLB="$TMP_DIR/raw_board.glb"
 RAW_GLB_W="$(win_path "$RAW_GLB")"
 
-echo "[1/6] Stripping cached EasyEDA model references on temp PCB copy..."
+echo "[1/7] Substituting KiCad STEP models and stripping unmapped cached VRML blocks..."
 node "$SITE_DIR/scripts/strip_pcb.mjs" "$PCB" "$CLEAN_PCB"
 
-echo "[2/6] Exporting clean KiCad GLB..."
+KV_CONN_PCB="$TMP_DIR/kv260_conn.kicad_pcb"
+KV_CONN_GLB="$TMP_DIR/kv260_conn.glb"
+KV_CONN_PCB_W="$(win_path "$KV_CONN_PCB")"
+KV_CONN_GLB_W="$(win_path "$KV_CONN_GLB")"
+node "$SITE_DIR/scripts/gen_kv260_conn_pcb.mjs" "$KV_CONN_PCB"
+
+echo "[2/7] Exporting clean KiCad board + KV260 connector GLBs..."
 "$KICAD" pcb export glb \
   --subst-models \
-  --include-tracks \
   --include-pads \
-  --include-zones \
-  --include-silkscreen \
-  --include-soldermask \
   --user-origin 0x0mm \
   -D "KIPRJMOD=$ROOT_W" \
   -f -o "$RAW_GLB_W" "$CLEAN_PCB_W"
+"$KICAD" pcb export glb \
+  --subst-models \
+  --user-origin 0x0mm \
+  -f -o "$KV_CONN_GLB_W" "$KV_CONN_PCB_W"
 
 echo "[3/6] Exporting per-layer SVGs..."
 LAYERS_DIR="$SITE_DIR/assets/layers"
@@ -85,7 +91,7 @@ echo "[4b/7] Building simulations.json & copying simulation plots..."
 node "$SITE_DIR/scripts/build_simulations.mjs"
 
 echo "[5/7] Optimizing board.glb and building kv260.glb + enclosure.glb..."
-node "$SITE_DIR/scripts/build_assets.mjs" "$RAW_GLB"
+node "$SITE_DIR/scripts/build_assets.mjs" "$RAW_GLB" "$KV_CONN_GLB"
 
 echo "[6/7] Building Rust core (site/core) and Slint WebAssembly HMI..."
 mkdir -p "$SITE_DIR/core/pkg"

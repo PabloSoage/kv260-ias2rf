@@ -16,6 +16,7 @@ struct PartEntry {
     desc_lower: String,
     nets: Vec<String>,
     group_id: u8,
+    side_mask: u8,
     // Base unexploded world AABB in Three.js Y-up metres
     bx0: f32,
     by0: f32,
@@ -107,6 +108,11 @@ impl SiteCore {
 
         let slot = self.parts.len();
         self.id_to_slot.insert(id.to_string(), slot);
+        let side_mask = if group_id == 0 {
+            if ly0 < 0.0006 && ly1 > 0.0018 { 3 } else if ly1 <= 0.0012 { 2 } else { 1 }
+        } else {
+            0
+        };
         self.parts.push(PartEntry {
             idx,
             id: id.to_string(),
@@ -116,6 +122,7 @@ impl SiteCore {
             desc_lower: desc.to_ascii_lowercase(),
             nets,
             group_id,
+            side_mask,
             bx0: lx0,
             by0: ly0,
             bz0: lz0,
@@ -135,6 +142,30 @@ impl SiteCore {
 
     pub fn part_count(&self) -> usize {
         self.parts.len()
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn set_part_bounds(
+        &mut self,
+        idx: u32,
+        side_mask: u8,
+        x0: f32,
+        y0: f32,
+        z0: f32,
+        x1: f32,
+        y1: f32,
+        z1: f32,
+    ) {
+        if let Some(p) = self.parts.get_mut(idx as usize) {
+            p.side_mask = side_mask;
+            p.bx0 = x0.min(x1);
+            p.bx1 = x0.max(x1).max(p.bx0 + 0.0005);
+            p.by0 = y0.min(y1);
+            p.by1 = y0.max(y1).max(p.by0 + 0.0006);
+            p.bz0 = z0.min(z1);
+            p.bz1 = z0.max(z1).max(p.bz0 + 0.0005);
+            p.vol = ((p.bx1 - p.bx0) * (p.by1 - p.by0) * (p.bz1 - p.bz0)).max(1e-12);
+        }
     }
 
     /// Update per-group Y translation offsets (len >= 8) and group visibility bitmask,
@@ -262,6 +293,26 @@ impl SiteCore {
         let t_delta_y = if dir[1].abs() > 1e-8 { cell_w[1] / dir[1].abs() } else { f32::INFINITY };
         let t_delta_z = if dir[2].abs() > 1e-8 { cell_w[2] / dir[2].abs() } else { f32::INFINITY };
 
+        // Compute PCB FR4 slab intersection t_pcb when adapter board is visible
+        let mut t_pcb = f32::INFINITY;
+        for p in &self.parts {
+            if p.group_id == 0 && p.visible {
+                let board_dy = p.ay0 - p.by0;
+                let y_mid = 0.00155 + board_dy;
+                if dir[1].abs() > 1e-6 {
+                    let th = (y_mid - orig[1]) / dir[1];
+                    if th > 0.0 {
+                        let hx = orig[0] + dir[0] * th;
+                        let hz = orig[2] + dir[2] * th;
+                        if (-0.112..=0.024).contains(&hx) && (-0.118..=0.032).contains(&hz) {
+                            t_pcb = th;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
         let mut best_t = f32::INFINITY;
         let mut best_vol = f32::INFINITY;
         let mut best_idx: i32 = -1;
@@ -272,8 +323,7 @@ impl SiteCore {
             if ix < 0 || ix >= GRID_X as isize || iy < 0 || iy >= GRID_Y as isize || iz < 0 || iz >= GRID_Z as isize {
                 break;
             }
-            // Early exit once voxel entry exceeds best_t + 2.5 mm depth window
-            if cur_t > best_t + 0.0025 {
+            if cur_t > best_t + 0.0012 {
                 break;
             }
             let cidx = ((iz as usize) * GRID_Y + (iy as usize)) * GRID_X + (ix as usize);
@@ -282,13 +332,23 @@ impl SiteCore {
                 if !p.visible {
                     continue;
                 }
+                if p.group_id == 0 {
+                    if dir[1] < -0.05 && p.side_mask == 2 {
+                        continue;
+                    }
+                    if dir[1] > 0.05 && p.side_mask == 1 {
+                        continue;
+                    }
+                }
                 if let Some((ht0, _)) = intersect_aabb(orig, dir, [p.ax0, p.ay0, p.az0], [p.ax1, p.ay1, p.az1]) {
-                    if ht0 <= best_t + 0.0025 {
-                        // Prefer frontmost object; inside a 2.5 mm cluster prefer tighter package over big carrier slabs
-                        let near_tie = (ht0 - best_t).abs() <= 0.0022;
-                        if ht0 + 0.0022 < best_t || (near_tie && p.vol < best_vol) || best_idx < 0 {
+                    if p.group_id == 0 && ht0 > t_pcb + 0.0005 {
+                        continue;
+                    }
+                    if ht0 <= best_t + 0.0012 {
+                        let near_tie = (ht0 - best_t).abs() <= 0.0008;
+                        if ht0 + 0.0008 < best_t || (near_tie && p.vol < best_vol) || best_idx < 0 {
                             best_t = best_t.min(ht0);
-                            best_vol = if (ht0 - best_t).abs() <= 0.0022 { best_vol.min(p.vol) } else { p.vol };
+                            best_vol = if (ht0 - best_t).abs() <= 0.0008 { best_vol.min(p.vol) } else { p.vol };
                             best_idx = p.idx as i32;
                         }
                     }
@@ -578,9 +638,14 @@ mod tests {
         let y = [0.0f32; 8];
         core.set_group_transforms(&y, 0xff);
 
-        // Downward ray onto U1506
+        // Downward ray onto U1506 (top) and upward ray onto bottom part U1501
         let hit = core.pick_ray(-0.0125, 0.05, -0.008, 0.0, -1.0, 0.0);
         assert_eq!(hit, 1);
+
+        core.add_part(2, "U1501", "U1501", "TCA6416", "", "Bottom expander", "", 0, -0.020, -0.0002, -0.080, -0.014, 0.0008, -0.074);
+        core.set_group_transforms(&y, 0xff);
+        let bot_hit = core.pick_ray(-0.017, -0.05, -0.077, 0.0, 1.0, 0.0);
+        assert_eq!(bot_hit, 2);
 
         // Search and net lookup
         assert_eq!(core.search("U1506", 5), "[1]");

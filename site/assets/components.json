@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18T15:33:12.854Z",
+  "generated_at": "2026-11-18T17:03:45.782Z",
   "pcb_file": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
   "registration": {
     "note": "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
@@ -99,10 +99,10 @@
     "total_components": 795,
     "described": 767,
     "undescribed": 28,
-    "kicad_step_models": 728,
-    "procedural_replacements": 37,
+    "kicad_step_models": 755,
+    "procedural_replacements": 9,
     "unique_nets": 587,
-    "kv260_parts": 22
+    "kv260_parts": 23
   },
   "layer_stack": [
     {
@@ -4459,16 +4459,16 @@
         -8.953,
         75.004,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         2,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C150871",
       "mpn": "SKY13418-485LF",
       "manufacturer": "Skyworks Solutions",
@@ -5404,16 +5404,16 @@
         -10.493,
         98.214,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2.92,
         1.62,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C2158038",
       "mpn": "AP22652W6-7",
       "manufacturer": "Diodes Incorporated",
@@ -7512,16 +7512,16 @@
         -14.353,
         87.984,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         1.24,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470902",
       "mpn": "SPF5043Z",
       "manufacturer": "Qorvo",
@@ -8312,7 +8312,7 @@
       ],
       "sheet": "STATUS",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "repo-vrml",
       "lcsc": "C7424785",
       "mpn": "TYPE-C-31-E-17",
       "manufacturer": "Korean Hroparts Elec",
@@ -9581,7 +9581,7 @@
       ],
       "sheet": "CONTROL",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C50933",
       "mpn": "HR911130C",
       "manufacturer": "HANRUN(Zhongshan HanRun Elec)",
@@ -9804,16 +9804,16 @@
         -10.953,
         84.504,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         4,
         4,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470913",
       "mpn": "PE42442A-Z",
       "manufacturer": "pSemi",
@@ -10040,16 +10040,16 @@
         -1.953,
         65.404,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         1.6,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C135223",
       "mpn": "1XXD26000MAA",
       "manufacturer": "KDS Daishinku",
@@ -11961,16 +11961,16 @@
         -13.053,
         92.024,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         1.24,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470892",
       "mpn": "PE4259-63",
       "manufacturer": "pSemi",
@@ -13945,16 +13945,16 @@
         -2.253,
         84.504,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         4,
         4,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470913",
       "mpn": "PE42442A-Z",
       "manufacturer": "pSemi",
@@ -15997,16 +15997,16 @@
         -39.303,
         92.454,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         5.9,
         3.9,
-        1
+        1.2
       ],
       "sheet": "POWER",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C142805",
       "mpn": "1812L150/24MR",
       "manufacturer": "Littelfuse",
@@ -18501,7 +18501,7 @@
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C879868",
       "mpn": "LFCN-1000+",
       "manufacturer": "Mini-Circuits",
@@ -20788,7 +20788,7 @@
       ],
       "sheet": "POWER",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C913186",
       "mpn": "SRP7028A-3R3M",
       "manufacturer": "BOURNS",
@@ -23528,7 +23528,7 @@
       ],
       "sheet": "POWER",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C3096093",
       "mpn": "PJ-102AH",
       "manufacturer": "CUI",
@@ -24635,16 +24635,16 @@
         -8.953,
         68.204,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         2,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C150871",
       "mpn": "SKY13418-485LF",
       "manufacturer": "Skyworks Solutions",
@@ -25760,16 +25760,16 @@
         -13.02,
         65.214,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         1.24,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470892",
       "mpn": "PE4259-63",
       "manufacturer": "pSemi",
@@ -26973,7 +26973,7 @@
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C4990147",
       "mpn": "HFCN-1000+",
       "manufacturer": "Mini-Circuits",
@@ -28062,7 +28062,7 @@
       ],
       "sheet": "POWER",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C913186",
       "mpn": "SRP7028A-3R3M",
       "manufacturer": "BOURNS",
@@ -28281,16 +28281,16 @@
         -10.243,
         48.904,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         1.24,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470892",
       "mpn": "PE4259-63",
       "manufacturer": "pSemi",
@@ -30038,7 +30038,7 @@
       ],
       "sheet": "CLOCK",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "",
       "mpn": "",
       "manufacturer": "",
@@ -30613,16 +30613,16 @@
         -15.653,
         83.944,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         2,
         1.24,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470892",
       "mpn": "PE4259-63",
       "manufacturer": "pSemi",
@@ -32516,7 +32516,7 @@
       ],
       "sheet": "POWER",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C1329579",
       "mpn": "SRP7028A-2R2M",
       "manufacturer": "BOURNS",
@@ -32611,16 +32611,16 @@
         17.447,
         60.604,
         2.4,
-        3.4
+        3.6
       ],
       "local_size_mm": [
         3,
         3,
-        1
+        1.2
       ],
       "sheet": "STATUS",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C3035748",
       "mpn": "CH340X",
       "manufacturer": "WCH(Jiangsu Qin Heng)",
@@ -32841,7 +32841,7 @@
       ],
       "sheet": "POWER",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C2041815",
       "mpn": "SRP7028A-8R2M",
       "manufacturer": "BOURNS",
@@ -35069,7 +35069,7 @@
       ],
       "sheet": "STATUS",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C19269358",
       "mpn": "FPC-1.0FX-15PWCR-H20",
       "manufacturer": "XUNPU",
@@ -36410,17 +36410,17 @@
         55.654,
         -13.143,
         57.654,
-        -0.2,
+        -0.4,
         0.8
       ],
       "local_size_mm": [
         2,
         1.24,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C470902",
       "mpn": "SPF5043Z",
       "manufacturer": "Qorvo",
@@ -36881,17 +36881,17 @@
         71.404,
         -18.153,
         75.404,
-        -0.2,
+        -0.4,
         0.8
       ],
       "local_size_mm": [
         4,
         4,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C182336",
       "mpn": "TCA6416ARTWR",
       "manufacturer": "Texas Instruments",
@@ -40165,17 +40165,17 @@
         49.504,
         -16.403,
         53.504,
-        -0.2,
+        -0.4,
         0.8
       ],
       "local_size_mm": [
         4,
         4,
-        1
+        1.2
       ],
       "sheet": "RX_VU",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C500480",
       "mpn": "PE4312C-Z",
       "manufacturer": "pSemi",
@@ -41233,17 +41233,17 @@
         91.804,
         -14.353,
         95.804,
-        -0.2,
+        -0.4,
         0.8
       ],
       "local_size_mm": [
         4,
         4,
-        1
+        1.2
       ],
       "sheet": "STATUS",
       "dnp": false,
-      "model_source": "procedural-replacement",
+      "model_source": "kicad-step",
       "lcsc": "C182336",
       "mpn": "TCA6416ARTWR",
       "manufacturer": "Texas Instruments",
@@ -43859,6 +43859,25 @@
       "role": "Holds the PetaLinux / Ubuntu root filesystem, device tree overlay, and recordings on the carrier.",
       "citation": "AMD UG1089",
       "manual_link": "docs/ENCLOSURE.md#2-geometry"
+    },
+    {
+      "id": "KV260_J_FAN",
+      "ref": "J13 (KV260 4010 Fan Header)",
+      "value": "Molex 4-pin PWM Header",
+      "part": "SOM / Carrier Fan Header",
+      "assembly": "kv260",
+      "subassembly": "carrier",
+      "bbox_mm": [
+        112,
+        74,
+        116.5,
+        84,
+        0,
+        6.5
+      ],
+      "role": "4-pin PWM header powering the KV260 4010 SOM cooler fan.",
+      "citation": "AMD UG1089",
+      "manual_link": "docs/ENCLOSURE_V2_THERMAL.md"
     }
   ],
   "extra_parts": [

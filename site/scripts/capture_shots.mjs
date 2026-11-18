@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SITE_DIR = path.dirname(HERE);
+const ROOT_DIR = path.dirname(SITE_DIR);
 const SHOTS_DIR = path.join(SITE_DIR, "shots");
 
 const MIME = {
@@ -28,6 +29,7 @@ const MIME = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
+  ".pdf": "application/pdf",
   ".md": "text/markdown; charset=utf-8",
 };
 
@@ -47,12 +49,18 @@ function findChrome() {
 }
 
 function startStaticServer() {
+  const telemetry = { pdfRangeRequests: 0, pdfFull200Count: 0, pdfBytesServed: 0 };
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
       const urlPath = decodeURIComponent((req.url || "/").split("?")[0]);
       const rel = urlPath === "/" ? "index.html" : urlPath.replace(/^\/+/, "");
-      const filePath = path.resolve(SITE_DIR, rel);
-      if (!filePath.startsWith(path.resolve(SITE_DIR))) {
+      let filePath = path.resolve(SITE_DIR, rel);
+      let allowedRoot = path.resolve(SITE_DIR);
+      if (rel.startsWith("docs/") && rel.toLowerCase().endsWith(".pdf")) {
+        filePath = path.resolve(ROOT_DIR, rel);
+        allowedRoot = path.resolve(ROOT_DIR, "docs");
+      }
+      if (!filePath.startsWith(allowedRoot)) {
         res.writeHead(403);
         res.end("Forbidden");
         return;
@@ -62,12 +70,55 @@ function startStaticServer() {
         res.end("Not Found: " + rel);
         return;
       }
+      const stat = fs.statSync(filePath);
       const ext = path.extname(filePath).toLowerCase();
-      res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
+      const ctype = MIME[ext] || "application/octet-stream";
+      const rangeHdr = req.headers.range;
+      if (rangeHdr) {
+        const m = rangeHdr.match(/^bytes=(\d*)-(\d*)$/);
+        if (!m) {
+          res.writeHead(416, { "Content-Range": `bytes */${stat.size}` });
+          res.end();
+          return;
+        }
+        const start = m[1] ? parseInt(m[1], 10) : 0;
+        const end = m[2] ? Math.min(stat.size - 1, parseInt(m[2], 10)) : stat.size - 1;
+        if (start > end || start >= stat.size) {
+          res.writeHead(416, { "Content-Range": `bytes */${stat.size}` });
+          res.end();
+          return;
+        }
+        const chunkLen = end - start + 1;
+        if (ext === ".pdf") {
+          telemetry.pdfRangeRequests++;
+          telemetry.pdfBytesServed += chunkLen;
+        }
+        res.writeHead(206, {
+          "Content-Type": ctype,
+          "Content-Range": `bytes ${start}-${end}/${stat.size}`,
+          "Accept-Ranges": "bytes",
+          "Content-Length": chunkLen,
+        });
+        fs.createReadStream(filePath, { start, end }).pipe(res);
+        return;
+      }
+      if (ext === ".pdf") {
+        telemetry.pdfFull200Count++;
+        telemetry.pdfBytesServed += stat.size;
+      }
+      res.writeHead(200, {
+        "Content-Type": ctype,
+        "Accept-Ranges": "bytes",
+        "Content-Length": stat.size,
+      });
+      if ((req.method || "GET").toUpperCase() === "HEAD") {
+        res.end();
+        return;
+      }
       fs.createReadStream(filePath).pipe(res);
     });
     server.listen(0, "127.0.0.1", () => {
-      resolve({ server, port: server.address().port });
+      resolve({ server, port: server.address().port, telemetry });
     });
   });
 }
@@ -139,7 +190,7 @@ async function waitFor(fn, timeoutMs = 45000, stepMs = 200) {
 
 async function run() {
   fs.mkdirSync(SHOTS_DIR, { recursive: true });
-  const { server, port } = await startStaticServer();
+  const { server, port, telemetry } = await startStaticServer();
   const baseUrl = `http://127.0.0.1:${port}/?noIntro=1`;
   const cdpPort = 9222 + Math.floor(Math.random() * 400);
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "ias2rf_chrome_"));
@@ -219,9 +270,19 @@ async function run() {
     })`);
     console.log("Rust Core CAN search:", canSearch);
 
-    // Benchmark 60 Info-Mode hover frames on Desktop (1440x900)
+    // Benchmark 60 Info-Mode hover frames & full-assembly AFTER metrics on Desktop (1440x900)
     await client.evalJs(`
       window.__SITE_API.scrollToExplorer();
+      window.__SITE_API.isolate("all");
+      window.__SITE_API.setEnclosure("open");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraPreset("iso");
+    `);
+    await sleep(300);
+    const deskAfterFull = await client.evalJs(`window.__SITE_API.benchmarkRender({ frames: 30, useWasm: true })`);
+    console.log("AFTER Full-Assembly Benchmark Desktop (1440x900):", deskAfterFull);
+
+    await client.evalJs(`
       window.__SITE_API.isolate("board");
       window.__SITE_API.setCameraPreset("iso");
     `);
@@ -230,6 +291,32 @@ async function run() {
     const deskWasm = await client.evalJs(`window.__SITE_API.benchmarkHover({ frames: 60, useWasm: true })`);
     console.log("Benchmark Desktop (1440x900) Three.js mesh raycast:", deskThree);
     console.log("Benchmark Desktop (1440x900) Rust WASM spatial grid:", deskWasm);
+
+    // Bottom-side hover picking check (projected centers of bottom parts + dense sweep)
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraPreset("bottom");
+    `);
+    await sleep(300);
+    const bottomCheck = await client.evalJs(`(() => {
+      const targets = ["U1506", "Q1530", "Q1531", "R1555", "U1313", "U1501", "D911", "J101"];
+      const projected = {};
+      for (const id of targets) {
+        const pt = window.__SITE_API.projectPartCenterNdc(id);
+        const r = pt ? window.__SITE_API.pickAtNdc(pt.x, pt.y) : null;
+        projected[id] = r ? r.id : null;
+      }
+      const gridHits = new Set();
+      for (let ix = -16; ix <= 16; ix++) {
+        for (let iy = -16; iy <= 16; iy++) {
+          const r = window.__SITE_API.pickAtNdc(ix * 0.032, iy * 0.032);
+          if (r && r.id) gridHits.add(r.id);
+        }
+      }
+      return { projected, gridCount: gridHits.size, gridSample: Array.from(gridHits).slice(0, 18) };
+    })()`);
+    console.log("Bottom-side pick verification:", JSON.stringify(bottomCheck));
 
     // 1. Landing Section Hero + 3-D Explorer Top Preview
     await client.evalJs(`
@@ -406,11 +493,22 @@ async function run() {
     await client.evalJs(`window.__SITE_API.selectTab("gallery");`);
     await snap("sim_gallery.png", 600);
 
-    // 12. Phone Profile (390x844) + Hover Benchmark
+    // 12. Phone Profile (390x844) + Hover & Full-Assembly Benchmark
     await setViewport(390, 844, true);
     await client.evalJs(`
       window.__SITE_API.setTheme("dark");
       window.__SITE_API.selectTab("explorer");
+      window.__SITE_API.isolate("all");
+      window.__SITE_API.setEnclosure("open");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.scrollToExplorer();
+    `);
+    await sleep(300);
+    const mobAfterFull = await client.evalJs(`window.__SITE_API.benchmarkRender({ frames: 30, useWasm: true })`);
+    console.log("AFTER Full-Assembly Benchmark Phone (390x844):", mobAfterFull);
+
+    await client.evalJs(`
       window.__SITE_API.isolate("board");
       window.__SITE_API.selectNet(null);
       window.__SITE_API.selectPart("J1503", false);
@@ -433,6 +531,114 @@ async function run() {
       window.__SITE_API.scrollToExplorer();
     `);
     await snap("phone_light.png");
+
+    // 13. Side-by-side comparison renders + Custom KV260 model shot (Desktop 1440x900)
+    await setViewport(1440, 900, false);
+    const composeSideBySide = async (liveB64, refRelPath, outName, liveLabel, refLabel) => {
+      const sideB64 = await client.evalJs(`(async (b64, refPath, lLbl, rLbl) => {
+        const cvs = document.createElement("canvas");
+        cvs.width = 1440;
+        cvs.height = 540;
+        const ctx = cvs.getContext("2d");
+        ctx.fillStyle = "#0b0d10";
+        ctx.fillRect(0, 0, 1440, 540);
+        const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.src = src; });
+        const [imL, imR] = await Promise.all([loadImg("data:image/png;base64," + b64), loadImg(refPath)]);
+        const drawFit = (im, ox, oy, bw, bh) => {
+          const s = Math.min(bw / im.width, bh / im.height);
+          const dw = im.width * s, dh = im.height * s;
+          ctx.drawImage(im, ox + (bw - dw) / 2, oy + (bh - dh) / 2, dw, dh);
+        };
+        drawFit(imL, 0, 0, 720, 540);
+        drawFit(imR, 720, 0, 720, 540);
+        ctx.fillStyle = "rgba(11,13,16,0.85)";
+        ctx.fillRect(14, 14, 290, 28);
+        ctx.fillRect(734, 14, 290, 28);
+        ctx.fillStyle = "#4cc2ff";
+        ctx.font = "bold 14px monospace";
+        ctx.fillText(lLbl, 24, 33);
+        ctx.fillStyle = "#ffb020";
+        ctx.fillText(rLbl, 744, 33);
+        return cvs.toDataURL("image/png").split(",")[1];
+      })(${JSON.stringify(liveB64)}, ${JSON.stringify(refRelPath)}, ${JSON.stringify(liveLabel)}, ${JSON.stringify(refLabel)})`);
+      fs.writeFileSync(path.join(SHOTS_DIR, outName), Buffer.from(sideB64, "base64"));
+      console.log("Captured", outName);
+    };
+
+    await client.evalJs(`
+      window.__SITE_API.setTheme("dark");
+      window.__SITE_API.selectTab("explorer");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setTeardown({ fan: true, hs: true, somLiftMm: 14, isolate: "kv260", select: "KV260_J8_USB" }, true);
+      window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.scrollToExplorer();
+    `);
+    await snap("kv260_custom_model.png", 500);
+
+    await client.evalJs(`
+      window.__SITE_API.isolate("all");
+      window.__SITE_API.setEnclosure("open");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraPreset("iso");
+    `);
+    const openB64 = await snap("tmp_enc_open.png", 450);
+    await composeSideBySide(openB64, "assets/img/case_v2_open.jpg", "compare_enclosure_open.png", "LIVE WEBGL (HIGH-RES SMOOTH)", "REF: docs/img/case_v2_open.jpg");
+    try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_enc_open.png")); } catch {}
+
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.selectNet(null);
+      window.__SITE_API.selectPart("U1506", false);
+      window.__SITE_API.setCameraPreset("bottom");
+    `);
+    const botB64 = await snap("tmp_board_bot.png", 450);
+    await composeSideBySide(botB64, "assets/img/board_bottom.png", "compare_board_bottom.png", "LIVE WEBGL BOTTOM SIDE", "REF: docs/img/board_bottom.png");
+    try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_board_bot.png")); } catch {}
+
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraPreset("iso");
+    `);
+    const isoB64 = await snap("tmp_board_iso.png", 450);
+    await composeSideBySide(isoB64, "assets/img/board_iso.png", "compare_board_iso.png", "LIVE WEBGL BOARD ISO (STEP)", "REF: docs/img/board_iso.png");
+    try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_board_iso.png")); } catch {}
+
+    // 14. Vendored PDF.js Streaming Reader Verification (Desktop #page=214 & Phone #page=1)
+    const pdfDeskUrl = `http://127.0.0.1:${port}/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=214`;
+    const tPdf0 = Date.now();
+    await client.send("Page.navigate", { url: pdfDeskUrl });
+    await waitFor(async () => {
+      return await client.evalJs(`(() => {
+        if (!window.__PDF_API || !window.__PDF_API.isReady()) return false;
+        const st = window.__PDF_API.getStats();
+        return st.renderedPages >= 1;
+      })()`);
+    }, 30000, 200);
+    const pdfDeskMs = Date.now() - tPdf0;
+    const pdfDeskStats = await client.evalJs("window.__PDF_API.getStats()");
+    await client.evalJs("window.scrollBy(0, 120)");
+    await snap("pdf_viewer_desktop.png", 500);
+    console.log(`PDF Desktop (#page=214) ready in ${pdfDeskMs} ms:`, pdfDeskStats);
+
+    await setViewport(390, 844, true);
+    const pdfPhoneUrl = `http://127.0.0.1:${port}/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1`;
+    const tPdfPhone0 = Date.now();
+    await client.send("Page.navigate", { url: pdfPhoneUrl });
+    await waitFor(async () => {
+      return await client.evalJs(`(() => {
+        if (!window.__PDF_API || !window.__PDF_API.isReady()) return false;
+        const st = window.__PDF_API.getStats();
+        return st.renderedPages >= 1;
+      })()`);
+    }, 30000, 200);
+    const pdfPhoneMs = Date.now() - tPdfPhone0;
+    await client.evalJs("window.scrollBy(0, 200)");
+    const pdfPhoneStats = await client.evalJs("window.__PDF_API.getStats()");
+    await snap("pdf_viewer_phone.png", 500);
+    console.log(`PDF Phone (#page=1) ready in ${pdfPhoneMs} ms:`, pdfPhoneStats);
+    console.log("PDF HTTP streaming telemetry:", telemetry);
 
     // Check errors across Runtime, Console, Log, and local Network
     const errors = [];

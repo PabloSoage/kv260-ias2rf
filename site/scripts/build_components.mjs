@@ -719,7 +719,38 @@ const KV260_PARTS = [
     citation: "AMD UG1089",
     manual_link: "docs/ENCLOSURE.md#2-geometry",
   },
+  {
+    id: "KV260_J_FAN",
+    ref: "J13 (KV260 4010 Fan Header)",
+    value: "Molex 4-pin PWM Header",
+    part: "SOM / Carrier Fan Header",
+    assembly: "kv260",
+    subassembly: "carrier",
+    bbox_mm: [112.0, 74.0, 116.5, 84.0, 0.0, 6.5],
+    role: "4-pin PWM header powering the KV260 4010 SOM cooler fan.",
+    citation: "AMD UG1089",
+    manual_link: "docs/ENCLOSURE_V2_THERMAL.md",
+  },
 ];
+
+const KICAD_STEP_REPLACED = new Set([
+  "DC-IN-TH_PJ-102AH.wrl",
+  "RJ45-TH_HR911130C.wrl",
+  "FPC-SMD_15P-P1.00_XUNPU_FPC-1.0FX-15PWCR-H20.wrl",
+  "SOT-23-6_L2.9-W1.6-H1.5-LS2.8-P0.95.wrl",
+  "SC-70-6_L2.0-W1.3-H1.0-P0.65.wrl",
+  "SOT343_L2.0-W1.3-H0.9-P1.30-LS2.1-BL.wrl",
+  "QFN-24_L4.0-W4.0-P0.50-BL-EP2.8.wrl",
+  "WQFN-24_L4.0-W4.0-H0.8-P0.50.wrl",
+  "QFN-20_L4.0-W4.0-H0.8-P0.50.wrl",
+  "QFN-14_L2.0-W2.0-H0.5-P0.45-BL-EP.wrl",
+  "MSOP-10_L3.0-W3.0-H1.1-LS5.0-P0.50.wrl",
+  "F1812_L4.5-W3.2-H1.0.wrl",
+  "IND-SMD_SRP7028A-8R2M.wrl",
+  "OSC-SMD_8P-L7.0-W5.0-BL.wrl",
+  "OSC-SMD_4P-L2.0-W1.6-H0.8.wrl",
+  "FILTER-SMD_1206-4P-L3.2-W1.6-H0.9-L.wrl",
+]);
 
 const EXTRA_PARTS = [
   {
@@ -856,7 +887,11 @@ function build() {
     // Model provenance
     const modelPaths = [...block.matchAll(/\(model\s+"([^"]+)"/g)].map((m) => m[1]);
     let modelSource = "none";
-    if (modelPaths.some((p) => p.includes("_work/mech/cache/models3d/"))) {
+    if (modelPaths.some((p) => KICAD_STEP_REPLACED.has(p.split("/").pop()))) {
+      modelSource = "kicad-step";
+    } else if (modelPaths.some((p) => p.includes("mech/models3d/USB_C_HRO"))) {
+      modelSource = "repo-vrml";
+    } else if (modelPaths.some((p) => p.includes("_work/mech/cache/models3d/"))) {
       modelSource = "procedural-replacement";
     } else if (modelPaths.some((p) => p.endsWith(".wrl") && !p.endsWith(".step"))) {
       modelSource = "procedural-replacement";

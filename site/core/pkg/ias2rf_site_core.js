@@ -144,6 +144,19 @@ export class SiteCore {
         wasm.sitecore_set_group_transforms(this.__wbg_ptr, ptr0, len0, val2);
     }
     /**
+     * @param {number} idx
+     * @param {number} side_mask
+     * @param {number} x0
+     * @param {number} y0
+     * @param {number} z0
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} z1
+     */
+    set_part_bounds(idx, side_mask, x0, y0, z0, x1, y1, z1) {
+        wasm.sitecore_set_part_bounds(this.__wbg_ptr, idx, side_mask, x0, y0, z0, x1, y1, z1);
+    }
+    /**
      * Mirror-Safe J9<->J1502 NOR gate + Montero V80 CAN 2.0 Differential Bit Waveform for Mock-up #4.
      * @param {boolean} ffc_type_d
      * @param {boolean} can_tx_dom

@@ -135,6 +135,7 @@
               <button class="btn btn-sm" id="btn-preset-kv-teardown" type="button">KV260 Teardown</button>
               <button class="btn btn-sm" id="btn-preset-som240" type="button">Inspect SOM240</button>
             </div>
+            <p style="margin:6px 0 0;font-size:10.5px;color:var(--text-muted);line-height:1.35;">KV260 and K26 are AMD products. This is a simplified model drawn for this project from AMD's public documentation, for illustration only; it is not AMD's CAD model.</p>
           </div>
 
           <div class="panel-card">
@@ -315,16 +316,19 @@
       <div class="scroll-page">
         <div class="section-head">
           <h2>Documentation &amp; Third-Party Licences</h2>
-          <a class="btn btn-sm btn-primary" href="LICENSES.md" target="_blank">Open site/LICENSES.md</a>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1" target="_blank" rel="noopener">Open PDF Reader</a>
+            <a class="btn btn-sm" href="LICENSES.md" target="_blank">Open site/LICENSES.md</a>
+          </div>
         </div>
 
         <div class="docs-grid">
           <div class="doc-card">
             <div>
               <strong>Complete Hardware &amp; Software Documentation (PDF)</strong>
-              <p>Compiled reference covering Rev08 architecture, BOM, bring-up, FPGA link, DSP &amp; integrations.</p>
+              <p>250-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
             </div>
-            <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/KV260-IAS2RF_Documentation.pdf" target="_blank" rel="noopener">Open Documentation PDF</a>
+            <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1" target="_blank" rel="noopener">Open Documentation PDF</a>
           </div>
           <div class="doc-card">
             <div>
@@ -332,28 +336,28 @@
               <p>13-sheet hierarchical KiCad schematic and full 8-layer copper/drill fabrication plots.</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/KV260-IAS2RF_schematic.pdf" target="_blank" rel="noopener">Schematic PDF</a>
-              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/KV260-IAS2RF_layout.pdf" target="_blank" rel="noopener">Layout PDF</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_schematic.pdf#page=1" target="_blank" rel="noopener">Schematic PDF</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_layout.pdf#page=1" target="_blank" rel="noopener">Layout PDF</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>Board Manual &amp; Project Overview</strong>
-              <p>Connector pinouts, RF tuning, component rationale and mechanical clearances (<code>BOARD_MANUAL.md</code>, <code>README.md</code>).</p>
+              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.23).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/README.md" target="_blank" rel="noopener">README.md</a>
-              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/BOARD_MANUAL.md" target="_blank" rel="noopener">BOARD_MANUAL.md</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=6" target="_blank" rel="noopener">Overview (p.6)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=23" target="_blank" rel="noopener">Board Manual (p.23)</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>FPGA Co-Simulation &amp; Vehicle Integrations</strong>
-              <p>XSim <code>tb_system</code> verification, <code>TX_KEY</code>, PS <code>CAN1</code> EMIO, GPS PPS, LiDAR/Radar fusion and SDR tests.</p>
+              <p>XSim <code>tb_system</code> verification (p.50), LVDS/pin map (p.59), CAN/GPS/LiDAR/Radar integrations (p.78), and CAD/FEA/CFD (p.167).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/fpga/SYSTEM_SIM.md" target="_blank" rel="noopener">SYSTEM_SIM.md</a>
-              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/INTEGRATIONS.md" target="_blank" rel="noopener">INTEGRATIONS.md</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=50" target="_blank" rel="noopener">System Sim (p.50)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=78" target="_blank" rel="noopener">Integrations (p.78)</a>
             </div>
           </div>
         </div>
@@ -367,23 +371,28 @@
             <tbody>
               <tr>
                 <td><code>assets/board.glb</code></td>
-                <td>Rev08 PCB + clean KiCad/repo 3-D bodies + procedural replacements</td>
-                <td>Project hardware (Apache-2.0, repository LICENSE); KiCad official STEP library bodies CC-BY-SA 4.0 + KiCad Exception. Zero EasyEDA cached models redistributed.</td>
+                <td>Rev08 PCB + clean KiCad/repo 3-D bodies + 9 procedural replacements</td>
+                <td>Project hardware, baked 2048x2048 PCB surface textures, and <code>mech/models3d/USB_C_HRO_TYPE-C-31-E-17.wrl</code> (Apache-2.0, repository LICENSE); KiCad 10 official STEP library bodies CC-BY-SA 4.0 + KiCad Libraries Exception. Zero EasyEDA cached models redistributed.</td>
               </tr>
               <tr>
                 <td><code>assets/kv260.glb</code></td>
-                <td>Simplified KV260 carrier, K26 SOM, connectors, heatsink &amp; 4010 fan</td>
-                <td>Written from scratch in <code>site/scripts/build_assets.mjs</code> (Apache-2.0 / MIT). AMD proprietary XTP679 STEP/STL is not redistributed.</td>
+                <td>Simplified KV260 carrier, K26 SOM, KiCad STEP connectors, 18-fin heatsink &amp; 4010 fan</td>
+                <td>KV260 and K26 are AMD products. This is a simplified model drawn for this project from AMD's public documentation, for illustration only; it is not AMD's CAD model. Carrier geometry written from scratch in <code>site/scripts/build_assets.mjs</code> (Apache-2.0 / MIT); standard connector bodies from KiCad 10 official STEP library (CC-BY-SA 4.0 + KiCad Exception). AMD proprietary XTP679 CAD is not redistributed.</td>
               </tr>
               <tr>
                 <td><code>assets/enclosure.glb</code></td>
-                <td>Closed v2 enclosure STLs, TPU bumpers, <code>HS1..HS4</code> &amp; <code>OD5015</code></td>
+                <td>High-res closed v2 enclosure STLs (30 deg smooth normals), TPU bumpers, <code>HS1..HS4</code> &amp; <code>OD5015</code></td>
                 <td>Apache-2.0 (project mechanical geometry in <code>mech/</code> &amp; <code>site/scripts/build_assets.mjs</code>).</td>
               </tr>
               <tr>
                 <td><code>vendor/three-0.170.0/</code></td>
                 <td>Three.js r170 + controls/loaders/MeshoptDecoder</td>
                 <td>MIT License (fully vendored, zero CDN runtime requests).</td>
+              </tr>
+              <tr>
+                <td><code>vendor/pdfjs-4.10.38/</code></td>
+                <td>Mozilla PDF.js v4.10.38 (<code>pdf.min.mjs</code>, <code>pdf.worker.min.mjs</code>)</td>
+                <td>Apache-2.0 License (vendored locally; streams deployed <code>docs/*.pdf</code> via HTTP 206 byte ranges).</td>
               </tr>
               <tr>
                 <td><code>site/core/pkg/</code></td>

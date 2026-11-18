@@ -3,6 +3,7 @@ import { OrbitControls } from "./vendor/three-0.170.0/OrbitControls.js";
 import { GLTFLoader } from "./vendor/three-0.170.0/GLTFLoader.js";
 import { RoomEnvironment } from "./vendor/three-0.170.0/RoomEnvironment.js";
 import { MeshoptDecoder } from "./vendor/three-0.170.0/meshopt_decoder.module.js";
+import { mergeGeometries } from "./vendor/three-0.170.0/BufferGeometryUtils.js";
 import initCore, { SiteCore } from "./core/pkg/ias2rf_site_core.js";
 import { initMockups } from "./mockups.js";
 import { createSimController } from "./sim_mode.js";
@@ -10,6 +11,28 @@ import { createSimController } from "./sim_mode.js";
 const REPO_BLOB = "https://github.com/PabloSoage/kv260-ias2rf/blob/main";
 const BOARD_REG_POS = new THREE.Vector3(0.107247, 0.0008, -0.198004);
 const BOARD_REG_ROTY = -Math.PI / 2;
+
+const DOC_PDF_PAGE_MAP = {
+  "README.md": 6,
+  "docs/BOARD_MANUAL.md": 23,
+  "docs/FPGA_GATEWARE.md": 50,
+  "fpga/SYSTEM_SIM.md": 50,
+  "docs/INTERFACE_SPEC.md": 59,
+  "docs/INTEGRATIONS.md": 78,
+  "docs/POWER_AND_STACKUP.md": 120,
+  "docs/SIGNAL_INTEGRITY.md": 136,
+  "docs/3D_MODELS.md": 163,
+  "docs/MECHANICAL.md": 167,
+  "docs/ENCLOSURE.md": 171,
+  "docs/ENCLOSURE_V2_THERMAL.md": 184,
+};
+
+function docToPdfHref(docPath) {
+  const clean = String(docPath || "docs/BOARD_MANUAL.md").split("#")[0];
+  if (clean.endsWith(".pdf")) return `pdf.html?file=${encodeURI(clean)}#page=1`;
+  const pg = DOC_PDF_PAGE_MAP[clean] || 23;
+  return `pdf.html?file=${encodeURIComponent("docs/KV260-IAS2RF_Documentation.pdf")}#page=${pg}`;
+}
 
 const GALLERY_SECTIONS = [
   {
@@ -93,6 +116,10 @@ const compByNet = new Map();
 
 // Main 3-D objects
 let renderer, scene, camera, controls;
+let needsRender = true;
+function requestRender() {
+  needsRender = true;
+}
 const assemblyRoot = new THREE.Group();
 const adapterGroup = new THREE.Group();
 let boardModel = null;
@@ -109,6 +136,10 @@ let activePulseMesh = null;
 
 // Layer viewer objects
 let layerRenderer, layerScene, layerCamera, layerControls;
+let layerNeedsRender = true;
+function requestLayerRender() {
+  layerNeedsRender = true;
+}
 const layerPlanesGroup = new THREE.Group();
 const layerEntries = [];
 let layerActiveId = "F.Cu";
@@ -271,27 +302,28 @@ function initExplorerThree() {
   const canvas = $("#webgl-canvas");
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.shadowMap.enabled = false;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
 
   scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.85;
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.06).texture;
+  scene.environmentIntensity = 0.65;
   pmrem.dispose();
 
-  scene.add(new THREE.HemisphereLight(0xdbe8f8, 0x1a2029, 0.55));
+  scene.add(new THREE.HemisphereLight(0xdbe8f8, 0x1a2029, 0.58));
   const keyLight = new THREE.DirectionalLight(0xfff8ef, 1.35);
   keyLight.position.set(0.45, 0.78, 0.52);
   scene.add(keyLight);
 
-  const rimLight = new THREE.DirectionalLight(0x9bc4ff, 0.52);
+  const rimLight = new THREE.DirectionalLight(0x9bc4ff, 0.55);
   rimLight.position.set(-0.55, 0.35, -0.52);
   scene.add(rimLight);
 
-  const botLight = new THREE.DirectionalLight(0xeef4fc, 0.38);
+  const botLight = new THREE.DirectionalLight(0xeef4fc, 0.50);
   botLight.position.set(0.05, -0.85, 0.25);
   scene.add(botLight);
 
@@ -303,6 +335,7 @@ function initExplorerThree() {
   controls.dampingFactor = 0.08;
   controls.minDistance = 0.025;
   controls.maxDistance = 1.4;
+  controls.addEventListener("change", requestRender);
 
   // Cancel scripted camera/intro motions immediately on user input
   const cancelAutoMotion = () => {
@@ -337,6 +370,7 @@ function initExplorerThree() {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    requestRender();
   };
   canvas._resizeFn = resizeExplorer;
   new ResizeObserver(resizeExplorer).observe(canvas.parentElement);
@@ -346,15 +380,349 @@ function initExplorerThree() {
 
   const tick = (now) => {
     requestAnimationFrame(tick);
-    stepTweens(now);
-    stepPulseDots(now);
-    simCtrl?.stepAnimation(now);
+    const tweenDirty = stepTweens(now);
+    const pulseDirty = !!(activePulseMesh && activeTraceSegs.length && !isReducedMotion());
+    if (pulseDirty) {
+      stepPulseDots(now);
+      needsRender = true;
+    }
+    const simDirty = !!(simCtrl && simCtrl.stepAnimation(now));
+    if (tweenDirty || simDirty) needsRender = true;
     if (state.tab === "explorer") {
-      controls.update();
-      renderer.render(scene, camera);
+      if (controls.update()) needsRender = true;
+      if (needsRender) {
+        renderer.render(scene, camera);
+        needsRender = false;
+      }
     }
   };
   requestAnimationFrame(tick);
+}
+
+function refreshBoardPickerBounds(cat) {
+  if (!siteCore || !cat) return;
+  scene.updateMatrixWorld(true);
+  const tmpBox = new THREE.Box3();
+  for (const c of cat.components) {
+    const idx = partIndexById.get(c.ref);
+    if (idx === undefined) continue;
+    const [wx0, wy0, wx1, wy1, wz0, wz1] = c.bbox_world_mm;
+    let x0 = Math.min(wx0, wx1) * 0.001;
+    let x1 = Math.max(wx0, wx1) * 0.001;
+    let y0 = Math.min(wz0, wz1) * 0.001;
+    let y1 = Math.max(wz0, wz1) * 0.001;
+    let z0 = Math.min(-wy0, -wy1) * 0.001;
+    let z1 = Math.max(-wy0, -wy1) * 0.001;
+
+    const obj = nodeById.get(c.ref);
+    if (obj) {
+      tmpBox.setFromObject(obj);
+      if (!tmpBox.isEmpty()) {
+        x0 = Math.min(x0, tmpBox.min.x);
+        x1 = Math.max(x1, tmpBox.max.x);
+        y0 = Math.min(y0, tmpBox.min.y);
+        y1 = Math.max(y1, tmpBox.max.y);
+        z0 = Math.min(z0, tmpBox.min.z);
+        z1 = Math.max(z1, tmpBox.max.z);
+      }
+    }
+    // Keep small 0402 parts & bare pads easily hoverable (>= 1.3 mm footprint span)
+    const cx = (x0 + x1) * 0.5;
+    const cz = (z0 + z1) * 0.5;
+    x0 = Math.min(x0, cx - 0.00065);
+    x1 = Math.max(x1, cx + 0.00065);
+    z0 = Math.min(z0, cz - 0.00065);
+    z1 = Math.max(z1, cz + 0.00065);
+
+    const isTht = (y0 < 0.00105 && y1 > 0.00210);
+    let sideMask = c.side === "bottom" ? 2 : 1;
+    if (isTht) {
+      sideMask = 3;
+    } else if (sideMask === 2) {
+      y0 = Math.min(y0, 0.00035);
+      y1 = Math.min(Math.max(y1, 0.00090), 0.00112);
+    } else {
+      y0 = Math.max(y0, 0.00205);
+      y1 = Math.max(y1, 0.00275);
+    }
+    siteCore.set_part_bounds(idx, sideMask, x0, y0, z0, x1, y1, z1);
+  }
+}
+
+function materialBatchSignature(mat) {
+  const c = mat.color ? mat.color.getHexString() : "ffffff";
+  const m = (mat.metalness ?? 0).toFixed(2);
+  const r = (mat.roughness ?? 0.5).toFixed(2);
+  const op = (mat.opacity ?? 1).toFixed(2);
+  const tr = mat.transparent ? 1 : 0;
+  const ds = mat.side === THREE.DoubleSide ? 2 : 0;
+  const mp = mat.map ? mat.map.uuid : "none";
+  return `${c}:${m}:${r}:${op}:${tr}:${ds}:${mp}`;
+}
+
+function batchStaticGroupByMaterial(groupRoot, { skipPrefixes = [], batchName = "STATIC_BATCH" } = {}) {
+  if (!groupRoot) return;
+  groupRoot.updateMatrixWorld(true);
+  const rootInv = groupRoot.matrixWorld.clone().invert();
+  const buckets = new Map();
+  const toHide = [];
+
+  groupRoot.traverse((obj) => {
+    if (!obj.isMesh || !obj.geometry) return;
+    let cur = obj;
+    let skip = false;
+    while (cur && cur !== groupRoot) {
+      if (cur.name && (cur.name.endsWith("_BATCH") || skipPrefixes.some((p) => cur.name.startsWith(p)))) {
+        skip = true;
+        break;
+      }
+      cur = cur.parent;
+    }
+    if (skip) return;
+
+    const mat = Array.isArray(obj.material) ? obj.material[0] : obj.material;
+    if (!mat) return;
+    if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox();
+
+    const relMat = new THREE.Matrix4().multiplyMatrices(rootInv, obj.matrixWorld);
+    const keepUv = !!mat.map && !!obj.geometry.getAttribute("uv");
+    const key = `${materialBatchSignature(mat)}:${keepUv ? 1 : 0}`;
+    let bucket = buckets.get(key);
+    if (!bucket) {
+      bucket = { mat: mat.clone(), geos: [] };
+      buckets.set(key, bucket);
+    }
+
+    const g = obj.geometry.clone();
+    for (const attrName of Object.keys(g.attributes)) {
+      if (attrName !== "position" && attrName !== "normal" && (!keepUv || attrName !== "uv")) {
+        g.deleteAttribute(attrName);
+      }
+    }
+    g.applyMatrix4(relMat);
+    if (!g.getAttribute("normal")) g.computeVertexNormals();
+    if (!g.index) {
+      const cnt = g.attributes.position.count;
+      const idxArr = new Uint32Array(cnt);
+      for (let i = 0; i < cnt; i++) idxArr[i] = i;
+      g.setIndex(new THREE.BufferAttribute(idxArr, 1));
+    } else if (relMat.determinant() < 0) {
+      const ix = g.index;
+      for (let t = 0; t + 2 < ix.count; t += 3) {
+        const b = ix.getX(t + 1);
+        ix.setX(t + 1, ix.getX(t + 2));
+        ix.setX(t + 2, b);
+      }
+    }
+    bucket.geos.push(g);
+    toHide.push(obj);
+  });
+
+  if (!buckets.size) return;
+  const batchGroup = new THREE.Group();
+  batchGroup.name = batchName;
+  let bi = 0;
+  for (const { mat, geos } of buckets.values()) {
+    const merged = mergeGeometries(geos, false);
+    geos.forEach((g) => g.dispose());
+    if (!merged) continue;
+    const m = new THREE.Mesh(merged, mat);
+    m.name = `${batchName}_${bi++}`;
+    batchGroup.add(m);
+  }
+  groupRoot.add(batchGroup);
+  for (const orig of toHide) {
+    orig.userData.batched = true;
+    orig.visible = false;
+  }
+}
+
+function loadSvgImage(svgText) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }));
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+function recolorKiCadSvg(svgText, hexColor, forceOpaqueFill = false) {
+  let out = svgText.replace(/(fill|stroke):#[0-9A-Fa-f]{6}/g, `$1:${hexColor}`);
+  if (forceOpaqueFill) out = out.replace(/fill-opacity:\s*[0-9.]+/g, "fill-opacity:1.0");
+  return out;
+}
+
+async function bakePcbSideTexture({ cuSvg, maskSvg, silkSvg, edgeSvg, outline, size = 2048, flipY = true }) {
+  const [cuSubtleImg, cuGoldImg, maskOpaqueImg, silkImg] = await Promise.all([
+    loadSvgImage(recolorKiCadSvg(cuSvg, "#247236")),
+    loadSvgImage(recolorKiCadSvg(cuSvg, "#e0be5c")),
+    loadSvgImage(recolorKiCadSvg(maskSvg, "#ffffff", true)),
+    loadSvgImage(recolorKiCadSvg(silkSvg, "#f0f4f8")),
+  ]);
+
+  const cvs = document.createElement("canvas");
+  cvs.width = size;
+  cvs.height = size;
+  const ctx = cvs.getContext("2d");
+
+  const xmin = outline.xmin ?? 89;
+  const ymin = outline.ymin ?? 82.75;
+  const wMm = outline.width_mm || 140;
+  const hMm = outline.height_mm || 132;
+  const pts = outline.segments?.[0] || [];
+
+  const traceOutlineClip = (c) => {
+    c.beginPath();
+    if (pts.length >= 3) {
+      pts.forEach(([kx, ky], i) => {
+        const px = ((kx - xmin) / wMm) * size;
+        const py = ((ky - ymin) / hMm) * size;
+        if (i === 0) c.moveTo(px, py);
+        else c.lineTo(px, py);
+      });
+      c.closePath();
+    } else {
+      c.rect(0, 0, size, size);
+    }
+  };
+
+  ctx.save();
+  traceOutlineClip(ctx);
+  ctx.clip();
+
+  // Base green solder mask
+  ctx.fillStyle = "#164b25";
+  ctx.fillRect(0, 0, size, size);
+
+  // Subtle copper relief underneath solder mask
+  if (cuSubtleImg) {
+    ctx.globalAlpha = 0.56;
+    ctx.drawImage(cuSubtleImg, 0, 0, size, size);
+    ctx.globalAlpha = 1.0;
+  }
+
+  // Exposed ENIG gold pads & test points through solder mask openings
+  if (cuGoldImg && maskOpaqueImg) {
+    const exp = document.createElement("canvas");
+    exp.width = size;
+    exp.height = size;
+    const ec = exp.getContext("2d");
+    ec.drawImage(cuGoldImg, 0, 0, size, size);
+    ec.globalCompositeOperation = "destination-in";
+    ec.drawImage(maskOpaqueImg, 0, 0, size, size);
+    ctx.drawImage(exp, 0, 0);
+  }
+
+  // Crisp component legend silkscreen
+  if (silkImg) {
+    ctx.globalAlpha = 0.94;
+    ctx.drawImage(silkImg, 0, 0, size, size);
+    ctx.globalAlpha = 1.0;
+  }
+  ctx.restore();
+
+  // Punch drilled mounting & THT holes from Edge_Cuts.svg so FR4 holes show cleanly
+  if (edgeSvg) {
+    const vbMatch = edgeSvg.match(/viewBox="0\.0000\s+0\.0000\s+([0-9.]+)\s+([0-9.]+)"/);
+    const svgW = vbMatch ? parseFloat(vbMatch[1]) : wMm;
+    const svgH = vbMatch ? parseFloat(vbMatch[2]) : hMm;
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "#000000";
+    const circRe = /<circle\s+cx="([0-9.]+)"\s+cy="([0-9.]+)"\s+r="([0-9.]+)"/g;
+    let m;
+    while ((m = circRe.exec(edgeSvg)) !== null) {
+      const cx = (parseFloat(m[1]) / svgW) * size;
+      const cy = (parseFloat(m[2]) / svgH) * size;
+      const r = (parseFloat(m[3]) / svgW) * size;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  const tex = new THREE.CanvasTexture(cvs);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = Math.min(4, renderer?.capabilities?.getMaxAnisotropy?.() || 1);
+  tex.flipY = flipY;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+async function bakePcbSurfaceTextures(boardRoot) {
+  let pcbNode = null;
+  boardRoot.traverse((o) => {
+    if (!pcbNode && (o.name === "PCB_LAYER_PCB" || o.name === "PCB_PCB")) pcbNode = o;
+  });
+  if (!pcbNode || !catalogue?.board_outline) return;
+
+  boardRoot.updateMatrixWorld(true);
+  const rootInv = boardRoot.matrixWorld.clone().invert();
+  const pcbLocalBox = new THREE.Box3();
+  const v = new THREE.Vector3();
+  pcbNode.traverse((m) => {
+    if (!m.isMesh || !m.geometry?.attributes?.position) return;
+    const rel = new THREE.Matrix4().multiplyMatrices(rootInv, m.matrixWorld);
+    const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i).applyMatrix4(rel);
+      pcbLocalBox.expandByPoint(v);
+    }
+  });
+  if (pcbLocalBox.isEmpty()) return;
+
+  const [edgeSvg, fCuSvg, fMaskSvg, fSilkSvg, bCuSvg, bMaskSvg, bSilkSvg] = await Promise.all(
+    ["Edge_Cuts.svg", "F_Cu.svg", "F_Mask.svg", "F_SilkS.svg", "B_Cu.svg", "B_Mask.svg", "B_SilkS.svg"].map(
+      (f) => fetch(`assets/layers/${f}`).then((r) => (r.ok ? r.text() : ""))
+    )
+  );
+  if (!fCuSvg || !bCuSvg) return;
+
+  const [topTex, botTex] = await Promise.all([
+    bakePcbSideTexture({ cuSvg: fCuSvg, maskSvg: fMaskSvg, silkSvg: fSilkSvg, edgeSvg, outline: catalogue.board_outline, flipY: true }),
+    bakePcbSideTexture({ cuSvg: bCuSvg, maskSvg: bMaskSvg, silkSvg: bSilkSvg, edgeSvg, outline: catalogue.board_outline, flipY: false }),
+  ]);
+
+  const w = pcbLocalBox.max.x - pcbLocalBox.min.x;
+  const h = pcbLocalBox.max.z - pcbLocalBox.min.z;
+  const cx = (pcbLocalBox.min.x + pcbLocalBox.max.x) * 0.5;
+  const cz = (pcbLocalBox.min.z + pcbLocalBox.max.z) * 0.5;
+
+  const topGeo = new THREE.PlaneGeometry(w, h);
+  topGeo.rotateX(-Math.PI / 2);
+  const topMat = new THREE.MeshStandardMaterial({
+    map: topTex,
+    roughness: 0.48,
+    metalness: 0.10,
+    alphaTest: 0.5,
+    side: THREE.FrontSide,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+  });
+  const topMesh = new THREE.Mesh(topGeo, topMat);
+  topMesh.name = "PCB_BAKED_TOP";
+  topMesh.position.set(cx, pcbLocalBox.max.y + 0.000015, cz);
+  boardRoot.add(topMesh);
+
+  const botGeo = new THREE.PlaneGeometry(w, h);
+  botGeo.rotateX(Math.PI / 2);
+  const botMat = new THREE.MeshStandardMaterial({
+    map: botTex,
+    roughness: 0.48,
+    metalness: 0.10,
+    alphaTest: 0.5,
+    side: THREE.FrontSide,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+  });
+  const botMesh = new THREE.Mesh(botGeo, botMat);
+  botMesh.name = "PCB_BAKED_BOTTOM";
+  botMesh.position.set(cx, pcbLocalBox.min.y - 0.000015, cz);
+  boardRoot.add(botMesh);
+
+  requestRender();
 }
 
 async function loadModelsWithProgress() {
@@ -362,7 +730,7 @@ async function loadModelsWithProgress() {
   loader.setMeshoptDecoder(MeshoptDecoder);
   const progressMap = { board: 0, kv: 0, enc: 0 };
   const updateLoaderUi = (label) => {
-    const avg = (progressMap.board * 0.85 + progressMap.kv * 0.05 + progressMap.enc * 0.10);
+    const avg = (progressMap.board * 0.72 + progressMap.kv * 0.14 + progressMap.enc * 0.14);
     setLoadProgress(30 + avg * 68, "Streaming 3-D CAD Assemblies...", label);
   };
   const loadGlb = (url, key, label) => new Promise((res, rej) => {
@@ -378,21 +746,6 @@ async function loadModelsWithProgress() {
     }, rej);
   });
 
-  const [bGltf, kGltf, eGltf] = await Promise.all([
-    loadGlb("assets/board.glb", "board", "board.glb"),
-    loadGlb("assets/kv260.glb", "kv", "kv260.glb"),
-    loadGlb("assets/enclosure.glb", "enc", "enclosure.glb"),
-  ]);
-
-  boardModel = bGltf.scene;
-  adapterGroup.add(boardModel);
-
-  kv260Model = kGltf.scene;
-  assemblyRoot.add(kv260Model);
-
-  enclosureModel = eGltf.scene;
-  assemblyRoot.add(enclosureModel);
-
   const collect = (root) => {
     root.traverse((obj) => {
       if (obj.name && partById.has(obj.name) && !nodeById.has(obj.name)) {
@@ -406,11 +759,43 @@ async function loadModelsWithProgress() {
       }
     });
   };
+
+  // Progressive load: display adapter board first while streaming KV260 & enclosure
+  const bGltf = await loadGlb("assets/board.glb", "board", "board.glb");
+  boardModel = bGltf.scene;
+  adapterGroup.add(boardModel);
   collect(boardModel);
+  refreshBoardPickerBounds(catalogue);
+  batchStaticGroupByMaterial(boardModel, { skipPrefixes: ["PCB_"], batchName: "BOARD_BATCH" });
+  setCameraPreset("iso", true);
+  requestRender();
+  if (renderer) renderer.render(scene, camera);
+
+  const bakePromise = bakePcbSurfaceTextures(boardModel);
+  const [kGltf, eGltf] = await Promise.all([
+    loadGlb("assets/kv260.glb", "kv", "kv260.glb"),
+    loadGlb("assets/enclosure.glb", "enc", "enclosure.glb"),
+    bakePromise,
+  ]);
+
+  kv260Model = kGltf.scene;
+  assemblyRoot.add(kv260Model);
   collect(kv260Model);
+  batchStaticGroupByMaterial(kvNodes.KV260_CARRIER_GROUP, { batchName: "KV_CARRIER_BATCH" });
+  batchStaticGroupByMaterial(kvNodes.K26_SOM_GROUP, { batchName: "KV_SOM_BATCH" });
+  batchStaticGroupByMaterial(kvNodes.KV260_FAN, { batchName: "KV_FAN_BATCH" });
+  batchStaticGroupByMaterial(kvNodes.KV260_HEATSINK, { batchName: "KV_HS_BATCH" });
+
+  enclosureModel = eGltf.scene;
+  assemblyRoot.add(enclosureModel);
   collect(enclosureModel);
+  batchStaticGroupByMaterial(encNodes.ENCLOSURE_BOTTOM_GROUP, { batchName: "ENC_BOT_BATCH" });
+  batchStaticGroupByMaterial(encNodes.ENCLOSURE_BUMPERS_GROUP, { batchName: "ENC_BMP_BATCH" });
+  batchStaticGroupByMaterial(encNodes.ENCLOSURE_LID_GROUP, { batchName: "ENC_LID_BATCH" });
+  batchStaticGroupByMaterial(encNodes.ADAPTER_HEATSINKS_GROUP, { batchName: "ENC_HS_BATCH" });
 
   setCameraPreset("iso", true);
+  requestRender();
 }
 
 // ---------------------------------------------------------------------------
@@ -429,12 +814,14 @@ function startScalarTween(key, from, to, durationMs) {
 
 function stepTweens(now) {
   let dirty = false;
+  let moved = false;
 
   // 1. Intro sequence (~2050 ms total, interruptible)
   if (tweenHandles.intro) {
     const tr = tweenHandles.intro;
     const u = Math.min(1, (now - tr.start) / tr.dur);
     applyIntroAtProgress(u);
+    moved = true;
     if (u >= 1) {
       tweenHandles.intro = null;
       syncHash();
@@ -477,10 +864,12 @@ function stepTweens(now) {
     camera.position.lerpVectors(c.fromPos, c.toPos, u);
     controls.target.lerpVectors(c.fromTgt, c.toTgt, u);
     controls.update();
+    moved = true;
     if (u >= 1) tweenHandles.cam = null;
   }
 
   if (dirty) applyAnimatedScene();
+  return dirty || moved;
 }
 
 function applyTransformsInstant() {
@@ -582,6 +971,7 @@ function applyAnimatedScene() {
     ]);
     siteCore.set_group_transforms(offsets, mask);
   }
+  requestRender();
 }
 
 function applyIntroAtProgress(u) {
@@ -682,6 +1072,7 @@ function moveCameraEased(targetCenter, targetPos, durationMs = 620) {
     controls.target.copy(targetCenter);
     camera.position.copy(targetPos);
     controls.update();
+    requestRender();
     return;
   }
   tweenHandles.cam = {
@@ -692,6 +1083,7 @@ function moveCameraEased(targetCenter, targetPos, durationMs = 620) {
     start: performance.now(),
     dur: Math.min(900, durationMs),
   };
+  requestRender();
 }
 
 function setCameraPreset(preset, instant = false) {
@@ -776,6 +1168,7 @@ function pickAtNdc(ndcX, ndcY) {
 function wireViewportPicking(canvas) {
   const tip = $("#hover-tooltip");
   let downPos = null;
+  let lastHoverId = null;
 
   const getNdc = (ev) => {
     const rect = canvas.getBoundingClientRect();
@@ -794,6 +1187,7 @@ function wireViewportPicking(canvas) {
     const pickMs = performance.now() - t0;
     $("#hud-perf").textContent = `${state.useWasmPicker ? "Rust" : "Three"} pick: ${pickMs.toFixed(2)} ms`;
 
+    const nextId = found && found.object ? found.id : null;
     if (found && found.object) {
       const entry = partById.get(found.id);
       const label = entry.kind === "board"
@@ -813,11 +1207,19 @@ function wireViewportPicking(canvas) {
       hoverBox.visible = false;
       canvas.style.cursor = "grab";
     }
+    if (nextId !== lastHoverId) {
+      lastHoverId = nextId;
+      requestRender();
+    }
   });
 
   canvas.addEventListener("pointerleave", () => {
     tip.style.display = "none";
-    hoverBox.visible = false;
+    if (hoverBox.visible || lastHoverId !== null) {
+      hoverBox.visible = false;
+      lastHoverId = null;
+      requestRender();
+    }
   });
 
   canvas.addEventListener("pointerdown", (ev) => {
@@ -862,21 +1264,24 @@ function wireViewportPicking(canvas) {
 function updateSelectionBox() {
   if (!state.selectedId) {
     selectBox.visible = false;
+    requestRender();
     return;
   }
   const obj = nodeById.get(state.selectedId);
   if (!obj || !isObjectEffectivelyVisible(obj)) {
     selectBox.visible = false;
+    requestRender();
     return;
   }
   selectBox.box.setFromObject(obj);
   selectBox.visible = !selectBox.box.isEmpty();
+  requestRender();
 }
 
 function isObjectEffectivelyVisible(obj) {
   let c = obj;
   while (c) {
-    if (!c.visible) return false;
+    if (!c.visible && !c.userData?.batched) return false;
     c = c.parent;
   }
   return true;
@@ -930,6 +1335,7 @@ function rebuildNetHighlightBoxes() {
     netPulseGroup.add(activePulseMesh);
     stepPulseDots(performance.now());
   }
+  requestRender();
 }
 
 function stepPulseDots(now) {
@@ -981,7 +1387,7 @@ function selectPart(id, shouldFocus = true) {
         ${c.callout ? `<p style="margin:0;font-size:11px;color:var(--cyan)"><strong>Manual callout:</strong> ${escapeHtml(c.callout)}</p>` : ""}
         <div class="btn-grid-3">
           <button id="insp-focus-btn" class="btn btn-sm btn-primary" type="button">Focus Camera</button>
-          <a class="btn btn-sm" style="text-align:center" href="${REPO_BLOB}/${encodeURI(c.manual_link || "docs/BOARD_MANUAL.md")}" target="_blank" rel="noopener">Manual</a>
+          <a class="btn btn-sm" style="text-align:center" href="${docToPdfHref(c.manual_link || "docs/BOARD_MANUAL.md")}" target="_blank" rel="noopener">Manual</a>
           <button id="insp-copy-link" class="btn btn-sm" type="button">Copy Link</button>
         </div>
       </div>
@@ -1037,7 +1443,7 @@ function selectPart(id, shouldFocus = true) {
         <p style="margin:0;font-size:12px;">${escapeHtml(k.role || "")}</p>
         <div class="btn-grid-3">
           <button id="insp-focus-btn" class="btn btn-sm btn-primary" type="button">Focus Camera</button>
-          <a class="btn btn-sm" style="text-align:center" href="${REPO_BLOB}/${encodeURI(k.manual_link || "docs/INTERFACE_SPEC.md")}" target="_blank" rel="noopener">Spec</a>
+          <a class="btn btn-sm" style="text-align:center" href="${docToPdfHref(k.manual_link || "docs/INTERFACE_SPEC.md")}" target="_blank" rel="noopener">Spec</a>
           <button id="insp-copy-link" class="btn btn-sm" type="button">Copy Link</button>
         </div>
       </div>
@@ -1127,7 +1533,7 @@ async function initLayerViewer() {
   const canvas = $("#layer-webgl-canvas");
   layerRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   layerRenderer.setClearColor(0x000000, 0);
-  layerRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  layerRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   layerRenderer.outputColorSpace = THREE.SRGBColorSpace;
 
   layerScene = new THREE.Scene();
@@ -1136,6 +1542,7 @@ async function initLayerViewer() {
   layerCamera.position.set(0.14, 0.14, 0.16);
   layerControls = new OrbitControls(layerCamera, canvas);
   layerControls.enableDamping = true;
+  layerControls.addEventListener("change", requestLayerRender);
   layerScene.add(layerPlanesGroup);
 
   const resizeLayers = () => {
@@ -1146,6 +1553,7 @@ async function initLayerViewer() {
     layerRenderer.setSize(w, h, false);
     layerCamera.aspect = w / h;
     layerCamera.updateProjectionMatrix();
+    requestLayerRender();
   };
   canvas._resizeFn = resizeLayers;
   new ResizeObserver(resizeLayers).observe(canvas.parentElement);
@@ -1204,9 +1612,15 @@ async function initLayerViewer() {
   const tickLayers = (now) => {
     requestAnimationFrame(tickLayers);
     if (state.tab === "layers") {
-      if (layerPeelStart >= 0) updateLayerStackVisuals(now);
-      layerControls.update();
-      layerRenderer.render(layerScene, layerCamera);
+      if (layerPeelStart >= 0) {
+        updateLayerStackVisuals(now);
+        layerNeedsRender = true;
+      }
+      if (layerControls.update()) layerNeedsRender = true;
+      if (layerNeedsRender) {
+        layerRenderer.render(layerScene, layerCamera);
+        layerNeedsRender = false;
+      }
     }
   };
   requestAnimationFrame(tickLayers);
@@ -1219,6 +1633,7 @@ function startLayerPeel() {
     return;
   }
   layerPeelStart = performance.now();
+  requestLayerRender();
 }
 
 function updateLayerStackVisuals(now = performance.now()) {
@@ -1243,6 +1658,7 @@ function updateLayerStackVisuals(now = performance.now()) {
     e.mesh.material.opacity = e.meta.id === layerActiveId ? Math.min(1.0, op + 0.15) : op;
   });
   if (allDone && layerPeelStart >= 0) layerPeelStart = -1;
+  requestLayerRender();
 }
 
 function select2dLayer(id) {
@@ -1419,9 +1835,11 @@ function selectTab(tabId) {
   document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === `tab-${tabId}`));
   if (tabId === "explorer") {
     $("#webgl-canvas")?._resizeFn?.();
+    requestRender();
   } else if (tabId === "layers") {
     $("#layer-webgl-canvas")?._resizeFn?.();
     startLayerPeel();
+    requestLayerRender();
   } else if (tabId === "hmi") {
     const ifr = $("#hmi-iframe");
     if (!ifr.src && ifr.dataset.src) ifr.src = ifr.dataset.src;
@@ -1435,6 +1853,7 @@ function setTheme(theme) {
   document.documentElement.setAttribute("data-theme", state.theme);
   $("#btn-theme").textContent = state.theme === "dark" ? "Light Mode" : "Dark Mode";
   simCtrl?.onThemeChange?.();
+  requestRender();
 }
 
 function setExplode(pct, instant = false) {
@@ -1664,6 +2083,7 @@ function benchmarkHover({ frames = 60, useWasm = true } = {}) {
   }
   hoverBox.visible = false;
   state.useWasmPicker = prevWasm;
+  requestRender();
 
   const avg = (a) => a.reduce((s, x) => s + x, 0) / a.length;
   const p95 = (a) => {
@@ -1678,6 +2098,70 @@ function benchmarkHover({ frames = 60, useWasm = true } = {}) {
     pick_p95_ms: +p95(pickTimes).toFixed(3),
     frame_mean_ms: +avg(frameTimes).toFixed(3),
     frame_p95_ms: +p95(frameTimes).toFixed(3),
+    draw_calls: renderer.info.render.calls,
+    triangles: renderer.info.render.triangles,
+  };
+}
+
+function benchmarkRender({ frames = 60, useWasm = true } = {}) {
+  const prevWasm = state.useWasmPicker;
+  const prevPos = camera.position.clone();
+  const prevTgt = controls.target.clone();
+  state.useWasmPicker = useWasm;
+  const gl = renderer.getContext();
+  const pickTimes = [];
+  const frameTimes = [];
+  const gpuTimes = [];
+  let hits = 0;
+
+  for (let i = 0; i < frames; i++) {
+    const angle = (i / frames) * 0.35 - 0.175;
+    camera.position.copy(prevPos).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle * 0.05);
+    camera.lookAt(prevTgt);
+    const nx = -0.55 + 1.1 * ((i % 12) / 11);
+    const ny = -0.45 + 0.9 * (Math.floor(i / 12) / Math.max(1, Math.floor(frames / 12)));
+    const f0 = performance.now();
+    const res = pickAtNdc(nx, ny);
+    const p1 = performance.now();
+    if (res && res.object) {
+      hoverBox.box.setFromObject(res.object);
+      hoverBox.visible = true;
+      hits++;
+    } else {
+      hoverBox.visible = false;
+    }
+    renderer.render(scene, camera);
+    const f1 = performance.now();
+    gl.finish();
+    const g1 = performance.now();
+    pickTimes.push(p1 - f0);
+    frameTimes.push(f1 - f0);
+    gpuTimes.push(g1 - f0);
+  }
+  hoverBox.visible = false;
+  camera.position.copy(prevPos);
+  controls.target.copy(prevTgt);
+  controls.update();
+  state.useWasmPicker = prevWasm;
+  renderer.render(scene, camera);
+  gl.finish();
+
+  const avg = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+  const p95 = (a) => {
+    const s = [...a].sort((x, y) => x - y);
+    return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))];
+  };
+  return {
+    picker: useWasm ? "rust-wasm" : "three-mesh",
+    frames,
+    hits,
+    pick_mean_ms: +avg(pickTimes).toFixed(3),
+    pick_p95_ms: +p95(pickTimes).toFixed(3),
+    frame_mean_ms: +avg(frameTimes).toFixed(3),
+    frame_p95_ms: +p95(frameTimes).toFixed(3),
+    gpu_flushed_frame_mean_ms: +avg(gpuTimes).toFixed(3),
+    draw_calls: renderer.info.render.calls,
+    triangles: renderer.info.render.triangles,
   };
 }
 
@@ -1711,7 +2195,19 @@ window.__SITE_API = {
     if (state.selectedId) selectPart(state.selectedId, false);
   },
   searchCore: (q) => siteCore ? JSON.parse(siteCore.search(q, 16)).map((i) => partList[i]) : [],
+  pickAtNdc,
+  projectPartCenterNdc: (id) => {
+    const obj = nodeById.get(id);
+    if (!obj) return null;
+    scene.updateMatrixWorld(true);
+    const bx = new THREE.Box3().setFromObject(obj);
+    if (bx.isEmpty()) return null;
+    const c = bx.getCenter(new THREE.Vector3()).project(camera);
+    return { x: c.x, y: c.y, z: c.z };
+  },
   benchmarkHover,
+  benchmarkRender,
+  requestRender,
   setSimMode: (flag, domain, targetId) => (flag ? simCtrl?.activateDomain(domain || "rf", targetId || null) : simCtrl?.setEnabled(false)),
   getSimState: () => simCtrl?.getState() || null,
   getPartSims: (ref) => simCtrl?.getPartSimulations(ref) || [],
@@ -1723,6 +2219,8 @@ window.__SITE_API = {
     kv260Parts: catalogue ? catalogue.kv260_parts.length : 0,
     coreParts: siteCore ? siteCore.part_count() : 0,
     selectedId: state.selectedId,
+    drawCalls: renderer ? renderer.info.render.calls : 0,
+    triangles: renderer ? renderer.info.render.triangles : 0,
   }),
 };
 
