@@ -19,6 +19,7 @@ Optional fault/mutation checks (max 2 concurrent runs, batch XSim only):
 .\fpga\sim\run.ps1 tb_system -Mutate no_echo_return
 .\fpga\sim\run.ps1 tb_system -Mutate eth_skip_fcs
 .\fpga\sim\run.ps1 tb_system -Mutate no_retrain
+.\fpga\sim\run.ps1 tb_system -Mutate tx_key_from_dsp_ctrl
 ```
 
 Note: [`run.ps1`](sim/run.ps1) copies [`fpga/sim/design.txt`](sim/design.txt) (`TEMP 42.5`, `VCCINT 1.00`, `VCCAUX 1.80`) into `fpga/sim/out/work_<runName>/` so the Artix XADC model receives deterministic telemetry stimulus.
@@ -32,7 +33,7 @@ Simulation resolution is `` `timescale 1ps/10fs `` ([`tb_system.v`](sim/tb_syste
 | Component / Model | File | Modeled Behavior |
 | :--- | :--- | :--- |
 | Artix-7 Top RTL | [`artix/top.v`](artix/top.v) | Real `artix_top` (`ENABLE_ETH = 1`), Si549 `500 MHz` (`#1000.000` ps half-period, default) and `400 MHz` (`#1250.000` ps, `-Define FPGA_CLK_400M`), with A-1 radar reset gate + G-1 `dbg_uart` monitor |
-| Kria K26 PL Wrapper | [`kria/kria_pl_link.v`](kria/kria_pl_link.v) | Real `kria_pl_link` with AXI4-Lite CSRs, 64-bit AXI4-Stream TX/RX DMA, MMCM, `IDELAYE3`/`ISERDESE3`, `u_train_fsm`, PS `UART1` EMIO -> `pmod_spare1/2`, configurable `pl_clk_100m` (`4999.500` ps `+100 ppm` initial, `-100 ppm` in S5) |
+| Kria K26 PL Wrapper | [`kria/kria_pl_link.v`](kria/kria_pl_link.v) | Real `kria_pl_link` with AXI4-Lite CSRs (including `TX_KEY` at `0x38` and read-only `DSP_CTRL[1]` + `kria_dsp_out` result readback), 64-bit AXI4-Stream TX/RX DMA, MMCM, `IDELAYE3`/`ISERDESE3`, `u_train_fsm`, PS `UART1` EMIO -> `pmod_spare1/2`, configurable `pl_clk_100m` (`4999.500` ps `+100 ppm` initial, `-100 ppm` in S5) |
 | LVDS Channel & Fault Hook | [`sim/models/board_lvds_channel.v`](sim/models/board_lvds_channel.v) | `sim_board_lvds_channel`: independent `DLY_P_PS` / `DLY_N_PS` leg delays, PRNG differential timing jitter (`JITTER_SPREAD_PS`), transport delays preserving multi-UI transitions (`>1000 ps` @ 1 Gbps), dynamic `cut_fault` and `glitch_inj` inputs |
 | AD9484 400 MSPS Radar ADC | [`sim/models/ad9484_radar_model.v`](sim/models/ad9484_radar_model.v) | `sim_ad9484_model`: 3-wire SPI (Chip ID `0x6C`), inverted DCO routing, `lvds_skew.py` per-bit skew + eye spread; `mode=0` (`0xAA`/`0x55` IDELAY calibration), `mode=1` (`121.5625 MHz` IF CW -> `+1.5625 MHz` baseband @ 25 MSPS), `mode=2` (closed-loop echo sampling `dacr_d`/`dacr_clk` delayed by `ECHO_DELAY_DAC_CYC = 250` @ DAC clock, upconverted to `120 MHz` IF + noise, `no_echo_mut` fault control) |
 | AD9253 Dual 14-bit SDR ADC | [`sim/models/ad9253_sdr_model.v`](sim/models/ad9253_sdr_model.v) | `sim_ad9253_model`: 3-wire SPI (Chip ID `0x8F`), coherent `6.25 MHz` (Ch A) + `12.5 MHz` (Ch B) @ `50.0` / `62.5 MSPS` (1-lane 16b DDR, `DCO = 400`/`500 MHz`), `lvds_skew.py` skew (`ADCS_D0 -8 ps`, `ADCS_D1 -34 ps`, `ADCS_FCO -18 ps` vs DCO) with `25 ps` transport margin |
@@ -85,7 +86,8 @@ Post-Rev08 Phase 1 (A-1..A-4 & G-1) verification ran directly against the final 
   - `[S3] PASS chirp zc1=18->zc2=34 echo_snr=152.7x cw_img_rej=60.4 dB`
   - `[S5] PASS -100ppm MIRROR_1P1 + mid-run ETH/IAS1 cuts lost_s1=0 lost_s2=0 mdio_wrs=1`
   - `[S6] PASS glitch->crc_err->clear->retrain(drop=1,up=1,post_crc=0)`
-  - `PASS: tb_system full-system verification (S1..S6, +/-100 ppm, Rev05 SI, ETH+IAS1) passed`
+  - `[S7] PASS TX_KEY 0x38 keys dsp_tx_en; DSP_CTRL[1] is RO`
+  - `PASS: tb_system full-system verification (S1..S7, +/-100 ppm, Rev05 SI, ETH+IAS1, TX_KEY) passed`
 - **`400 MHz` Si549 mode:** `.\fpga\sim\run.ps1 tb_system -Define FPGA_CLK_400M` -> **Exit code `0`**, elapsed **`516.44 s`** ([`tb_system-def-FPGA_CLK_400M.log`](sim/out/tb_system-def-FPGA_CLK_400M.log))
   - `[S1] PASS REG_LINK_STATUS=0x003500fd 0xE8=0x00460436 uart_resp=00460436 mdio_polls=7 dl_up=1 eth_up=1`
   - `[S2] PASS AD9253=0x8F AD9484=0x6C TMP1075=0x2A80 PPS=1251(+800 ppm)`
@@ -93,7 +95,8 @@ Post-Rev08 Phase 1 (A-1..A-4 & G-1) verification ran directly against the final 
   - `[S4] PASS rx04=5(max=8579) rx05=80(max=7999) dacs_i=32 dacs_q=31` (`50.0 MSPS` AD9253)
   - `[S5] PASS -100ppm MIRROR_1P1 + mid-run ETH/IAS1 cuts lost_s1=0 lost_s2=0 mdio_wrs=1`
   - `[S6] PASS glitch->crc_err->clear->retrain(drop=1,up=1,post_crc=0)`
-  - `PASS: tb_system full-system verification (S1..S6, +/-100 ppm, Rev05 SI, ETH+IAS1) passed`
+  - `[S7] PASS TX_KEY 0x38 keys dsp_tx_en; DSP_CTRL[1] is RO`
+  - `PASS: tb_system full-system verification (S1..S7, +/-100 ppm, Rev05 SI, ETH+IAS1, TX_KEY) passed`
 
 ### Dual-Frequency, Debug UART & Module Testbench Suite (`500 MHz` + `400 MHz`)
 
@@ -103,7 +106,7 @@ Post-Rev08 Phase 1 (A-1..A-4 & G-1) verification ran directly against the final 
 
 ### Negative Mutation Runs (`tb_system -Mutate`)
 
-Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `no_echo_return` exit `1` in `270.72 s`, `eth_skip_fcs` exit `1` in `261.98 s`, `no_retrain` exit `1` in `287.13 s`) validated `tb_system` fault sensitivity.
+Earlier Part A baseline mutations (`bad_channel_skew` exit `1` in `306.53 s`, `no_echo_return` exit `1` in `270.72 s`, `eth_skip_fcs` exit `1` in `261.98 s`, `no_retrain` exit `1` in `287.13 s`) validated `tb_system` fault sensitivity. The `TX_KEY` interlock mutation `tx_key_from_dsp_ctrl` fails at S7 (`FAIL @ 173368788500 ps: S7: DSP_CTRL[1] keyed the transmitter`, exit `1`).
 
 ---
 

@@ -4,19 +4,20 @@ Rust, with the logic in one crate that has no I/O, so that it runs on the A53s a
 
 | Crate | Target | What |
 |---|---|---|
-| `core` (`kria-core`) | any; `no_std`, no allocation, no `unsafe` | `pps` (GPS PPS discipline of `kria_pps`), `interlock` (transmit lock), `link` (IAS1 link watchdog), `radar` (the 10.5 GHz beam scan), `bev` (the PL grid's commands and coordinates), `ring` (Linux's grid commands for core 1), `telemetry` (`opendash-telemetry/1`), `mailbox` (the shared blocks) |
-| `vehicled` (`kria-vehicled`) | A53, `aarch64-unknown-linux-gnu` | The ECU stream from opendash into the mailbox, and the HMI's transmit request (`/run/kria-hmi/tx`) |
+| `core` (`kria-core`) | any; `no_std`, no allocation, no `unsafe` | `pps` (GPS PPS discipline of `kria_pps`), `interlock` (transmit lock), `link` (IAS1 link watchdog), `can` (PS `CAN1` driver, DBC speed signal extractor, `CanConfig`/`CanStatus`/`CanRing`, `fresher` speed selector), `radar` (the 10.5 GHz beam scan), `bev` (the PL grid's commands and coordinates), `ring` (Linux's grid commands for core 1), `telemetry` (`opendash-telemetry/1`), `mailbox` (the shared blocks) |
+| `vehicled` (`kria-vehicled`) | A53, `aarch64-unknown-linux-gnu` | The ECU stream from opendash (`--server`) and/or the vehicle CAN (`--can`, `--can-speed`, `--can-active`) into the mailbox, and the HMI's transmit request (`/run/kria-hmi/tx`) |
 | `hmi-core` (`kria-hmi-core`) | any (host-tested) | The screens' data plane, no I/O: `frame` (the `kria_ps_framer` blocks), `audio` (stream 0x20, RDS decoder), `adsb` (CRC-24, CPR, the aircraft table), `radar` (streams 0x22, 0x23), `spectrum` (FFT, waterfall), `modes` (a frequency and mode to register writes), `state` (the snapshot and the screens' commands) |
 | `hmid` (`kria-hmid`) | A53 (`--features hw`), or a PC with the simulated board | The HMI's data service: DMA blocks in, audio out (ALSA), register writes, I/Q recording, the snapshot over WebSocket, the browser build over HTTP |
 | `sdr` (`kria-sdr`, `kria-sdrd`) | A53, `aarch64-unknown-linux-gnu` | The KrakenSDR (alignment, calibration, `kria_doa`, MUSIC) and the HackRF Pro (`kria_sweep`, panorama, transmit gate); the USB libraries and `/dev/mem` behind feature `hw` |
-| `r5f`: `kria-r5f0` | R5F core 0, `armv7r-none-eabihf` | 1 kHz loop: PPS discipline, IAS1 link watchdog, transmit interlock, status |
-| `r5f`: `kria-r5f1` | R5F core 1, `armv7r-none-eabihf` | 10 kHz loop: radar beam scan, the fusion grid's command port and frames, status |
+| `r5f`: `kria-r5f0` | R5F core 0, `armv7r-none-eabihf` | 1 kHz loop: PPS discipline, IAS1 link watchdog, transmit interlock (owns `TX_KEY` at `0x8000_0038`), status |
+| `r5f`: `kria-r5f1` | R5F core 1, `armv7r-none-eabihf` | 10 kHz loop: radar beam scan, the fusion grid's command port and frames, PS `CAN1` (`0xFF07_0000`) vehicle CAN polling and speed decoding, status |
 
 ## Build and test
 
 ```
 cd sw/kria
-cargo test -p kria-core                       # 29 tests on the host
+cargo test -p kria-core                       # 35 tests on the host (including 6 in can)
+cargo test -p kria-vehicled                   # 1 test on the host (--can-speed parser)
 cargo run --release -p kria-core --example pps_sim > pps.csv
 cargo run --release -p kria-core --example radar_grid   # core 1 end to end: fpga/sim/out/radar_grid
 cargo build --release -p kria-vehicled        # for the PC
@@ -28,7 +29,7 @@ cd r5f && cargo build --release               # r5f/target/armv7r-none-eabihf/re
 
 ```
 cd sw/kria
-cargo test -p kria-hmi-core                   # 17 tests: RDS, ADS-B vectors, CPR, radar words, framer blocks
+cargo test -p kria-hmi-core                   # 18 tests: RDS, ADS-B vectors, CPR, radar words, framer blocks, state
 cargo run --release -p kria-hmid -- --sim --listen 0.0.0.0:8080 --www ../hmi/app/www --sdr-out ../hmi/sdr
 cargo build --release -p kria-hmid --features hw --target aarch64-unknown-linux-gnu   # on the KV260, as root
 cd ../hmi/app && cargo run --release -- --connect 127.0.0.1:8080   # the screens, native (Linux KMS on the KV260)
@@ -72,11 +73,12 @@ Targets: `rustup target add armv7r-none-eabihf aarch64-unknown-linux-gnu`.
    echo start > /sys/class/remoteproc/remoteproc0/state
    echo start > /sys/class/remoteproc/remoteproc1/state
    ```
-3. On Linux, with opendash's "Telemetry out" running on the phone:
+3. On Linux, with the car's CAN bus on `J9` pins 6 and 8 and/or opendash's "Telemetry out" running on the phone:
    ```
-   sudo kria-vehicled --server <phone>:35001 --licensed
+   sudo kria-vehicled --can 500000 --can-speed 0x0D0:16:16:intel:1/1 --licensed
+   sudo kria-vehicled --server <phone>:35001 --can 500000 --can-speed 0x0D0:16:16:intel:1/1 --licensed
    ```
-   It writes the mailbox through `/dev/mem` and prints the R5F's PPS and interlock state every 5 s.
+   `kria-vehicled` starts `CAN1` in listen-only snoop mode by default (pass `--can-active` on a bench bus with no other receiver to ACK frames). With `--can`, it keeps running even if opendash is unreachable. It writes the mailbox through `/dev/mem` and prints the R5F's PPS, CAN and interlock state every 5 s.
 4. For core 1's scan: load the Artix's beam table in scan order, set `ADAR_CTRL[13]` and `scan_last`, write the grid's weights and origins, then `Core1Config` in the mailbox with `scan` and `grid` set and a heartbeat at least once a second. Linux must leave EMIO GPIO 1 (`BEAM_STROBE`) to core 1.
 
-None of this has been run on a KV260 yet. The remoteproc steps are the standard Xilinx ones `[E]`; check the remoteproc indices and that the kernel allows `/dev/mem` on the reserved regions.
+None of this has been run on a car or on a KV260 yet. The remoteproc steps are the standard Xilinx ones `[E]`; check the remoteproc indices and that the kernel allows `/dev/mem` on the reserved regions.

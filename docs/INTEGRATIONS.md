@@ -5,7 +5,7 @@
 Six devices could be connected to the KV260 alongside this board in the owner's vehicle (a Mitsubishi Montero V80, [VEHICLE_PLATFORM.md](VEHICLE_PLATFORM.md)):
 - a USB GPS;
 - a 77 GHz automotive radar through a CAN-to-USB adapter;
-- the engine's live data through opendash;
+- the engine's live data through opendash, or straight from the car's CAN 2.0 bus on KV260 `J9` (§2.2, §4);
 - a 3D LiDAR on a USB-to-Ethernet adapter;
 - a KrakenSDR, five coherent receivers for direction finding (§9);
 - a HackRF Pro, a transceiver from 100 kHz to 7.1 GHz with a fast sweep (§10).
@@ -25,7 +25,7 @@ The software that runs on the K26's processors is in Rust, with its logic in one
 |---|---|---|---|---|
 | GPS receiver with PPS | USB (or UART) for position and time; its PPS on KV260 `J9` pin 12, a free PL pin | 1 to 10 fixes/s; one pulse a second | PL: `kria_pps` timestamps it to 10 ns; R5F 0: disciplines the PPS sent to the front end | RTL bench and K26 build; loop simulated (§2) |
 | 77 GHz radar | Its own CAN FD bus (USB-CAN FD adapter), or 100BASE-T1 Ethernet through a media converter | Object list or detections at about 20 Hz; classic CAN is too small for either (§3) | A53 or R5F 1: decode; PL: into the grid | Bus load and fog performance simulated (§3, §6) |
-| Engine live data (opendash) | opendash's telemetry server on the phone (Wi-Fi), or the SM3 directly | Up to 40 identifiers at 100 Hz, about 3,500 values/s | A53: `kria-vehicled`; R5F 0: road speed into the transmit lock | End to end against an emulated ECU (§4) |
+| Engine live data and road speed (CAN / opendash) | The car's CAN 2.0 bus (`J9` pins 6 and 8 -> PS `CAN1` EMIO), or opendash on the phone (Wi-Fi) | Up to `1 Mbit/s` classic CAN 2.0 frames, or up to 40 identifiers at 100 Hz over Wi-Fi | R5F 1 (`CAN1`) or A53 (`kria-vehicled`); R5F 0: fresher speed into the transmit lock (`TX_KEY`) | Built (`G6`/`D6` placed in K26 BD), 7 host CAN tests and emulated opendash E2E; not run on a car (§2.2, §4) |
 | 3D LiDAR, Ethernet | USB 3.0 to Gigabit Ethernet adapter | 0.2 to 1.3 Mpoints/s, 20 to 70 Mbit/s | A53: driver, SLAM; PL: occupancy grid | Fog performance simulated (§5, §6) |
 | Fusion grid | Inside the PL | 100 M cell updates/s | PL: `kria_bev_grid` behind `kria_bev_axi`; R5F 1: its commands, the 10.5 GHz scan, the frames | RTL bit-exact against its model, in the K26 build; end to end from R5F 1's code through the RTL (§6.1) |
 | KrakenSDR | USB 2.0 (five RTL2832U behind its hub) | 5 × 2.4 MS/s, 24 MB/s | A53: `kria-sdrd` (alignment, calibration, MUSIC); PL: `kria_doa` (weights, covariance, Bartlett) | End to end from USB transfers through the RTL to the Bearing screen (§9) |
@@ -54,13 +54,13 @@ The KV260's own Gigabit port (`J10`) already carries this board's Ethernet link,
 - **`J9` pin 12 is `HDA10`**, SOM240 `A16`, ball `J12`, bank 45 at 3.3 V `[V]`. The source is the KV260 schematic (XTP682 rev 2, page 13), with the ball from AMD's K26 board file `part0_pins.xml`.
 - Pin 11 next to it goes through a reset supervisor and is not usable.
 
-**On the board (since 18 November).** The receiver plugs into `J1503`, a 4-way JST-SH on the adapter (1: 3.3 V out through a 0.2 A PTC, 2: PPS in, 3 and 4: ground). The pulse passes an ESD diode and 100 Ω into a 74LVC1G17 Schmitt buffer, and the buffer drives two contacts of `J1502`, a 15-way 1 mm FPC receptacle: pin 12 and pin 4, through 220 Ω each. A 100 mm 15-way FFC joins `J1502` to the KV260's `J9` (STATUS sheet, [LAYOUT §6.8](LAYOUT.md)).
+**On the board (since 18 November).** The receiver plugs into `J1503`, now a 6-way JST-SH on the adapter shared with the vehicle CAN (1: 3.3 V out through a 0.2 A PTC, 2: PPS in, 3: ground, 4: `CANH`, 5: `CANL`, 6: ground; expanded from 4 pins when the CAN tap was added). The pulse passes an ESD diode and 100 Ω into a 74LVC1G17 Schmitt buffer, and the buffer drives two contacts of `J1502`, a 15-way 1 mm FPC receptacle: pin 12 and pin 4, through 220 Ω each. A 100 mm 15-way FFC joins `J1502` to the KV260's `J9` (STATUS sheet, [LAYOUT §6.8](LAYOUT.md)).
 
 Why two contacts: the two FFC types (contacts on the same side, or on opposite sides) reverse the order, pin *n* to pin 16 − *n*. Whichever cable is fitted:
 - one copy of the pulse meets `J9` pin 12;
 - the other copy meets `J9` pin 4, a ground, through its 220 Ω (15 mA while the pulse is high).
 
-Only pins 6, 7, 9 and 10 are grounded on the adapter. They land on `J9`'s grounds 7 and 10, or on 9 and 6, two MIPI receiver pins that the design leaves unused. `J9`'s pins 11, 13, 14 and 15 (the reset supervisor, the I²C pair and 3.3 V) meet nothing in either case. So a wrong cable cannot harm the KV260, and either cable works. `[E: J9's ground pins are from the Raspberry Pi pinout; check with a meter before the first power-up]`
+Only pins 7 and 9 are tied directly to ground on the adapter (pins 6 and 10 now feed the two NPN inputs of the mirror-safe CAN transmitter, §2.2). Adapter pins 7 and 9 land on `J9`'s ground on pin 7 and the unused MIPI pin 9 (or vice versa), and adapter pins 6 and 10 land on `J9` pin 6 (`can1_txn`) and `J9` ground pin 10. `J9`'s pins 11, 13, 14 and 15 (the reset supervisor, the I²C pair and 3.3 V) meet nothing in either case. So a wrong cable cannot harm the KV260, and either cable works. `[E: J9's ground pins are from the Raspberry Pi pinout; check with a meter before the first power-up]`
 
 Any GPS module with a 3.3 V PPS output works, and it can share the USB link for its position and time.
 
@@ -109,6 +109,39 @@ Without the integral term, the warm-up showed up as a constant 300 ns error. The
 - five seconds of holdover.
 
 It passes, and the mutation `pps_no_filter` (no glitch filter) fails three checks. The bench also set a rule for the firmware: clear only the status bits that were read, or a capture that lands between the read and the clear is lost.
+
+### 2.2 The vehicle's CAN bus on R5F core 1
+
+**Why.** Reading road speed directly from the car's powertrain CAN 2.0 bus on R5F core 1 feeds the transmit interlock (`kria_core::interlock`) even when Linux, Wi-Fi or the phone (`opendash`, §4) is not running. The Zynq UltraScale+ PS controller (`CAN1` at `0xFF07_0000`, `UG1085` ch. 23) supports classic CAN 2.0 up to `1 Mbit/s`, which matches a car's powertrain or diagnostic CAN 2.0 bus (`250` or `500 kbit/s`). It does not support CAN FD, so the 77 GHz radar stays on its own USB CAN FD adapter or 100BASE-T1 converter (§3).
+
+**Where it connects.** It shares the 15-way 1 mm FFC (`J1502` to KV260 `J9`, the unused IAS1 camera connector) and the expanded 6-way 1 mm JST-SH `J1503` (`1`: `+3V3_D` through the `0.2 A` PTC, `2`: `PPS`, `3`: `GND`, `4`: `CANH`, `5`: `CANL`, `6`: `GND`) with the GPS PPS on the adapter (`_work/sheets/status_spec.py`; board placement and routing in progress).
+
+**The two `J9` pins and the FFC mirror trick (`fpga/kria/bd.tcl`, `fpga/kria/xck26_bd.xdc`, `STATUS` sheet):**
+- **`CAN1` RX (`J9` pin 8):** `can1_rx` enters `J9` pin 8 (`CLK_N`, `SOM240_1 C13`, K26 ball `D6`, Bank 66 `LVCMOS12`, `PULLUP TRUE`). Pin 8 is the centre pin of the 15-way FFC (`16 - 8 = 8`), so it lands on `J1502` pin 8 with both straight and reversing FFC cables. On the adapter, `U1506` (`TCAN330DCNT`, `3.3 V` supply, `S` and `SHDN` grounded) drives `CAN_RXD` through a `1.8 kΩ / 1 kΩ` voltage divider (`R1556` / `R1557`, `3.3 V` to `1.18 V`, `2.8 kΩ` load) into `J1502` pin 8 because K26 Bank 66 runs at `PL_1V2` (`1.2 V`).
+- **`CAN1` TX (`J9` pin 6):** In `bd.tcl`, `can1_tx_inv` inverts `ps8/emio_can1_phy_tx` to `can1_txn` on `J9` pin 6 (`DATA1_P`, `SOM240_1 A9`, K26 ball `G6`, Bank 66 `LVCMOS12`, `DRIVE 4`, `SLEW SLOW`), so `can1_txn` is `0 V` when recessive and `1.2 V` when dominant. A straight FFC lands `J9` pin 6 on `J1502` pin 6 and `J9` pin 10 (`GND`) on `J1502` pin 10; a reversing FFC swaps them. Only `J1502` pins 7 and 9 remain grounded directly on the adapter. Pins 6 and 10 each feed the base of an `MMBT3904` NPN (`Q1530`, `Q1531`) through `2.2 kΩ` (`R1551`, `R1552`) with a `4.7 kΩ` base-emitter pull-down (`R1553`, `R1554`). Their shared collectors drive `CAN_TXD` with a `2.2 kΩ` pull-up (`R1555`) to `+3V3_D`, implementing `CAN_TXD = NOR(pin 6, pin 10) = TX` regardless of cable direction.
+- **Unconfigured fail-safe and bus protection:** While the K26 PL is unconfigured (pins floating or weakly pulled up), the `4.7 kΩ` base-emitter resistors hold both NPNs off so `CAN_TXD` stays high (recessive) and does not clamp the car's bus. `TCAN330DCNT` also provides both TXD and RXD dominant time-out protection. `CANH` and `CANL` go directly to `J1503` pins 4 and 5 behind an automotive CAN ESD diode (`D1531`, `PESD1CAN`) with **no termination resistor**, because tapping an existing vehicle bus must not add a third terminator.
+
+**Firmware and snoop mode (`sw/kria/core/src/can.rs`, `sw/kria/r5f/src/bin/core1.rs`, `sw/kria/r5f/src/bin/core0.rs`):**
+- At `100 MHz` `CAN1_REF_CTRL`, `can::bit_timing` uses `20` time quanta per bit (`1` sync + `16` prop/phase1 (`TS1 = 15`) + `3` phase2 (`TS2 = 2`), sample point at `85%`, `SJW = 3`, `BRPR = 100 MHz / (20 * bitrate) - 1`), supporting `125 kbit/s`, `250 kbit/s`, `500 kbit/s` and `1 Mbit/s`.
+- Core 1 keeps `CAN1` in reset until Linux enables it through `CanConfig`. By default (`active = false`) core 1 puts `CAN1` in `MSR_SNOOP` (`0x04`, listen-only mode), so the board never sends `ACK` or error frames onto a vehicle bus unless `--can-active` is explicitly set.
+- If Linux's heartbeat stops for `1 s`, core 1 stops the 10.5 GHz radar scan and occupancy grid (§6.1) but **keeps `CAN1` listening and publishing road speed**, so the transmit interlock stays armed with live bus speed.
+- Core 0 reads both `CanStatus.speed` and `ToR5f.ecu` (`opendash`) and passes `can::fresher(bus, ecu)` to `Interlock::step`, selecting whichever speed measurement has the newer `kria_pps` PL tick stamp.
+
+**Mailbox layout and ring buffer (`sw/kria/core/src/can.rs`, magic `"KCN1"`):**
+
+| Offset | Size | Name | Writer | Content |
+|---|---|---|---|---|
+| `0x0C0` | `64 B` | `CanStatus` | core 1 | Controller state (`Off`, `Snoop`, `Active`, `BusOff`), total frames, speed frames, bus errors, RX FIFO overflows, latest decoded `SpeedSample` (`centi_kmh`, `stamp`), `ring_head`, core 1 heartbeat |
+| `0x180` | `64 B` | `CanConfig` | Linux | `enabled`, `active` (`false` = snoop), `bitrate`, optional DBC `Signal` (`id`, `extended`, `start`, `len` 1..32, `motorola`, `num`, `den` in `0.01 km/h` per raw count, signed `offset`), Linux heartbeat |
+| `0x4000` | `2 KiB` | `CanRing` | core 1 (head) | `128 × 16 B` frame ring (`id`, `len`, `extended`, `rtr`, `stamp_ms`, `data[8]`) for `kria-vehicled` to log or inspect |
+
+**`kria-vehicled` CLI (`sw/kria/vehicled/src/main.rs`):**
+- `--can BITRATE` enables `CAN1` (`125000`, `250000`, `500000`, `1000000` bit/s, snoop mode by default).
+- `--can-speed ID[x]:START:LEN:intel|motorola:NUM/DEN[:OFFSET]` configures the DBC road-speed signal decoded in core 1, for example `kria-vehicled --can 500000 --can-speed 0x0D0:16:16:intel:1/1` (or an `x` suffix on ID for 29-bit extended frames).
+- `--can-active` switches `CAN1` out of snoop mode into normal active mode for bench tests where no other receiver acknowledges frames.
+- When `--can` is supplied, `kria-vehicled` keeps running on the CAN bus alone even if the `opendash` TCP server on the phone is unreachable.
+
+**Verification and limits:** `6` unit tests in `kria-core::can` (bit timing for all four rates at `100 MHz`, `IDR`/`DLR`/`DW1`/`DW2` register packing, Intel and Motorola DBC signal extraction with scaling and offset, `CanConfig`/`CanStatus`/`CanRing` round trips, and `fresher` speed selection across wrap) and `1` CLI parser test in `kria-vehicled`. The K26 bitstream places `G6` and `D6` in Bank 66 (`LVCMOS12`). Adapter board placement and routing are in progress, and none of it has been run on a car or on a KV260.
 
 ## 3. 77 GHz radar over CAN
 
@@ -323,7 +356,7 @@ In the full build it costs about what it costs alone (§6.1). The 64 K × 8 memo
 - **Drains Linux's ring.** The 77 GHz radar's objects (decoded on the A53s, §3), and anything else Linux wants in the grid, go through a ring in the shared region ([`kria_core::ring`](../sw/kria/core/src/ring.rs)), 64 per loop.
 - **Makes the frames.** Every `frame_ms` (100 ms by default) it arms the DMA on the free buffer, pushes a decay pass and a dump, and publishes the buffer in its status block when the DMA finishes.
 
-Linux sets the scan (beams, azimuths, dwell, range and Doppler per bin), the radar's mount and the frame cadence in the mailbox (`Core1Config`), and writes the grid's weights and origins once. Silent for a second, Linux stops core 1's scan and grid.
+Linux sets the scan (beams, azimuths, dwell, range and Doppler per bin), the radar's mount and the frame cadence in the mailbox (`Core1Config`), and writes the grid's weights and origins once. Silent for a second, Linux stops core 1's scan and grid while core 1 keeps the vehicle CAN (§2.2) running.
 
 **End to end.** [`sw/kria/core/examples/radar_grid.rs`](../sw/kria/core/examples/radar_grid.rs) runs core 1's code in core 1's order for 2 s. Around it are models of the Artix's beam scan, of `kria_radar_proc` (a CPI every 400 µs, three CFAR cells per target in the beam, the conjugate map) and of a scene: a car ahead closing at 2 m/s, a pedestrian, a cyclist crossing, and a parked van. The 77 GHz radar sees the same objects every 50 ms, through the ring. Its 2,705 commands then go through the RTL: [`tb_kria_bev_axi`](../fpga/sim/tb_kria_bev_axi.v) alternates them between the register port and the stream, and the dump matches the bit-exact model in all 65,536 cells.
 
@@ -355,7 +388,7 @@ To rerun:
 
 The mutation `bev_axi_no_stage` (`DET_CMD` ignores `DET_XY`) fails it. The Artix's scan mode is in `tb_adar_ctrl`: five strobes load beams 0, 1, 2, 0 and 1, each with its own weights; the mutation `scan_ignored` fails it. The CPI count is checked by the system bench `tb_system_signals` in the G-8 radar case, which passes again with it.
 
-**Cost in the K26 build:** `kria_bev_0` takes `782` LUT (`192` of them LUTRAM), `623` FF and `16` BRAM36, and its DMA `axi_dma_1` `1,043` LUT, `1,590` FF and one BRAM36 and one BRAM18. With the KrakenSDR and HackRF Pro blocks of §9 and §10 the whole block design is at `51,870` LUT (`44.3 %`), `40` BRAM36 eq. (`27.8 %`) and `229` DSP48E2, and meets timing with `WNS = +1.125 ns` and `WHS = +0.010 ns` (FPGA_GATEWARE §3.3).
+**Cost in the K26 build:** `kria_bev_0` takes `781` LUT (`192` of them LUTRAM), `623` FF and `16` BRAM36, and its DMA `axi_dma_1` `1,046` LUT, `1,590` FF and one BRAM36 and one BRAM18. Including `kria_dsp_out`, `kria_ps_framer`, `TX_KEY`, PS `CAN1` EMIO and the KrakenSDR and HackRF Pro blocks (§9, §10), the whole block design is at `53,294` LUT (`45.5 %`), `46,879` FF (`20.0 %`), `44.0` BRAM36 eq. (`30.6 %`), `1` URAM (`1.6 %`) and `229` DSP48E2, and meets timing with `WNS = +0.991 ns` and `WHS = +0.010 ns` ([FPGA_GATEWARE.md §3.3](FPGA_GATEWARE.md)).
 
 ## 7. Software on the K26's processors
 
@@ -363,22 +396,22 @@ Code that runs on the Kria's ARM cores is written in Rust, with its logic in an 
 
 | Crate | Runs on | What it does |
 |---|---|---|
-| [`kria-core`](../sw/kria/core/src/lib.rs) | A53 and R5F (`no_std`, no allocation, no `unsafe`) | `pps` (the loop of §2.1), `interlock` (the transmit lock), `link` (the IAS1 link watchdog), `radar` (the beam scan), `bev` (the grid's commands and coordinates), `ring` (Linux's grid commands for core 1), `telemetry` (`opendash-telemetry/1` lines), `mailbox` (the shared blocks' layout and seqlock) |
-| [`kria-vehicled`](../sw/kria/vehicled/src/main.rs) | A53, Linux | §4.1 |
-| [`kria-r5f0`](../sw/kria/r5f/src/bin/core0.rs) | R5F core 0, from TCM, started by remoteproc | At 1 kHz: the PPS loop on `kria_pps`, the IAS1 link watchdog, the transmit lock (it owns `DSP_CTRL[1]`), and status back to Linux |
-| [`kria-r5f1`](../sw/kria/r5f/src/bin/core1.rs) | R5F core 1, from its own TCM | At 10 kHz: the 10.5 GHz radar's beam scan, the fusion grid's command port and frames (§6.1) |
+| [`kria-core`](../sw/kria/core/src/lib.rs) | A53 and R5F (`no_std`, no allocation, no `unsafe`) | `pps` (the loop of §2.1), `interlock` (the transmit lock), `link` (the IAS1 link watchdog), `can` (the PS `CAN1` register driver, DBC speed extractor and mailbox blocks of §2.2), `radar` (the beam scan), `bev` (the grid's commands and coordinates), `ring` (Linux's grid commands for core 1), `telemetry` (`opendash-telemetry/1` lines), `mailbox` (the shared blocks' layout and seqlock) |
+| [`kria-vehicled`](../sw/kria/vehicled/src/main.rs) | A53, Linux | §2.2, §4.1 |
+| [`kria-r5f0`](../sw/kria/r5f/src/bin/core0.rs) | R5F core 0, from TCM, started by remoteproc | At 1 kHz: the PPS loop on `kria_pps`, the IAS1 link watchdog, the transmit lock (it owns `TX_KEY` at `0x8000_0038`), and status back to Linux |
+| [`kria-r5f1`](../sw/kria/r5f/src/bin/core1.rs) | R5F core 1, from its own TCM | At 10 kHz: the 10.5 GHz radar's beam scan, the fusion grid's command port and frames (§6.1), and the vehicle's CAN 2.0 bus on PS `CAN1` (§2.2) |
 | [`kria-hmi-core`](../sw/kria/hmi-core/src/lib.rs) | A53 (any host; tested on a PC) | The screens' data plane: the PL's result blocks, RDS, ADS-B, radar, spectrum, a frequency and mode to register writes ([HMI.md §4](HMI.md)) |
 | [`kria-hmid`](../sw/kria/hmid/src/main.rs) | A53, Linux | The HMI's data service: DMA blocks in, audio, register writes, I/Q recording, snapshots over WebSocket; asks core 0 for transmit through `kria-vehicled` and the mailbox |
 | [`kria-hmi`](../sw/hmi/app/ui/app.slint) | A53 (Linux KMS), a PC, a browser | The ten screens, in Slint ([HMI.md §3](HMI.md)) |
 
 **The transmit lock** (`kria_core::interlock`) runs on R5F core 0 every millisecond:
-- **Speed source:** the ECU's road speed first, while fresh (1 s), then the GPS's (2 s).
+- **Speed source:** the car's road speed first (whichever of core 1's `CAN1` speed reading and `opendash`'s ECU reading has the newer `kria_pps` tick stamp, via `can::fresher`, while fresh within 1 s), then the GPS's (2 s).
 - **Moving or parked:** 3 km/h or more is moving. Parked needs under 1 km/h for 3 s, with hysteresis in between.
 - **Licence:** the flag must be set.
 - **Time-out:** at most 180 s of continuous transmission, then a 10 s cooldown after the button is released.
-- **Fail-safe:** no fresh speed from either source, or Linux silent for 0.5 s, means locked.
+- **Fail-safe:** no fresh speed from any source, Linux silent for 0.5 s, or the IAS1 link down means locked.
 
-On the R5F it holds while Linux is busy or restarting. Linux never writes the transmit-enable bit; it asks through the mailbox. Core 0 also requires the IAS1 link to be up: with the link down the transmit samples do not reach the front end, and when it returns they should not resume on their own.
+On the R5F it holds while Linux is busy or restarting. Core 0 switches the transmitter on and off exclusively through `TX_KEY` (`0x8000_0038` in `kria_pl_link`), which requires `24'h4B4559` (`"KEY"`) in `[31:8]` and full byte strobes (`0x4B45_5901` on, `0x4B45_5900` off). `TX_KEY` is clocked on `pl_clk_100m`, so core 0 can always clear it (including from `on_panic()`) even when the IAS1 receive clock is missing. `DSP_CTRL[1]` (`0x8000_0040`) is now read-only and mirrors `TX_KEY[0]`, so whole-register writes to `DSP_CTRL` by Linux (`kria-hmid`) cannot key or clear the transmitter. Core 0 also requires the IAS1 link to be up: with the link down the transmit samples do not reach the front end, and when it returns they should not resume on their own.
 
 **The IAS1 link watchdog** (`kria_core::link`), also on core 0 every millisecond:
 - **Down:** after 20 ms with `link_up` low, it pulses `LINK_CTRL[2]` to retrain. If the link stays down, it retrains again after 100 ms, then 200, 400 and so on up to 5 s, so a front end that is switched off is not hammered. The first training after start gets 3 s.
@@ -398,37 +431,41 @@ A link register read can abort: `kria_pl_link` answers SLVERR when the link's re
   | `0x000` | speeds, licence, transmit request | Linux |
   | `0x040` | PPS, interlock and link status | core 0 |
   | `0x080` | scan and grid status, the latest frame | core 1 |
+  | `0x0C0` | vehicle CAN status and decoded road speed (`CanStatus`) | core 1 |
   | `0x100` | scan and grid configuration | Linux |
+  | `0x180` | vehicle CAN bitrate and DBC speed signal (`CanConfig`) | Linux |
   | `0x1000` | grid command ring | Linux (head), core 1 (tail) |
+  | `0x4000` | vehicle CAN received frame ring (`CanRing`, `128 × 16 B`) | core 1 (head) |
 - **Who writes:** one writer per block, and each block is a seqlock.
 - **Time base:** `kria_pps`'s `NOW`, the PL clock that all three read. Reading `NOW_LO` latches `NOW_HI` for whoever reads it next, so each reader takes two pairs and keeps them only if they agree.
 
 RPMsg (OpenAMP) is the general-purpose alternative. For a few numbers a millisecond, a fixed block with no driver is enough.
 
 **Tests:**
-- **`kria-core`:** 29 tests on the host.
+- **`kria-core`:** 35 tests on the host.
   - PPS: lock with a fast and a slow oscillator, a frequency step, a false pulse, holdover and reacquisition, a counter that wraps.
   - Interlock: settling, creeping, GPS fallback and fail-safe, licence, time-out and cooldown.
   - Link watchdog: power-up training, the back-off sequence and its reset, slow errors counted, a burst retrained once.
+  - Vehicle CAN: bit timing for 125 kbit/s to 1 Mbit/s at 100 MHz, `CAN1` frame register packing, Intel and Motorola DBC signal extraction with scale and offset, `CanConfig`/`CanStatus`/`CanRing` round trips, and `fresher` speed selection across counter wrap.
   - Radar scan: dwell and beam order with nothing in view, a target holding the beam, the conjugate map, negative Doppler, CPIs missed across the counter's wrap.
   - Grid: command words against the RTL layout, cell edges, sine and cosine within 2e-6, mounts, configuration words.
   - Telemetry: lines exactly as opendash writes them, and junk.
   - Mailbox and ring: round trips, seqlock, counters that wrap.
 - **Cross-builds:** the core builds for `armv7r-none-eabihf` and `aarch64-unknown-linux-gnu`.
-- **The R5F firmware:** two images, each linked into its core's ATCM (7.5 KB and 7.8 KB of code) and BTCM.
-- **The daemon:** builds for the A53s, and ran the end-to-end test of §4.1.
+- **The R5F firmware:** two images, each linked into its core's ATCM and BTCM (`armv7r-none-eabihf`).
+- **The daemon:** 1 host test (`--can-speed` parser), builds for the A53s, and ran the end-to-end test of §4.1.
 - **Core 1 end to end:** §6.1.
 
-None of it has run on a KV260 yet.
+None of it has run on a car or on a KV260 yet.
 
 ## 8. What it would take, in order
 
 1. **On a KV260:**
-   - the bitstream with `kria_pps`, the grid and its DMA;
+   - the bitstream with `kria_pps`, `TX_KEY`, PS `CAN1` EMIO, the grid and its DMA;
    - the overlay with the PPS and grid nodes, the mailbox and the frame buffers;
    - `kria-r5f0` and `kria-r5f1` loaded through remoteproc;
    - the Artix's beam table loaded in scan order and `ADAR_CTRL[13]` set;
-   - `kria-vehicled` against opendash on the phone;
+   - `kria-vehicled` with `--can` on the vehicle's CAN 2.0 bus (`J9` pins 6 and 8) and/or against opendash on the phone;
    - `gpsd` and `chrony` for the GPS's position and time, and its PPS on `J9` pin 12.
 
    Everything here is built and tested on the bench. Only the board is missing.
@@ -573,14 +610,14 @@ Both blocks and their DMAs are in the K26 block design (`fpga/kria/bd.tcl`), bui
 
 | Instance | LUT | FF | BRAM36 / 18 | DSP |
 |---|---|---|---|---|
-| `kria_doa_0` | 10,114 (3,200 of them LUTRAM) | 2,098 | 0 / 1 | 115 |
-| `axi_dma_2` | 559 | 841 | 1 / 1 | 0 |
-| `kria_sweep_0` | 1,586 | 638 | 2 / 1 | 8 |
+| `kria_doa_0` | 10,116 (3,200 of them LUTRAM) | 2,098 | 0 / 1 | 115 |
+| `axi_dma_2` | 560 | 841 | 1 / 1 | 0 |
+| `kria_sweep_0` | 1,585 | 638 | 2 / 1 | 8 |
 | `axi_dma_3` | 1,665 | 2,415 | 2 / 2 | 0 |
-| **Whole K26 design** | **51,870 of 117,120 (44.3 %)** | 44,547 (19.0 %) | 40 eq. (27.8 %) | 229 (18.3 %) |
+| **Whole K26 design** | **53,294 of 117,120 (45.5 %)** | 46,879 (20.0 %) | 44.0 eq. (30.6 %), 1 URAM | 229 (18.3 %) |
 
-- **Timing:** `WNS = +1.125 ns`, `WHS = +0.010 ns`; `clk_pl_0` `+1.497 ns`, its worst path in the ADS-B receiver, not in the new blocks.
-- **Clock-domain crossings:** none added. The four new instances run on `clk_pl_0`, the clock of the HP0 and HPM0_LPD ports; `cdc.rpt` has the same crossings as the build before.
+- **Timing:** `WNS = +0.991 ns`, `WHS = +0.010 ns`; `clk_pl_0` `+1.475 ns`, its worst intra-clock path in the ADS-B receiver, not in the new blocks.
+- **Clock-domain crossings:** none added by `kria_doa_0`, `kria_sweep_0`, `axi_dma_2`, `axi_dma_3` or PS `CAN1` EMIO. The four streaming instances run on `clk_pl_0`, the clock of the HP0 and HPM0_LPD ports ([FPGA_GATEWARE.md §3.3](FPGA_GATEWARE.md)).
 - **Addresses**, as Vivado assigned them (the XSA's hardware handoff): `kria_doa_0` `0x8005_0000`, `axi_dma_2` `0x8006_0000`, `kria_sweep_0` `0x8007_0000`, `axi_dma_3` `0x8008_0000`, each 64 KiB, after the existing five slaves at `0x8000_0000` to `0x8004_FFFF`. The overlay (`sw/ias2rf_pl.dtsi`) adds the four nodes and the DMA buffers `kraken_buf` (`0x3EE4_0000`, 512 KiB) and `sweep_buf` (`0x3EF0_0000`, 832 KiB).
 - **The first build** put `kria_sweep`'s FFT memory, read at four places at once, in flip-flops and multiplexers: 43,305 LUT for that block alone. The memory is now one block RAM with a write and a read port, six clocks per butterfly; the block fell to 1,586 LUT, and the benches above were re-run on it.
 - **Not done:** `kria_doa`'s steering table stays in LUTRAM; moving it to block RAM would free about 3,200 LUT.
