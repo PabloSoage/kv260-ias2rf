@@ -25,16 +25,19 @@ import rev08_pcb as P                                    # noqa: E402
 
 U = lambda: str(uuid.uuid4())
 J1502_AT = (197.4, 106.65, 180)
-J1503_AT = (193.8, 112.6, 180)
+J1503_AT = (194.4, 112.6, 180)   # 0.6 mm east of the old SM04B: its wider west tab clears LINK_RX_D1_N (x 189.65, F.Cu)
 H2 = (203.0, 112.25, 3.2)
 VIA_Y_FPC, VIA_Y_JST = 109.5, 115.8
 BOTTOM_BOX = (185.6, 107.6, 207.5, 127.5)
 BOTTOM = [  # ref, anchor: the free area south of the GPS circuit (x 186 to 194, y 119 to 127)
     ("U1506", (190.0, 121.0)), ("D1531", (193.0, 119.8)), ("C1550", (187.4, 120.2)),
     ("R1556", (187.4, 122.0)), ("R1557", (187.4, 123.2)),
-    ("Q1530", (188.6, 125.0)), ("Q1531", (192.0, 125.0)),
-    ("R1551", (187.2, 126.6)), ("R1552", (193.6, 126.6)), ("R1553", (189.4, 126.8)), ("R1554", (191.0, 126.8)),
+    ("Q1530", (188.6, 125.0)),
+    ("R1551", (187.2, 126.6)), ("R1553", (189.4, 126.8)),
     ("R1555", (190.2, 123.4)),
+]
+FIXED = [  # ref, (x, y, angle): Q1531 and its base resistors in the pocket east of the via field
+    ("Q1531", (205.12, 123.5, 90)), ("R1552", (205.0, 120.6, 90)), ("R1554", (203.75, 126.37, 90)),
 ]
 
 
@@ -89,7 +92,7 @@ def main(src, dst):
     comps, pins = P.netlist()
     fpc = {n: (round(204.4 - (n - 1), 4), 107.95) for n in range(1, 16)}
     old_jst = {n: (round(195.3 - (n - 1), 4), 114.6) for n in range(1, 5)}
-    new_jst = {n: (round(196.3 - (n - 1), 4), 114.6) for n in range(1, 7)}
+    new_jst = {n: (round(196.9 - (n - 1), 4), 114.6) for n in range(1, 7)}
     # 1. the old stubs: J1503's pins and tabs, FPC pins 6 and 10 (ground until now)
     pts = [p for p in old_jst.values()] + [(p[0], VIA_Y_JST) for p in old_jst.values()]
     pts += [(191.0, 110.725), (191.0, 109.375), (196.6, 110.725)]
@@ -110,32 +113,32 @@ def main(src, dst):
                 break
         else:
             raise SystemExit(f"{ref} not on the board")
-    # 3. the new stubs (top)
+    # 3. the new stubs (top): ground vias for J1503's pins 3 and 6 and its east tab to FPC pin 7's ground via;
+    #    the signal pins are routed from their pads. F1501's +3V3_D via sat under the new pin 1: it goes too
+    #    (a new one is placed with the routing).
+    t, n = drop_items(t, [(196.65, 114.338)], {"+3V3_D"})
+    print(f"removed F1501's via under J1503 pin 1 ({n} items)")
     items = []
-    for n, net in ((6, "/STATUS/J9_CAN_TX6"), (10, "/STATUS/J9_CAN_TX10"), (8, "/STATUS/J9_CAN_RX")):
-        x, y = fpc[n]
-        v = (x, VIA_Y_FPC)
-        items += [seg((x, y), v, 0.2, "F.Cu", net), via(v, net)]
-    for n, net in ((1, "/STATUS/GPS_3V3"), (2, "/STATUS/GPS_PPS_IN"), (3, "GND"), (4, "/STATUS/CAN_H"),
-                   (5, "/STATUS/CAN_L"), (6, "GND")):
+    for n in (3, 6):
         x, y = new_jst[n]
         v = (x, VIA_Y_JST)
-        items += [seg((x, y), v, 0.2, "F.Cu", net), via(v, net)]
-    items += [seg((190.0, 110.725), (190.0, 109.375), 0.3, "F.Cu", "GND"), via((190.0, 109.375), "GND")]
-    items += [seg((197.6, 110.725), (fpc[7][0], VIA_Y_FPC), 0.3, "F.Cu", "GND")]
+        items += [seg((x, y), v, 0.2, "F.Cu", "GND"), via(v, "GND")]
+    items += [seg((198.2, 110.725), (fpc[7][0], VIA_Y_FPC), 0.3, "F.Cu", "GND")]
     s = t.rfind("\n\t(embedded_fonts")
     t = t[:s] + "\n" + "".join(items).rstrip("\n") + t[s:]
     # 4. the new bottom parts
     have = {r for _, _, r in P.footprints(t)}
     anchors = [(ref, comps[ref]["footprint"], xy, "B", allowed_bottom) for ref, xy in BOTTOM if ref not in have]
     packed = P.pack(t, comps, pins, anchors)
+    packed += [P.place(P.lib_text(comps[r]["footprint"]), comps[r]["footprint"], r, comps[r], pins[r], x, y, a, True)
+               for r, (x, y, a) in FIXED if r not in have]
     s = max(e for _, e, _ in P.footprints(t))
     t = t[:s] + "\n" + "".join(packed).rstrip("\n") + t[s:]
     missing = [r for r in comps if r not in {x for _, _, x in P.footprints(t)}]
     if missing:
         print("not on the board:", missing)
     open(dst, "w", encoding="utf-8", newline="\n").write(t)
-    print(f"J1503 and J1502 replaced, {len(packed)} of {len(anchors)} bottom parts packed -> {dst}")
+    print(f"J1503 and J1502 replaced, {len(packed)} of {len(anchors) + len(FIXED)} bottom parts packed -> {dst}")
 
 
 if __name__ == "__main__":
