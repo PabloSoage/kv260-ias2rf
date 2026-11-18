@@ -199,6 +199,8 @@ module tb_system;
 
     wire        pmod_cs_n, pmod_sclk, pmod_mosi, pmod_miso;
     wire        kria_beam_strobe, kria_pps_sync, kria_spare1, kria_spare2;
+    pullup(kria_spare1);
+    pullup(kria_spare2);
 
     wire        eth_mdc, eth_rst_n;
     tri1        eth_mdio;
@@ -944,7 +946,16 @@ module tb_system;
         u_m24c02.mem[0]  = 8'hC3;
 
         pl_resetn = 1'b0;
-        #250_000; // 250 ns global reset
+        #100_000;
+        if (u_kria.adapter_alive !== 1'b0 ||
+            pmod_cs_n !== 1'bz || pmod_mosi !== 1'bz || pmod_sclk !== 1'bz ||
+            kria_beam_strobe !== 1'bz || kria_pps_sync !== 1'bz) begin
+            $display("DBG P2: cs=%b mosi=%b sclk=%b strb=%b pps=%b sp1=%b alive=%b lu=%b sp2_a=%b",
+                     pmod_cs_n, pmod_mosi, pmod_sclk, kria_beam_strobe, kria_pps_sync, kria_spare1,
+                     u_kria.adapter_alive, u_kria.linkup_pl_sync, u_kria.spare2_alive);
+            fail_msg("Audit P2: Kria Pmod outputs not high-Z while adapter offline");
+        end
+        #150_000; // 250 ns total global reset
         pl_resetn = 1'b1;
 
         // =====================================================================
@@ -961,8 +972,13 @@ module tb_system;
             axil_rd(8'h04, csr_r);
             tmo_cnt = tmo_cnt + 1;
         end
-        if (!csr_r[6])
+        if (!csr_r[6]) begin
+            $display("DBG S1: scan_tap=%0d bl0=%0d bl1=%0d l0=%b l1=%b dl=%b sh0=%0d sh1=%0d pcs_rst_rx=%b alive=%b",
+                     u_kria.u_train_fsm.scan_tap, u_kria.u_train_fsm.best_len0, u_kria.u_train_fsm.best_len1,
+                     u_kria.l0_lock, u_kria.l1_lock, u_kria.d_lock, u_kria.sh_err0, u_kria.sh_err1,
+                     u_kria.pcs_rst_rx, u_kria.adapter_alive);
             fail_msg("S1: Kria REG_LINK_STATUS did not report link_up");
+        end
         if (!TB_BOOT_500M && !csr_r[21])
             fail_msg("S1: Kria REG_LINK_STATUS did not report adc_trained in 400M mode");
         if (TB_BOOT_500M && csr_r[21])
@@ -973,6 +989,9 @@ module tb_system;
             fail_msg("S1: SGMII AN or MDIO poll did not complete");
         if (!irq_link_up)
             fail_msg("S1: irq_link_up not asserted");
+        if (pmod_cs_n === 1'bz || pmod_mosi === 1'bz || pmod_sclk === 1'bz ||
+            kria_beam_strobe === 1'bz || kria_pps_sync === 1'bz || kria_spare1 === 1'bz)
+            fail_msg("Audit P2: Kria Pmod outputs stayed high-Z after adapter_alive");
         if ((u_kria.eye_r0 <= u_kria.eye_l0) || (u_kria.eye_r1 <= u_kria.eye_l1) ||
             (u_kria.train_cnt_l0 > 9'd511) || (u_kria.train_cnt_l1 > 9'd511))
             fail_msg("S1: Kria eye bounds invalid or outside 0..511 taps");

@@ -5,8 +5,8 @@
 //! * 30-170 MHz: the RX_VU front end straight to the AD9484 (`VU_CONV_ON` low), preselector A on the FM band-pass
 //!   (88-108 MHz) or the FM reject; the AERIS DDC's NCO through the radar NCO override (`RADAR_CTRL[2]`, a 24-bit
 //!   word at 400 MHz in `[31:8]`), stream 0x01 at 25 MS/s.
-//! * 240 MHz to 3 GHz: through the RFFC5072 converter to the 135 MHz IF (a high-pass in front of preselector B cuts
-//!   the band below ~240 MHz; 170-240 MHz is not covered). The LO sits above the signal up to 1 GHz, below it above
+//! * 300 MHz to 3 GHz: through the RFFC5072 converter to the 135 MHz IF (a high-pass in front of preselector B cuts
+//!   the band below 300 MHz; 170-300 MHz is not covered). The LO sits above the signal up to 1 GHz, below it above
 //!   (RFFC5072_PROGRAMMING §4.1), preselector B on the UHF low-pass, the 1090 MHz SAW, the 1 GHz high-pass, or the
 //!   LFCN-1000+ 1 GHz low-pass (where the gateware forces `VU_LNA_ON` = 1).
 //! The channel itself (`kria_channel_rx`) is set as the G-8 cases set it (FPGA_GATEWARE §6.1): CIC and FIR
@@ -21,9 +21,9 @@ pub const VU_FS: f64 = 400e6;
 pub const VU_STREAM: f64 = 25e6;
 pub const IF_HZ: f64 = 135e6;
 pub const DIRECT_MAX_HZ: f64 = 170e6;
-pub const CONVERTED_MIN_HZ: f64 = 240e6;
+pub const CONVERTED_MIN_HZ: f64 = 300e6;
 
-/// True when `freq_hz` is covered by the RF front end (170..240 MHz is excluded by the preselector-B high-pass).
+/// True when `freq_hz` is covered by the RF front end (170..300 MHz is excluded by the preselector-B 300 MHz high-pass).
 pub fn is_covered(freq_hz: f64) -> bool {
     !(freq_hz > DIRECT_MAX_HZ && freq_hz < CONVERTED_MIN_HZ)
 }
@@ -313,14 +313,14 @@ mod tests {
 
     #[test]
     fn band_boundaries_and_lna_force_rule() {
-        // Direct sampling stays 30-170 MHz; 170-240 MHz is not covered; converted starts at 240 MHz
+        // Direct sampling stays 30-170 MHz; 170-300 MHz is not covered; converted starts at 300 MHz
         let direct = plan(170e6, Mode::Nbfm, 0.0);
         assert_eq!((direct.path, direct.covered, direct.lo_hz), (Path::Direct, true, None));
-        let gap = plan(200e6, Mode::Nbfm, 0.0);
+        let gap = plan(250e6, Mode::Nbfm, 0.0);
         assert!(!gap.covered);
         assert_eq!(gap.lo_hz, None);
-        let conv = plan(240e6, Mode::Nbfm, 0.0);
-        assert_eq!((conv.path, conv.covered, conv.lo_hz), (Path::Converted, true, Some(375e6)));
+        let conv = plan(300e6, Mode::Nbfm, 0.0);
+        assert_eq!((conv.path, conv.covered, conv.lo_hz), (Path::Converted, true, Some(435e6)));
 
         // Gateware R3 rule: VU_CONV_ON=1, PSA=B(11), PSB=LFCN-1000+(011) forces VU_LNA_ON=1
         let raw_bypass: u8 = 0x80 | (1 << 6) | (0 << 5) | (3 << 2) | 3; // 0xCF

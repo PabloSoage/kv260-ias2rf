@@ -178,7 +178,7 @@ pub fn apply(ui: &AppWindow, m: &mut Model, snap: &Value) {
     let path = s(r, "path");
     let covered = r.get("covered").and_then(|v| v.as_bool()).unwrap_or(true);
     let mut path_str = if !covered {
-        "not covered (170–240 MHz)".to_string()
+        "not covered (170–300 MHz)".to_string()
     } else {
         match path.as_str() {
             "hf" => "HF · AD9253 B".to_string(),

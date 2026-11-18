@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date             : Wed Nov 18 21:52:23 2026
+| Date             : Thu Nov 19 00:43:52 2026
 | Host             : Akasha running 64-bit major release  (build 9200)
 | Command          : report_power -file D:/Repos/kv260-ias2rf/fpga/artix/reports_rev06/power_70c_max.rpt
 | Design           : artix_top
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+---------------------------------+
-| Total On-Chip Power (W)  | 1.604 (Junction temp exceeded!) |
+| Total On-Chip Power (W)  | 1.619 (Junction temp exceeded!) |
 | Design Power Budget (W)  | Unspecified*                    |
 | Power Budget Margin (W)  | NA                              |
-| Dynamic (W)              | 1.162                           |
-| Device Static (W)        | 0.442                           |
+| Dynamic (W)              | 1.174                           |
+| Device Static (W)        | 0.444                           |
 | Effective TJA (C/W)      | 14.4                            |
-| Max Ambient (C)          | 61.9                            |
-| Junction Temperature (C) | 93.1                            |
+| Max Ambient (C)          | 61.7                            |
+| Junction Temperature (C) | 93.3                            |
 | Confidence Level         | Low                             |
 | Setting File             | ---                             |
 | Simulation Activity File | ---                             |
@@ -52,23 +52,23 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.158 |       31 |       --- |             --- |
-| Slice Logic              |     0.048 |    62601 |       --- |             --- |
-|   LUT as Logic           |     0.035 |    24646 |     32600 |           75.60 |
+| Clocks                   |     0.169 |       31 |       --- |             --- |
+| Slice Logic              |     0.048 |    62622 |       --- |             --- |
+|   LUT as Logic           |     0.035 |    24594 |     32600 |           75.44 |
 |   CARRY4                 |     0.009 |     3311 |      8150 |           40.63 |
-|   Register               |     0.004 |    28990 |     65200 |           44.46 |
+|   Register               |     0.004 |    29023 |     65200 |           44.51 |
 |   LUT as Distributed RAM |    <0.001 |      490 |      9600 |            5.10 |
-|   F7/F8 Muxes            |    <0.001 |      511 |     32600 |            1.57 |
+|   F7/F8 Muxes            |    <0.001 |      498 |     32600 |            1.53 |
 |   LUT as Shift Register  |    <0.001 |       11 |      9600 |            0.11 |
 |   Others                 |     0.000 |      141 |       --- |             --- |
-| Signals                  |     0.071 |    55700 |       --- |             --- |
+| Signals                  |     0.071 |    55739 |       --- |             --- |
 | Block RAM                |     0.056 |       18 |        75 |           24.00 |
 | MMCM                     |     0.397 |        3 |         5 |           60.00 |
-| DSPs                     |     0.096 |      119 |       120 |           99.17 |
+| DSPs                     |     0.097 |      119 |       120 |           99.17 |
 | I/O                      |     0.332 |      132 |       170 |           77.65 |
 | XADC                     |     0.003 |        1 |       --- |             --- |
-| Static Power             |     0.442 |          |           |                 |
-| Total                    |     1.604 |          |           |                 |
+| Static Power             |     0.444 |          |           |                 |
+| Total                    |     1.619 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -78,8 +78,8 @@ Table of Contents
 +-----------+-------------+------------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A)  | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+------------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |      0.776 |       0.450 |      0.326 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |      0.367 |       0.299 |      0.067 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |      0.791 |       0.462 |      0.328 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |      0.367 |       0.299 |      0.068 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.007* |       0.005 |      0.002 |       0.036 | Unspecified | NA         |
 | Vcco25    |       2.500 |      0.061 |       0.060 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco18    |       1.800 |     0.002* |       0.000 |      0.001 |       0.041 | Unspecified | NA         |
@@ -176,23 +176,24 @@ Table of Contents
 +----------------------------+-----------+
 | Name                       | Power (W) |
 +----------------------------+-----------+
-| artix_top                  |     1.162 |
+| artix_top                  |     1.174 |
 |   gen_rev06_eth.u_dual_mux |     0.025 |
 |     u_fifo_eth             |     0.013 |
 |     u_fifo_ias             |     0.013 |
 |   gen_rev06_eth.u_eth_mac  |     0.003 |
-|   gen_rev06_eth.u_eth_phy  |     0.067 |
+|   gen_rev06_eth.u_eth_phy  |     0.068 |
 |     u_dec                  |     0.001 |
 |     u_ibuf_diff            |     0.006 |
 |   u_adar_ctrl              |     0.006 |
 |   u_adc_cap                |     0.243 |
-|   u_adcr_peak              |     0.009 |
+|   u_adcr_peak              |     0.011 |
 |   u_adcs_cap               |     0.041 |
-|   u_clk_mode_ctrl          |     0.010 |
-|     u_fe_ctrl              |     0.002 |
-|     u_hk_xo                |     0.003 |
-|       u_xo_i2c             |     0.001 |
-|   u_d2                     |     0.089 |
+|   u_clk_mode_ctrl          |     0.011 |
+|     u_fe_ctrl              |     0.003 |
+|     u_hk_xo                |     0.004 |
+|       u_xo_i2c             |     0.002 |
+|   u_conv_spi               |     0.001 |
+|   u_d2                     |     0.088 |
 |     g_rom[0].u_rom         |     0.002 |
 |     g_rom[1].u_rom         |     0.003 |
 |     g_rom[2].u_rom         |     0.003 |
@@ -201,19 +202,19 @@ Table of Contents
 |       u_a                  |     0.002 |
 |       u_b                  |     0.005 |
 |   u_d2_peak                |     0.001 |
-|   u_dac_radar              |     0.008 |
+|   u_dac_radar              |     0.009 |
 |   u_dac_sdr                |     0.005 |
 |   u_dbg_uart               |     0.004 |
-|   u_ddc                    |     0.141 |
-|     g_hb4.u_hb4            |     0.006 |
+|   u_ddc                    |     0.149 |
+|     g_hb4.u_hb4            |     0.005 |
 |       u_a                  |     0.002 |
 |       u_b                  |     0.004 |
-|     u_ddc                  |     0.133 |
-|       cic_i_inst           |     0.016 |
-|       cic_q_inst           |     0.016 |
+|     u_ddc                  |     0.142 |
+|       cic_i_inst           |     0.019 |
+|       cic_q_inst           |     0.020 |
 |       fir_i_inst           |     0.041 |
-|       fir_q_inst           |     0.042 |
-|       nco_core             |     0.007 |
+|       fir_q_inst           |     0.041 |
+|       nco_core             |     0.008 |
 |   u_dl_pcs_rx              |     0.003 |
 |     u_deframer             |     0.002 |
 |       u_crc                |     0.001 |
@@ -221,7 +222,7 @@ Table of Contents
 |   u_fe_agc                 |     0.003 |
 |   u_hk_i2c                 |     0.001 |
 |   u_pmod_spi               |     0.002 |
-|   u_sdr_ddc                |     0.051 |
+|   u_sdr_ddc                |     0.052 |
 |     u_ch_a                 |     0.025 |
 |       u_nco                |     0.003 |
 |     u_ch_b                 |     0.026 |
@@ -231,7 +232,7 @@ Table of Contents
 |     u_enc_l1               |     0.001 |
 |     u_framer               |     0.001 |
 |     u_tx_lanes             |     0.001 |
-|   u_xadc_pps               |     0.011 |
+|   u_xadc_pps               |     0.012 |
 +----------------------------+-----------+
 
 

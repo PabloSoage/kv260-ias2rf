@@ -88,7 +88,9 @@ module kria_async_fifo #(
     end
 endmodule
 
-module kria_top (
+module kria_top #(
+    parameter integer PMOD_ALIVE_CYC = 375_000_000   // 3 s @ 125 MHz tx_clk_div
+) (
     // Uplink LVDS/SSTL12 pairs (Artix Bank 34 -> K26 Bank 66 HP)
     input  wire link_rx_clk_p,
     input  wire link_rx_clk_n,
@@ -911,7 +913,8 @@ module kria_top (
     // -------------------------------------------------------------------------
     // SAXIGP2 DMA Engine + Downlink Loopback in tx_clk_div (125 MHz)
     // -------------------------------------------------------------------------
-    (* ASYNC_REG = "TRUE" *) reg [1:0] link_up_tx_sync, lb_tx_sync, prbs_tx_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] link_up_tx_sync = 2'b00;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] lb_tx_sync = 2'b00, prbs_tx_sync = 2'b00;
     reg [15:0] dma_wr_ofs, dma_rd_ofs;
     reg        wr_aw_done, wr_w_done, wr_busy;
     reg        rd_ar_done, rd_busy;
@@ -1130,13 +1133,38 @@ module kria_top (
         end
     end
 
+    // Audit P2: keep Kria Pmod outputs high-Z until adapter_alive
+    // (IAS1 link trained OR a falling edge on PMOD_SPARE2 in the last 3 s).
+    (* ASYNC_REG = "TRUE" *) reg [2:0] spare2_sync = 3'b111;
+    reg [28:0] spare2_alive_cnt = 29'd0;
+    wire       spare2_fall  = spare2_sync[2] & ~spare2_sync[1];
+    wire       spare2_alive = (spare2_alive_cnt != 29'd0);
+    always @(posedge tx_clk_div) begin
+        if (rst_tx) begin
+            spare2_sync      <= 3'b111;
+            spare2_alive_cnt <= 29'd0;
+        end else begin
+            spare2_sync <= {spare2_sync[1:0], pmod_spare2};
+            if (spare2_fall)
+                spare2_alive_cnt <= PMOD_ALIVE_CYC[28:0];
+            else if (spare2_alive_cnt != 29'd0)
+                spare2_alive_cnt <= spare2_alive_cnt - 29'd1;
+        end
+    end
+
+`ifdef MUTATE_KRIA_PMOD_ALWAYS_OE
+    wire adapter_alive = 1'b1;
+`else
+    wire adapter_alive = link_up_tx_sync[1] | spare2_alive;
+`endif
+
     assign fpga_prog_b      = prog_b_r;
-    assign pmod_cs_n        = pmod_cs_r;
-    assign pmod_mosi        = pmod_mosi_r;
-    assign pmod_sclk        = pmod_sclk_r;
-    assign pmod_beam_strobe = pmod_strobe_r;
-    assign pmod_pps_sync    = pmod_pps_r;
-    assign pmod_spare1      = ps_uart1_txd;
+    assign pmod_cs_n        = adapter_alive ? pmod_cs_r     : 1'bz;
+    assign pmod_mosi        = adapter_alive ? pmod_mosi_r   : 1'bz;
+    assign pmod_sclk        = adapter_alive ? pmod_sclk_r   : 1'bz;
+    assign pmod_beam_strobe = adapter_alive ? pmod_strobe_r : 1'bz;
+    assign pmod_pps_sync    = adapter_alive ? pmod_pps_r    : 1'bz;
+    assign pmod_spare1      = adapter_alive ? ps_uart1_txd  : 1'bz;
 
     (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync;
     reg [63:0] rx_meta_snap_tx;

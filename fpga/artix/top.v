@@ -1050,7 +1050,7 @@ module artix_top #(
         sat_sync[1] | ovf_sync[1],
         ~alert_sync_r[1],
         dl_up_sync[1],
-        beam_sync_r[1],
+        dl_up_sync[1] ? beam_sync_r[1] : 1'b0,
         adc_err_sync[1],
         adc_tr_sync[1],
         adcr_mmcm_s[1],
@@ -2978,6 +2978,7 @@ module artix_top #(
     // -------------------------------------------------------------------------
     // 8. Debug UART on PMOD_SPARE1 (RX) / PMOD_SPARE2 (TX) (125 MHz link_clk)
     // -------------------------------------------------------------------------
+    wire dbg_uart_tx;
     dbg_uart #(
         .BUILD_DATE       (BUILD_DATE),
         .BUILD_TIME       (BUILD_TIME),
@@ -2989,7 +2990,7 @@ module artix_top #(
         .clk              (link_clk),
         .rst              (link_rst),
         .uart_rx          (pmod_spare1),
-        .uart_tx          (pmod_spare2),
+        .uart_tx          (dbg_uart_tx),
         .cfg_baud_div     (reg_uart_baud_div),
         .cfg_stat_cyc     (reg_uart_stat_div),
         .cfg_status_dis   (reg_uart_stat_dis),
@@ -3024,6 +3025,13 @@ module artix_top #(
         .csr_req_ack      (uart_csr_req_ack),
         .csr_req_rdata    (uart_csr_req_rdata)
     );
+
+    // Audit P2: PMOD_SPARE2 (debug UART TX) is open-drain so Artix never sources current into an unpowered Kria.
+`ifdef MUTATE_SPARE2_PUSHPULL
+    assign pmod_spare2 = dbg_uart_tx;
+`else
+    assign pmod_spare2 = dbg_uart_tx ? 1'bz : 1'b0;
+`endif
 
     // Active-high interrupt to KV260 carrier (Bank 35, LVCMOS18)
     // Audit 2.6: gate with link_trained (dl_up_sync[1]) so an unpowered K26 never sees clamp current.

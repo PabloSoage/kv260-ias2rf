@@ -76,6 +76,9 @@ module tb_dbg_uart;
 
     reg        top_rx_pin = 1'b1;
     wire       top_tx_pin;
+    pullup(top_tx_pin);
+    reg        test_od_pd = 1'b0;
+    assign (pull0, highz1) top_tx_pin = test_od_pd ? 1'b0 : 1'bz;
     wire       pmod_miso, fpga_irq, clk_sel, eth_mdc, eth_rst_n, conv_spi_sclk;
     wire       conv_spi_csb_r, conv_spi_csb_s, conv_spi_sdio;
     wire       adar_sclk, adar_sdio, adar_rx_load, adar_tx_load, adar_tr;
@@ -418,6 +421,16 @@ module tb_dbg_uart;
             $finish;
         end
         $display("[Phase A] Boot banner OK: %s", cap_ln);
+        // Audit P2: verify PMOD_SPARE2 is open-drain (1'bz when idle high, pulled to X by test_od_pd)
+        #100;
+        test_od_pd = 1'b1;
+        #20;
+        if (top_tx_pin !== 1'bx) begin
+            $display("FAIL: tb_dbg_uart PMOD_SPARE2 is not open-drain when idle high (got %b)", top_tx_pin);
+            $finish;
+        end
+        test_od_pd = 1'b0;
+        #20;
 
         // Disable automatic periodic STAT on u_top so interactive cmd lines stay aligned
         uart_cmd({"w f0 00010010", 8'h0D, {18{8'h00}}}, 14, cap_ln);

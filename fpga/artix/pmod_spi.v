@@ -134,23 +134,11 @@ module pmod_spi #(
         end
     end
 
-    wire cs_active = ~cs_n_sync[1];
-    wire cs_fall   =  cs_n_sync[2] & ~cs_n_sync[1];
-    wire sclk_rise = ~sclk_sync[2] &  sclk_sync[1];
-    wire sclk_fall =  sclk_sync[2] & ~sclk_sync[1];
-    wire mosi_bit  =  mosi_sync[1];
+    wire sclk_rise_raw = ~sclk_sync[2] &  sclk_sync[1];
+    wire sclk_fall_raw =  sclk_sync[2] & ~sclk_sync[1];
+    wire mosi_bit      =  mosi_sync[1];
 
-`ifdef MUTATE_BAD_CPOL_CPHA
-    // Intentionally wrong CPHA=1 edge polarity for negative testing
-    wire sample_edge = sclk_fall;
-    wire shift_edge  = sclk_rise;
-`else
-    // Mode 0 (CPOL=0, CPHA=0): sample MOSI on rising SCLK, update MISO on falling SCLK
-    wire sample_edge = sclk_rise;
-    wire shift_edge  = sclk_fall;
-`endif
-
-    // Audit P2: detect Kria presence before driving PMOD_MISO.
+    // Audit P2: detect Kria presence before driving PMOD_MISO or accepting SPI traffic.
     // Set after PMOD_CS stays high continuously for >= 1 ms; cleared if CS stays low > 100 ms with no SCLK edge.
     reg        kria_present;
     reg [31:0] cs_high_cnt;
@@ -170,7 +158,7 @@ module pmod_spi #(
             end
         end else begin
             cs_high_cnt <= 32'd0;
-            if (sclk_rise || sclk_fall) begin
+            if (sclk_rise_raw || sclk_fall_raw) begin
                 cs_low_idle_cnt <= 32'd0;
             end else if (cs_low_idle_cnt > KRIA_LOSS_CYCLES) begin
                 kria_present <= 1'b0;
@@ -180,10 +168,25 @@ module pmod_spi #(
         end
     end
 
-`ifdef MUTATE_MISO_ALWAYS_OE
-    assign pmod_miso_oe = cs_active;
+    wire cs_active = ~cs_n_sync[1] & kria_present;
+    wire cs_fall   =  cs_n_sync[2] & ~cs_n_sync[1] & kria_present;
+    wire sclk_rise =  sclk_rise_raw & kria_present;
+    wire sclk_fall =  sclk_fall_raw & kria_present;
+
+`ifdef MUTATE_BAD_CPOL_CPHA
+    // Intentionally wrong CPHA=1 edge polarity for negative testing
+    wire sample_edge = sclk_fall;
+    wire shift_edge  = sclk_rise;
 `else
-    assign pmod_miso_oe = cs_active & kria_present;
+    // Mode 0 (CPOL=0, CPHA=0): sample MOSI on rising SCLK, update MISO on falling SCLK
+    wire sample_edge = sclk_rise;
+    wire shift_edge  = sclk_fall;
+`endif
+
+`ifdef MUTATE_MISO_ALWAYS_OE
+    assign pmod_miso_oe = ~cs_n_sync[1];
+`else
+    assign pmod_miso_oe = cs_active;
 `endif
 
     // -------------------------------------------------------------------------

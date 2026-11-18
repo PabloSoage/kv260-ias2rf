@@ -986,21 +986,43 @@ module kria_pl_link (
     IOBUF u_iobuf_scl (.I(emio_i2c_scl_o), .O(emio_i2c_scl_i), .T(emio_i2c_scl_t), .IO(hk_scl));
     IOBUF u_iobuf_sda (.I(emio_i2c_sda_o), .O(emio_i2c_sda_i), .T(emio_i2c_sda_t), .IO(hk_sda));
 
-    assign fpga_prog_b      = emio_gpio_t[0] ? 1'b1 : emio_gpio_o[0];
-    assign pmod_cs_n        = emio_gpio_o[4] ? ~emio_gpio_t[4] : emio_spi_ssn;
-    assign pmod_mosi        = emio_spi_mo;
-    assign pmod_sclk        = emio_spi_sclk;
-    assign emio_spi_mi      = pmod_miso;
-    assign pmod_beam_strobe = emio_gpio_o[1];
-    assign pmod_pps_sync    = pps_ref;
-    assign pmod_spare1      = emio_uart1_txd;
-    assign emio_uart1_rxd   = pmod_spare2;
-
-    (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync, linkup_pl_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] irq_sync = 2'b00, linkup_pl_sync = 2'b00;
+    (* ASYNC_REG = "TRUE" *) reg [2:0] spare2_sync = 3'b111;
+    reg [28:0] spare2_alive_cnt = 29'd0;
+    wire       spare2_fall  = spare2_sync[2] & ~spare2_sync[1];
+    wire       spare2_alive = (spare2_alive_cnt != 29'd0);
     always @(posedge pl_clk_100m) begin
-        irq_sync       <= {irq_sync[0], fpga_irq};
-        linkup_pl_sync <= {linkup_pl_sync[0], kria_link_up};
+        if (!pl_resetn) begin
+            irq_sync         <= 2'b00;
+            linkup_pl_sync   <= 2'b00;
+            spare2_sync      <= 3'b111;
+            spare2_alive_cnt <= 29'd0;
+        end else begin
+            irq_sync       <= {irq_sync[0], fpga_irq};
+            linkup_pl_sync <= {linkup_pl_sync[0], kria_link_up};
+            spare2_sync    <= {spare2_sync[1:0], pmod_spare2};
+            if (spare2_fall)
+                spare2_alive_cnt <= 29'd300_000_000; // 3 s @ 100 MHz pl_clk_100m
+            else if (spare2_alive_cnt != 29'd0)
+                spare2_alive_cnt <= spare2_alive_cnt - 29'd1;
+        end
     end
+
+`ifdef MUTATE_KRIA_PMOD_ALWAYS_OE
+    wire adapter_alive = 1'b1;
+`else
+    wire adapter_alive = linkup_pl_sync[1] | spare2_alive;
+`endif
+
+    assign fpga_prog_b      = emio_gpio_t[0] ? 1'b1 : emio_gpio_o[0];
+    assign pmod_cs_n        = adapter_alive ? (emio_gpio_o[4] ? ~emio_gpio_t[4] : emio_spi_ssn) : 1'bz;
+    assign pmod_mosi        = adapter_alive ? emio_spi_mo    : 1'bz;
+    assign pmod_sclk        = adapter_alive ? emio_spi_sclk  : 1'bz;
+    assign emio_spi_mi      = pmod_miso;
+    assign pmod_beam_strobe = adapter_alive ? emio_gpio_o[1] : 1'bz;
+    assign pmod_pps_sync    = adapter_alive ? pps_ref        : 1'bz;
+    assign pmod_spare1      = adapter_alive ? emio_uart1_txd : 1'bz;
+    assign emio_uart1_rxd   = pmod_spare2;
 
     assign irq_fpga    = irq_sync[1];
     assign irq_link_up = linkup_pl_sync[1];

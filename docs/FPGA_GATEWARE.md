@@ -94,10 +94,12 @@ The post-route floorplan below is plotted directly from Vivado 2026.1 placed lea
 | **25 °C typical** (`8-11 layers, no airflow`) | **`1.249 W`** | `43.0 °C` | `0.468 A` (`0.449 A` dyn / `0.019 A` static) | `0.313 A` (`0.299 A` dyn / `0.013 A` static) |
 | **70 °C maximum** (`8-11 layers, no airflow`) | **`1.604 W`** | `93.1 °C` | `0.776 A` (`0.450 A` dyn / `0.326 A` static) | `0.367 A` (`0.299 A` dyn / `0.067 A` static) |
 
-- **Rev08 Audit Inter-Board & RF Safety Gates:**
-  - `FPGA_IRQ` (`top.v`): gated by `dl_up_sync[1]` (`link_trained`), so an unpowered K26 never receives clamp current when an alert is asserted (`tb_artix_top`, mutation `irq_ungated`).
-  - `PMOD_MISO` (`pmod_spi.v`): `pmod_miso_oe = cs_active & kria_present`; `kria_present` sets only after `PMOD_CS` stays continuously high for `>= 1 ms` (`125,000` cycles) and clears if `PMOD_CS` stays low `> 100 ms` (`12,500,000` cycles) with no SCLK edge (`tb_pmod_spi`, mutation `miso_always_oe`). `PMOD_SPARE2` (debug UART TX) is left active for USB console bring-up without a Kria.
-  - `VU_LNA_ON` on `LFCN-1000+` (`fe_ctrl.v`): whenever `OP_EXP` sets `VU_CONV_ON = 1` (`bit 6`), `V2V1 = 2'b11` (`bits 1:0`), and `V1V2V3 = 3'b011` (`bits 4:2`), `fe_ctrl` forces `VU_LNA_ON = 1` (`bit 5`) regardless of software request and reports it in `FE_STAT[27]` (`tb_fe_ctrl`, mutation `no_lna_force`).
+- **Rev08 Audit Inter-Board & RF Safety Gates (Power-Domain Rule: no FPGA sources current into an unpowered board):**
+  - `FPGA_IRQ` (`fpga/artix/top.v`): gated by `dl_up_sync[1]` (`link_trained`), so an unpowered K26 never receives clamp current when an alert is asserted (`tb_artix_top`, mutation `irq_ungated`).
+  - `PMOD_MISO` (`fpga/artix/pmod_spi.v`): `pmod_miso_oe = cs_active & kria_present`; `kria_present` sets only after `PMOD_CS` stays continuously high for `>= 1 ms` (`125,000` cycles) and clears if `PMOD_CS` stays low `> 100 ms` (`12,500,000` cycles) with no SCLK edge (`tb_pmod_spi`, mutation `miso_always_oe`).
+  - `PMOD_SPARE2` (`fpga/artix/top.v`): debug UART TX (`115,200 baud`) is open-drain (`dbg_uart_tx ? 1'bz : 1'b0`), relying on the Kria's `PULLUP TRUE` on `pmod_spare2` (`fpga/kria/xck26_bd.xdc`) and the CH340X's internal pull-up (`tb_dbg_uart`, mutation `spare2_pushpull`). With `10–20 kOhm` pull-up and `~15–35 pF` bus capacitance, rise time (`~0.33–1.54 us`) stays well below the `8.68 us` bit time.
+  - K26 Pmod outputs (`fpga/kria/top.v`): `PMOD_CS`, `MOSI`, `SCLK`, `BEAM_STROBE`, `PPS_SYNC`, and `PMOD_SPARE1` stay high-Z until `adapter_alive` (`link_up_tx_sync[1]` OR a falling edge on `PMOD_SPARE2` within the last `3 s`, `PMOD_ALIVE_CYC = 375,000,000`), returning to high-Z when both lapse (`tb_system`, mutation `kria_pmod_always_oe`).
+  - `VU_LNA_ON` on `LFCN-1000+` (`fpga/artix/fe_ctrl.v`): whenever `OP_EXP` sets `VU_CONV_ON = 1` (`bit 6`), `V2V1 = 2'b11` (`bits 1:0`), and `V1V2V3 = 3'b011` (`bits 4:2`), `fe_ctrl` forces `VU_LNA_ON = 1` (`bit 5`) regardless of software request and reports it in `FE_STAT[27]` (`tb_fe_ctrl`, mutation `no_lna_force`).
 
 ---
 
@@ -439,7 +441,7 @@ Until 18 November the DSP suite's results reached the PS only as status register
 
 - **`can1_txn` (TX):** `ps8/emio_can1_phy_tx` is inverted by `can1_tx_inv` (`util_vector_logic`, `C_OPERATION {not}`, `C_SIZE {1}`) to top-level port `can1_txn[0:0]` on ball `G6` (`KV260 J9` pin 6, `DATA1_P`, `SOM240_1 A9`, `LVCMOS12`, `DRIVE 4`, `SLEW SLOW`, Bank 66).
 - **`can1_rx` (RX):** Top-level input `can1_rx` on ball `D6` (`KV260 J9` pin 8, `CLK_N`, `SOM240_1 C13`, `LVCMOS12`, `PULLUP TRUE`, Bank 66) feeds `ps8/emio_can1_phy_rx`.
-- **Bank 66 voltage and level shift:** Bank 66 on the K26 SOM is powered at `PL_1V2` (`1.2 V`), so [`fpga/kria/xck26_bd.xdc`](../fpga/kria/xck26_bd.xdc) constrains both pins as `LVCMOS12`. On the Rev08 adapter (`STATUS` sheet), `can1_txn` drives a pair of `MMBT3904` NPN transistors (`Q1530`, `Q1531`) wired as a `3.3 V` NOR stage into `U1506` (`TCAN330DCNT`), and `CAN_RXD` is stepped down from `3.3 V` to `1.18 V` by a `1.8 kΩ / 1 kΩ` divider (`R1556` / `R1557`); see [INTEGRATIONS.md §2.2](INTEGRATIONS.md).
+- **Bank 66 voltage and level shift:** Bank 66 on the K26 SOM is powered at `PL_1V2` (`1.2 V`), so [`fpga/kria/xck26_bd.xdc`](../fpga/kria/xck26_bd.xdc) constrains both pins as `LVCMOS12`. On the Rev08 adapter (`STATUS` sheet), `can1_txn` drives a pair of `MMBT3904` NPN transistors (`Q1530`, `Q1531`) wired as a `3.3 V` NOR stage into `U1506` (`TCAN3403DDFRQ1`, `3.3 V`, pin 5 `VIO` on `+3V3_D`, `STB` low, `±58 V` bus), and `CAN_RXD` is stepped down from `3.3 V` to `1.18 V` by a `1.8 kΩ / 1 kΩ` divider (`R1556` / `R1557`); see [INTEGRATIONS.md §2.2](INTEGRATIONS.md).
 
 ## 6. XSim & Full-System Verification Suite (`fpga/sim/`)
 

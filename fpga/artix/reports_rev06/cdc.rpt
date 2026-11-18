@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Wed Nov 18 21:52:13 2026
+| Date         : Thu Nov 19 00:43:42 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_cdc -details -file D:/Repos/kv260-ias2rf/fpga/artix/reports_rev06/cdc.rpt
 | Design       : artix_top
@@ -27,7 +27,7 @@ CDC-10  Critical     61  Combinational logic detected before a synchronizer
 CDC-11  Critical      2  Fan-out from launch flop to destination clock
 CDC-13  Critical    156  1-bit CDC path on a non-FD primitive
 CDC-14  Critical      1  Multi-bit CDC path on a non-FD primitive
-CDC-15  Warning     766  Clock enable controlled CDC structure detected
+CDC-15  Warning     770  Clock enable controlled CDC structure detected
 
 Source Clock: adcs_ddc_clk_unbuf
 Destination Clock: adcs_clk_div
@@ -41,10 +41,10 @@ Source Clock: link_clk_unbuf
 Destination Clock: adcs_clk_div
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                         Depth  Exception            Source (From)           Destination (To)
----  ------  --------  --------------------------------------------------  -----  -------------------  ----------------------  -----------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  sys_rst_reg/C           adcs_rst_sync_reg[0]/PRE
-  2  CDC-2   Warning   1-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  reg_adcs_ctrl_reg[0]/C  u_adcs_cap/en_sync_r_reg[0]/D
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                   Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  ------------------------------  -----------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_pmod_spi/ctrl_soft_rst_reg/C  adcs_rst_sync_reg[0]/PRE
+  2  CDC-2   Warning   1-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  reg_adcs_ctrl_reg[0]/C          u_adcs_cap/en_sync_r_reg[0]/D
 
 Source Clock: refclk_200m_unbuf
 Destination Clock: adcs_clk_div
@@ -66,10 +66,10 @@ Source Clock: link_clk_unbuf
 Destination Clock: adcs_clk_div_1
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                         Depth  Exception            Source (From)           Destination (To)
----  ------  --------  --------------------------------------------------  -----  -------------------  ----------------------  -----------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  sys_rst_reg/C           adcs_rst_sync_reg[0]/PRE
-  2  CDC-2   Warning   1-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  reg_adcs_ctrl_reg[0]/C  u_adcs_cap/en_sync_r_reg[0]/D
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)                   Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  ------------------------------  -----------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_pmod_spi/ctrl_soft_rst_reg/C  adcs_rst_sync_reg[0]/PRE
+  2  CDC-2   Warning   1-bit synchronized with missing ASYNC_REG property      2  Asynch Clock Groups  reg_adcs_ctrl_reg[0]/C          u_adcs_cap/en_sync_r_reg[0]/D
 
 Source Clock: refclk_200m_unbuf
 Destination Clock: adcs_clk_div_1
@@ -159,7 +159,7 @@ Row  ID      Severity  Description                                             D
 ---  ------  --------  ------------------------------------------------------  -----  -----------------------  ---------------------------------------  ---------------------------------------------
   1  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Max Delay Datapath Only  reg_adcs_ctrl_reg[2]/C                   adcs_ch_en_s1_reg[0]/D
   2  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Max Delay Datapath Only  reg_adcs_ctrl_reg[3]/C                   adcs_ch_en_s1_reg[1]/D
-  3  CDC-10  Critical  Combinational logic detected before a synchronizer          2  False Path               sys_rst_reg/C                            adcs_ddc_rst_sync_reg[0]/PRE
+  3  CDC-10  Critical  Combinational logic detected before a synchronizer          2  False Path               u_pmod_spi/ctrl_soft_rst_reg/C           adcs_ddc_rst_sync_reg[0]/PRE
   4  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Max Delay Datapath Only  sdr_cfg_tog_link_reg/C                   sdr_cfg_tog_sync_reg[0]/D
   5  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  reg_sdr_decim_reg[0]/C                   sdr_decim_adcs_reg[0]/D
   6  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  reg_sdr_decim_reg[1]/C                   sdr_decim_adcs_reg[1]/D
@@ -334,7 +334,7 @@ Row  ID      Severity  Description                                         Depth
   4  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Max Delay Datapath Only  adc_rst_sync_100_reg[1]/C  adcr_or_holdoff_400_reg[3]/CLR
   5  CDC-7   Critical  Asynchronous reset unknown CDC circuitry                0  Max Delay Datapath Only  adc_rst_sync_100_reg[1]/C  adcr_or_tog_400_reg/CLR
   6  CDC-11  Critical  Fan-out from launch flop to destination clock           2  Max Delay Datapath Only  adc_rst_sync_100_reg[1]/C  adcr_pk_rst_s_reg[0]/D
-  7  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Max Delay Datapath Only  rad_en_100_sync_reg[1]/C   u_ddc/u_ddc/mixers_enable_sync_chain_reg[0]/D
+  7  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Max Delay Datapath Only  adc_tr_100_sync_reg[1]/C   u_ddc/u_ddc/mixers_enable_sync_chain_reg[0]/D
   8  CDC-11  Critical  Fan-out from launch flop to destination clock           2  Max Delay Datapath Only  adc_rst_sync_100_reg[1]/C  u_ddc/u_ddc/reset_sync_400m_reg[0]/CLR
 
 Source Clock: clk_trn_500
@@ -354,27 +354,27 @@ CDC Type: No Common Primary Clock
 
 Row  ID      Severity  Description                                         Depth  Exception            Source (From)             Destination (To)
 ---  ------  --------  --------------------------------------------------  -----  -------------------  ------------------------  ---------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[8]/D
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[0]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[8]/D
   2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[9]/D
-  3  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[10]/D
-  4  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[11]/D
+  3  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[2]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[10]/D
+  4  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[3]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[11]/D
   5  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[12]/D
   6  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[13]/D
-  7  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[14]/D
+  7  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[6]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[14]/D
   8  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[7]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[15]/D
-  9  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[16]/D
- 10  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[17]/D
+  9  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[8]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[16]/D
+ 10  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[9]/C   u_ddc/u_ddc/ftw_ovrd_s1_reg[17]/D
  11  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[18]/D
  12  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[19]/D
  13  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[20]/D
  14  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[21]/D
- 15  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[22]/D
+ 15  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[14]/C  u_ddc/u_ddc/ftw_ovrd_s1_reg[22]/D
  16  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[23]/D
  17  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[24]/D
  18  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[25]/D
  19  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[26]/D
  20  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[27]/D
- 21  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_hi_reg[20]/C  u_ddc/u_ddc/ftw_ovrd_s1_reg[28]/D
+ 21  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[28]/D
  22  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[29]/D
  23  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[30]/D
  24  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  reg_rad_nco_ovrd_reg/C    u_ddc/u_ddc/ftw_ovrd_s1_reg[31]/D
@@ -407,10 +407,10 @@ Source Clock: refclk_200m_unbuf
 Destination Clock: clk_adcr_dco
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                         Depth  Exception            Source (From)          Destination (To)
----  ------  --------  --------------------------------------------------  -----  -------------------  ---------------------  ----------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  ref_rst_sync_reg[1]/C  u_adc_cap/rst_sync_bufr_reg[0]/PRE
-  2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  ref_rst_sync_reg[1]/C  u_adc_cap/rst_sync_d2_reg[0]/PRE
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)         Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  --------------------  ----------------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  adcr_cap_rst_r_reg/C  u_adc_cap/rst_sync_bufr_reg[0]/PRE
+  2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  adcr_cap_rst_r_reg/C  u_adc_cap/rst_sync_d2_reg[0]/PRE
 
 Source Clock: input port clock
 Destination Clock: clk_adcr_dco_500
@@ -432,10 +432,10 @@ Source Clock: refclk_200m_unbuf
 Destination Clock: clk_adcr_dco_500
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                         Depth  Exception   Source (From)          Destination (To)
----  ------  --------  --------------------------------------------------  -----  ----------  ---------------------  ----------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  False Path  ref_rst_sync_reg[1]/C  u_adc_cap/rst_sync_bufr_reg[0]/PRE
-  2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  False Path  ref_rst_sync_reg[1]/C  u_adc_cap/rst_sync_d2_reg[0]/PRE
+Row  ID      Severity  Description                                         Depth  Exception   Source (From)         Destination (To)
+---  ------  --------  --------------------------------------------------  -----  ----------  --------------------  ----------------------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  False Path  adcr_cap_rst_r_reg/C  u_adc_cap/rst_sync_bufr_reg[0]/PRE
+  2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  False Path  adcr_cap_rst_r_reg/C  u_adc_cap/rst_sync_d2_reg[0]/PRE
 
 Source Clock: input port clock
 Destination Clock: clk_adcs_dco_400
@@ -551,7 +551,7 @@ Row  ID     Severity  Description                  Depth  Exception   Source (Fr
  86  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[2]/D
  87  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[3]/D
  88  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[4]/D
- 89  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_sda         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[5]/D
+ 89  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[5]/D
  90  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[6]/D
  91  CDC-1  Critical  1-bit unknown CDC circuitry      0  False Path  xo_scl         u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/shreg_reg[7]/D
 
@@ -561,12 +561,12 @@ CDC Type: No Common Primary Clock
 
 Row  ID      Severity  Description                                         Depth  Exception            Source (From)                                      Destination (To)
 ---  ------  --------  --------------------------------------------------  -----  -------------------  -------------------------------------------------  ----------------------------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  sys_rst_reg/C                                      u_clk_mode_ctrl/link_rst_cfg_s_reg[0]/D
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_pmod_spi/ctrl_soft_rst_reg/C                     u_clk_mode_ctrl/link_rst_cfg_s_reg[0]/D
   2  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_cfg_tog_link_reg/C             u_clk_mode_ctrl/req_cfg_tog_s_reg[0]/D
   3  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_tog_link_reg/C           u_clk_mode_ctrl/req_delta_tog_s_reg[0]/D
   4  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_tog_link_reg/C            u_clk_mode_ctrl/req_prog_tog_s_reg[0]/D
   5  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_tog_link_reg/C             u_clk_mode_ctrl/req_raw_tog_s_reg[0]/D
-  6  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[13]/C  u_clk_mode_ctrl/u_fe_ctrl/FSM_sequential_st_reg[2]/D
+  6  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[4]/C   u_clk_mode_ctrl/u_fe_ctrl/FSM_sequential_st_reg[2]/D
   7  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[0]/C   u_clk_mode_ctrl/u_fe_ctrl/arg_reg[0]/D
   8  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[1]/C   u_clk_mode_ctrl/u_fe_ctrl/arg_reg[1]/D
   9  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[2]/C   u_clk_mode_ctrl/u_fe_ctrl/arg_reg[2]/D
@@ -595,7 +595,7 @@ Row  ID      Severity  Description                                         Depth
  32  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[29]/C  u_clk_mode_ctrl/u_fe_ctrl/op_reg[1]/D
  33  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[30]/C  u_clk_mode_ctrl/u_fe_ctrl/op_reg[2]/D
  34  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[31]/C  u_clk_mode_ctrl/u_fe_ctrl/op_reg[3]/D
- 35  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[29]/C  u_clk_mode_ctrl/u_fe_ctrl/pre_init_reg/D
+ 35  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/u_fe_ctrl/cmd_hold_link_reg[30]/C  u_clk_mode_ctrl/u_fe_ctrl/pre_init_reg/D
  36  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[0]/C        u_clk_mode_ctrl/xo_delta_m_cfg_reg[0]/D
  37  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[1]/C        u_clk_mode_ctrl/xo_delta_m_cfg_reg[1]/D
  38  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_delta_lat_link_reg[2]/C        u_clk_mode_ctrl/xo_delta_m_cfg_reg[2]/D
@@ -646,7 +646,7 @@ Row  ID      Severity  Description                                         Depth
  83  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[6]/C        u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[6]/D
  84  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_clk_mode_ctrl/req_raw_wdata_link_reg[7]/C        u_clk_mode_ctrl/xo_raw_wdata_cfg_reg[7]/D
  85  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_lat_link_reg[1]/C         u_clk_mode_ctrl/xo_req_500m_cfg_reg/D
- 86  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/req_prog_lat_link_reg[0]/C         u_clk_mode_ctrl/xo_use_ext_clk_cfg_reg/D
+ 86  CDC-1   Critical  1-bit unknown CDC circuitry                             0  Asynch Clock Groups  u_clk_mode_ctrl/req_ctrl_lat_link_reg[0]/C         u_clk_mode_ctrl/xo_use_ext_clk_cfg_reg/D
 
 Source Clock: clk_cfgmclk
 Destination Clock: clk_dac_400
@@ -878,11 +878,11 @@ Source Clock: refclk_200m_unbuf
 Destination Clock: clk_trn_400
 CDC Type: No Common Primary Clock
 
-Row  ID      Severity  Description                                         Depth  Exception            Source (From)          Destination (To)
----  ------  --------  --------------------------------------------------  -----  -------------------  ---------------------  ---------------------------------
-  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  d2_mode_ref_reg/C      u_adc_cap/mode_sync_200_reg[0]/D
-  2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  ref_rst_sync_reg[1]/C  u_adc_cap/rst_sync_200_reg[0]/PRE
-  3  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  d2_mode_ref_reg/C      u_adc_cap/tr_start_sync_reg[0]/D
+Row  ID      Severity  Description                                         Depth  Exception            Source (From)         Destination (To)
+---  ------  --------  --------------------------------------------------  -----  -------------------  --------------------  ---------------------------------
+  1  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  d2_mode_ref_reg/C     u_adc_cap/mode_sync_200_reg[0]/D
+  2  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  adcr_cap_rst_r_reg/C  u_adc_cap/rst_sync_200_reg[0]/PRE
+  3  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  d2_mode_ref_reg/C     u_adc_cap/tr_start_sync_reg[0]/D
 
 Source Clock: clk_100m_unbuf
 Destination Clock: clk_trn_500
@@ -987,7 +987,7 @@ Row  ID      Severity  Description                                         Depth
   5  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_pmod_spi/ctrl_tap_override_en_reg/C  dl_ov_sync_reg[0]/D
   6  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_pmod_spi/ctrl_prbs7_rx_chk_en_reg/C  dl_prbs_en_sync_reg[0]/D
   7  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  retrain_tog_link_reg/C                 dl_retrain_sync_reg[0]/D
-  8  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  sys_rst_reg/C                          dl_rst_sync_reg[0]/PRE
+  8  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_pmod_spi/ctrl_soft_rst_reg/C         dl_rst_sync_reg[0]/PRE
   9  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  reg_dacs_ctrl_reg[0]/C                 reg_dacs_ctrl_dl_reg[0]/D
  10  CDC-14  Critical  Multi-bit CDC path on a non-FD primitive                0  Asynch Clock Groups  dl_cfg_tap_hold_reg[4:0]/C             u_dl_idelay_d0/CNTVALUEIN[4:0]
  11  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cfg_tap_hold_reg[0]/C               u_dl_train_fsm/cntval_l0_reg[0]/D
@@ -1010,7 +1010,7 @@ CDC Type: No Common Phase
 
 Row  ID      Severity  Description                                         Depth  Exception                Source (From)                                                   Destination (To)
 ---  ------  --------  --------------------------------------------------  -----  -----------------------  --------------------------------------------------------------  ---------------------------------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer      3  Max Delay Datapath Only  sys_rst_reg/C                                                   gen_rev06_eth.eth_rst_312_s_reg[0]/PRE
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer      3  Max Delay Datapath Only  u_pmod_spi/ctrl_soft_rst_reg/C                                  gen_rev06_eth.eth_rst_312_s_reg[0]/PRE
   2  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Max Delay Datapath Only  gen_rev06_eth.u_eth_phy/rx_rd_gray_reg[5:0]/C                   gen_rev06_eth.u_eth_phy/rx_rd_g1_reg[5:0]/D
   3  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Max Delay Datapath Only  gen_rev06_eth.u_eth_phy/tx_fifo_mem_reg_0_15_0_5/RAMA/CLK       gen_rev06_eth.u_eth_phy/tx_pair_312_reg[0]/D
   4  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Max Delay Datapath Only  gen_rev06_eth.u_eth_phy/tx_fifo_mem_reg_0_15_0_5/RAMA_D1/CLK    gen_rev06_eth.u_eth_phy/tx_pair_312_reg[1]/D
@@ -1081,99 +1081,99 @@ CDC Type: Safely Timed
 Row  ID      Severity  Description                                             Depth  Exception                Source (From)                                   Destination (To)
 ---  ------  --------  ------------------------------------------------------  -----  -----------------------  ----------------------------------------------  ---------------------------------------------
   1  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Max Delay Datapath Only  adcs_clip_tog_ddc_reg/C                         adcs_clip_tog_sync_reg[0]/D
-  2  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/FSM_sequential_tx_state_reg/D
-  3  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/cur_ch_reg/CE
-  4  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/cur_ch_reg/D
-  5  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[0]/CE
-  6  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[1]/CE
-  7  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[2]/CE
-  8  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[3]/CE
-  9  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[4]/CE
- 10  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[5]/CE
- 11  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[6]/CE
- 12  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[7]/CE
- 13  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[8]/CE
- 14  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[9]/CE
- 15  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[10]/CE
- 16  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[11]/CE
- 17  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[12]/CE
- 18  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[13]/CE
- 19  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[14]/CE
- 20  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[15]/CE
- 21  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[16]/CE
- 22  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[17]/CE
- 23  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[18]/CE
- 24  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[19]/CE
- 25  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[20]/CE
- 26  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[21]/CE
- 27  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[22]/CE
- 28  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[23]/CE
- 29  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[24]/CE
- 30  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[25]/CE
- 31  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[26]/CE
- 32  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[27]/CE
- 33  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[28]/CE
- 34  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[29]/CE
- 35  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[30]/CE
- 36  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[31]/CE
- 37  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[32]/CE
- 38  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[33]/CE
- 39  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[34]/CE
- 40  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[35]/CE
- 41  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[36]/CE
- 42  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[37]/CE
- 43  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[38]/CE
- 44  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[39]/CE
- 45  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[40]/CE
- 46  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[41]/CE
- 47  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[42]/CE
- 48  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[43]/CE
- 49  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[44]/CE
- 50  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[45]/CE
- 51  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[46]/CE
- 52  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[47]/CE
- 53  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[48]/CE
- 54  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[49]/CE
- 55  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[50]/CE
- 56  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[51]/CE
- 57  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[52]/CE
- 58  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[53]/CE
- 59  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[54]/CE
- 60  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[55]/CE
- 61  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[56]/CE
- 62  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[57]/CE
- 63  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[58]/CE
- 64  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[59]/CE
- 65  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[60]/CE
- 66  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[61]/CE
- 67  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[62]/CE
- 68  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_timestamp_reg[63]/CE
- 69  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[0]/CE
- 70  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[1]/CE
- 71  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[2]/CE
- 72  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[3]/CE
- 73  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[4]/CE
- 74  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[5]/CE
- 75  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[6]/CE
- 76  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[7]/CE
- 77  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[8]/CE
- 78  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/pkt_words_lat_reg[9]/CE
- 79  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/rr_pref_reg/CE
- 80  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/rr_pref_reg/D
+  2  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/FSM_sequential_tx_state_reg/D
+  3  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/cur_ch_reg/CE
+  4  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/cur_ch_reg/D
+  5  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[0]/CE
+  6  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[1]/CE
+  7  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[2]/CE
+  8  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[3]/CE
+  9  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[4]/CE
+ 10  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[5]/CE
+ 11  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[6]/CE
+ 12  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[7]/CE
+ 13  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[8]/CE
+ 14  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[9]/CE
+ 15  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[10]/CE
+ 16  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[11]/CE
+ 17  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[12]/CE
+ 18  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[13]/CE
+ 19  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[14]/CE
+ 20  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[15]/CE
+ 21  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[16]/CE
+ 22  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[17]/CE
+ 23  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[18]/CE
+ 24  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[19]/CE
+ 25  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[20]/CE
+ 26  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[21]/CE
+ 27  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[22]/CE
+ 28  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[23]/CE
+ 29  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[24]/CE
+ 30  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[25]/CE
+ 31  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[26]/CE
+ 32  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[27]/CE
+ 33  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[28]/CE
+ 34  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[29]/CE
+ 35  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[30]/CE
+ 36  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[31]/CE
+ 37  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[32]/CE
+ 38  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[33]/CE
+ 39  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[34]/CE
+ 40  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[35]/CE
+ 41  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[36]/CE
+ 42  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[37]/CE
+ 43  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[38]/CE
+ 44  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[39]/CE
+ 45  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[40]/CE
+ 46  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[41]/CE
+ 47  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[42]/CE
+ 48  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[43]/CE
+ 49  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[44]/CE
+ 50  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[45]/CE
+ 51  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[46]/CE
+ 52  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[47]/CE
+ 53  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[48]/CE
+ 54  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[49]/CE
+ 55  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[50]/CE
+ 56  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[51]/CE
+ 57  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[52]/CE
+ 58  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[53]/CE
+ 59  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[54]/CE
+ 60  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[55]/CE
+ 61  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[56]/CE
+ 62  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[57]/CE
+ 63  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[58]/CE
+ 64  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[59]/CE
+ 65  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[60]/CE
+ 66  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[61]/CE
+ 67  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[62]/CE
+ 68  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_timestamp_reg[63]/CE
+ 69  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[0]/CE
+ 70  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[1]/CE
+ 71  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[2]/CE
+ 72  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[3]/CE
+ 73  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[4]/CE
+ 74  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[5]/CE
+ 75  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[6]/CE
+ 76  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[7]/CE
+ 77  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[8]/CE
+ 78  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/pkt_words_lat_reg[9]/CE
+ 79  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/rr_pref_reg/CE
+ 80  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/rr_pref_reg/D
  81  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      3  Max Delay Datapath Only  u_sdr_ddc/u_ch_a/dropped_pairs_adc_reg[23:0]/C  u_sdr_ddc/u_ch_a/drop_sync1_reg[23:0]/D
  82  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Max Delay Datapath Only  u_sdr_ddc/u_ch_a/wr_ptr_gray_reg[9:0]/C         u_sdr_ddc/u_ch_a/wr_ptr_gray_sync1_reg[9:0]/D
  83  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      3  Max Delay Datapath Only  u_sdr_ddc/u_ch_b/dropped_pairs_adc_reg[23:0]/C  u_sdr_ddc/u_ch_b/drop_sync1_reg[23:0]/D
  84  CDC-5   Warning   Multi-bit synchronized with missing ASYNC_REG property      2  Max Delay Datapath Only  u_sdr_ddc/u_ch_b/wr_ptr_gray_reg[9:0]/C         u_sdr_ddc/u_ch_b/wr_ptr_gray_sync1_reg[9:0]/D
- 85  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[0]/CE
- 86  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[1]/CE
- 87  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[2]/CE
- 88  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[3]/CE
- 89  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[4]/CE
- 90  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[5]/CE
- 91  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[6]/CE
- 92  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[7]/CE
- 93  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[8]/CE
- 94  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[1]/C                          u_sdr_ddc/word_idx_reg[9]/CE
+ 85  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[0]/CE
+ 86  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[1]/CE
+ 87  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[2]/CE
+ 88  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[3]/CE
+ 89  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[4]/CE
+ 90  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[5]/CE
+ 91  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[6]/CE
+ 92  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[7]/CE
+ 93  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[8]/CE
+ 94  CDC-1   Critical  1-bit unknown CDC circuitry                                 0  Max Delay Datapath Only  adcs_ch_en_s2_reg[0]/C                          u_sdr_ddc/word_idx_reg[9]/CE
 
 Source Clock: clk_100m_unbuf
 Destination Clock: link_clk_unbuf
@@ -1214,135 +1214,135 @@ Row  ID      Severity  Description                                         Depth
  31  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  fb_q_hold_100_reg[14]/C                           fb_ddc_q_link_reg[14]/D
  32  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  fb_q_hold_100_reg[15]/C                           fb_ddc_q_link_reg[15]/D
  33  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  fb_tog_100_reg/C                                  fb_tog_sync_reg[0]/D
- 34  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_0_2/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[0]
+ 34  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_0_2/RAMA/CLK              gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[0]
  35  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_0_2/RAMB/CLK              gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[1]
  36  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_0_2/RAMC/CLK              gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[2]
  37  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_3_5/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[3]
  38  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_3_5/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[4]
  39  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_3_5/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[5]
- 40  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_6_8/RAMA/CLK              gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[6]
- 41  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_6_8/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[7]
+ 40  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_6_8/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[6]
+ 41  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_6_8/RAMB/CLK              gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[7]
  42  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_6_8/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[8]
- 43  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_9_11/RAMA/CLK             gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[9]
+ 43  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_9_11/RAMA/CLK           gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[9]
  44  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_9_11/RAMB/CLK             gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[10]
  45  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_9_11/RAMC/CLK           gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[11]
- 46  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_12_14/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[12]
- 47  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_12_14/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[13]
+ 46  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_12_14/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[12]
+ 47  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_12_14/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[13]
  48  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_12_14/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[14]
- 49  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_15_17/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[15]
+ 49  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_15_17/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[15]
  50  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_15_17/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[16]
- 51  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_15_17/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[17]
+ 51  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_15_17/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[17]
  52  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_18_20/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[18]
- 53  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_18_20/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[19]
+ 53  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_18_20/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[19]
  54  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_18_20/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[20]
  55  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_21_23/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[21]
  56  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_21_23/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[22]
  57  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_21_23/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[23]
  58  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_24_26/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[24]
  59  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_24_26/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[25]
- 60  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_24_26/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[26]
+ 60  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_24_26/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[26]
  61  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_27_29/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[27]
- 62  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_27_29/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[28]
- 63  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_27_29/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[29]
+ 62  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_27_29/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[28]
+ 63  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_27_29/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[29]
  64  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_30_32/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[30]
  65  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_30_32/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIADI[31]
  66  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_30_32/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[0]
- 67  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_33_35/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[1]
- 68  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_33_35/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[2]
- 69  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_33_35/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[3]
- 70  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_36_38/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[0]
- 71  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_36_38/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[1]
- 72  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_36_38/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[2]
+ 67  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_33_35/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[1]
+ 68  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_33_35/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[2]
+ 69  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_33_35/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_0/DIPADIP[3]
+ 70  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_36_38/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[0]
+ 71  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_36_38/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[1]
+ 72  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_36_38/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[2]
  73  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_39_41/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[3]
  74  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_39_41/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[4]
- 75  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_39_41/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[5]
- 76  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_42_44/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[6]
- 77  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_42_44/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[7]
+ 75  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_39_41/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[5]
+ 76  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_42_44/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[6]
+ 77  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_42_44/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[7]
  78  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_42_44/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[8]
  79  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_45_47/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[9]
  80  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_45_47/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[10]
  81  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_45_47/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[11]
- 82  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_48_50/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[12]
+ 82  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_48_50/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[12]
  83  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_48_50/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[13]
  84  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_48_50/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[14]
- 85  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_51_53/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[15]
+ 85  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_51_53/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[15]
  86  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_51_53/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[16]
  87  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_51_53/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[17]
- 88  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_54_56/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[18]
- 89  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_54_56/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[19]
- 90  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_54_56/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[20]
- 91  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_57_59/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[21]
- 92  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_57_59/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[22]
+ 88  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_54_56/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[18]
+ 89  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_54_56/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[19]
+ 90  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_54_56/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[20]
+ 91  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_57_59/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[21]
+ 92  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_57_59/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[22]
  93  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_57_59/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[23]
  94  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_60_62/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[24]
  95  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_60_62/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[25]
- 96  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_60_62/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[26]
+ 96  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_60_62/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[26]
  97  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_63_63/DP/CLK            gen_rev06_eth.u_dual_mux/u_fifo_eth/data_mem_reg_1/DIADI[27]
- 98  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_0_2/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[0]
+ 98  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_0_2/RAMA/CLK              gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[0]
  99  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_0_2/RAMB/CLK              gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[1]
 100  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_0_2/RAMC/CLK              gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[2]
 101  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_3_5/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[3]
 102  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_3_5/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[4]
 103  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_3_5/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[5]
-104  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_6_8/RAMA/CLK              gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[6]
-105  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_6_8/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[7]
+104  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_6_8/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[6]
+105  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_6_8/RAMB/CLK              gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[7]
 106  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_6_8/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[8]
-107  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_9_11/RAMA/CLK             gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[9]
+107  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_9_11/RAMA/CLK           gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[9]
 108  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_9_11/RAMB/CLK             gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[10]
 109  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_9_11/RAMC/CLK           gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[11]
-110  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_12_14/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[12]
-111  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_12_14/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[13]
+110  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_12_14/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[12]
+111  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_12_14/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[13]
 112  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_12_14/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[14]
-113  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_15_17/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[15]
+113  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_15_17/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[15]
 114  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_15_17/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[16]
-115  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_15_17/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[17]
+115  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_15_17/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[17]
 116  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_18_20/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[18]
-117  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_18_20/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[19]
+117  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_18_20/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[19]
 118  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_18_20/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[20]
 119  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_21_23/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[21]
 120  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_21_23/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[22]
 121  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_21_23/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[23]
 122  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_24_26/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[24]
 123  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_24_26/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[25]
-124  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_24_26/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[26]
+124  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_24_26/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[26]
 125  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_27_29/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[27]
-126  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_27_29/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[28]
-127  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_27_29/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[29]
+126  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_27_29/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[28]
+127  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_27_29/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[29]
 128  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_30_32/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[30]
 129  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_30_32/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIADI[31]
 130  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_30_32/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[0]
-131  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_33_35/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[1]
-132  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_33_35/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[2]
-133  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_33_35/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[3]
-134  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_36_38/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[0]
-135  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_36_38/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[1]
-136  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_36_38/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[2]
+131  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_33_35/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[1]
+132  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_33_35/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[2]
+133  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_33_35/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_0/DIPADIP[3]
+134  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_36_38/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[0]
+135  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_36_38/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[1]
+136  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_36_38/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[2]
 137  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_39_41/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[3]
 138  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_39_41/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[4]
-139  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_39_41/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[5]
-140  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_42_44/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[6]
-141  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_42_44/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[7]
+139  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_39_41/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[5]
+140  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_42_44/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[6]
+141  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_42_44/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[7]
 142  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_42_44/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[8]
 143  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_45_47/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[9]
 144  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_45_47/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[10]
 145  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_45_47/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[11]
-146  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_48_50/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[12]
+146  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_48_50/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[12]
 147  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_48_50/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[13]
 148  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_48_50/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[14]
-149  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_51_53/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[15]
+149  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_51_53/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[15]
 150  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_51_53/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[16]
 151  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_51_53/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[17]
-152  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_54_56/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[18]
-153  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_54_56/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[19]
-154  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_54_56/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[20]
-155  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_57_59/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[21]
-156  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_57_59/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[22]
+152  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_54_56/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[18]
+153  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_54_56/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[19]
+154  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_54_56/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[20]
+155  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_57_59/RAMA/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[21]
+156  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_57_59/RAMB/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[22]
 157  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_57_59/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[23]
 158  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_60_62/RAMA/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[24]
 159  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_60_62/RAMB/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[25]
-160  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_0_63_60_62/RAMC/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[26]
+160  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_60_62/RAMC/CLK          gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[26]
 161  CDC-13  Critical  1-bit CDC path on a non-FD primitive                    0  Asynch Clock Groups  u_ddc/fifo_mem_reg_64_127_63_63/DP/CLK            gen_rev06_eth.u_dual_mux/u_fifo_ias/data_mem_reg_1/DIADI[27]
-162  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_ddc/u_ddc/fir_i_inst/accumulator_reg_reg[35]/C  ovf_sync_reg[0]/D
+162  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_ddc/u_ddc/fir_i_inst/accumulator_reg_reg[34]/C  ovf_sync_reg[0]/D
 163  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          3  Asynch Clock Groups  u_ddc/drop_100_reg[23:0]/C                        u_ddc/drop_sync1_reg[23:0]/D
 164  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_ddc/wr_ptr_gray_reg[7:0]/C                      u_ddc/wr_gray_sync1_reg[7:0]/D
 
@@ -1356,13 +1356,13 @@ Row  ID      Severity  Description                                         Depth
   2  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_ddc/u_ddc/nco_core/dds_ready_reg/C  ddc_stat_s1_reg[0]/D
   3  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_ddc/u_ddc/mixer_overflow_q_reg/C    ddc_stat_s1_reg[1]/D
   4  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_ddc/u_ddc/overflow_detected_reg/C   sat_sync_reg[0]/D
-  5  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[40]/C        u_fe_agc/pk_reg[0]/D
-  6  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[40]/C        u_fe_agc/pk_reg[1]/D
-  7  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[64]/C        u_fe_agc/pk_reg[2]/D
-  8  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[64]/C        u_fe_agc/pk_reg[3]/D
-  9  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[64]/C        u_fe_agc/pk_reg[4]/D
- 10  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[64]/C        u_fe_agc/pk_reg[5]/D
- 11  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[64]/C        u_fe_agc/pk_reg[6]/D
+  5  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[68]/C        u_fe_agc/pk_reg[0]/D
+  6  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[63]/C        u_fe_agc/pk_reg[1]/D
+  7  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[68]/C        u_fe_agc/pk_reg[2]/D
+  8  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[63]/C        u_fe_agc/pk_reg[3]/D
+  9  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[63]/C        u_fe_agc/pk_reg[4]/D
+ 10  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[68]/C        u_fe_agc/pk_reg[5]/D
+ 11  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  u_adcr_peak/peak_set_reg[68]/C        u_fe_agc/pk_reg[6]/D
  12  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_adcr_peak/peak_tog_reg/C            u_fe_agc/tog_s_reg[0]/D
 
 Source Clock: clk_adcr_dco
@@ -1459,7 +1459,7 @@ Row  ID      Severity  Description                                             D
   6  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/boot_err_cfg_reg/C                              u_clk_mode_ctrl/boot_err_s_reg[0]/D
   7  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/busy_reg/C                              u_clk_mode_ctrl/busy_s_reg[0]/D
   8  CDC-3   Info      1-bit synchronized with ASYNC_REG property                  2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/delta_clamped_reg/C                     u_clk_mode_ctrl/clamped_s_reg[0]/D
-  9  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/switch_done_cfg_reg/C                           u_clk_mode_ctrl/prog_done_s_reg[0]/D
+  9  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/boot_done_cfg_reg/C                             u_clk_mode_ctrl/prog_done_s_reg[0]/D
  10  CDC-10  Critical  Combinational logic detected before a synchronizer          2  Asynch Clock Groups  u_clk_mode_ctrl/u_hk_xo/u_xo_i2c/FSM_sequential_state_reg[3]/C  u_clk_mode_ctrl/raw_ready_s_reg[0]/D
  11  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_err_cfg_reg/C                          u_clk_mode_ctrl/raw_resp_err_link_reg/D
  12  CDC-15  Warning   Clock enable controlled CDC structure detected              0  Asynch Clock Groups  u_clk_mode_ctrl/raw_resp_rdata_cfg_reg[0]/C                     u_clk_mode_ctrl/raw_resp_rdata_link_reg[0]/D
@@ -1659,88 +1659,92 @@ Row  ID      Severity  Description                                         Depth
  10  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dacs_lvl_hold_dl_reg[9]/C                           dacs_fifo_lvl_link_reg[9]/D
  11  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  dacs_lvl_tog_dl_reg/C                               dacs_lvl_tog_s_reg[0]/D
  12  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_cmd_wgray_reg[4:0]/C                             dl_cmd_wgray_s1_reg[4:0]/D
- 13  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][0]/C                              dl_cmd_word_reg[0]/D
- 14  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][1]/C                             dl_cmd_word_reg[1]/D
+ 13  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][0]/C                              dl_cmd_word_reg[0]/D
+ 14  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][1]/C                             dl_cmd_word_reg[1]/D
  15  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][2]/C                              dl_cmd_word_reg[2]/D
- 16  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][3]/C                              dl_cmd_word_reg[3]/D
- 17  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][4]/C                              dl_cmd_word_reg[4]/D
- 18  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][5]/C                             dl_cmd_word_reg[5]/D
+ 16  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][3]/C                              dl_cmd_word_reg[3]/D
+ 17  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][4]/C                              dl_cmd_word_reg[4]/D
+ 18  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][5]/C                              dl_cmd_word_reg[5]/D
  19  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][6]/C                              dl_cmd_word_reg[6]/D
- 20  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][7]/C                              dl_cmd_word_reg[7]/D
- 21  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][8]/C                              dl_cmd_word_reg[8]/D
- 22  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][9]/C                              dl_cmd_word_reg[9]/D
- 23  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][10]/C                            dl_cmd_word_reg[10]/D
- 24  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][11]/C                             dl_cmd_word_reg[11]/D
- 25  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][12]/C                             dl_cmd_word_reg[12]/D
- 26  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][13]/C                             dl_cmd_word_reg[13]/D
- 27  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][14]/C                             dl_cmd_word_reg[14]/D
- 28  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][15]/C                             dl_cmd_word_reg[15]/D
- 29  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][16]/C                             dl_cmd_word_reg[16]/D
- 30  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[12][17]/C                            dl_cmd_word_reg[17]/D
- 31  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][18]/C                             dl_cmd_word_reg[18]/D
+ 20  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][7]/C                              dl_cmd_word_reg[7]/D
+ 21  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][8]/C                              dl_cmd_word_reg[8]/D
+ 22  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][9]/C                              dl_cmd_word_reg[9]/D
+ 23  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][10]/C                             dl_cmd_word_reg[10]/D
+ 24  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][11]/C                             dl_cmd_word_reg[11]/D
+ 25  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][12]/C                             dl_cmd_word_reg[12]/D
+ 26  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][13]/C                             dl_cmd_word_reg[13]/D
+ 27  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][14]/C                             dl_cmd_word_reg[14]/D
+ 28  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][15]/C                             dl_cmd_word_reg[15]/D
+ 29  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][16]/C                             dl_cmd_word_reg[16]/D
+ 30  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][17]/C                             dl_cmd_word_reg[17]/D
+ 31  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][18]/C                            dl_cmd_word_reg[18]/D
  32  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][19]/C                             dl_cmd_word_reg[19]/D
- 33  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][20]/C                             dl_cmd_word_reg[20]/D
- 34  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][21]/C                            dl_cmd_word_reg[21]/D
- 35  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][22]/C                             dl_cmd_word_reg[22]/D
- 36  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][23]/C                             dl_cmd_word_reg[23]/D
- 37  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][24]/C                            dl_cmd_word_reg[24]/D
- 38  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][25]/C                             dl_cmd_word_reg[25]/D
- 39  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][26]/C                             dl_cmd_word_reg[26]/D
- 40  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][27]/C                            dl_cmd_word_reg[27]/D
- 41  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][28]/C                             dl_cmd_word_reg[28]/D
- 42  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][29]/C                             dl_cmd_word_reg[29]/D
- 43  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][30]/C                             dl_cmd_word_reg[30]/D
- 44  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][31]/C                             dl_cmd_word_reg[31]/D
- 45  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[3][32]/C                             dl_cmd_word_reg[32]/D
- 46  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][33]/C                            dl_cmd_word_reg[33]/D
- 47  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][34]/C                             dl_cmd_word_reg[34]/D
- 48  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][34]/C                             dl_cmd_word_reg[34]_rep/D
- 49  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][34]/C                             dl_cmd_word_reg[34]_rep__0/D
- 50  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][34]/C                             dl_cmd_word_reg[34]_rep__1/D
- 51  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][35]/C                             dl_cmd_word_reg[35]/D
- 52  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][35]/C                             dl_cmd_word_reg[35]_rep/D
- 53  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][35]/C                             dl_cmd_word_reg[35]_rep__0/D
- 54  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][35]/C                             dl_cmd_word_reg[35]_rep__1/D
- 55  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][36]/C                             dl_cmd_word_reg[36]/D
- 56  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][36]/C                             dl_cmd_word_reg[36]_rep/D
- 57  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][36]/C                             dl_cmd_word_reg[36]_rep__0/D
- 58  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][37]/C                             dl_cmd_word_reg[37]/D
- 59  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][38]/C                             dl_cmd_word_reg[38]/D
- 60  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][39]/C                             dl_cmd_word_reg[39]/D
- 61  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][40]/C                             dl_cmd_word_reg[40]/D
- 62  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][41]/C                             dl_cmd_word_reg[41]/D
- 63  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][42]/C                             dl_cmd_word_reg[42]/D
- 64  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][43]/C                            dl_cmd_word_reg[43]/D
- 65  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][44]/C                             dl_cmd_word_reg[44]/D
- 66  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][45]/C                             dl_cmd_word_reg[45]/D
- 67  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][46]/C                             dl_cmd_word_reg[46]/D
- 68  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][47]/C                            dl_cmd_word_reg[47]/D
- 69  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][56]/C                            dl_cmd_word_reg[56]/D
- 70  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][57]/C                             dl_cmd_word_reg[57]/D
- 71  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][58]/C                             dl_cmd_word_reg[58]/D
- 72  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][59]/C                             dl_cmd_word_reg[59]/D
- 73  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][60]/C                            dl_cmd_word_reg[60]/D
- 74  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][61]/C                             dl_cmd_word_reg[61]/D
- 75  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][62]/C                             dl_cmd_word_reg[62]/D
- 76  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][63]/C                             dl_cmd_word_reg[63]/D
- 77  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/crc_err_cnt_reg[31:0]/C      dl_crc_sync1_reg[31:0]/D
- 78  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_rx_drop_cnt_reg[7:0]/C                           dl_drop_sync1_reg[7:0]/D
- 79  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_train_fsm/eye_left_l0_reg[8:0]/C               dl_el_sync1_reg[8:0]/D
- 80  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_train_fsm/eye_right_l0_reg[8:0]/C              dl_er_sync1_reg[8:0]/D
- 81  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/block_lock_reg/C                dl_lock_sync_reg[0]/D
- 82  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/pkt_rx_cnt_reg[31:0]/C       dl_pkt_sync1_reg[31:0]/D
- 83  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_prbs_err_cnt_reg[31:0]/C                         dl_prbs_sync1_reg[31:0]/D
- 84  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/remote_status_reg[7:0]/C     dl_rem_sync1_reg[7:0]/D
- 85  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/sh_err_cnt_reg[31:0]/C          dl_sh_sync1_reg[31:0]/D
- 86  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[0]/C  dl_st_sync1_reg[0]/D
- 87  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[1]/C  dl_st_sync1_reg[1]/D
- 88  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[0]/C  dl_st_sync1_reg[2]/D
- 89  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[0]/D
- 90  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[1]/D
- 91  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[2]/D
- 92  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[3]/D
- 93  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[4]/D
- 94  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_train_fsm/link_up_reg/C                        dl_up_sync_reg[0]/D
+ 33  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][20]/C                            dl_cmd_word_reg[20]/D
+ 34  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][21]/C                             dl_cmd_word_reg[21]/D
+ 35  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][22]/C                             dl_cmd_word_reg[22]/D
+ 36  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[6][23]/C                             dl_cmd_word_reg[23]/D
+ 37  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][24]/C                             dl_cmd_word_reg[24]/D
+ 38  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][25]/C                             dl_cmd_word_reg[25]/D
+ 39  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[10][26]/C                            dl_cmd_word_reg[26]/D
+ 40  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][27]/C                            dl_cmd_word_reg[27]/D
+ 41  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][28]/C                            dl_cmd_word_reg[28]/D
+ 42  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][29]/C                             dl_cmd_word_reg[29]/D
+ 43  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][30]/C                             dl_cmd_word_reg[30]/D
+ 44  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][31]/C                             dl_cmd_word_reg[31]/D
+ 45  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][32]/C                             dl_cmd_word_reg[32]/D
+ 46  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][33]/C                             dl_cmd_word_reg[33]/D
+ 47  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][34]/C                             dl_cmd_word_reg[34]/D
+ 48  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][34]/C                             dl_cmd_word_reg[34]_rep/D
+ 49  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][34]/C                             dl_cmd_word_reg[34]_rep__0/D
+ 50  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][34]/C                             dl_cmd_word_reg[34]_rep__1/D
+ 51  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][34]/C                             dl_cmd_word_reg[34]_rep__2/D
+ 52  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][34]/C                             dl_cmd_word_reg[34]_rep__3/D
+ 53  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][35]/C                            dl_cmd_word_reg[35]/D
+ 54  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][35]/C                            dl_cmd_word_reg[35]_rep/D
+ 55  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][35]/C                            dl_cmd_word_reg[35]_rep__0/D
+ 56  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][35]/C                            dl_cmd_word_reg[35]_rep__1/D
+ 57  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][35]/C                            dl_cmd_word_reg[35]_rep__2/D
+ 58  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][35]/C                            dl_cmd_word_reg[35]_rep__3/D
+ 59  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][36]/C                            dl_cmd_word_reg[36]/D
+ 60  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][36]/C                            dl_cmd_word_reg[36]_rep/D
+ 61  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[11][36]/C                            dl_cmd_word_reg[36]_rep__0/D
+ 62  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][37]/C                             dl_cmd_word_reg[37]/D
+ 63  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[9][38]/C                             dl_cmd_word_reg[38]/D
+ 64  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][39]/C                             dl_cmd_word_reg[39]/D
+ 65  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[2][40]/C                             dl_cmd_word_reg[40]/D
+ 66  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[1][41]/C                             dl_cmd_word_reg[41]/D
+ 67  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][42]/C                             dl_cmd_word_reg[42]/D
+ 68  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[14][43]/C                            dl_cmd_word_reg[43]/D
+ 69  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][44]/C                             dl_cmd_word_reg[44]/D
+ 70  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][45]/C                             dl_cmd_word_reg[45]/D
+ 71  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][46]/C                             dl_cmd_word_reg[46]/D
+ 72  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[7][47]/C                             dl_cmd_word_reg[47]/D
+ 73  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[5][56]/C                             dl_cmd_word_reg[56]/D
+ 74  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[0][57]/C                             dl_cmd_word_reg[57]/D
+ 75  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][58]/C                            dl_cmd_word_reg[58]/D
+ 76  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][59]/C                             dl_cmd_word_reg[59]/D
+ 77  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[13][60]/C                            dl_cmd_word_reg[60]/D
+ 78  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[15][61]/C                            dl_cmd_word_reg[61]/D
+ 79  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[4][62]/C                             dl_cmd_word_reg[62]/D
+ 80  CDC-15  Warning   Clock enable controlled CDC structure detected          0  Asynch Clock Groups  dl_cmd_mem_reg[8][63]/C                             dl_cmd_word_reg[63]/D
+ 81  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/crc_err_cnt_reg[31:0]/C      dl_crc_sync1_reg[31:0]/D
+ 82  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_rx_drop_cnt_reg[7:0]/C                           dl_drop_sync1_reg[7:0]/D
+ 83  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_train_fsm/eye_left_l0_reg[8:0]/C               dl_el_sync1_reg[8:0]/D
+ 84  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_train_fsm/eye_right_l0_reg[8:0]/C              dl_er_sync1_reg[8:0]/D
+ 85  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/block_lock_reg/C                dl_lock_sync_reg[0]/D
+ 86  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/pkt_rx_cnt_reg[31:0]/C       dl_pkt_sync1_reg[31:0]/D
+ 87  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  dl_prbs_err_cnt_reg[31:0]/C                         dl_prbs_sync1_reg[31:0]/D
+ 88  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_deframer/remote_status_reg[7:0]/C     dl_rem_sync1_reg[7:0]/D
+ 89  CDC-6   Warning   Multi-bit synchronized with ASYNC_REG property          2  Asynch Clock Groups  u_dl_pcs_rx/u_bl_l0/sh_err_cnt_reg[31:0]/C          dl_sh_sync1_reg[31:0]/D
+ 90  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[2]/C  dl_st_sync1_reg[0]/D
+ 91  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[2]/C  dl_st_sync1_reg[1]/D
+ 92  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  u_dl_train_fsm/FSM_sequential_train_state_reg[2]/C  dl_st_sync1_reg[2]/D
+ 93  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[0]/D
+ 94  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[1]/D
+ 95  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[2]/D
+ 96  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[3]/D
+ 97  CDC-10  Critical  Combinational logic detected before a synchronizer      2  Asynch Clock Groups  dl_ov_sync_reg[1]/C                                 dl_tap_sync1_reg[4]/D
+ 98  CDC-3   Info      1-bit synchronized with ASYNC_REG property              2  Asynch Clock Groups  u_dl_train_fsm/link_up_reg/C                        dl_up_sync_reg[0]/D
 
 Source Clock: gen_rev06_eth.clk_312p5_u
 Destination Clock: link_clk_unbuf
@@ -1793,8 +1797,8 @@ Source Clock: link_clk_unbuf
 Destination Clock: refclk_200m_unbuf
 CDC Type: Safely Timed
 
-Row  ID      Severity  Description                                              Depth  Exception                Source (From)                    Destination (To)
----  ------  --------  -------------------------------------------------------  -----  -----------------------  -------------------------------  -----------------------
-  1  CDC-10  Critical  Combinational logic detected before a synchronizer           2  Max Delay Datapath Only  u_clk_mode_ctrl/busy_s_reg[1]/C  d2_run_ref_s_reg[0]/D
-  2  CDC-9   Info      Asynchronous reset synchronized with ASYNC_REG property      2  False Path               sys_rst_reg/C                    ref_rst_sync_reg[0]/PRE
+Row  ID      Severity  Description                                              Depth  Exception                Source (From)                           Destination (To)
+---  ------  --------  -------------------------------------------------------  -----  -----------------------  --------------------------------------  -----------------------
+  1  CDC-10  Critical  Combinational logic detected before a synchronizer           2  Max Delay Datapath Only  u_clk_mode_ctrl/active_500m_s_reg[1]/C  d2_run_ref_s_reg[0]/D
+  2  CDC-9   Info      Asynchronous reset synchronized with ASYNC_REG property      2  False Path               sys_rst_reg/C                           ref_rst_sync_reg[0]/PRE
 
