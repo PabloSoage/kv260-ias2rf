@@ -7,6 +7,7 @@ burn out under the key light. Each material is classed by its colour and by whic
     ENIG tone than the bare laminate, so tracks and pours read through the mask as on a real board;
   - green laminate (KV260 carrier, K26 SOM): dielectric, satin;
   - KV260 connector shells (white or neutral grey in its STEP): nickel-plated steel;
+  - KV260 ivory (warm white in its STEP): natural-nylon housings (fan header, FFC, buttons), a beige dielectric;
   - gold / brass (pins, contacts): metal, ENIG/brass gold;
   - mid/light neutral grey (shields, tin): metal;
   - white plastics on the adapter (JST housings, transformer cases): a dark ivory (0.20 linear, about 0.48 sRGB), so they never read white under the studio lights;
@@ -82,6 +83,7 @@ def studio_world(world, color=(0.20, 0.22, 0.25), strength=0.25):
 def apply(materials, objects):
     roots = _roots(objects)
     n = {}
+    beige = set()
 
     def count(k):
         n[k] = n.get(k, 0) + 1
@@ -147,6 +149,16 @@ def apply(materials, objects):
             _set(b, "Metallic", 1.0)
             _set(b, "Roughness", 0.38)
             count("gold")
+        elif "kv" in who and L > 0.9 and bl < 0.95 * r:
+            # AMD's ivory (1, 1, 0.89) is natural nylon, not a shell: the fan header J13, J3, the camera FFC
+            # J9 and the buttons (the fan-sink's printing shares it and becomes ink below). As nickel it read as
+            # metal. A beige dielectric, about as dark as the adapter's ivory so it never burns white.
+            b.inputs["Base Color"].default_value = (0.27, 0.23, 0.155, 1)
+            _set(b, "Metallic", 0.0)
+            _set(b, "Roughness", 0.55)
+            _set(b, "Specular IOR Level", 0.3)
+            beige.add(m.name)
+            count("kv beige")
         elif "kv" in who and sat < 0.13 and L > 0.3:
             v = min(0.62, max(0.5, L))                                 # KV260 shells: nickel
             b.inputs["Base Color"].default_value = (v, v, v * 0.98, 1)
@@ -207,5 +219,21 @@ def apply(materials, objects):
             o.data.materials.append(ink if ztop > 18.0 else nickel)
             bare += 1
     n["bare->nickel"] = bare
+    # the SOM's and the fan-sink's uses of that ivory are its silkscreen and the printed logo: light ink
+    ink_n = 0
+    for o in objects:
+        if o.type != "MESH":
+            continue
+        r = o
+        while r and not r.name.startswith("SOM-ML_PCBA"):
+            r = r.parent
+        if not r:
+            continue
+        for s in o.material_slots:
+            if s.material and s.material.name in beige:
+                s.link = "OBJECT"
+                s.material = ink
+                ink_n += 1
+    n["kv ivory->ink"] = ink_n
     print("matfix", n)
     return n
