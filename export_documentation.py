@@ -1154,11 +1154,11 @@ def add_summary_page(master: fitz.Document, part_summary: Iterable[tuple[str, in
     facts = [
         ("PCB & Stackup", "8-layer JLC08161H-2116C (140 x 132 mm, 0 DRC / 0 ERC, openEMS S11 = -30.9 dB @ 1 GHz)"),
         ("High-Speed Link", "2-lane IAS1 LVDS (2.0-2.5 Gb/s UL, 1.0 Gb/s DL) + dedicated-pin 1000BASE-T RTL8211FSI UDP"),
-        ("Artix-7 (XC7A50T)", "15,681 LUTs (48.1%), 18,084 FFs (27.7%), 16 BRAM36 (21.3%), 110 DSPs (91.7%), WNS = +0.111 ns at 400 and 500 MHz"),
-        ("Kria K26 (XCK26)", "Full BD: 11,034 LUTs (9.4%), 18,212 FFs (7.8%), 3 BRAM36 (2.1%), WNS = +1.291 ns"),
-        ("RF Missions", "AERIS-10 X-Band Radar (10.5 GHz, 20 km, 8x ADAR1000) + Wideband SDR (0-62.5 MHz HF/CB + VHF/UHF)"),
+        ("Artix-7 (XC7A50T)", "25,068 LUTs (76.9%), 28,881 FFs (44.3%), 18 BRAM36 eq. (24.0%), 119 DSPs (99.2%), WNS = +0.076 ns at 400 and 500 MHz"),
+        ("Kria K26 (XCK26)", "Full BD: 51,870 LUTs (44.3%), 44,547 FFs (19.0%), 40 BRAM36 eq. (27.8%), 229 DSPs (18.3%), WNS = +1.125 ns"),
+        ("RF Missions", "AERIS-10 X-Band Radar (10.5 GHz, 20 km, 8x ADAR1000) + Wideband SDR (HF to 30 MHz, VHF/UHF 25 MHz to 1.1 GHz on J961)"),
         ("HF input", "J951: 30 MHz 7th-order elliptic anti-alias filter on the board, >= 60 dB from 50 MHz; no RF switch in the path"),
-        ("Thermal & Mech.", "Enclosure v2 (50x15 mm filtered lid fan, HS1-HS3, 50 g FEA BGA <= 162 ue): rated 56 C ambient with the stock KV260, 70 C with a K26I SOM"),
+        ("Thermal & Mech.", "Enclosure v2 (50x15 mm filtered lid fan, HS1-HS3, 50 g FEA BGA <= 96 ue): rated 56 C ambient with the stock KV260, 71 C with a K26I SOM"),
         ("XSim Co-Sim", "Dual-FPGA Artix-7 + PCB channels + K26 PL + RTL8211FSI/GEM3 UDP end-to-end PASS (S1..S6)"),
     ]
     ry = y + 12
@@ -1297,7 +1297,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
         summary.extend([
             ("Appendix A: Vector Vivado FPGA Silicon Floorplans & Schematics", len(VECTOR_FPGA_PDFS)),
             ("Appendix B: Vector Heatsink Mechanical Map", 1),
-            ("Appendix C: Vector 11-Sheet Hierarchical KiCad Schematic", 11),
+            ("Appendix C: Vector 13-Page Hierarchical KiCad Schematic", 13),
             ("Appendix D: Vector 10-Sheet 8-Layer PCB Layout", 10),
         ])
     add_cover_page(master)
@@ -1358,17 +1358,17 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
 
             pnum = add_section_divider(
                 master,
-                "Appendix C: 11-Sheet Hierarchical KiCad Schematic",
-                "Complete connected overview + all 10 hierarchical schematic sheets (11 vector sheets)",
+                "Appendix C: 13-Page Hierarchical KiCad Schematic",
+                "Complete connected overview + all 12 hierarchical schematic sheets (13 vector pages)",
             )
-            toc.append([1, "Appendix C: Vector 11-Sheet Hierarchical KiCad Schematic", pnum])
+            toc.append([1, "Appendix C: Vector 13-Page Hierarchical KiCad Schematic", pnum])
             sch_start = len(master) + 1
             insert_vector_pdf(
                 master,
                 REPO_ROOT / "docs/KV260-IAS2RF_schematic.pdf",
                 toc,
                 2,
-                "Complete 11-Page Hierarchical KiCad Schematic",
+                "Complete 13-Page Hierarchical KiCad Schematic",
             )
             sch_labels = [
                 "Sheet 1: ROOT Hierarchical Top",
@@ -1382,6 +1382,8 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
                 "Sheet 9: DAC_SDR (AD9767 Dual Channel)",
                 "Sheet 10: ROUTING (RF Switches + SMAs)",
                 "Sheet 11: POWER (12V Buck/LDO/Inverter Tree)",
+                "Sheet 12: RX_VU (VHF/UHF Front End, RFFC5072 Converter)",
+                "Sheet 13: STATUS (LEDs, I/O Expanders, Debug USB-C)",
             ]
             sch_end = len(master)
             for off, lbl in enumerate(sch_labels):

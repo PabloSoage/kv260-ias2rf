@@ -347,7 +347,7 @@ To rerun:
 
 The mutation `bev_axi_no_stage` (`DET_CMD` ignores `DET_XY`) fails it. The Artix's scan mode is in `tb_adar_ctrl`: five strobes load beams 0, 1, 2, 0 and 1, each with its own weights; the mutation `scan_ignored` fails it. The CPI count is checked by the system bench `tb_system_signals` in the G-8 radar case, which passes again with it.
 
-**Cost in the K26 build:** `kria_bev_0` takes `790` LUT (`192` of them LUTRAM), `623` FF and `16` BRAM36, and its DMA `axi_dma_1` `1,046` LUT, `1,590` FF and one BRAM36 and one BRAM18. The whole block design is at `36,393` LUT (`31.1 %`), `32.5` BRAM36 (`22.6 %`) and `106` DSP48E2, and meets timing with `WNS = +0.874 ns` and `WHS = +0.010 ns` (FPGA_GATEWARE §3.3).
+**Cost in the K26 build:** `kria_bev_0` takes `782` LUT (`192` of them LUTRAM), `623` FF and `16` BRAM36, and its DMA `axi_dma_1` `1,043` LUT, `1,590` FF and one BRAM36 and one BRAM18. With the KrakenSDR and HackRF Pro blocks of §9 and §10 the whole block design is at `51,870` LUT (`44.3 %`), `40` BRAM36 eq. (`27.8 %`) and `229` DSP48E2, and meets timing with `WNS = +1.125 ns` and `WHS = +0.010 ns` (FPGA_GATEWARE §3.3).
 
 ## 7. Software on the K26's processors
 

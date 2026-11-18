@@ -537,7 +537,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **Done 17 November** (section 11.7): G3 passed; `J961` brought to the other SMAs' standard, bias tee and LNA bias fixed, DRC 0 / 0 / 0 |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
 | 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | **Done 17 November**: rated 56.1 °C stock, 71.1 °C K26I (ENCLOSURE_V2_THERMAL §8); 50 g FEA SF 8.3 / 5.0, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE §5.3) |
-| 9 | Regenerate every output and review every document (section 11.1); draw the board manual (section 11.3) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done** |
+| 9 | Regenerate every output and review every document (section 11.1); draw the board manual (section 11.3) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done.** Passed 18 November (section 11.8) |
 | 10 | Tag `rev08`, push | — | — |
 
 Phases 1 and 2 can run in parallel. Nothing in phases 4–10 starts before G1.
@@ -743,6 +743,31 @@ Details, tables and figures: SIGNAL_INTEGRITY 9.10. Every check ran on a copy of
   the same 7 warnings. `check_sheet rx_vu`: PASS. Nothing else's copper moved: the board diff is 5 property
   lines, 9 vias and 1 zone, and after the refill only the fills around `J961` differ. The BOM rules name the
   four parts (`lcsc_select.py`): BLM15HD102SN1, LQW2BAS1R0J, and AHW1608F-1R0KTF for the 0603 1 µH chokes.
+
+### 11.8 Phase 9 result: every output regenerated (17 and 18 November 2026), gate G4
+
+Each row of section 11.1, with what was redone and where the result is. The phase 9 commits are `52e0ea0` to the commit that adds this section, merged into `main` together.
+
+| Group | State |
+|---|---|
+| Board electrical checks | **Done.** ERC 0 errors, the same 7 warnings. DRC with zones refilled and schematic parity 0 / 0 / 0 (`make_fab`). LVDS skew table re-run: all 29 pairs identical to the 8-layer table (LAYOUT 6.7) |
+| Signal integrity | **Done in phase 6** (section 11.7, SIGNAL_INTEGRITY 9.10): `J961`'s launch, the IF line, coupling and isolation with the new aggressors, the bias tee and LNA feed; the three new filters' Monte Carlo in phase 3 (section 5.4) |
+| Power | **Done.** `power_budget.py` with every Rev08 load: 802 mA at 12 V, 9.6 W (1.04 A, 12.5 W with margin); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
+| Thermal | **Done.** Enclosure CFD at the rated ambients with the front end and camera (phase 8: 56.1 °C stock, 71.1 °C K26I); the 2-D board map and the five cooling cases at 8.2 W (SIGNAL_INTEGRITY 9.6: the LMR33630 is now the hottest junction, 87 °C at 25 °C in still air; every junction under 92 °C at 70 °C with sink and fan); the heatsink map |
+| Mechanical strength | **Done in phase 8.** 50 g in three axes with the new notch, lug, slots, lens window and clamps; SF 8.3 / 5.0 at 23 / 70 °C, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE 5.3) |
+| Gateware | **Done.** Artix rebuilt with the corrected constraints (25,068 LUT, `WNS +0.076 ns`, `WHS +0.049 ns` over both clock modes); K26 rebuilt on 18 November with the integrations of section 14 (51,870 LUT, `WNS +1.125 ns`, `WHS +0.010 ns`, no new clock crossings); utilisation, timing, pulse-width, methodology and CDC reports, floorplans and schematics regenerated from the routed designs. `tb_system` passes at both clock modes; the G-8 campaign re-run on the final RTL passes all 8 cases (FPGA_GATEWARE 6.1, figures moved by 0.9 dB at most); the two new benches pass bit-exact and their mutations fail |
+| Renders and 3-D | **Done.** Board renders (top, iso, bottom, 4K) with the 22 Rev08 part models; mount, case v1 and v2, the camera on the tongue, `J961`'s notch, the 4K case views, the heatsink renders; each checked against the render rules. `check_case`: the same 15 / 16 intended contacts |
+| Fabrication | **Done.** BOM 214 lines / 739 parts, CPL 739, 765 vias in pads; LCSC codes for 212 of 214 lines on live stock; quote about $2,417 for two boards, $4,804 for five. Nine lines are short at the moment, the SMA among them (5 in stock): to be re-checked at order (decision 5) |
+| Documents | **Done.** Every document reviewed against the final design on 17 November (the list in the phase 9 commit), then again where the 18 November additions touched them: INTEGRATIONS, HMI, FPGA_GATEWARE, the READMEs, this plan |
+| Documentation PDF layout | **Done.** The table defects of section 11.2 stay fixed. A further fault, found on 18 November: the pagination of JLCPCB_QUOTE's parts table never settled. Cut at row 96, the rows from 96 fit on the page; uncut, row 96 started the next one; the cut came and went for all 3,000 passes, which is also what made a build run 2 hours and 30 GB without finishing. The cut is now held after three returns, with a spacer that moves its part to the next page (55 passes). Long part numbers in that document's tables get break points. Final book: 250 pages, `pdf_table_check` 0 (a) and 0 (b) defects; every page inspected as an image, the (c) pages and the held cut (rows 94 to 97, each once) by eye |
+| Board manual | **Done.** BOARD_MANUAL.md and the README section, drawn from the `.kicad_pcb` (90 callouts); its check passes both ways. Chapter 2 of the book |
+| Design history | **Done.** The Rev08 row in [history/README.md](history/README.md) |
+| This plan | **Done.** Sections 8 and 12 marked; the additions of 17 and 18 November in section 14 |
+
+**Known gaps, carried over on purpose:**
+- **`J1501` has no 3-D model.** No vendor or EasyEDA model exists for it; the renders show its footprint only. `SH1` and `SH2`, the shield frames, are drawn as walls.
+- **Nothing has run on hardware.** The board is not built; the gateware, the R5F firmware and `kria-sdrd` run in simulation and on the host only.
+- **Open, for the owner:** HMI.md names Qt Quick for the in-car application, while the rule for user interfaces on the Kria is Compose Multiplatform. The screens are HTML mock-ups either way; the framework is not chosen here.
 
 ### Risk register
 
