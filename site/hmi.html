@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>KV260-IAS2RF Live HMI (Browser Simulation)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23ffb020'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%230b0d10'%3ER8%3C/text%3E%3C/svg%3E">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #0b0d10;
+      color: #e6edf3;
+      font: 13px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow: hidden;
+    }
+    #simbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 36px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 12px;
+      background: #141921;
+      border-bottom: 1px solid #2a3340;
+      font-size: 12px;
+    }
+    #simbar .group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+    .tag {
+      background: #2b210e;
+      color: #ffb020;
+      border: 1px solid #755013;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    button {
+      background: #1e2631;
+      color: #e6edf3;
+      border: 1px solid #374353;
+      border-radius: 4px;
+      padding: 3px 9px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    button.active {
+      background: #ffb020;
+      color: #0b0d10;
+      border-color: #ffb020;
+      font-weight: 600;
+    }
+    a { color: #8ab4f8; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    #stage {
+      position: fixed;
+      left: 50%;
+      top: calc(50% + 18px);
+      width: 1280px;
+      height: 720px;
+      transform-origin: 50% 50%;
+    }
+    #canvas {
+      display: block;
+      width: 1280px;
+      height: 720px;
+      outline: none;
+      touch-action: none;
+    }
+    #wait {
+      position: fixed;
+      inset: 36px 0 0 0;
+      display: grid;
+      place-items: center;
+      color: #8b949e;
+      font-size: 15px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="simbar">
+    <div class="group">
+      <span class="tag">SIM MODE (Mock kria-hmid)</span>
+      <button id="btn-parked" class="active" type="button">0 km/h Parked (TX allowed)</button>
+      <button id="btn-driving" type="button">68 km/h Driving (TX locked)</button>
+      <button id="btn-wbfm" type="button">FM 98.1</button>
+      <button id="btn-hf" type="button">HF 7.2 MHz</button>
+      <button id="btn-radar" type="button">Radar Map</button>
+    </div>
+    <div class="group">
+      <span>Built with <a href="https://slint.dev" target="_blank" rel="noopener">Slint</a> (Royalty-free Web App 2.0)</span>
+      <a href="LICENSES.md" target="_blank" rel="noopener">Licences</a>
+    </div>
+  </div>
+  <div id="stage"><canvas id="canvas"></canvas></div>
+  <div id="wait">Loading Slint WebAssembly HMI...</div>
+  <script type="module">
+    import { installHmiSimWebSocket } from "./hmi_sim_ws.js";
+    const { simState } = installHmiSimWebSocket();
+    const stage = document.getElementById("stage");
+    const fit = () => {
+      const s = Math.min(innerWidth / 1280, Math.max(120, innerHeight - 36) / 720);
+      stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+    };
+    addEventListener("resize", fit);
+    fit();
+
+    const btnParked = document.getElementById("btn-parked");
+    const btnDriving = document.getElementById("btn-driving");
+    btnParked.onclick = () => {
+      if (!simState) return;
+      simState.speed_kmh = 0;
+      simState.parked_s = 4.0;
+      btnParked.classList.add("active");
+      btnDriving.classList.remove("active");
+    };
+    btnDriving.onclick = () => {
+      if (!simState) return;
+      simState.speed_kmh = 68;
+      simState.parked_s = 0;
+      simState.tx_requested = false;
+      btnDriving.classList.add("active");
+      btnParked.classList.remove("active");
+    };
+    document.getElementById("btn-wbfm").onclick = () => {
+      if (!simState) return;
+      simState.fn = "radio";
+      simState.freq_hz = 98.1e6;
+      simState.mode = "wbfm";
+    };
+    document.getElementById("btn-hf").onclick = () => {
+      if (!simState) return;
+      simState.fn = "radio";
+      simState.freq_hz = 7.2e6;
+      simState.mode = "am";
+    };
+    document.getElementById("btn-radar").onclick = () => {
+      if (!simState) return;
+      simState.fn = "radar";
+    };
+
+    const { default: init } = await import("./hmi/pkg/kria_hmi.js");
+    init()
+      .then(() => { const w = document.getElementById("wait"); if (w) w.remove(); })
+      .catch((e) => {
+        if (String(e).includes("Using exceptions for control flow")) {
+          const w = document.getElementById("wait"); if (w) w.remove();
+        } else {
+          document.getElementById("wait").textContent = "Could not start HMI: " + e;
+          console.error(e);
+        }
+      });
+  </script>
+</body>
+</html>

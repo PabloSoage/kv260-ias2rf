@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>KV260-IAS2RF | Interactive 3-D Explorer, Stack-up &amp; Browser HMI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23ffb020'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='14' font-weight='bold' text-anchor='middle' fill='%230b0d10'%3ER8%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">REV08</span>
+      <div class="brand-title">
+        <strong>KV260-IAS2RF Explorer</strong>
+        <span>8-Layer Radar &amp; Wideband SDR Front-End for AMD Kria KV260</span>
+      </div>
+    </div>
+
+    <nav class="nav-tabs" aria-label="Primary Views">
+      <button class="nav-tab active" data-tab="explorer" type="button">3-D Explorer</button>
+      <button class="nav-tab" data-tab="layers" type="button">Layers (8-Cu)</button>
+      <button class="nav-tab" data-tab="hmi" type="button">Live HMI (WASM)</button>
+      <button class="nav-tab" data-tab="mockups" type="button">Mock-ups</button>
+      <button class="nav-tab" data-tab="gallery" type="button">Sim Gallery</button>
+      <button class="nav-tab" data-tab="docs" type="button">Docs &amp; Licences</button>
+    </nav>
+
+    <div class="header-actions">
+      <div class="search-wrap">
+        <input id="search-input" class="search-input" type="search" placeholder="Search Ref (U501, J9), Net, MPN..." autocomplete="off" aria-label="Search components or nets">
+        <div id="search-dropdown" class="search-dropdown" role="listbox"></div>
+      </div>
+      <button id="btn-theme" class="btn" type="button" aria-label="Toggle Light/Dark Theme">Light Mode</button>
+    </div>
+  </header>
+
+  <main class="main-shell">
+    <!-- 1. Interactive 3-D Explorer -->
+    <section id="tab-explorer" class="tab-panel active" aria-label="3-D Assembly Explorer">
+      <div class="explorer-grid">
+        <aside id="dock-controls" class="dock">
+          <div class="panel-card">
+            <h3>Explode &amp; Enclosure</h3>
+            <div class="control-row">
+              <label for="range-explode">Explode Stack</label>
+              <strong id="val-explode" class="mono">0%</strong>
+            </div>
+            <input id="range-explode" type="range" min="0" max="100" value="0">
+            <div class="btn-grid-3">
+              <button class="btn btn-sm active" data-enc="closed" type="button">Closed</button>
+              <button class="btn btn-sm" data-enc="open" type="button">Open Lid</button>
+              <button class="btn btn-sm" data-enc="hidden" type="button">No Case</button>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <h3>KV260 Teardown &amp; Info</h3>
+            <label class="check-row">
+              <input id="chk-kv-fan" type="checkbox" checked>
+              <span>Show KV260 4010 Fan</span>
+            </label>
+            <label class="check-row">
+              <input id="chk-kv-hs" type="checkbox" checked>
+              <span>Show KV260 Heatsink</span>
+            </label>
+            <div class="control-row">
+              <label for="range-som-lift">Lift K26 SOM</label>
+              <strong id="val-som-lift" class="mono">0 mm</strong>
+            </div>
+            <input id="range-som-lift" type="range" min="0" max="30" value="0">
+            <div class="btn-grid">
+              <button class="btn btn-sm" id="btn-preset-kv-teardown" type="button">KV260 Teardown</button>
+              <button class="btn btn-sm" id="btn-preset-som240" type="button">Inspect SOM240</button>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <h3>Isolate Assembly (or double-click)</h3>
+            <div class="btn-grid">
+              <button class="btn btn-sm active" data-iso="all" type="button">Full Assembly</button>
+              <button class="btn btn-sm" data-iso="board" type="button">Our Board</button>
+              <button class="btn btn-sm" data-iso="kv260" type="button">KV260 + SOM</button>
+              <button class="btn btn-sm" data-iso="thermal" type="button">Heatsinks</button>
+            </div>
+            <button class="btn btn-sm" data-iso="enclosure" type="button">Enclosure Only</button>
+          </div>
+
+          <div class="panel-card">
+            <h3>Camera Presets</h3>
+            <div class="btn-grid-3">
+              <button class="btn btn-sm" data-cam="iso" type="button">Iso</button>
+              <button class="btn btn-sm" data-cam="top" type="button">Top</button>
+              <button class="btn btn-sm" data-cam="bottom" type="button">Bottom</button>
+              <button class="btn btn-sm" data-cam="front" type="button">Front SMA</button>
+              <button class="btn btn-sm" data-cam="back" type="button">Back I/O</button>
+              <button class="btn btn-sm" data-cam="reset" type="button">Reset</button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="viewport-wrap">
+          <div id="loading-overlay" class="loading-overlay">Loading 3-D CAD &amp; Component Catalogue...</div>
+          <canvas id="webgl-canvas" tabindex="0" aria-label="Interactive 3-D PCB and KV260 Viewport"></canvas>
+          <div id="hover-tooltip" class="hover-tooltip"></div>
+
+          <div class="hud-top">
+            <div class="hud-pill" id="hud-status">Hover or tap any component, connector, IC, KV260 part, or heatsink.</div>
+            <div class="hud-pill mono" id="hud-stats">Loading...</div>
+          </div>
+
+          <div class="hud-bottom">
+            <div class="hud-pill">Drag: Orbit &middot; Right-drag: Pan &middot; Scroll: Zoom &middot; Double-click: Isolate</div>
+          </div>
+        </div>
+
+        <div class="mobile-drawer-bar">
+          <button id="btn-mob-controls" class="btn btn-sm" type="button">Show Controls</button>
+          <button id="btn-mob-inspector" class="btn btn-sm active" type="button">Inspector</button>
+        </div>
+
+        <aside id="inspector-pane" class="inspector-pane" aria-label="Part Inspector">
+          <div id="inspector-empty" class="panel-card">
+            <h3>Component &amp; KV260 Inspector</h3>
+            <p style="margin:0;color:var(--text-muted)">
+              Click or tap any component on the Rev08 board (e.g. <strong>U501</strong> AD9484, <strong>U1101</strong> XC7A50T, <strong>J101</strong> IAS1, <strong>J1502</strong> FFC), any KV260 part (<strong>K26_XCK26</strong>, <strong>KV260_J9_RPI</strong>, <strong>SOM240_1</strong>), or heatsink <strong>HS1..HS4</strong>.
+            </p>
+            <div class="btn-grid">
+              <button class="btn btn-sm quick-pick" data-ref="U501" type="button">U501 (AD9484)</button>
+              <button class="btn btn-sm quick-pick" data-ref="U1101" type="button">U1101 (XC7A50T)</button>
+              <button class="btn btn-sm quick-pick" data-ref="J1502" type="button">J1502 (J9 FFC)</button>
+              <button class="btn btn-sm quick-pick" data-ref="KV260_J9_RPI" type="button">KV260 J9 RPi</button>
+            </div>
+          </div>
+          <div id="inspector-body" style="display:none;flex-direction:column;gap:10px;"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 2. 8-Layer PCB Stack-up & 2-D SVG Viewer -->
+    <section id="tab-layers" class="tab-panel" aria-label="8-Layer PCB Stack-up Viewer">
+      <div class="layers-grid">
+        <aside class="dock">
+          <div class="panel-card">
+            <h3>8-Layer Stack-up Controls</h3>
+            <div class="control-row">
+              <label for="range-layer-spread">Z-Spread</label>
+              <strong id="val-layer-spread" class="mono">6.0 mm</strong>
+            </div>
+            <input id="range-layer-spread" type="range" min="1" max="15" step="0.5" value="6">
+            <div class="control-row">
+              <label for="range-layer-opacity">Opacity</label>
+              <strong id="val-layer-opacity" class="mono">85%</strong>
+            </div>
+            <input id="range-layer-opacity" type="range" min="15" max="100" value="85">
+            <div class="btn-grid">
+              <button id="btn-layers-all" class="btn btn-sm" type="button">Show All</button>
+              <button id="btn-layers-cu" class="btn btn-sm" type="button">8 Copper Only</button>
+            </div>
+          </div>
+          <div class="panel-card">
+            <h3>PCB Layers (Select for 2-D Zoom)</h3>
+            <div id="layer-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+        </aside>
+
+        <div class="layers-main">
+          <div class="layer-3d-wrap">
+            <canvas id="layer-webgl-canvas" aria-label="3-D Layer Stack-up"></canvas>
+            <div class="hud-top">
+              <div class="hud-pill">3-D Exploded 8-Cu Stack-up (rendered from KiCad vector SVGs)</div>
+            </div>
+          </div>
+          <div class="layer-2d-wrap">
+            <div class="layer-2d-bar">
+              <strong id="layer-2d-title">F.Cu - Top Copper</strong>
+              <div style="display:flex;gap:6px;">
+                <button id="btn-l2d-in" class="btn btn-sm" type="button">Zoom +</button>
+                <button id="btn-l2d-out" class="btn btn-sm" type="button">Zoom -</button>
+                <button id="btn-l2d-reset" class="btn btn-sm" type="button">Reset</button>
+              </div>
+            </div>
+            <div id="layer-2d-stage" class="layer-2d-stage">
+              <img id="layer-2d-img" src="assets/layers/F_Cu.svg" alt="Selected PCB SVG layer">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Live Slint WASM HMI -->
+    <section id="tab-hmi" class="tab-panel" aria-label="Live Slint WASM HMI">
+      <div class="hmi-tab-wrap">
+        <div class="hmi-banner">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span class="badge">LIVE WASM HMI</span>
+            <strong>Real <code>sw/hmi/app</code> Slint UI in browser Simulation Mode (WebSocket shim)</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span>Built with <a href="https://slint.dev" target="_blank" rel="noopener">Slint</a> (<a href="LICENSES.md" target="_blank">Royalty-free Web App 2.0</a>)</span>
+            <a class="btn btn-sm btn-primary" href="hmi.html" target="_blank">Open Standalone Fullscreen</a>
+          </div>
+        </div>
+        <iframe id="hmi-iframe" class="hmi-iframe" data-src="hmi.html" title="KV260-IAS2RF Live Slint WebAssembly HMI (Simulation Mode)"></iframe>
+      </div>
+    </section>
+
+    <!-- 4. Interactive Mock-ups -->
+    <section id="tab-mockups" class="tab-panel" aria-label="Interactive Subsystem Mock-ups">
+      <div class="scroll-page">
+        <div class="section-head">
+          <h2>Interactive Hardware &amp; Firmware Simulators</h2>
+          <span class="tag-mockup">[Mock-up] Client-side Behavioural Models</span>
+        </div>
+        <div id="mockups-root" class="mockup-grid"></div>
+      </div>
+    </section>
+
+    <!-- 5. Simulation & Hardware Gallery -->
+    <section id="tab-gallery" class="tab-panel" aria-label="Simulation and Render Gallery">
+      <div class="scroll-page">
+        <div class="section-head">
+          <h2>Verification Gallery (XSim G-8, System Integrations &amp; CAD)</h2>
+          <span style="color:var(--text-muted)">Click any figure to inspect full resolution</span>
+        </div>
+        <div id="gallery-root"></div>
+      </div>
+    </section>
+
+    <!-- 6. Docs & Licences -->
+    <section id="tab-docs" class="tab-panel" aria-label="Documentation and Third-Party Licences">
+      <div class="scroll-page">
+        <div class="section-head">
+          <h2>Documentation &amp; Third-Party Licences</h2>
+          <a class="btn btn-sm btn-primary" href="LICENSES.md" target="_blank">Open site/LICENSES.md</a>
+        </div>
+
+        <div class="docs-grid">
+          <div class="doc-card">
+            <div>
+              <strong>Complete Hardware &amp; Software Documentation (PDF)</strong>
+              <p>Compiled reference covering Rev08 architecture, BOM, bring-up, FPGA link, DSP &amp; integrations.</p>
+            </div>
+            <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/KV260-IAS2RF_Documentation.pdf" target="_blank" rel="noopener">Open Documentation PDF</a>
+          </div>
+          <div class="doc-card">
+            <div>
+              <strong>Schematic &amp; 8-Layer Layout PDFs</strong>
+              <p>13-sheet hierarchical KiCad schematic and full 8-layer copper/drill fabrication plots.</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/KV260-IAS2RF_schematic.pdf" target="_blank" rel="noopener">Schematic PDF</a>
+              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/KV260-IAS2RF_layout.pdf" target="_blank" rel="noopener">Layout PDF</a>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div>
+              <strong>Board Manual &amp; Project Overview</strong>
+              <p>Connector pinouts, RF tuning, component rationale and mechanical clearances (`BOARD_MANUAL.md`, `README.md`).</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/README.md" target="_blank" rel="noopener">README.md</a>
+              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/BOARD_MANUAL.md" target="_blank" rel="noopener">BOARD_MANUAL.md</a>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div>
+              <strong>FPGA Co-Simulation &amp; Vehicle Integrations</strong>
+              <p>XSim `tb_system` verification, `TX_KEY`, PS `CAN1` EMIO, GPS PPS, LiDAR/Radar fusion and SDR tests.</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/fpga/SYSTEM_SIM.md" target="_blank" rel="noopener">SYSTEM_SIM.md</a>
+              <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/docs/INTEGRATIONS.md" target="_blank" rel="noopener">INTEGRATIONS.md</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h3>Bundled Asset &amp; Software Licences (`site/LICENSES.md`)</h3>
+          <table class="kv-table">
+            <thead>
+              <tr><th>Asset / Library</th><th>Scope</th><th>Licence / Provenance</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>assets/board.glb</code></td>
+                <td>Rev08 PCB + clean KiCad/repo 3-D bodies + 38 procedural replacements</td>
+                <td>Project hardware (CERN-OHL-S-2.0 / Apache-2.0); KiCad official STEP library bodies CC-BY-SA 4.0 + KiCad Exception. Zero EasyEDA cached models redistributed.</td>
+              </tr>
+              <tr>
+                <td><code>assets/kv260.glb</code></td>
+                <td>Simplified KV260 carrier, K26 SOM, connectors, heatsink &amp; 4010 fan</td>
+                <td>Written from scratch in <code>site/scripts/build_assets.mjs</code> (Apache-2.0 / MIT). AMD proprietary XTP679 STEP/STL is not redistributed.</td>
+              </tr>
+              <tr>
+                <td><code>assets/enclosure.glb</code></td>
+                <td>Closed v2 enclosure STLs, TPU bumpers, <code>HS1..HS4</code> &amp; <code>OD5015</code></td>
+                <td>Apache-2.0 (project mechanical geometry in <code>mech/</code> &amp; <code>site/scripts/build_assets.mjs</code>).</td>
+              </tr>
+              <tr>
+                <td><code>vendor/three-0.170.0/</code></td>
+                <td>Three.js r170 + controls/loaders/MeshoptDecoder</td>
+                <td>MIT License (fully vendored, zero CDN runtime requests).</td>
+              </tr>
+              <tr>
+                <td><code>hmi/pkg/kria_hmi.*</code></td>
+                <td><code>sw/hmi/app</code> compiled to WebAssembly</td>
+                <td>App source MIT; WASM UI runtime distributed strictly as a browser Web App under Slint Royalty-free 2.0 (Built with Slint; no GPL-3.0 KMS binaries).</td>
+              </tr>
+              <tr>
+                <td>Typography</td>
+                <td>UI sans-serif &amp; monospace</td>
+                <td>OS system font stacks only (no bundled or remote fonts).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Image Lightbox Modal -->
+  <div id="img-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Figure Preview">
+    <div class="modal-box">
+      <div class="control-row">
+        <strong id="img-modal-cap">Preview</strong>
+        <button id="img-modal-close" class="btn btn-sm" type="button">Close</button>
+      </div>
+      <img id="img-modal-img" src="" alt="Enlarged figure">
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
