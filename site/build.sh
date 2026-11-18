@@ -78,10 +78,13 @@ for L in $LAYERS; do
     "$PCB_W" >/dev/null
 done
 
-echo "[4/6] Building components.json catalogue..."
+echo "[4/7] Building components.json catalogue..."
 node "$SITE_DIR/scripts/build_components.mjs"
 
-echo "[5/6] Optimizing board.glb and building kv260.glb + enclosure.glb..."
+echo "[4b/7] Building simulations.json & copying simulation plots..."
+node "$SITE_DIR/scripts/build_simulations.mjs"
+
+echo "[5/7] Optimizing board.glb and building kv260.glb + enclosure.glb..."
 node "$SITE_DIR/scripts/build_assets.mjs" "$RAW_GLB"
 
 echo "[6/7] Building Rust core (site/core) and Slint WebAssembly HMI..."

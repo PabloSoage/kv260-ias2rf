@@ -5,6 +5,7 @@ import { RoomEnvironment } from "./vendor/three-0.170.0/RoomEnvironment.js";
 import { MeshoptDecoder } from "./vendor/three-0.170.0/meshopt_decoder.module.js";
 import initCore, { SiteCore } from "./core/pkg/ias2rf_site_core.js";
 import { initMockups } from "./mockups.js";
+import { createSimController } from "./sim_mode.js";
 
 const REPO_BLOB = "https://github.com/PabloSoage/kv260-ias2rf/blob/main";
 const BOARD_REG_POS = new THREE.Vector3(0.107247, 0.0008, -0.198004);
@@ -115,6 +116,7 @@ let layerPeelStart = -1;
 let l2dZoom = 1.0;
 let l2dPan = { x: 0, y: 0 };
 let mockupCtrl = null;
+let simCtrl = null;
 
 function $(sel) {
   return document.querySelector(sel);
@@ -152,20 +154,54 @@ async function boot() {
   renderGallery();
   setLoadProgress(10, "Loading Rust/WASM Core & Component Catalogue...", "site/core/pkg/ias2rf_site_core_bg.wasm");
 
-  const [_, catResp, traceResp] = await Promise.all([
+  const [_, catResp, traceResp, simResp] = await Promise.all([
     initCore(),
     fetch("assets/components.json"),
     fetch("assets/net_traces.json"),
+    fetch("assets/simulations.json"),
   ]);
   if (!catResp.ok) throw new Error(`components.json HTTP ${catResp.status}`);
   catalogue = await catResp.json();
   if (traceResp.ok) netTraces = await traceResp.json();
+  const simData = simResp.ok ? await simResp.json() : null;
 
   setLoadProgress(28, "Building Spatial BVH/Grid in Rust WASM...", `${catalogue.components.length} board + ${catalogue.kv260_parts.length} KV260 parts`);
   siteCore = new SiteCore();
   indexAndLoadCore(catalogue);
 
   initExplorerThree();
+  simCtrl = createSimController({
+    THREE,
+    scene,
+    adapterGroup,
+    nodeById,
+    partById,
+    encNodes,
+    kvNodes,
+    getNetTraces: () => netTraces,
+    selectPart,
+    focusPartCamera,
+    setIsolate,
+    setEnclosure,
+    setCameraPreset,
+    openImageModal: (src, cap) => {
+      const mImg = $("#img-modal-img");
+      const mCap = $("#img-modal-cap");
+      const modal = $("#img-modal");
+      if (mImg && mCap && modal) {
+        mImg.src = src;
+        mCap.textContent = cap || "Simulation Figure";
+        modal.classList.add("open");
+      }
+    },
+    applyAnimatedScene,
+    syncHash,
+    escapeHtml,
+    isReducedMotion,
+    REPO_BLOB,
+  });
+  simCtrl.wireDomEvents();
+  if (simData) simCtrl.setData(simData);
   await loadModelsWithProgress();
   await initLayerViewer();
 
@@ -312,6 +348,7 @@ function initExplorerThree() {
     requestAnimationFrame(tick);
     stepTweens(now);
     stepPulseDots(now);
+    simCtrl?.stepAnimation(now);
     if (state.tab === "explorer") {
       controls.update();
       renderer.render(scene, camera);
@@ -521,6 +558,7 @@ function applyAnimatedScene() {
   scene.updateMatrixWorld(true);
   updateSelectionBox();
   rebuildNetHighlightBoxes();
+  simCtrl?.updateAnimatedOffsets();
 
   if (siteCore) {
     const mask =
@@ -762,7 +800,8 @@ function wireViewportPicking(canvas) {
         ? `${entry.data.ref} &middot; ${escapeHtml(entry.data.value)}`
         : `${entry.data.ref || entry.data.id} &middot; ${escapeHtml(entry.data.part || entry.data.value)}`;
       const role = entry.kind === "board" ? entry.data.description : entry.data.role;
-      tip.innerHTML = `<strong>${label}</strong><br><span style="color:var(--text-muted)">${escapeHtml((role || "").slice(0, 88))}</span>`;
+      const simTip = simCtrl ? simCtrl.buildHoverHtml(found.id) : "";
+      tip.innerHTML = `<strong>${label}</strong><br><span style="color:var(--text-muted)">${escapeHtml((role || "").slice(0, 88))}</span>${simTip}`;
       tip.style.left = `${Math.min(rect.width - 210, Math.max(8, ev.clientX - rect.left + 12))}px`;
       tip.style.top = `${Math.min(rect.height - 65, Math.max(8, ev.clientY - rect.top + 12))}px`;
       tip.style.display = "block";
@@ -972,6 +1011,7 @@ function selectPart(id, shouldFocus = true) {
         <h3>Pinout / Pads (${Object.keys(c.pads || {}).length})</h3>
         <table class="kv-table"><thead><tr><th>Pin</th><th>Net</th></tr></thead><tbody>${padRows}</tbody></table>
       </div>` : ""}
+      ${simCtrl ? simCtrl.buildInspectorSectionHtml(id) : ""}
     `;
 
     if (state.activeNet) {
@@ -1009,9 +1049,11 @@ function selectPart(id, shouldFocus = true) {
           <tr><th>Citation</th><td>${escapeHtml(k.citation || "Simplified project-authored model (AMD XTP679 not redistributed)")}</td></tr>
         </table>
       </div>
+      ${simCtrl ? simCtrl.buildInspectorSectionHtml(id) : ""}
     `;
   }
 
+  simCtrl?.wireInspectorButtons(body);
   body.querySelector("#insp-focus-btn")?.addEventListener("click", () => focusPartCamera(id));
   body.querySelector("#insp-copy-link")?.addEventListener("click", (ev) => {
     syncHash();
@@ -1326,6 +1368,7 @@ function syncHash() {
   if (state.somLiftMm > 0) p.set("som", String(state.somLiftMm));
   if (state.activeNet) p.set("net", state.activeNet);
   if (state.theme !== "dark") p.set("theme", state.theme);
+  simCtrl?.getHashParams(p);
   const str = p.toString();
   history.replaceState(null, "", str ? "#" + str : "#");
 }
@@ -1351,10 +1394,11 @@ function applyHashParams() {
     const view = p.get("view") || p.get("iso");
     if (view) { setIsolate(view, true); touched = true; }
     if (p.get("net")) { state.activeNet = p.get("net"); rebuildNetHighlightBoxes(); touched = true; }
+    if (simCtrl?.applyHashParams(p)) touched = true;
     if (p.get("part")) { selectPart(p.get("part"), false); touched = true; }
     if (p.get("layer")) { select2dLayer(p.get("layer")); touched = true; }
     if (p.get("cam")) { setCameraPreset(p.get("cam"), true); touched = true; }
-    if (touched && (p.get("part") || view || p.has("explode")) && state.tab === "explorer") {
+    if (touched && (p.get("part") || view || p.has("explode") || p.has("sim")) && state.tab === "explorer") {
       const stg = $("#explorer-stage");
       const hdrH = $(".topbar")?.offsetHeight || 54;
       if (stg) window.scrollTo(0, Math.max(0, stg.offsetTop - hdrH));
@@ -1390,6 +1434,7 @@ function setTheme(theme) {
   state.theme = theme === "light" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", state.theme);
   $("#btn-theme").textContent = state.theme === "dark" ? "Light Mode" : "Dark Mode";
+  simCtrl?.onThemeChange?.();
 }
 
 function setExplode(pct, instant = false) {
@@ -1667,6 +1712,9 @@ window.__SITE_API = {
   },
   searchCore: (q) => siteCore ? JSON.parse(siteCore.search(q, 16)).map((i) => partList[i]) : [],
   benchmarkHover,
+  setSimMode: (flag, domain, targetId) => (flag ? simCtrl?.activateDomain(domain || "rf", targetId || null) : simCtrl?.setEnabled(false)),
+  getSimState: () => simCtrl?.getState() || null,
+  getPartSims: (ref) => simCtrl?.getPartSimulations(ref) || [],
   getStats: () => ({
     ready: state.ready,
     tab: state.tab,

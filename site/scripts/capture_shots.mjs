@@ -330,6 +330,55 @@ async function run() {
     `);
     await snap("can_parts_info.png");
 
+    // 8b. 3-D Simulations Mode (All 5 domains + Per-Component Cross-Reference)
+    const simCheck = await client.evalJs(`JSON.stringify({
+      u501_count: window.__SITE_API.getPartSims("U501").length,
+      u1101_count: window.__SITE_API.getPartSims("U1101").length,
+      j951_count: window.__SITE_API.getPartSims("J951").length
+    })`);
+    console.log("Sim component index check:", simCheck);
+
+    await client.evalJs(`
+      window.__SITE_API.setTheme("dark");
+      window.__SITE_API.selectNet(null);
+      window.__SITE_API.setSimMode(true, "rf", "ADCS_D0");
+      window.__SITE_API.selectPart("U601", false);
+      window.__SITE_API.setCameraPreset("top");
+      window.__SITE_API.scrollToExplorer();
+    `);
+    await snap("sim_mode_rf.png", 550);
+
+    await client.evalJs(`
+      window.__SITE_API.setSimMode(true, "power", "+1V0");
+      window.__SITE_API.selectPart("U1004", false);
+      window.__SITE_API.setCameraPreset("top");
+    `);
+    await snap("sim_mode_power.png", 550);
+
+    await client.evalJs(`
+      window.__SITE_API.setTeardown({ fan: true, hs: true, somLiftMm: 0, isolate: "all" }, true);
+      window.__SITE_API.setSimMode(true, "thermal", "rev08_clean_fine_70C");
+      window.__SITE_API.selectPart("U501", false);
+      window.__SITE_API.setCameraPreset("iso");
+    `);
+    await snap("sim_mode_thermal.png", 600);
+
+    await client.evalJs(`
+      window.__SITE_API.setSimMode(true, "mech", "Zm");
+      window.__SITE_API.selectPart("U1101", false);
+      window.__SITE_API.setCameraPreset("iso");
+    `);
+    await snap("sim_mode_mech.png", 600);
+
+    await client.evalJs(`
+      window.__SITE_API.setSimMode(true, "g8", "radar");
+      window.__SITE_API.selectPart("U501", false);
+      window.__SITE_API.setCameraPreset("top");
+    `);
+    await snap("sim_mode_g8.png", 600);
+
+    await client.evalJs(`window.__SITE_API.setSimMode(false);`);
+
     // 9. Layer Stack-up Mode (with peeled SVGs)
     await client.evalJs(`
       window.__SITE_API.selectTab("layers");
