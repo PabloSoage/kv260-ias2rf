@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18T17:03:45.782Z",
+  "generated_at": "2026-11-18T18:16:31.996Z",
   "pcb_file": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
   "registration": {
     "note": "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
@@ -4707,7 +4707,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+1V0 (FPGA core) present (switched from +3V3_D by `Q1521`). Spec: +1V0 rail present green LED (switched from +3V3_D via Q1521)",
+      "description": "+1V0 (FPGA core) present (switched from +3V3_D by `Q1521`)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -7648,44 +7648,44 @@
     {
       "id": "J1503",
       "ref": "J1503",
-      "value": "SM06B-SRSS-TB",
-      "footprint": "JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal",
+      "value": "BM06B-SRSS-TB",
+      "footprint": "JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
       "side": "top",
       "x_mm": 194.4,
-      "y_mm": 112.6,
-      "rot_deg": 180,
+      "y_mm": 113.275,
+      "rot_deg": 0,
       "bbox_board_mm": [
         189.5,
-        109.32,
+        110.675,
         199.3,
-        115.88
+        115.875
       ],
       "model_pos_mm": [
-        -5.353,
+        -6.028,
         3.604,
         2.4
       ],
       "bbox_world_mm": [
-        -8.633,
+        -8.628,
         -1.296,
-        -2.073,
+        -3.428,
         8.504,
         2.4,
         5.35
       ],
       "local_size_mm": [
         9.8,
-        6.56,
+        5.2,
         2.95
       ],
       "sheet": "STATUS",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C160405",
-      "mpn": "SM06B-SRSS-TB(LF)(SN)",
+      "lcsc": "C160392",
+      "mpn": "BM06B-SRSS-TB(LF)(SN)",
       "manufacturer": "JST",
-      "bom_desc": "-25℃~+85℃ 1 1A 1mm 1x6P 2.9mm 4.32mm 50V 6 6P 8mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount, Right Angle Tin UL94V-0 White SMD,P=1mm,Surface Mount，Right Angle Wire To Board Connector ROHS",
-      "description": "GPS receiver and vehicle CAN, JST-SH 6-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 GND, 4 CANH, 5 CANL, 6 GND (no termination: it taps the car's bus). Spec: GPS receiver and vehicle CAN: 1 = 3.3 V out, 2 = PPS in, 3 = ground, 4 = CANH, 5 = CANL, 6 = ground",
+      "bom_desc": "-25℃~+85℃ 1 1A 1mm 1x6P 3.6mm 4.25mm 50V 6 6P 8mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount,Vertical Tin UL94V-0 White SMD,P=1mm Wire To Board Connector ROHS",
+      "description": "GPS receiver and vehicle CAN, JST-SH 6-pin, vertical, the plug from above: 1 GND, 2 CANL, 3 CANH, 4 GND, 5 PPS in (3.3 V), 6 +3.3 V out (0.2 A PTC) (no termination: it taps the car's bus)",
       "callout": 25,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
@@ -7696,12 +7696,12 @@
         "GND"
       ],
       "pads": {
-        "1": "/STATUS/GPS_3V3",
-        "2": "/STATUS/GPS_PPS_IN",
-        "3": "GND",
-        "4": "/STATUS/CAN_H",
-        "5": "/STATUS/CAN_L",
-        "6": "GND",
+        "1": "GND",
+        "2": "/STATUS/CAN_L",
+        "3": "/STATUS/CAN_H",
+        "4": "GND",
+        "5": "/STATUS/GPS_PPS_IN",
+        "6": "/STATUS/GPS_3V3",
         "MP": "GND"
       }
     },
@@ -17123,7 +17123,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+1V8_D present (switched from +3V3_D by `Q1520`). Spec: +1V8_D rail present green LED (switched from +3V3_D via Q1520)",
+      "description": "+1V8_D present (switched from +3V3_D by `Q1520`)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -42840,7 +42840,7 @@
       "mpn": "TCAN330DCNT",
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 1 1Mbps 2.5mA 3V~3.6V 60mA CAN Transceiver Low-power mode、Wake-up function、TXD dominant timeout、ESD protection、Undervoltage Protection、Thermal shutdown protection、Bus fault protection、Short-Circuit Protection、Silent mode SOT-23-8 CAN Transceivers ROHS",
-      "description": "Vehicle CAN transceiver on `J1503` pins 4 and 5, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8. Spec: Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode",
+      "description": "Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8. Spec: Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode",
       "callout": 95,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [

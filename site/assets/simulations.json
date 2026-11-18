@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18T17:03:46.011Z",
+  "generated_at": "2026-11-18T18:04:41.988Z",
   "copied_images": 21,
   "rf_si": {
     "pairs": [
@@ -2298,7 +2298,7 @@
           "C1185",
           "C1187"
         ],
-        "routed_segments": 240,
+        "routed_segments": 276,
         "target_z_mohm": 120,
         "sim_z_band_mohm": 51,
         "sim_z_100MHz_mohm": 61,
@@ -2639,7 +2639,7 @@
           "C1053",
           "C1129"
         ],
-        "routed_segments": 240,
+        "routed_segments": 301,
         "target_z_mohm": 700,
         "sim_z_band_mohm": 109,
         "sim_z_100MHz_mohm": 109,
@@ -2962,7 +2962,7 @@
           "C1156",
           "C1161"
         ],
-        "routed_segments": 240,
+        "routed_segments": 252,
         "target_z_mohm": 2000,
         "sim_z_band_mohm": 146,
         "sim_z_100MHz_mohm": 146,
@@ -3355,7 +3355,7 @@
           "C1550",
           "R1555"
         ],
-        "routed_segments": 240,
+        "routed_segments": 726,
         "target_z_mohm": 1000,
         "sim_z_band_mohm": 37,
         "sim_z_100MHz_mohm": 37,
@@ -3752,7 +3752,7 @@
           "C1060",
           "JP1301"
         ],
-        "routed_segments": 240,
+        "routed_segments": 321,
         "target_z_mohm": null,
         "sim_z_band_mohm": null,
         "sim_z_100MHz_mohm": null,
@@ -3905,7 +3905,7 @@
           "C1306",
           "C1331"
         ],
-        "routed_segments": 240,
+        "routed_segments": 400,
         "target_z_mohm": null,
         "sim_z_band_mohm": null,
         "sim_z_100MHz_mohm": null,
@@ -9362,7 +9362,10 @@
       "docs/sim/case3d_v2.json",
       "docs/sim/case_fea.json"
     ],
-    "provenance_note": "Summary stress peaks, coordinates, safety factors, and BGA microstrains come directly from docs/sim/case3d_v2.json and docs/sim/case_fea.json. Full per-vertex contour plots are shown from the real CalculiX/Cycles renders (case3d_v2_stress.jpg, case3d_v2_boards.jpg)."
+    "provenance_note": "Summary stress peaks, coordinates, safety factors, and BGA microstrains come directly from docs/sim/case3d_v2.json and docs/sim/case_fea.json. Full per-vertex contour plots are shown from the real CalculiX/Cycles renders (case3d_v2_stress.jpg, case3d_v2_boards.jpg).",
+    "has_fea_3d": true,
+    "fea_3d_file": "assets/fea_v2_fields.bin",
+    "fea_3d_source": "_work/mech/cache/fea3d/v2/case3d_v2_{Zm,Xp,Yp}.ply & boards3d_v2_{Zm,Xp,Yp}.ply -> docs/sim/case3d_v2.json"
   },
   "gateware_g8": {
     "modes": [

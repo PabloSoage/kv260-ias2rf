@@ -22,8 +22,13 @@ const KICAD_STEP_SUBS = {
   },
   "RJ45-TH_HR911130C.wrl": {
     step: "${KICAD10_3DMODEL_DIR}/Connector_RJ.3dshapes/RJ45_Amphenol_RJHSE538X.step",
-    offset: "3.56 1.5 0",
-    rotate: "0 0 180",
+    offset: "-3.56 -1.5 0",
+    rotate: "0 0 0",
+  },
+  "JST_SH_BM06B-SRSS-TB_toned.wrl": {
+    step: "${KICAD10_3DMODEL_DIR}/Connector_JST.3dshapes/JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical.step",
+    offset: "0 0 0",
+    rotate: "0 0 0",
   },
   "FPC-SMD_15P-P1.00_XUNPU_FPC-1.0FX-15PWCR-H20.wrl": {
     step: "${KICAD10_3DMODEL_DIR}/Connector_FFC-FPC.3dshapes/TE_1-84952-5_1x15-1MP_P1.0mm_Horizontal.step",

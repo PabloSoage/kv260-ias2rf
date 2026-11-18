@@ -53,7 +53,7 @@
   box-sizing: border-box;
 }
 
-html, body {
+html {
   margin: 0;
   padding: 0;
   min-height: 100%;
@@ -62,8 +62,14 @@ html, body {
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.45;
-  overflow-x: hidden;
   scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-x: clip;
 }
 
 a {

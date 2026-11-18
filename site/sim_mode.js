@@ -62,6 +62,9 @@ export function createSimController(ctx) {
   let g8PulseMesh = null;
   let g8PulseSegs = [];
   let thermalTex = null;
+  let feaData = null;
+  let feaLoadPromise = null;
+  const feaAppliedMeshes = [];
 
   const DOMAIN_META = [
     { id: "rf", label: "RF / SI" },
@@ -140,12 +143,44 @@ export function createSimController(ctx) {
   }
 
   function resetAllTints() {
+    while (feaAppliedMeshes.length) {
+      const m = feaAppliedMeshes.pop();
+      if (m.geometry && m.userData.__feaAddedColor) {
+        m.geometry.deleteAttribute("color");
+        delete m.userData.__feaAddedColor;
+      }
+      const mats = Array.isArray(m.material) ? m.material : [m.material];
+      mats.forEach((mat) => {
+        if (mat && mat.userData.__simOrigVertexColors !== undefined) {
+          mat.vertexColors = mat.userData.__simOrigVertexColors;
+          delete mat.userData.__simOrigVertexColors;
+          mat.needsUpdate = true;
+        }
+      });
+    }
     setGroupTint(encNodes?.ENCLOSURE_BOTTOM_GROUP, null);
     setGroupTint(encNodes?.ENCLOSURE_LID_GROUP, null);
     setGroupTint(encNodes?.ENCLOSURE_BUMPERS_GROUP, null);
     setGroupTint(encNodes?.ADAPTER_HEATSINKS_GROUP, null);
     setGroupTint(kvNodes?.KV260_HEATSINK, null);
     setGroupTint(kvNodes?.K26_SOM_GROUP, null);
+  }
+
+  function clearAllOverlays() {
+    clearGroup(simBoardGroup);
+    clearGroup(simWorldGroup);
+    resetAllTints();
+    g8PulseMesh = null;
+    g8PulseSegs = [];
+    if (thermalTex) {
+      thermalTex.dispose();
+      thermalTex = null;
+    }
+    const bar = document.querySelector("#sim-legend-bar");
+    if (bar && !enabled) {
+      bar.style.display = "none";
+      bar.innerHTML = "";
+    }
   }
 
   function addTraceLines(netNames, colorHex, opacity = 0.92, yOffset = 0.0) {
@@ -198,15 +233,7 @@ export function createSimController(ctx) {
   // 3-D Overlays per Domain
   // -------------------------------------------------------------------------
   function rebuild3DOverlay() {
-    clearGroup(simBoardGroup);
-    clearGroup(simWorldGroup);
-    resetAllTints();
-    g8PulseMesh = null;
-    g8PulseSegs = [];
-    if (thermalTex) {
-      thermalTex.dispose();
-      thermalTex = null;
-    }
+    clearAllOverlays();
 
     if (!enabled || !sims) {
       updateLegendBar();
@@ -366,7 +393,141 @@ export function createSimController(ctx) {
     setGroupTint(kvNodes?.KV260_HEATSINK, heatColorHex(Math.max(0, Math.min(1, (c.K26_sink_C - 40) / 65))).getHex(), 0.92);
   }
 
+  function loadFeaFields() {
+    if (feaData) return Promise.resolve(feaData);
+    if (feaLoadPromise) return feaLoadPromise;
+    const url = sims?.mechanical?.fea_3d_file;
+    if (!url) return Promise.resolve(null);
+    feaLoadPromise = fetch(url)
+      .then((r) => (r.ok ? r.arrayBuffer() : null))
+      .then((buf) => {
+        if (!buf) return null;
+        const dv = new DataView(buf);
+        if (dv.getUint32(0, true) !== 0x32414546) return null;
+        const caseCount = dv.getUint32(4, true);
+        const boardVertCount = dv.getUint32(8, true);
+        const boardTriCount = dv.getUint32(12, true);
+        let off = 16;
+        const casePos = new Float32Array(buf, off, caseCount * 3);
+        off += caseCount * 12;
+        const cZm = new Uint8Array(buf, off, caseCount * 3); off += caseCount * 3;
+        const cXp = new Uint8Array(buf, off, caseCount * 3); off += caseCount * 3;
+        const cYp = new Uint8Array(buf, off, caseCount * 3); off += caseCount * 3;
+        off += (4 - ((caseCount * 9) % 4)) % 4;
+        const boardPos = new Float32Array(buf, off, boardVertCount * 3);
+        off += boardVertCount * 12;
+        const boardIdx = new Uint16Array(buf, off, boardTriCount * 3);
+        off += boardTriCount * 6;
+        off += (4 - ((boardTriCount * 6) % 4)) % 4;
+        const bZm = new Uint8Array(buf, off, boardVertCount * 3); off += boardVertCount * 3;
+        const bXp = new Uint8Array(buf, off, boardVertCount * 3); off += boardVertCount * 3;
+        const bYp = new Uint8Array(buf, off, boardVertCount * 3);
+        // Build 4 mm lookup grid over casePos
+        const inv = 1.0 / 0.004;
+        const grid = new Map();
+        for (let i = 0; i < caseCount; i++) {
+          const key = `${Math.round(casePos[i * 3] * inv)},${Math.round(casePos[i * 3 + 1] * inv)},${Math.round(casePos[i * 3 + 2] * inv)}`;
+          if (!grid.has(key)) grid.set(key, []);
+          grid.get(key).push(i);
+        }
+        feaData = {
+          caseCount, boardVertCount, boardTriCount, casePos, grid,
+          caseRgb: { Zm: cZm, Xp: cXp, Yp: cYp },
+          boardPos, boardIdx,
+          boardRgb: { Zm: bZm, Xp: bXp, Yp: bYp },
+        };
+        return feaData;
+      })
+      .catch(() => null);
+    return feaLoadPromise;
+  }
+
+  function applyFeaCaseColors(grp, loadId) {
+    if (!grp || !feaData) return false;
+    const rgb = feaData.caseRgb[loadId] || feaData.caseRgb.Zm;
+    const { casePos, grid } = feaData;
+    const inv = 1.0 / 0.004;
+    const yOff = grp.position ? grp.position.y : 0;
+    const tmp = new THREE.Vector3();
+    let applied = false;
+
+    grp.traverse((o) => {
+      if (!o.isMesh || !o.geometry?.attributes?.position) return;
+      if (!o.visible && !o.userData?.batched) return;
+      if (!o.visible) return;
+      const pos = o.geometry.attributes.position;
+      const cols = new Float32Array(pos.count * 3);
+      for (let i = 0; i < pos.count; i++) {
+        tmp.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+        const x = tmp.x, y = tmp.y - yOff, z = tmp.z;
+        const gx = Math.round(x * inv), gy = Math.round(y * inv), gz = Math.round(z * inv);
+        let bestD = Infinity, bestJ = 0;
+        for (let dz = -1; dz <= 1; dz++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              const list = grid.get(`${gx + dx},${gy + dy},${gz + dz}`);
+              if (!list) continue;
+              for (let m = 0; m < list.length; m++) {
+                const j = list[m];
+                const ddx = casePos[j * 3] - x, ddy = casePos[j * 3 + 1] - y, ddz = casePos[j * 3 + 2] - z;
+                const d2 = ddx * ddx + ddy * ddy + ddz * ddz;
+                if (d2 < bestD) { bestD = d2; bestJ = j; }
+              }
+            }
+          }
+        }
+        cols[i * 3] = Math.pow(rgb[bestJ * 3] / 255, 2.2);
+        cols[i * 3 + 1] = Math.pow(rgb[bestJ * 3 + 1] / 255, 2.2);
+        cols[i * 3 + 2] = Math.pow(rgb[bestJ * 3 + 2] / 255, 2.2);
+      }
+      o.geometry.setAttribute("color", new THREE.BufferAttribute(cols, 3));
+      o.userData.__feaAddedColor = true;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      mats.forEach((m) => {
+        if (!m) return;
+        if (m.userData.__simOrigColor === undefined) {
+          m.userData.__simOrigColor = m.color ? m.color.getHex() : null;
+          m.userData.__simOrigEmissive = m.emissive ? m.emissive.getHex() : 0;
+          m.userData.__simOrigTransparent = !!m.transparent;
+          m.userData.__simOrigOpacity = m.opacity ?? 1;
+        }
+        if (m.userData.__simOrigVertexColors === undefined) {
+          m.userData.__simOrigVertexColors = !!m.vertexColors;
+        }
+        m.vertexColors = true;
+        if (m.color) m.color.setHex(0xffffff);
+        if (m.emissive) m.emissive.setHex(0x000000);
+        m.transparent = false;
+        m.opacity = 1.0;
+        m.needsUpdate = true;
+      });
+      feaAppliedMeshes.push(o);
+      applied = true;
+    });
+    return applied;
+  }
+
   function populateMechWorld(ld) {
+    if (feaData) {
+      const bRgb = feaData.boardRgb[ld.id] || feaData.boardRgb.Zm;
+      const bCols = new Float32Array(feaData.boardVertCount * 3);
+      for (let i = 0; i < bCols.length; i++) bCols[i] = Math.pow(bRgb[i] / 255, 2.2);
+      const bGeo = new THREE.BufferGeometry();
+      bGeo.setAttribute("position", new THREE.BufferAttribute(feaData.boardPos, 3));
+      bGeo.setAttribute("color", new THREE.BufferAttribute(bCols, 3));
+      bGeo.setIndex(new THREE.BufferAttribute(feaData.boardIdx, 1));
+      bGeo.computeVertexNormals();
+      const bMat = new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        side: THREE.DoubleSide,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+      });
+      const bMesh = new THREE.Mesh(bGeo, bMat);
+      bMesh.name = "SIM_FEA_BOARDS_STRAIN";
+      simWorldGroup.add(bMesh);
+    }
+
     const [px, py, pz] = ld.peak_at_mm;
     const peakPos = new THREE.Vector3(px * 0.001, pz * 0.001, -py * 0.001);
     const spMesh = new THREE.Mesh(
@@ -435,10 +596,21 @@ export function createSimController(ctx) {
   function buildMech3D() {
     const ld = sims.mechanical.load_cases.find((x) => x.id === sel.mechLoad) || sims.mechanical.load_cases[0];
     if (!ld) return;
-    const sfNorm = Math.max(0, Math.min(1, (8.5 - ld.sf_70C) / 7.5));
-    const caseHex = heatColorHex(sfNorm).getHex();
-    setGroupTint(encNodes?.ENCLOSURE_BOTTOM_GROUP, caseHex, 0.52);
-    setGroupTint(encNodes?.ENCLOSURE_LID_GROUP, caseHex, 0.42);
+    if (!feaData) {
+      const sfNorm = Math.max(0, Math.min(1, (8.5 - ld.sf_70C) / 7.5));
+      const caseHex = heatColorHex(sfNorm).getHex();
+      setGroupTint(encNodes?.ENCLOSURE_BOTTOM_GROUP, caseHex, 0.52);
+      setGroupTint(encNodes?.ENCLOSURE_LID_GROUP, caseHex, 0.42);
+      loadFeaFields().then((d) => {
+        if (d && enabled && domain === "mech") {
+          rebuild3DOverlay();
+          applyAnimatedScene();
+        }
+      });
+    } else {
+      applyFeaCaseColors(encNodes?.ENCLOSURE_BOTTOM_GROUP, ld.id);
+      applyFeaCaseColors(encNodes?.ENCLOSURE_LID_GROUP, ld.id);
+    }
     setGroupTint(encNodes?.ENCLOSURE_BUMPERS_GROUP, 0x10b981, 0.85);
     populateMechWorld(ld);
   }
@@ -711,7 +883,7 @@ export function createSimController(ctx) {
       bar.innerHTML = `<strong>Thermal CFD:</strong><span>${escapeHtml(c?.title || "")}</span><span class="sim-grad-bar"></span><span class="mono">40 °C -> 120 °C Tj</span>`;
     } else if (domain === "mech") {
       const ld = sims.mechanical.load_cases.find((x) => x.id === sel.mechLoad);
-      bar.innerHTML = `<strong>Mech FEA:</strong><span>${escapeHtml(ld?.title || "")}</span><span class="sim-grad-bar"></span><span class="mono">Peak ${ld?.case_vm_peak_MPa} MPa (SF 70°C: ${ld?.sf_70C}x)</span>`;
+      bar.innerHTML = `<strong>Mech FEA:</strong><span>${escapeHtml(ld?.title || "")}</span><span class="sim-grad-bar"></span><span class="mono">Case von Mises 0..${ld?.case_vm_peak_MPa} MPa (Allow 17.4 MPa) &middot; Boards 0..500 ue &middot; Src: case3d_v2.json</span>`;
     } else if (domain === "g8") {
       const gm = sims.gateware_g8.modes.find((m) => m.id === sel.g8Mode);
       bar.innerHTML = `<strong>Gateware G-8:</strong><span>${escapeHtml(gm?.title || "")}</span><span class="mono" style="color:var(--green)">${gm?.passed ? "PASS" : "FAIL"}</span>`;
@@ -1149,9 +1321,7 @@ export function createSimController(ctx) {
     if (enabled) {
       activateDomain(domId || domain, null);
     } else {
-      clearGroup(simBoardGroup);
-      clearGroup(simWorldGroup);
-      resetAllTints();
+      clearAllOverlays();
       updateAll();
     }
   }
@@ -1198,7 +1368,18 @@ export function createSimController(ctx) {
     isEnabled: () => enabled,
     getDomain: () => domain,
     getState: () => ({ enabled, domain, ...sel }),
-    updateAnimatedOffsets: () => populateWorldOverlays(),
+    updateAnimatedOffsets: () => {
+      if (enabled) populateWorldOverlays();
+    },
+    onDeselect: () => {
+      if (!enabled) return;
+      sel.rfFocusId = null;
+      if (sel.rfFocusType === "pair") sel.rfFocusType = "all";
+      rebuild3DOverlay();
+      renderDockSubcontrols();
+      renderTelemetryCard();
+      applyAnimatedScene();
+    },
     onThemeChange: () => {
       const c = document.querySelector("#sim-chart-canvas");
       if (c && enabled) drawChartInContainer(c);

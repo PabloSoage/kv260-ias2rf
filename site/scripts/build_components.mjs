@@ -750,6 +750,7 @@ const KICAD_STEP_REPLACED = new Set([
   "OSC-SMD_8P-L7.0-W5.0-BL.wrl",
   "OSC-SMD_4P-L2.0-W1.6-H0.8.wrl",
   "FILTER-SMD_1206-4P-L3.2-W1.6-H0.9-L.wrl",
+  "JST_SH_BM06B-SRSS-TB_toned.wrl",
 ]);
 
 const EXTRA_PARTS = [
@@ -845,7 +846,7 @@ function extractNetTraces(pcbText) {
       arr = [];
       byNet.set(net, arr);
     }
-    if (arr.length < 240) arr.push([x1, y1, x2, y2, lIdx]);
+    arr.push([x1, y1, x2, y2, lIdx]);
   }
   const out = {};
   for (const [k, v] of byNet.entries()) out[k] = v;
@@ -952,7 +953,12 @@ function build() {
 
     let description = "no description yet";
     const meaningfulSpec = specInfo && specInfo.desc && specInfo.desc !== value && specInfo.desc !== footprint;
-    if (manualInfo && meaningfulSpec && !manualInfo.desc.includes(specInfo.desc)) {
+    const specOverlapsManual = manualInfo && meaningfulSpec && (
+      manualInfo.desc.includes(specInfo.desc) ||
+      (/1\s*(?:GND|ground)/i.test(manualInfo.desc) && /1\s*=\s*(?:GND|ground)/i.test(specInfo.desc)) ||
+      specInfo.desc.split(/\W+/).filter((w) => w.length > 3).filter((w) => manualInfo.desc.toLowerCase().includes(w.toLowerCase())).length >= 5
+    );
+    if (manualInfo && meaningfulSpec && !specOverlapsManual) {
       description = `${manualInfo.desc}. Spec: ${specInfo.desc}`;
     } else if (manualInfo) {
       description = manualInfo.desc;

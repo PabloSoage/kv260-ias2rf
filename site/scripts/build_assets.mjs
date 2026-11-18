@@ -606,11 +606,11 @@ function calibrateMaterial(mat) {
     pbr.baseColorFactor = [0.86, 0.68, 0.36, 1.0];
     pbr.metallicFactor = 0.95;
     pbr.roughnessFactor = 0.32;
-  } else if (sat < 0.15 && L > 0.70) {
-    pbr.baseColorFactor = [0.24, 0.22, 0.18, a];
+  } else if (sat < 0.24 && L > 0.55) {
+    pbr.baseColorFactor = [0.24, 0.21, 0.16, a];
     pbr.metallicFactor = 0.0;
-    pbr.roughnessFactor = 0.50;
-  } else if (sat < 0.12 && L > 0.34 && L <= 0.70) {
+    pbr.roughnessFactor = 0.54;
+  } else if (sat < 0.12 && L > 0.34 && L <= 0.55) {
     const v = Math.max(0.45, Math.min(0.68, L * 1.1));
     pbr.baseColorFactor = [v, v, v * 0.98, 1.0];
     pbr.metallicFactor = 0.92;
@@ -1241,6 +1241,7 @@ function buildEnclosureGlb() {
     { name: "CASE_BOTTOM", file: "case_v2_bottom.stl", mat: mPetg, group: "bottom", flipX180: false },
     { name: "CASE_LID", file: "case_v2_lid.stl", mat: mPetg, group: "lid", flipX180: true },
     { name: "CASE_FILTER_FRAME", file: "case_v2_filter_frame.stl", mat: mPetg, group: "lid", flipX180: false },
+    { name: "CASE_GROMMET", file: "case_grommet.stl", mat: mTpu, group: "lid", flipX180: false, translateM: [-0.003528, 0.03275, -0.005004] },
     { name: "CASE_BUMPER_LF", file: "case_bumper_lfront.stl", mat: mTpu, group: "bumpers", flipX180: false },
     { name: "CASE_BUMPER_RF", file: "case_bumper_rfront.stl", mat: mTpu, group: "bumpers", flipX180: false },
     { name: "CASE_BUMPER_LB", file: "case_bumper_lback.stl", mat: mTpu, group: "bumpers", flipX180: false },
@@ -1253,7 +1254,9 @@ function buildEnclosureGlb() {
     if (!fs.existsSync(p)) continue;
     const g = readBinaryStlCreaseSmooth(p, s.flipX180, 30);
     const prims = gb.addOptimizedPrimitives(g.positions, g.normals, g.indices, s.mat, 0);
-    const ni = gb.addNode({ name: s.name, mesh: gb.addMesh(s.name, prims) });
+    const nodeObj = { name: s.name, mesh: gb.addMesh(s.name, prims) };
+    if (s.translateM) nodeObj.translation = s.translateM;
+    const ni = gb.addNode(nodeObj);
     if (s.group === "lid") lidNodes.push(ni);
     else if (s.group === "bottom") bottomNodes.push(ni);
     else bumperNodes.push(ni);

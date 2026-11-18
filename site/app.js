@@ -86,6 +86,7 @@ const state = {
   isolateMode: "all", // all | board | kv260 | thermal | enclosure
   selectedId: null,
   activeNet: null,
+  activeNetIsPower: false,
   useWasmPicker: true,
 };
 
@@ -1234,6 +1235,7 @@ function wireViewportPicking(canvas) {
     const { nx, ny } = getNdc(ev);
     const found = pickAtNdc(nx, ny);
     if (found) selectPart(found.id, false);
+    else clearSelection();
   });
 
   canvas.addEventListener("dblclick", (ev) => {
@@ -1287,22 +1289,57 @@ function isObjectEffectivelyVisible(obj) {
   return true;
 }
 
+function isPowerNetName(n) {
+  return /^(?:\+|-)\d|^(?:VCC|VDD|VBUS|VREF|VIN|VBAT|GND|AGND|DGND)/i.test(String(n || "").trim());
+}
+
+function pickPrimaryNetForComponent(c) {
+  const nonGnd = (c.nets || []).filter((n) => n && !/^(?:GND|AGND|DGND)$/i.test(n.trim()));
+  const sig = nonGnd.find((n) => !isPowerNetName(n) && (netTraces[n]?.length || 0) > 0);
+  if (sig) return { net: sig, isPower: false };
+  const pwr = nonGnd.find((n) => (netTraces[n]?.length || 0) > 0);
+  if (pwr) return { net: pwr, isPower: true };
+  return { net: null, isPower: false };
+}
+
+function clearSelection() {
+  state.selectedId = null;
+  state.activeNet = null;
+  state.activeNetIsPower = false;
+  updateSelectionBox();
+  rebuildNetHighlightBoxes();
+  const body = $("#inspector-body");
+  const empty = $("#inspector-empty");
+  if (body) body.style.display = "none";
+  if (empty) empty.style.display = "";
+  const st = $("#hud-status");
+  if (st) st.textContent = "Hover or tap any component";
+  simCtrl?.onDeselect?.();
+  syncHash();
+  requestRender();
+}
+
 function rebuildNetHighlightBoxes() {
   while (netHighlightGroup.children.length) netHighlightGroup.remove(netHighlightGroup.children[0]);
   while (netPulseGroup.children.length) netPulseGroup.remove(netPulseGroup.children[0]);
   activeTraceSegs = [];
   activePulseMesh = null;
 
-  if (!state.activeNet || !adapterGroup.visible) return;
+  if (!state.activeNet || !adapterGroup.visible) {
+    requestRender();
+    return;
+  }
+  const dimPower = !!state.activeNetIsPower;
   const refs = siteCore
     ? Array.from(siteCore.net_mates(state.activeNet)).map((idx) => partList[idx]).filter(Boolean)
     : (compByNet.get(state.activeNet) || []);
 
+  const boxColor = dimPower ? 0x3b82b8 : 0x4cc2ff;
   for (const ref of refs) {
     const obj = nodeById.get(ref);
     if (!obj) continue;
     const bx = new THREE.Box3().setFromObject(obj);
-    if (!bx.isEmpty()) netHighlightGroup.add(new THREE.Box3Helper(bx, 0x4cc2ff));
+    if (!bx.isEmpty()) netHighlightGroup.add(new THREE.Box3Helper(bx, boxColor));
   }
 
   // Build real routed KiCad copper traces + traveling signal pulses inside adapterGroup
@@ -1325,12 +1362,16 @@ function rebuildNetHighlightBoxes() {
     }
     const lineGeo = new THREE.BufferGeometry();
     lineGeo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-    const lineMat = new THREE.LineBasicMaterial({ color: 0x4cc2ff, transparent: true, opacity: 0.92 });
+    const lineMat = new THREE.LineBasicMaterial({
+      color: dimPower ? 0x3b82b8 : 0x4cc2ff,
+      transparent: true,
+      opacity: dimPower ? 0.44 : 0.92,
+    });
     netPulseGroup.add(new THREE.LineSegments(lineGeo, lineMat));
 
-    const dotCount = Math.min(28, Math.max(8, activeTraceSegs.length));
-    const dotGeo = new THREE.SphereGeometry(0.00045, 8, 8);
-    const dotMat = new THREE.MeshBasicMaterial({ color: 0xffb020 });
+    const dotCount = dimPower ? Math.min(12, Math.max(4, activeTraceSegs.length)) : Math.min(28, Math.max(8, activeTraceSegs.length));
+    const dotGeo = new THREE.SphereGeometry(dimPower ? 0.00036 : 0.00045, 8, 8);
+    const dotMat = new THREE.MeshBasicMaterial({ color: dimPower ? 0x93c5fd : 0xffb020 });
     activePulseMesh = new THREE.InstancedMesh(dotGeo, dotMat, dotCount);
     netPulseGroup.add(activePulseMesh);
     stepPulseDots(performance.now());
@@ -1356,10 +1397,23 @@ function stepPulseDots(now) {
   activePulseMesh.instanceMatrix.needsUpdate = true;
 }
 
-function selectPart(id, shouldFocus = true) {
+function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
   const entry = partById.get(id);
   if (!entry) return;
   state.selectedId = id;
+  if (autoHighlightNet && !applyingHash) {
+    if (entry.kind === "board") {
+      const picked = pickPrimaryNetForComponent(entry.data);
+      state.activeNet = picked.net;
+      state.activeNetIsPower = picked.isPower;
+    } else {
+      state.activeNet = null;
+      state.activeNetIsPower = false;
+    }
+  } else {
+    state.activeNetIsPower = !!(state.activeNet && isPowerNetName(state.activeNet));
+  }
+  rebuildNetHighlightBoxes();
   updateSelectionBox();
   if (shouldFocus) focusPartCamera(id);
 
@@ -1469,15 +1523,18 @@ function selectPart(id, shouldFocus = true) {
   });
   body.querySelector("#insp-clear-net")?.addEventListener("click", () => {
     state.activeNet = null;
+    state.activeNetIsPower = false;
     rebuildNetHighlightBoxes();
-    selectPart(id, false);
+    selectPart(id, false, false);
     syncHash();
   });
   body.querySelectorAll("[data-net]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      state.activeNet = state.activeNet === btn.dataset.net ? null : btn.dataset.net;
+      const next = state.activeNet === btn.dataset.net ? null : btn.dataset.net;
+      state.activeNet = next;
+      state.activeNetIsPower = !!(next && isPowerNetName(next));
       rebuildNetHighlightBoxes();
-      selectPart(id, false);
+      selectPart(id, false, false);
       syncHash();
     });
   });
@@ -1978,6 +2035,17 @@ function wireUiEvents() {
   document.addEventListener("click", (ev) => {
     if (!ev.target.closest(".search-wrap")) drop.classList.remove("open");
   });
+  window.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Escape") return;
+    const modal = $("#img-modal");
+    if (modal?.classList.contains("open")) {
+      modal.classList.remove("open");
+      return;
+    }
+    drop.classList.remove("open");
+    clearSelection();
+    if (simCtrl?.isEnabled()) simCtrl.setEnabled(false);
+  });
 
   $("#range-explode").addEventListener("input", (ev) => setExplode(ev.target.value, true));
   $("#btn-replay-intro").addEventListener("click", () => { setIsolate("all", true); playIntro(); });
@@ -2175,7 +2243,15 @@ window.__SITE_API = {
   setTeardown: (opts) => applyTeardownPreset(opts, true),
   isolate: (m) => setIsolate(m, true),
   selectPart,
+  clearSelection,
   setCameraPreset: (p) => setCameraPreset(p, true),
+  setCameraLookAt: (tx, ty, tz, px, py, pz) => {
+    tweenHandles.cam = null;
+    controls.target.set(tx, ty, tz);
+    camera.position.set(px, py, pz);
+    controls.update();
+    requestRender();
+  },
   select2dLayer,
   scrollToExplorer: () => {
     const el = $("#explorer-stage");
@@ -2191,8 +2267,9 @@ window.__SITE_API = {
   applyHash: () => applyHashParams(),
   selectNet: (net) => {
     state.activeNet = net;
+    state.activeNetIsPower = !!(net && isPowerNetName(net));
     rebuildNetHighlightBoxes();
-    if (state.selectedId) selectPart(state.selectedId, false);
+    if (state.selectedId) selectPart(state.selectedId, false, false);
   },
   searchCore: (q) => siteCore ? JSON.parse(siteCore.search(q, 16)).map((i) => partList[i]) : [],
   pickAtNdc,

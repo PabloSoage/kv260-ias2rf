@@ -56,7 +56,7 @@ function startStaticServer() {
       const rel = urlPath === "/" ? "index.html" : urlPath.replace(/^\/+/, "");
       let filePath = path.resolve(SITE_DIR, rel);
       let allowedRoot = path.resolve(SITE_DIR);
-      if (rel.startsWith("docs/") && rel.toLowerCase().endsWith(".pdf")) {
+      if (rel.startsWith("docs/") && /\.(pdf|png|jpg)$/i.test(rel)) {
         filePath = path.resolve(ROOT_DIR, rel);
         allowedRoot = path.resolve(ROOT_DIR, "docs");
       }
@@ -455,7 +455,7 @@ async function run() {
       window.__SITE_API.selectPart("U1101", false);
       window.__SITE_API.setCameraPreset("iso");
     `);
-    await snap("sim_mode_mech.png", 600);
+    await snap("sim_mode_mech.png", 900);
 
     await client.evalJs(`
       window.__SITE_API.setSimMode(true, "g8", "radar");
@@ -465,6 +465,45 @@ async function run() {
     await snap("sim_mode_g8.png", 600);
 
     await client.evalJs(`window.__SITE_API.setSimMode(false);`);
+
+    // Behavioral checks: single scrollbar, copper-flow auto-highlight & clear, sim overlay clearing
+    const t35Checks = await client.evalJs(`(() => {
+      const bodyOvY = getComputedStyle(document.body).overflowY;
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.selectPart("U501", false);
+      const u501HasBox = document.getElementById("inspector-body")?.style.display === "flex";
+      const hashAfterU501 = location.hash;
+      window.__SITE_API.selectPart("R1555", false);
+      const hashAfterR1555 = location.hash;
+      window.__SITE_API.clearSelection();
+      const emptyAfterClear = document.getElementById("inspector-empty")?.style.display !== "none" && !location.hash.includes("part=") && !location.hash.includes("net=");
+      return { bodyOvY, u501HasBox, hashAfterU501, hashAfterR1555, emptyAfterClear, netsChanged: hashAfterU501 !== hashAfterR1555 };
+    })()`);
+    console.log("Behavioral checks (Desktop):", t35Checks);
+
+    // Close-ups: J1503 vertical + J1201 RJ45 orientation
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.selectPart("J1503", true);
+    `);
+    await snap("j1503_vertical_closeup.png", 700);
+
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.selectPart("J1201", true);
+    `);
+    await snap("j1201_rj45_closeup.png", 700);
+
+    await client.evalJs(`
+      window.__SITE_API.clearSelection();
+      window.__SITE_API.isolate("all");
+      window.__SITE_API.setEnclosure("closed");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraLookAt(-0.0035, 0.0345, -0.005, -0.030, 0.062, 0.026);
+    `);
+    await snap("grommet_closeup.png", 700);
 
     // 9. Layer Stack-up Mode (with peeled SVGs)
     await client.evalJs(`
@@ -532,10 +571,19 @@ async function run() {
     `);
     await snap("phone_light.png");
 
+    await client.evalJs(`
+      window.__SITE_API.setTheme("dark");
+      window.__SITE_API.setSimMode(true, "thermal", "rev08_clean_fine_70C");
+      window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.scrollToExplorer();
+    `);
+    await snap("sim_mode_phone.png", 550);
+    await client.evalJs(`window.__SITE_API.setSimMode(false);`);
+
     // 13. Side-by-side comparison renders + Custom KV260 model shot (Desktop 1440x900)
     await setViewport(1440, 900, false);
-    const composeSideBySide = async (liveB64, refRelPath, outName, liveLabel, refLabel) => {
-      const sideB64 = await client.evalJs(`(async (b64, refPath, lLbl, rLbl) => {
+    const composeSideBySide = async (liveB64, refRelPath, outName, liveLabel, refLabel, liveCrop = null, refCrop = null) => {
+      const sideB64 = await client.evalJs(`(async (b64, refPath, lLbl, rLbl, lCrop, rCrop) => {
         const cvs = document.createElement("canvas");
         cvs.width = 1440;
         cvs.height = 540;
@@ -544,23 +592,27 @@ async function run() {
         ctx.fillRect(0, 0, 1440, 540);
         const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.src = src; });
         const [imL, imR] = await Promise.all([loadImg("data:image/png;base64," + b64), loadImg(refPath)]);
-        const drawFit = (im, ox, oy, bw, bh) => {
-          const s = Math.min(bw / im.width, bh / im.height);
-          const dw = im.width * s, dh = im.height * s;
-          ctx.drawImage(im, ox + (bw - dw) / 2, oy + (bh - dh) / 2, dw, dh);
+        const drawFit = (im, ox, oy, bw, bh, crop) => {
+          const sx = crop ? crop[0] * im.width : 0;
+          const sy = crop ? crop[1] * im.height : 0;
+          const sw = crop ? crop[2] * im.width : im.width;
+          const sh = crop ? crop[3] * im.height : im.height;
+          const s = Math.min(bw / sw, bh / sh);
+          const dw = sw * s, dh = sh * s;
+          ctx.drawImage(im, sx, sy, sw, sh, ox + (bw - dw) / 2, oy + (bh - dh) / 2, dw, dh);
         };
-        drawFit(imL, 0, 0, 720, 540);
-        drawFit(imR, 720, 0, 720, 540);
+        drawFit(imL, 0, 0, 720, 540, lCrop);
+        drawFit(imR, 720, 0, 720, 540, rCrop);
         ctx.fillStyle = "rgba(11,13,16,0.85)";
-        ctx.fillRect(14, 14, 290, 28);
-        ctx.fillRect(734, 14, 290, 28);
+        ctx.fillRect(14, 14, 340, 28);
+        ctx.fillRect(734, 14, 340, 28);
         ctx.fillStyle = "#4cc2ff";
         ctx.font = "bold 14px monospace";
         ctx.fillText(lLbl, 24, 33);
         ctx.fillStyle = "#ffb020";
         ctx.fillText(rLbl, 744, 33);
         return cvs.toDataURL("image/png").split(",")[1];
-      })(${JSON.stringify(liveB64)}, ${JSON.stringify(refRelPath)}, ${JSON.stringify(liveLabel)}, ${JSON.stringify(refLabel)})`);
+      })(${JSON.stringify(liveB64)}, ${JSON.stringify(refRelPath)}, ${JSON.stringify(liveLabel)}, ${JSON.stringify(refLabel)}, ${JSON.stringify(liveCrop)}, ${JSON.stringify(refCrop)})`);
       fs.writeFileSync(path.join(SHOTS_DIR, outName), Buffer.from(sideB64, "base64"));
       console.log("Captured", outName);
     };
@@ -597,13 +649,45 @@ async function run() {
     try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_board_bot.png")); } catch {}
 
     await client.evalJs(`
+      window.__SITE_API.clearSelection();
       window.__SITE_API.isolate("board");
       window.__SITE_API.setExplode(0);
-      window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.setCameraLookAt(-0.041, 0.002, -0.039, -0.225, 0.175, -0.175);
     `);
     const isoB64 = await snap("tmp_board_iso.png", 450);
-    await composeSideBySide(isoB64, "assets/img/board_iso.png", "compare_board_iso.png", "LIVE WEBGL BOARD ISO (STEP)", "REF: docs/img/board_iso.png");
+    await composeSideBySide(
+      isoB64,
+      "assets/img/board_iso.png",
+      "compare_board_iso.png",
+      "LIVE WEBGL (SAME AZ/EL AS KICAD ISO)",
+      "REF: docs/img/board_iso.png",
+      [0.20, 0.08, 0.56, 0.90],
+      null
+    );
     try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_board_iso.png")); } catch {}
+
+    // Same-angle connector close-ups: J1201 (RJ45), J1001 (Barrel Jack), J1501 (USB-C)
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setCameraLookAt(-0.0195, 0.008, 0.0212, -0.048, 0.030, 0.052);
+    `);
+    const j1201B64 = await snap("tmp_j1201.png", 350);
+    await composeSideBySide(j1201B64, "docs/img/mount_rj45.jpg", "compare_j1201_rj45.png", "LIVE WEBGL: J1201 RJ45 TAB", "REF: docs/img/mount_rj45.jpg", [0.20, 0.08, 0.56, 0.90], null);
+    try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_j1201.png")); } catch {}
+
+    await client.evalJs(`
+      window.__SITE_API.setCameraLookAt(-0.0428, 0.007, -0.0948, -0.075, 0.036, -0.128);
+    `);
+    const j1001B64 = await snap("tmp_j1001.png", 350);
+    await composeSideBySide(j1001B64, "assets/img/board_iso.png", "compare_j1001_dc.png", "LIVE WEBGL: J1001 BARREL JACK", "REF: board_iso.png (J1001)", [0.20, 0.08, 0.56, 0.90], [0.06, 0.25, 0.30, 0.35]);
+    try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_j1001.png")); } catch {}
+
+    await client.evalJs(`
+      window.__SITE_API.setCameraLookAt(0.0138, 0.005, -0.0644, -0.025, 0.032, -0.095);
+    `);
+    const j1501B64 = await snap("tmp_j1501.png", 350);
+    await composeSideBySide(j1501B64, "assets/img/board_iso.png", "compare_j1501_usbc.png", "LIVE WEBGL: J1501 USB-C TAB", "REF: board_iso.png (J1501)", [0.20, 0.08, 0.56, 0.90], [0.20, 0.06, 0.28, 0.32]);
+    try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_j1501.png")); } catch {}
 
     // 14. Vendored PDF.js Streaming Reader Verification (Desktop #page=214 & Phone #page=1)
     const pdfDeskUrl = `http://127.0.0.1:${port}/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=214`;

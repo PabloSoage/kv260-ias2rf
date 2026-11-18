@@ -771,6 +771,147 @@ function build() {
     }
   }
 
+function parseAsciiPly(filePath) {
+  const txt = fs.readFileSync(filePath, "utf8");
+  const lines = txt.split(/\r?\n/);
+  let nv = 0, nf = 0, i = 0;
+  while (i < lines.length && lines[i] !== "end_header") {
+    const p = lines[i].trim().split(/\s+/);
+    if (p[0] === "element" && p[1] === "vertex") nv = parseInt(p[2], 10);
+    if (p[0] === "element" && p[1] === "face") nf = parseInt(p[2], 10);
+    i++;
+  }
+  i++;
+  const pos = new Float32Array(nv * 3);
+  const rgb = new Uint8Array(nv * 3);
+  const vals = new Float32Array(nv);
+  for (let k = 0; k < nv; k++) {
+    const p = lines[i + k].trim().split(/\s+/);
+    const xm = parseFloat(p[0]), ym = parseFloat(p[1]), zm = parseFloat(p[2]);
+    // Assembly mm -> Three.js Y-up metres
+    pos[k * 3] = xm * 0.001;
+    pos[k * 3 + 1] = zm * 0.001;
+    pos[k * 3 + 2] = -ym * 0.001;
+    rgb[k * 3] = parseInt(p[3], 10) & 255;
+    rgb[k * 3 + 1] = parseInt(p[4], 10) & 255;
+    rgb[k * 3 + 2] = parseInt(p[5], 10) & 255;
+    vals[k] = parseFloat(p[6] || "0");
+  }
+  i += nv;
+  const idx = new Uint16Array(nf * 3);
+  for (let k = 0; k < nf; k++) {
+    const p = lines[i + k].trim().split(/\s+/);
+    idx[k * 3] = parseInt(p[1], 10);
+    idx[k * 3 + 1] = parseInt(p[2], 10);
+    idx[k * 3 + 2] = parseInt(p[3], 10);
+  }
+  return { nv, nf, pos, rgb, vals, idx };
+}
+
+function buildNearestColorTable(refPos, targetPly, cellSizeM = 0.004) {
+  const inv = 1.0 / cellSizeM;
+  const grid = new Map();
+  for (let i = 0; i < targetPly.nv; i++) {
+    const x = targetPly.pos[i * 3], y = targetPly.pos[i * 3 + 1], z = targetPly.pos[i * 3 + 2];
+    const key = `${Math.round(x * inv)},${Math.round(y * inv)},${Math.round(z * inv)}`;
+    if (!grid.has(key)) grid.set(key, []);
+    grid.get(key).push(i);
+  }
+  const n = refPos.length / 3;
+  const outRgb = new Uint8Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const x = refPos[i * 3], y = refPos[i * 3 + 1], z = refPos[i * 3 + 2];
+    const gx = Math.round(x * inv), gy = Math.round(y * inv), gz = Math.round(z * inv);
+    let bestD = Infinity, bestJ = 0;
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const list = grid.get(`${gx + dx},${gy + dy},${gz + dz}`);
+          if (!list) continue;
+          for (let m = 0; m < list.length; m++) {
+            const j = list[m];
+            const ddx = targetPly.pos[j * 3] - x;
+            const ddy = targetPly.pos[j * 3 + 1] - y;
+            const ddz = targetPly.pos[j * 3 + 2] - z;
+            const d2 = ddx * ddx + ddy * ddy + ddz * ddz;
+            if (d2 < bestD) { bestD = d2; bestJ = j; }
+          }
+        }
+      }
+    }
+    outRgb[i * 3] = targetPly.rgb[bestJ * 3];
+    outRgb[i * 3 + 1] = targetPly.rgb[bestJ * 3 + 1];
+    outRgb[i * 3 + 2] = targetPly.rgb[bestJ * 3 + 2];
+  }
+  return outRgb;
+}
+
+function buildFea3dBinary() {
+  const candidates = [
+    path.join(ROOT_DIR, "_work", "mech", "cache", "fea3d", "v2"),
+    path.join("D:\\Repos\\kv260-ias2rf", "_work", "mech", "cache", "fea3d", "v2"),
+  ];
+  const feaDir = candidates.find((d) => fs.existsSync(path.join(d, "case3d_v2_Zm.ply")));
+  if (!feaDir) return false;
+
+  const caseZm = parseAsciiPly(path.join(feaDir, "case3d_v2_Zm.ply"));
+  const caseXp = parseAsciiPly(path.join(feaDir, "case3d_v2_Xp.ply"));
+  const caseYp = parseAsciiPly(path.join(feaDir, "case3d_v2_Yp.ply"));
+  const bZm = parseAsciiPly(path.join(feaDir, "boards3d_v2_Zm.ply"));
+  const bXp = parseAsciiPly(path.join(feaDir, "boards3d_v2_Xp.ply"));
+  const bYp = parseAsciiPly(path.join(feaDir, "boards3d_v2_Yp.ply"));
+
+  // Downsample case stress points using 3.2 mm voxels, keeping peak val per voxel
+  const voxelInv = 1.0 / 0.0032;
+  const voxBest = new Map();
+  for (let i = 0; i < caseZm.nv; i++) {
+    const x = caseZm.pos[i * 3], y = caseZm.pos[i * 3 + 1], z = caseZm.pos[i * 3 + 2];
+    const key = `${Math.round(x * voxelInv)},${Math.round(y * voxelInv)},${Math.round(z * voxelInv)}`;
+    const prev = voxBest.get(key);
+    if (prev === undefined || caseZm.vals[i] > caseZm.vals[prev]) voxBest.set(key, i);
+  }
+  const caseIndices = [...voxBest.values()];
+  const caseCount = caseIndices.length;
+  const casePos = new Float32Array(caseCount * 3);
+  const caseRgbZm = new Uint8Array(caseCount * 3);
+  for (let k = 0; k < caseCount; k++) {
+    const idx = caseIndices[k];
+    casePos[k * 3] = caseZm.pos[idx * 3];
+    casePos[k * 3 + 1] = caseZm.pos[idx * 3 + 1];
+    casePos[k * 3 + 2] = caseZm.pos[idx * 3 + 2];
+    caseRgbZm[k * 3] = caseZm.rgb[idx * 3];
+    caseRgbZm[k * 3 + 1] = caseZm.rgb[idx * 3 + 1];
+    caseRgbZm[k * 3 + 2] = caseZm.rgb[idx * 3 + 2];
+  }
+  const caseRgbXp = buildNearestColorTable(casePos, caseXp);
+  const caseRgbYp = buildNearestColorTable(casePos, caseYp);
+
+  const bRgbXp = buildNearestColorTable(bZm.pos, bXp, 0.003);
+  const bRgbYp = buildNearestColorTable(bZm.pos, bYp, 0.003);
+
+  const hdr = new Uint32Array([0x32414546, caseCount, bZm.nv, bZm.nf]); // "FEA2"
+  const pad4 = (n) => (4 - (n % 4)) % 4;
+  const parts = [
+    Buffer.from(hdr.buffer),
+    Buffer.from(casePos.buffer),
+    Buffer.from(caseRgbZm.buffer),
+    Buffer.from(caseRgbXp.buffer),
+    Buffer.from(caseRgbYp.buffer),
+    Buffer.alloc(pad4(caseCount * 9)),
+    Buffer.from(bZm.pos.buffer),
+    Buffer.from(bZm.idx.buffer),
+    Buffer.alloc(pad4(bZm.idx.byteLength)),
+    Buffer.from(bZm.rgb.buffer),
+    Buffer.from(bRgbXp.buffer),
+    Buffer.from(bRgbYp.buffer),
+  ];
+  const binPath = path.join(ASSETS_DIR, "fea_v2_fields.bin");
+  fs.writeFileSync(binPath, Buffer.concat(parts));
+  console.log(`Wrote ${binPath} (${(fs.statSync(binPath).size / 1024).toFixed(1)} KB, ${caseCount} case pts, ${bZm.nv} board verts / ${bZm.nf} tris)`);
+  return true;
+}
+
+  const hasFea3d = buildFea3dBinary();
   const out = {
     generated_at: new Date().toISOString(),
     copied_images: copiedImages,
@@ -791,7 +932,12 @@ function build() {
       source_files: ["docs/sim/pdn_1V0.csv", "docs/sim/pdn_1V8_D.csv", "docs/sim/pdn_2V5.csv", "docs/sim/pdn_3V3_D.csv", "docs/sim/fb401_filter.json", "docs/SIGNAL_INTEGRITY.md", "docs/POWER_AND_STACKUP.md"],
     },
     thermal,
-    mechanical,
+    mechanical: {
+      ...mechanical,
+      has_fea_3d: hasFea3d,
+      fea_3d_file: hasFea3d ? "assets/fea_v2_fields.bin" : null,
+      fea_3d_source: "_work/mech/cache/fea3d/v2/case3d_v2_{Zm,Xp,Yp}.ply & boards3d_v2_{Zm,Xp,Yp}.ply -> docs/sim/case3d_v2.json",
+    },
     gateware_g8: {
       modes: gatewareModes,
       overview_figure: "assets/img/sim/g8_overview.png",
