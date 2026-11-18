@@ -8,6 +8,8 @@ been validated.** The hardware, dual-FPGA Vivado gateware, Enclosure v2 cooling,
 
 ![The board, 3D render](docs/img/board_iso.png)
 
+**Explore it in 3-D:** [pablosoage.github.io/kv260-ias2rf](https://pablosoage.github.io/kv260-ias2rf/). Turn the board, the KV260 and the enclosure, open the case, hover a part to see what it is and what it does, and look at the board layer by layer.
+
 An adapter board for the **AMD Kria KV260 Vision AI Starter Kit**. It plugs into the KV260's IAS1
 camera connector and carries the converters, a common clock and a front-end FPGA. It serves two
 signal chains:

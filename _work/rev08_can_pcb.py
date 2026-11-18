@@ -11,6 +11,8 @@ The vehicle CAN on the board (18 November 2026, before the Rev08 tag), as text e
   3. The transceiver, the NOR pair, the ESD diode and the passives on the bottom of the same corner, beyond the
      carrier's edge (KiCad y > 107.25), in the free area south of the GPS circuit.
 
+Then run _work/rev08_final_models.py, which points J1503 at its toned 3-D model (KiCad's is pure white).
+
 Usage:  py _work/rev08_can_pcb.py <in.kicad_pcb> <out.kicad_pcb>
 """
 import math
