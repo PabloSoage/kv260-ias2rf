@@ -37,7 +37,7 @@ The thirteen SMAs are on the front edge (`J401`-`J952`) and the back wall (`J961
 | 21 | `J1103` | top | AERIS ADAR | AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines |
 | 22 | `J1201` | top | HR911130C | Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone |
 | 23 | `J1501` | top | TYPE-C-31-E-17 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
-| 24 | `J1502` | top | FPC-1.0FX-15PWCR-H20 | GPS PPS to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`) |
+| 24 | `J1502` | top | FPC-1.0FX-15PWCR-H20 | GPS PPS and the vehicle CAN to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`); CAN TX leaves on `J9` pin 6 and RX comes back on pin 8 (PS `CAN1`, R5F core 1) |
 | 25 | `J1503` | top | SM06B-SRSS-TB | GPS receiver and vehicle CAN, JST-SH 6-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 GND, 4 CANH, 5 CANL, 6 GND (no termination: it taps the car's bus) |
 
 ### 1.1 Pmod `J1102`
@@ -179,17 +179,18 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | 80 | `U1503` | top | USBLC6-2SC6 | STATUS | ESD on the USB data lines |
 | 81 | `U1504` | top | LP5907MFX-3.3 | STATUS | 3.3 V LDO for the USB bridge, from the cable |
 | 82 | `U1505` | bottom | SN74LVC1G17DCKR | STATUS | GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4 |
-| 83 | `Y401` | top | Si549 LVPECL 3V3 pinout C | CLOCK | Programmable master oscillator, 400 or 500 MHz |
-| 84 | `Y1201` | top | 25MHz | CONTROL | Crystal for the Ethernet PHY |
-| 85 | `Y1301` | top | 26MHz 1XXD26000MAA | RX_VU | TCXO, the RFFC5072's reference |
-| 86 | `FL1301` | top | TA1090EC | RX_VU | 1090 MHz SAW filter (ADS-B path) |
-| 87 | `FL1302` | top | HFCN-1000+ | RX_VU | High-pass after the mixer |
-| 88 | `FL1303` | top | LFCN-1000+ | RX_VU | Low-pass, UHF preselector |
-| 89 | `T701` | top | ADT2-1T+ | DAC_RADAR | AD9708 output balun |
-| 90 | `T801` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC1 output balun |
-| 91 | `T802` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC2 output balun |
-| 92 | `T1301` | top | TC1-1-13M+ | RX_VU | Mixer input balun |
-| 93 | `T1302` | top | TC4-1W+ | RX_VU | Mixer output balun |
+| 83 | `U1506` | bottom | TCAN330DCNT | STATUS | Vehicle CAN transceiver on `J1503` pins 4 and 5, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8 |
+| 84 | `Y401` | top | Si549 LVPECL 3V3 pinout C | CLOCK | Programmable master oscillator, 400 or 500 MHz |
+| 85 | `Y1201` | top | 25MHz | CONTROL | Crystal for the Ethernet PHY |
+| 86 | `Y1301` | top | 26MHz 1XXD26000MAA | RX_VU | TCXO, the RFFC5072's reference |
+| 87 | `FL1301` | top | TA1090EC | RX_VU | 1090 MHz SAW filter (ADS-B path) |
+| 88 | `FL1302` | top | HFCN-1000+ | RX_VU | High-pass after the mixer |
+| 89 | `FL1303` | top | LFCN-1000+ | RX_VU | Low-pass, UHF preselector |
+| 90 | `T701` | top | ADT2-1T+ | DAC_RADAR | AD9708 output balun |
+| 91 | `T801` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC1 output balun |
+| 92 | `T802` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC2 output balun |
+| 93 | `T1301` | top | TC1-1-13M+ | RX_VU | Mixer input balun |
+| 94 | `T1302` | top | TC4-1W+ | RX_VU | Mixer output balun |
 
 ## 5. Typical uses
 
