@@ -38,7 +38,7 @@ The thirteen SMAs are on the front edge (`J401`-`J952`) and the back wall (`J961
 | 22 | `J1201` | top | HR911130C | Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone |
 | 23 | `J1501` | top | TYPE-C-31-E-17 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
 | 24 | `J1502` | top | FPC-1.0FX-15PWCR-H20 | GPS PPS to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`) |
-| 25 | `J1503` | top | SM04B-SRSS-TB | GPS receiver, JST-SH 4-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 and 4 GND |
+| 25 | `J1503` | top | SM06B-SRSS-TB | GPS receiver and vehicle CAN, JST-SH 6-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 GND, 4 CANH, 5 CANL, 6 GND (no termination: it taps the car's bus) |
 
 ### 1.1 Pmod `J1102`
 

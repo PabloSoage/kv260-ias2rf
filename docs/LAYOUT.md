@@ -475,6 +475,17 @@ passives are on the bottom of the same corner, which lies beyond the carrier's e
 from the ring of the mounting hole `H2`; the stitching via under its east tab moved 0.85 mm. What the circuit does is
 in [INTEGRATIONS §2.1](INTEGRATIONS.md).
 
-The board after these changes: 783 footprints, 13,580 track segments, 2,589 vias. DRC with zones refilled and schematic
+**The vehicle CAN (added the same day).** `J1503` became a 6-way JST-SH (SM06B-SRSS-TB: 1 GPS 3.3 V, 2 PPS,
+3 ground, 4 `CANH`, 5 `CANL`, 6 ground) and moved 0.6 mm east, because its wider west tab would have sat on
+`LINK_RX_D1_N`, which runs straight down x 189.65 on L1; the tab now clears it by 0.26 mm (the LVDS class asks for
+0.15) and has its own ground via, since that track cuts it off from the L1 pour. `F1501`'s `+3V3_D` via, now under
+the new pin 1, moved under the PTC's body. The transceiver `U1506` (TCAN330DCNT), the ESD diode `D1531`, `Q1530` and
+nine passives sit on the bottom south of the GPS circuit (x 186 to 194, y 115 to 128); `Q1531` and its two base
+resistors found room only east of the via field (x 203 to 207, y 120 to 127), so the FPC pin 10 line runs there and
+its collector comes back to `CAN_TXD`. The CAN signals use L1, L3, L6 and L8 only (`CANH`/`CANL` 0.2 mm, the GPS
+supply 0.3 mm), never the planes. The script is `_work/rev08_can_pcb.py`; what the circuit does is in
+[INTEGRATIONS §2.2](INTEGRATIONS.md).
+
+The board after these changes: 795 footprints, 13,695 track segments, 2,612 vias. DRC with zones refilled and schematic
 parity: **0 violations, 0 unconnected pads, 0 footprint errors**; ERC 0 errors and the same 7 warnings. The warnings
 are those of the board before, plus three silkscreen overlaps between the new bottom-side passives.

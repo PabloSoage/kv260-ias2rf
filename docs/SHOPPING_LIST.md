@@ -26,7 +26,7 @@ Organised by **stage** (the reasoning behind the order is in
 | ☐ | **SDRplay RSPdx-R2** (1 kHz – 2 GHz, 14-bit, RX only) | HF, AM, airband and weak signals; replaces the HF upconverter | €200 |
 | ☐ | **KrakenSDR** (5 coherent channels, 24 MHz – 1.766 GHz) | **Direction finding, ready to use** | €500 |
 | ☐ | Antenna set: discone, HF whip, 5× VHF/UHF for the Kraken | Coverage and DF | €200 |
-| ☐ | USB GPS (u-blox) + IMU, with a 3.3 V PPS output | Position and heading for triangulation and SLAM; its PPS and 3.3 V supply on `J1503` (JST-SH 4-pin: 1 3.3 V, 2 PPS, 3 and 4 GND) | €80 |
+| ☐ | USB GPS (u-blox) + IMU, with a 3.3 V PPS output | Position and heading for triangulation and SLAM; its PPS and 3.3 V supply on `J1503` (JST-SH 6-pin: 1 3.3 V, 2 PPS, 3 GND; 4 and 5 are the car's CANH and CANL, 6 GND) | €80 |
 | | | **Subtotal** | **~€1,600** |
 
 > **Updated 29 September 2026.** Stage 0 used to be a HackRF One plus an HF upconverter
