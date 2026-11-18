@@ -84,7 +84,15 @@ node "$SITE_DIR/scripts/build_components.mjs"
 echo "[5/6] Optimizing board.glb and building kv260.glb + enclosure.glb..."
 node "$SITE_DIR/scripts/build_assets.mjs" "$RAW_GLB"
 
-echo "[6/6] Building Slint WebAssembly HMI and copying doc figures..."
+echo "[6/7] Building Rust core (site/core) and Slint WebAssembly HMI..."
+mkdir -p "$SITE_DIR/core/pkg"
+CARGO_TARGET_DIR="$TMP_DIR/core_target" cargo build \
+  --manifest-path "$SITE_DIR/core/Cargo.toml" \
+  --release --lib --target wasm32-unknown-unknown
+wasm-bindgen --target web --no-typescript \
+  --out-dir "$SITE_DIR/core/pkg" \
+  "$TMP_DIR/core_target/wasm32-unknown-unknown/release/ias2rf_site_core.wasm"
+
 mkdir -p "$SITE_DIR/hmi/pkg"
 CARGO_TARGET_DIR="$TMP_DIR/hmi_target" cargo build \
   --manifest-path "$ROOT_DIR/sw/hmi/app/Cargo.toml" \
@@ -93,6 +101,7 @@ wasm-bindgen --target web --no-typescript \
   --out-dir "$SITE_DIR/hmi/pkg" \
   "$TMP_DIR/hmi_target/wasm32-unknown-unknown/release/kria_hmi.wasm"
 
+echo "[7/7] Copying doc figures..."
 mkdir -p "$SITE_DIR/assets/img/sim" "$SITE_DIR/assets/img/integrations"
 cp -f "$ROOT_DIR"/docs/img/sim/*.png "$SITE_DIR/assets/img/sim/"
 cp -f "$ROOT_DIR"/docs/img/integrations/*.png "$SITE_DIR/assets/img/integrations/"
@@ -100,4 +109,4 @@ cp -f "$ROOT_DIR"/docs/img/board_top.png "$ROOT_DIR"/docs/img/board_bottom.png "
 cp -f "$ROOT_DIR"/docs/img/case_v2_closed.jpg "$ROOT_DIR"/docs/img/case_v2_open.jpg "$SITE_DIR/assets/img/"
 
 echo "Build complete. Asset sizes:"
-ls -lh "$SITE_DIR/assets/"*.glb "$SITE_DIR/assets/components.json" "$SITE_DIR/hmi/pkg/"
+ls -lh "$SITE_DIR/assets/"*.glb "$SITE_DIR/assets/"*.json "$SITE_DIR/core/pkg/" "$SITE_DIR/hmi/pkg/"

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Local static server + headless Chrome CDP verification and screenshot capture.
- * Pure Node.js (uses built-in global WebSocket in Node 24, zero Python, zero npm packages).
+ * Local static server + headless Chrome CDP verification, Rust vs Three.js hover benchmarks,
+ * deep-link/CAN checks, intro sequence storyboard, and responsive screenshots in site/shots/.
+ * Pure Node.js (zero Python, zero npm packages).
  */
 
 import http from "node:http";
@@ -139,7 +140,7 @@ async function waitFor(fn, timeoutMs = 45000, stepMs = 200) {
 async function run() {
   fs.mkdirSync(SHOTS_DIR, { recursive: true });
   const { server, port } = await startStaticServer();
-  const baseUrl = `http://127.0.0.1:${port}/`;
+  const baseUrl = `http://127.0.0.1:${port}/?noIntro=1`;
   const cdpPort = 9222 + Math.floor(Math.random() * 400);
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "ias2rf_chrome_"));
   const chromePath = findChrome();
@@ -193,16 +194,16 @@ async function run() {
       await sleep(350);
     };
 
-    const snap = async (filename) => {
-      await sleep(500);
+    const snap = async (filename, waitMs = 450) => {
+      await sleep(waitMs);
       const { data } = await client.send("Page.captureScreenshot", { format: "png" });
       fs.writeFileSync(path.join(SHOTS_DIR, filename), Buffer.from(data, "base64"));
       console.log("Captured", filename);
+      return data;
     };
 
     await setViewport(1440, 900, false);
 
-    // Wait for GLB models + components.json ready
     await waitFor(async () => {
       return await client.evalJs("window.__SITE_API && window.__SITE_API.isReady()");
     }, 60000, 300);
@@ -210,10 +211,75 @@ async function run() {
     const stats = await client.evalJs("window.__SITE_API.getStats()");
     console.log("Site ready stats:", stats);
 
-    // 1. Desktop Dark (Closed Assembly Iso)
+    // Check Rust WASM search & CAN part specs
+    const canSearch = await client.evalJs(`JSON.stringify({
+      u1506: window.__SITE_API.searchCore("U1506").slice(0, 3),
+      j1503: window.__SITE_API.searchCore("J1503").slice(0, 3),
+      tcan: window.__SITE_API.searchCore("TCAN330").slice(0, 3)
+    })`);
+    console.log("Rust Core CAN search:", canSearch);
+
+    // Benchmark 60 Info-Mode hover frames on Desktop (1440x900)
+    await client.evalJs(`
+      window.__SITE_API.scrollToExplorer();
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setCameraPreset("iso");
+    `);
+    await sleep(300);
+    const deskThree = await client.evalJs(`window.__SITE_API.benchmarkHover({ frames: 60, useWasm: false })`);
+    const deskWasm = await client.evalJs(`window.__SITE_API.benchmarkHover({ frames: 60, useWasm: true })`);
+    console.log("Benchmark Desktop (1440x900) Three.js mesh raycast:", deskThree);
+    console.log("Benchmark Desktop (1440x900) Rust WASM spatial grid:", deskWasm);
+
+    // 1. Landing Section Hero + 3-D Explorer Top Preview
     await client.evalJs(`
       window.__SITE_API.setTheme("dark");
       window.__SITE_API.selectTab("explorer");
+      window.__SITE_API.isolate("all");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setEnclosure("closed");
+      window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.scrollToTop();
+    `);
+    await snap("landing_hero.png");
+
+    // 2. Capture 4 Intro Sequence frames & compose intro_seq.png 2x2 storyboard
+    await client.evalJs(`window.__SITE_API.scrollToExplorer();`);
+    const introFramesB64 = [];
+    for (const [u, label] of [[0.0, "t=0.0s Fly-In (Closed)"], [0.35, "t=0.7s Lid Opening"], [0.70, "t=1.4s Explode + SOM Lift"], [1.0, "t=2.1s Settled Cutaway"]]) {
+      await client.evalJs(`window.__SITE_API.setIntroFrame(${u});`);
+      await sleep(350);
+      const { data } = await client.send("Page.captureScreenshot", { format: "png" });
+      introFramesB64.push({ label, data });
+    }
+    const seqPngB64 = await client.evalJs(`(async (frames) => {
+      const cvs = document.createElement("canvas");
+      cvs.width = 1440;
+      cvs.height = 900;
+      const ctx = cvs.getContext("2d");
+      ctx.fillStyle = "#0b0d10";
+      ctx.fillRect(0, 0, 1440, 900);
+      for (let i = 0; i < 4; i++) {
+        const img = new Image();
+        img.src = "data:image/png;base64," + frames[i].data;
+        await new Promise((r) => { img.onload = r; });
+        const x = (i % 2) * 720, y = Math.floor(i / 2) * 450;
+        ctx.drawImage(img, x, y, 720, 450);
+        ctx.fillStyle = "rgba(11, 13, 16, 0.85)";
+        ctx.fillRect(x + 12, y + 12, 230, 26);
+        ctx.fillStyle = "#ffb020";
+        ctx.font = "bold 14px monospace";
+        ctx.fillText(frames[i].label, x + 20, y + 30);
+      }
+      return cvs.toDataURL("image/png").split(",")[1];
+    })(${JSON.stringify(introFramesB64)})`);
+    fs.writeFileSync(path.join(SHOTS_DIR, "intro_seq.png"), Buffer.from(seqPngB64, "base64"));
+    console.log("Captured intro_seq.png");
+
+    // 3. Desktop Dark (Closed Assembly Iso inside Explorer)
+    await client.evalJs(`
+      window.__SITE_API.setTheme("dark");
+      window.__SITE_API.scrollToExplorer();
       window.__SITE_API.setExplode(0);
       window.__SITE_API.setEnclosure("closed");
       window.__SITE_API.isolate("all");
@@ -221,7 +287,7 @@ async function run() {
     `);
     await snap("desktop_dark.png");
 
-    // 2. Desktop Light (Open Lid showing inside assembly & board)
+    // 4. Desktop Light (Open Lid Cutaway)
     await client.evalJs(`
       window.__SITE_API.setTheme("light");
       window.__SITE_API.setEnclosure("open");
@@ -230,7 +296,7 @@ async function run() {
     `);
     await snap("desktop_light.png");
 
-    // 3. Exploded View
+    // 5. Exploded View
     await client.evalJs(`
       window.__SITE_API.setTheme("dark");
       window.__SITE_API.setEnclosure("open");
@@ -239,7 +305,7 @@ async function run() {
     `);
     await snap("exploded_view.png");
 
-    // 4. KV260 Teardown & Info Mode (fan/heatsink hidden, SOM lifted 22 mm, J9 RPi selected)
+    // 6. KV260 Teardown & Info Mode
     await client.evalJs(`
       window.__SITE_API.setExplode(0);
       window.__SITE_API.setTeardown({ fan: false, hs: false, somLiftMm: 22, isolate: "kv260", select: "KV260_J9_RPI" });
@@ -247,25 +313,31 @@ async function run() {
     `);
     await snap("kv260_teardown_info.png");
 
-    // 5. Board Info Mode (Our board isolated, U501 AD9484 selected + net highlight)
+    // 7. Board Info Mode + Pulsing Copper Net Highlight
     await client.evalJs(`
       window.__SITE_API.isolate("board");
       window.__SITE_API.selectPart("U501", false);
+      window.__SITE_API.selectNet("+1V8_ADCR_A");
       window.__SITE_API.setCameraPreset("iso");
-      const netBtn = document.querySelector('#inspector-body [data-net]');
-      if (netBtn) netBtn.click();
     `);
     await snap("board_info_mode.png");
 
-    // 6. Layer Stack-up Mode
+    // 8. Final Vehicle CAN Parts Deep-Link Info Mode (#part=U1506&view=board&explode=0&net=/STATUS/CAN_TXD&cam=bottom)
+    await client.evalJs(`
+      location.hash = "#part=U1506&view=board&explode=0&net=%2FSTATUS%2FCAN_TXD&cam=bottom";
+      window.__SITE_API.applyHash();
+      window.__SITE_API.scrollToExplorer();
+    `);
+    await snap("can_parts_info.png");
+
+    // 9. Layer Stack-up Mode (with peeled SVGs)
     await client.evalJs(`
       window.__SITE_API.selectTab("layers");
       window.__SITE_API.select2dLayer("F.Cu");
     `);
-    await sleep(900);
-    await snap("layer_mode.png");
+    await snap("layer_mode.png", 1000);
 
-    // 7. Live Slint WASM HMI Mode
+    // 10. Live Slint WASM HMI Mode
     await client.evalJs(`window.__SITE_API.selectTab("hmi");`);
     await waitFor(async () => {
       return await client.evalJs(`(() => {
@@ -276,34 +348,40 @@ async function run() {
         return !w && c && c.width > 100 && c.height > 100;
       })()`);
     }, 30000, 300);
-    await sleep(1000);
-    await snap("hmi_wasm.png");
+    await snap("hmi_wasm.png", 900);
 
-    // 8. Mock-ups & Sim Gallery
+    // 11. Animated Rust Mock-ups & Final Sim Gallery
     await client.evalJs(`window.__SITE_API.selectTab("mockups");`);
-    await snap("mockups_gallery.png");
+    await snap("mockups_gallery.png", 700);
 
     await client.evalJs(`window.__SITE_API.selectTab("gallery");`);
-    await snap("sim_gallery.png");
+    await snap("sim_gallery.png", 600);
 
-    // 9. Phone Dark (390x844)
+    // 12. Phone Profile (390x844) + Hover Benchmark
     await setViewport(390, 844, true);
     await client.evalJs(`
       window.__SITE_API.setTheme("dark");
       window.__SITE_API.selectTab("explorer");
       window.__SITE_API.isolate("board");
-      window.__SITE_API.selectPart("J1502", false);
+      window.__SITE_API.selectNet(null);
+      window.__SITE_API.selectPart("J1503", false);
       window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.scrollToExplorer();
     `);
+    await sleep(300);
+    const mobThree = await client.evalJs(`window.__SITE_API.benchmarkHover({ frames: 60, useWasm: false })`);
+    const mobWasm = await client.evalJs(`window.__SITE_API.benchmarkHover({ frames: 60, useWasm: true })`);
+    console.log("Benchmark Phone (390x844) Three.js mesh raycast:", mobThree);
+    console.log("Benchmark Phone (390x844) Rust WASM spatial grid:", mobWasm);
     await snap("phone_dark.png");
 
-    // 10. Phone Light (390x844)
     await client.evalJs(`
       window.__SITE_API.setTheme("light");
       window.__SITE_API.isolate("all");
       window.__SITE_API.setEnclosure("open");
       window.__SITE_API.setExplode(50);
       window.__SITE_API.setCameraPreset("iso");
+      window.__SITE_API.scrollToExplorer();
     `);
     await snap("phone_light.png");
 

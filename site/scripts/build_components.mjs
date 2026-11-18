@@ -20,10 +20,15 @@ function readText(p) {
 }
 
 function topLevelBlocks(text, head) {
-  const key = "\n\t(" + head;
+  const key = "\n\t(" + head.trimEnd();
   const out = [];
   let idx = text.indexOf(key);
   while (idx >= 0) {
+    const nextCh = text[idx + key.length] || "";
+    if (!/\s/.test(nextCh)) {
+      idx = text.indexOf(key, idx + key.length);
+      continue;
+    }
     const start = idx + 2;
     let depth = 0;
     let j = start;
@@ -253,62 +258,119 @@ function extractPythonStringArgs(expr) {
   return strings;
 }
 
+function balancedCall(txt, parenStart) {
+  let depth = 0;
+  let j = parenStart;
+  let inStr = false;
+  let qChar = "";
+  while (j < txt.length) {
+    const ch = txt[j];
+    if (inStr) {
+      if (ch === "\\") j += 2;
+      else {
+        if (ch === qChar) inStr = false;
+        j++;
+      }
+    } else if (ch === '"' || ch === "'") {
+      inStr = true;
+      qChar = ch;
+      j++;
+    } else if (ch === "(") {
+      depth++;
+      j++;
+    } else if (ch === ")") {
+      depth--;
+      j++;
+      if (depth === 0) return j;
+    } else {
+      j++;
+    }
+  }
+  return j;
+}
+
+function bestDescFromStrs(strs, ref) {
+  let best = "";
+  for (const s of strs) {
+    if (/^[A-Za-z0-9_.+-]+:[A-Za-z0-9_.+-]+$/.test(s)) continue;
+    if (/^(Device|Resistor_|Capacitor_|Inductor_|Diode_|LED_|Switch|Button_|Connector|Package_|Transistor_|FPGA_|74xGxx|kv260-ias2rf|AVT_KHK_Lib|Interface_|Regulator_|Power_)/.test(s) && !s.includes(" ")) continue;
+    if (/_Metric$|^Package_|^Device:|^Connector/.test(s)) continue;
+    if (s === ref || s.length <= 2) continue;
+    if (s.length > best.length) best = s;
+  }
+  return best;
+}
+
 function parseSheetSpecs() {
   const dir = path.join(ROOT_DIR, "_work", "sheets");
   const specs = new Map();
   if (!fs.existsSync(dir)) return specs;
   for (const fn of fs.readdirSync(dir).filter((f) => f.endsWith("_spec.py"))) {
     const txt = readText(path.join(dir, fn));
+
+    // 1. Dictionary entries: "REF": (lib, val, fp, why)
     const re = /^\s*"([A-Z]{1,4}\d+[A-Z]?)"\s*:\s*/gm;
     let m;
     while ((m = re.exec(txt)) !== null) {
       const ref = m[1];
-      let start = m.index + m[0].length;
+      const start = m.index + m[0].length;
       const open = txt[start];
       if (open !== "(" && !/^[A-Z]+\(/.test(txt.slice(start, start + 10))) continue;
       const parenStart = txt.indexOf("(", start);
       if (parenStart < 0 || parenStart - start > 12) continue;
-      let depth = 0;
-      let j = parenStart;
-      let inStr = false;
-      let qChar = "";
-      while (j < txt.length) {
-        const ch = txt[j];
-        if (inStr) {
-          if (ch === "\\") j += 2;
-          else {
-            if (ch === qChar) inStr = false;
-            j++;
-          }
-        } else if (ch === '"' || ch === "'") {
-          inStr = true;
-          qChar = ch;
-          j++;
-        } else if (ch === "(") {
-          depth++;
-          j++;
-        } else if (ch === ")") {
-          depth--;
-          j++;
-          if (depth === 0) break;
-        } else {
-          j++;
-        }
-      }
-      const callExpr = txt.slice(start, j);
-      const strs = extractPythonStringArgs(callExpr);
-      // Longest descriptive string (usually last or second-to-last before footprint var)
-      let best = "";
-      for (const s of strs) {
-        if (/^(Device|Resistor_|Capacitor_|Inductor_|Diode_|LED_|Switch|Button_|Connector|Package_|Transistor_|FPGA_|74xGxx|kv260-ias2rf|AVT_KHK_Lib):/.test(s)) continue;
-        if (/_Metric$|^Package_|^Device:|^Connector/.test(s)) continue;
-        if (s.length > best.length) best = s;
-      }
-      if (best && best !== ref) {
+      const j = balancedCall(txt, parenStart);
+      const strs = extractPythonStringArgs(txt.slice(start, j));
+      const best = bestDescFromStrs(strs, ref);
+      if (best) specs.set(ref, { desc: best, source_file: `_work/sheets/${fn}` });
+    }
+
+    // 2. Two-terminal helper calls: two("REF", R|C|C0402|L|LED("val", "why"), ...)
+    const twoRe = /^\s*two\(\s*"([A-Z]{1,4}\d+[A-Z]?)"\s*,/gm;
+    while ((m = twoRe.exec(txt)) !== null) {
+      const ref = m[1];
+      const parenStart = m.index + m[0].indexOf("(");
+      const j = balancedCall(txt, parenStart);
+      const strs = extractPythonStringArgs(txt.slice(parenStart, j));
+      const best = bestDescFromStrs(strs, ref);
+      if (best && !specs.has(ref)) {
         specs.set(ref, { desc: best, source_file: `_work/sheets/${fn}` });
       }
     }
   }
+
+  // 3. Programmatic STATUS LED & rail LED entries generated in _work/sheets/status_spec.py
+  const statusTxt = readText(path.join(dir, "status_spec.py"));
+  const stMatch = statusTxt.match(/STATUS\s*=\s*\[([\s\S]*?)\n\]/);
+  if (stMatch) {
+    const itemRe = /\(\s*"(D\d+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\)/g;
+    let sm;
+    let k = 0;
+    while ((sm = itemRe.exec(stMatch[1])) !== null) {
+      const [, dRef, shortName, colour, why] = sm;
+      const rRef = `R15${11 + k}`;
+      k++;
+      if (!specs.has(dRef)) specs.set(dRef, { desc: `Status LED (${shortName}, ${colour}): ${why}`, source_file: "_work/sheets/status_spec.py" });
+      if (!specs.has(rRef)) specs.set(rRef, { desc: `${shortName} status LED current-limit resistor (~1.3 mA from +3V3_D)`, source_file: "_work/sheets/status_spec.py" });
+    }
+  }
+  const railMap = {
+    D1520: "+12V rail present green LED (~1 mA)",
+    R1520: "+12V rail LED series resistor (~1 mA)",
+    D1521: "+5V0 rail present green LED (~1 mA)",
+    R1521: "+5V0 rail LED series resistor (~1 mA)",
+    D1522: "+3V3_D rail present green LED (~1 mA)",
+    R1522: "+3V3_D rail LED series resistor (~1 mA)",
+    D1523: "+1V8_D rail present green LED (switched from +3V3_D via Q1520)",
+    R1523: "+1V8_D rail LED resistor from +3V3_D",
+    R1525: "Base drive resistor for Q1520 (+1V8_D rail sense, 35-110 uA)",
+    D1524: "+1V0 rail present green LED (switched from +3V3_D via Q1521)",
+    R1524: "+1V0 rail LED resistor from +3V3_D",
+    R1526: "Base drive resistor for Q1521 (+1V0 rail sense, 35-110 uA)",
+  };
+  for (const [ref, desc] of Object.entries(railMap)) {
+    if (!specs.has(ref)) specs.set(ref, { desc, source_file: "_work/sheets/status_spec.py" });
+  }
+
   return specs;
 }
 
@@ -350,7 +412,7 @@ function parseManualCatalog() {
 function sheetLink(sheet, ref) {
   if (/^TP\d+$/.test(ref)) return "docs/BOARD_MANUAL.md#12-test-points";
   if (ref === "J1102") return "docs/BOARD_MANUAL.md#11-pmod-j1102";
-  if (ref === "J1502" || ref === "J1503" || ref === "U1506" || ref === "D1531" || ref === "Q1530" || ref === "Q1531") {
+  if (/^(J1502|J1503|U1506|D1531|Q1530|Q1531|C1550|R155[1-7])$/.test(ref)) {
     return "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1";
   }
   const map = {
@@ -726,9 +788,45 @@ const STACKUP = [
   { id: "Edge.Cuts", name: "Board Outline (Edge.Cuts)", role: "140 x 132 mm milled perimeter, RJ45 tab, J961 & J18 clearances", thickness_mm: 0.0, z_mm: 0.8, color: "#f0b429" },
 ];
 
+function extractNetTraces(pcbText) {
+  const layerIdxMap = {
+    "F.Cu": 0, "In1.Cu": 1, "In2.Cu": 2, "In3.Cu": 3,
+    "In4.Cu": 4, "In5.Cu": 5, "In6.Cu": 6, "B.Cu": 7,
+  };
+  const byNet = new Map();
+  for (const blk of topLevelBlocks(pcbText, "segment")) {
+    const netM = blk.match(/\(net\s+(?:\d+\s+)?"((?:[^"\\]|\\.)*)"\)/);
+    if (!netM) continue;
+    const net = unescapeKiCad(netM[1]);
+    if (!net || net === "GND") continue;
+    const stM = blk.match(/\(start\s+([-\d.]+)\s+([-\d.]+)\)/);
+    const enM = blk.match(/\(end\s+([-\d.]+)\s+([-\d.]+)\)/);
+    const lyM = blk.match(/\(layer\s+"([^"]+)"\)/);
+    if (!stM || !enM || !lyM) continue;
+    const x1 = +parseFloat(stM[1]).toFixed(2);
+    const y1 = +parseFloat(stM[2]).toFixed(2);
+    const x2 = +parseFloat(enM[1]).toFixed(2);
+    const y2 = +parseFloat(enM[2]).toFixed(2);
+    if (x1 === x2 && y1 === y2) continue;
+    const lIdx = layerIdxMap[lyM[1]] ?? 0;
+    let arr = byNet.get(net);
+    if (!arr) {
+      arr = [];
+      byNet.set(net, arr);
+    }
+    if (arr.length < 240) arr.push([x1, y1, x2, y2, lIdx]);
+  }
+  const out = {};
+  for (const [k, v] of byNet.entries()) out[k] = v;
+  const tracesPath = path.join(SITE_DIR, "assets", "net_traces.json");
+  fs.writeFileSync(tracesPath, JSON.stringify(out));
+  console.log(`Wrote ${tracesPath}: ${byNet.size} routed signal nets.`);
+}
+
 function build() {
   const pcbText = fs.readFileSync(PCB_PATH, "utf8");
   const edgeCuts = parseEdgeCuts(pcbText);
+  extractNetTraces(pcbText);
   const bom = parseBom();
   const sheetSpecs = parseSheetSpecs();
   const manual = parseManualCatalog();

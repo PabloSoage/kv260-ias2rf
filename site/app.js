@@ -3,12 +3,10 @@ import { OrbitControls } from "./vendor/three-0.170.0/OrbitControls.js";
 import { GLTFLoader } from "./vendor/three-0.170.0/GLTFLoader.js";
 import { RoomEnvironment } from "./vendor/three-0.170.0/RoomEnvironment.js";
 import { MeshoptDecoder } from "./vendor/three-0.170.0/meshopt_decoder.module.js";
+import initCore, { SiteCore } from "./core/pkg/ias2rf_site_core.js";
 import { initMockups } from "./mockups.js";
 
 const REPO_BLOB = "https://github.com/PabloSoage/kv260-ias2rf/blob/main";
-
-// World registration constants (from docs/INTERFACE_SPEC.md & build_mount.py)
-// Board KiCad origin -> Kria Y-up metres: (0.107247, 0.0008, -0.198004), rotY = -PI/2
 const BOARD_REG_POS = new THREE.Vector3(0.107247, 0.0008, -0.198004);
 const BOARD_REG_ROTY = -Math.PI / 2;
 
@@ -41,18 +39,17 @@ const GALLERY_SECTIONS = [
     ],
   },
   {
-    title: "Rev08 Hardware & Closed-Case v2 Mechanical Renders",
+    title: "Final Vehicle-CAN Rev08 Board & Closed-Case v2 Renders",
     items: [
-      { src: "assets/img/board_iso.png", title: "Rev08 Adapter Isometric Render", cap: "calibrated soldermask, ENIG copper pads, SMAs, XC7A50T, AD9484 and Si549 clock tree." },
-      { src: "assets/img/board_top.png", title: "Rev08 Top Side (RF & Converters)", cap: "Front SMA launch panel, ADAR1000 header, DAC/ADC banks and Artix-7 FPGA." },
-      { src: "assets/img/board_bottom.png", title: "Rev08 Bottom Side (KV260 Mate)", cap: "J101/J102/J103 IAS/RPi plugs, J1501 USB-C, J1502 J9 FFC, J1503 CAN+PPS & RJ45." },
+      { src: "assets/img/board_iso.png", title: "Rev08 Final Adapter Isometric", cap: "Updated Rev08 board with routed vehicle CAN (U1506, Q1530/Q1531, J1503 6-way JST-SH)." },
+      { src: "assets/img/board_top.png", title: "Rev08 Final Top Side", cap: "Front SMA launch panel, ADAR1000 header, J1502 15-way FFC, J1503 6-pin CAN+PPS & Artix-7." },
+      { src: "assets/img/board_bottom.png", title: "Rev08 Final Bottom Side", cap: "U1506 TCAN330DCNT CAN transceiver, Q1530/Q1531 NOR pair, D1531 PESD1CAN, J101/J102 plugs." },
       { src: "assets/img/case_v2_closed.jpg", title: "Closed Enclosure v2 (PETG-CF + TPU)", cap: "Dual-fan intake/exhaust enclosure with printable filter frame and corner bumpers." },
       { src: "assets/img/case_v2_open.jpg", title: "Closed Enclosure v2 (Open Service View)", cap: "Internal heatsink clearance, dual OD5015 lid fan and captive connector exits." },
     ],
   },
 ];
 
-// Global application state
 const state = {
   ready: false,
   tab: "explorer",
@@ -65,14 +62,35 @@ const state = {
   isolateMode: "all", // all | board | kv260 | thermal | enclosure
   selectedId: null,
   activeNet: null,
+  useWasmPicker: true,
+};
+
+// Interpolated / animated state for eased motion & slide-out teardown
+const anim = {
+  explodePct: 0,
+  somLiftMm: 0,
+  lidOpen: 0,
+  caseVisFade: 1,
+  kvFanSlide: 0,
+  kvHsSlide: 0,
+};
+let tweenHandles = {
+  explode: null,
+  somLift: null,
+  cam: null,
+  intro: null,
 };
 
 let catalogue = null;
+let netTraces = {};
+let siteCore = null;
+const partList = [];
+const partIndexById = new Map();
 const partById = new Map();
 const nodeById = new Map();
 const compByNet = new Map();
 
-// Main 3-D viewport objects
+// Main 3-D objects
 let renderer, scene, camera, controls;
 const assemblyRoot = new THREE.Group();
 const adapterGroup = new THREE.Group();
@@ -84,19 +102,26 @@ const encNodes = {};
 let hoverBox = null;
 let selectBox = null;
 const netHighlightGroup = new THREE.Group();
+const netPulseGroup = new THREE.Group();
+let activeTraceSegs = [];
+let activePulseMesh = null;
 
 // Layer viewer objects
 let layerRenderer, layerScene, layerCamera, layerControls;
 const layerPlanesGroup = new THREE.Group();
 const layerEntries = [];
 let layerActiveId = "F.Cu";
+let layerPeelStart = -1;
 let l2dZoom = 1.0;
 let l2dPan = { x: 0, y: 0 };
+let mockupCtrl = null;
 
-// Wait helpers
 function $(sel) {
   return document.querySelector(sel);
 }
+
+const isReducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+const easeOutCubic = (u) => 1 - Math.pow(1 - Math.min(1, Math.max(0, u)), 3);
 
 function escapeHtml(s) {
   return String(s ?? "")
@@ -106,48 +131,104 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
+function setLoadProgress(pct, stage, detail) {
+  const fill = $("#load-bar-fill");
+  const pctEl = $("#load-pct");
+  const stEl = $("#load-stage");
+  const dtEl = $("#load-detail");
+  if (fill) fill.style.width = `${Math.min(100, Math.max(4, pct))}%`;
+  if (pctEl) pctEl.textContent = `${Math.round(pct)}%`;
+  if (stage && stEl) stEl.textContent = stage;
+  if (detail && dtEl) dtEl.textContent = detail;
+}
+
 // ---------------------------------------------------------------------------
-// Initialisation
+// Boot & Parallel Asset / Rust WASM Streaming
 // ---------------------------------------------------------------------------
 
 async function boot() {
-  initMockups($("#mockups-root"));
-  renderGallery();
   wireUiEvents();
+  setupScrollStory();
+  renderGallery();
+  setLoadProgress(10, "Loading Rust/WASM Core & Component Catalogue...", "site/core/pkg/ias2rf_site_core_bg.wasm");
 
-  const resp = await fetch("assets/components.json");
-  if (!resp.ok) throw new Error(`Failed loading components.json: ${resp.status}`);
-  catalogue = await resp.json();
-  indexCatalogue(catalogue);
+  const [_, catResp, traceResp] = await Promise.all([
+    initCore(),
+    fetch("assets/components.json"),
+    fetch("assets/net_traces.json"),
+  ]);
+  if (!catResp.ok) throw new Error(`components.json HTTP ${catResp.status}`);
+  catalogue = await catResp.json();
+  if (traceResp.ok) netTraces = await traceResp.json();
+
+  setLoadProgress(28, "Building Spatial BVH/Grid in Rust WASM...", `${catalogue.components.length} board + ${catalogue.kv260_parts.length} KV260 parts`);
+  siteCore = new SiteCore();
+  indexAndLoadCore(catalogue);
 
   initExplorerThree();
-  await loadModels();
-  initLayerViewer();
+  await loadModelsWithProgress();
+  await initLayerViewer();
 
-  applyAssemblyTransforms();
+  mockupCtrl = initMockups($("#mockups-root"), () => siteCore, () => state.tab === "mockups");
+
+  applyTransformsInstant();
   updateStatsPill();
+  $("#hud-perf").textContent = `Rust Grid: ${siteCore.part_count()} AABBs ready`;
+
+  setLoadProgress(100, "Ready", "Loaded GLBs & Rust/WASM core");
   $("#loading-overlay").classList.add("hidden");
   state.ready = true;
+
+  const hasHash = applyHashParams();
+  if (!hasHash && !location.search.includes("noIntro=1") && !isReducedMotion()) {
+    playIntro();
+  }
 }
 
-function indexCatalogue(cat) {
-  for (const c of cat.components) {
-    partById.set(c.ref, { kind: "board", data: c });
-    for (const net of c.nets || []) {
+function indexAndLoadCore(cat) {
+  let idx = 0;
+  const pushPart = (id, kind, data, groupId, bmin, bmax) => {
+    partIndexById.set(id, idx);
+    partList[idx] = id;
+    partById.set(id, { kind, data });
+    const nets = data.nets || [];
+    for (const net of nets) {
       if (!compByNet.has(net)) compByNet.set(net, []);
-      compByNet.get(net).push(c.ref);
+      compByNet.get(net).push(id);
     }
+    siteCore.add_part(
+      idx,
+      id,
+      data.ref || id,
+      data.value || data.part || "",
+      data.mpn || "",
+      data.description || data.role || "",
+      nets.join("\n"),
+      groupId,
+      bmin[0], bmin[1], bmin[2],
+      bmax[0], bmax[1], bmax[2]
+    );
+    idx++;
+  };
+
+  for (const c of cat.components) {
+    const [kx0, ky0, kx1, ky1, kz0, kz1] = c.bbox_world_mm;
+    pushPart(c.ref, "board", c, 0, [kx0 * 0.001, kz0 * 0.001, -ky1 * 0.001], [kx1 * 0.001, kz1 * 0.001, -ky0 * 0.001]);
   }
   for (const k of cat.kv260_parts) {
-    partById.set(k.id, { kind: k.subassembly === "cooling" ? "kv_cooling" : "kv260", data: k });
+    const [kx0, ky0, kx1, ky1, kz0, kz1] = k.bbox_mm;
+    const gid = k.id === "KV260_FAN" ? 3 : k.id === "KV260_HEATSINK" ? 4 : k.subassembly === "som" ? 2 : 1;
+    pushPart(k.id, k.subassembly === "cooling" ? "kv_cooling" : "kv260", k, gid, [kx0 * 0.001, kz0 * 0.001, -ky1 * 0.001], [kx1 * 0.001, kz1 * 0.001, -ky0 * 0.001]);
   }
   for (const ex of cat.extra_parts || []) {
-    partById.set(ex.id, { kind: "extra", data: ex });
+    const [kx0, ky0, kx1, ky1, kz0, kz1] = ex.bbox_mm;
+    const gid = ex.id === "FAN2_5015" ? 6 : 7;
+    pushPart(ex.id, "extra", ex, gid, [kx0 * 0.001, kz0 * 0.001, -ky1 * 0.001], [kx1 * 0.001, kz1 * 0.001, -ky0 * 0.001]);
   }
 }
 
 // ---------------------------------------------------------------------------
-// Three.js Explorer Setup & Lighting (calibrated materials + RoomEnvironment)
+// Three.js Explorer Scene & Lighting
 // ---------------------------------------------------------------------------
 
 function initExplorerThree() {
@@ -165,9 +246,7 @@ function initExplorerThree() {
   scene.environmentIntensity = 0.85;
   pmrem.dispose();
 
-  const hemi = new THREE.HemisphereLight(0xdbe8f8, 0x1a2029, 0.55);
-  scene.add(hemi);
-
+  scene.add(new THREE.HemisphereLight(0xdbe8f8, 0x1a2029, 0.55));
   const keyLight = new THREE.DirectionalLight(0xfff8ef, 1.35);
   keyLight.position.set(0.45, 0.78, 0.52);
   scene.add(keyLight);
@@ -187,10 +266,20 @@ function initExplorerThree() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.minDistance = 0.025;
-  controls.maxDistance = 1.2;
+  controls.maxDistance = 1.4;
+
+  // Cancel scripted camera/intro motions immediately on user input
+  const cancelAutoMotion = () => {
+    tweenHandles.intro = null;
+    tweenHandles.cam = null;
+  };
+  canvas.addEventListener("pointerdown", cancelAutoMotion, { passive: true });
+  canvas.addEventListener("wheel", cancelAutoMotion, { passive: true });
+  canvas.addEventListener("touchstart", cancelAutoMotion, { passive: true });
 
   adapterGroup.position.copy(BOARD_REG_POS);
   adapterGroup.rotation.y = BOARD_REG_ROTY;
+  adapterGroup.add(netPulseGroup);
 
   assemblyRoot.add(adapterGroup);
   scene.add(assemblyRoot);
@@ -219,8 +308,10 @@ function initExplorerThree() {
 
   wireViewportPicking(canvas);
 
-  const tick = () => {
+  const tick = (now) => {
     requestAnimationFrame(tick);
+    stepTweens(now);
+    stepPulseDots(now);
     if (state.tab === "explorer") {
       controls.update();
       renderer.render(scene, camera);
@@ -229,15 +320,31 @@ function initExplorerThree() {
   requestAnimationFrame(tick);
 }
 
-async function loadModels() {
+async function loadModelsWithProgress() {
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  const loadGlb = (url) => new Promise((res, rej) => loader.load(url, res, undefined, rej));
+  const progressMap = { board: 0, kv: 0, enc: 0 };
+  const updateLoaderUi = (label) => {
+    const avg = (progressMap.board * 0.85 + progressMap.kv * 0.05 + progressMap.enc * 0.10);
+    setLoadProgress(30 + avg * 68, "Streaming 3-D CAD Assemblies...", label);
+  };
+  const loadGlb = (url, key, label) => new Promise((res, rej) => {
+    loader.load(url, (g) => {
+      progressMap[key] = 1;
+      updateLoaderUi(`${label} ready`);
+      res(g);
+    }, (ev) => {
+      if (ev.total > 0) {
+        progressMap[key] = ev.loaded / ev.total;
+        updateLoaderUi(`${label} (${(ev.loaded / 1e6).toFixed(1)} / ${(ev.total / 1e6).toFixed(1)} MB)`);
+      }
+    }, rej);
+  });
 
   const [bGltf, kGltf, eGltf] = await Promise.all([
-    loadGlb("assets/board.glb"),
-    loadGlb("assets/kv260.glb"),
-    loadGlb("assets/enclosure.glb"),
+    loadGlb("assets/board.glb", "board", "board.glb"),
+    loadGlb("assets/kv260.glb", "kv", "kv260.glb"),
+    loadGlb("assets/enclosure.glb", "enc", "enclosure.glb"),
   ]);
 
   boardModel = bGltf.scene;
@@ -249,7 +356,6 @@ async function loadModels() {
   enclosureModel = eGltf.scene;
   assemblyRoot.add(enclosureModel);
 
-  // Index selectable Object3D nodes by exact ID/Ref
   const collect = (root) => {
     root.traverse((obj) => {
       if (obj.name && partById.has(obj.name) && !nodeById.has(obj.name)) {
@@ -267,85 +373,290 @@ async function loadModels() {
   collect(kv260Model);
   collect(enclosureModel);
 
-  setCameraPreset("iso");
+  setCameraPreset("iso", true);
 }
 
 // ---------------------------------------------------------------------------
-// Explode, Teardown, Isolate & Camera Framing
+// Tweens, Slide-Out Part Animations, Intro Sequence & Scene Application
 // ---------------------------------------------------------------------------
 
-function applyAssemblyTransforms() {
-  const t = state.explodePct / 100;
-  const somOffset = state.somLiftMm * 0.001 + 0.028 * t;
+function startScalarTween(key, from, to, durationMs) {
+  if (isReducedMotion() || durationMs <= 0) {
+    tweenHandles[key] = null;
+    anim[key] = to;
+    applyAnimatedScene();
+    return;
+  }
+  tweenHandles[key] = { from, to, start: performance.now(), dur: Math.min(900, durationMs) };
+}
+
+function stepTweens(now) {
+  let dirty = false;
+
+  // 1. Intro sequence (~2050 ms total, interruptible)
+  if (tweenHandles.intro) {
+    const tr = tweenHandles.intro;
+    const u = Math.min(1, (now - tr.start) / tr.dur);
+    applyIntroAtProgress(u);
+    if (u >= 1) {
+      tweenHandles.intro = null;
+      syncHash();
+    }
+  }
+
+  // 2. Smooth explode / SOM lift scalars
+  for (const key of ["explodePct", "somLiftMm"]) {
+    const h = tweenHandles[key];
+    if (!h) continue;
+    const u = Math.min(1, (now - h.start) / h.dur);
+    anim[key] = h.from + (h.to - h.from) * easeOutCubic(u);
+    dirty = true;
+    if (u >= 1) tweenHandles[key] = null;
+  }
+
+  // 3. Smooth slide-out offsets for enclosure lid, KV260 fan & heatsink
+  const stepRate = isReducedMotion() ? 1.0 : 0.16;
+  const targets = {
+    lidOpen: state.enclosureMode === "open" ? 1 : 0,
+    caseVisFade: state.enclosureMode === "hidden" ? 0 : 1,
+    kvFanSlide: state.showKvFan ? 0 : 1,
+    kvHsSlide: state.showKvHs ? 0 : 1,
+  };
+  for (const [k, tgt] of Object.entries(targets)) {
+    const diff = tgt - anim[k];
+    if (Math.abs(diff) > 0.002) {
+      anim[k] += diff * stepRate;
+      dirty = true;
+    } else if (anim[k] !== tgt) {
+      anim[k] = tgt;
+      dirty = true;
+    }
+  }
+
+  // 4. Camera tween (<= 750 ms eased)
+  if (tweenHandles.cam) {
+    const c = tweenHandles.cam;
+    const u = easeOutCubic(Math.min(1, (now - c.start) / c.dur));
+    camera.position.lerpVectors(c.fromPos, c.toPos, u);
+    controls.target.lerpVectors(c.fromTgt, c.toTgt, u);
+    controls.update();
+    if (u >= 1) tweenHandles.cam = null;
+  }
+
+  if (dirty) applyAnimatedScene();
+}
+
+function applyTransformsInstant() {
+  anim.explodePct = state.explodePct;
+  anim.somLiftMm = state.somLiftMm;
+  anim.lidOpen = state.enclosureMode === "open" ? 1 : 0;
+  anim.caseVisFade = state.enclosureMode === "hidden" ? 0 : 1;
+  anim.kvFanSlide = state.showKvFan ? 0 : 1;
+  anim.kvHsSlide = state.showKvHs ? 0 : 1;
+  applyAnimatedScene();
+}
+
+function applyAnimatedScene() {
+  const t = anim.explodePct / 100;
+  const somY = anim.somLiftMm * 0.001 + 0.028 * t;
   const showEnc = state.isolateMode === "all" || state.isolateMode === "enclosure";
   const showBoard = state.isolateMode === "all" || state.isolateMode === "board";
   const showKv = state.isolateMode === "all" || state.isolateMode === "kv260";
   const showThermal = state.isolateMode === "all" || state.isolateMode === "thermal";
 
+  const yBoard = 0.072 * t;
   adapterGroup.visible = showBoard;
-  adapterGroup.position.set(BOARD_REG_POS.x, BOARD_REG_POS.y + 0.072 * t, BOARD_REG_POS.z);
+  adapterGroup.position.set(BOARD_REG_POS.x, BOARD_REG_POS.y + yBoard, BOARD_REG_POS.z);
 
-  if (kv260Model) {
-    kv260Model.visible = showKv || state.isolateMode === "thermal";
-  }
+  const ySom = somY;
+  const yCoolingBase = somY + 0.040 * t;
+  const yFanSlide = anim.kvFanSlide * 0.042;
+  const yHsSlide = anim.kvHsSlide * 0.042;
+  const fanVis = (showKv || showThermal) && anim.kvFanSlide < 0.98;
+  const hsVis = (showKv || showThermal) && anim.kvHsSlide < 0.98;
+
+  if (kv260Model) kv260Model.visible = showKv || showThermal;
   if (kvNodes.KV260_CARRIER_GROUP) kvNodes.KV260_CARRIER_GROUP.visible = showKv;
   if (kvNodes.K26_SOM_GROUP) {
     kvNodes.K26_SOM_GROUP.visible = showKv;
-    kvNodes.K26_SOM_GROUP.position.y = somOffset;
+    kvNodes.K26_SOM_GROUP.position.y = ySom;
   }
   if (kvNodes.KV260_COOLING_GROUP) {
-    kvNodes.KV260_COOLING_GROUP.visible = showKv || showThermal;
-    kvNodes.KV260_COOLING_GROUP.position.y = somOffset + 0.040 * t;
+    kvNodes.KV260_COOLING_GROUP.visible = fanVis || hsVis;
+    kvNodes.KV260_COOLING_GROUP.position.y = yCoolingBase;
   }
-  if (kvNodes.KV260_FAN) kvNodes.KV260_FAN.visible = state.showKvFan && (showKv || showThermal);
-  if (kvNodes.KV260_HEATSINK) kvNodes.KV260_HEATSINK.visible = state.showKvHs && (showKv || showThermal);
+  if (kvNodes.KV260_FAN) {
+    kvNodes.KV260_FAN.visible = fanVis;
+    kvNodes.KV260_FAN.position.y = yFanSlide;
+  }
+  if (kvNodes.KV260_HEATSINK) {
+    kvNodes.KV260_HEATSINK.visible = hsVis;
+    kvNodes.KV260_HEATSINK.position.y = yHsSlide;
+  }
 
-  if (enclosureModel) {
-    enclosureModel.visible = showEnc || showThermal;
-  }
-  const caseVis = showEnc && state.enclosureMode !== "hidden";
+  const caseVis = showEnc && anim.caseVisFade > 0.02;
+  const hideSlide = (1 - anim.caseVisFade) * 0.06;
+  const yBottom = -0.045 * t - hideSlide;
+  const yLid = anim.lidOpen * 0.085 + 0.150 * t + hideSlide;
+  const yAdpHs = 0.105 * t;
+
+  if (enclosureModel) enclosureModel.visible = showEnc || showThermal;
   if (encNodes.ENCLOSURE_BOTTOM_GROUP) {
     encNodes.ENCLOSURE_BOTTOM_GROUP.visible = caseVis;
-    encNodes.ENCLOSURE_BOTTOM_GROUP.position.y = -0.045 * t;
+    encNodes.ENCLOSURE_BOTTOM_GROUP.position.y = yBottom;
   }
   if (encNodes.ENCLOSURE_BUMPERS_GROUP) {
     encNodes.ENCLOSURE_BUMPERS_GROUP.visible = caseVis;
-    encNodes.ENCLOSURE_BUMPERS_GROUP.position.y = -0.025 * t;
+    encNodes.ENCLOSURE_BUMPERS_GROUP.position.y = -0.025 * t - hideSlide * 0.5;
   }
   if (encNodes.ENCLOSURE_LID_GROUP) {
-    const lidOpenOffset = state.enclosureMode === "open" ? 0.085 : 0.0;
     encNodes.ENCLOSURE_LID_GROUP.visible = caseVis;
-    encNodes.ENCLOSURE_LID_GROUP.position.y = lidOpenOffset + 0.150 * t;
+    encNodes.ENCLOSURE_LID_GROUP.position.y = yLid;
   }
   if (encNodes.ADAPTER_HEATSINKS_GROUP) {
     encNodes.ADAPTER_HEATSINKS_GROUP.visible = showThermal;
-    encNodes.ADAPTER_HEATSINKS_GROUP.position.y = 0.105 * t;
+    encNodes.ADAPTER_HEATSINKS_GROUP.position.y = yAdpHs;
   }
 
   scene.updateMatrixWorld(true);
   updateSelectionBox();
   rebuildNetHighlightBoxes();
+
+  if (siteCore) {
+    const mask =
+      (showBoard ? 1 << 0 : 0) |
+      (showKv ? 1 << 1 : 0) |
+      (showKv ? 1 << 2 : 0) |
+      (fanVis ? 1 << 3 : 0) |
+      (hsVis ? 1 << 4 : 0) |
+      (caseVis ? 1 << 5 : 0) |
+      (caseVis ? 1 << 6 : 0) |
+      (showThermal ? 1 << 7 : 0);
+    const offsets = new Float32Array([
+      yBoard,
+      0.0,
+      ySom,
+      yCoolingBase + yFanSlide,
+      yCoolingBase + yHsSlide,
+      yBottom,
+      yLid,
+      yAdpHs,
+    ]);
+    siteCore.set_group_transforms(offsets, mask);
+  }
+}
+
+function applyIntroAtProgress(u) {
+  const c = new THREE.Vector3(0.02, 0.02, -0.05);
+  let explodeTarget = 0;
+  let somTarget = 0;
+  let lidMode = "closed";
+  let camOffset;
+
+  if (u < 0.35) {
+    const p = easeOutCubic(u / 0.35);
+    lidMode = p > 0.45 ? "open" : "closed";
+    anim.lidOpen = lidMode === "open" ? Math.min(1, (p - 0.45) / 0.55) : 0;
+    explodeTarget = p * 12;
+    camOffset = new THREE.Vector3().lerpVectors(
+      new THREE.Vector3(-0.34, 0.25, 0.34),
+      new THREE.Vector3(-0.23, 0.19, 0.24),
+      p
+    );
+  } else if (u < 0.72) {
+    const p = easeOutCubic((u - 0.35) / 0.37);
+    lidMode = "open";
+    anim.lidOpen = 1;
+    explodeTarget = 12 + p * 46; // up to 58%
+    somTarget = p * 14;
+    camOffset = new THREE.Vector3().lerpVectors(
+      new THREE.Vector3(-0.23, 0.19, 0.24),
+      new THREE.Vector3(-0.25, 0.21, 0.25),
+      p
+    );
+  } else {
+    const p = easeOutCubic((u - 0.72) / 0.28);
+    lidMode = "open";
+    anim.lidOpen = 1;
+    explodeTarget = 58 - p * 40; // settles at 18% cutaway
+    somTarget = 14 * (1 - p);
+    camOffset = new THREE.Vector3().lerpVectors(
+      new THREE.Vector3(-0.25, 0.21, 0.25),
+      new THREE.Vector3(-0.21, 0.17, 0.21),
+      p
+    );
+  }
+
+  state.enclosureMode = lidMode;
+  state.explodePct = Math.round(explodeTarget);
+  state.somLiftMm = Math.round(somTarget);
+  anim.explodePct = explodeTarget;
+  anim.somLiftMm = somTarget;
+  document.querySelectorAll("[data-enc]").forEach((b) => b.classList.toggle("active", b.dataset.enc === lidMode));
+  $("#range-explode").value = state.explodePct;
+  $("#val-explode").textContent = `${state.explodePct}%`;
+  $("#range-som-lift").value = state.somLiftMm;
+  $("#val-som-lift").textContent = `${state.somLiftMm} mm`;
+
+  applyAnimatedScene();
+  controls.target.copy(c);
+  camera.position.copy(c).add(camOffset);
+  controls.update();
+}
+
+function playIntro() {
+  if (isReducedMotion()) {
+    state.enclosureMode = "open";
+    state.explodePct = 18;
+    state.somLiftMm = 0;
+    document.querySelectorAll("[data-enc]").forEach((b) => b.classList.toggle("active", b.dataset.enc === "open"));
+    $("#range-explode").value = 18;
+    $("#val-explode").textContent = "18%";
+    applyTransformsInstant();
+    setCameraPreset("iso", true);
+    return;
+  }
+  tweenHandles.cam = null;
+  tweenHandles.intro = { start: performance.now(), dur: 2050 };
 }
 
 function getActiveBounds() {
   const box = new THREE.Box3();
-  const candidates = [];
-  if (adapterGroup.visible) candidates.push(adapterGroup);
-  if (kvNodes.KV260_CARRIER_GROUP?.visible) candidates.push(kvNodes.KV260_CARRIER_GROUP);
-  if (kvNodes.K26_SOM_GROUP?.visible) candidates.push(kvNodes.K26_SOM_GROUP);
-  if (kvNodes.KV260_COOLING_GROUP?.visible && (kvNodes.KV260_FAN?.visible || kvNodes.KV260_HEATSINK?.visible)) {
-    candidates.push(kvNodes.KV260_COOLING_GROUP);
+  const candidates = [
+    adapterGroup,
+    kvNodes.KV260_CARRIER_GROUP,
+    kvNodes.K26_SOM_GROUP,
+    kvNodes.KV260_COOLING_GROUP,
+    encNodes.ENCLOSURE_BOTTOM_GROUP,
+    encNodes.ENCLOSURE_LID_GROUP,
+    encNodes.ADAPTER_HEATSINKS_GROUP,
+  ];
+  for (const obj of candidates) {
+    if (obj && isObjectEffectivelyVisible(obj)) box.expandByObject(obj);
   }
-  if (encNodes.ENCLOSURE_BOTTOM_GROUP?.visible) candidates.push(encNodes.ENCLOSURE_BOTTOM_GROUP);
-  if (encNodes.ENCLOSURE_LID_GROUP?.visible) candidates.push(encNodes.ENCLOSURE_LID_GROUP);
-  if (encNodes.ADAPTER_HEATSINKS_GROUP?.visible) candidates.push(encNodes.ADAPTER_HEATSINKS_GROUP);
-
-  for (const obj of candidates) box.expandByObject(obj);
   if (box.isEmpty()) box.set(new THREE.Vector3(-0.08, -0.02, -0.12), new THREE.Vector3(0.14, 0.06, 0.03));
   return box;
 }
 
-function setCameraPreset(preset) {
+function moveCameraEased(targetCenter, targetPos, durationMs = 620) {
+  if (isReducedMotion() || durationMs <= 0) {
+    tweenHandles.cam = null;
+    controls.target.copy(targetCenter);
+    camera.position.copy(targetPos);
+    controls.update();
+    return;
+  }
+  tweenHandles.cam = {
+    fromPos: camera.position.clone(),
+    toPos: targetPos.clone(),
+    fromTgt: controls.target.clone(),
+    toTgt: targetCenter.clone(),
+    start: performance.now(),
+    dur: Math.min(900, durationMs),
+  };
+}
+
+function setCameraPreset(preset, instant = false) {
   scene.updateMatrixWorld(true);
   const box = getActiveBounds();
   const center = box.getCenter(new THREE.Vector3());
@@ -362,12 +673,11 @@ function setCameraPreset(preset) {
     back: new THREE.Vector3(1.0, 0.30, -0.08),
   };
   const d = (dirs[preset] || dirs.iso).clone().normalize();
-  controls.target.copy(center);
-  camera.position.copy(center).addScaledVector(d, dist);
-  controls.update();
+  const pos = center.clone().addScaledVector(d, dist);
+  moveCameraEased(center, pos, instant ? 0 : 620);
 }
 
-function focusPartCamera(id) {
+function focusPartCamera(id, instant = false) {
   const obj = nodeById.get(id);
   if (!obj) return;
   scene.updateMatrixWorld(true);
@@ -375,19 +685,37 @@ function focusPartCamera(id) {
   if (box.isEmpty()) return;
   const center = box.getCenter(new THREE.Vector3());
   const sz = box.getSize(new THREE.Vector3());
-  const dist = Math.max(Math.max(sz.x, sz.y, sz.z) * 2.8, 0.045);
+  const dist = Math.max(Math.max(sz.x, sz.y, sz.z) * 2.8, 0.048);
   const dir = camera.position.clone().sub(controls.target).normalize();
   if (dir.lengthSq() < 0.01) dir.set(-0.5, 0.7, 0.6).normalize();
-  controls.target.copy(center);
-  camera.position.copy(center).addScaledVector(dir, dist);
-  controls.update();
+  moveCameraEased(center, center.clone().addScaledVector(dir, dist), instant ? 0 : 580);
 }
 
 // ---------------------------------------------------------------------------
-// Raycasting, Hover Tooltip, Tap Selection & Inspector Rendering
+// Hover & Click Picking (Rust WASM SiteCore + Three.js Fallback Benchmark)
 // ---------------------------------------------------------------------------
 
-function resolvePartHit(hits) {
+const _raycaster = new THREE.Raycaster();
+const _ptr = new THREE.Vector2();
+
+function pickAtNdc(ndcX, ndcY) {
+  _ptr.set(ndcX, ndcY);
+  _raycaster.setFromCamera(_ptr, camera);
+  if (state.useWasmPicker && siteCore) {
+    const r = _raycaster.ray;
+    const hitIdx = siteCore.pick_ray(
+      r.origin.x, r.origin.y, r.origin.z,
+      r.direction.x, r.direction.y, r.direction.z
+    );
+    if (hitIdx >= 0) {
+      const id = partList[hitIdx];
+      return { id, object: nodeById.get(id) || null };
+    }
+    return null;
+  }
+
+  // Fallback / baseline Three.js mesh traversal
+  const hits = _raycaster.intersectObject(assemblyRoot, true);
   for (let i = 0; i < hits.length; i++) {
     const h = hits[i];
     if (!h.object.visible) continue;
@@ -398,44 +726,42 @@ function resolvePartHit(hits) {
       }
       cur = cur.parent;
     }
-    // If closest hit is soldermask/silkscreen, allow next hit within 0.2 mm behind it
     const nm = h.object.name || "";
     if ((nm === "PCB_LAYER_SOLDERMASK" || nm === "PCB_LAYER_SILKSCREEN") && hits[i + 1] && hits[i + 1].distance - h.distance < 0.002) {
       continue;
     }
-    // Otherwise opaque PCB core / carrier / case blocks rear items
     return null;
   }
   return null;
 }
 
 function wireViewportPicking(canvas) {
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
   const tip = $("#hover-tooltip");
   let downPos = null;
 
-  const setPointer = (ev) => {
+  const getNdc = (ev) => {
     const rect = canvas.getBoundingClientRect();
-    pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-    return rect;
+    return {
+      rect,
+      nx: ((ev.clientX - rect.left) / rect.width) * 2 - 1,
+      ny: -((ev.clientY - rect.top) / rect.height) * 2 + 1,
+    };
   };
 
   canvas.addEventListener("pointermove", (ev) => {
     if (!state.ready) return;
-    const rect = setPointer(ev);
-    raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObject(assemblyRoot, true);
-    const found = resolvePartHit(hits);
+    const { rect, nx, ny } = getNdc(ev);
+    const t0 = performance.now();
+    const found = pickAtNdc(nx, ny);
+    const pickMs = performance.now() - t0;
+    $("#hud-perf").textContent = `${state.useWasmPicker ? "Rust" : "Three"} pick: ${pickMs.toFixed(2)} ms`;
+
     if (found && found.object) {
       const entry = partById.get(found.id);
       const label = entry.kind === "board"
         ? `${entry.data.ref} &middot; ${escapeHtml(entry.data.value)}`
         : `${entry.data.ref || entry.data.id} &middot; ${escapeHtml(entry.data.part || entry.data.value)}`;
-      const role = entry.kind === "board"
-        ? entry.data.description
-        : entry.data.role;
+      const role = entry.kind === "board" ? entry.data.description : entry.data.role;
       tip.innerHTML = `<strong>${label}</strong><br><span style="color:var(--text-muted)">${escapeHtml((role || "").slice(0, 88))}</span>`;
       tip.style.left = `${Math.min(rect.width - 210, Math.max(8, ev.clientX - rect.left + 12))}px`;
       tip.style.top = `${Math.min(rect.height - 65, Math.max(8, ev.clientY - rect.top + 12))}px`;
@@ -463,18 +789,18 @@ function wireViewportPicking(canvas) {
     if (!downPos || !state.ready) return;
     const moved = Math.hypot(ev.clientX - downPos.x, ev.clientY - downPos.y);
     downPos = null;
-    if (moved > 5) return; // orbit drag, not a tap
-    setPointer(ev);
-    raycaster.setFromCamera(pointer, camera);
-    const found = resolvePartHit(raycaster.intersectObject(assemblyRoot, true));
+    if (moved > 5) return;
+    const { nx, ny } = getNdc(ev);
+    const found = pickAtNdc(nx, ny);
     if (found) selectPart(found.id, false);
   });
 
   canvas.addEventListener("dblclick", (ev) => {
     if (!state.ready) return;
-    setPointer(ev);
-    raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObject(assemblyRoot, true);
+    const { nx, ny } = getNdc(ev);
+    _ptr.set(nx, ny);
+    _raycaster.setFromCamera(_ptr, camera);
+    const hits = _raycaster.intersectObject(assemblyRoot, true);
     if (!hits.length) {
       setIsolate("all");
       return;
@@ -489,6 +815,10 @@ function wireViewportPicking(canvas) {
     }
   });
 }
+
+// ---------------------------------------------------------------------------
+// Selection Box & Animated Pulsing Copper Net Highlight
+// ---------------------------------------------------------------------------
 
 function updateSelectionBox() {
   if (!state.selectedId) {
@@ -515,16 +845,70 @@ function isObjectEffectivelyVisible(obj) {
 
 function rebuildNetHighlightBoxes() {
   while (netHighlightGroup.children.length) netHighlightGroup.remove(netHighlightGroup.children[0]);
+  while (netPulseGroup.children.length) netPulseGroup.remove(netPulseGroup.children[0]);
+  activeTraceSegs = [];
+  activePulseMesh = null;
+
   if (!state.activeNet || !adapterGroup.visible) return;
-  const refs = compByNet.get(state.activeNet) || [];
+  const refs = siteCore
+    ? Array.from(siteCore.net_mates(state.activeNet)).map((idx) => partList[idx]).filter(Boolean)
+    : (compByNet.get(state.activeNet) || []);
+
   for (const ref of refs) {
     const obj = nodeById.get(ref);
     if (!obj) continue;
     const bx = new THREE.Box3().setFromObject(obj);
-    if (!bx.isEmpty()) {
-      netHighlightGroup.add(new THREE.Box3Helper(bx, 0x4cc2ff));
-    }
+    if (!bx.isEmpty()) netHighlightGroup.add(new THREE.Box3Helper(bx, 0x4cc2ff));
   }
+
+  // Build real routed KiCad copper traces + traveling signal pulses inside adapterGroup
+  const rawSegs = netTraces[state.activeNet] || [];
+  if (rawSegs.length) {
+    const verts = new Float32Array(rawSegs.length * 6);
+    activeTraceSegs = [];
+    for (let i = 0; i < rawSegs.length; i++) {
+      const [x1, y1, x2, y2, lIdx] = rawSegs[i];
+      // Place top copper highlight just above top silk (+1.72 mm) and bottom copper just below (-0.09 mm)
+      const yLocal = lIdx <= 3 ? 0.00172 : -0.00009;
+      const o = i * 6;
+      verts[o] = x1 * 0.001;
+      verts[o + 1] = yLocal;
+      verts[o + 2] = y1 * 0.001;
+      verts[o + 3] = x2 * 0.001;
+      verts[o + 4] = yLocal;
+      verts[o + 5] = y2 * 0.001;
+      activeTraceSegs.push([x1 * 0.001, yLocal, y1 * 0.001, x2 * 0.001, yLocal, y2 * 0.001]);
+    }
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x4cc2ff, transparent: true, opacity: 0.92 });
+    netPulseGroup.add(new THREE.LineSegments(lineGeo, lineMat));
+
+    const dotCount = Math.min(28, Math.max(8, activeTraceSegs.length));
+    const dotGeo = new THREE.SphereGeometry(0.00045, 8, 8);
+    const dotMat = new THREE.MeshBasicMaterial({ color: 0xffb020 });
+    activePulseMesh = new THREE.InstancedMesh(dotGeo, dotMat, dotCount);
+    netPulseGroup.add(activePulseMesh);
+    stepPulseDots(performance.now());
+  }
+}
+
+function stepPulseDots(now) {
+  if (!activePulseMesh || !activeTraceSegs.length) return;
+  const count = activePulseMesh.count;
+  const speed = isReducedMotion() ? 0 : now * 0.0016;
+  const m = new THREE.Matrix4();
+  for (let i = 0; i < count; i++) {
+    const segIdx = Math.floor((i * activeTraceSegs.length) / count);
+    const seg = activeTraceSegs[segIdx];
+    const phase = (speed + i * 0.13) % 1.0;
+    const x = seg[0] + (seg[3] - seg[0]) * phase;
+    const y = seg[1] + 0.0002;
+    const z = seg[2] + (seg[5] - seg[2]) * phase;
+    m.makeTranslation(x, y, z);
+    activePulseMesh.setMatrixAt(i, m);
+  }
+  activePulseMesh.instanceMatrix.needsUpdate = true;
 }
 
 function selectPart(id, shouldFocus = true) {
@@ -534,7 +918,6 @@ function selectPart(id, shouldFocus = true) {
   updateSelectionBox();
   if (shouldFocus) focusPartCamera(id);
 
-  // Open mobile inspector drawer cleanly
   $("#inspector-empty").style.display = "none";
   const body = $("#inspector-body");
   body.style.display = "flex";
@@ -557,9 +940,10 @@ function selectPart(id, shouldFocus = true) {
         <h2 style="margin:0;font-size:17px;">${escapeHtml(c.ref)} <small style="font-weight:500;color:var(--text-muted)">${escapeHtml(c.value)}</small></h2>
         <p style="margin:0;font-size:12px;">${escapeHtml(c.description || "no description yet")}</p>
         ${c.callout ? `<p style="margin:0;font-size:11px;color:var(--cyan)"><strong>Manual callout:</strong> ${escapeHtml(c.callout)}</p>` : ""}
-        <div class="btn-grid">
+        <div class="btn-grid-3">
           <button id="insp-focus-btn" class="btn btn-sm btn-primary" type="button">Focus Camera</button>
-          <a class="btn btn-sm" style="text-align:center" href="${REPO_BLOB}/${encodeURI(c.manual_link || "docs/BOARD_MANUAL.md")}" target="_blank" rel="noopener">Open Manual</a>
+          <a class="btn btn-sm" style="text-align:center" href="${REPO_BLOB}/${encodeURI(c.manual_link || "docs/BOARD_MANUAL.md")}" target="_blank" rel="noopener">Manual</a>
+          <button id="insp-copy-link" class="btn btn-sm" type="button">Copy Link</button>
         </div>
       </div>
 
@@ -594,7 +978,8 @@ function selectPart(id, shouldFocus = true) {
       const siblings = (compByNet.get(state.activeNet) || []).slice(0, 12);
       const mateBox = body.querySelector("#insp-net-mates");
       if (mateBox) {
-        mateBox.innerHTML = `Connected on <code>${escapeHtml(state.activeNet)}</code> (${(compByNet.get(state.activeNet) || []).length} parts): ` +
+        const segCount = (netTraces[state.activeNet] || []).length;
+        mateBox.innerHTML = `Connected on <code>${escapeHtml(state.activeNet)}</code> (${(compByNet.get(state.activeNet) || []).length} parts, ${segCount} trace segs): ` +
           siblings.map((r) => `<button type="button" class="net-chip pick-ref" data-ref="${escapeHtml(r)}">${escapeHtml(r)}</button>`).join(" ");
         mateBox.querySelectorAll(".pick-ref").forEach((b) => b.addEventListener("click", () => selectPart(b.dataset.ref, true)));
       }
@@ -610,9 +995,10 @@ function selectPart(id, shouldFocus = true) {
         </div>
         <h2 style="margin:0;font-size:17px;">${escapeHtml(k.ref)} <small style="font-weight:500;color:var(--text-muted)">${escapeHtml(k.part || k.value)}</small></h2>
         <p style="margin:0;font-size:12px;">${escapeHtml(k.role || "")}</p>
-        <div class="btn-grid">
+        <div class="btn-grid-3">
           <button id="insp-focus-btn" class="btn btn-sm btn-primary" type="button">Focus Camera</button>
-          <a class="btn btn-sm" style="text-align:center" href="${REPO_BLOB}/${encodeURI(k.manual_link || "docs/INTERFACE_SPEC.md")}" target="_blank" rel="noopener">Open Citation / Spec</a>
+          <a class="btn btn-sm" style="text-align:center" href="${REPO_BLOB}/${encodeURI(k.manual_link || "docs/INTERFACE_SPEC.md")}" target="_blank" rel="noopener">Spec</a>
+          <button id="insp-copy-link" class="btn btn-sm" type="button">Copy Link</button>
         </div>
       </div>
 
@@ -627,24 +1013,33 @@ function selectPart(id, shouldFocus = true) {
   }
 
   body.querySelector("#insp-focus-btn")?.addEventListener("click", () => focusPartCamera(id));
+  body.querySelector("#insp-copy-link")?.addEventListener("click", (ev) => {
+    syncHash();
+    navigator.clipboard?.writeText(location.href).catch(() => {});
+    ev.target.textContent = "Copied!";
+    setTimeout(() => { ev.target.textContent = "Copy Link"; }, 1200);
+  });
   body.querySelector("#insp-clear-net")?.addEventListener("click", () => {
     state.activeNet = null;
     rebuildNetHighlightBoxes();
     selectPart(id, false);
+    syncHash();
   });
   body.querySelectorAll("[data-net]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.activeNet = state.activeNet === btn.dataset.net ? null : btn.dataset.net;
       rebuildNetHighlightBoxes();
       selectPart(id, false);
+      syncHash();
     });
   });
 
   $("#hud-status").innerHTML = `Selected <strong>${escapeHtml(id)}</strong>`;
+  syncHash();
 }
 
 // ---------------------------------------------------------------------------
-// 8-Layer PCB Stack-up 3-D + 2-D SVG Viewer
+// 8-Layer PCB Stack-up + Sequential Peel Animation
 // ---------------------------------------------------------------------------
 
 function svgToCanvasTexture(svgText, hexColor) {
@@ -687,7 +1082,6 @@ async function initLayerViewer() {
     { id: "B.SilkS", name: "Bottom Silkscreen", color: "#d6dbe0" },
   ];
 
-  // Build 3-D Layer WebGL scene
   const canvas = $("#layer-webgl-canvas");
   layerRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   layerRenderer.setClearColor(0x000000, 0);
@@ -715,8 +1109,8 @@ async function initLayerViewer() {
   new ResizeObserver(resizeLayers).observe(canvas.parentElement);
   resizeLayers();
 
-  const wM = (catalogue.board_outline.width_mm || 141.55) * 0.001;
-  const hM = (catalogue.board_outline.height_mm || 132.55) * 0.001;
+  const wM = (catalogue.board_outline.width_mm || 140.0) * 0.001;
+  const hM = (catalogue.board_outline.height_mm || 132.0) * 0.001;
   const geom = new THREE.PlaneGeometry(wM, hM);
   geom.rotateX(-Math.PI / 2);
 
@@ -756,7 +1150,7 @@ async function initLayerViewer() {
     row.querySelector("input").addEventListener("change", (ev) => {
       ev.stopPropagation();
       entry.visible = ev.target.checked;
-      updateLayerStackVisuals();
+      updateLayerStackVisuals(performance.now());
     });
     row.addEventListener("click", () => select2dLayer(L.id));
     listEl.appendChild(row);
@@ -765,9 +1159,10 @@ async function initLayerViewer() {
   updateLayerStackVisuals();
   select2dLayer("F.Cu");
 
-  const tickLayers = () => {
+  const tickLayers = (now) => {
     requestAnimationFrame(tickLayers);
     if (state.tab === "layers") {
+      if (layerPeelStart >= 0) updateLayerStackVisuals(now);
       layerControls.update();
       layerRenderer.render(layerScene, layerCamera);
     }
@@ -775,18 +1170,37 @@ async function initLayerViewer() {
   requestAnimationFrame(tickLayers);
 }
 
-function updateLayerStackVisuals() {
+function startLayerPeel() {
+  if (isReducedMotion()) {
+    layerPeelStart = -1;
+    updateLayerStackVisuals();
+    return;
+  }
+  layerPeelStart = performance.now();
+}
+
+function updateLayerStackVisuals(now = performance.now()) {
   const spreadM = Number($("#range-layer-spread").value) * 0.001;
   const op = Number($("#range-layer-opacity").value) / 100;
   $("#val-layer-spread").textContent = `${Number($("#range-layer-spread").value).toFixed(1)} mm`;
   $("#val-layer-opacity").textContent = `${Math.round(op * 100)}%`;
 
   const mid = (layerEntries.length - 1) / 2;
+  let allDone = true;
   layerEntries.forEach((e, i) => {
     e.mesh.visible = e.visible;
-    e.mesh.position.y = (mid - i) * spreadM;
+    const targetY = (mid - i) * spreadM;
+    if (layerPeelStart >= 0) {
+      const stagger = i * 48;
+      const localU = Math.max(0, Math.min(1, (now - layerPeelStart - stagger) / 420));
+      if (localU < 1) allDone = false;
+      e.mesh.position.y = targetY * easeOutCubic(localU);
+    } else {
+      e.mesh.position.y = targetY;
+    }
     e.mesh.material.opacity = e.meta.id === layerActiveId ? Math.min(1.0, op + 0.15) : op;
   });
+  if (allDone && layerPeelStart >= 0) layerPeelStart = -1;
 }
 
 function select2dLayer(id) {
@@ -804,7 +1218,7 @@ function apply2dTransform() {
 }
 
 // ---------------------------------------------------------------------------
-// Sim Gallery & Lightbox
+// Gallery, Story Cards & Deep Links (#part=U501&view=board&explode=60)
 // ---------------------------------------------------------------------------
 
 function renderGallery() {
@@ -848,8 +1262,111 @@ function renderGallery() {
   });
 }
 
+function setupScrollStory() {
+  const cards = document.querySelectorAll(".story-card");
+  if ("IntersectionObserver" in window && !isReducedMotion()) {
+    const io = new IntersectionObserver((entries) => {
+      for (const en of entries) {
+        if (en.isIntersecting) en.target.classList.add("in-view");
+      }
+    }, { threshold: 0.15 });
+    cards.forEach((c) => io.observe(c));
+  }
+
+  const actions = {
+    board: () => {
+      setIsolate("board");
+      setExplode(0);
+      selectPart("U1101", true);
+    },
+    radar: () => {
+      setIsolate("board");
+      setExplode(0);
+      selectPart("U501", true);
+    },
+    can: () => {
+      setIsolate("board");
+      setExplode(0);
+      state.activeNet = "/STATUS/CAN_TXD";
+      setCameraPreset("bottom");
+      selectPart("U1506", false);
+    },
+    kv260: () => {
+      applyTeardownPreset({ fan: false, hs: false, somLiftMm: 22, isolate: "kv260", select: "K26_XCK26" });
+    },
+  };
+
+  cards.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $("#explorer-stage")?.scrollIntoView({ behavior: isReducedMotion() ? "auto" : "smooth", block: "start" });
+      actions[btn.dataset.story]?.();
+    });
+  });
+
+  $("#btn-enter-explorer")?.addEventListener("click", () => {
+    $("#explorer-stage")?.scrollIntoView({ behavior: isReducedMotion() ? "auto" : "smooth", block: "start" });
+  });
+  $("#btn-replay-intro-top")?.addEventListener("click", () => {
+    $("#explorer-stage")?.scrollIntoView({ behavior: isReducedMotion() ? "auto" : "smooth", block: "start" });
+    setIsolate("all");
+    playIntro();
+  });
+}
+
+let applyingHash = false;
+
+function syncHash() {
+  if (!state.ready || applyingHash) return;
+  const p = new URLSearchParams();
+  if (state.tab !== "explorer") p.set("tab", state.tab);
+  if (state.isolateMode !== "all") p.set("view", state.isolateMode);
+  if (state.selectedId) p.set("part", state.selectedId);
+  if (state.explodePct > 0) p.set("explode", String(state.explodePct));
+  if (state.enclosureMode !== "closed") p.set("enc", state.enclosureMode);
+  if (state.somLiftMm > 0) p.set("som", String(state.somLiftMm));
+  if (state.activeNet) p.set("net", state.activeNet);
+  if (state.theme !== "dark") p.set("theme", state.theme);
+  const str = p.toString();
+  history.replaceState(null, "", str ? "#" + str : "#");
+}
+
+function applyHashParams() {
+  const raw = location.hash.replace(/^#/, "");
+  if (!raw) return false;
+  const p = new URLSearchParams(raw);
+  let touched = false;
+  applyingHash = true;
+  try {
+    if (p.get("theme")) { setTheme(p.get("theme")); touched = true; }
+    if (p.get("tab")) { selectTab(p.get("tab")); touched = true; }
+    if (p.has("enc")) { setEnclosure(p.get("enc"), true); touched = true; }
+    if (p.has("explode")) { setExplode(Number(p.get("explode")) || 0, true); touched = true; }
+    if (p.has("som")) {
+      state.somLiftMm = Math.max(0, Math.min(30, Number(p.get("som")) || 0));
+      $("#range-som-lift").value = state.somLiftMm;
+      $("#val-som-lift").textContent = `${state.somLiftMm} mm`;
+      applyTransformsInstant();
+      touched = true;
+    }
+    const view = p.get("view") || p.get("iso");
+    if (view) { setIsolate(view, true); touched = true; }
+    if (p.get("net")) { state.activeNet = p.get("net"); rebuildNetHighlightBoxes(); touched = true; }
+    if (p.get("part")) { selectPart(p.get("part"), false); touched = true; }
+    if (p.get("layer")) { select2dLayer(p.get("layer")); touched = true; }
+    if (p.get("cam")) { setCameraPreset(p.get("cam"), true); touched = true; }
+    if (touched && (p.get("part") || view || p.has("explode")) && state.tab === "explorer") {
+      const stg = $("#explorer-stage");
+      const hdrH = $(".topbar")?.offsetHeight || 54;
+      if (stg) window.scrollTo(0, Math.max(0, stg.offsetTop - hdrH));
+    }
+  } finally {
+    applyingHash = false;
+  }
+  return touched;
+}
+
 // ---------------------------------------------------------------------------
-// UI Wiring, Search, Tabs & Public Deterministic API
+// UI Actions, Search via Rust Core & Benchmarking API
 // ---------------------------------------------------------------------------
 
 function selectTab(tabId) {
@@ -860,9 +1377,12 @@ function selectTab(tabId) {
     $("#webgl-canvas")?._resizeFn?.();
   } else if (tabId === "layers") {
     $("#layer-webgl-canvas")?._resizeFn?.();
+    startLayerPeel();
   } else if (tabId === "hmi") {
     const ifr = $("#hmi-iframe");
     if (!ifr.src && ifr.dataset.src) ifr.src = ifr.dataset.src;
+  } else if (tabId === "mockups") {
+    mockupCtrl?.forceTick?.();
   }
 }
 
@@ -872,11 +1392,53 @@ function setTheme(theme) {
   $("#btn-theme").textContent = state.theme === "dark" ? "Light Mode" : "Dark Mode";
 }
 
-function setIsolate(mode) {
+function setExplode(pct, instant = false) {
+  const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
+  const prev = anim.explodePct;
+  state.explodePct = clamped;
+  $("#range-explode").value = clamped;
+  $("#val-explode").textContent = `${clamped}%`;
+  if (instant) {
+    tweenHandles.explodePct = null;
+    anim.explodePct = clamped;
+    applyAnimatedScene();
+  } else {
+    startScalarTween("explodePct", prev, clamped, 550);
+  }
+}
+
+function setEnclosure(mode, instant = false) {
+  state.enclosureMode = mode;
+  document.querySelectorAll("[data-enc]").forEach((b) => b.classList.toggle("active", b.dataset.enc === mode));
+  if (instant) applyTransformsInstant();
+  else applyAnimatedScene();
+}
+
+function setIsolate(mode, instant = false) {
   state.isolateMode = mode;
   document.querySelectorAll("[data-iso]").forEach((b) => b.classList.toggle("active", b.dataset.iso === mode));
-  applyAssemblyTransforms();
-  setCameraPreset("iso");
+  applyAnimatedScene();
+  setCameraPreset("iso", instant);
+}
+
+function applyTeardownPreset({ fan = false, hs = false, somLiftMm = 20, isolate = "kv260", select = null }, instant = false) {
+  state.showKvFan = fan;
+  state.showKvHs = hs;
+  const prevSom = anim.somLiftMm;
+  state.somLiftMm = somLiftMm;
+  $("#chk-kv-fan").checked = fan;
+  $("#chk-kv-hs").checked = hs;
+  $("#range-som-lift").value = somLiftMm;
+  $("#val-som-lift").textContent = `${somLiftMm} mm`;
+  if (instant) {
+    anim.somLiftMm = somLiftMm;
+    anim.kvFanSlide = fan ? 0 : 1;
+    anim.kvHsSlide = hs ? 0 : 1;
+  } else {
+    startScalarTween("somLiftMm", prevSom, somLiftMm, 520);
+  }
+  setIsolate(isolate, instant);
+  if (select) selectPart(select, false);
 }
 
 function updateStatsPill() {
@@ -886,39 +1448,51 @@ function updateStatsPill() {
 }
 
 function wireUiEvents() {
+  window.addEventListener("hashchange", applyHashParams);
+
   document.querySelectorAll(".nav-tab").forEach((b) => {
-    b.addEventListener("click", () => selectTab(b.dataset.tab));
+    b.addEventListener("click", () => {
+      selectTab(b.dataset.tab);
+      syncHash();
+    });
   });
 
   $("#btn-theme").addEventListener("click", () => {
     setTheme(state.theme === "dark" ? "light" : "dark");
+    syncHash();
   });
 
-  // Search box across board components, KV260 parts, and nets
   const searchIn = $("#search-input");
   const drop = $("#search-dropdown");
 
   const runSearch = (qRaw) => {
-    const q = qRaw.trim().toLowerCase();
+    const q = qRaw.trim();
     if (!q || !catalogue) {
       drop.classList.remove("open");
       return;
     }
-    const matches = [];
-    for (const [id, entry] of partById.entries()) {
-      const d = entry.data;
-      const hay = `${id} ${d.ref || ""} ${d.value || ""} ${d.part || ""} ${d.mpn || ""} ${d.description || d.role || ""} ${(d.nets || []).join(" ")}`.toLowerCase();
-      if (hay.includes(q)) {
-        matches.push({ id, entry });
-        if (matches.length >= 16) break;
+    let indices = [];
+    if (siteCore) {
+      indices = JSON.parse(siteCore.search(q, 16));
+    } else {
+      const ql = q.toLowerCase();
+      for (const [id, entry] of partById.entries()) {
+        const d = entry.data;
+        const hay = `${id} ${d.ref || ""} ${d.value || ""} ${d.part || ""} ${d.mpn || ""} ${d.description || d.role || ""} ${(d.nets || []).join(" ")}`.toLowerCase();
+        if (hay.includes(ql)) {
+          indices.push(partIndexById.get(id));
+          if (indices.length >= 16) break;
+        }
       }
     }
-    if (!matches.length) {
+    if (!indices.length) {
       drop.innerHTML = `<div class="search-item"><span>No parts matching "${escapeHtml(qRaw)}"</span></div>`;
       drop.classList.add("open");
       return;
     }
-    drop.innerHTML = matches.map(({ id, entry }) => {
+    drop.innerHTML = indices.map((idx) => {
+      const id = partList[idx];
+      const entry = partById.get(id);
       const d = entry.data;
       return `<button type="button" class="search-item" data-pick="${escapeHtml(id)}">
         <div class="search-item-head"><span>${escapeHtml(d.ref || id)}</span><span class="mono" style="color:var(--accent)">${escapeHtml(d.part || d.value || "")}</span></div>
@@ -930,6 +1504,7 @@ function wireUiEvents() {
       btn.addEventListener("click", () => {
         drop.classList.remove("open");
         selectTab("explorer");
+        $("#explorer-stage")?.scrollIntoView({ behavior: isReducedMotion() ? "auto" : "smooth", block: "start" });
         selectPart(btn.dataset.pick, true);
       });
     });
@@ -940,34 +1515,26 @@ function wireUiEvents() {
     if (!ev.target.closest(".search-wrap")) drop.classList.remove("open");
   });
 
-  // Explode & Enclosure
-  $("#range-explode").addEventListener("input", (ev) => {
-    state.explodePct = Number(ev.target.value);
-    $("#val-explode").textContent = `${state.explodePct}%`;
-    applyAssemblyTransforms();
-  });
+  $("#range-explode").addEventListener("input", (ev) => setExplode(ev.target.value, true));
+  $("#btn-replay-intro").addEventListener("click", () => { setIsolate("all", true); playIntro(); });
 
   document.querySelectorAll("[data-enc]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.enclosureMode = btn.dataset.enc;
-      document.querySelectorAll("[data-enc]").forEach((b) => b.classList.toggle("active", b.dataset.enc === state.enclosureMode));
-      applyAssemblyTransforms();
-    });
+    btn.addEventListener("click", () => setEnclosure(btn.dataset.enc, false));
   });
 
-  // KV260 Teardown controls
   $("#chk-kv-fan").addEventListener("change", (ev) => {
     state.showKvFan = ev.target.checked;
-    applyAssemblyTransforms();
+    applyAnimatedScene();
   });
   $("#chk-kv-hs").addEventListener("change", (ev) => {
     state.showKvHs = ev.target.checked;
-    applyAssemblyTransforms();
+    applyAnimatedScene();
   });
   $("#range-som-lift").addEventListener("input", (ev) => {
     state.somLiftMm = Number(ev.target.value);
+    anim.somLiftMm = state.somLiftMm;
     $("#val-som-lift").textContent = `${state.somLiftMm} mm`;
-    applyAssemblyTransforms();
+    applyAnimatedScene();
   });
 
   $("#btn-preset-kv-teardown").addEventListener("click", () => {
@@ -977,18 +1544,10 @@ function wireUiEvents() {
     applyTeardownPreset({ fan: false, hs: false, somLiftMm: 26, isolate: "kv260", select: "SOM240_1" });
   });
 
-  // Isolate & Camera Presets
-  document.querySelectorAll("[data-iso]").forEach((btn) => {
-    btn.addEventListener("click", () => setIsolate(btn.dataset.iso));
-  });
-  document.querySelectorAll("[data-cam]").forEach((btn) => {
-    btn.addEventListener("click", () => setCameraPreset(btn.dataset.cam));
-  });
-  document.querySelectorAll(".quick-pick").forEach((btn) => {
-    btn.addEventListener("click", () => selectPart(btn.dataset.ref, true));
-  });
+  document.querySelectorAll("[data-iso]").forEach((btn) => btn.addEventListener("click", () => setIsolate(btn.dataset.iso)));
+  document.querySelectorAll("[data-cam]").forEach((btn) => btn.addEventListener("click", () => setCameraPreset(btn.dataset.cam)));
+  document.querySelectorAll(".quick-pick").forEach((btn) => btn.addEventListener("click", () => selectPart(btn.dataset.ref, true)));
 
-  // Mobile drawer toggles
   $("#btn-mob-controls").addEventListener("click", () => {
     const open = $("#dock-controls").classList.toggle("mobile-open");
     $("#btn-mob-controls").classList.toggle("active", open);
@@ -999,9 +1558,9 @@ function wireUiEvents() {
     $("#btn-mob-inspector").classList.toggle("active", !hidden);
   });
 
-  // Layer Viewer Controls
-  $("#range-layer-spread").addEventListener("input", updateLayerStackVisuals);
-  $("#range-layer-opacity").addEventListener("input", updateLayerStackVisuals);
+  $("#btn-layer-peel").addEventListener("click", startLayerPeel);
+  $("#range-layer-spread").addEventListener("input", () => updateLayerStackVisuals());
+  $("#range-layer-opacity").addEventListener("input", () => updateLayerStackVisuals());
   $("#btn-layers-all").addEventListener("click", () => {
     layerEntries.forEach((e) => { e.visible = true; });
     $("#layer-list").querySelectorAll("input").forEach((c) => { c.checked = true; });
@@ -1031,51 +1590,96 @@ function wireUiEvents() {
   window.addEventListener("pointerup", () => { drag2d = null; });
 }
 
-function applyTeardownPreset({ fan = false, hs = false, somLiftMm = 20, isolate = "kv260", select = null }) {
-  state.showKvFan = fan;
-  state.showKvHs = hs;
-  state.somLiftMm = somLiftMm;
-  $("#chk-kv-fan").checked = fan;
-  $("#chk-kv-hs").checked = hs;
-  $("#range-som-lift").value = somLiftMm;
-  $("#val-som-lift").textContent = `${somLiftMm} mm`;
-  setIsolate(isolate);
-  if (select) selectPart(select, false);
+// Benchmark helper: compares Info-Mode hover pick + render time with Three.js vs Rust WASM SiteCore
+function benchmarkHover({ frames = 60, useWasm = true } = {}) {
+  const prevWasm = state.useWasmPicker;
+  state.useWasmPicker = useWasm;
+  const pickTimes = [];
+  const frameTimes = [];
+  let hits = 0;
+
+  for (let i = 0; i < frames; i++) {
+    const nx = -0.55 + 1.1 * ((i % 12) / 11);
+    const ny = -0.45 + 0.9 * (Math.floor(i / 12) / Math.max(1, Math.floor(frames / 12)));
+    const f0 = performance.now();
+    const p0 = performance.now();
+    const res = pickAtNdc(nx, ny);
+    const p1 = performance.now();
+    if (res && res.object) {
+      hoverBox.box.setFromObject(res.object);
+      hoverBox.visible = true;
+      hits++;
+    } else {
+      hoverBox.visible = false;
+    }
+    renderer.render(scene, camera);
+    const f1 = performance.now();
+    pickTimes.push(p1 - p0);
+    frameTimes.push(f1 - f0);
+  }
+  hoverBox.visible = false;
+  state.useWasmPicker = prevWasm;
+
+  const avg = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+  const p95 = (a) => {
+    const s = [...a].sort((x, y) => x - y);
+    return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))];
+  };
+  return {
+    picker: useWasm ? "rust-wasm" : "three-mesh",
+    frames,
+    hits,
+    pick_mean_ms: +avg(pickTimes).toFixed(3),
+    pick_p95_ms: +p95(pickTimes).toFixed(3),
+    frame_mean_ms: +avg(frameTimes).toFixed(3),
+    frame_p95_ms: +p95(frameTimes).toFixed(3),
+  };
 }
 
-// Expose deterministic helpers for automated screenshot & UI tests
+// Public API for deterministic screenshots, deep-links & benchmarks
 window.__SITE_API = {
   isReady: () => state.ready,
   selectTab,
   setTheme,
-  setExplode: (pct) => {
-    state.explodePct = pct;
-    $("#range-explode").value = pct;
-    $("#val-explode").textContent = `${pct}%`;
-    applyAssemblyTransforms();
-  },
-  setEnclosure: (mode) => {
-    state.enclosureMode = mode;
-    document.querySelectorAll("[data-enc]").forEach((b) => b.classList.toggle("active", b.dataset.enc === mode));
-    applyAssemblyTransforms();
-  },
-  setTeardown: applyTeardownPreset,
-  isolate: setIsolate,
+  setExplode: (pct) => setExplode(pct, true),
+  setEnclosure: (mode) => setEnclosure(mode, true),
+  setTeardown: (opts) => applyTeardownPreset(opts, true),
+  isolate: (m) => setIsolate(m, true),
   selectPart,
-  setCameraPreset,
+  setCameraPreset: (p) => setCameraPreset(p, true),
   select2dLayer,
+  scrollToExplorer: () => {
+    const el = $("#explorer-stage");
+    const hdrH = $(".topbar")?.offsetHeight || 54;
+    if (el) window.scrollTo(0, Math.max(0, el.offsetTop - hdrH));
+  },
+  scrollToTop: () => window.scrollTo(0, 0),
+  setIntroFrame: (u) => {
+    tweenHandles.intro = null;
+    tweenHandles.cam = null;
+    applyIntroAtProgress(u);
+  },
+  applyHash: () => applyHashParams(),
+  selectNet: (net) => {
+    state.activeNet = net;
+    rebuildNetHighlightBoxes();
+    if (state.selectedId) selectPart(state.selectedId, false);
+  },
+  searchCore: (q) => siteCore ? JSON.parse(siteCore.search(q, 16)).map((i) => partList[i]) : [],
+  benchmarkHover,
   getStats: () => ({
     ready: state.ready,
     tab: state.tab,
     theme: state.theme,
     boardComponents: catalogue ? catalogue.components.length : 0,
     kv260Parts: catalogue ? catalogue.kv260_parts.length : 0,
+    coreParts: siteCore ? siteCore.part_count() : 0,
     selectedId: state.selectedId,
   }),
 };
 
 boot().catch((err) => {
   console.error(err);
-  const ov = $("#loading-overlay");
-  if (ov) ov.textContent = `Load error: ${err.message}`;
+  const st = $("#load-stage");
+  if (st) st.textContent = `Load error: ${err.message}`;
 });

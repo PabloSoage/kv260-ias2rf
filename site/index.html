@@ -28,7 +28,7 @@
 
     <div class="header-actions">
       <div class="search-wrap">
-        <input id="search-input" class="search-input" type="search" placeholder="Search Ref (U501, J9), Net, MPN..." autocomplete="off" aria-label="Search components or nets">
+        <input id="search-input" class="search-input" type="search" placeholder="Search Ref (U1506, U501), Net, MPN..." autocomplete="off" aria-label="Search components or nets">
         <div id="search-dropdown" class="search-dropdown" role="listbox"></div>
       </div>
       <button id="btn-theme" class="btn" type="button" aria-label="Toggle Light/Dark Theme">Light Mode</button>
@@ -36,12 +36,58 @@
   </header>
 
   <main class="main-shell">
-    <!-- 1. Interactive 3-D Explorer -->
-    <section id="tab-explorer" class="tab-panel active" aria-label="3-D Assembly Explorer">
-      <div class="explorer-grid">
+    <!-- 1. Landing Overview -> Interactive 3-D Explorer -->
+    <section id="tab-explorer" class="tab-panel active" aria-label="Architecture Overview and 3-D Assembly Explorer">
+      <section id="landing-section" class="landing-section" aria-label="Hardware Architecture Story">
+        <div class="landing-inner">
+          <div class="hero-top">
+            <div class="hero-copy">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                <span class="badge">FINAL REV08 HARDWARE</span>
+                <span class="badge badge-wasm">RUST/WASM CORE</span>
+                <span class="badge badge-cyan">VEHICLE CAN + GPS PPS</span>
+              </div>
+              <h1>Dual-FPGA 10.5 GHz Phased-Array Radar &amp; DC-1 GHz SDR for AMD Kria KV260</h1>
+              <p>Scroll into the interactive 3-D workstation below: inspect 795 routed PCB parts powered by a spatial Rust/WASM picker, pulse routed copper traces, peel the 8-layer stack-up, tear down the K26 SOM, and drive live Slint &amp; DSP WASM simulations.</p>
+            </div>
+            <div class="hero-actions">
+              <button id="btn-enter-explorer" class="btn btn-primary" type="button">Enter 3-D Explorer</button>
+              <button id="btn-replay-intro-top" class="btn" type="button">Replay Intro</button>
+            </div>
+          </div>
+
+          <div class="story-grid">
+            <button type="button" class="story-card in-view" data-story="board">
+              <span class="story-step">01 / REV08 ADAPTER BOARD</span>
+              <strong>8-Layer ENIG &amp; XC7A50T Front-End</strong>
+              <span>795 parts on 140 x 132 mm FR4 with 13 coaxial SMA launches, Si549 500/400 MHz clock tree, and 64b/66b IAS1 + SGMII failover link.</span>
+            </button>
+            <button type="button" class="story-card in-view" data-story="radar">
+              <span class="story-step">02 / CONVERTERS &amp; SIGNAL CHAIN</span>
+              <strong>400 MSPS Radar + 14-bit Dual SDR</strong>
+              <span>AD9484 radar IF ADC, AD9253 dual 62.5 MSPS SDR ADC, AD9708 chirp DAC, AD9767 TX I/Q DAC, and 8x ADAR1000 beamformer array.</span>
+            </button>
+            <button type="button" class="story-card in-view" data-story="can">
+              <span class="story-step">03 / KV260 &amp; MIRROR-SAFE J9 FFC</span>
+              <strong>Vehicle CAN 2.0 + GPS 10 ns PPS</strong>
+              <span>J1502 joins J9 for HDA10 PPS + PS CAN1 EMIO via U1506 TCAN330DCNT and Q1530/Q1531 NOR gate (J1503 6-way JST-SH tap).</span>
+            </button>
+            <button type="button" class="story-card in-view" data-story="kv260">
+              <span class="story-step">04 / K26 MPSoC &amp; TX_KEY SAFETY</span>
+              <strong>Quad A53 + Dual R5F + PL Fusion</strong>
+              <span>Kria PL hosts kria_bev_grid (100 M cells/s), kria_pps, and hardware TX_KEY (0x8000_0038) lock over 0x3EE0_0000 R5F mailbox.</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div id="explorer-stage" class="explorer-grid">
         <aside id="dock-controls" class="dock">
           <div class="panel-card">
-            <h3>Explode &amp; Enclosure</h3>
+            <div class="control-row">
+              <h3>Explode &amp; Enclosure</h3>
+              <button id="btn-replay-intro" class="btn btn-sm" type="button">Replay Intro</button>
+            </div>
             <div class="control-row">
               <label for="range-explode">Explode Stack</label>
               <strong id="val-explode" class="mono">0%</strong>
@@ -100,7 +146,21 @@
         </aside>
 
         <div class="viewport-wrap">
-          <div id="loading-overlay" class="loading-overlay">Loading 3-D CAD &amp; Component Catalogue...</div>
+          <div id="loading-overlay" class="loading-overlay">
+            <div class="loader-card">
+              <div class="control-row">
+                <strong id="load-stage">Initializing Rust/WASM Core &amp; Streaming 3-D CAD...</strong>
+                <span id="load-pct" class="mono" style="color:var(--accent)">5%</span>
+              </div>
+              <div class="progress-track">
+                <div id="load-bar-fill" class="progress-fill"></div>
+              </div>
+              <div class="skel-line" style="width:92%"></div>
+              <div class="skel-line" style="width:74%"></div>
+              <div id="load-detail" class="mono" style="font-size:11px;color:var(--text-muted)">Loading site/core WASM &amp; board.glb...</div>
+            </div>
+          </div>
+
           <canvas id="webgl-canvas" tabindex="0" aria-label="Interactive 3-D PCB and KV260 Viewport"></canvas>
           <div id="hover-tooltip" class="hover-tooltip"></div>
 
@@ -111,6 +171,7 @@
 
           <div class="hud-bottom">
             <div class="hud-pill">Drag: Orbit &middot; Right-drag: Pan &middot; Scroll: Zoom &middot; Double-click: Isolate</div>
+            <div class="hud-pill mono" id="hud-perf">WASM Picker: ready</div>
           </div>
         </div>
 
@@ -123,12 +184,12 @@
           <div id="inspector-empty" class="panel-card">
             <h3>Component &amp; KV260 Inspector</h3>
             <p style="margin:0;color:var(--text-muted)">
-              Click or tap any component on the Rev08 board (e.g. <strong>U501</strong> AD9484, <strong>U1101</strong> XC7A50T, <strong>J101</strong> IAS1, <strong>J1502</strong> FFC), any KV260 part (<strong>K26_XCK26</strong>, <strong>KV260_J9_RPI</strong>, <strong>SOM240_1</strong>), or heatsink <strong>HS1..HS4</strong>.
+              Click or tap any component on the Rev08 board (e.g. <strong>U1506</strong> TCAN330 CAN, <strong>U501</strong> AD9484, <strong>U1101</strong> XC7A50T, <strong>J1502/J1503</strong>), any KV260 part (<strong>K26_XCK26</strong>, <strong>KV260_J9_RPI</strong>, <strong>SOM240_1</strong>), or heatsink <strong>HS1..HS4</strong>.
             </p>
             <div class="btn-grid">
               <button class="btn btn-sm quick-pick" data-ref="U501" type="button">U501 (AD9484)</button>
-              <button class="btn btn-sm quick-pick" data-ref="U1101" type="button">U1101 (XC7A50T)</button>
-              <button class="btn btn-sm quick-pick" data-ref="J1502" type="button">J1502 (J9 FFC)</button>
+              <button class="btn btn-sm quick-pick" data-ref="U1506" type="button">U1506 (TCAN330)</button>
+              <button class="btn btn-sm quick-pick" data-ref="J1503" type="button">J1503 (6p CAN+PPS)</button>
               <button class="btn btn-sm quick-pick" data-ref="KV260_J9_RPI" type="button">KV260 J9 RPi</button>
             </div>
           </div>
@@ -142,7 +203,10 @@
       <div class="layers-grid">
         <aside class="dock">
           <div class="panel-card">
-            <h3>8-Layer Stack-up Controls</h3>
+            <div class="control-row">
+              <h3>8-Layer Stack-up</h3>
+              <button id="btn-layer-peel" class="btn btn-sm btn-primary" type="button">Peel Stack</button>
+            </div>
             <div class="control-row">
               <label for="range-layer-spread">Z-Spread</label>
               <strong id="val-layer-spread" class="mono">6.0 mm</strong>
@@ -168,7 +232,7 @@
           <div class="layer-3d-wrap">
             <canvas id="layer-webgl-canvas" aria-label="3-D Layer Stack-up"></canvas>
             <div class="hud-top">
-              <div class="hud-pill">3-D Exploded 8-Cu Stack-up (rendered from KiCad vector SVGs)</div>
+              <div class="hud-pill">3-D Sequentially Peeled 8-Cu Stack-up (KiCad vector SVGs)</div>
             </div>
           </div>
           <div class="layer-2d-wrap">
@@ -205,12 +269,12 @@
       </div>
     </section>
 
-    <!-- 4. Interactive Mock-ups -->
+    <!-- 4. Interactive Rust-Backed Mock-ups -->
     <section id="tab-mockups" class="tab-panel" aria-label="Interactive Subsystem Mock-ups">
       <div class="scroll-page">
         <div class="section-head">
-          <h2>Interactive Hardware &amp; Firmware Simulators</h2>
-          <span class="tag-mockup">[Mock-up] Client-side Behavioural Models</span>
+          <h2>Animated Hardware &amp; Firmware Simulators (Rust/WASM Core)</h2>
+          <span class="tag-mockup">[Mock-up] Live WASM Logic &amp; Animation</span>
         </div>
         <div id="mockups-root" class="mockup-grid"></div>
       </div>
@@ -220,7 +284,7 @@
     <section id="tab-gallery" class="tab-panel" aria-label="Simulation and Render Gallery">
       <div class="scroll-page">
         <div class="section-head">
-          <h2>Verification Gallery (XSim G-8, System Integrations &amp; CAD)</h2>
+          <h2>Verification Gallery (XSim G-8, System Integrations &amp; Final CAN CAD)</h2>
           <span style="color:var(--text-muted)">Click any figure to inspect full resolution</span>
         </div>
         <div id="gallery-root"></div>
@@ -256,7 +320,7 @@
           <div class="doc-card">
             <div>
               <strong>Board Manual &amp; Project Overview</strong>
-              <p>Connector pinouts, RF tuning, component rationale and mechanical clearances (`BOARD_MANUAL.md`, `README.md`).</p>
+              <p>Connector pinouts, RF tuning, component rationale and mechanical clearances (<code>BOARD_MANUAL.md</code>, <code>README.md</code>).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/README.md" target="_blank" rel="noopener">README.md</a>
@@ -266,7 +330,7 @@
           <div class="doc-card">
             <div>
               <strong>FPGA Co-Simulation &amp; Vehicle Integrations</strong>
-              <p>XSim `tb_system` verification, `TX_KEY`, PS `CAN1` EMIO, GPS PPS, LiDAR/Radar fusion and SDR tests.</p>
+              <p>XSim <code>tb_system</code> verification, <code>TX_KEY</code>, PS <code>CAN1</code> EMIO, GPS PPS, LiDAR/Radar fusion and SDR tests.</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="https://github.com/PabloSoage/kv260-ias2rf/blob/main/fpga/SYSTEM_SIM.md" target="_blank" rel="noopener">SYSTEM_SIM.md</a>
@@ -276,7 +340,7 @@
         </div>
 
         <div class="panel-card">
-          <h3>Bundled Asset &amp; Software Licences (`site/LICENSES.md`)</h3>
+          <h3>Bundled Asset &amp; Software Licences (<code>site/LICENSES.md</code>)</h3>
           <table class="kv-table">
             <thead>
               <tr><th>Asset / Library</th><th>Scope</th><th>Licence / Provenance</th></tr>
@@ -284,7 +348,7 @@
             <tbody>
               <tr>
                 <td><code>assets/board.glb</code></td>
-                <td>Rev08 PCB + clean KiCad/repo 3-D bodies + 38 procedural replacements</td>
+                <td>Rev08 PCB + clean KiCad/repo 3-D bodies + procedural replacements</td>
                 <td>Project hardware (Apache-2.0, repository LICENSE); KiCad official STEP library bodies CC-BY-SA 4.0 + KiCad Exception. Zero EasyEDA cached models redistributed.</td>
               </tr>
               <tr>
@@ -301,6 +365,11 @@
                 <td><code>vendor/three-0.170.0/</code></td>
                 <td>Three.js r170 + controls/loaders/MeshoptDecoder</td>
                 <td>MIT License (fully vendored, zero CDN runtime requests).</td>
+              </tr>
+              <tr>
+                <td><code>site/core/pkg/</code></td>
+                <td><code>ias2rf-site-core</code> Rust/WASM spatial picker, search &amp; simulations</td>
+                <td>MIT License (project authors; pinned <code>wasm-bindgen = 0.2.130</code>).</td>
               </tr>
               <tr>
                 <td><code>hmi/pkg/kria_hmi.*</code></td>

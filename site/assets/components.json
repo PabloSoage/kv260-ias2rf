@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18T13:19:28.027Z",
+  "generated_at": "2026-11-18T15:33:12.854Z",
   "pcb_file": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
   "registration": {
     "note": "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
@@ -12,21 +12,96 @@
     "thickness_mm": 1.6
   },
   "board_outline": {
-    "xmin": null,
-    "ymin": null,
-    "xmax": null,
-    "ymax": null,
-    "width_mm": null,
-    "height_mm": null,
-    "segments": []
+    "xmin": 89,
+    "ymin": 82.75,
+    "xmax": 229,
+    "ymax": 214.75,
+    "width_mm": 140,
+    "height_mm": 132,
+    "segments": [
+      [
+        [
+          89,
+          107.25
+        ],
+        [
+          129.9,
+          107.25
+        ],
+        [
+          129.9,
+          82.75
+        ],
+        [
+          142.4,
+          82.75
+        ],
+        [
+          142.4,
+          112.25
+        ],
+        [
+          173.3,
+          112.25
+        ],
+        [
+          173.3,
+          96.25
+        ],
+        [
+          179.4,
+          96.25
+        ],
+        [
+          179.4,
+          82.75
+        ],
+        [
+          193,
+          82.75
+        ],
+        [
+          193,
+          102.25
+        ],
+        [
+          208,
+          102.25
+        ],
+        [
+          208,
+          117.5
+        ],
+        [
+          229,
+          117.5
+        ],
+        [
+          229,
+          136
+        ],
+        [
+          208,
+          136
+        ],
+        [
+          208,
+          214.75
+        ],
+        [
+          89,
+          214.75
+        ]
+      ]
+    ]
   },
   "counts": {
-    "total_components": 783,
-    "described": 755,
+    "total_components": 795,
+    "described": 767,
     "undescribed": 28,
-    "kicad_step_models": 715,
-    "procedural_replacements": 38,
-    "unique_nets": 578,
+    "kicad_step_models": 728,
+    "procedural_replacements": 37,
+    "unique_nets": 587,
     "kv260_parts": 22
   },
   "layer_stack": [
@@ -472,7 +547,7 @@
       "mpn": "0402WGF5101TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 5.1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 5.1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "USB_CC2",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -1827,7 +1902,7 @@
       "mpn": "USBLC6-2SC6",
       "manufacturer": "TECH PUBLIC",
       "bom_desc": "-55℃~+125℃ 0.35pF 12V 150W 2 5V 6A 6V 80nA ESD IEC 61000-4-2、IEC 61000-4-5、IEC 61000-4-4 Unidirectional SOT-23-6 ESD and Surge Protection (TVS/ESD) ROHS",
-      "description": "ESD on the USB data lines. Spec: Power_Protection:USBLC6-2SC6",
+      "description": "ESD on the USB data lines",
       "callout": 92,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
@@ -1887,7 +1962,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "VDD of U1307",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -1992,7 +2067,7 @@
       "manufacturer": "",
       "bom_desc": "",
       "description": "Mixer input balun. Spec: Mixer input balun 1:1, 4.5-3000 MHz",
-      "callout": 104,
+      "callout": 105,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_MIX_IN",
@@ -2152,7 +2227,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "CH340X VCC",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -2516,7 +2591,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "output balun return (C20)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -2724,7 +2799,7 @@
       "mpn": "0402WGF1501TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 1.5kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 1.5kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "+3V3_D rail LED series resistor (~1 mA)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -3036,7 +3111,7 @@
       "mpn": "CL05B103KB5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "10nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "10nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "TCXO supply (C44)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -3568,7 +3643,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+12V present (after the input protection)",
+      "description": "+12V present (after the input protection). Spec: +12V rail present green LED (~1 mA)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -3724,7 +3799,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "VDD of U1305",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -4576,7 +4651,7 @@
       "manufacturer": "TST",
       "bom_desc": "-30℃~+85℃ 1.09GHz 30MHz 30dB、33.5dB 3dB 50Ω SMD3838-6P SAW Filters ROHS",
       "description": "1090 MHz SAW filter (ADS-B path). Spec: SAW band-pass 1090 MHz (ADS-B)",
-      "callout": 98,
+      "callout": 99,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_SAW_IN",
@@ -4632,7 +4707,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+1V0 (FPGA core) present (switched from +3V3_D by `Q1521`)",
+      "description": "+1V0 (FPGA core) present (switched from +3V3_D by `Q1521`). Spec: +1V0 rail present green LED (switched from +3V3_D via Q1521)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -5187,7 +5262,7 @@
       "mpn": "CC0402JRNPO9BN331",
       "manufacturer": "YAGEO",
       "bom_desc": "330pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "330pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "loop filter C17",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -5611,7 +5686,7 @@
       "mpn": "CL10B224KA8NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "220nF 25V X7R ±10% 0603 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "Capacitor_SMD:C_0603_1608Metric",
+      "description": "Table 9-2: CHF 220 nF",
       "callout": null,
       "manual_link": "docs/POWER_SPEC.md",
       "nets": [
@@ -5923,7 +5998,7 @@
       "mpn": "BLM15HD102SN1D",
       "manufacturer": "Murata Electronics",
       "bom_desc": "-55℃~+125℃ 1 1.25Ω 1kΩ@100MHz 250mA ±25% 0402 Ferrite Beads ROHS",
-      "description": "-55℃~+125℃ 1 1.25Ω 1kΩ@100MHz 250mA ±25% 0402 Ferrite Beads ROHS",
+      "description": "LNA drain choke near the pin: a GHz bead (phase 6: a 56 nH here resonated with C1305 at 67 MHz)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -6287,7 +6362,7 @@
       "mpn": "0402B102K500NT",
       "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
       "bom_desc": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LNA input DC block (also the switch's RF1)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -6911,7 +6986,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "Base drive resistor for Q1521 (+1V0 rail sense, 35-110 uA)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -7347,7 +7422,7 @@
       "mpn": "0402WGF2202TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 22kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 22kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "loop filter R3",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -7573,47 +7648,49 @@
     {
       "id": "J1503",
       "ref": "J1503",
-      "value": "SM04B-SRSS-TB",
-      "footprint": "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+      "value": "SM06B-SRSS-TB",
+      "footprint": "JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal",
       "side": "top",
-      "x_mm": 193.8,
+      "x_mm": 194.4,
       "y_mm": 112.6,
       "rot_deg": 180,
       "bbox_board_mm": [
-        189.9,
+        189.5,
         109.32,
-        197.7,
+        199.3,
         115.88
       ],
       "model_pos_mm": [
         -5.353,
-        4.204,
+        3.604,
         2.4
       ],
       "bbox_world_mm": [
         -8.633,
-        0.304,
+        -1.296,
         -2.073,
-        8.104,
+        8.504,
         2.4,
         5.35
       ],
       "local_size_mm": [
-        7.8,
+        9.8,
         6.56,
         2.95
       ],
       "sheet": "STATUS",
       "dnp": false,
-      "model_source": "procedural-replacement",
-      "lcsc": "C160404",
-      "mpn": "SM04B-SRSS-TB(LF)(SN)",
+      "model_source": "kicad-step",
+      "lcsc": "C160405",
+      "mpn": "SM06B-SRSS-TB(LF)(SN)",
       "manufacturer": "JST",
-      "bom_desc": "-25℃~+85℃ 1 1A 1mm 1x4P 2.9mm 4 4.32mm 4P 50V 6mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount, Right Angle Tin UL94V-0 White SMD,P=1mm, Wire To Board Connector ROHS",
-      "description": "GPS receiver, JST-SH 4-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 and 4 GND. Spec: GPS receiver and vehicle CAN: 1 = 3.3 V out, 2 = PPS in, 3 = ground, 4 = CANH, 5 = CANL, 6 = ground",
+      "bom_desc": "-25℃~+85℃ 1 1A 1mm 1x6P 2.9mm 4.32mm 50V 6 6P 8mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount, Right Angle Tin UL94V-0 White SMD,P=1mm,Surface Mount，Right Angle Wire To Board Connector ROHS",
+      "description": "GPS receiver and vehicle CAN, JST-SH 6-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 GND, 4 CANH, 5 CANL, 6 GND (no termination: it taps the car's bus). Spec: GPS receiver and vehicle CAN: 1 = 3.3 V out, 2 = PPS in, 3 = ground, 4 = CANH, 5 = CANL, 6 = ground",
       "callout": 25,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
+        "/STATUS/CAN_H",
+        "/STATUS/CAN_L",
         "/STATUS/GPS_3V3",
         "/STATUS/GPS_PPS_IN",
         "GND"
@@ -7622,7 +7699,9 @@
         "1": "/STATUS/GPS_3V3",
         "2": "/STATUS/GPS_PPS_IN",
         "3": "GND",
-        "4": "GND",
+        "4": "/STATUS/CAN_H",
+        "5": "/STATUS/CAN_L",
+        "6": "GND",
         "MP": "GND"
       }
     },
@@ -8134,7 +8213,7 @@
       "mpn": "CC0402BRNPO9BN8R2",
       "manufacturer": "YAGEO",
       "bom_desc": "50V 8.2pF NP0 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "50V 8.2pF NP0 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "loop filter C8",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -9687,7 +9766,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+5V0 present",
+      "description": "+5V0 present. Spec: +5V0 rail present green LED (~1 mA)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -9976,7 +10055,7 @@
       "manufacturer": "KDS Daishinku",
       "bom_desc": "-40℃~+85℃ 1.5mA 1.7V~3.6V 26MHz ±1.5ppm SMD2016-4P Temperature Compensated Crystal Oscillators (TCXO) ROHS",
       "description": "TCXO, the RFFC5072's reference. Spec: RFFC5072 reference, 26 MHz +-1.5 ppm, clipped sine",
-      "callout": 97,
+      "callout": 98,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_TCXO_OUT",
@@ -10187,7 +10266,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "mixer output coupling (C21)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -10239,7 +10318,7 @@
       "mpn": "0402WGF1001TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "heartbeat LED",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -10776,7 +10855,7 @@
       "mpn": "0402WGF4701TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 4.7kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "Resistor_SMD:R_0402_1005Metric",
+      "description": "Same as R413",
       "callout": null,
       "manual_link": "docs/CLOCK_SPEC.md",
       "nets": [
@@ -11141,7 +11220,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-20℃~+85℃ 0.2dB 18dB 1:2 1° 400kHz~450MHz SMD-6P Balun ROHS",
       "description": "AD9767 DAC1 output balun",
-      "callout": 102,
+      "callout": 103,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_A",
@@ -11508,7 +11587,7 @@
       "mpn": "FRC0402F1300TS",
       "manufacturer": "FOJAN",
       "bom_desc": "-55℃~+155℃ 130Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "Resistor_SMD:R_0402_1005Metric",
+      "description": "Same as R402",
       "callout": null,
       "manual_link": "docs/CLOCK_SPEC.md",
       "nets": [
@@ -12799,7 +12878,7 @@
       "mpn": "0402WGF5102TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 50V 51kΩ 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 50V 51kΩ 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "REXT, 1 % (data sheet note 3)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -12903,7 +12982,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "Capacitor_SMD:C_0402_1005Metric",
+      "description": "Same as C409",
       "callout": null,
       "manual_link": "docs/CLOCK_SPEC.md",
       "nets": [
@@ -13017,7 +13096,7 @@
       "mpn": "0402WGF1501TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 1.5kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 1.5kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "+1V0 rail LED resistor from +3V3_D",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -13173,7 +13252,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LP5907 input",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -14014,7 +14093,7 @@
       "mpn": "0402WGF3301TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 3.3kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 3.3kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "+5V0 rail LED series resistor (~1 mA)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -14738,7 +14817,7 @@
       "mpn": "0402WGF1501TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 1.5kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 1.5kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "+1V8_D rail LED resistor from +3V3_D",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -15880,7 +15959,7 @@
       "mpn": "0402WGF4700TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 470Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 470Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "loop filter R6",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -16784,7 +16863,7 @@
       "mpn": "BLM15HD102SN1D",
       "manufacturer": "Murata Electronics",
       "bom_desc": "-55℃~+125℃ 1 1.25Ω 1kΩ@100MHz 250mA ±25% 0402 Ferrite Beads ROHS",
-      "description": "-55℃~+125℃ 1 1.25Ω 1kΩ@100MHz 250mA ±25% 0402 Ferrite Beads ROHS",
+      "description": "bias-tee choke near the line: a GHz ferrite bead, resistive above 150 MHz, so the branch cannot resonate (phase 6, _work/sim/bias_tee.py; a 56 nH resonated with L1301's capacitance)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -16888,7 +16967,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LP5907 output",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -17044,7 +17123,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+1V8_D present (switched from +3V3_D by `Q1520`)",
+      "description": "+1V8_D present (switched from +3V3_D by `Q1520`). Spec: +1V8_D rail present green LED (switched from +3V3_D via Q1520)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -17614,7 +17693,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "AP22652 input",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -18428,7 +18507,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-55℃~+100℃ 1.3GHz 1dB 50Ω Low Pass SMD-4P,3.2x1.6mm RF Filters ROHS",
       "description": "Low-pass, UHF preselector",
-      "callout": 100,
+      "callout": 101,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_LP1G_IN",
@@ -19720,7 +19799,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "+12V rail LED series resistor (~1 mA)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -19926,7 +20005,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "AP22652 output",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -19978,7 +20057,7 @@
       "mpn": "0402B102K500NT",
       "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
       "bom_desc": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "reference AC coupling (C16)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -20392,7 +20471,7 @@
       "mpn": "2N7002",
       "manufacturer": "Jiangsu Changjing Electronics Technology Co., Ltd.",
       "bom_desc": "1 N-channel 115mA 2.5V 225mW 25pF 50pF 5pF 5Ω@10V 60V N-Channel ±20V SOT-23 MOSFETs ROHS",
-      "description": "Transistor_FET:Q_NMOS_GSD",
+      "description": "DONE LED driver",
       "callout": null,
       "manual_link": "docs/CONTROL_SPEC.md",
       "nets": [
@@ -20818,7 +20897,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "VDD of U1306",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -21234,7 +21313,7 @@
       "mpn": "LQW18ANR27G00D",
       "manufacturer": "Murata Electronics",
       "bom_desc": "110mA 270nH 3.4Ω Consumer grade Unshielded Inductor ±2% 0603 Inductors (SMD) ROHS",
-      "description": "Inductor_SMD:L_0603_1608Metric",
+      "description": "AERIS L22 (107.3 nH)",
       "callout": null,
       "manual_link": "docs/CONVERTER_SPEC.md",
       "nets": [
@@ -21826,7 +21905,7 @@
       "mpn": "150040VS73240",
       "manufacturer": "Wurth Elektronik",
       "bom_desc": "-40℃~+85℃ 120° 20mA 2V 50mcd 570nm 572nm Discrete Diode Green Water Clear 0402 LED Indication - Discrete ROHS",
-      "description": "+3V3_D present",
+      "description": "+3V3_D present. Spec: +3V3_D rail present green LED (~1 mA)",
       "callout": 30,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -22721,7 +22800,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-20℃~+85℃ 0.2dB 18dB 1:2 1° 400kHz~450MHz SMD-6P Balun ROHS",
       "description": "AD9767 DAC2 output balun",
-      "callout": 103,
+      "callout": 104,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_C",
@@ -22778,7 +22857,7 @@
       "mpn": "0402WGF5101TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 5.1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 5.1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "CC1: a sink (UFP)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -22986,7 +23065,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "output balun centre tap decoupling (C6)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -23142,7 +23221,7 @@
       "mpn": "KT-0603G",
       "manufacturer": "Hubei KENTO Elec",
       "bom_desc": "-40℃~+85℃ 1.6mm x 0.8mm square LED 100mW 120° 3.1V 430mcd 513nm~528nm 525nm 5mA Discrete Diode Emerald Green Water Clear 0603 LED Indication - Discrete ROHS",
-      "description": "DONE: the FPGA has loaded a bitstream. Spec: LED_SMD:LED_0603_1608Metric",
+      "description": "DONE: the FPGA has loaded a bitstream. Spec: DONE: configured",
       "callout": 31,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -23507,7 +23586,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-40℃~+85℃ 3MHz~800MHz Transformer SMD,3.8x3.8mm RF Misc ICs and Modules ROHS",
       "description": "Mixer output balun. Spec: Mixer output balun 4:1 with centre tap: the data sheet's -2 dB arrangement; the mixer's bias current flows through it: MIX2_IDD <= 3 (TC4-1W+ is rated 30 mA)",
-      "callout": 105,
+      "callout": 106,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V0_RF",
@@ -23770,7 +23849,7 @@
       "mpn": "CC0402JRNPO9BN331",
       "manufacturer": "YAGEO",
       "bom_desc": "330pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "330pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "loop filter C10",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -25122,7 +25201,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "mixer input coupling (data sheet C24)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -26900,7 +26979,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "2.54GHz 50Ω SMD3216-4P Ceramic Filters ROHS",
       "description": "High-pass after the mixer",
-      "callout": 99,
+      "callout": 100,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_HP1G_IN",
@@ -27214,7 +27293,7 @@
       "mpn": "0402WGF0000TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 0Ω 50V 62.5mW Thick Film Resistor ±1% ±800ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 0Ω 50V 62.5mW Thick Film Resistor ±1% ±800ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "V3 to VCC: the CH340X at 3.3 V (data sheet); at 5 V this is 100 nF to ground instead",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -27474,7 +27553,7 @@
       "mpn": "0402B102K500NT",
       "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
       "bom_desc": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "DC block, antenna side (C0G)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -27728,7 +27807,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "Base drive resistor for Q1520 (+1V8_D rail sense, 35-110 uA)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -29341,7 +29420,7 @@
       "mpn": "0402B102K500NT",
       "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
       "bom_desc": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LNA output DC block",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -29393,7 +29472,7 @@
       "mpn": "CC0402JRNPO9BN181",
       "manufacturer": "YAGEO",
       "bom_desc": "180pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "180pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "loop filter C9",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -29495,7 +29574,7 @@
       "mpn": "LQW18ANR27G00D",
       "manufacturer": "Murata Electronics",
       "bom_desc": "110mA 270nH 3.4Ω Consumer grade Unshielded Inductor ±2% 0603 Inductors (SMD) ROHS",
-      "description": "Inductor_SMD:L_0603_1608Metric",
+      "description": "AERIS L26",
       "callout": null,
       "manual_link": "docs/CONVERTER_SPEC.md",
       "nets": [
@@ -29704,7 +29783,7 @@
       "manufacturer": "YXC Crystal Oscillators",
       "bom_desc": "-40℃~+85℃ 12pF 25MHz 50Ω Crystal Oscillator ±10ppm ±20ppm SMD3225-4P Crystals ROHS",
       "description": "Crystal for the Ethernet PHY",
-      "callout": 96,
+      "callout": 97,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/CONTROL/ETH_XI",
@@ -29965,7 +30044,7 @@
       "manufacturer": "",
       "bom_desc": "",
       "description": "Programmable master oscillator, 400 or 500 MHz. Spec: 5x7 mm package, pin-compatible with Si570 (datasheet: 'if replacing Si570A-K, use Code C')",
-      "callout": 95,
+      "callout": 96,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_CLK",
@@ -30026,7 +30105,7 @@
       "mpn": "MMBT3904LT1G",
       "manufacturer": "onsemi",
       "bom_desc": "-55℃~+150℃ 1 NPN 200mA 200mV 225mW 300MHz 40 40V 50nA 6V NPN SOT-23 Bipolar (BJT) ROHS",
-      "description": "Transistor_BJT:Q_NPN_BEC",
+      "description": "+1V0 LED switch",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -30184,7 +30263,7 @@
       "mpn": "LQW18ANR27G00D",
       "manufacturer": "Murata Electronics",
       "bom_desc": "110mA 270nH 3.4Ω Consumer grade Unshielded Inductor ±2% 0603 Inductors (SMD) ROHS",
-      "description": "Inductor_SMD:L_0603_1608Metric",
+      "description": "AERIS L25",
       "callout": null,
       "manual_link": "docs/CONVERTER_SPEC.md",
       "nets": [
@@ -30444,7 +30523,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "Capacitor_SMD:C_0402_1005Metric",
+      "description": "ADCLK948 p.10: 1 uF bypass",
       "callout": null,
       "manual_link": "docs/CLOCK_SPEC.md",
       "nets": [
@@ -30712,7 +30791,7 @@
       "mpn": "LQW18ANR27G00D",
       "manufacturer": "Murata Electronics",
       "bom_desc": "110mA 270nH 3.4Ω Consumer grade Unshielded Inductor ±2% 0603 Inductors (SMD) ROHS",
-      "description": "Inductor_SMD:L_0603_1608Metric",
+      "description": "AERIS L27",
       "callout": null,
       "manual_link": "docs/CONVERTER_SPEC.md",
       "nets": [
@@ -30764,7 +30843,7 @@
       "mpn": "SZYY0402B",
       "manufacturer": "Yongyu Photoelectric",
       "bom_desc": "-40℃~+85℃ 120° 3.2V 466nm~469nm 5mA 85mcd Blue Discrete Diode 0402 LED Indication - Discrete ROHS",
-      "description": "Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second",
+      "description": "Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second. Spec: heartbeat: on while the debug UART's transmit line is low",
       "callout": 29,
       "manual_link": "docs/BOARD_MANUAL.md#3-leds",
       "nets": [
@@ -30920,7 +30999,7 @@
       "mpn": "LQW2BAS1R0J00L",
       "manufacturer": "Murata Electronics",
       "bom_desc": "170mA 1uH 2.4Ω Unshielded Inductor ±5% 0805 Power Inductors ROHS",
-      "description": "170mA 1uH 2.4Ω Unshielded Inductor ±5% 0805 Power Inductors ROHS",
+      "description": "bias-tee choke, low end, 0805 wirewound LQW2BAS1R0J (157 ohm at 25 MHz, 170 mA)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -31344,7 +31423,7 @@
       "mpn": "0402WGF4700TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 470Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 470Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "loop filter R2",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -31864,7 +31943,7 @@
       "mpn": "MMBT3904LT1G",
       "manufacturer": "onsemi",
       "bom_desc": "-55℃~+150℃ 1 NPN 200mA 200mV 225mW 300MHz 40 40V 50nA 6V NPN SOT-23 Bipolar (BJT) ROHS",
-      "description": "Transistor_BJT:Q_NPN_BEC",
+      "description": "+1V8_D LED switch",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -32282,7 +32361,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "VDD of U1304",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -32924,7 +33003,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-20℃~+85℃ 0.2dB 18dB 1:2 1° 400kHz~450MHz SMD-6P Balun ROHS",
       "description": "AD9708 output balun. Spec: 100 ohm differential (two 50 ohm loads) to 50 ohm single-ended. Mini-Circuits ADT2-1T+: impedance ratio 2, 0.4-450 MHz. 100 ohm secondary to the DAC; centre tap unused",
-      "callout": 101,
+      "callout": 102,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_B",
@@ -34995,10 +35074,13 @@
       "mpn": "FPC-1.0FX-15PWCR-H20",
       "manufacturer": "XUNPU",
       "bom_desc": "-25℃~+85℃ 0.3mm 15P 1mm 2mm 500mA 50V Bottom Contact Copper alloy Hinged Lid Surface Mount, Right Angle Tin SMD,P=1mm, FFC, FPC (Flat Flexible) Connector Assemblies ROHS",
-      "description": "GPS PPS to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`). Spec: To KV260 J9 (Raspberry Pi camera connector) by a 15-way 1 mm FFC, 100 mm; J9 pin 12 = HDA10 (PL)",
+      "description": "GPS PPS and the vehicle CAN to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`); CAN TX leaves on `J9` pin 6 and RX comes back on pin 8 (PS `CAN1`, R5F core 1). Spec: To KV260 J9 (Raspberry Pi camera connector) by a 15-way 1 mm FFC, 100 mm; J9 pin 12 = HDA10 (PL)",
       "callout": 24,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
+        "/STATUS/J9_CAN_RX",
+        "/STATUS/J9_CAN_TX10",
+        "/STATUS/J9_CAN_TX6",
         "/STATUS/J9_PPS12",
         "/STATUS/J9_PPS4",
         "GND"
@@ -35009,11 +35091,11 @@
         "3": "(nc)",
         "4": "/STATUS/J9_PPS4",
         "5": "(nc)",
-        "6": "GND",
+        "6": "/STATUS/J9_CAN_TX6",
         "7": "GND",
-        "8": "(nc)",
+        "8": "/STATUS/J9_CAN_RX",
         "9": "GND",
-        "10": "GND",
+        "10": "/STATUS/J9_CAN_TX10",
         "11": "(nc)",
         "12": "/STATUS/J9_PPS12",
         "13": "(nc)",
@@ -35166,7 +35248,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "~RESET pull-up to VCCI",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -35218,7 +35300,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LNA supply",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -35674,7 +35756,7 @@
       "mpn": "0402WGF1003TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "~FAULT pull-up",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -35979,7 +36061,7 @@
       "mpn": "0402WGF1200TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 120Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 120Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "TCXO supply filter (R31)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -36135,7 +36217,7 @@
       "mpn": "0402WGF2200TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 220Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 220Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "PPS to J1502 pin 4 (J9 pin 12 with a reversing cable)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -36187,7 +36269,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "TCA6416A VCCP",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -36398,7 +36480,7 @@
       "mpn": "0402WGF1003TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "holds the buffer low with no receiver",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -36450,7 +36532,7 @@
       "mpn": "0402WGF2200TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 220Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 220Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "PPS to J1502 pin 12 (J9 pin 12 with a straight cable)",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -36502,7 +36584,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "input balun return (C23)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -37273,7 +37355,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "+3V0_RF",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -37483,7 +37565,7 @@
       "mpn": "0402WGF1003TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "ENBL low (converter off) until the expander drives it",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -37535,7 +37617,7 @@
       "mpn": "0402WGF1001TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "bridge TXD to the FPGA's PMOD_SPARE1; a Kria on the Pmod wins",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -37587,7 +37669,7 @@
       "mpn": "0402WGF1003TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "RESETX high until the expander drives it",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -37743,7 +37825,7 @@
       "mpn": "0402WGF1001TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "FPGA's PMOD_SPARE2 to the bridge's RXD",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -38122,7 +38204,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "TCA6416A VCCI",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -38174,7 +38256,7 @@
       "mpn": "0402B102K500NT",
       "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
       "bom_desc": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "IF amplifier output DC block",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -38226,7 +38308,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "TCA6416A VCCP",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -38434,7 +38516,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "PE4312 VDD",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -38642,7 +38724,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "TCA6416A VCCI",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -38798,7 +38880,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "PE4312 DATA: series 10 k at the pin (data sheet Table 2 note 3)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -38902,7 +38984,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LP5907 output",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -39422,7 +39504,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LP5907 input",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -39474,7 +39556,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "TCXO pin 1: Vcont at mid-scale-high on a VC-TCXO, enable on a standby part, 0.3 mA into a plain TCXO's ground pin; safe for every 1XXD variant",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -39578,7 +39660,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "PE4312 VDD, RF",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -39734,7 +39816,7 @@
       "mpn": "0402WGF1003TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "~EN high: bias off until the expander drives it low",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -39942,7 +40024,7 @@
       "mpn": "FRC0402F2103TS",
       "manufacturer": "FOJAN",
       "bom_desc": "-55℃~+155℃ 210kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 210kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "RLIM: 125 mA typical (95-155), data sheet table, 1 %",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -40046,7 +40128,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "U1505 VCC",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -40434,7 +40516,7 @@
       "mpn": "0402WGF1003TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "ENX high (deselected) until the expander drives it",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -40538,7 +40620,7 @@
       "mpn": "CC0402JRNPO9BN101",
       "manufacturer": "YAGEO",
       "bom_desc": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "LNA supply, RF: DNP (phase 6, with FB1304 it would only add loss at 25-60 MHz)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -40590,7 +40672,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "~RESET pull-up",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -40798,7 +40880,7 @@
       "mpn": "AHW1608F-1R0KTF",
       "manufacturer": "APV",
       "bom_desc": "12 1uH 330mA 400MHz 810mΩ Consumer grade Wire-wound chip inductor ±10% 0603 Inductors (SMD) ROHS",
-      "description": "12 1uH 330mA 400MHz 810mΩ Consumer grade Wire-wound chip inductor ±10% 0603 Inductors (SMD) ROHS",
+      "description": "IF amplifier drain choke (30-170 MHz only)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -40902,7 +40984,7 @@
       "mpn": "AHW1608F-1R0KTF",
       "manufacturer": "APV",
       "bom_desc": "12 1uH 330mA 400MHz 810mΩ Consumer grade Wire-wound chip inductor ±10% 0603 Inductors (SMD) ROHS",
-      "description": "12 1uH 330mA 400MHz 810mΩ Consumer grade Wire-wound chip inductor ±10% 0603 Inductors (SMD) ROHS",
+      "description": "LNA drain choke, low end (SPF5043Z eval board: 100 nH, here 30 MHz up)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -41252,7 +41334,7 @@
       "mpn": "CL05A105KA5NQNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1uF 25V X5R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "GPS supply",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -41304,7 +41386,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "GPS supply",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -41408,7 +41490,7 @@
       "mpn": "0402WGF1000TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 100Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 100Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "PPS input series, with D1530",
       "callout": null,
       "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
       "nets": [
@@ -42338,7 +42420,7 @@
       "mpn": "0402WGF1002TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
       "bom_desc": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 10kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "MODE high: mixer 2 and PLL2 bank under hardware control (software control sets SIPIN)",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -42546,7 +42628,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "IF amplifier supply",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -42654,7 +42736,7 @@
       "mpn": "0402B102K500NT",
       "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
       "bom_desc": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "1nF 50V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "IF amplifier input DC block",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
@@ -42716,6 +42798,646 @@
       "pads": {
         "1": "/CONTROL/ETH_SGRX_PHY_P",
         "2": "/CONTROL/ETH_SGRX_FPGA_P"
+      }
+    },
+    {
+      "id": "U1506",
+      "ref": "U1506",
+      "value": "TCAN330DCNT",
+      "footprint": "SOT-23-8",
+      "side": "bottom",
+      "x_mm": 189.85,
+      "y_mm": 121,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        188.15,
+        118.95,
+        191.55,
+        123.05
+      ],
+      "model_pos_mm": [
+        -13.753,
+        8.154,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -15.803,
+        6.454,
+        -11.703,
+        9.854,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        4.1,
+        3.4,
+        1.2
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C2671056",
+      "mpn": "TCAN330DCNT",
+      "manufacturer": "Texas Instruments",
+      "bom_desc": "-40℃~+125℃ 1 1Mbps 2.5mA 3V~3.6V 60mA CAN Transceiver Low-power mode、Wake-up function、TXD dominant timeout、ESD protection、Undervoltage Protection、Thermal shutdown protection、Bus fault protection、Short-Circuit Protection、Silent mode SOT-23-8 CAN Transceivers ROHS",
+      "description": "Vehicle CAN transceiver on `J1503` pins 4 and 5, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8. Spec: Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode",
+      "callout": 95,
+      "manual_link": "docs/BOARD_MANUAL.md#4-chips",
+      "nets": [
+        "+3V3_D",
+        "/STATUS/CAN_H",
+        "/STATUS/CAN_L",
+        "/STATUS/CAN_RXD",
+        "/STATUS/CAN_TXD",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_TXD",
+        "2": "GND",
+        "3": "+3V3_D",
+        "4": "/STATUS/CAN_RXD",
+        "5": "GND",
+        "6": "/STATUS/CAN_L",
+        "7": "/STATUS/CAN_H",
+        "8": "GND"
+      }
+    },
+    {
+      "id": "D1531",
+      "ref": "D1531",
+      "value": "PESD1CAN",
+      "footprint": "SOT-23",
+      "side": "bottom",
+      "x_mm": 188.02,
+      "y_mm": 117.02,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        186.32,
+        115.09,
+        189.72,
+        118.95
+      ],
+      "model_pos_mm": [
+        -9.773,
+        9.984,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -11.703,
+        8.284,
+        -7.843,
+        11.684,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        3.86,
+        3.4,
+        1.2
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C343993",
+      "mpn": "PESD1CAN",
+      "manufacturer": "BORN",
+      "bom_desc": "-55℃~+125℃ 12pF 2 24V 26.7V 280W@8/20us 48V 500nA 6A Bidirectional ESD IEC 61000-4-2、IEC 61000-4-5、IEC 61000-4-4 SOT-23 ESD and Surge Protection (TVS/ESD) ROHS",
+      "description": "ESD on CANH and CANL",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_H",
+        "/STATUS/CAN_L",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_H",
+        "2": "/STATUS/CAN_L",
+        "3": "GND"
+      }
+    },
+    {
+      "id": "C1550",
+      "ref": "C1550",
+      "value": "100n",
+      "footprint": "C_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 187.4,
+      "y_mm": 120.2,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        186.94,
+        119.29,
+        187.86,
+        121.11
+      ],
+      "model_pos_mm": [
+        -12.953,
+        10.604,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -13.863,
+        10.144,
+        -12.043,
+        11.064,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.82,
+        0.92,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C1525",
+      "mpn": "CL05B104KO5NNNC",
+      "manufacturer": "Samsung Electro-Mechanics",
+      "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "TCAN330 VCC",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "+3V3_D",
+        "GND"
+      ],
+      "pads": {
+        "1": "+3V3_D",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "R1556",
+      "ref": "R1556",
+      "value": "1.8k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 187.43,
+      "y_mm": 122.04,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        186.96,
+        121.11,
+        187.9,
+        122.97
+      ],
+      "model_pos_mm": [
+        -14.793,
+        10.574,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -15.723,
+        10.104,
+        -13.863,
+        11.044,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25871",
+      "mpn": "0402WGF1801TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 1.8kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "RXD divider, top: 3.3 V to 1.18 V for J9's 1.2 V bank",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_RXD",
+        "/STATUS/J9_CAN_RX"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_RXD",
+        "2": "/STATUS/J9_CAN_RX"
+      }
+    },
+    {
+      "id": "R1557",
+      "ref": "R1557",
+      "value": "1k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 187.54,
+      "y_mm": 123.52,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        186.61,
+        123.05,
+        188.47,
+        123.99
+      ],
+      "model_pos_mm": [
+        -16.273,
+        10.464,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -16.743,
+        9.534,
+        -15.803,
+        11.394,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C11702",
+      "mpn": "0402WGF1001TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 1kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "RXD divider, bottom",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/J9_CAN_RX",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/J9_CAN_RX",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "Q1530",
+      "ref": "Q1530",
+      "value": "MMBT3904",
+      "footprint": "SOT-23",
+      "side": "bottom",
+      "x_mm": 188.74,
+      "y_mm": 125.69,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        186.81,
+        123.99,
+        190.67,
+        127.39
+      ],
+      "model_pos_mm": [
+        -18.443,
+        9.264,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -20.143,
+        7.334,
+        -16.743,
+        11.194,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        3.86,
+        3.4,
+        1.2
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C81464",
+      "mpn": "MMBT3904LT1G",
+      "manufacturer": "onsemi",
+      "bom_desc": "-55℃~+150℃ 1 NPN 200mA 200mV 225mW 300MHz 40 40V 50nA 6V NPN SOT-23 Bipolar (BJT) ROHS",
+      "description": "CAN TX from FPC pin 6; with Q1531 a NOR into TXD (one of pins 6, 10 is a J9 ground)",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_TXB6",
+        "/STATUS/CAN_TXD",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_TXB6",
+        "2": "GND",
+        "3": "/STATUS/CAN_TXD"
+      }
+    },
+    {
+      "id": "R1551",
+      "ref": "R1551",
+      "value": "2.2k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 189.59,
+      "y_mm": 123.52,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        188.66,
+        123.05,
+        190.52,
+        123.99
+      ],
+      "model_pos_mm": [
+        -16.273,
+        8.414,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -16.743,
+        7.484,
+        -15.803,
+        9.344,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25879",
+      "mpn": "0402WGF2201TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 2.2kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "CAN TX base from FPC pin 6 (J9 pin 6 with a straight cable)",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_TXB6",
+        "/STATUS/J9_CAN_TX6"
+      ],
+      "pads": {
+        "1": "/STATUS/J9_CAN_TX6",
+        "2": "/STATUS/CAN_TXB6"
+      }
+    },
+    {
+      "id": "R1553",
+      "ref": "R1553",
+      "value": "4.7k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 191.15,
+      "y_mm": 125.16,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        190.68,
+        124.23,
+        191.62,
+        126.09
+      ],
+      "model_pos_mm": [
+        -17.913,
+        6.854,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -18.843,
+        6.384,
+        -16.983,
+        7.324,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25900",
+      "mpn": "0402WGF4701TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 4.7kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "holds the NPN off while the K26 pin floats or is weakly pulled up",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_TXB6",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_TXB6",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "R1555",
+      "ref": "R1555",
+      "value": "2.2k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 191.64,
+      "y_mm": 123.55,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        190.71,
+        123.08,
+        192.57,
+        124.02
+      ],
+      "model_pos_mm": [
+        -16.303,
+        6.364,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -16.773,
+        5.434,
+        -15.833,
+        7.294,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25879",
+      "mpn": "0402WGF2201TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 2.2kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "TXD pull-up: recessive unless an NPN conducts",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "+3V3_D",
+        "/STATUS/CAN_TXD"
+      ],
+      "pads": {
+        "1": "+3V3_D",
+        "2": "/STATUS/CAN_TXD"
+      }
+    },
+    {
+      "id": "Q1531",
+      "ref": "Q1531",
+      "value": "MMBT3904",
+      "footprint": "SOT-23",
+      "side": "bottom",
+      "x_mm": 205.12,
+      "y_mm": 123.5,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        203.42,
+        121.57,
+        206.82,
+        125.43
+      ],
+      "model_pos_mm": [
+        -16.253,
+        -7.116,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -18.183,
+        -8.816,
+        -14.323,
+        -5.416,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        3.86,
+        3.4,
+        1.2
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C81464",
+      "mpn": "MMBT3904LT1G",
+      "manufacturer": "onsemi",
+      "bom_desc": "-55℃~+150℃ 1 NPN 200mA 200mV 225mW 300MHz 40 40V 50nA 6V NPN SOT-23 Bipolar (BJT) ROHS",
+      "description": "CAN TX from FPC pin 10",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_TXB10",
+        "/STATUS/CAN_TXD",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_TXB10",
+        "2": "GND",
+        "3": "/STATUS/CAN_TXD"
+      }
+    },
+    {
+      "id": "R1552",
+      "ref": "R1552",
+      "value": "2.2k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 205,
+      "y_mm": 120.6,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        204.53,
+        119.67,
+        205.47,
+        121.53
+      ],
+      "model_pos_mm": [
+        -13.353,
+        -6.996,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -14.283,
+        -7.466,
+        -12.423,
+        -6.526,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25879",
+      "mpn": "0402WGF2201TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 2.2kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "CAN TX base from FPC pin 10 (J9 pin 6 with a reversing cable)",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_TXB10",
+        "/STATUS/J9_CAN_TX10"
+      ],
+      "pads": {
+        "1": "/STATUS/J9_CAN_TX10",
+        "2": "/STATUS/CAN_TXB10"
+      }
+    },
+    {
+      "id": "R1554",
+      "ref": "R1554",
+      "value": "4.7k",
+      "footprint": "R_0402_1005Metric",
+      "side": "bottom",
+      "x_mm": 203.75,
+      "y_mm": 126.37,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        203.28,
+        125.44,
+        204.22,
+        127.3
+      ],
+      "model_pos_mm": [
+        -19.123,
+        -5.746,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -20.053,
+        -6.216,
+        -18.193,
+        -5.276,
+        0.25,
+        0.8
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "STATUS",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25900",
+      "mpn": "0402WGF4701TCE",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 4.7kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "holds the NPN off while the K26 pin floats or is weakly pulled up",
+      "callout": null,
+      "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
+      "nets": [
+        "/STATUS/CAN_TXB10",
+        "GND"
+      ],
+      "pads": {
+        "1": "/STATUS/CAN_TXB10",
+        "2": "GND"
       }
     }
   ],

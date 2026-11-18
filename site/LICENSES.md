@@ -25,15 +25,19 @@ Zero CDN requests are made at run time. All client dependencies are pinned and v
 | `BufferGeometryUtils.js` | `three` v0.170.0 (`examples/jsm/utils/`) | MIT License |
 | `meshopt_decoder.module.js` | `meshoptimizer` v0.18 (bundled inside `three` v0.170.0 `examples/jsm/libs/`) | MIT License (`Copyright (C) 2016-2022 Arseny Kapoulkine`) |
 
-## 3. Browser HMI (`site/hmi/`)
+## 3. Rust/WASM Site Core (`site/core/`)
+
+- **`site/core/` source & compiled bundle (`site/core/pkg/ias2rf_site_core.js`, `site/core/pkg/ias2rf_site_core_bg.wasm`):** Written from scratch for spatial ray-AABB grid picking, search/net graph lookup and live hardware simulations under the **MIT License** (project authors). Uses pinned `wasm-bindgen = 0.2.130` (MIT / Apache-2.0).
+
+## 4. Browser HMI (`site/hmi/`)
 
 - **`sw/hmi/app/` source code:** MIT License (project authors).
 - **Compiled WebAssembly bundle (`site/hmi/pkg/kria_hmi.js`, `site/hmi/pkg/kria_hmi_bg.wasm`):** Built from `sw/hmi/app` with `slint` v1.19.0 and distributed strictly as a browser **Web Application** under the **Slint Royalty-free Desktop, Mobile, and Web Applications License v2.0** (`LicenseRef-Slint-Royalty-free-2.0`). Per Section 2(b) of that licence, visible Slint attribution (`Built with Slint`) is displayed directly on the public HMI page (`site/hmi.html` and the Live HMI tab of `site/index.html`) alongside `site/LICENSES.md`. Notice that embedded Linux/KMS binaries on the KV260 hardware remain under GPL-3.0 and are **not** distributed in `site/`.
 
-## 4. Fonts and Styling
+## 5. Fonts and Styling
 
 `site/index.html`, `site/hmi.html` and `site/styles.css` use only the operating system's built-in sans-serif and monospace UI font stacks (`system-ui`, `-apple-system`, `Segoe UI`, `Roboto`, `ui-monospace`, `Consolas`). No external web fonts are loaded or redistributed.
 
-## 5. GitHub Actions Workflow (`.github/workflows/pages.yml`)
+## 6. GitHub Actions Workflow (`.github/workflows/pages.yml`)
 
 Uses official GitHub Pages actions pinned to major release tags (`actions/checkout@v4`, `actions/configure-pages@v5`, `actions/upload-pages-artifact@v3`, `actions/deploy-pages@v4`), MIT License (GitHub).
