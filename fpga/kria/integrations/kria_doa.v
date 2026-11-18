@@ -178,6 +178,8 @@ module kria_doa_axi (
     wire acc_done = acc_end && (drain == 0);
 
     // ------------------------------------------------------------------ steering table: 10 memories of 512 x 32
+    reg [8:0]  sc_m;                  // bearing being read by the scan
+    reg [31:0] bq [0:9];              // the steering table at sc_m, one clock later
     (* ram_style = "block" *) reg [31:0] btab0 [0:511];
     (* ram_style = "block" *) reg [31:0] btab1 [0:511];
     (* ram_style = "block" *) reg [31:0] btab2 [0:511];
@@ -203,6 +205,11 @@ module kria_doa_axi (
                 default: ;
             endcase
         end
+        // reads every clock at the bearing being issued (block RAM with a registered output); the scan uses them
+        // only while it runs
+        bq[0] <= btab0[sc_m]; bq[1] <= btab1[sc_m]; bq[2] <= btab2[sc_m]; bq[3] <= btab3[sc_m];
+        bq[4] <= btab4[sc_m]; bq[5] <= btab5[sc_m]; bq[6] <= btab6[sc_m]; bq[7] <= btab7[sc_m];
+        bq[8] <= btab8[sc_m]; bq[9] <= btab9[sc_m];
     end
 
     // ------------------------------------------------------------------ scan
@@ -222,11 +229,9 @@ module kria_doa_axi (
     reg signed [24:0] rs_re [0:9];    // off-diagonal pairs in table order
     reg signed [24:0] rs_im [0:9];
     reg signed [27:0] rs_tr;          // trace, sum of 5 diagonal entries
-    reg [8:0]  sc_m;                  // bearing being read
     reg        sc_rd;                 // a read was issued this clock
     reg        sc_load;               // scaling R this clock
     // pipeline: t0 read issued, t1 table data, t2 products, t3 pair sums, t4 total, t5 write
-    reg [31:0] bq [0:9];
     reg        p1_v, p2_v, p3_v, p4_v;
     reg [8:0]  p1_m, p2_m, p3_m, p4_m;
     reg signed [41:0] p2_prod [0:9];
@@ -278,9 +283,6 @@ module kria_doa_axi (
             end
             // issue one table read per clock
             if (scanning && !sc_load) begin
-                bq[0] <= btab0[sc_m]; bq[1] <= btab1[sc_m]; bq[2] <= btab2[sc_m]; bq[3] <= btab3[sc_m];
-                bq[4] <= btab4[sc_m]; bq[5] <= btab5[sc_m]; bq[6] <= btab6[sc_m]; bq[7] <= btab7[sc_m];
-                bq[8] <= btab8[sc_m]; bq[9] <= btab9[sc_m];
                 p1_m <= sc_m;
                 if (sc_m == NA - 1) scanning <= 1'b0;
                 else sc_m <= sc_m + 1'b1;

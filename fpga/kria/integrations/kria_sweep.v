@@ -19,8 +19,10 @@
 // 32-bit powers each (bins 161 to 224, then 33 to 96, the lower bin in the low half), tlast on the last.
 // A power is (sum over the segments of re^2 + im^2) >> PSHIFT, saturated to 32 bits.
 //
-// Timing: per segment 256 loads, 1,024 butterflies of 3 clocks and 128 power sums, 3,456 clocks; with 8 segments
-// a block takes 30,000 clocks, 0.3 ms at 100 MHz, against the 0.82 ms between blocks of a HackRF Pro sweep
+// Timing: per segment 256 loads, 1,024 butterflies of 6 clocks (one write and one read port of a block RAM: read a,
+// read b, take a, multiply b, write two outputs) and 128 power reads, about 6,540 clocks; with 8 segments and the
+// 2,048-beat input a block takes about 54,500
+// clocks, 0.545 ms at 100 MHz, against the 0.82 ms between blocks of a HackRF Pro sweep
 // (1,220 blocks/s). The input is held off (tready low) while a block is processed; the DMA's buffer absorbs it.
 //
 // Registers (AXI4-Lite, 32-bit, byte addresses, 12-bit address space):
@@ -102,9 +104,16 @@ module kria_sweep_axi (
     assign s_axis_tready = (state == S_RECV);
     assign m_axis_tkeep = 8'hFF;
 
-    // FFT memory: 256 x (re, im)
-    reg signed [DW-1:0] mre [0:255];
-    reg signed [DW-1:0] mim [0:255];
+    // FFT memory: 256 x {re, im}, a simple dual-port block RAM: one write and one registered read per clock
+    (* ram_style = "block" *) reg [2*DW-1:0] fmem [0:255];
+    reg  [7:0]      m_wa, m_ra;
+    reg             m_we;
+    reg  [2*DW-1:0] m_wd, m_q;
+    always @(posedge clk) begin
+        if (m_we) fmem[m_wa] <= m_wd;
+        m_q <= fmem[m_ra];
+    end
+    wire signed [DW-1:0] q_re = m_q[2*DW-1:DW], q_im = m_q[DW-1:0];
 
     function automatic [7:0] bitrev8;
         input [7:0] v;
@@ -123,13 +132,17 @@ module kria_sweep_axi (
     // butterflies
     reg [2:0]  st;            // stage 0..7
     reg [6:0]  bf;            // butterfly 0..127
-    reg [1:0]  ph;            // phase within a butterfly
+    reg [2:0]  ph;            // phase within a butterfly, 0 to 5
     reg [7:0]  i0, i1;
     reg signed [DW-1:0] a_re, a_im;
     reg signed [15:0]   w_c, w_s;
     reg signed [DW-1:0] t_re, t_im;
-    // power accumulators: pair j holds two bins
-    reg [7:0]  pw_i;          // output pair index 0..63
+    reg signed [DW-1:0] o1_re, o1_im;
+    // power accumulators: pair j holds two bins. Read r (0..127) is bin lo (r even) or hi (r odd) of pair r/2;
+    // its data comes back two clocks after it is issued, as pr2
+    reg [7:0]  pw_i;          // read index 0..128
+    reg        pv1, pv2;
+    reg [6:0]  pr1, pr2;
     reg [47:0] acc_lo [0:63];
     reg [47:0] acc_hi [0:63];
     reg [6:0]  out_i;
@@ -163,15 +176,17 @@ module kria_sweep_axi (
         end
     endfunction
 
-    wire [7:0] lo_bin = bin_of(pw_i[5:0], 1'b0);
-    wire [7:0] hi_bin = bin_of(pw_i[5:0], 1'b1);
+    // read r of the power pass: pair r/2, the lower bin for r even, the upper for r odd
+    wire [7:0] rd_bin = bin_of(pw_i[6:1], pw_i[0]);
 
     always @(posedge clk) tail_q <= tail[tail_ra];
 
     always @(posedge clk) begin
+        m_we <= 1'b0;
         if (!resetn) begin
             state <= S_RECV; beat <= 11'd0; hdr_ok <= 1'b0; blocks <= 32'd0; bad <= 32'd0;
             m_axis_tvalid <= 1'b0; m_axis_tlast <= 1'b0; ld_rd <= 1'b0; ld_rd2 <= 1'b0;
+            pv1 <= 1'b0; pv2 <= 1'b0;
         end else begin
             case (state)
             S_RECV: if (s_axis_tvalid) begin
@@ -191,28 +206,29 @@ module kria_sweep_axi (
                 end else beat <= beat + 1'b1;
             end
             S_LOAD: begin
-                // sample i of the segment: tail beat (1024 - 64 (nseg - seg)) + i/4, lane i%4; windowed, written at
-                // the bit-reversed address one clock after its read
-                // pipeline: issue (tail_ra), memory (tail_q), write; two clocks from a read to its sample's write
+                // sample i of the segment: tail beat (1024 - 64 (nseg - seg)) + i/4, lane i%4; windowed and written
+                // at the bit-reversed address. Pipeline: issue (tail_ra), memory (tail_q), write
                 ld_s2 <= ld_s; ld_rd2 <= ld_rd;
                 if (ld_rd2) begin
                     begin : ld
                         reg signed [7:0] xr, xi;
                         reg signed [16:0] wv;
                         reg signed [24:0] pr, pi;
+                        reg signed [DW-1:0] lr, li;
                         xr = tail_q[16*ld_s2[1:0] +: 8];
                         xi = tail_q[16*ld_s2[1:0] + 8 +: 8];
                         wv = {1'b0, win[ld_s2]};
                         pr = xr * wv;
                         pi = xi * wv;
-                        mre[bitrev8(ld_s2)] <= pr >>> 7;
-                        mim[bitrev8(ld_s2)] <= pi >>> 7;
+                        lr = pr >>> 7;
+                        li = pi >>> 7;
+                        m_we <= 1'b1; m_wa <= bitrev8(ld_s2); m_wd <= {lr, li};
                     end
                 end
                 if (ld_i == 9'd256) begin
                     ld_rd <= 1'b0;
-                    if (!ld_rd && !ld_rd2) begin
-                        state <= S_FFT; st <= 3'd0; bf <= 7'd0; ph <= 2'd0;
+                    if (!ld_rd && !ld_rd2) begin   // the last write was registered last clock; it lands now
+                        state <= S_FFT; st <= 3'd0; bf <= 7'd0; ph <= 3'd0;
                     end
                 end else begin
                     tail_ra <= 10'd1024 - ({5'd0, nseg - seg} << 6) + ld_i[7:2];
@@ -222,8 +238,10 @@ module kria_sweep_axi (
                 end
             end
             S_FFT: begin
+                // six clocks per butterfly on one write and one read port: read a, read b, take a, multiply b,
+                // write the upper output, write the lower one
                 case (ph)
-                2'd0: begin
+                3'd0: begin
                     // indices of butterfly bf in stage st: half = 2^st
                     begin : idx
                         reg [7:0] half, grp, pos;
@@ -232,39 +250,45 @@ module kria_sweep_axi (
                         grp  = {1'b0, bf} >> st;
                         i0 <= (grp << (st + 1)) | pos;
                         i1 <= ((grp << (st + 1)) | pos) + half;
+                        m_ra <= (grp << (st + 1)) | pos;
                         w_c <= twd[(pos << (7 - st))][15:0];
                         w_s <= twd[(pos << (7 - st))][31:16];
                     end
-                    ph <= 2'd1;
+                    ph <= 3'd1;
                 end
-                2'd1: begin
+                3'd1: begin m_ra <= i1; ph <= 3'd2; end   // the RAM reads a at this edge
+                3'd2: begin a_re <= q_re; a_im <= q_im; ph <= 3'd3; end   // and b at this one
+                3'd3: begin
                     // t = W b, W = c + j s (s = -sin)
                     begin : mul
-                        reg signed [DW-1:0] b_re, b_im;
                         reg signed [DW+16:0] tr, ti;
-                        b_re = mre[i1]; b_im = mim[i1];
-                        tr = w_c * b_re - w_s * b_im;
-                        ti = w_c * b_im + w_s * b_re;
+                        tr = w_c * q_re - w_s * q_im;
+                        ti = w_c * q_im + w_s * q_re;
 `ifdef MUTATE_SWEEP_TWIDDLE_CONJ
-                        tr = w_c * b_re + w_s * b_im;   // MUTATION: conjugate twiddle mirrors the spectrum
-                        ti = w_c * b_im - w_s * b_re;
+                        tr = w_c * q_re + w_s * q_im;   // MUTATION: conjugate twiddle mirrors the spectrum
+                        ti = w_c * q_im - w_s * q_re;
 `endif
                         t_re <= tr >>> 15;
                         t_im <= ti >>> 15;
                     end
-                    a_re <= mre[i0]; a_im <= mim[i0];
-                    ph <= 2'd2;
+                    ph <= 3'd4;
                 end
-                default: begin
+                3'd4: begin
                     // sums one bit wider, then halved: each stage scales by 1/2, the FFT by 1/256
                     begin : bfly
                         reg signed [DW:0] sr0, si0, sr1, si1;
+                        reg signed [DW-1:0] o0r, o0i;
                         sr0 = a_re + t_re; si0 = a_im + t_im;
                         sr1 = a_re - t_re; si1 = a_im - t_im;
-                        mre[i0] <= sr0 >>> 1; mim[i0] <= si0 >>> 1;
-                        mre[i1] <= sr1 >>> 1; mim[i1] <= si1 >>> 1;
+                        o0r = sr0 >>> 1; o0i = si0 >>> 1;
+                        o1_re <= sr1 >>> 1; o1_im <= si1 >>> 1;
+                        m_we <= 1'b1; m_wa <= i0; m_wd <= {o0r, o0i};
                     end
-                    ph <= 2'd0;
+                    ph <= 3'd5;
+                end
+                default: begin
+                    m_we <= 1'b1; m_wa <= i1; m_wd <= {o1_re, o1_im};
+                    ph <= 3'd0;
                     if (bf == 7'd127) begin
                         bf <= 7'd0;
                         if (st == 3'd7) begin
@@ -275,16 +299,25 @@ module kria_sweep_axi (
                 endcase
             end
             S_POW: begin
-                if (pw_i == 8'd64) begin
-                    if (seg + 1'b1 == nseg) begin
-                        state <= S_OUT; out_i <= 7'd0;
-                        m_axis_tdata <= freq; m_axis_tvalid <= 1'b1; m_axis_tlast <= 1'b0;
-                    end else begin
-                        seg <= seg + 1'b1; state <= S_LOAD; ld_i <= 9'd0; ld_rd <= 1'b0; ld_rd2 <= 1'b0;
+                // 128 reads, one per clock; each comes back two clocks later
+                pv2 <= pv1; pr2 <= pr1;
+                if (pv2) begin
+                    if (!pr2[0]) acc_lo[pr2[6:1]] <= (seg == 0 ? 48'd0 : acc_lo[pr2[6:1]]) + pwr(q_re, q_im);
+                    else         acc_hi[pr2[6:1]] <= (seg == 0 ? 48'd0 : acc_hi[pr2[6:1]]) + pwr(q_re, q_im);
+                end
+                if (pw_i == 8'd128) begin
+                    pv1 <= 1'b0;
+                    if (!pv1 && !pv2) begin
+                        if (seg + 1'b1 == nseg) begin
+                            state <= S_OUT; out_i <= 7'd0;
+                            m_axis_tdata <= freq; m_axis_tvalid <= 1'b1; m_axis_tlast <= 1'b0;
+                        end else begin
+                            seg <= seg + 1'b1; state <= S_LOAD; ld_i <= 9'd0; ld_rd <= 1'b0; ld_rd2 <= 1'b0;
+                        end
                     end
                 end else begin
-                    acc_lo[pw_i[5:0]] <= (seg == 0 ? 48'd0 : acc_lo[pw_i[5:0]]) + pwr(mre[lo_bin], mim[lo_bin]);
-                    acc_hi[pw_i[5:0]] <= (seg == 0 ? 48'd0 : acc_hi[pw_i[5:0]]) + pwr(mre[hi_bin], mim[hi_bin]);
+                    m_ra <= rd_bin;
+                    pv1 <= 1'b1; pr1 <= pw_i[6:0];
                     pw_i <= pw_i + 1'b1;
                 end
             end

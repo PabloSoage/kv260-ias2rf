@@ -530,7 +530,7 @@ So the integration does three things: the sweep, through the PL; reception above
 - takes the USB transfers as they come, checks each block's header (a bad one is dropped and counted), and keeps its frequency;
 - transforms the block's last 2^k segments of 256 samples (k = 3: 2,048 of its 8,187), each with a Hann window, and sums their powers bin by bin (Welch's method without overlap);
 - returns per block the frequency and 128 powers, the two quarter bands at 78.125 kHz, for the A53 to place on the panorama.
-- The window and the 128 twiddles are written by the A53 at start. One block takes 30,000 clocks, 0.3 ms at 100 MHz, against 0.82 ms between blocks.
+- The window and the 128 twiddles are written by the A53 at start. One block takes about 54,500 clocks, 0.545 ms at 100 MHz, against 0.82 ms between blocks. The FFT works in one block RAM with one write and one read port, six clocks per butterfly.
 
 **Why the averaging.** One FFT of a noise-like signal (LTE, Wi-Fi, DVB-T) is ragged, ±5 dB from bin to bin. The sum of eight is within ±1.8 dB. A PC keeps one FFT per block to save its CPU; the PL has the time.
 
@@ -556,6 +556,20 @@ So the integration does three things: the sweep, through the PL; reception above
 
 **Not tested:** a real HackRF Pro, its gains and its spurs, and the `hw` paths of `kria-sdrd` (the libhackrf calls); the 20 MS/s stream path and the transmit path beyond the gate, which use libhackrf's calls as `hackrf_transfer` does. Bluetooth hops faster than a sweep (1,600 hops a second against 1.7 sweeps a second); the panorama sees a few hops per sweep, and the peak-hold shows the band.
 
-### 10.2 In the K26 build
+### 10.2 Both blocks in the K26 build
 
-TODO_BUILD
+Both blocks and their DMAs are in the K26 block design (`fpga/kria/bd.tcl`), built on 18 November ([FPGA_GATEWARE.md §3.3](FPGA_GATEWARE.md)):
+
+| Instance | LUT | FF | BRAM36 / 18 | DSP |
+|---|---|---|---|---|
+| `kria_doa_0` | 10,114 (3,200 of them LUTRAM) | 2,098 | 0 / 1 | 115 |
+| `axi_dma_2` | 559 | 841 | 1 / 1 | 0 |
+| `kria_sweep_0` | 1,586 | 638 | 2 / 1 | 8 |
+| `axi_dma_3` | 1,665 | 2,415 | 2 / 2 | 0 |
+| **Whole K26 design** | **51,870 of 117,120 (44.3 %)** | 44,547 (19.0 %) | 40 eq. (27.8 %) | 229 (18.3 %) |
+
+- **Timing:** `WNS = +1.125 ns`, `WHS = +0.010 ns`; `clk_pl_0` `+1.497 ns`, its worst path in the ADS-B receiver, not in the new blocks.
+- **Clock-domain crossings:** none added. The four new instances run on `clk_pl_0`, the clock of the HP0 and HPM0_LPD ports; `cdc.rpt` has the same crossings as the build before.
+- **Addresses**, as Vivado assigned them (the XSA's hardware handoff): `kria_doa_0` `0x8005_0000`, `axi_dma_2` `0x8006_0000`, `kria_sweep_0` `0x8007_0000`, `axi_dma_3` `0x8008_0000`, each 64 KiB, after the existing five slaves at `0x8000_0000` to `0x8004_FFFF`. The overlay (`sw/ias2rf_pl.dtsi`) adds the four nodes and the DMA buffers `kraken_buf` (`0x3EE4_0000`, 512 KiB) and `sweep_buf` (`0x3EF0_0000`, 832 KiB).
+- **The first build** put `kria_sweep`'s FFT memory, read at four places at once, in flip-flops and multiplexers: 43,305 LUT for that block alone. The memory is now one block RAM with a write and a read port, six clocks per butterfly; the block fell to 1,586 LUT, and the benches above were re-run on it.
+- **Not done:** `kria_doa`'s steering table stays in LUTRAM; moving it to block RAM would free about 3,200 LUT.

@@ -132,13 +132,15 @@ def classify_artix_group(grp):
 
 
 KRIA_GROUPS = [
-    ("ps_dma",     "PS8 interface, two AXI DMAs + SmartConnect", "#546E7A"),
+    ("ps_dma",     "PS8 interface, four AXI DMAs + SmartConnect", "#546E7A"),
     ("link",       "IAS1 link: SERDES, eye trainer, PCS, FIFOs",  "#1565C0"),
     ("ch_rx",      "DSP suite: channel receivers",               "#00897B"),
     ("radar",      "DSP suite: radar processor",                 "#C62828"),
     ("adsb",       "DSP suite: ADS-B receiver",                  "#7B1FA2"),
     ("tx_mod",     "DSP suite: transmit modulator, queue",       "#F57C00"),
     ("bev",        "Fusion grid (kria_bev_0)",                   "#2E7D32"),
+    ("doa",        "KrakenSDR direction finding (kria_doa_0)",   "#AD1457"),
+    ("sweep",      "HackRF Pro sweep FFT (kria_sweep_0)",        "#0277BD"),
     ("pps",        "GPS PPS (kria_pps_0)",                       "#D84315"),
     ("other",      "Clocking / I/O",                             "#90A4AE"),
 ]
@@ -162,6 +164,10 @@ def classify_kria_group(grp):
         return "bev"
     if grp.startswith("kria_pps"):
         return "pps"
+    if grp.startswith("kria_doa"):
+        return "doa"
+    if grp.startswith("kria_sweep"):
+        return "sweep"
     if grp.startswith(("ps8", "axi_", "rst_", "xlslice", "xlconcat")):
         return "ps_dma"
     return "other"
@@ -485,7 +491,7 @@ def plot_kria_bd_schematic(kria_json):
 
     ax.text(12, 14.45, "Kria KV260 XCK26-SFVC784-2LV-c: Vivado IPI Block Design (ias2rf_k26_bd) & PL Link Circuit",
             ha="center", va="center", fontsize=13.2, fontweight="bold", color="#0F172A")
-    ax.text(12, 14.05, f"PS8 + kria_pl_link (link, DSP suite) + kria_pps + kria_bev (fusion grid) + two AXI DMAs into DDR4   |   "
+    ax.text(12, 14.05, f"PS8 + kria_pl_link (link, DSP suite) + kria_pps + kria_bev (fusion grid) + kria_doa + kria_sweep + four AXI DMAs into DDR4   |   "
             f"BD WNS = {d['wns_ns']:+.3f} ns, WHS = {d['whs_ns']:+.3f} ns",
             ha="center", va="center", fontsize=9.0, color="#334155")
 
@@ -530,13 +536,31 @@ def plot_kria_bd_schematic(kria_json):
                 ["drives PPS_SYNC and pps_ref", "IRQ In4"],
                 hdr_col="#D84315", fill_col="#FFF7ED")
     draw_module(ax, 13.2, 0.9, 4.4, 2.4, "axi_smc_ctrl / axi_smc_hp0", "AXI SmartConnects, reset, IRQ concat",
-                ["ctrl: HPM0_LPD -> 5 slaves above", "hp0: 3 DMA masters -> S_AXI_HP0_FPD", "xlconcat_0 [5:0] -> pl_ps_irq0"],
+                ["ctrl: HPM0_LPD -> 9 slaves", "hp0: 6 DMA masters -> S_AXI_HP0_FPD", "xlconcat_0 [7:0] -> pl_ps_irq0"],
                 hdr_col="#7E22CE", fill_col="#FAF5FF")
+
+    # Bottom: the USB receivers' blocks (INTEGRATIONS.md sections 9 and 10)
+    draw_module(ax, 0.4, 0.6, 2.95, 3.3, "axi_dma_2 (0x8006_0000)", "AXI DMA, MM2S only",
+                ["KrakenSDR snapshots", "from kraken_buf", "IRQ In6 (SPI 95)"],
+                hdr_col="#880E4F", fill_col="#FCE4EC")
+    draw_module(ax, 3.5, 0.6, 2.95, 3.3, "kria_doa_0 (0x8005_0000)", "KrakenSDR direction finding",
+                ["5 weights, R 5x5 (48 bit)", "Bartlett, 360 bearings", "R read back for MUSIC"],
+                hdr_col="#AD1457", fill_col="#FCE4EC")
+    draw_module(ax, 6.6, 0.6, 2.95, 3.3, "kria_sweep_0 (0x8007_0000)", "HackRF Pro sweep",
+                ["16 KiB blocks, header", "256-pt FFT x 8 segments", "128 bins per block out"],
+                hdr_col="#0277BD", fill_col="#E1F5FE")
+    draw_module(ax, 9.7, 0.6, 2.95, 3.3, "axi_dma_3 (0x8008_0000)", "AXI DMA, MM2S + S2MM",
+                ["blocks in, bins out", "sweep_buf", "IRQ In7 (S2MM, SPI 96)"],
+                hdr_col="#01579B", fill_col="#E1F5FE")
+    draw_wire(ax, [(3.35, 2.3), (3.5, 2.3)], "#AD1457", 1.8)
+    draw_wire(ax, [(9.7, 2.6), (9.55, 2.6)], "#0277BD", 1.8)
+    draw_wire(ax, [(9.55, 1.6), (9.7, 1.6)], "#0277BD", 1.8)
+    draw_wire(ax, [(12.65, 2.1), (13.2, 2.1)], "#7E22CE", 1.6)
 
     # Right: PS8
     draw_module(ax, 18.4, 0.9, 5.1, 12.6, "ps8 (zynq_ultra_ps_e)", "Zynq UltraScale+ MPSoC",
                 ["Quad Cortex-A53 (Linux)", "Dual Cortex-R5F:", "  core 0 AGC, front end, PPS", "  core 1 radar beam scan, grid", "DDR4 controller (4 GB)", "",
-                 "S_AXI_HP0_FPD <- both DMAs", "M_AXI_HPM0_LPD -> CSRs", "pl_clk0 = 100 MHz", "pl_ps_irq0[5:0] <- xlconcat_0", "",
+                 "S_AXI_HP0_FPD <- four DMAs", "M_AXI_HPM0_LPD -> CSRs", "pl_clk0 = 100 MHz", "pl_ps_irq0[7:0] <- xlconcat_0", "",
                  "EMIO: UART1 (Pmod), I2C0 (HK),", "  SPI0 (Pmod), GPIO (PPS, PROG_B)", "MIO GEM3 -> J10 RJ45", "DisplayPort -> HMI"],
                 hdr_col="#991B1B", fill_col="#FEF2F2", badge="Hard IP")
 
