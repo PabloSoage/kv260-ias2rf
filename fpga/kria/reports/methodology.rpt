@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Wed Nov 18 12:04:56 2026
+| Date         : Wed Nov 18 12:54:28 2026
 | Host         : Akasha running 64-bit major release  (build 9200)
 | Command      : report_methodology -file D:/Repos/kv260-ias2rf/fpga/kria/reports/methodology.rpt
 | Design       : ias2rf_k26_bd_wrapper
@@ -38,7 +38,7 @@ Table of Contents
 -----------------
 LUTAR-1#1 Warning
 LUT drives async reset alert  
-LUT cell ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_rx_sync[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[0]/PRE,
+LUT cell ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_tx_sync[2]_i_1, with 2 or more inputs, drives asynchronous preset/clear pin(s) ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[0]/PRE,
 ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[1]/PRE,
 ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_300_sync_reg[2]/PRE,
 ias2rf_k26_bd_i/kria_pl_link_0/inst/rst_rx_sync_reg[0]/PRE,
