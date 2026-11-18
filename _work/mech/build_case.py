@@ -742,6 +742,26 @@ print("camera module x", round(cx - CAM_W / 2, 2), "..", round(cx + CAM_W / 2, 2
       round(cy + CAM_L / 2, 2), "| lens window x", round(cx - 5, 1), "..", round(cx + 5, 1), "y", round(cy - 8.5, 1),
       "..", round(cy + 8.5, 1))
 
+# J1503 (Rev08, 18 Nov): the GPS receiver's and the vehicle CAN's 6-way JST-SH, vertical, so its plug goes in from
+# above and the cable rises straight to the lid. It leaves through an 8 mm hole in the lid top with a split TPU
+# grommet (case_grommet.stl: 8 mm body in an 8.2 mm hole, 12 mm flange outside, 10 mm lip inside, 3.2 mm bore, a 0.8 mm slit to slip the
+# crimped cable in sideways). The hole sits 1.4 mm north-east of the plug, clear of the corner clamp at (-5, -5)
+# and of v2's filter recess (x -69 to -11); the clamp gives way above the receptacle, where the plug stands.
+J1503_C = k2m(194.4, 113.275)
+GROM_C, GROM_D = (J1503_C[0] + 2.5, J1503_C[1] + 1.4), 8.2
+jx0, jy0 = k2m(198.9, 115.2)
+jx1, jy1 = k2m(189.9, 111.4)
+cut(lid, box("plug_room", jx0, jx1, jy0, jy1, ADAPTER_TOP, Z_TOP_IN + 0.1), self_ix=True)
+cut(lid, cyl("grommet_hole", GROM_C[0], GROM_C[1], Z_TOP_IN - 1, Z_TOP + 1, GROM_D, verts=48))
+# drawn 0.1 mm clear of the lid all round (the TPU is squeezed into the hole); body 8.0 in the 8.2 mm hole
+grommet = cyl("grommet", GROM_C[0], GROM_C[1], Z_TOP_IN - 0.15, Z_TOP + 0.15, 8.0, TPU, verts=48)
+union(grommet, cyl("grommet_flange", GROM_C[0], GROM_C[1], Z_TOP + 0.1, Z_TOP + 1.3, 12.0, TPU, verts=48))
+union(grommet, cyl("grommet_lip", GROM_C[0], GROM_C[1], Z_TOP_IN - 1.1, Z_TOP_IN - 0.1, 10.0, TPU, verts=48))
+cut(grommet, cyl("grommet_bore", GROM_C[0], GROM_C[1], Z_TOP_IN - 2, Z_TOP + 2, 3.2, verts=32))
+cut(grommet, box("grommet_slit", GROM_C[0], GROM_C[0] + 7.0, GROM_C[1] - 0.4, GROM_C[1] + 0.4, Z_TOP_IN - 2, Z_TOP + 2))
+print("J1503 at", tuple(round(v, 2) for v in J1503_C), "| grommet hole at", tuple(round(v, 2) for v in GROM_C),
+      "| plug room x", round(jx0, 2), "..", round(jx1, 2), "y", round(jy0, 2), "..", round(jy1, 2))
+
 # label, debossed 0.6 mm in the lid
 # clear of the ribbon slot over J1103 (x -75.7, y 26-80) and of v2's grille
 bpy.ops.object.text_add(location=(-70 * MM, 96 * MM, (Z_TOP - 0.6) * MM))
@@ -891,6 +911,10 @@ if "--stl" in argv:
     stl([pads[0]], os.path.join(out, "case_pad_ring.stl"))
     stl([pads[-1]], os.path.join(out, "case_pad_rj45.stl"))
     stl([cam_pads[0]], os.path.join(out, "case_pad_camera.stl"))
+    gl = grommet.location.copy()
+    grommet.location = (-GROM_C[0] * MM, -GROM_C[1] * MM, -Z_TOP_IN * MM)   # at the origin, lip down
+    stl([grommet], os.path.join(out, "case_grommet.stl"))
+    grommet.location = gl
     for b in bumpers:
         stl([b], os.path.join(out, f"case_{b.name.lower()}.stl"))
     for o in (bottom, lid):

@@ -129,7 +129,7 @@ pins = [o for o in bpy.data.objects if re.fullmatch(r"pin\d+", o.name)]     # no
 pads = [o for o in bpy.data.objects if o.name.startswith("pad")]
 bumpers = [o for o in bpy.data.objects if o.name.startswith("bumper")]
 boards = [o for o in bpy.data.objects if o.parent is None and o.name not in
-          ("case_lid", "case_bottom", "floor", "tgt", "cam", "key", "fill", "rim") and not o.name.startswith(("pin", "pad", "bumper", "fan2_vis", "case_v2_filter_frame"))]
+          ("case_lid", "case_bottom", "floor", "tgt", "cam", "key", "fill", "rim") and not o.name.startswith(("pin", "pad", "bumper", "fan2_vis", "case_v2_filter_frame", "grommet"))]
 home = {o.name: (o.location.copy(), o.rotation_euler.copy()) for o in [lid] + pins + pads + bumpers}
 
 
@@ -213,7 +213,7 @@ VIEWS = {   # name: (target mm, camera mm, lens mm)
     "j961":        ((-14, 112, 4), (-70, 320, 90), 70),       # Rev08: J961's notch and the moved lug, back wall
 }
 PREFIX = argv[argv.index("--prefix") + 1] if "--prefix" in argv else "case_"
-LIDX = [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame"))]
+LIDX = [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame", "grommet"))]
 for o in LIDX:                                 # v2: the fan and the filter frame move with the lid
     mw = o.matrix_world.copy()
     o.parent = lid

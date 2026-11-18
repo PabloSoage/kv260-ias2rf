@@ -5654,10 +5654,10 @@
 		(uuid "62339b73-17b6-5fd1-97d1-6a192580c468")
 	)
 	(junction
-		(at 626.11 66.04)
+		(at 626.11 60.96)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "dee7be09-e769-5c74-ae4e-82ee915157e2")
+		(uuid "b51aacee-4373-5247-a8be-3903bdd4238e")
 	)
 	(junction
 		(at 751.84 73.66)
@@ -7723,53 +7723,43 @@
 	)
 	(wire
 		(pts
-			(xy 631.19 58.42) (xy 626.11 58.42)
+			(xy 631.19 53.34) (xy 626.11 53.34)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "10b09d7b-6964-58bb-a07a-45d3ec8f1642")
+		(uuid "acb4bf5f-3656-5c6e-9f0e-ede77301dec8")
 	)
 	(wire
 		(pts
-			(xy 631.19 66.04) (xy 626.11 66.04)
+			(xy 631.19 60.96) (xy 626.11 60.96)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c41f8586-eb62-57d4-837f-1eb54f795564")
+		(uuid "1405fcd4-6225-535c-a0b2-6792c320f876")
 	)
 	(wire
 		(pts
-			(xy 626.11 58.42) (xy 626.11 66.04)
+			(xy 626.11 53.34) (xy 626.11 60.96)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d8cf35e4-dfe2-58bb-be37-ff114cd9bec0")
+		(uuid "33a481a6-e2bf-537f-a81a-5560242b4201")
 	)
 	(wire
 		(pts
-			(xy 626.11 66.04) (xy 626.11 68.58)
+			(xy 626.11 60.96) (xy 626.11 63.5)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "4339fe39-c1cf-51e6-9057-e386ef547d92")
-	)
-	(wire
-		(pts
-			(xy 631.19 53.34) (xy 628.65 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "01ed6a47-1c4b-50cb-b4ce-586a90f50a19")
+		(uuid "10bf278c-5cee-5a3d-9e41-85e337165546")
 	)
 	(wire
 		(pts
@@ -7783,13 +7773,13 @@
 	)
 	(wire
 		(pts
-			(xy 631.19 60.96) (xy 628.65 60.96)
+			(xy 631.19 58.42) (xy 628.65 58.42)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bc3c2ca3-fc5a-5ddf-a3f7-cbd2c756007d")
+		(uuid "0cba419d-0d33-5676-980e-1d5be41370c1")
 	)
 	(wire
 		(pts
@@ -7800,6 +7790,16 @@
 			(type default)
 		)
 		(uuid "dd0c26c4-7bd1-5b00-90f9-0a3d45b5f2c9")
+	)
+	(wire
+		(pts
+			(xy 631.19 66.04) (xy 628.65 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "373c2bc7-650d-57dd-aef8-e46d55841620")
 	)
 	(wire
 		(pts
@@ -9526,17 +9526,7 @@
 		)
 		(uuid "8658c5e9-19d2-5f51-97e7-58ec528f3fd1")
 	)
-	(label "GPS_3V3"
-		(at 628.65 53.34 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3ef0e53a-4ff1-5e3c-a8ff-757f89f59383")
-	)
-	(label "GPS_PPS_IN"
+	(label "CAN_L"
 		(at 628.65 55.88 180)
 		(effects
 			(font
@@ -9544,19 +9534,19 @@
 			)
 			(justify right)
 		)
-		(uuid "f30983cc-7aa6-5ccf-99a8-e7507ee35fdf")
+		(uuid "4ad06c27-851e-5b64-8bce-cc210f82f1ed")
 	)
 	(label "CAN_H"
-		(at 628.65 60.96 180)
+		(at 628.65 58.42 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right)
 		)
-		(uuid "74f2b30e-b44e-5792-a324-72c6bff0ead7")
+		(uuid "3f6bd36c-3307-5063-85d1-e78a9a547e52")
 	)
-	(label "CAN_L"
+	(label "GPS_PPS_IN"
 		(at 628.65 63.5 180)
 		(effects
 			(font
@@ -9564,7 +9554,17 @@
 			)
 			(justify right)
 		)
-		(uuid "f5111fba-b797-56bf-b257-5fe6281ca094")
+		(uuid "9b39971f-f0f2-596f-99aa-4a4f222ec643")
+	)
+	(label "GPS_3V3"
+		(at 628.65 66.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "14c89e3f-10d0-5b67-8f83-24a33c186b91")
 	)
 	(label "GPS_PPS_R"
 		(at 681.99 63.5 180)
@@ -10012,7 +10012,7 @@
 		)
 		(uuid "4b10e37d-57f1-579a-840c-36541d43e5f8")
 	)
-	(text "6. Vehicle CAN (PS CAN1, R5F core 1): J1503 4/5 -> D1531 -> U1506 TCAN330. RXD -> R1556/R1557 -> J1502 pin 8 (J9 CLK_N, 1.2 V)."
+	(text "6. Vehicle CAN (PS CAN1, R5F core 1): J1503 3/2 (CANH/CANL) -> D1531 -> U1506 TCAN330. RXD -> R1556/R1557 -> J1502 pin 8 (J9 CLK_N, 1.2 V)."
 		(exclude_from_sim no)
 		(at 20.32 364.49 0)
 		(effects
@@ -16844,7 +16844,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "SM06B-SRSS-TB"
+		(property "Value" "BM06B-SRSS-TB"
 			(at 633.73 83.82 0)
 			(effects
 				(font
@@ -16853,7 +16853,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal"
+		(property "Footprint" "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical"
 			(at 636.27 58.42 0)
 			(hide yes)
 			(effects
@@ -16912,7 +16912,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 626.11 68.58 0)
+		(at 626.11 63.5 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -16922,7 +16922,7 @@
 		(dnp no)
 		(uuid "4a7a5f81-e87f-5902-869e-1da83fa13b61")
 		(property "Reference" "#PWR2449"
-			(at 626.11 72.39 0)
+			(at 626.11 67.31 0)
 			(hide yes)
 			(effects
 				(font
@@ -16931,7 +16931,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 626.11 72.39 0)
+			(at 626.11 67.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16939,7 +16939,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 626.11 68.58 0)
+			(at 626.11 63.5 0)
 			(hide yes)
 			(effects
 				(font
@@ -16948,7 +16948,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 626.11 68.58 0)
+			(at 626.11 63.5 0)
 			(hide yes)
 			(effects
 				(font
@@ -16957,7 +16957,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 626.11 68.58 0)
+			(at 626.11 63.5 0)
 			(hide yes)
 			(effects
 				(font

@@ -13,7 +13,7 @@
 > `J1501`, now the HRO TYPE-C-31-E-17 (18 Nov, LAYOUT 6.8), has no EasyEDA or KiCad model either; its model is drawn
 > from the maker's drawing by `_work/mech/usbc_hro_model.py` (housing, steel shell, seal ring, tongue, contacts) and,
 > being ours, is in the repository: `mech/models3d/USB_C_HRO_TYPE-C-31-E-17.wrl`. `J1502`, the 15-way FPC receptacle,
-> uses its EasyEDA model from the cache; `J1503`, `U1505`, `D1530`, `F1501` and the passives use KiCad's. The audit below is the Rev06 one (570 footprints).
+> uses its EasyEDA model from the cache, and so does `J1503` (LCSC C160392, toned by `_work/rev08_final_models.py`: KiCad's has a pure white housing); `U1505`, `D1530`, `F1501` and the passives use KiCad's. The audit below is the Rev06 one (570 footprints).
 
 An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (KiCad's stock `share/kicad/3dmodels` library) identified:
 

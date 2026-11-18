@@ -470,13 +470,13 @@ C7424785), surface-mount contacts and shell tabs, plastic pegs 0.7 mm long, 6.0 
 **The GPS PPS path.** `J1502`, a 15-way 1 mm FPC receptacle (XUNPU FPC-1.0FX-15PWCR-H20), sits on the top edge east
 of the IAS1 tongue (x 187 to 208, y 102.3 to 108.8), its cable side on the edge, so a 100 mm FFC runs over the
 carrier to the KV260's `J9`, about 67 mm away (located from AMD's STEP model, `kv260_step_locate.py`: TE 1-1734248-5 at
-KiCad x 195, y 18). `J1503`, the GPS receiver's JST-SH, is below it. The buffer, the ESD diode, the PTC and seven
+KiCad x 195, y 18). `J1503`, the GPS receiver's and the vehicle CAN's JST-SH, is below it. The buffer, the ESD diode, the PTC and seven
 passives are on the bottom of the same corner, which lies beyond the carrier's edge (y > 107.25). Its contact pads are 0.35 mm
 from the ring of the mounting hole `H2`; the stitching via under its east tab moved 0.85 mm. What the circuit does is
 in [INTEGRATIONS §2.1](INTEGRATIONS.md).
 
-**The vehicle CAN (added the same day).** `J1503` became a 6-way JST-SH (SM06B-SRSS-TB: 1 GPS 3.3 V, 2 PPS,
-3 ground, 4 `CANH`, 5 `CANL`, 6 ground) and moved 0.6 mm east, because its wider west tab would have sat on
+**The vehicle CAN (added the same day).** `J1503` became a 6-way JST-SH (first a side-entry SM06B-SRSS-TB, see
+below) and moved 0.6 mm east, because its wider west tab would have sat on
 `LINK_RX_D1_N`, which runs straight down x 189.65 on L1; the tab now clears it by 0.26 mm (the LVDS class asks for
 0.15) and has its own ground via, since that track cuts it off from the L1 pour. `F1501`'s `+3V3_D` via, now under
 the new pin 1, moved under the PTC's body. The transceiver `U1506` (TCAN330DCNT), the ESD diode `D1531`, `Q1530` and
@@ -486,6 +486,16 @@ its collector comes back to `CAN_TXD`. The CAN signals use L1, L3, L6 and L8 onl
 supply 0.3 mm), never the planes. The script is `_work/rev08_can_pcb.py`; what the circuit does is in
 [INTEGRATIONS §2.2](INTEGRATIONS.md).
 
-The board after these changes: 795 footprints, 13,695 track segments, 2,612 vias. DRC with zones refilled and schematic
+**`J1503` made vertical (the same day).** The side-entry SM06B opened north, 2.8 mm from the back of `J1502`: the plug
+would have stood out of it into the FPC's body, its wires had nowhere to go, and no finger could reach it. It is now
+the vertical BM06B-SRSS-TB, so the plug goes in from above and its cable rises straight to a grommet in the
+enclosure's lid (ENCLOSURE §2). Its six pads are where the SM06B's were (x 191.9 to 196.9, y 114.6, 0.6 x 1.55 mm),
+so the copper to the pins did not change; the part turned from 180° to 0°, its pin 1 is the west pad and the pin-out
+is the old one mirrored: 1 ground, 2 `CANL`, 3 `CANH`, 4 ground, 5 PPS, 6 GPS 3.3 V (the STATUS sheet with it). Its
+mounting tabs moved 1.35 mm south (y 112.075): the old tab stubs and the west tab's via went, each tab has a ground
+via or stub again, and `J9_CAN_TX10`, which ran down x 197.45 where the east tab now sits, was routed again (9
+segments, 2 vias, 17.2 mm). Script: `_work/rev08_j1503_vertical.py`; DRC identical to before it.
+
+The board after these changes: 795 footprints, 13,695 track segments, 2,613 vias. DRC with zones refilled and schematic
 parity: **0 violations, 0 unconnected pads, 0 footprint errors**; ERC 0 errors and the same 7 warnings. The warnings
 are those of the board before, plus three silkscreen overlaps between the new bottom-side passives.

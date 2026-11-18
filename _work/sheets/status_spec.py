@@ -30,7 +30,7 @@ STATUS sheet (Rev08) - the connection specification. See docs/REV08_PLAN.md sect
   TXD: TXD = NOR(pin 6, pin 10) = TX. An NPN stays off while the K26 is unconfigured, even against a weak
   pull-up, so the bus stays recessive; the TCAN330 also times out a stuck dominant TXD. Pins 6 and 10 are therefore
   no longer grounds; 7 and 9 still are. The bus leaves on J1503, now a 6-way JST-SH shared with the GPS receiver
-  (4 CANH, 5 CANL, 6 ground), behind a PESD1CAN. No termination: a tap on a car's bus must not terminate it.
+  (2 CANL, 3 CANH, 1 and 4 ground), behind a PESD1CAN. No termination: a tap on a car's bus must not terminate it.
 
 These parts were first planned on the CONTROL sheet; that A1 sheet has no free area large enough to draw them
 legibly, so they have their own sheet, joined to CONTROL by PMOD_SPARE1/2 and to CLOCK by XO_SCL/XO_SDA.
@@ -57,9 +57,10 @@ PARTS = {
     "J1502": ("Connector_Generic_MountingPin:Conn_01x15_MountingPin", "FPC-1.0FX-15PWCR-H20",
               FP + "FPC_1.0_15P_XUNPU_FPC-1.0FX-15PWCR-H20",
               "To KV260 J9 (Raspberry Pi camera connector) by a 15-way 1 mm FFC, 100 mm; J9 pin 12 = HDA10 (PL)"),
-    "J1503": ("Connector_Generic_MountingPin:Conn_01x06_MountingPin", "SM06B-SRSS-TB",
-              "Connector_JST:JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal",
-              "GPS receiver and vehicle CAN: 1 = 3.3 V out, 2 = PPS in, 3 = ground, 4 = CANH, 5 = CANL, 6 = ground"),
+    "J1503": ("Connector_Generic_MountingPin:Conn_01x06_MountingPin", "BM06B-SRSS-TB",
+              "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
+              "GPS receiver and vehicle CAN, vertical (plug from above): 1 = ground, 2 = CANL, 3 = CANH, 4 = ground, "
+              "5 = PPS in, 6 = 3.3 V out"),
     "U1506": ("Interface_CAN_LIN:TCAN330", "TCAN330DCNT", "Package_TO_SOT_SMD:SOT-23-8",
               "Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode"),
     "Q1530": ("Transistor_BJT:Q_NPN_BEC", "MMBT3904", "Package_TO_SOT_SMD:SOT-23",
@@ -97,7 +98,7 @@ PINS = {
               "B7": "USB_DN", "A8": "NC", "B8": "NC", "SH": GND},
     "J1502": {"12": "J9_PPS12", "4": "J9_PPS4", "6": "J9_CAN_TX6", "10": "J9_CAN_TX10", "8": "J9_CAN_RX",
               "7": GND, "9": GND, "MP": GND, **{str(n): "NC" for n in (1, 2, 3, 5, 11, 13, 14, 15)}},
-    "J1503": {"1": "GPS_3V3", "2": "GPS_PPS_IN", "3": GND, "4": "CAN_H", "5": "CAN_L", "6": GND, "MP": GND},
+    "J1503": {"1": GND, "2": "CAN_L", "3": "CAN_H", "4": GND, "5": "GPS_PPS_IN", "6": "GPS_3V3", "MP": GND},
     "U1506": {"1": "CAN_TXD", "2": GND, "3": V3D, "4": "CAN_RXD", "5": GND, "6": "CAN_L", "7": "CAN_H", "8": GND},
     "Q1530": {"1": "CAN_TXB6", "2": GND, "3": "CAN_TXD"},
     "Q1531": {"1": "CAN_TXB10", "2": GND, "3": "CAN_TXD"},

@@ -33,7 +33,7 @@ notes = [
     "3. Rail LEDs: dark = dead rail. +1V8_D and +1V0 drive an NPN that switches their LED from +3V3_D.",
     "4. J1501 USB-C -> U1503 ESD -> U1502 CH340X at 3.3 V from the cable (U1504): /dev/ttyUSBx at 115200 8N1.",
     "5. GPS PPS: J1503 -> D1530, R1540 -> U1505 -> R1542 (J1502 pin 12), R1543 (pin 4); FFC to KV260 J9, pin 12 = HDA10 (PL).",
-    "6. Vehicle CAN (PS CAN1, R5F core 1): J1503 4/5 -> D1531 -> U1506 TCAN330. RXD -> R1556/R1557 -> J1502 pin 8 (J9 CLK_N, 1.2 V).",
+    "6. Vehicle CAN (PS CAN1, R5F core 1): J1503 3/2 (CANH/CANL) -> D1531 -> U1506 TCAN330. RXD -> R1556/R1557 -> J1502 pin 8 (J9 CLK_N, 1.2 V).",
     "   TX: J9 pin 6 (DATA1_P, inverted in the PL) on J1502 pin 6 or 10 -> Q1530/Q1531 NOR -> TXD. Either FFC type works.",
 ]
 for i, t in enumerate(notes):

@@ -28,6 +28,7 @@ protect the corners. Every board rests on a honeycomb or on a clamp post with a 
 | `case_lid.stl` (248.1 × 161.3 × 34.8 mm) | 1 | same as the tray | Bambu A1 | Exported upside down: the top on the bed. The lugs have 45° ribs above them, so no supports |
 | `case_pin.stl` | 6 | PETG or PA (not PLA: it creeps) | A1, or the Saturn 4 Ultra in a tough resin for a fit test | Exported on its flat side, so the split prongs bend across the layers |
 | `case_pad_ring.stl`, `case_pad_rj45.stl` | 7 + 1 | TPU 95A | A1, from the external spool (TPU does not go through the AMS Lite) | Flat |
+| `case_grommet.stl` | 1 | TPU 95A | A1, external spool | Flange down. Split, so the crimped cable from `J1503` slips in sideways |
 | `case_bumper_l/rfront/back.stl` | 4 (optional) | TPU 95A, gyroid 20 % | A1, external spool | As exported |
 | Stainless M4 × 16 (M4 × 20 where a bumper is), DIN 934 nuts, Loctite 243 | 6 | A2/A4 | — | The nuts drop into the hex traps under the tray's lugs |
 | M5 screws for the vehicle ears | 4 | A2/A4 | — | Through rubber isolators (§3.3) |
@@ -72,6 +73,12 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     lens and two clamps on the module's ends, each with a TPU pad (`case_pad_camera.stl`, 2 off). The module's
     outline is the catalogue's 8.74 × 24.18 mm, taken from the connector at one end towards +Y, clear of the
     carrier's `J18`; check it against a module in hand before printing the lid.
+  - **The GPS and vehicle CAN cable (18 Nov).** `J1503` is now a vertical JST-SH, so its plug goes in from above
+    and the cable rises straight to the lid, about 23 mm. It leaves through an 8.2 mm hole in the lid top, 2.9 mm
+    from the plug's axis (X −3.5, Y 5.0), with a split TPU grommet (`case_grommet.stl`: 8 mm body, 12 mm flange
+    outside, 10 mm lip inside, 3.2 mm bore for the six 28 AWG wires, a 0.8 mm slit to slip the crimped cable in
+    from the side). The hole clears the corner clamp at (−5, −5) and v2's filter recess (X −69 to −11). The clamp
+    gives way above the receptacle, where the plug stands. Fit the plug before the lid goes on, as the ribbon.
 
 | | |
 |---|---|

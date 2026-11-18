@@ -48,11 +48,11 @@ def main():
         o for o in bpy.data.objects
         if o.parent is None
         and o.name not in ("case_lid", "case_bottom", "floor", "tgt", "cam", "key", "fill", "rim")
-        and not o.name.startswith(("pin", "pad", "bumper", "fan2_vis", "case_v2_filter_frame"))
+        and not o.name.startswith(("pin", "pad", "bumper", "fan2_vis", "case_v2_filter_frame", "grommet"))
     ]
     home = {o.name: (o.location.copy(), o.rotation_euler.copy()) for o in [lid] + pins + pads + bumpers}
 
-    for o in [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame"))]:
+    for o in [o for o in bpy.data.objects if o.name.startswith(("fan2_vis", "case_v2_filter_frame", "grommet"))]:
         mw = o.matrix_world.copy()
         o.parent = lid
         o.matrix_world = mw
