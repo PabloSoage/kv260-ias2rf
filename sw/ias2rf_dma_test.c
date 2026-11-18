@@ -143,9 +143,23 @@ static int run_s2mm_capture(volatile uint32_t *dma, uint64_t phys_buf,
         if ((sr & DMA_SR_IDLE) || (sr & DMA_SR_IOC_IRQ)) {
             uint32_t got = reg_rd(dma, DMA_S2MM_LENGTH);
             printf("DMA S2MM complete: %u bytes (SR=0x%08x)\n", got, sr);
-            uint32_t nwords = got >> 3;
-            for (uint32_t w = 0; w < (nwords < 8 ? nwords : 8); w++)
-                printf("  rx[%2u] = 0x%016llx\n", w, (unsigned long long)virt_buf[w]);
+            /* kria_ps_framer's packets: {0xA5, tid, flags, 0, words16, seq16}, the PL time, then the payload */
+            uint32_t nwords = got >> 3, shown = 0;
+            for (uint32_t w = 0; w + 1 < nwords && shown < 16; shown++) {
+                uint64_t h = virt_buf[w];
+                if ((h >> 56) != 0xA5) {
+                    printf("  word %u: 0x%016llx is not a framer header\n", w, (unsigned long long)h);
+                    break;
+                }
+                uint32_t n = (uint32_t)((h >> 16) & 0xFFFF);
+                printf("  packet seq %5u stream 0x%02x flags 0x%02x, %4u words, t = %llu",
+                       (unsigned)(h & 0xFFFF), (unsigned)((h >> 48) & 0xFF), (unsigned)((h >> 40) & 0xFF), n,
+                       (unsigned long long)virt_buf[w + 1]);
+                if (n > 0 && w + 2 < nwords)
+                    printf(", first 0x%016llx", (unsigned long long)virt_buf[w + 2]);
+                printf("\n");
+                w += 2 + n;
+            }
             return 0;
         }
         usleep(10);
@@ -158,6 +172,11 @@ static int run_s2mm_capture(volatile uint32_t *dma, uint64_t phys_buf,
 #define ARTIX_ADCS_STAT     0x0038
 #define ARTIX_RADAR_CTRL    0x00E4  /* [0] rad_ddc_en (reset 1); the Pmod spare1 GPIO before Rev08 */
 #define ARTIX_RADAR_STATUS  0x00E8  /* [5] link up and ADC trained; the Pmod spare2 GPIO before Rev08 */
+
+/* kria_ps_framer ends a block at 64 KiB or after 1 ms idle; the largest is 8,706 words (FPGA_GATEWARE.md 5.10) */
+#define FRAMER_BLOCK_MAX    69648u
+#define CMD_OFFSET          (96u * 1024u)
+#define UBUF_SPAN           (128u * 1024u)
 
 #define CMD_OP_WR           0x01
 #define CMD_OP_RD           0x02
@@ -216,16 +235,16 @@ int main(int argc, char **argv)
     uint64_t phys_addr = 0, buf_size = 0;
     if (read_sysfs_u64("/sys/class/u-dma-buf/udmabuf0/phys_addr", &phys_addr) == 0 &&
         read_sysfs_u64("/sys/class/u-dma-buf/udmabuf0/size", &buf_size) == 0 &&
-        buf_size >= 8192) {
+        buf_size >= UBUF_SPAN) {
         int ufd = open("/dev/udmabuf0", O_RDWR | O_SYNC);
         if (ufd >= 0) {
-            volatile uint64_t *ubuf = (volatile uint64_t *)mmap(NULL, 8192,
+            volatile uint64_t *ubuf = (volatile uint64_t *)mmap(NULL, UBUF_SPAN,
                                                                 PROT_READ | PROT_WRITE,
                                                                 MAP_SHARED, ufd, 0);
             if (ubuf != MAP_FAILED) {
-                /* the command word sits 4 KB into the buffer, clear of the S2MM capture */
-                volatile uint64_t *cmd = ubuf + 512;
-                uint64_t cmd_phys = phys_addr + 4096;
+                /* the command word sits 96 KiB into the buffer, clear of the S2MM block */
+                volatile uint64_t *cmd = ubuf + CMD_OFFSET / 8;
+                uint64_t cmd_phys = phys_addr + CMD_OFFSET;
                 if (argc > 1 && strcmp(argv[1], "--rd-adcs") == 0)
                     send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_RD, ARTIX_ADCS_STAT, 0);
                 else if (argc > 2 && strcmp(argv[1], "--rd") == 0)
@@ -240,8 +259,8 @@ int main(int argc, char **argv)
                                   strtoul(argv[2], NULL, 0) ? 1u : 0u);
                 else if (argc > 1 && strcmp(argv[1], "--radar-status") == 0)
                     send_mm2s_cmd(csr, dma, cmd_phys, cmd, CMD_OP_RD, ARTIX_RADAR_STATUS, 0);
-                run_s2mm_capture(dma, phys_addr, ubuf, 4096);
-                munmap((void *)ubuf, 8192);
+                run_s2mm_capture(dma, phys_addr, ubuf, FRAMER_BLOCK_MAX);
+                munmap((void *)ubuf, UBUF_SPAN);
             }
             close(ufd);
         }

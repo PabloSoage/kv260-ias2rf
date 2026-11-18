@@ -31,6 +31,9 @@ module kria_dsp_suite (
     input  wire [7:0]  rx_tap_tid,
     input  wire [63:0] rx_tap_data,
 
+    // Transmit enable: kria_pl_link's TX_KEY (0x38), written only by R5F core 0's interlock (18 Nov 2026).
+    // DSP_CTRL[1] no longer keys the transmitter; it reads back tx_key, so Linux can write DSP_CTRL whole.
+    input  wire        tx_key,
     // Optional TX Master Stream muxed ahead of u_fifo_pl2tx when dsp_tx_en=1
     output wire        dsp_tx_en,
     output wire [63:0] tx_axis_tdata,
@@ -38,7 +41,14 @@ module kria_dsp_suite (
     input  wire        tx_axis_tready,
     output wire        tx_axis_tlast,
     output wire [7:0]  tx_axis_tid,
-    output wire [15:0] tx_axis_tuser
+    output wire [15:0] tx_axis_tuser,
+
+    // Results for the A53s (kria_dsp_out): audio 0x20, ADS-B 0x21, radar detections 0x22, radar map 0x23
+    output wire [63:0] out_axis_tdata,
+    output wire        out_axis_tvalid,
+    input  wire        out_axis_tready,
+    output wire        out_axis_tlast,
+    output wire [7:0]  out_axis_tid
 );
     // CSR Registers (0x40..0x7C)
     reg [31:0] reg_dsp_ctrl;      // 0x40: [0]dsp_rx_en, [1]dsp_tx_en, [3:2]src_sel(0=01,1=05,2=04),
@@ -58,7 +68,11 @@ module kria_dsp_suite (
     reg [15:0] reg_radar_minp;    // 0x7C write [31:16] CFAR power floor / 16; 0 keeps the former fixed 20000
 
     wire       dsp_rx_en   = reg_dsp_ctrl[0];
+`ifdef MUTATE_TX_KEY_FROM_DSP_CTRL
     assign     dsp_tx_en   = reg_dsp_ctrl[1];
+`else
+    assign     dsp_tx_en   = tx_key;
+`endif
     wire [1:0] src_sid_sel = reg_dsp_ctrl[3:2];
     wire [2:0] ch_mode     = reg_dsp_ctrl[6:4];
     wire       adsb_en     = reg_dsp_ctrl[7];
@@ -66,6 +80,8 @@ module kria_dsp_suite (
     wire       radar_win   = reg_dsp_ctrl[9];
     wire [2:0] tx_mode     = reg_dsp_ctrl[12:10];
     wire       radar_sync  = reg_dsp_ctrl[13];     // radar CPIs start at the Artix's mark (G-8)
+    wire       out_en      = reg_dsp_ctrl[14];     // results stream to the A53s (18 Nov)
+    wire [3:0] map_log2    = reg_dsp_ctrl[18:15];  // a radar map every 2^n CPIs
 
     wire [7:0] target_tid = (src_sid_sel == 2'd0) ? 8'h01 :
                             (src_sid_sel == 2'd1) ? 8'h05 : 8'h04;
@@ -269,9 +285,44 @@ module kria_dsp_suite (
         .peak_pwr          (mon_peak_pwr)
     );
 
+    // Results to the A53s
+    reg         lat_ctcss_det;
+    wire [15:0] out_drop_cnt;
+    kria_dsp_out u_dsp_out (
+        .clk          (clk),
+        .rst          (rst),
+        .en           (out_en),
+        .map_log2     (map_log2),
+        .aud_valid    (mon_audio_valid),
+        .aud_l        (mon_audio_l),
+        .aud_r        (mon_audio_r),
+        .aud_mono     (mon_audio_mono),
+        .pilot_locked (mon_pilot_locked),
+        .ctcss_det    (lat_ctcss_det),
+        .rds_valid    (mon_rds_valid),
+        .rds_bit      (mon_rds_bit),
+        .adsb_valid   (mon_adsb_valid),
+        .adsb_crc_ok  (mon_adsb_crc_ok),
+        .adsb_data    (mon_adsb_data),
+        .adsb_snr     (mon_adsb_snr),
+        .rd_valid     (mon_rd_valid),
+        .rd_rbin      (mon_rd_rbin),
+        .rd_dbin      (mon_rd_dbin),
+        .rd_pwr       (mon_rd_pwr),
+        .rd_det       (mon_rd_det),
+        .cpi_done     (mon_cpi_done),
+        .cpi_det_cnt  (mon_cpi_det_cnt),
+        .m_tdata      (out_axis_tdata),
+        .m_tvalid     (out_axis_tvalid),
+        .m_tready     (out_axis_tready),
+        .m_tlast      (out_axis_tlast),
+        .m_tid        (out_axis_tid),
+        .drop_cnt     (out_drop_cnt)
+    );
+
     // Status latches & telemetry counters
     reg signed [15:0] lat_aud_l, lat_aud_r;
-    reg               lat_ctcss_det;
+    // lat_ctcss_det is declared ahead of kria_dsp_out, which reads it
     reg [15:0]        aud_cnt, rds_cnt;
     reg [111:0]       lat_adsb_msg;
 
@@ -331,7 +382,7 @@ module kria_dsp_suite (
 
     always @* begin
         case (csr_rd_addr[7:2])
-            6'h10: csr_rd_rdata = reg_dsp_ctrl;
+            6'h10: csr_rd_rdata = {reg_dsp_ctrl[31:2], tx_key, reg_dsp_ctrl[0]};
             6'h11: csr_rd_rdata = reg_ch_nco_ftw;
             6'h12: csr_rd_rdata = reg_ch_decim;
             6'h13: csr_rd_rdata = reg_ch_demod_cfg;
@@ -339,7 +390,8 @@ module kria_dsp_suite (
             6'h15: csr_rd_rdata = reg_ch_ctcss_cfg;
             6'h16: csr_rd_rdata = reg_ch_ctcss_thr;
             6'h17: csr_rd_rdata = {lat_aud_r, lat_aud_l};
-            6'h18: csr_rd_rdata = {aud_cnt, rds_cnt[7:0], 5'd0, bq_ovf, lat_ctcss_det, mon_pilot_locked};
+            6'h18: csr_rd_rdata = {aud_cnt, rds_cnt[7:0], 4'd0, (out_drop_cnt != 16'd0), bq_ovf, lat_ctcss_det,
+                                   mon_pilot_locked};
             6'h19: csr_rd_rdata = reg_adsb_cfg;
             6'h1A: csr_rd_rdata = {adsb_err_cnt[15:0], adsb_ok_cnt[15:0]};
             6'h1B: csr_rd_rdata = lat_adsb_msg[31:0];

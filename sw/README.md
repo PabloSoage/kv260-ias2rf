@@ -18,7 +18,7 @@ Zynq UltraScale+ PL bitstream (`fpga/kria/bd.tcl` + `fpga/kria/kria_pl_link.v`).
     commands, [FPGA_GATEWARE §5.4](../docs/FPGA_GATEWARE.md))
 - `ias2rf_dma_test.c`: Standalone C smoke test (`mmap` `/dev/mem` + optional `u-dma-buf` `/dev/udmabuf0`):
   - Prints all IAS1 link CSRs (`0x00..0x34`) and flags `0xDEAD_C10C` if the Artix `LINK_RX_CLK` is not yet running.
-  - Supports `--retrain` (pulses `LINK_CTRL[2]`) and `--rd-adcs` (sends a Stream `0x10` register-read request for Artix `0x0038 ADCS_STATUS` via `MM2S`, then captures 4 KB of uplink frames via `S2MM`).
+  - Supports `--retrain` (pulses `LINK_CTRL[2]`) and `--rd-adcs` (sends a Stream `0x10` register-read request for Artix `0x0038 ADCS_STATUS` via `MM2S`, then captures one `kria_ps_framer` block via `S2MM`, up to 69,648 bytes, and lists its first packets: stream id, sequence number, length and PL time; [FPGA_GATEWARE §5.10](../docs/FPGA_GATEWARE.md)).
   - Artix registers through the same command channel: `--rd ADDR`, `--wr ADDR VALUE`, and for the radar path
     `--radar-en 0|1` (`RADAR_CTRL[0]`, `0xE4`) and `--radar-status` (`RADAR_STATUS`, `0xE8`; bit 5 is "link up and
     ADC trained"). Since Rev08 these replace the two Pmod spare GPIOs, which now carry the debug UART.

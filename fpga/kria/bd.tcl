@@ -20,7 +20,9 @@ add_files -norecurse [file join $script_dir "kria_channel_rx.v"]
 add_files -norecurse [file join $script_dir "kria_adsb_rx.v"]
 add_files -norecurse [file join $script_dir "kria_tx_mod.v"]
 add_files -norecurse [file join $script_dir "kria_radar_proc.v"]
+add_files -norecurse [file join $script_dir "kria_dsp_out.v"]
 add_files -norecurse [file join $script_dir "kria_dsp_suite.v"]
+add_files -norecurse [file join $script_dir "kria_ps_framer.v"]
 add_files -norecurse [file join $script_dir "kria_pl_link.v"]
 add_files -norecurse [file join $script_dir "kria_pps.v"]
 add_files -norecurse [file join $script_dir "integrations" "kria_bev_grid.v"]
@@ -52,6 +54,9 @@ set_property -dict [list \
     CONFIG.PSU__SPI0__PERIPHERAL__IO {EMIO} \
     CONFIG.PSU__UART1__PERIPHERAL__ENABLE {1} \
     CONFIG.PSU__UART1__PERIPHERAL__IO {EMIO} \
+    CONFIG.PSU__CAN1__PERIPHERAL__ENABLE {1} \
+    CONFIG.PSU__CAN1__PERIPHERAL__IO {EMIO} \
+    CONFIG.PSU__CRL_APB__CAN1_REF_CTRL__FREQMHZ {100} \
     CONFIG.PSU__GPIO_EMIO__PERIPHERAL__ENABLE {1} \
     CONFIG.PSU__GPIO_EMIO__PERIPHERAL__IO {8} \
     CONFIG.PSU__DDRC__ENABLE {1} \
@@ -64,6 +69,8 @@ set_property -dict [list \
 
 set rst_sys [create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps8_100M]
 set link_pl [create_bd_cell -type module -reference kria_pl_link kria_pl_link_0]
+# The PS-bound stream: link packets and DSP results, each behind a header, in 64 KiB DMA blocks (kria_ps_framer.v)
+set framer [create_bd_cell -type module -reference kria_ps_framer kria_ps_framer_0]
 # GPS PPS capture and disciplined PPS generator (fpga/kria/kria_pps.v)
 set pps_blk [create_bd_cell -type module -reference kria_pps kria_pps_0]
 # EMIO GPIO[2], the software PPS, into kria_pps (mode 0 keeps the old behaviour)
@@ -151,6 +158,7 @@ connect_bd_net [get_bd_pins ps8/pl_clk0] \
     [get_bd_pins axi_dma_1/m_axi_s2mm_aclk] \
     [get_bd_pins kria_doa_0/clk] [get_bd_pins axi_dma_2/s_axi_lite_aclk] [get_bd_pins axi_dma_2/m_axi_mm2s_aclk] \
     [get_bd_pins kria_sweep_0/clk] [get_bd_pins axi_dma_3/s_axi_lite_aclk] \
+    [get_bd_pins kria_ps_framer_0/clk] \
     [get_bd_pins axi_dma_3/m_axi_mm2s_aclk] [get_bd_pins axi_dma_3/m_axi_s2mm_aclk] \
     [get_bd_pins axi_smc_ctrl/aclk] \
     [get_bd_pins axi_smc_hp0/aclk]
@@ -162,6 +170,7 @@ connect_bd_net [get_bd_pins rst_ps8_100M/peripheral_aresetn] \
     [get_bd_pins kria_bev_0/resetn] [get_bd_pins axi_dma_1/axi_resetn] \
     [get_bd_pins kria_doa_0/resetn] [get_bd_pins axi_dma_2/axi_resetn] \
     [get_bd_pins kria_sweep_0/resetn] [get_bd_pins axi_dma_3/axi_resetn] \
+    [get_bd_pins kria_ps_framer_0/resetn] \
     [get_bd_pins axi_smc_ctrl/aresetn] \
     [get_bd_pins axi_smc_hp0/aresetn]
 
@@ -187,7 +196,9 @@ connect_bd_intf_net [get_bd_intf_pins axi_dma_3/M_AXI_S2MM] [get_bd_intf_pins ax
 connect_bd_intf_net [get_bd_intf_pins axi_smc_hp0/M00_AXI]  [get_bd_intf_pins ps8/S_AXI_HP0_FPD]
 
 # AXI4-Stream Link <-> AXI DMA
-connect_bd_intf_net [get_bd_intf_pins kria_pl_link_0/m_axis_rx] [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM]
+connect_bd_intf_net [get_bd_intf_pins kria_pl_link_0/m_axis_rx]  [get_bd_intf_pins kria_ps_framer_0/s_axis_a]
+connect_bd_intf_net [get_bd_intf_pins kria_pl_link_0/m_axis_dsp] [get_bd_intf_pins kria_ps_framer_0/s_axis_b]
+connect_bd_intf_net [get_bd_intf_pins kria_ps_framer_0/m_axis]   [get_bd_intf_pins axi_dma_0/S_AXIS_S2MM]
 connect_bd_intf_net [get_bd_intf_pins axi_dma_0/M_AXIS_MM2S]   [get_bd_intf_pins kria_pl_link_0/s_axis_tx]
 # Grid dumps -> axi_dma_1. s_axis_det is kept for a LiDAR DMA; until then its tvalid is tied to 0
 connect_bd_intf_net [get_bd_intf_pins kria_bev_0/m_axis] [get_bd_intf_pins axi_dma_1/S_AXIS_S2MM]
@@ -230,6 +241,16 @@ connect_bd_net [get_bd_pins ps8/emio_gpio_i] [get_bd_pins kria_pl_link_0/emio_gp
 
 connect_bd_net [get_bd_pins ps8/emio_uart1_txd] [get_bd_pins kria_pl_link_0/emio_uart1_txd]
 connect_bd_net [get_bd_pins ps8/emio_uart1_rxd] [get_bd_pins kria_pl_link_0/emio_uart1_rxd]
+
+# CAN1 (the vehicle's bus, R5F core 1) through EMIO to KV260 J9 (INTEGRATIONS 2.2): TX goes out inverted on
+# J9 pin 6 (can1_txn), because the adapter's NPN pair inverts it back; RX comes in on J9 pin 8 (can1_rx).
+create_bd_cell -type ip -vlnv xilinx.com:ip:util_vector_logic:2.0 can1_tx_inv
+set_property -dict [list CONFIG.C_OPERATION {not} CONFIG.C_SIZE {1}] [get_bd_cells can1_tx_inv]
+create_bd_port -dir O can1_txn
+create_bd_port -dir I can1_rx
+connect_bd_net [get_bd_pins ps8/emio_can1_phy_tx] [get_bd_pins can1_tx_inv/Op1]
+connect_bd_net [get_bd_pins can1_tx_inv/Res] [get_bd_ports can1_txn]
+connect_bd_net [get_bd_ports can1_rx] [get_bd_pins ps8/emio_can1_phy_rx]
 
 # External Board Pins (names match fpga/kria/xck26_bd.xdc)
 foreach {dir p} {

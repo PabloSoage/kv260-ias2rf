@@ -612,6 +612,7 @@ module tb_system_signals;
             end
         end
         kria_wr(8'h40, k_ctrl);
+        if (k_ctrl[1]) kria_wr(8'h38, 32'h4B45_5901);   // TX_KEY: the transmit enable (R5F core 0's register)
 
         repeat (run_us) #1_000_000;
         cap_en = 1'b0;

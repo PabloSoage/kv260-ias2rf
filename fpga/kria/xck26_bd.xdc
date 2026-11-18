@@ -78,3 +78,17 @@ set_property PACKAGE_PIN J12 [get_ports gps_pps]
 set_property IOSTANDARD LVCMOS33 [get_ports gps_pps]
 set_property PULLDOWN TRUE [get_ports gps_pps]
 set_false_path -from [get_ports gps_pps]
+
+# CAN1 (PS CAN controller through EMIO, R5F core 1), on two Raspberry Pi camera lines of KV260 J9 that this
+# design leaves unused (AMD kv260_carrier board file, interface mipi_csi_raspi): J9 pin 6 = DATA1_P = SOM240_1 A9
+# = ball G6, and J9 pin 8 = CLK_N = SOM240_1 C13 = ball D6, both bank 66 HP at PL_1V2. The adapter turns them into
+# 3.3 V (INTEGRATIONS 2.2): can1_txn drives an NPN pair, so it is TX inverted and must idle low; can1_rx comes
+# through a 1.8 k / 1 k divider from the transceiver's RXD.
+set_property PACKAGE_PIN G6 [get_ports can1_txn]
+set_property IOSTANDARD LVCMOS12 [get_ports can1_txn]
+set_property DRIVE 4 [get_ports can1_txn]
+set_property PACKAGE_PIN D6 [get_ports can1_rx]
+set_property IOSTANDARD LVCMOS12 [get_ports can1_rx]
+set_property PULLUP TRUE [get_ports can1_rx]
+set_false_path -to   [get_ports can1_txn]
+set_false_path -from [get_ports can1_rx]

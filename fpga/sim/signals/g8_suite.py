@@ -343,7 +343,7 @@ def case_hf_ssb():
     ax[0, 0].set_xlabel("Offset from 14.200 MHz (kHz)"); ax[0, 0].set_ylabel("dB")
     ax[0, 1].plot(np.arange(240) / fs_a * 1e3, a_u[:240], lw=0.9, label="USB tone")
     ax[0, 1].plot(np.arange(240) / fs_a * 1e3, a_l[:240], lw=0.9, label="same tone in LSB")
-    ax[0, 1].set_title(f"Demodulated audio (Kria RTL), {lv:.0f} dBm: opposite sideband {osr:.0f} dB down")
+    ax[0, 1].set_title(f"Kria RTL audio at {lv:.0f} dBm: opposite sideband {osr:.0f} dB down")
     ax[0, 1].set_xlabel("ms"); ax[0, 1].set_ylabel("LSB"); ax[0, 1].legend()
     fa, pa = psd_db(a_u, fs_a, 1024)
     ax[1, 0].plot(fa / 1e3, pa - pa.max(), lw=0.9)

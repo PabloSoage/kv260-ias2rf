@@ -155,7 +155,7 @@ Source: [`sw/integrations/kria_sw_figures.py`](../sw/integrations/kria_sw_figure
 - **100BASE-T1** if the point cloud is wanted for the fusion grid (§6).
 - **CAN FD** if only tracked objects are.
 
-Either way the stream is small for the KV260: decoding it takes negligible CPU, and R5F core 1 could own it ([HMI.md §4](HMI.md)).
+Either way the stream is small for the KV260: decoding it takes negligible CPU, and R5F core 1 could own it ([HMI.md §5](HMI.md)).
 
 **Fog.** Two-way attenuation in fog follows ITU-R P.840. The liquid-water coefficient comes from the double-Debye permittivity of water. The fog's liquid water content comes from its visibility (Eldridge, `V = 0.024 M^-0.65` km). The LiDAR's extinction uses Koschmieder's `sigma = 3.912 / V` on both ways. Each sensor is scaled from its clear-air range: a radar's return falls as `1/R^4`, a LiDAR's on an extended target as `1/R^2`:
 
@@ -367,6 +367,9 @@ Code that runs on the Kria's ARM cores is written in Rust, with its logic in an 
 | [`kria-vehicled`](../sw/kria/vehicled/src/main.rs) | A53, Linux | §4.1 |
 | [`kria-r5f0`](../sw/kria/r5f/src/bin/core0.rs) | R5F core 0, from TCM, started by remoteproc | At 1 kHz: the PPS loop on `kria_pps`, the IAS1 link watchdog, the transmit lock (it owns `DSP_CTRL[1]`), and status back to Linux |
 | [`kria-r5f1`](../sw/kria/r5f/src/bin/core1.rs) | R5F core 1, from its own TCM | At 10 kHz: the 10.5 GHz radar's beam scan, the fusion grid's command port and frames (§6.1) |
+| [`kria-hmi-core`](../sw/kria/hmi-core/src/lib.rs) | A53 (any host; tested on a PC) | The screens' data plane: the PL's result blocks, RDS, ADS-B, radar, spectrum, a frequency and mode to register writes ([HMI.md §4](HMI.md)) |
+| [`kria-hmid`](../sw/kria/hmid/src/main.rs) | A53, Linux | The HMI's data service: DMA blocks in, audio, register writes, I/Q recording, snapshots over WebSocket; asks core 0 for transmit through `kria-vehicled` and the mailbox |
+| [`kria-hmi`](../sw/hmi/app/ui/app.slint) | A53 (Linux KMS), a PC, a browser | The ten screens, in Slint ([HMI.md §3](HMI.md)) |
 
 **The transmit lock** (`kria_core::interlock`) runs on R5F core 0 every millisecond:
 - **Speed source:** the ECU's road speed first, while fresh (1 s), then the GPS's (2 s).

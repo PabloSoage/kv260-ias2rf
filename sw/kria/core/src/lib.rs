@@ -18,12 +18,15 @@
 //! - [`bev`]: the PL fusion grid's commands and configuration, and sensor
 //!   coordinates to grid cells. R5F core 1 and the A53s.
 //! - [`ring`]: the queue of grid commands from Linux to R5F core 1.
+//! - [`can`]: the vehicle's CAN bus on R5F core 1: bit timing, frames, the
+//!   road-speed signal from the car's DBC, and its mailbox blocks.
 //! - [`mailbox`]: the shared-memory blocks through which Linux and the R5F
 //!   cores exchange all of this.
 #![cfg_attr(not(test), no_std)]
 #![forbid(unsafe_code)]
 
 pub mod bev;
+pub mod can;
 pub mod interlock;
 pub mod link;
 pub mod mailbox;

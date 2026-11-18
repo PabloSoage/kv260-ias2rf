@@ -1,0 +1,555 @@
+// The in-car HMI (HMI.md §2, §3): ten screens at 1280 x 720, night theme, one amber accent, touch targets of at
+// least 56 px, the same 88 px bottom bar on every screen. Every value comes from kria-hmid's snapshot through the
+// `Hmi` global; every button sends a JSON command back (kria_hmi_core::state::Command).
+
+export struct Preset { name: string, freq: string }
+export struct Plane { callsign: string, alt: string, dist: string, speed: string, x: float, y: float, track: float }
+export struct Det { range: string, speed: string, power: string, x: float, y: float }
+export struct Sig { label: string, x: float, w: float }
+export struct Src { bearing: string, power: string, x: float, y: float }
+export struct Row { key: string, value: string, ok: bool }
+
+export global Theme {
+    out property <color> bg: #0a0c0f;
+    out property <color> panel: #13171c;
+    out property <color> panel2: #1a2027;
+    out property <color> line: #263039;
+    out property <color> text: #e7eaee;
+    out property <color> dim: #98a2ad;
+    out property <color> amber: #ffb020;
+    out property <color> green: #3ddc84;
+    out property <color> red: #ff5a5a;
+    out property <color> blue: #4da3ff;
+    out property <length> r: 14px;
+}
+
+export global Hmi {
+    in-out property <int> screen: 0;
+    in property <bool> connected;
+    in property <string> clock: "--:--";
+    in property <string> function: "radio";
+    // radio
+    in property <string> freq-text: "---";
+    in property <string> freq-unit: "MHz";
+    in property <string> mode: "";
+    in property <string> path-text: "";
+    in property <float> level;
+    in property <string> level-text: "";
+    in property <bool> pilot;
+    in property <bool> ctcss;
+    in property <string> rds-ps: "";
+    in property <string> rds-rt: "";
+    in property <string> rds-extra: "";
+    in property <string> gain-text: "";
+    in property <[Preset]> presets;
+    // spectrum
+    in property <image> spec-img;
+    in property <string> spec-title: "";
+    in property <bool> recording;
+    in property <float> tx-freq-hz: 7100000;
+    in property <float> tx-level-f: 0.5;
+    in property <string> tx-mode-id: "am";
+    in property <string> rec-text: "";
+    in property <string> spec-left: "";
+    in property <string> spec-right: "";
+    in property <float> marker-x: 0.5;
+    in property <image> waterfall;
+    // ADS-B
+    in property <[Plane]> planes;
+    in property <string> adsb-text: "";
+    // radar
+    in property <image> radar-map;
+    in property <[Det]> dets;
+    in property <string> radar-text: "";
+    in property <string> cfar-text: "";
+    // vehicle and transmit
+    in property <string> speed-text: "--";
+    in property <string> rpm-text: "--";
+    in property <string> coolant-text: "--";
+    in property <string> fuel-text: "--";
+    in property <string> veh-source: "";
+    in property <string> tx-freq: "";
+    in property <string> tx-mode: "";
+    in property <string> tx-level: "";
+    in property <string> tx-state: "";
+    in property <bool> tx-keyed;
+    in property <bool> tx-licensed;
+    in property <bool> tx-requested;
+    // wideband and bearing (kria-sdrd)
+    in property <image> wb-img;
+    in property <[Sig]> wb-signals;
+    in property <string> wb-text: "no sweep yet";
+    in property <string> bart-path;
+    in property <string> music-path;
+    in property <[Src]> sources;
+    in property <string> doa-text: "no fix yet";
+    // system
+    in property <[Row]> rows;
+    callback send(string);
+}
+
+component Panel inherits Rectangle {
+    in property <string> title;
+    background: Theme.panel;
+    border-radius: Theme.r;
+    border-width: 1px;
+    border-color: Theme.line;
+    clip: true;
+    if title != "" : Text {
+        x: 18px; y: 12px;
+        text: title;
+        color: Theme.dim;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+}
+
+component Btn inherits Rectangle {
+    in property <string> label;
+    in property <bool> active;
+    in property <bool> danger;
+    callback clicked;
+    min-height: 56px;
+    min-width: 56px;
+    border-radius: 12px;
+    background: active ? Theme.amber : ta.pressed ? Theme.line : Theme.panel2;
+    border-width: 1px;
+    border-color: active ? Theme.amber : danger ? Theme.red : Theme.line;
+    Text {
+        text: label;
+        color: active ? #111 : danger ? Theme.red : Theme.text;
+        font-size: 20px;
+        font-weight: 600;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    ta := TouchArea { clicked => { root.clicked(); } }
+}
+
+component Chip inherits Rectangle {
+    in property <string> label;
+    in property <bool> on;
+    height: 34px;
+    width: max(80px, t.preferred-width + 28px);
+    border-radius: 17px;
+    background: on ? Theme.amber.with-alpha(0.18) : Theme.panel2;
+    border-width: 1px;
+    border-color: on ? Theme.amber : Theme.line;
+    t := Text { text: label; color: on ? Theme.amber : Theme.dim; font-size: 15px; font-weight: 600;
+        horizontal-alignment: center; vertical-alignment: center; }
+}
+
+component Big inherits Text {
+    color: Theme.text;
+    font-size: 72px;
+    font-weight: 300;
+}
+
+component Kv inherits Rectangle {
+    in property <string> key;
+    in property <string> value;
+    in property <bool> ok: true;
+    height: 46px;
+    HorizontalLayout {
+        padding-left: 18px; padding-right: 18px;
+        Text { text: key; color: Theme.dim; font-size: 18px; vertical-alignment: center; }
+        Text { text: value; color: ok ? Theme.text : Theme.red; font-size: 18px; font-weight: 600;
+            horizontal-alignment: right; vertical-alignment: center; }
+    }
+    Rectangle { y: parent.height - 1px; height: 1px; background: Theme.line; }
+}
+
+component Polar inherits Rectangle {
+    in property <int> rings: 3;
+    // rings and cross, nose up
+    for k in rings : Rectangle {
+        width: parent.width * (k + 1) / rings;
+        height: self.width;
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        border-radius: self.width / 2;
+        border-width: 1px;
+        border-color: Theme.line;
+    }
+    Rectangle { x: parent.width / 2; width: 1px; background: Theme.line; }
+    Rectangle { y: parent.height / 2; height: 1px; background: Theme.line; }
+}
+
+// ---------------------------------------------------------------- screens
+component Home inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel {
+            title: "RECEIVING";
+            VerticalLayout {
+                padding: 18px; padding-top: 44px; spacing: 6px;
+                HorizontalLayout { spacing: 10px; alignment: start;
+                    Big { text: Hmi.freq-text; font-size: 96px; }
+                    Text { text: Hmi.freq-unit; color: Theme.dim; font-size: 28px; vertical-alignment: bottom; }
+                }
+                HorizontalLayout { spacing: 10px; alignment: start;
+                    Chip { label: Hmi.mode; on: true; }
+                    Chip { label: Hmi.path-text; }
+                    Chip { label: "STEREO"; on: Hmi.pilot; }
+                }
+                Text { text: Hmi.rds-ps; color: Theme.amber; font-size: 44px; font-weight: 600; }
+                Text { text: Hmi.rds-rt; color: Theme.dim; font-size: 20px; wrap: word-wrap; }
+                Rectangle { }
+                TouchArea { height: 56px; clicked => { Hmi.screen = 2; }
+                    Text { text: "Open radio ›"; color: Theme.amber; font-size: 20px; } }
+            }
+        }
+        VerticalLayout {
+            spacing: 18px; width: 440px;
+            Panel { title: "AIRCRAFT";
+                TouchArea { clicked => { Hmi.screen = 6; } }
+                Big { x: 18px; y: 40px; text: Hmi.planes.length; }
+                Text { x: 130px; y: 76px; text: Hmi.adsb-text; color: Theme.dim; font-size: 16px; width: 290px; wrap: word-wrap; }
+            }
+            Panel { title: "RADAR";
+                TouchArea { clicked => { Hmi.screen = 7; } }
+                Big { x: 18px; y: 40px; text: Hmi.dets.length; }
+                Text { x: 130px; y: 76px; text: Hmi.radar-text; color: Theme.dim; font-size: 16px; width: 290px; wrap: word-wrap; }
+            }
+            Panel { title: "SPECTRUM";
+                TouchArea { clicked => { Hmi.screen = 3; } }
+                Image { x: 12px; y: 40px; width: parent.width - 24px; height: parent.height - 52px;
+                    source: Hmi.spec-img; image-fit: fill; }
+            }
+        }
+    }
+}
+
+component Vehicle inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "SPEED";
+            Big { x: 18px; y: 60px; text: Hmi.speed-text; font-size: 160px; }
+            Text { x: 22px; y: 260px; text: "km/h"; color: Theme.dim; font-size: 28px; }
+            Text { x: 22px; y: parent.height - 50px; text: Hmi.veh-source; color: Theme.dim; font-size: 15px; }
+        }
+        VerticalLayout { spacing: 18px; width: 520px;
+            Panel { title: "ENGINE";
+                VerticalLayout { padding-top: 44px;
+                    Kv { key: "Engine speed"; value: Hmi.rpm-text; }
+                    Kv { key: "Coolant"; value: Hmi.coolant-text; }
+                    Kv { key: "Fuel"; value: Hmi.fuel-text; }
+                }
+            }
+            Panel { title: "TRANSMIT LOCK";
+                Text { x: 18px; y: 50px; width: parent.width - 36px; text: Hmi.tx-state; font-size: 30px; font-weight: 600;
+                    color: Hmi.tx-keyed ? Theme.red : Theme.amber; wrap: word-wrap; }
+                Text { x: 18px; y: 130px; width: parent.width - 36px; color: Theme.dim; font-size: 16px; wrap: word-wrap;
+                    text: "Transmit stays locked while the vehicle moves (ECU speed, GPS as fallback). R5F core 0 owns the key."; }
+            }
+        }
+    }
+}
+
+component Radio inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        VerticalLayout { spacing: 18px;
+            Panel { title: "FREQUENCY";
+                VerticalLayout { padding: 18px; padding-top: 40px; spacing: 12px;
+                    HorizontalLayout { spacing: 10px; alignment: start;
+                        Big { text: Hmi.freq-text; font-size: 104px; }
+                        Text { text: Hmi.freq-unit; color: Theme.dim; font-size: 30px; vertical-alignment: bottom; }
+                    }
+                    HorizontalLayout { spacing: 10px;
+                        Btn { label: "−1 M"; clicked => { Hmi.send("{\"cmd\":\"step\",\"hz\":-1e6}"); } }
+                        Btn { label: "−100 k"; clicked => { Hmi.send("{\"cmd\":\"step\",\"hz\":-1e5}"); } }
+                        Btn { label: "−5 k"; clicked => { Hmi.send("{\"cmd\":\"step\",\"hz\":-5e3}"); } }
+                        Btn { label: "+5 k"; clicked => { Hmi.send("{\"cmd\":\"step\",\"hz\":5e3}"); } }
+                        Btn { label: "+100 k"; clicked => { Hmi.send("{\"cmd\":\"step\",\"hz\":1e5}"); } }
+                        Btn { label: "+1 M"; clicked => { Hmi.send("{\"cmd\":\"step\",\"hz\":1e6}"); } }
+                    }
+                    HorizontalLayout { spacing: 10px;
+                        for m in ["am", "usb", "lsb", "nbfm", "wbfm"] : Btn {
+                            label: m == "nbfm" ? "NFM" : m == "wbfm" ? "WFM" : m == "am" ? "AM" : m == "usb" ? "USB" : "LSB";
+                            active: Hmi.mode == (m == "nbfm" ? "NFM" : m == "wbfm" ? "WFM" : m == "am" ? "AM" : m == "usb" ? "USB" : "LSB");
+                            clicked => { Hmi.send("{\"cmd\":\"set_mode\",\"mode\":\"" + m + "\"}"); }
+                        }
+                    }
+                }
+            }
+            Panel { title: "SIGNAL"; height: 150px;
+                Rectangle { x: 18px; y: 50px; width: parent.width - 36px; height: 26px; border-radius: 13px; background: Theme.panel2;
+                    Rectangle { x: 0; width: parent.width * clamp(Hmi.level, 0, 1); border-radius: 13px;
+                        background: @linear-gradient(90deg, Theme.green 0%, Theme.amber 80%, Theme.red 100%); }
+                }
+                Text { x: 18px; y: 92px; text: Hmi.level-text; color: Theme.text; font-size: 20px; }
+                HorizontalLayout { x: parent.width - 330px; y: 88px; spacing: 8px; width: 312px;
+                    Chip { label: "PILOT"; on: Hmi.pilot; }
+                    Chip { label: "CTCSS"; on: Hmi.ctcss; }
+                    Chip { label: Hmi.gain-text; }
+                }
+            }
+        }
+        VerticalLayout { spacing: 18px; width: 380px;
+            Panel { title: "RDS"; height: 190px;
+                Text { x: 18px; y: 42px; text: Hmi.rds-ps == "" ? "—" : Hmi.rds-ps; color: Theme.amber; font-size: 48px; font-weight: 600; }
+                Text { x: 18px; y: 108px; width: parent.width - 36px; text: Hmi.rds-rt; color: Theme.text; font-size: 17px; wrap: word-wrap; }
+                Text { x: 18px; y: parent.height - 30px; text: Hmi.rds-extra; color: Theme.dim; font-size: 14px; }
+            }
+            Panel { title: "PRESETS";
+                for p[i] in Hmi.presets : Btn {
+                    x: 14px + mod(i, 2) * (parent.width - 28px) / 2;
+                    y: 44px + floor(i / 2) * 64px;
+                    width: (parent.width - 28px) / 2 - 8px;
+                    height: 56px;
+                    label: p.name;
+                    clicked => { Hmi.send("{\"cmd\":\"preset\",\"index\":" + i + "}"); }
+                }
+            }
+        }
+    }
+}
+
+component Spectrum inherits Rectangle {
+    VerticalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: Hmi.spec-title; height: 280px;
+            Image { x: 12px; y: 40px; width: parent.width - 24px; height: parent.height - 70px;
+                source: Hmi.spec-img; image-fit: fill; }
+            Rectangle { x: 12px + (parent.width - 24px) * Hmi.marker-x; y: 40px; width: 2px; height: parent.height - 70px;
+                background: Theme.blue; }
+            Text { x: 14px; y: parent.height - 26px; text: Hmi.spec-left; color: Theme.dim; font-size: 14px; }
+            Text { x: parent.width - 180px; y: parent.height - 26px; width: 166px; horizontal-alignment: right;
+                text: Hmi.spec-right; color: Theme.dim; font-size: 14px; }
+            TouchArea { clicked => {
+                Hmi.send("{\"cmd\":\"marker_frac\",\"x\":" + (self.mouse-x / self.width) + "}"); } }
+        }
+        Panel { title: Hmi.recording ? "WATERFALL, 60 ROWS · RECORDING " + Hmi.rec-text : "WATERFALL, 60 ROWS";
+            Image { x: 12px; y: 40px; width: parent.width - 24px; height: parent.height - 52px;
+                source: Hmi.waterfall; image-fit: fill; }
+        }
+        HorizontalLayout { spacing: 12px; height: 56px;
+            Btn { label: "Listen at marker"; clicked => { Hmi.send("{\"cmd\":\"listen_at_marker\"}"); } }
+            Btn { label: Hmi.recording ? "Stop recording" : "Record IQ"; danger: Hmi.recording;
+                clicked => { Hmi.send("{\"cmd\":\"record\",\"on\":" + (Hmi.recording ? "false" : "true") + "}"); } }
+            Btn { label: "HF A/B"; clicked => { Hmi.send("{\"cmd\":\"tune\",\"freq_hz\":7.2e6}"); } }
+            Btn { label: "VHF/UHF"; clicked => { Hmi.send("{\"cmd\":\"tune\",\"freq_hz\":98.1e6}"); } }
+        }
+    }
+}
+
+component Wideband inherits Rectangle {
+    VerticalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "HACKRF PRO SWEEP, 0 TO 7.2 GHZ";
+            Rectangle { x: 12px; y: 40px; width: (parent.width - 24px) * 3 / 7.2; height: parent.height - 76px;
+                background: Theme.green.with-alpha(0.06); }
+            Rectangle { x: 12px + (parent.width - 24px) * 3 / 7.2; y: 40px; width: (parent.width - 24px) * 4.2 / 7.2;
+                height: parent.height - 76px; background: Theme.blue.with-alpha(0.06); }
+            Image { x: 12px; y: 40px; width: parent.width - 24px; height: parent.height - 76px;
+                source: Hmi.wb-img; image-fit: fill; }
+            for s in Hmi.wb-signals : Rectangle {
+                x: 12px + (parent.width - 24px) * s.x; y: 44px; width: 1px; height: 18px; background: Theme.blue;
+            }
+            Text { x: 14px; y: parent.height - 30px; text: "0 GHz"; color: Theme.dim; font-size: 14px; }
+            Text { x: 12px + (parent.width - 24px) * 3 / 7.2 - 40px; y: parent.height - 30px; text: "3 GHz: this board"; color: Theme.green; font-size: 14px; }
+            Text { x: parent.width - 90px; y: parent.height - 30px; text: "7.2 GHz"; color: Theme.dim; font-size: 14px; }
+        }
+        Panel { title: "STRONGEST SIGNALS"; height: 150px;
+            Text { x: 18px; y: 44px; width: parent.width - 36px; text: Hmi.wb-text; color: Theme.text; font-size: 17px; wrap: word-wrap; }
+        }
+    }
+}
+
+component Bearing inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "KRAKENSDR BEARING, NOSE UP"; width: 620px;
+            p := Polar { x: 40px; y: 46px; width: parent.height - 70px; height: self.width; rings: 3; }
+            Path { x: p.x; y: p.y; width: p.width; height: p.height; commands: Hmi.bart-path;
+                viewbox-width: 1000; viewbox-height: 1000; stroke: Theme.blue; stroke-width: 2px; }
+            Path { x: p.x; y: p.y; width: p.width; height: p.height; commands: Hmi.music-path;
+                viewbox-width: 1000; viewbox-height: 1000; stroke: Theme.amber; stroke-width: 2.5px; }
+            for s in Hmi.sources : Rectangle {
+                x: p.x + p.width * s.x - 10px; y: p.y + p.height * s.y - 10px; width: 20px; height: 20px;
+                border-radius: 10px; background: Theme.amber;
+            }
+        }
+        Panel { title: "SOURCES";
+            VerticalLayout { padding-top: 44px;
+                for s in Hmi.sources : Kv { key: s.bearing; value: s.power; }
+                Rectangle { height: 90px; Text { x: 18px; width: parent.width - 36px; text: Hmi.doa-text; color: Theme.dim; font-size: 16px; wrap: word-wrap; } }
+                Rectangle { }
+            }
+        }
+    }
+}
+
+component Adsb inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "AROUND THE VEHICLE: 33, 67, 100 KM"; width: 620px;
+            p := Polar { x: 40px; y: 46px; width: parent.height - 70px; height: self.width; rings: 3; }
+            Rectangle { x: p.x + p.width / 2 - 7px; y: p.y + p.height / 2 - 7px; width: 14px; height: 14px;
+                border-radius: 3px; background: Theme.amber; }
+            for a in Hmi.planes : Rectangle {
+                x: p.x + p.width * a.x - 6px; y: p.y + p.height * a.y - 6px; width: 12px; height: 12px;
+                border-radius: 6px; background: Theme.blue;
+                Text { x: 16px; y: -8px; text: a.callsign; color: Theme.text; font-size: 14px; }
+            }
+        }
+        Panel { title: "AIRCRAFT";
+            VerticalLayout { padding-top: 44px;
+                for a in Hmi.planes : Kv { key: a.callsign; value: a.alt + "   " + a.dist + "   " + a.speed; }
+                Rectangle { height: 50px; Text { x: 18px; width: parent.width - 36px; text: Hmi.adsb-text; color: Theme.dim; font-size: 15px; wrap: word-wrap; } }
+                Rectangle { }
+            }
+        }
+    }
+}
+
+component Radar inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "RANGE-DOPPLER, LAST MAP"; width: 640px;
+            Image { x: 18px; y: 44px; width: parent.width - 36px; height: parent.height - 92px;
+                source: Hmi.radar-map; image-fit: fill; }
+            for d in Hmi.dets : Rectangle {
+                x: 18px + (parent.width - 36px) * d.x - 9px; y: 44px + (parent.height - 92px) * d.y - 9px;
+                width: 18px; height: 18px; border-width: 2px; border-color: Theme.amber; border-radius: 4px;
+            }
+            Text { x: 18px; y: parent.height - 40px; text: "Doppler −8 … +7 bins →   range ↓ 0 … 63 bins"; color: Theme.dim; font-size: 14px; }
+        }
+        VerticalLayout { spacing: 18px;
+            Panel { title: "DETECTIONS";
+                VerticalLayout { padding-top: 44px;
+                    for d in Hmi.dets : Kv { key: d.range; value: d.speed + "   " + d.power; }
+                    Rectangle { height: 40px; Text { x: 18px; width: parent.width - 36px; text: Hmi.radar-text; color: Theme.dim; font-size: 15px; } }
+                    Rectangle { }
+                }
+            }
+            Panel { title: "CA-CFAR"; height: 170px;
+                Text { x: 18px; y: 44px; text: Hmi.cfar-text; color: Theme.text; font-size: 18px; }
+                HorizontalLayout { x: 18px; y: 90px; width: parent.width - 36px; height: 56px; spacing: 10px;
+                    Btn { label: "α −"; clicked => { Hmi.send("{\"cmd\":\"radar_alpha_step\",\"step\":-256}"); } }
+                    Btn { label: "α +"; clicked => { Hmi.send("{\"cmd\":\"radar_alpha_step\",\"step\":256}"); } }
+                }
+            }
+        }
+    }
+}
+
+component Transmit inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "TRANSMIT";
+            VerticalLayout { padding: 18px; padding-top: 44px; spacing: 14px;
+                HorizontalLayout { spacing: 10px; alignment: start;
+                    Big { text: Hmi.tx-freq; }
+                    Text { text: "MHz"; color: Theme.dim; font-size: 28px; vertical-alignment: bottom; }
+                }
+                HorizontalLayout { spacing: 10px; height: 56px;
+                    for m in ["cw", "am", "nbfm", "usb", "lsb"] : Btn { label: m.to-uppercase(); active: Hmi.tx-mode-id == m;
+                        clicked => { Hmi.send("{\"cmd\":\"tx_set\",\"freq_hz\":" + (Hmi.tx-freq-hz) + ",\"mode\":\"" + m + "\",\"level\":" + (Hmi.tx-level-f) + "}"); } }
+                }
+                HorizontalLayout { spacing: 10px; height: 56px;
+                    for s in [-100000, -1000, 1000, 100000] : Btn {
+                        label: (s > 0 ? "+" : "−") + (abs(s) >= 1000 ? (abs(s) / 1000) + " k" : abs(s));
+                        clicked => { Hmi.send("{\"cmd\":\"tx_set\",\"freq_hz\":" + (max(0, Hmi.tx-freq-hz + s)) + ",\"mode\":\"" + Hmi.tx-mode-id + "\",\"level\":" + (Hmi.tx-level-f) + "}"); } }
+                }
+                HorizontalLayout { spacing: 10px; height: 56px;
+                    Kv { key: "Level"; value: Hmi.tx-level; }
+                    Btn { label: "−"; width: 90px; clicked => { Hmi.send("{\"cmd\":\"tx_set\",\"freq_hz\":" + (Hmi.tx-freq-hz) + ",\"mode\":\"" + Hmi.tx-mode-id + "\",\"level\":" + (max(0, Hmi.tx-level-f - 0.1)) + "}"); } }
+                    Btn { label: "+"; width: 90px; clicked => { Hmi.send("{\"cmd\":\"tx_set\",\"freq_hz\":" + (Hmi.tx-freq-hz) + ",\"mode\":\"" + Hmi.tx-mode-id + "\",\"level\":" + (min(1, Hmi.tx-level-f + 0.1)) + "}"); } }
+                }
+                Kv { key: "Licence"; value: Hmi.tx-licensed ? "set" : "not set"; ok: Hmi.tx-licensed; }
+                HorizontalLayout { spacing: 10px;
+                    Btn { label: Hmi.tx-licensed ? "Clear licence" : "Set licence";
+                        clicked => { Hmi.send("{\"cmd\":\"licence\",\"on\":" + (Hmi.tx-licensed ? "false" : "true") + "}"); } }
+                    Btn { label: "Function: radio"; clicked => { Hmi.send("{\"cmd\":\"function\",\"function\":\"radio\"}"); } }
+                }
+                Rectangle { }
+            }
+        }
+        Panel { title: "HOLD TO TALK"; width: 470px;
+            ptt := Rectangle {
+                x: (parent.width - self.width) / 2; y: 60px; width: 300px; height: 300px; border-radius: 150px;
+                background: Hmi.tx-keyed ? Theme.red : Hmi.tx-requested ? Theme.amber.with-alpha(0.25) : Theme.panel2;
+                border-width: 3px; border-color: Hmi.tx-keyed ? Theme.red : Theme.amber;
+                Text { text: Hmi.tx-keyed ? "ON AIR" : "PTT"; color: Hmi.tx-keyed ? #111 : Theme.amber; font-size: 54px; font-weight: 700;
+                    horizontal-alignment: center; vertical-alignment: center; }
+                TouchArea {
+                    pointer-event(e) => {
+                        if (e.kind == PointerEventKind.down) { Hmi.send("{\"cmd\":\"tx_request\",\"on\":true}"); }
+                        if (e.kind == PointerEventKind.up) { Hmi.send("{\"cmd\":\"tx_request\",\"on\":false}"); }
+                    }
+                }
+            }
+            Text { x: 18px; y: 390px; width: parent.width - 36px; horizontal-alignment: center; text: Hmi.tx-state;
+                color: Hmi.tx-keyed ? Theme.red : Theme.amber; font-size: 24px; font-weight: 600; wrap: word-wrap; }
+        }
+    }
+}
+
+component System inherits Rectangle {
+    HorizontalLayout {
+        padding: 18px; spacing: 18px;
+        Panel { title: "SYSTEM";
+            VerticalLayout { padding-top: 44px;
+                for r in Hmi.rows : Kv { key: r.key; value: r.value; ok: r.ok; }
+                Rectangle { }
+            }
+        }
+        Panel { title: "FUNCTION"; width: 360px;
+            VerticalLayout { padding: 18px; padding-top: 44px; spacing: 12px;
+                Btn { label: "Receiver"; active: Hmi.function == "radio"; clicked => { Hmi.send("{\"cmd\":\"function\",\"function\":\"radio\"}"); } }
+                Btn { label: "ADS-B 1090"; active: Hmi.function == "adsb"; clicked => { Hmi.send("{\"cmd\":\"function\",\"function\":\"adsb\"}"); } }
+                Btn { label: "Radar"; active: Hmi.function == "radar"; clicked => { Hmi.send("{\"cmd\":\"function\",\"function\":\"radar\"}"); } }
+                Text { text: "The PL's DSP suite runs one function at a time on the one front end."; color: Theme.dim; font-size: 15px; wrap: word-wrap; }
+                Rectangle { }
+            }
+        }
+    }
+}
+
+component NavBar inherits Rectangle {
+    height: 88px;
+    background: Theme.panel;
+    Rectangle { height: 1px; y: 0; background: Theme.line; }
+    HorizontalLayout {
+        for name[i] in ["Home", "Vehicle", "Radio", "Spectrum", "Wideband", "Bearing", "ADS-B", "Radar", "Transmit", "System"] : Rectangle {
+            width: 128px;
+            Text { text: name; color: Hmi.screen == i ? Theme.amber : Theme.dim; font-size: 18px; font-weight: Hmi.screen == i ? 700 : 500;
+                horizontal-alignment: center; vertical-alignment: center; }
+            Rectangle { y: 0; height: 4px; width: 64px; x: 32px; border-radius: 2px;
+                background: Hmi.screen == i ? Theme.amber : transparent; }
+            TouchArea { clicked => { Hmi.screen = i; } }
+        }
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "KV260-IAS2RF";
+    width: 1280px;
+    height: 720px;
+    background: Theme.bg;
+    // header
+    Rectangle { y: 0; height: 0px; }
+    VerticalLayout {
+        Rectangle {
+            height: 632px;
+            if Hmi.screen == 0 : Home { }
+            if Hmi.screen == 1 : Vehicle { }
+            if Hmi.screen == 2 : Radio { }
+            if Hmi.screen == 3 : Spectrum { }
+            if Hmi.screen == 4 : Wideband { }
+            if Hmi.screen == 5 : Bearing { }
+            if Hmi.screen == 6 : Adsb { }
+            if Hmi.screen == 7 : Radar { }
+            if Hmi.screen == 8 : Transmit { }
+            if Hmi.screen == 9 : System { }
+            if !Hmi.connected : Rectangle { x: (parent.width - 420px) / 2; y: 24px; width: 420px; height: 56px; border-radius: 28px;
+                background: Theme.red.with-alpha(0.9);
+                Text { text: "No data from kria-hmid"; color: #111; font-size: 22px; font-weight: 700;
+                    horizontal-alignment: center; vertical-alignment: center; } }
+        }
+        NavBar { }
+    }
+}

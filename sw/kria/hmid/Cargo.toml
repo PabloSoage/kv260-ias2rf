@@ -1,0 +1,19 @@
+[package]
+name = "kria-hmid"
+description = "The HMI's data service on the A53s: DMA blocks from kria_ps_framer into kria-hmi-core, register writes out, snapshots to the screens over WebSocket (native or browser); a simulated board for the PC"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kria-core = { path = "../core" }
+kria-hmi-core = { path = "../hmi-core" }
+serde_json = "1"
+tungstenite = { version = "0.30", default-features = false, features = ["handshake"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
+[features]
+# /dev/mem, the DMA engine and the R5F mailbox on a KV260 (Linux only). Off by default: the PC build simulates.
+hw = []

@@ -12,17 +12,28 @@
 //!               [--speed-id 0x000D] [--licensed] [--mailbox devmem|none]
 //!               [--interlock] [--seconds N] [--csv FILE]
 //!               [--then-select ID,..] [--then-after S]
+//!               [--can BITRATE] [--can-speed ID:START:LEN:intel|motorola:NUM/DEN[:OFFSET]] [--can-active]
 //! ```
 //!
 //! `--mailbox devmem` (Linux on the KV260) writes the mailbox at
 //! `kria_core::mailbox::BASE` and reads the PL clock from `kria_pps` through
 //! `/dev/mem`. `none` keeps a local clock and writes nothing, for a PC.
+//! `--can` enables the vehicle's CAN bus on R5F core 1 (`kria_core::can`):
+//! it writes `CanConfig` into the mailbox, listen-only unless `--can-active`.
+//! `--can-speed` is the car's road-speed signal as its DBC gives it, scaled to
+//! 0.01 km/h (`0x0D0:16:16:intel:1/1` is a 16-bit Intel signal from bit 16 in
+//! 0.01 km/h; an extended identifier ends in `x`, e.g. `0x18FEF100x`). Core 1
+//! then decodes the speed straight from the bus, and core 0 takes whichever of
+//! that and this daemon's ECU stream is fresher. With `--can` and no
+//! telemetry server, the daemon keeps running on the bus alone.
+//!
 //! `--interlock` runs the R5F's interlock here as well and prints its decision,
 //! so the whole chain can be watched on a PC. `--then-select` sends a second
 //! selection after `--then-after` seconds, the way a screen would on changing
 //! page, and the CSV shows the gap that costs.
 
 use kria_core::interlock::{Config as IlConfig, Inputs, Interlock, Speed};
+use kria_core::can::{self, CanConfig, Signal};
 use kria_core::mailbox::{self, ToR5f};
 use kria_core::telemetry::{self, Line};
 use std::collections::HashMap;
@@ -51,7 +62,39 @@ struct Args {
     csv: Option<String>,
     then_select: Vec<String>,
     then_after: u64,
+    can: Option<CanConfig>,
 }
+
+/// `ID[x]:START:LEN:intel|motorola:NUM/DEN[:OFFSET]`
+fn parse_signal(s: &str) -> Option<Signal> {
+    let f: Vec<&str> = s.split(':').collect();
+    if f.len() < 5 {
+        return None;
+    }
+    let (idt, extended) = match f[0].strip_suffix('x') {
+        Some(x) => (x, true),
+        None => (f[0], false),
+    };
+    let id = u32::from_str_radix(idt.trim_start_matches("0x"), 16).ok()?;
+    let (num, den) = f[4].split_once('/').unwrap_or((f[4], "1"));
+    Some(Signal {
+        id,
+        extended,
+        start: f[1].parse().ok()?,
+        len: f[2].parse().ok()?,
+        motorola: match f[3] {
+            "motorola" => true,
+            "intel" => false,
+            _ => return None,
+        },
+        num: num.parse().ok()?,
+        den: den.parse().ok()?,
+        offset: f.get(5).map_or(Some(0), |o| o.parse().ok())?,
+    })
+}
+
+/// Written by kria-hmid: the screens' transmit request and licence flag.
+const HMI_TX_FILE: &str = "/run/kria-hmi/tx";
 
 fn args() -> Args {
     let mut a = Args {
@@ -66,6 +109,7 @@ fn args() -> Args {
         csv: None,
         then_select: vec![],
         then_after: 10,
+        can: None,
     };
     let v: Vec<String> = std::env::args().skip(1).collect();
     let list = |s: &str| s.split(',').filter(|x| !x.is_empty()).map(String::from).collect::<Vec<_>>();
@@ -84,6 +128,21 @@ fn args() -> Args {
             "--csv" => { a.csv = Some(next); i += 1 }
             "--then-select" => { a.then_select = list(&next); i += 1 }
             "--then-after" => { a.then_after = next.parse().unwrap_or(10); i += 1 }
+            "--can" => {
+                let c = a.can.get_or_insert_with(CanConfig::default);
+                c.enabled = true;
+                c.bitrate = next.parse().unwrap_or(500_000);
+                i += 1
+            }
+            "--can-speed" => {
+                let sig = parse_signal(&next).unwrap_or_else(|| {
+                    eprintln!("--can-speed: expected ID[x]:START:LEN:intel|motorola:NUM/DEN[:OFFSET], got {next}");
+                    std::process::exit(2)
+                });
+                a.can.get_or_insert_with(|| CanConfig { enabled: true, ..Default::default() }).speed = Some(sig);
+                i += 1
+            }
+            "--can-active" => a.can.get_or_insert_with(|| CanConfig { enabled: true, ..Default::default() }).active = true,
             other => {
                 eprintln!("unknown argument {other}");
                 std::process::exit(2);
@@ -99,6 +158,12 @@ trait Platform {
     fn now(&mut self) -> u64;
     fn write_mailbox(&mut self, half: &[u8; mailbox::HALF], seq_odd: u32, seq_even: u32);
     fn read_r5f(&mut self) -> Option<mailbox::FromR5f>;
+    /// Seqlock write of a 64-byte block this daemon owns, at `off` in the mailbox.
+    fn write_block(&mut self, _off: usize, _b: &[u8; 64], _seq_odd: u32, _seq_even: u32) {}
+    /// Core 1's report on the bus.
+    fn read_can(&mut self) -> Option<can::CanStatus> {
+        None
+    }
 }
 
 struct Pc {
@@ -159,6 +224,29 @@ impl Platform for DevMem {
         let _ = self.f.write_at(&half[mailbox::SEQ + 4..], seq + 4);
         let _ = self.f.write_at(&seq_even.to_le_bytes(), seq);
     }
+    fn write_block(&mut self, off: usize, b: &[u8; 64], seq_odd: u32, seq_even: u32) {
+        use std::os::unix::fs::FileExt;
+        let at = mailbox::BASE + off as u64;
+        let seq = at + mailbox::SEQ as u64;
+        let _ = self.f.write_at(&seq_odd.to_le_bytes(), seq);
+        let _ = self.f.write_at(&b[..mailbox::SEQ], at);
+        let _ = self.f.write_at(&b[mailbox::SEQ + 4..], seq + 4);
+        let _ = self.f.write_at(&seq_even.to_le_bytes(), seq);
+    }
+    fn read_can(&mut self) -> Option<can::CanStatus> {
+        use std::os::unix::fs::FileExt;
+        let at = mailbox::BASE + can::STATUS as u64;
+        for _ in 0..4 {
+            let mut x = [0u8; 64];
+            let mut y = [0u8; 64];
+            self.f.read_at(&mut x, at).ok()?;
+            self.f.read_at(&mut y, at).ok()?;
+            if x == y {
+                return can::decode_status(&x);
+            }
+        }
+        None
+    }
     fn read_r5f(&mut self) -> Option<mailbox::FromR5f> {
         use std::os::unix::fs::FileExt;
         let at = mailbox::BASE + mailbox::FROM_R5F as u64;
@@ -198,18 +286,36 @@ fn send_select(s: &mut TcpStream, rows: &[String], always: &[String]) -> std::io
 fn main() {
     let a = args();
     let mut pf = platform(a.devmem);
+    // the telemetry server; with --can the daemon also runs without one, on the bus alone
     let mut stream = match TcpStream::connect(&a.server) {
-        Ok(s) => s,
+        Ok(s) => Some(s),
+        Err(e) if a.can.is_some() => {
+            eprintln!("cannot reach {}: {e}; running on the vehicle's CAN bus alone", a.server);
+            None
+        }
         Err(e) => {
             eprintln!("cannot reach {}: {e}", a.server);
             std::process::exit(1);
         }
     };
-    stream.set_nodelay(true).ok();
-    stream.set_read_timeout(Some(Duration::from_millis(50))).ok();
-    let mut reader = BufReader::new(stream.try_clone().expect("socket clone"));
-    send_select(&mut stream, &a.select, &a.always).expect("send selection");
-    eprintln!("connected to {}; selection {:?}, always {:?}", a.server, a.select, a.always);
+    let mut reader = None;
+    if let Some(s) = stream.as_mut() {
+        s.set_nodelay(true).ok();
+        s.set_read_timeout(Some(Duration::from_millis(50))).ok();
+        reader = Some(BufReader::new(s.try_clone().expect("socket clone")));
+        send_select(s, &a.select, &a.always).expect("send selection");
+        eprintln!("connected to {}; selection {:?}, always {:?}", a.server, a.select, a.always);
+    }
+    if let Some(c) = &a.can {
+        eprintln!(
+            "CAN: {} bit/s, {}, speed {}",
+            c.bitrate,
+            if c.active { "active (sends and acknowledges)" } else { "listen only" },
+            c.speed.map_or("not decoded".to_string(), |s| format!("{s:?}"))
+        );
+    }
+    let mut can_seq: u32 = 0;
+    let mut last_can_report = Instant::now();
 
     let mut csv = a.csv.as_ref().map(|p| {
         let mut f = std::io::BufWriter::new(std::fs::File::create(p).expect("csv"));
@@ -234,11 +340,44 @@ fn main() {
         }
         if !switched && start.elapsed() >= Duration::from_secs(a.then_after) {
             switched = true;
-            send_select(&mut stream, &a.then_select, &a.always).ok();
+            if let Some(s) = stream.as_mut() {
+                send_select(s, &a.then_select, &a.always).ok();
+            }
             eprintln!("{:8.3} s  selection {:?}", start.elapsed().as_secs_f64(), a.then_select);
         }
 
         line.clear();
+        let Some(reader) = reader.as_mut() else {
+            std::thread::sleep(Duration::from_millis(50));
+            // no server: the mailbox below still gets the HMI's request and licence, and the bus's speed
+            line.clear();
+            if last_box.elapsed() >= Duration::from_millis(50) {
+                last_box = Instant::now();
+                let now = pf.now();
+                let hmi = std::fs::read(HMI_TX_FILE).unwrap_or_default();
+                let m = ToR5f {
+                    ecu: None,
+                    gps: None,
+                    licensed: a.licensed || hmi.get(1) == Some(&b'1'),
+                    request: hmi.first() == Some(&b'1'),
+                    heartbeat: now,
+                };
+                seq = seq.wrapping_add(2);
+                pf.write_mailbox(&mailbox::encode_to_r5f(&m, seq), seq.wrapping_sub(1), seq);
+                if let Some(c) = &a.can {
+                    let c = CanConfig { heartbeat: now, ..*c };
+                    can_seq = can_seq.wrapping_add(2);
+                    pf.write_block(can::CONFIG, &can::encode_config(&c, can_seq), can_seq.wrapping_sub(1), can_seq);
+                }
+            }
+            if last_can_report.elapsed() >= Duration::from_secs(5) {
+                last_can_report = Instant::now();
+                if let Some(s) = pf.read_can() {
+                    eprintln!("{:8.3} s  CAN {:?}: {} frames, speed {:?}", start.elapsed().as_secs_f64(), s.state, s.frames, s.speed);
+                }
+            }
+            continue;
+        };
         match reader.read_line(&mut line) {
             Ok(0) => {
                 eprintln!("server closed the connection");
@@ -279,9 +418,19 @@ fn main() {
                 centi_kmh: (v.max(0.0) * 100.0).round() as u32,
                 stamp,
             });
-            let m = ToR5f { ecu, gps: None, licensed: a.licensed, request: false, heartbeat: now };
+            // the HMI (kria-hmid) asks for transmit and sets the licence flag through a two-byte file, so this
+            // daemon stays the mailbox's only writer: byte 0 '1' = request, byte 1 '1' = licensed
+            let hmi = std::fs::read(HMI_TX_FILE).unwrap_or_default();
+            let request = hmi.first() == Some(&b'1');
+            let licensed = a.licensed || hmi.get(1) == Some(&b'1');
+            let m = ToR5f { ecu, gps: None, licensed, request, heartbeat: now };
             seq = seq.wrapping_add(2);
             pf.write_mailbox(&mailbox::encode_to_r5f(&m, seq), seq.wrapping_sub(1), seq);
+            if let Some(c) = &a.can {
+                let c = CanConfig { heartbeat: now, ..*c };
+                can_seq = can_seq.wrapping_add(2);
+                pf.write_block(can::CONFIG, &can::encode_config(&c, can_seq), can_seq.wrapping_sub(1), can_seq);
+            }
             if a.interlock {
                 let d = il.step(Inputs { now, ecu, gps: None, licensed: a.licensed, request: true });
                 if let Some(f) = csv.as_mut() {
@@ -316,5 +465,21 @@ fn main() {
     }
     if let Some(mut f) = csv {
         f.flush().ok();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn can_speed_argument() {
+        let s = parse_signal("0x0D0:16:16:intel:1/1").unwrap();
+        assert_eq!((s.id, s.extended, s.start, s.len, s.motorola, s.num, s.den, s.offset), (0xD0, false, 16, 16, false, 1, 1, 0));
+        let s = parse_signal("0x18FEF100x:8:16:intel:100/256:-50").unwrap();
+        assert_eq!((s.id, s.extended, s.num, s.den, s.offset), (0x18FE_F100, true, 100, 256, -50));
+        assert!(parse_signal("0x1A0:7:12:motorola:625/100").unwrap().motorola);
+        assert!(parse_signal("0x1A0:7:12:sideways:1/1").is_none());
+        assert!(parse_signal("0x1A0:7").is_none());
     }
 }

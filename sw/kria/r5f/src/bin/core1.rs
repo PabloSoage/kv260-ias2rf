@@ -1,4 +1,4 @@
-//! R5F core 1: the radar scan and the fusion grid.
+//! R5F core 1: the radar scan, the fusion grid and the vehicle's CAN bus.
 //!
 //! Started by Linux through remoteproc (`kria-r5f1`), configured through the
 //! mailbox (`kria_core::mailbox::Core1Config`). A loop every 100 us, timed by
@@ -17,8 +17,16 @@
 //!   the dump into one of two 64 KiB frame buffers, and the status block says
 //!   which one holds the latest complete frame.
 //!
+//! - **Vehicle CAN.** The PS's CAN1 (EMIO, KV260 `J9`, the adapter's TCAN330),
+//!   listen-only unless Linux asks otherwise (`kria_core::can::CanConfig`).
+//!   Every frame goes into a ring in the mailbox for Linux; the frames that
+//!   carry the road speed (the car's DBC signal) are decoded into
+//!   `CanStatus`, which core 0's interlock reads as the ECU speed, straight
+//!   from the bus.
+//!
 //! Linux's configuration is a heartbeat too: silent for 1 s, the scan and the
-//! grid stop (the beam stays where it is; nothing transmits from here).
+//! grid stop (the beam stays where it is; nothing transmits from here). The CAN
+//! controller keeps listening, and keeps publishing the speed.
 #![no_std]
 #![no_main]
 
@@ -31,6 +39,8 @@ mod rt;
 
 use hw::{dmb, now, rd, wr, TICK_HZ};
 use kria_core::bev::{self, Command, Grid, Sensor};
+use kria_core::can::{self, BusState, CanConfig, CanStatus};
+use kria_core::interlock::Speed;
 use kria_core::mailbox::{self, Core1Config, Core1Status};
 use kria_core::radar::Scheduler;
 use kria_core::ring;
@@ -58,6 +68,34 @@ const GPIO_MASK_DATA_3_LSW: usize = 0xFF0A_0018;
 const GPIO_DIRM_3: usize = 0xFF0A_02C4;
 const GPIO_OEN_3: usize = 0xFF0A_02C8;
 const STROBE_BIT: u32 = 1 << 1;
+
+/// The PS CAN controller CAN1 (UG1085, CAN chapter), reference clock 100 MHz
+/// (`PSU__CRL_APB__CAN1_REF_CTRL__FREQMHZ` in fpga/kria/bd.tcl).
+const CAN1: usize = 0xFF07_0000;
+const CAN_REF_HZ: u32 = 100_000_000;
+const CAN_SRR: usize = CAN1 + 0x00;
+const CAN_MSR: usize = CAN1 + 0x04;
+const CAN_BRPR: usize = CAN1 + 0x08;
+const CAN_BTR: usize = CAN1 + 0x0C;
+const CAN_SR: usize = CAN1 + 0x18;
+const CAN_ISR: usize = CAN1 + 0x1C;
+const CAN_ICR: usize = CAN1 + 0x24;
+const CAN_RX_ID: usize = CAN1 + 0x50;
+const CAN_RX_DLC: usize = CAN1 + 0x54;
+const CAN_RX_DW1: usize = CAN1 + 0x58;
+const CAN_RX_DW2: usize = CAN1 + 0x5C;
+const SRR_SRST: u32 = 1 << 0;
+const SRR_CEN: u32 = 1 << 1;
+const MSR_SNOOP: u32 = 1 << 2;
+const SR_CONFIG: u32 = 1 << 0;
+const SR_ESTAT_SHIFT: u32 = 7;
+const IXR_RXOFLW: u32 = 1 << 6;
+const IXR_RXNEMP: u32 = 1 << 7;
+const IXR_ERROR: u32 = 1 << 8;
+const IXR_BSOFF: u32 = 1 << 9;
+/// Frames taken from the RX FIFO per loop (64 deep; 500 kbit/s brings at most
+/// about one frame per 100 us loop).
+const CAN_BURST: u32 = 8;
 
 const LOOP_TICKS: u64 = TICK_HZ / 10_000;
 const MS: u64 = TICK_HZ / 1000;
@@ -111,6 +149,74 @@ fn ring_rd(off: usize) -> u32 {
     rd(ring::BASE as usize + off)
 }
 
+/// The vehicle bus: the controller set up from `CanConfig`, its frames into
+/// the ring and the speed into `CanStatus`.
+struct Bus {
+    cfg: CanConfig,
+    st: CanStatus,
+}
+
+impl Bus {
+    /// Reset the controller and, if enabled, start it at the configured rate,
+    /// in snoop (listen-only) mode unless `active`.
+    fn configure(&mut self, c: CanConfig) {
+        self.cfg = c;
+        wr(CAN_SRR, SRR_SRST);
+        while rd(CAN_SR) & SR_CONFIG == 0 {}
+        self.st.state = BusState::Off;
+        let Some((brpr, btr)) = can::bit_timing(CAN_REF_HZ, c.bitrate) else { return };
+        if !c.enabled {
+            return;
+        }
+        wr(CAN_BRPR, brpr);
+        wr(CAN_BTR, btr);
+        wr(CAN_MSR, if c.active { 0 } else { MSR_SNOOP });
+        wr(CAN_SRR, SRR_CEN);
+        self.st.state = BusState::Idle;
+    }
+
+    fn poll(&mut self, t: u64) {
+        if self.st.state == BusState::Off {
+            return;
+        }
+        let isr = rd(CAN_ISR);
+        if isr & (IXR_RXOFLW | IXR_ERROR | IXR_BSOFF) != 0 {
+            if isr & IXR_RXOFLW != 0 {
+                self.st.overflows = self.st.overflows.wrapping_add(1);
+            }
+            if isr & IXR_ERROR != 0 {
+                self.st.errors = self.st.errors.wrapping_add(1);
+            }
+            wr(CAN_ICR, isr & (IXR_RXOFLW | IXR_ERROR | IXR_BSOFF));
+        }
+        let mut n = 0;
+        while rd(CAN_ISR) & IXR_RXNEMP != 0 && n < CAN_BURST {
+            let f = can::Frame::from_regs(rd(CAN_RX_ID), rd(CAN_RX_DLC), rd(CAN_RX_DW1), rd(CAN_RX_DW2));
+            wr(CAN_ICR, IXR_RXNEMP);
+            self.st.frames = self.st.frames.wrapping_add(1);
+            let at = mailbox::BASE as usize + can::RING + (self.st.ring_head as usize % can::RING_LEN) * can::RING_ENTRY;
+            let e = can::encode_ring_entry(&f);
+            for (k, w) in e.chunks_exact(4).enumerate() {
+                wr(at + 4 * k, u32::from_le_bytes([w[0], w[1], w[2], w[3]]));
+            }
+            dmb();
+            self.st.ring_head = self.st.ring_head.wrapping_add(1);
+            if let Some(v) = self.cfg.speed.and_then(|s| s.decode(&f)) {
+                self.st.speed = Some(Speed { centi_kmh: v, stamp: t });
+                self.st.speed_frames = self.st.speed_frames.wrapping_add(1);
+            }
+            n += 1;
+        }
+        // the error state field of SR: 1 active, 2 bus off, 3 passive
+        self.st.state = match rd(CAN_SR) >> SR_ESTAT_SHIFT & 3 {
+            2 => BusState::BusOff,
+            3 => BusState::ErrorPassive,
+            _ if self.st.frames > 0 => BusState::Receiving,
+            _ => BusState::Idle,
+        };
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn main_entry() -> ! {
     let mut cfg = Core1Config::default();
@@ -128,6 +234,10 @@ pub extern "C" fn main_entry() -> ! {
     let mut next_buf = 0u8;
     let mut running = false;
     let mut scanning = false;
+    let mut bus = Bus { cfg: CanConfig::default(), st: CanStatus::default() };
+    let mut can_cfg_seq = u32::MAX;
+    let mut can_seq = 0u32;
+    bus.configure(CanConfig::default()); // held in reset until Linux enables it
 
     // EMIO GPIO 1 an output, low.
     strobe(false);
@@ -167,7 +277,24 @@ pub extern "C" fn main_entry() -> ! {
                 cfg.heartbeat = c.heartbeat;
             }
             running = t.saturating_sub(cfg.heartbeat) < TICK_HZ;
+            if let Some((c, s)) = hw::read_stable::<{ can::BLOCK }>(can::CONFIG)
+                .and_then(|b| can::decode_config(&b).map(|c| (c, u32::from_le_bytes([b[4], b[5], b[6], b[7]]))))
+            {
+                if s != can_cfg_seq {
+                    can_cfg_seq = s;
+                    let mut c = c;
+                    c.heartbeat = 0;
+                    let mut old = bus.cfg;
+                    old.heartbeat = 0;
+                    if c != old || bus.st.state == BusState::BusOff {
+                        bus.configure(c);
+                    }
+                }
+            }
         }
+
+        // --- vehicle CAN: drain the RX FIFO
+        bus.poll(t);
         let scan = running && cfg.scan;
         let feed = running && cfg.grid && st.grid_ok;
         if scan && !scanning {
@@ -269,6 +396,9 @@ pub extern "C" fn main_entry() -> ! {
             st.heartbeat = t;
             let m = st;
             hw::write_stable(mailbox::CORE1_STATUS, &mut seq, |s| mailbox::encode_core1_status(&m, s));
+            bus.st.heartbeat = t;
+            let c = bus.st;
+            hw::write_stable(can::STATUS, &mut can_seq, |s| can::encode_status(&c, s));
         }
     }
 }

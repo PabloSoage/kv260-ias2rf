@@ -84,7 +84,7 @@ endmodule
 
 module kria_pl_link (
     (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 pl_clk_100m CLK" *)
-    (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF s_axi:m_axis_rx:s_axis_tx, ASSOCIATED_RESET pl_resetn" *)
+    (* X_INTERFACE_PARAMETER = "ASSOCIATED_BUSIF s_axi:m_axis_rx:s_axis_tx:m_axis_dsp, ASSOCIATED_RESET pl_resetn" *)
     input  wire        pl_clk_100m,
     (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 pl_resetn RST" *)
     (* X_INTERFACE_PARAMETER = "POLARITY ACTIVE_LOW" *)
@@ -146,6 +146,18 @@ module kria_pl_link (
     output wire [7:0]  m_axis_rx_tid,
     (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis_rx TUSER" *)
     output wire [0:0]  m_axis_rx_tuser,
+
+    // AXI4-Stream Master: the DSP suite's results (kria_dsp_out), merged ahead of the DMA by kria_ps_framer
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis_dsp TDATA" *)
+    output wire [63:0] m_axis_dsp_tdata,
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis_dsp TVALID" *)
+    output wire        m_axis_dsp_tvalid,
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis_dsp TREADY" *)
+    input  wire        m_axis_dsp_tready,
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis_dsp TLAST" *)
+    output wire        m_axis_dsp_tlast,
+    (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 m_axis_dsp TID" *)
+    output wire [7:0]  m_axis_dsp_tid,
 
     // AXI4-Stream Slave TX (from axi_dma MM2S in pl_clk_100m domain)
     (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 s_axis_tx TDATA" *)
@@ -467,6 +479,11 @@ module kria_pl_link (
     reg [31:0] wdata_lat  = 32'd0;
     reg  [3:0] wstrb_lat  = 4'd0;
     reg  [7:0] tx_default_sid_r = 8'h10;
+    // TX_KEY (0x38, pl_clk, 18 Nov 2026): the transmit enable, R5F core 0's alone. A write takes effect only with
+    // 24'h4B4559 ("KEY") in [31:8], so a stray write cannot key the transmitter; it is answered here, without the
+    // link's receive clock, so core 0 can always switch the transmitter off.
+    localparam [23:0] TX_KEY_MAGIC = 24'h4B4559;
+    reg        tx_key_r = 1'b0;
 
     // Rev08 G-8 DSP Suite CSR wires (pl_clk_100m domain, 0x40..0x7C)
     reg         dsp_csr_wr_en = 1'b0;
@@ -561,6 +578,7 @@ module kria_pl_link (
             aw_seen          <= 1'b0;
             w_seen           <= 1'b0;
             tx_default_sid_r <= 8'h10;
+            tx_key_r         <= 1'b0;
             dsp_csr_wr_en    <= 1'b0;
             dsp_csr_wr_addr  <= 8'd0;
             dsp_csr_wr_wdata <= 32'd0;
@@ -594,6 +612,14 @@ module kria_pl_link (
                             s_axi_bvalid <= 1'b1;
                             aw_seen      <= 1'b0;
                             w_seen       <= 1'b0;
+                        end else if ((aw_seen ? awaddr_lat : s_axi_awaddr) == 8'h38) begin
+                            if ((w_seen ? wstrb_lat : s_axi_wstrb) == 4'hF &&
+                                (w_seen ? wdata_lat[31:8] : s_axi_wdata[31:8]) == TX_KEY_MAGIC)
+                                tx_key_r <= w_seen ? wdata_lat[0] : s_axi_wdata[0];
+                            s_axi_bresp  <= 2'b00;
+                            s_axi_bvalid <= 1'b1;
+                            aw_seen      <= 1'b0;
+                            w_seen       <= 1'b0;
                         end else if ((aw_seen ? awaddr_lat[7:6] : s_axi_awaddr[7:6]) == 2'b01) begin
                             dsp_csr_wr_en    <= 1'b1;
                             dsp_csr_wr_addr  <= aw_seen ? awaddr_lat : s_axi_awaddr;
@@ -617,6 +643,10 @@ module kria_pl_link (
                         s_axi_arready <= 1'b1;
                         if (s_axi_araddr == 8'h34) begin
                             s_axi_rdata  <= {24'd0, tx_default_sid_r};
+                            s_axi_rresp  <= 2'b00;
+                            s_axi_rvalid <= 1'b1;
+                        end else if (s_axi_araddr == 8'h38) begin
+                            s_axi_rdata  <= {TX_KEY_MAGIC, 7'd0, tx_key_r};
                             s_axi_rresp  <= 2'b00;
                             s_axi_rvalid <= 1'b1;
                         end else if (s_axi_araddr[7:6] == 2'b01) begin
@@ -826,13 +856,19 @@ module kria_pl_link (
         .rx_tap_last    (m_axis_rx_tlast),
         .rx_tap_tid     (m_axis_rx_tid),
         .rx_tap_data    (m_axis_rx_tdata),
+        .tx_key         (tx_key_r),
         .dsp_tx_en      (dsp_tx_en),
         .tx_axis_tdata  (dsp_tx_tdata),
         .tx_axis_tvalid (dsp_tx_tvalid),
         .tx_axis_tready (!tx_afifo_full && dsp_tx_en),
         .tx_axis_tlast  (dsp_tx_tlast),
         .tx_axis_tid    (dsp_tx_tid),
-        .tx_axis_tuser  (dsp_tx_tuser)
+        .tx_axis_tuser  (dsp_tx_tuser),
+        .out_axis_tdata (m_axis_dsp_tdata),
+        .out_axis_tvalid(m_axis_dsp_tvalid),
+        .out_axis_tready(m_axis_dsp_tready),
+        .out_axis_tlast (m_axis_dsp_tlast),
+        .out_axis_tid   (m_axis_dsp_tid)
     );
 
     wire [63:0] eff_tx_tdata  = dsp_tx_en ? dsp_tx_tdata  : s_axis_tx_tdata;

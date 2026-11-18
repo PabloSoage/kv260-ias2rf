@@ -1421,10 +1421,32 @@ module tb_system;
                  retrain_saw_drop, csr_r[6], post_crc_errs);
 
         // =====================================================================
+        // S7: TX_KEY (0x38), the transmit enable owned by R5F core 0 (18 Nov 2026)
+        // =====================================================================
+        begin : s7_tx_key
+            reg [31:0] r;
+            axil_rd(8'h38, r);
+            if (r !== 32'h4B45_5900 || u_kria.dsp_tx_en !== 1'b0) fail_msg("S7: TX_KEY not off after reset");
+            axil_wr(8'h40, 32'h0000_0003);                 // DSP_CTRL with bit 1 set: must not key
+            if (u_kria.dsp_tx_en !== 1'b0) fail_msg("S7: DSP_CTRL[1] keyed the transmitter");
+            axil_wr(8'h38, 32'h0000_0001);                 // no key word: ignored
+            if (u_kria.dsp_tx_en !== 1'b0) fail_msg("S7: TX_KEY accepted a write without the key word");
+            axil_wr(8'h38, 32'h4B45_5901);
+            axil_rd(8'h40, r);
+            if (u_kria.dsp_tx_en !== 1'b1 || r[1] !== 1'b1) fail_msg("S7: TX_KEY did not key, or DSP_CTRL[1] does not show it");
+            axil_wr(8'h40, 32'h0000_0001);                 // Linux rewrites DSP_CTRL whole, bit 1 clear
+            if (u_kria.dsp_tx_en !== 1'b1) fail_msg("S7: a whole-register DSP_CTRL write cleared the transmit enable");
+            axil_wr(8'h38, 32'h4B45_5900);
+            if (u_kria.dsp_tx_en !== 1'b0) fail_msg("S7: TX_KEY did not switch the transmitter off");
+            axil_wr(8'h40, 32'h0000_0000);
+            $display("[S7] PASS TX_KEY: key word required, DSP_CTRL[1] read-only, whole DSP_CTRL writes leave it alone");
+        end
+
+        // =====================================================================
         // Final Summary
         // =====================================================================
         if (fails == 0) begin
-            $display("PASS: tb_system full-system verification (S1..S6, +/-100 ppm, Rev05 SI, ETH+IAS1) passed");
+            $display("PASS: tb_system full-system verification (S1..S7, +/-100 ppm, Rev05 SI, ETH+IAS1, TX_KEY) passed");
             $finish;
         end else begin
             $display("FAIL: tb_system finished with %0d error(s)", fails);

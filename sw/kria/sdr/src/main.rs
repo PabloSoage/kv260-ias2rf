@@ -171,8 +171,7 @@ fn kraken_post(dir: &Path) {
         json_arr(&bart, 2),
         json_arr(&mus, 2)
     );
-    // the HMI's Bearing screen reads the same record as a script (sw/hmi/screens/data/)
-    fs::write(dir.join("kraken_doa.js"), format!("window.KRAKEN_DOA = {};\n", js.trim())).unwrap();
+    // kria-hmid passes this record to the Bearing screen (its --sdr-out; a copy is in sw/hmi/sdr/)
     fs::write(dir.join("kraken_doa.json"), js).unwrap();
     println!(
         "kraken-post: {} source(s); MUSIC {:?}; Bartlett {:?}",
@@ -270,8 +269,7 @@ fn hackrf_post(dir: &Path) {
         sj,
         txs
     );
-    // the HMI's Wideband screen reads the same record as a script (sw/hmi/screens/data/)
-    fs::write(dir.join("hackrf_sweep.js"), format!("window.HACKRF_SWEEP = {};\n", js.trim())).unwrap();
+    // kria-hmid passes this record to the Wideband screen (its --sdr-out; a copy is in sw/hmi/sdr/)
     fs::write(dir.join("hackrf_sweep.json"), js).unwrap();
     println!("hackrf-post: {} blocks, {:.1} % of 0-7.25 GHz covered, {} signals", beats.len() / 65, covered * 100.0, sig.len());
     for (f, bw, pk) in sig.iter().take(12) {

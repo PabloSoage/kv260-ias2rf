@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<title>KV260 IAS2RF</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0d10; overflow: hidden; }
+  /* the screens are laid out for 1280 x 720 (the car display); in a browser or on a phone the whole
+     canvas is scaled to fit, keeping its shape, so nothing is cropped */
+  #stage { position: fixed; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: 50% 50%; }
+  #canvas { display: block; width: 1280px; height: 720px; outline: none; touch-action: none; }
+  #wait { position: fixed; inset: 0; display: grid; place-items: center; color: #8b949e;
+          font: 16px system-ui, sans-serif; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="canvas"></canvas></div>
+<div id="wait">Loading the screens…</div>
+<script type="module">
+  import init from "./pkg/kria_hmi.js";
+  const stage = document.getElementById("stage");
+  const fit = () => {
+    const s = Math.min(innerWidth / 1280, innerHeight / 720);
+    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  };
+  addEventListener("resize", fit);
+  fit();
+  // kria-hmid serves this page and the WebSocket on the same port; the module connects to ws://<host>/ws
+  init().then(() => document.getElementById("wait").remove()).catch((e) => {
+    // Slint leaves its start function by throwing this on purpose; anything else is a real error
+    if (String(e).includes("Using exceptions for control flow")) {
+      document.getElementById("wait").remove();
+    } else {
+      document.getElementById("wait").textContent = "Could not start: " + e;
+      throw e;
+    }
+  });
+</script>
+</body>
+</html>

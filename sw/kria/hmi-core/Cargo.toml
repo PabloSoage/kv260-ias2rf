@@ -1,0 +1,11 @@
+[package]
+name = "kria-hmi-core"
+description = "I/O-free data plane and state of the in-car HMI: the PS-bound DMA blocks of kria_ps_framer, audio and RDS, ADS-B (Mode S, CPR), radar detections and maps, the wideband spectrum, channel presets and the commands they become"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kria-core = { path = "../core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

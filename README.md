@@ -194,7 +194,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | **[docs/BOARD_MANUAL.md](docs/BOARD_MANUAL.md)** | **Board manual.** Every connector, LED, switch, jumper, test point and chip, with drawings of both sides, the Pmod pin-out, troubleshooting by LED and typical uses |
 | **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** Complete vehicle platform: LiDAR, SDR, radar, OBD2 |
 | [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | **Dual-FPGA Gateware.** Artix-7 + Kria K26 RTL, Vivado 2026.1 utilization/timing/floorplans/schematics, CSR map, wideband SDR & AERIS-10 radar DSP, and XSim e2e simulation |
-| [docs/HMI.md](docs/HMI.md) | **In-car HMI.** The eight touchscreen screens (receiver, spectrum, ADS-B, radar, transmit, vehicle, system), the KV260's display path and which job runs on the PL, the A53s, the R5F cores, the GPU and the VCU |
+| [docs/HMI.md](docs/HMI.md) | **In-car HMI.** The ten touchscreen screens, a Slint application in Rust that runs on the KV260 (Linux KMS), a PC or a phone's browser, its data service and the PL's result streams behind it, and which job runs on the PL, the A53s, the R5F cores, the GPU and the VCU |
 | [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) | **Possible integrations.** USB GPS, a 77 GHz radar over CAN, engine live data through opendash (measured against an emulated ECU), a 3D LiDAR, their behaviour in fog, and `kria_bev_grid`, a fusion occupancy grid for the PL |
 | [docs/KV260-IAS2RF_Documentation.pdf](docs/KV260-IAS2RF_Documentation.pdf) | **Unified Offline Book.** Combined project manual with vector Vivado floorplans, 11-sheet schematic, 10-sheet 8-layer layout, 4K renders, and simulations (generated via [`export_documentation.py`](export_documentation.py)) |
 | [docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md) | Parts and checklist per stage, with indicative costs |
@@ -294,6 +294,39 @@ Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to
 *(Lossless vector PDF/SVG and 4K PNGs of all Vivado floorplans and schematics live in [`docs/img/highres/fpga/`](docs/img/highres/README.md#3-vivado-20261-fpga-silicon-floorplans--schematics-fpga).)*
 
 ---
+
+## Receiver, transmitter and radar simulations (G-8)
+
+Every use of the board is simulated with realistic signals through the real RTL: the ADC model, the Artix DDC, the board's LVDS channel model, the IAS1 link and the Kria's DSP. Each result is compared with a floating-point reference fed the same input, and each case includes a deliberate fault (a mutation) that its checks must catch. All eight cases pass ([docs/FPGA_GATEWARE.md §6.1](docs/FPGA_GATEWARE.md); `python fpga/sim/signals/g8_suite.py`). Levels are at the antenna connector.
+
+![G-8 sensitivity of every receive mode](docs/img/sim/g8_overview.png)
+
+| Case | Path | Result (RTL, with the reference in brackets) |
+|---|---|---|
+| HF AM, 7.2 MHz | AD9253, `sdr_ddc`, AM | 10 dB SINAD at -104.4 dBm (-104.3); a +40 dB signal 9 kHz away costs 2.0 dB |
+| HF SSB, 14.2 MHz USB | AD9253, `sdr_ddc`, USB | 10 dB SINAD at -118.5 dBm (-118.2); opposite sideband 56.4 dB down |
+| VHF FM broadcast, 98.1 MHz | AD9484, AERIS DDC, WBFM | 30 dB SINAD at -108.9 dBm (-110.2); stereo separation 32.6 dB; RDS without errors from -105 dBm |
+| VHF airband AM, 121.5 MHz | AD9484, AERIS DDC, AM | 10 dB SINAD at -114.3 dBm (-114.1); 8.33 kHz neighbours cost 0.1 dB at most |
+| UHF PMR446 NBFM, 446 MHz | Converter, AD9484, NBFM | 12 dB SINAD at -122.5 dBm (-122.8); CTCSS detected at that level |
+| ADS-B, 1090 MHz | Converter, AD9484, `kria_adsb_rx` | 90 % of frames decoded at -86.4 dBm (-89.0); 3 of 3 overlapping replies decoded |
+| Radar, FMCW | AD9484, `kria_radar_proc` | Pd 0.5 at -18.8 dB per sample (model -18.7); Pfa 1.99e-2 (2.00e-2); beam scan finds the target at -15 degrees |
+| Transmit | `kria_tx_mod`, link, AD9767 | AM and NBFM SINAD 83 and 58 dB; adjacent channel -80 and -66 dBc; USB opposite sideband 49.9 dB down |
+
+| | |
+|---|---|
+| ![HF AM](docs/img/sim/g8_hf_am.png) | ![HF SSB](docs/img/sim/g8_hf_ssb.png) |
+| ![FM broadcast](docs/img/sim/g8_fm_broadcast.png) | ![Airband AM](docs/img/sim/g8_airband_am.png) |
+| ![PMR446 NBFM](docs/img/sim/g8_vhf_uhf_nbfm.png) | ![ADS-B](docs/img/sim/g8_adsb_1090.png) |
+| ![Radar range-Doppler and CFAR](docs/img/sim/g8_radar_rd_cfar.png) | ![Transmit spectra and masks](docs/img/sim/g8_tx_masks.png) |
+
+## In-car screens
+
+The touchscreen application ([docs/HMI.md](docs/HMI.md)) is written in Rust and Slint and runs on the KV260, a PC or a phone's browser. These images are drawn by the application itself, from the data its service decodes out of the simulated board's DMA blocks.
+
+| | |
+|---|---|
+| ![Home screen](docs/img/hmi/hmi_home.png) | ![Spectrum screen](docs/img/hmi/hmi_spectrum.png) |
+| ![Radar screen](docs/img/hmi/hmi_radar.png) | ![ADS-B screen](docs/img/hmi/hmi_adsb.png) |
 
 ## Simulation results (8-layer JLC08161H-2116C)
 

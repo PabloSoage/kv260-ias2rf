@@ -16,10 +16,12 @@
 //!   clock is gone) counts as down.
 //! - **Transmit interlock.** Reads the mailbox Linux writes (road speed from
 //!   the ECU stream, GPS speed, licence flag, transmit request), runs
-//!   `kria_core::interlock::Interlock`, and owns `DSP_CTRL[1]` (transmit
-//!   enable): set only while the interlock allows it, the link is up and the
-//!   operator asks; cleared within a millisecond otherwise. Linux never writes
-//!   that bit.
+//!   `kria_core::interlock::Interlock`, and owns `TX_KEY` (`kria_pl_link`
+//!   0x38, the transmit enable): set only while the interlock allows it, the
+//!   link is up and the operator asks; cleared within a millisecond otherwise.
+//!   The register is this core's alone (`DSP_CTRL[1]` only reads it back), and
+//!   a write needs the key word, so nothing Linux writes can key the
+//!   transmitter.
 //! - **Status** back to Linux in the mailbox, with a heartbeat.
 //!
 //! Interrupts are not used: the GPS capture is polled once a millisecond,
@@ -34,6 +36,7 @@ mod hw;
 mod rt;
 
 use hw::{now, rd, try_rd, wr, PPS, TICK_HZ};
+use kria_core::can;
 use kria_core::interlock::{self, Interlock};
 use kria_core::link::{self, Watchdog};
 use kria_core::mailbox::{self, FromR5f};
@@ -51,13 +54,15 @@ const PPS_GEN_HI: usize = PPS + 0x24;
 const PPS_ID: usize = PPS + 0x34;
 
 /// `kria_pl_link`: link registers (fpga/link/LINK_PROTOCOL.md 7.2) and
-/// DSP_CTRL (docs/FPGA_GATEWARE.md 5.5), bit 1 transmit enable.
+/// TX_KEY (docs/FPGA_GATEWARE.md 5.3): `[31:8]` the key word, `[0]` transmit
+/// enable. It is answered on `pl_clk`, so it works with the link down.
 const LINK: usize = 0x8000_0000;
 const LINK_CTRL: usize = LINK + 0x00;
 const LINK_STATUS: usize = LINK + 0x04;
 const LINK_CRC: usize = LINK + 0x18;
-const DSP_CTRL: usize = LINK + 0x40;
-const TX_EN: u32 = 1 << 1;
+const TX_KEY: usize = LINK + 0x38;
+const TX_KEY_OFF: u32 = 0x4B45_5900;
+const TX_KEY_ON: u32 = 0x4B45_5901;
 
 const ST_CAP: u32 = 1 << 0;
 const ST_MISSING: u32 = 1 << 1;
@@ -71,7 +76,7 @@ const LOOP_TICKS: u64 = TICK_HZ / 1000;
 
 #[no_mangle]
 fn on_panic() {
-    wr(DSP_CTRL, rd(DSP_CTRL) & !TX_EN);
+    wr(TX_KEY, TX_KEY_OFF);
 }
 
 #[no_mangle]
@@ -138,18 +143,23 @@ pub extern "C" fn main_entry() -> ! {
         let input = hw::read_stable::<{ mailbox::HALF }>(mailbox::TO_R5F)
             .and_then(|b| mailbox::decode_to_r5f(&b))
             .filter(|m| t.saturating_sub(m.heartbeat) < linux_timeout);
+        // the road speed from the bus itself (core 1), or from Linux's ECU stream: whichever is fresher
+        let bus = hw::read_stable::<{ can::BLOCK }>(can::STATUS)
+            .and_then(|b| can::decode_status(&b))
+            .filter(|s| t.saturating_sub(s.heartbeat) < linux_timeout)
+            .and_then(|s| s.speed);
         let d = il.step(interlock::Inputs {
             now: t,
-            ecu: input.and_then(|m| m.ecu),
+            ecu: can::fresher(bus, input.and_then(|m| m.ecu)),
             gps: input.and_then(|m| m.gps),
             licensed: input.is_some_and(|m| m.licensed),
             request: input.is_some_and(|m| m.request),
         });
         let transmit = d.transmit && wd.up();
-        let ctrl = rd(DSP_CTRL);
-        let want = if transmit { ctrl | TX_EN } else { ctrl & !TX_EN };
-        if want != ctrl {
-            wr(DSP_CTRL, want);
+        // its own register: a plain write, no read-modify-write shared with Linux
+        let want = if transmit { TX_KEY_ON } else { TX_KEY_OFF };
+        if rd(TX_KEY) != want {
+            wr(TX_KEY, want);
         }
 
         // --- status

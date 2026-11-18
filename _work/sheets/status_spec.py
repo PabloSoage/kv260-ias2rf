@@ -21,6 +21,16 @@ STATUS sheet (Rev08) - the connection specification. See docs/REV08_PLAN.md sect
   pin of J9 through 220 ohm (15 mA while the pulse is high). Ground lands on J9's 7 and 10 or 9 and 6; 6 and 9 are
   MIPI receiver pins that the design leaves unused. Pins 11, 13, 14 and 15 of J9 (a reset supervisor, the I2C
   pair, 3.3 V) meet nothing either way.
+* The vehicle's CAN bus (18 November, INTEGRATIONS 2.2): the PS's CAN1 controller through EMIO, for R5F core 1.
+  Two more J9 lines that the design leaves unused carry it, both in the K26's bank 66 at 1.2 V: pin 6 (DATA1_P) and
+  pin 8 (CLK_N). Pin 8 maps to itself with either cable type, so it brings RX in: the TCAN330's RXD through a
+  1.8 k / 1 k divider (3.3 V to 1.18 V). TX goes out on J9 pin 6, inverted by the PL; it reaches adapter pin 6 or
+  pin 10 depending on the cable, and the other of the two lands on a ground pin of J9 (10 or 6). Each drives one
+  NPN (MMBT3904, Q1530 and Q1531) through 2.2 k, with 4.7 k from base to emitter, collectors joined with a 2.2 k pull-up into
+  TXD: TXD = NOR(pin 6, pin 10) = TX. An NPN stays off while the K26 is unconfigured, even against a weak
+  pull-up, so the bus stays recessive; the TCAN330 also times out a stuck dominant TXD. Pins 6 and 10 are therefore
+  no longer grounds; 7 and 9 still are. The bus leaves on J1503, now a 6-way JST-SH shared with the GPS receiver
+  (4 CANH, 5 CANL, 6 ground), behind a PESD1CAN. No termination: a tap on a car's bus must not terminate it.
 
 These parts were first planned on the CONTROL sheet; that A1 sheet has no free area large enough to draw them
 legibly, so they have their own sheet, joined to CONTROL by PMOD_SPARE1/2 and to CLOCK by XO_SCL/XO_SDA.
@@ -47,9 +57,16 @@ PARTS = {
     "J1502": ("Connector_Generic_MountingPin:Conn_01x15_MountingPin", "FPC-1.0FX-15PWCR-H20",
               FP + "FPC_1.0_15P_XUNPU_FPC-1.0FX-15PWCR-H20",
               "To KV260 J9 (Raspberry Pi camera connector) by a 15-way 1 mm FFC, 100 mm; J9 pin 12 = HDA10 (PL)"),
-    "J1503": ("Connector_Generic_MountingPin:Conn_01x04_MountingPin", "SM04B-SRSS-TB",
-              "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
-              "GPS receiver: 1 = 3.3 V out, 2 = PPS in (3.3 V CMOS), 3, 4 = ground"),
+    "J1503": ("Connector_Generic_MountingPin:Conn_01x06_MountingPin", "SM06B-SRSS-TB",
+              "Connector_JST:JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal",
+              "GPS receiver and vehicle CAN: 1 = 3.3 V out, 2 = PPS in, 3 = ground, 4 = CANH, 5 = CANL, 6 = ground"),
+    "U1506": ("Interface_CAN_LIN:TCAN330", "TCAN330DCNT", "Package_TO_SOT_SMD:SOT-23-8",
+              "Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode"),
+    "Q1530": ("Transistor_BJT:Q_NPN_BEC", "MMBT3904", "Package_TO_SOT_SMD:SOT-23",
+              "CAN TX from FPC pin 6; with Q1531 a NOR into TXD (one of pins 6, 10 is a J9 ground)"),
+    "Q1531": ("Transistor_BJT:Q_NPN_BEC", "MMBT3904", "Package_TO_SOT_SMD:SOT-23", "CAN TX from FPC pin 10"),
+    "D1531": ("Power_Protection:NUP2105L", "PESD1CAN", "Package_TO_SOT_SMD:SOT-23",
+              "ESD on CANH and CANL"),
     "U1505": ("74xGxx:74LVC1G17", "SN74LVC1G17DCKR", "Package_TO_SOT_SMD:SOT-353_SC-70-5",
               "PPS Schmitt buffer: drives J9 pin 12 through either cable type"),
     "D1530": ("Device:D_TVS", "PESD5V0F1BL", "Diode_SMD:D_SOD-882", "ESD on the GPS PPS input"),
@@ -78,9 +95,13 @@ PINS = {
     "J1501": {"A1": GND, "A12": GND, "B1": GND, "B12": GND, "A4": "VBUS_USB", "A9": "VBUS_USB", "B4": "VBUS_USB",
               "B9": "VBUS_USB", "A5": "USB_CC1", "B5": "USB_CC2", "A6": "USB_DP", "B6": "USB_DP", "A7": "USB_DN",
               "B7": "USB_DN", "A8": "NC", "B8": "NC", "SH": GND},
-    "J1502": {"12": "J9_PPS12", "4": "J9_PPS4", "6": GND, "7": GND, "9": GND, "10": GND, "MP": GND,
-              **{str(n): "NC" for n in (1, 2, 3, 5, 8, 11, 13, 14, 15)}},
-    "J1503": {"1": "GPS_3V3", "2": "GPS_PPS_IN", "3": GND, "4": GND, "MP": GND},
+    "J1502": {"12": "J9_PPS12", "4": "J9_PPS4", "6": "J9_CAN_TX6", "10": "J9_CAN_TX10", "8": "J9_CAN_RX",
+              "7": GND, "9": GND, "MP": GND, **{str(n): "NC" for n in (1, 2, 3, 5, 11, 13, 14, 15)}},
+    "J1503": {"1": "GPS_3V3", "2": "GPS_PPS_IN", "3": GND, "4": "CAN_H", "5": "CAN_L", "6": GND, "MP": GND},
+    "U1506": {"1": "CAN_TXD", "2": GND, "3": V3D, "4": "CAN_RXD", "5": GND, "6": "CAN_L", "7": "CAN_H", "8": GND},
+    "Q1530": {"1": "CAN_TXB6", "2": GND, "3": "CAN_TXD"},
+    "Q1531": {"1": "CAN_TXB10", "2": GND, "3": "CAN_TXD"},
+    "D1531": {"1": "CAN_H", "2": "CAN_L", "3": GND},
     "U1505": {"1": "NC", "2": "GPS_PPS_R", "3": GND, "4": "GPS_PPS_Y", "5": V3D},
     "D1530": {"1": "GPS_PPS_IN", "2": GND},
     "F1501": {"1": V3D, "2": "GPS_3V3"},
@@ -135,6 +156,15 @@ two("R1543", R("220", "PPS to J1502 pin 4 (J9 pin 12 with a reversing cable)"), 
 two("C1540", C("1u", "GPS supply"), "GPS_3V3", GND)
 two("C1541", C("100n", "GPS supply"), "GPS_3V3", GND)
 two("C1542", C("100n", "U1505 VCC"), V3D, GND)
+# vehicle CAN to KV260 J9 (pins 6/10 TX, 8 RX)
+two("R1551", R("2.2k", "CAN TX base from FPC pin 6 (J9 pin 6 with a straight cable)"), "J9_CAN_TX6", "CAN_TXB6")
+two("R1552", R("2.2k", "CAN TX base from FPC pin 10 (J9 pin 6 with a reversing cable)"), "J9_CAN_TX10", "CAN_TXB10")
+two("R1553", R("4.7k", "holds the NPN off while the K26 pin floats or is weakly pulled up"), "CAN_TXB6", GND)
+two("R1554", R("4.7k", "holds the NPN off while the K26 pin floats or is weakly pulled up"), "CAN_TXB10", GND)
+two("R1555", R("2.2k", "TXD pull-up: recessive unless an NPN conducts"), V3D, "CAN_TXD")
+two("R1556", R("1.8k", "RXD divider, top: 3.3 V to 1.18 V for J9's 1.2 V bank"), "CAN_RXD", "J9_CAN_RX")
+two("R1557", R("1k", "RXD divider, bottom"), "J9_CAN_RX", GND)
+two("C1550", C("100n", "TCAN330 VCC"), V3D, GND)
 
 FILTERS = {}
 HIER = {"XO_SCL": "input", "XO_SDA": "bidirectional", "PMOD_SPARE1": "output", "PMOD_SPARE2": "input"}

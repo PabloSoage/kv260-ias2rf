@@ -211,6 +211,11 @@ At 500 MHz the AD9484 runs at 500 MSPS and its DCO at 250 MHz. The AERIS DDC sta
 | **`8'h10`** | Kria -> Artix | `kria_pl_link` -> `artix_top` | Short CMD packet (`len = 8B`, `{opcode[63:56], flags, addr[47:32], wdata[31:0]}`) or legacy IQ TX (`len >= 24B`) |
 | **`8'h11`** | Artix -> Kria | `artix_top` Readback Engine | Register read response `{16'h0002, addr[47:32], rdata[31:0]}` |
 | **`8'h12`** | Kria -> Artix | `kria_pl_link` -> `dac_sdr` | AD9767 dual `14`-bit `I/Q` TX sample stream |
+| **`8'h20`** | Kria PL -> PS | `kria_dsp_out` -> `kria_ps_framer` | Audio, 64 words a packet: `{flags, mono, right, left}`, flags pilot, CTCSS, RDS bit present, RDS bit (§5.10) |
+| **`8'h21`** | Kria PL -> PS | `kria_dsp_out` -> `kria_ps_framer` | ADS-B, one CRC-good frame a packet, 2 words |
+| **`8'h22`** | Kria PL -> PS | `kria_dsp_out` -> `kria_ps_framer` | Radar detections of one CPI (at most 64) and a summary word `{0xFF, cpi, detections, dropped}` |
+| **`8'h23`** | Kria PL -> PS | `kria_dsp_out` -> `kria_ps_framer` | Radar range-Doppler map, 512 words, two cells a word `{det, dbin, rbin, exponent, mantissa}` |
+| `8'h00` | Kria PL -> PS | `kria_ps_framer` | Flush packet (0 words): ends a DMA block after 1 ms without data |
 
 ### 5.2 Artix-7 Full CSR Space (`0x00..0xFC` and, since Rev08, `0x100..0x124` via IAS1 CMD `8'h10`, UDP Port `0x4952` or Debug UART; the Pmod SPI port reaches `0x00..0x7F` only)
 
@@ -284,14 +289,14 @@ The suite sits in `kria_pl_link` on `pl_clk_100m` and takes the stream selected 
 
 | Offset | Register | Fields |
 | :---: | :--- | :--- |
-| `0x40` | `DSP_CTRL` | `[0]` receive enable, `[1]` transmit enable, `[3:2]` source stream, `[6:4]` channel mode (`0` AM, `1` USB, `2` LSB, `3` NBFM, `4` WBFM), `[7]` ADS-B, `[8]` radar, `[9]` radar window, `[12:10]` TX mode (`0` CW, `1` AM, `2` NBFM, `3` USB, `4` LSB), `[13]` `radar_sync`: CPIs start at the Artix's mark |
+| `0x40` | `DSP_CTRL` | `[0]` receive enable, `[1]` transmit enable, `[3:2]` source stream, `[6:4]` channel mode (`0` AM, `1` USB, `2` LSB, `3` NBFM, `4` WBFM), `[7]` ADS-B, `[8]` radar, `[9]` radar window, `[12:10]` TX mode (`0` CW, `1` AM, `2` NBFM, `3` USB, `4` LSB), `[13]` `radar_sync`: CPIs start at the Artix's mark, `[14]` the result streams of `kria_dsp_out` on, `[18:15]` a radar map every `2^n` CPIs (§5.10) |
 | `0x44` | `CH_NCO` | Channel NCO frequency word, `2^32 · f / f_stream`; `0` bypasses the mixer |
 | `0x48` | `CH_DECIM` | `[15:0]` CIC decimation `R`, `[21:16]` CIC shift (gain `R^N`), `[22]` five CIC stages instead of three, `[31:24]` FIR decimation |
 | `0x4C` | `CH_DEMOD` | `[15:0]` de-emphasis coefficient, `[31:16]` CTCSS Goertzel coefficient (Q14 `2 cos ω`) |
 | `0x50` | `CH_PILOT` | 19 kHz pilot frequency word at the channel rate |
 | `0x54` | `CH_CTCSS` | `[15:0]` Goertzel block length, `[31:16]` RDS samples per bit, **Q8.8** (`250 kS/s`: `210.53` = `0xD287`) |
 | `0x58` | `CH_CTCSS_THR` | CTCSS detection threshold (Goertzel power) |
-| `0x5C`, `0x60` | status (RO) | Last audio pair; `{audio count [31:16], RDS bit count [15:8], input queue overflow [2] (sticky), CTCSS detect [1], pilot lock [0]}` |
+| `0x5C`, `0x60` | status (RO) | Last audio pair; `{audio count [31:16], RDS bit count [15:8], result stream lost data [3] (sticky), input queue overflow [2] (sticky), CTCSS detect [1], pilot lock [0]}` |
 | `0x64` | `ADSB_CFG` | `[7:0]` samples per 0.5 µs chip (`[7]` adds one on every other chip: `0x8C` = 12.5 at 25 MSPS), `[23:8]` floor on the four preamble pulses' summed chip averages |
 | `0x68`, `0x6C` | ADS-B status (RO) | `{CRC errors, CRC good}` frame counters; low word of the last good frame |
 | `0x70`–`0x78` | `TX_CAR`, `TX_TONE`, `TX_CFG` | Carrier and test-tone frequency words; `[15:0]` modulation parameter, `[31:16]` amplitude |
@@ -400,6 +405,21 @@ One block takes about 54,500 clocks with 8 segments (1,024 butterflies of six cl
 
 Bench: `tb_kria_sweep` (section 6) against the A53's bit-exact model, with the mutation `sweep_twiddle_conj`. Cost and timing: section 3.3.
 
+### 5.10 The PL's results to the A53s (`kria_dsp_out`, `kria_ps_framer`, 18 Nov)
+
+Until 18 November the DSP suite's results reached the PS only as status registers (the last audio pair, the last ADS-B word, the radar's peak), and `axi_dma_0`'s S2MM channel received the link's packets one by one: a transfer of at most 512 bytes each, about 200,000 re-arms a second at the AD9484 stream's rate, with each packet's stream id lost (the DMA writes only `tdata`). Two blocks close that gap for the in-car software ([HMI.md §4](HMI.md)).
+
+[`fpga/kria/kria_dsp_out.v`](../fpga/kria/kria_dsp_out.v), inside `kria_dsp_suite`, packs the results as the streams `8'h20` to `8'h23` of §5.1. Each source has its own FIFO, and the arbiter sends whole packets round robin. An audio packet that waits 2 ms for its next sample ends early. A map starts only when its FIFO has room for all of it, otherwise that CPI's map is skipped. Samples or frames that meet a full FIFO, detections beyond 64 and skipped maps set `0x60[3]` (sticky). `DSP_CTRL[14]` turns the streams on; `DSP_CTRL[18:15]` sets how often a map is sent.
+
+[`fpga/kria/kria_ps_framer.v`](../fpga/kria/kria_ps_framer.v) sits between `kria_pl_link` and `axi_dma_0`. It takes the link's uplink packets (input A, with the stream id and the CRC flag) and the results (input B), stores each packet whole in a 4,096-word FIFO (32 KiB, which also covers the DMA's re-arm time), and sends it behind two header words:
+
+| Word | Content |
+|---|---|
+| 0 | `{0xA5, tid[7:0], flags[7:0], 0x00, words[15:0], seq[15:0]}`; flags `[0]` CRC error, `[1]` from input B; `seq` counts every packet, so a gap shows a loss |
+| 1 | The 64-bit `pl_clk_100m` tick count when the packet's last word arrived (10 ns) |
+
+`tlast` goes on the last word of the first packet that brings the block to 8,192 words (64 KiB) or more, so a transfer is at most 8,706 words: Linux arms S2MM with 69,648 bytes and reads `S2MM_LENGTH` for what came. When nothing is pending for 1 ms and the block holds data, a flush packet (`tid 0`, 0 words) ends it. The inputs alternate when both have a packet waiting. `tb_kria_ps_framer` drives both inputs with every stream type, random gaps and output backpressure: 798 of 798 packets in order with correct headers, 136 blocks, 1 flush, 3,000 audio samples, 133 of 133 ADS-B frames, 12 CPI summaries and 6 maps. Its two mutations fail as they should (`MUTATE_FRAMER_LAST_EVERY_PACKET`, `MUTATE_MAP_NO_NORMALISE`). `kria-hmi-core::frame` is the software side and is tested on the same format.
+
 ## 6. XSim & Full-System Verification Suite (`fpga/sim/`)
 
 Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado 2026.1`) with unified primitive models (`unisims_ver`, `secureip`, `glbl`) and behavioral hardware board/IC models (`fpga/sim/models/`):
@@ -426,6 +446,7 @@ Every module and top-level integration is verified in AMD/Xilinx `xsim` (`Vivado
 | `tb_kria_pps.v` | `kria_pps` over AXI-Lite with 10,000-tick seconds: ID, mode 0 forwarding, captures and IRQ, capture period, mode 1 after qualification, a 5-tick glitch (flagged, not captured or forwarded), missing GPS, the fractional generator (8 s of 10,000.25 ticks = 80,002), one-shot adjust, a closed loop holding the generator within 1 tick of a 10,000.37-tick GPS second, and holdover; mutation `pps_no_filter` (exit `1`) |
 | `tb_kria_doa.v` | `kria_doa_axi` from the A53's own files (`kria-sdrd kraken-pre`, `+DOA_DIR`): ID, the driver's 3,606 register writes (weights, steering table, `N_LOG2`), a CPI of 32,768 snapshots with gaps in `tvalid`, R's diagonal read back and `SHIFT` chosen from it as the driver does, the rescan; all 15 entries of R and all 360 bearings of P equal the bit-exact model; `DROPPED` = 0; writes `doa_rtl.txt` for `kraken-post`; mutation `doa_no_conj` (exit `1`) |
 | `tb_kria_sweep.v` | `kria_sweep_axi` from the A53's own files (`kria-sdrd hackrf-pre`, `+SWEEP_DIR`): ID, window, twiddles, `PSHIFT` and `NSEG_LOG2`; one 720-block sweep from 0 to 7.2 GHz (1.47 M beats, random gaps in `tvalid`) with one corrupted header; every one of the 46,735 output beats and its `tlast` equals the bit-exact model under random back-pressure; `BLOCKS` = 719, `BAD` = 1; writes `sweep_rtl.hex` for `hackrf-post`; mutation `sweep_twiddle_conj` (exit `1`) |
+| `tb_kria_ps_framer.v` | `kria_dsp_out` and `kria_ps_framer` together: the link's packets of every stream type on input A and the DSP suite's audio, ADS-B, CPI and map events on input B, random gaps and output back-pressure; every packet comes out whole, in order, with its header, sequence number and stream id (798 of 798), blocks end at 64 KiB or on the 1 ms flush (136 blocks, 1 flush), 3,000 audio samples, 133 of 133 ADS-B frames, 12 CPI summaries, 6 maps; mutations `MUTATE_FRAMER_LAST_EVERY_PACKET` and `MUTATE_MAP_NO_NORMALISE` (exit `1`) |
 | `tb_dbg_uart.v` | G-1 `dbg_uart` boot banner, periodic `STAT`, `r`/`w`/`s`/`h` CLI, 4-master CSR collision arbitration, `BREAK` recovery (`500 MHz` & `400 MHz`) + mutations `wrong_divisor` & `drop_monitor_write` (exit `1`) |
 | `tb_clk_mode_switch.v` | Safe-boot Si549 `500 MHz` init, A-1 radar path reset/retrain on `500<->400 MHz` switch, and `±50 ppm` `ADPLL_DELTA_M` Ethernet clamp (`500 MHz` & `400 MHz`, `+` `-Mutate no_delta_clamp`) |
 | `tb_dual_path_drain.v` | `dual_path_sf_fifo` drain while the IAS1 uplink is closed: bulk dropped whole on both sides, `0x11` kept and sent first, a started packet never cut, a started discard runs to its `eop` (`-Mutate drain_started_pkt`, `drain_all_sid`, `drain_release`, `drain_no_wskip`) |
@@ -464,5 +485,25 @@ Results on the RTL of this revision (`fpga/sim/signals/results.json`, re-run on 
 | ADS-B, 1090 MHz | Converter, AD9484, AERIS DDC, `kria_adsb_rx` | 90 % decode at -86.4 dBm (timing-aware reference -89.0) | 3 of 3 overlapping replies CRC-good | `unpack_no_queue` (0 of 3), `one_phase`, `strict_preamble` | 8 / 8 |
 | Radar, FMCW at 120 MHz IF | AD9484, AERIS DDC, CPI mark, `kria_radar_proc` | Pd 0.5 at -18.83 dB per sample (model -18.74); Pfa 1.99e-2 (model 2.00e-2) | Targets at 0, -10 and -30 dB all detected, none elsewhere; beam scan peaks at the target's -15 degrees | `wrong_twiddle_sign` | 7 / 7 |
 | Transmit | `kria_tx_mod`, link, `dac_sdr` / `dac_radar` | AM and NBFM SINAD 83 and 58 dB, adjacent channel -80 and -66 dBc; USB opposite sideband 49.9 dB, carrier 81 dB down; CW SFDR 66.7 dBc | AM at the AD9767 pins on a 3.125 MHz carrier, depth 0.80; 24 radar chirps at the programmed start and slope | `flip_usb_q` | 10 / 10 |
+
+![G-8 sensitivity of every receive mode](img/sim/g8_overview.png)
+
+`python fpga/sim/signals/g8_overview.py` draws this summary from `results.json`. The figures of each case follow: the Kria's input from the full chain, the decoded output, and the sweep of the RTL against the reference.
+
+![HF AM, 7.2 MHz](img/sim/g8_hf_am.png)
+
+![HF SSB, 14.2 MHz USB](img/sim/g8_hf_ssb.png)
+
+![FM broadcast, 98.1 MHz](img/sim/g8_fm_broadcast.png)
+
+![Airband AM, 121.5 MHz](img/sim/g8_airband_am.png)
+
+![PMR446 NBFM, 446 MHz](img/sim/g8_vhf_uhf_nbfm.png)
+
+![ADS-B, 1090 MHz](img/sim/g8_adsb_1090.png)
+
+![Radar, range-Doppler map and CA-CFAR](img/sim/g8_radar_rd_cfar.png)
+
+![Transmit, spectra against their masks](img/sim/g8_tx_masks.png)
 
 Two properties of the chain show up in these numbers and matter to software. The AERIS DDC delivers the conjugate spectrum, so on the AD9484 path the channel NCO is set to minus the offset and the radar map is read at `(64 - r, 16 - d)`. The first radar CPI after the stimulus starts holds the DDC filters' start-up transient (Doppler sidelobes near -30 dBc even in floating point), so the first map after enabling the radar should be discarded.

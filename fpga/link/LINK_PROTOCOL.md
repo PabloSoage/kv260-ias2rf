@@ -120,6 +120,8 @@ Rather than tunneling AERIS's legacy 11-byte (`0xAA .. 0x55`) UART/FTDI USB reco
 | `8'h11` | Artix -> Kria | Telemetry / `StatusResponse` snapshot (6 x 32-bit status words: mode, stream_ctrl, threshold, chirp timings, AGC gain, self-test flags) | `24 .. 64` B |
 | `8'h7F` | Both | PRBS / loopback diagnostic burst for link bring-up and BER verification | `8 .. 4096` B |
 
+The ids `8'h20` to `8'h23` never cross the link: they are the Kria PL's own results to its PS (audio, ADS-B, radar detections and maps from `kria_dsp_out`), merged with the link's uplink packets by `kria_ps_framer` into DMA blocks with their own header word ([FPGA_GATEWARE.md §5.10](../../docs/FPGA_GATEWARE.md)).
+
 ---
 
 ## 7. Hardware Training FSM & Register Map
