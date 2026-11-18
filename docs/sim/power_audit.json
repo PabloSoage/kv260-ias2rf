@@ -1,0 +1,620 @@
+{
+ "budget": {
+  "rows": [
+   {
+    "rail": "+5V0",
+    "part": "LMR33630ADDA",
+    "rating_a": 3.0,
+    "typ_ma": 2099,
+    "worst_ma": 2407,
+    "use": 0.802,
+    "typ_w": 1.166,
+    "worst_w": 1.337
+   },
+   {
+    "rail": "+3V3_D",
+    "part": "TPS562201",
+    "rating_a": 2.0,
+    "typ_ma": 1779,
+    "worst_ma": 1891,
+    "use": 0.946,
+    "typ_w": 0.652,
+    "worst_w": 0.693
+   },
+   {
+    "rail": "+2V5",
+    "part": "TPS562201",
+    "rating_a": 2.0,
+    "typ_ma": 601,
+    "worst_ma": 601,
+    "use": 0.3,
+    "typ_w": 0.205,
+    "worst_w": 0.205
+   },
+   {
+    "rail": "+1V0",
+    "part": "TPS562201",
+    "rating_a": 2.0,
+    "typ_ma": 420,
+    "worst_ma": 735,
+    "use": 0.367,
+    "typ_w": 0.057,
+    "worst_w": 0.1
+   },
+   {
+    "rail": "+1V8_A",
+    "part": "TPS7A8300",
+    "rating_a": 2.0,
+    "typ_ma": 500,
+    "worst_ma": 500,
+    "use": 0.25,
+    "typ_w": 0.35,
+    "worst_w": 0.35
+   },
+   {
+    "rail": "+1V8_D",
+    "part": "TPS7A8300",
+    "rating_a": 2.0,
+    "typ_ma": 567,
+    "worst_ma": 629,
+    "use": 0.315,
+    "typ_w": 0.85,
+    "worst_w": 0.943
+   },
+   {
+    "rail": "+3V3_A",
+    "part": "TPS7A8300",
+    "rating_a": 2.0,
+    "typ_ma": 100,
+    "worst_ma": 100,
+    "use": 0.05,
+    "typ_w": 0.17,
+    "worst_w": 0.17
+   },
+   {
+    "rail": "+3V0_FE",
+    "part": "LP5907MFX-3.0",
+    "rating_a": 0.25,
+    "typ_ma": 180,
+    "worst_ma": 180,
+    "use": 0.72,
+    "typ_w": 0.054,
+    "worst_w": 0.054
+   },
+   {
+    "rail": "-3V3",
+    "part": "LM2663M",
+    "rating_a": 0.2,
+    "typ_ma": 8,
+    "worst_ma": 8,
+    "use": 0.04,
+    "typ_w": 0.007,
+    "worst_w": 0.007
+   }
+  ],
+  "input_typ_ma": 973,
+  "input_worst_ma": 1115,
+  "fix_1v8d_from_2v5": {
+   "ldo_w": 0.44,
+   "v2v5_ma": 1230,
+   "v3v3_ma": 1262,
+   "input_ma": 1067
+  }
+ },
+ "windows": [
+  {
+   "part": "XC7A50T VCCINT (DS181)",
+   "rail": "+1V0",
+   "vmin": 0.922,
+   "vmax": 1.055,
+   "rmin": 0.95,
+   "rmax": 1.05,
+   "absmax": 1.1,
+   "ok": false,
+   "abs_ok": true
+  },
+  {
+   "part": "XC7A50T VCCAUX, VCCO_35, VCCADC (DS181)",
+   "rail": "+1V8_D",
+   "vmin": 1.665,
+   "vmax": 1.823,
+   "rmin": 1.71,
+   "rmax": 1.89,
+   "absmax": 2.0,
+   "ok": false,
+   "abs_ok": true
+  },
+  {
+   "part": "XC7A50T VCCO_34 at 2.5 V (DS181)",
+   "rail": "+2V5",
+   "vmin": 2.347,
+   "vmax": 2.632,
+   "rmin": 2.375,
+   "rmax": 2.625,
+   "absmax": 3.6,
+   "ok": false,
+   "abs_ok": true
+  },
+  {
+   "part": "XC7A50T VCCO_14/15 at 3.3 V (DS181)",
+   "rail": "+3V3_D",
+   "vmin": 3.126,
+   "vmax": 3.493,
+   "rmin": 3.135,
+   "rmax": 3.465,
+   "absmax": 3.6,
+   "ok": false,
+   "abs_ok": true
+  },
+  {
+   "part": "AD9484 AVDD",
+   "rail": "+1V8_A",
+   "vmin": 1.727,
+   "vmax": 1.873,
+   "rmin": 1.7,
+   "rmax": 1.9,
+   "absmax": 2.0,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "AD9253 AVDD",
+   "rail": "+1V8_A",
+   "vmin": 1.727,
+   "vmax": 1.873,
+   "rmin": 1.7,
+   "rmax": 1.9,
+   "absmax": 2.0,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "AD9484 / AD9253 DRVDD",
+   "rail": "+1V8_D (ADC DRVDD branch)",
+   "vmin": 1.747,
+   "vmax": 1.823,
+   "rmin": 1.7,
+   "rmax": 1.9,
+   "absmax": 2.0,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "XC7A50T VCCAUX with U1006 set to 1.85 V",
+   "rail": "+1V8_D at 1.85 V (50 mV pin grounded)",
+   "vmin": 1.714,
+   "vmax": 1.873,
+   "rmin": 1.71,
+   "rmax": 1.89,
+   "absmax": 2.0,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "AD9484 / AD9253 DRVDD with U1006 set to 1.85 V",
+   "rail": "+1V8_D at 1.85 V, ADC branch",
+   "vmin": 1.797,
+   "vmax": 1.873,
+   "rmin": 1.7,
+   "rmax": 1.9,
+   "absmax": 2.0,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "AD9767 / AD9708 AVDD",
+   "rail": "+3V3_A",
+   "vmin": 3.252,
+   "vmax": 3.338,
+   "rmin": 2.7,
+   "rmax": 5.5,
+   "absmax": 6.5,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "AD8352 x4 (via ferrites)",
+   "rail": "+5V0",
+   "vmin": 4.852,
+   "vmax": 5.184,
+   "rmin": 3.0,
+   "rmax": 5.25,
+   "absmax": 5.5,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "Si549 (via FB401)",
+   "rail": "+3V3_D",
+   "vmin": 3.076,
+   "vmax": 3.493,
+   "rmin": 3.135,
+   "rmax": 3.465,
+   "absmax": 3.8,
+   "ok": false,
+   "abs_ok": true
+  },
+  {
+   "part": "ADCLK948 (via FB401), 3.3 V +-10 %",
+   "rail": "+3V3_D",
+   "vmin": 3.076,
+   "vmax": 3.493,
+   "rmin": 2.97,
+   "rmax": 3.63,
+   "absmax": 3.9,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "RTL8211FSI, 3.3 V +-5 % [E]",
+   "rail": "+3V3_D",
+   "vmin": 3.126,
+   "vmax": 3.493,
+   "rmin": 3.135,
+   "rmax": 3.465,
+   "absmax": 3.63,
+   "ok": false,
+   "abs_ok": true
+  },
+  {
+   "part": "TCAN330",
+   "rail": "+3V3_D",
+   "vmin": 3.126,
+   "vmax": 3.493,
+   "rmin": 3.0,
+   "rmax": 3.6,
+   "absmax": 5.0,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "M3SWA2-34DR+ VDD",
+   "rail": "+3V3_D",
+   "vmin": 3.126,
+   "vmax": 3.493,
+   "rmin": 3.0,
+   "rmax": 3.6,
+   "absmax": null,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "RFFC5072",
+   "rail": "+3V0_FE",
+   "vmin": 2.895,
+   "vmax": 3.095,
+   "rmin": 2.7,
+   "rmax": 3.3,
+   "absmax": 3.6,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "SPF5043Z x2 (drain through 1 uH)",
+   "rail": "+3V0_FE",
+   "vmin": 2.895,
+   "vmax": 3.095,
+   "rmin": 2.7,
+   "rmax": 5.25,
+   "absmax": 5.5,
+   "ok": true,
+   "abs_ok": true
+  },
+  {
+   "part": "PE4312, PE4259, PE42442, SKY13418 (2.3-3.6 V) [E]",
+   "rail": "+3V0_FE",
+   "vmin": 2.895,
+   "vmax": 3.095,
+   "rmin": 2.3,
+   "rmax": 3.6,
+   "absmax": 4.0,
+   "ok": true,
+   "abs_ok": true
+  }
+ ],
+ "headroom": [
+  {
+   "ldo": "U1005 +1V8_A",
+   "worst_headroom": 0.5,
+   "typ_headroom": 0.644,
+   "dropout": 0.05,
+   "ok": true
+  },
+  {
+   "ldo": "U1006 +1V8_D (as drawn, from +3V3_D)",
+   "worst_headroom": 1.316,
+   "typ_headroom": 1.505,
+   "dropout": 0.063,
+   "ok": true
+  },
+  {
+   "ldo": "U1006 +1V8_D (fed from +2V5)",
+   "worst_headroom": 0.548,
+   "typ_headroom": 0.691,
+   "dropout": 0.063,
+   "ok": true
+  },
+  {
+   "ldo": "U1007 +3V3_A",
+   "worst_headroom": 1.517,
+   "typ_headroom": 1.714,
+   "dropout": 0.01,
+   "ok": true
+  },
+  {
+   "ldo": "U1315 +3V0_FE (through FB1301)",
+   "worst_headroom": 0.026,
+   "typ_headroom": 0.287,
+   "dropout": 0.18,
+   "ok": false
+  }
+ ],
+ "input": {
+  "p_typ_w": 11.67,
+  "p_worst_w": 13.39,
+  "ptc_trip_c_worst_12v": 59.5,
+  "ptc_trip_c_worst_10v5": 44.400000000000006,
+  "ptc_trip_c_typ_12v": 71.60000000000001
+ },
+ "startup": {
+  "nominal": {
+   "vcco_minus_vccaux_over_2v625_ms": 0.0,
+   "t90_ms": {
+    "+1V0": 4.93,
+    "+1V8_D": 5.62,
+    "+2V5": 4.93,
+    "+3V3_D": 4.93,
+    "+1V8_A": 5.75
+   },
+   "order": [
+    "+1V0",
+    "+2V5",
+    "+3V3_D",
+    "+1V8_D",
+    "+1V8_A"
+   ]
+  },
+  "fast LDO, slow buck": {
+   "vcco_minus_vccaux_over_2v625_ms": 0.0,
+   "t90_ms": {
+    "+1V0": 5.11,
+    "+1V8_D": 5.34,
+    "+2V5": 5.11,
+    "+3V3_D": 5.11,
+    "+1V8_A": 5.5
+   },
+   "order": [
+    "+1V0",
+    "+2V5",
+    "+3V3_D",
+    "+1V8_D",
+    "+1V8_A"
+   ]
+  },
+  "slow LDO": {
+   "vcco_minus_vccaux_over_2v625_ms": 0.262,
+   "t90_ms": {
+    "+1V0": 4.93,
+    "+1V8_D": 6.25,
+    "+2V5": 4.93,
+    "+3V3_D": 4.93,
+    "+1V8_A": 6.39
+   },
+   "order": [
+    "+1V0",
+    "+2V5",
+    "+3V3_D",
+    "+1V8_D",
+    "+1V8_A"
+   ]
+  }
+ },
+ "transients": [
+  {
+   "vds_max": 44.4019,
+   "e1003": 0.1927,
+   "e1001": 0.0,
+   "p1003": 454.6853,
+   "p1001": 0.0,
+   "vin_max": 13.3507,
+   "vin_min": -44.0164,
+   "v12_max": 13.3316,
+   "v12_min": 0.3855,
+   "kind": "ISO 7637-2 pulse 1 (-150 V, 10 ohm, 2 ms; supply disconnected)",
+   "ok": true,
+   "d1003_limit_j": 2.1,
+   "d1001_limit_j": 0.84
+  },
+  {
+   "vds_max": 40.4929,
+   "e1003": 0.0161,
+   "e1001": 0.0,
+   "p1003": 2330.2872,
+   "p1001": 0.0,
+   "vin_max": 59.1251,
+   "vin_min": 11.3464,
+   "v12_max": 18.6376,
+   "v12_min": 11.3182,
+   "kind": "ISO 7637-2 pulse 2a (+112 V, 2 ohm, 50 us)",
+   "ok": true,
+   "d1003_limit_j": 0.332,
+   "d1001_limit_j": 0.1328
+  },
+  {
+   "vds_max": 0.0,
+   "e1003": 0.0,
+   "e1001": 0.0,
+   "p1003": 0.0,
+   "p1001": 0.0,
+   "vin_max": 13.3602,
+   "vin_min": 13.2557,
+   "v12_max": 13.3317,
+   "v12_min": 13.2555,
+   "kind": "ISO 7637-2 pulse 3a (-220 V, 50 ohm, 0.1 us)",
+   "ok": true,
+   "d1003_limit_j": 0.0177,
+   "d1001_limit_j": 0.0071
+  },
+  {
+   "vds_max": 0.0,
+   "e1003": 0.0,
+   "e1001": 0.0,
+   "p1003": 0.0,
+   "p1001": 0.0,
+   "vin_max": 13.3828,
+   "vin_min": 13.2676,
+   "v12_max": 13.333,
+   "v12_min": 13.2674,
+   "kind": "ISO 7637-2 pulse 3b (+150 V, 50 ohm, 0.1 us)",
+   "ok": true,
+   "d1003_limit_j": 0.0177,
+   "d1001_limit_j": 0.0071
+  },
+  {
+   "vds_max": 31.5534,
+   "e1003": 0.0,
+   "e1001": 0.0,
+   "p1003": 0.0,
+   "p1001": 0.0,
+   "vin_max": 35.0001,
+   "vin_min": 5.5804,
+   "v12_max": 18.3283,
+   "v12_min": 3.4466,
+   "kind": "ISO 16750-2 load dump, test B (suppressed to 35 V, 0.5 ohm, 400 ms)",
+   "ok": true,
+   "d1003_limit_j": 29.6985,
+   "d1001_limit_j": 11.8794
+  },
+  {
+   "vds_max": 50.5518,
+   "e1003": 116.188,
+   "e1001": 0.0,
+   "p1003": 1669.7677,
+   "p1001": 0.0,
+   "vin_max": 54.5515,
+   "vin_min": 12.9166,
+   "v12_max": 18.3217,
+   "v12_min": 3.9997,
+   "kind": "ISO 16750-2 load dump, test A (87 V unsuppressed, 1 ohm, 400 ms)",
+   "ok": false,
+   "d1003_limit_j": 29.6985,
+   "d1001_limit_j": 11.8794
+  },
+  {
+   "vds_max": 20.0775,
+   "e1003": 0.0,
+   "e1001": 0.0,
+   "p1003": 0.0,
+   "p1001": 0.0,
+   "vin_max": 24.0009,
+   "vin_min": 13.3676,
+   "v12_max": 18.3041,
+   "v12_min": 3.9235,
+   "kind": "Jump start, 24 V for 60 s (ISO 16750-2 4.3.1.2), first 50 ms",
+   "ok": true,
+   "d1003_limit_j": 363.7307,
+   "d1001_limit_j": 145.4923
+  },
+  {
+   "vds_max": 28.6331,
+   "e1003": 0.0,
+   "e1001": 0.0,
+   "p1003": 0.0,
+   "p1001": 0.0,
+   "vin_max": 12.6581,
+   "vin_min": -27.8413,
+   "v12_max": 12.9395,
+   "v12_min": 0.7918,
+   "kind": "Reverse battery, -14 V (ISO 16750-2 4.7), first 50 ms",
+   "ok": true,
+   "d1003_limit_j": 363.7307,
+   "d1001_limit_j": 145.4923
+  }
+ ],
+ "faults": [
+  {
+   "fault": "Bias tee J961 shorted (5 V)",
+   "limiter": "AP22652, RLIM 210 k",
+   "result": "95-155 mA, then thermal cycling; fault flag to U1313 P10",
+   "note": "FB1302 rated 250 mA, L1301 170 mA [V]: both above 155 mA",
+   "ok": true
+  },
+  {
+   "fault": "GPS supply J1503 pin 6 shorted",
+   "limiter": "F1501 JK-SMD0805-020 (0.2 A hold, 0.4 A trip)",
+   "result": "trips in under a second at 1 A; +3V3_D sags briefly",
+   "note": "+3V3_D buck current limit carries the trip current; C1540 1 uF",
+   "ok": true
+  },
+  {
+   "fault": "Fan J1002 shorted",
+   "limiter": "F1002 SMD1206P050TF (0.5 A hold, 1 A trip)",
+   "result": "trips; +5V0 holds (3 A buck)",
+   "note": "",
+   "ok": true
+  },
+  {
+   "fault": "CAN bus shorted to +12-14.8 V (battery)",
+   "limiter": "none: PESD1CAN stands off 24 V",
+   "result": "TCAN330 CANH/CANL absolute maximum is +-14 V [V]",
+   "note": "a charging alternator (14.4-14.8 V) or a 24 V jump start destroys U1506",
+   "ok": false
+  },
+  {
+   "fault": "CAN bus shorted to ground",
+   "limiter": "TCAN330 driver current limit",
+   "result": "survives (rated)",
+   "note": "",
+   "ok": true
+  },
+  {
+   "fault": "USB-C host on J1501 with the board off",
+   "limiter": "LP5907 from VBUS powers only the CH340X",
+   "result": "1 k (R1533) into the FPGA's PMOD_SPARE1: under 3 mA",
+   "note": "",
+   "ok": true
+  }
+ ],
+ "backpower": [
+  {
+   "line": "Pmod (8 lines, 3.3 V, no series resistor on either board: KV260 R276-R283 are 0 ohm)",
+   "path": "Artix bank 15 <-> K26 HDA bank",
+   "i_ma": 108.0
+  },
+  {
+   "line": "PMOD_SPARE1 from the CH340X",
+   "path": "USB bridge -> Artix",
+   "i_ma": 2.6
+  },
+  {
+   "line": "PMOD_SPARE2 to the CH340X",
+   "path": "Artix -> USB bridge",
+   "i_ma": 2.6
+  },
+  {
+   "line": "GPS PPS to J9 pin 12 (and its copy)",
+   "path": "U1505 -> K26 HDA10",
+   "i_ma": 11.0
+  },
+  {
+   "line": "CAN RX to J9 pin 8, through 1.8 k / 1 k",
+   "path": "TCAN330 RXD -> K26 bank 66 (1.2 V)",
+   "i_ma": 0.9
+  },
+  {
+   "line": "IAS1 LVDS pairs",
+   "path": "AC-coupled (C101-C110)",
+   "i_ma": 0.0
+  },
+  {
+   "line": "IAS1 HK_SCL/HK_SDA (open drain) and PROG_B (74LVC1G07, Ioff)",
+   "path": "carrier 1.8 V <-> bank 35",
+   "i_ma": 0.0
+  },
+  {
+   "line": "IAS1 FPGA_IRQ, push-pull 1.8 V",
+   "path": "Artix bank 35 -> K26 HPA",
+   "i_ma": 48.0
+  }
+ ]
+}

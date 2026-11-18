@@ -21,18 +21,27 @@ Usage:  py _work/power_budget.py
 # (rail, load, volts, milliamps, confidence, source / what to check)
 LOADS = [
     # ---- FPGA ---------------------------------------------------------
-    ("+1V0", "XC7A50T VCCINT", 1.0, 700, "E",
-     "AERIS-10's design on the same part reports 0.730 W total in Vivado "
-     "[V]. VCCINT dominates; 700 mA at 1.0 V leaves room for our link SerDes"),
-    ("+1V8_D", "XC7A50T VCCAUX", 1.8, 100, "E", "DS181, typical for this device size"),
+    # 18 Nov 2026 (Rev08 RF and power audit): the FPGA rows are Vivado 2026.1 report_power on the routed Rev08
+    # design (fpga/artix/.build_rev06/artix_top_routed.dcp), vectorless, worst case: 70 C ambient, maximum
+    # process, still air. At 25 C typical: VCCINT 416 mA, VCCAUX 313 mA, VCCADC 21 mA, 1.20 W on chip.
+    # The first estimate had VCCINT 700 mA and VCCAUX 100 mA: VCCAUX feeds the three MMCMs (0.40 W) and the
+    # I/O (0.33 W, IDELAY/ISERDES/LVDS), so it is three to four times what was assumed.
+    ("+1V0", "XC7A50T VCCINT + VCCBRAM", 1.0, 735, "V",
+     "Vivado report_power, routed Rev08 design, 70 C, maximum process: VCCINT 716 mA + VCCBRAM 19 mA "
+     "(416 + 4 mA at 25 C typical). Confidence 'Low' (vectorless): to be measured on the first board"),
+    ("+1V8_D", "XC7A50T VCCAUX", 1.8, 365, "V",
+     "Vivado report_power, same run: 365 mA at 70 C maximum process, 313 mA at 25 C typical. "
+     "Three MMCMs (0.40 W) and the I/O (0.33 W) dominate; it was estimated at 100 mA until 18 Nov"),
+    ("+1V8_D", "XC7A50T VCCADC (XADC, filtered from VCCAUX by FB1101)", 1.8, 31, "V",
+     "Vivado report_power: 31 mA at 70 C maximum process, 21 mA typical"),
     # The link bank moved from +1V2 to +2V5 on 25 Sep: the FPGA drives LVDS_25
     # on three link pairs, which needs a 2.5 V bank (docs/IAS_LINK_SPEC.md §3).
     # 25 Sep, CONTROL drawn: bank 34 at 2.5 V holds only the three link
     # output pairs; the ADC and link INPUT pairs sit in the 3.3 V bank 14
     # (LVDS_25 inputs are allowed there, UG471). Bank 35 at 1.8 V drives the
     # ADAR1000 ribbon and the converter SPI.
-    ("+2V5", "XC7A50T VCCO_34, three LVDS_25 output pairs", 2.5, 100, "E",
-     "LVDS_25 drivers into 100 ohm plus bank overhead; Vivado to confirm"),
+    ("+2V5", "XC7A50T VCCO_34, three LVDS_25 output pairs", 2.5, 100, "V",
+     "Vivado report_power: Vcco25 61 mA; 100 mA kept as the figure, which covers it"),
     ("+1V8_D", "XC7A50T VCCO_35, ADAR ribbon (35 lines), SPI, HK", 1.8, 30, "E",
      "static control lines, SPI a few MHz; Vivado to confirm"),
     ("+1V2", "Termination bias: 2 link pairs + CLK_FPGA, divider", 1.2, 1, "V",
@@ -141,8 +150,17 @@ LOADS = [
      "u-blox NEO-M9N about 32 mA plus an active antenna about 20 mA; INTEGRATIONS 2.1 (18 Nov)"),
     ("+3V3_D", "GPS PPS buffer SN74LVC1G17 and its two 220 ohm outputs (one into a J9 ground)", 3.3, 2, "E",
      "15 mA while the pulse is high, 10 % duty: 1.5 mA mean"),
-    # Not counted: the bias tee's external load (AP22652, limited to 100 mA,
-    # off by default) and the CH340X, which draws from the USB cable.
+    # 18 Nov 2026 audit: loads that existed on the board but were missing from this table.
+    ("+3V3_D", "RTL8211FSI Ethernet PHY, 1000BASE-T linked (internal 1.0 V switcher)", 3.3, 152, "E",
+     "0.5 W, the figure the thermal model and ENCLOSURE_V2_THERMAL use for U1201 (13 Nov), at 3.3 V"),
+    ("+3V3_D", "TCAN330 CAN transceiver, transmitting dominant into the car's 60 ohm", 3.3, 55, "V",
+     "TCAN330 data sheet SLLSEQ7F, supply current, normal mode, dominant, RL = 60 ohm: 55 mA max"),
+    ("+5V0", "Enclosure fan on J1002 (50 x 50 mm, 5 V)", 5.0, 100, "E",
+     "POWER_SPEC 1.2: about 0.1 A; F1002 holds 0.5 A"),
+    ("+5V0", "Bias tee on J961 at its current limit (JP1301 at 5 V, antenna shorted or a hungry LNA)", 5.0, 155, "V",
+     "AP22652 with RLIM 210 k: 95-155 mA (RX_VU_SPEC 1.3); off at power-up, counted at its limit so a "
+     "short at the antenna cannot overload anything"),
+    # Not counted: the CH340X, which draws from the USB cable.
 ]
 
 # rail -> (source rail, converter type, efficiency or dropout)
