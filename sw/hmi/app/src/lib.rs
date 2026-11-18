@@ -176,12 +176,21 @@ pub fn apply(ui: &AppWindow, m: &mut Model, snap: &Value) {
     h.set_freq_text(ss(freq_text(freq)));
     h.set_mode(ss(mode_name(&s(r, "mode"))));
     let path = s(r, "path");
-    h.set_path_text(ss(match path.as_str() {
-        "hf" => "HF · AD9253 B".to_string(),
-        "direct" => "VHF direct · AD9484".to_string(),
-        "converted" => format!("converter · LO {:.3} MHz", f(r, "lo_hz").unwrap_or(0.0) / 1e6),
-        _ => String::new(),
-    }));
+    let covered = r.get("covered").and_then(|v| v.as_bool()).unwrap_or(true);
+    let mut path_str = if !covered {
+        "not covered (170–240 MHz)".to_string()
+    } else {
+        match path.as_str() {
+            "hf" => "HF · AD9253 B".to_string(),
+            "direct" => "VHF direct · AD9484".to_string(),
+            "converted" => format!("converter · LO {:.3} MHz", f(r, "lo_hz").unwrap_or(0.0) / 1e6),
+            _ => String::new(),
+        }
+    };
+    if b(r, "lna_forced") && !path_str.is_empty() {
+        path_str.push_str(" · LNA forced");
+    }
+    h.set_path_text(ss(path_str));
     let lvl = f(r, "level_dbfs").unwrap_or(-120.0);
     h.set_level(((lvl + 90.0) / 90.0) as f32);
     h.set_level_text(ss(format!("{lvl:.1} dBFS audio · {:.1} kS/s", f(r, "audio_rate").unwrap_or(0.0) / 1e3)));

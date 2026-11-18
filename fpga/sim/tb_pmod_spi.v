@@ -57,7 +57,9 @@ module tb_pmod_spi;
     end
 
     pmod_spi #(
-        .FB_FIFO_DEPTH (64)
+        .FB_FIFO_DEPTH    (64),
+        .KRIA_HIGH_CYCLES (100),
+        .KRIA_LOSS_CYCLES (400)
     ) dut (
         .clk                  (clk),
         .rst                  (rst),
@@ -181,6 +183,28 @@ module tb_pmod_spi;
         rst = 1'b0;
         repeat (4) @(posedge clk);
 
+        // 0. Audit P2: kria_present is 0 right after reset; CS low must NOT enable MISO OE
+        pmod_cs_n = 1'b0;
+        repeat (6) @(posedge clk);
+        if (pmod_miso_oe !== 1'b0) begin
+            $display("FAIL: tb_pmod_spi pmod_miso_oe asserted before Kria presence detected");
+            $finish;
+        end
+        pmod_cs_n = 1'b1;
+        repeat (110) @(posedge clk);
+        if (pmod_miso_oe !== 1'b0) begin
+            $display("FAIL: tb_pmod_spi pmod_miso_oe asserted while CS_N high");
+            $finish;
+        end
+        pmod_cs_n = 1'b0;
+        repeat (6) @(posedge clk);
+        if (pmod_miso_oe !== 1'b1) begin
+            $display("FAIL: tb_pmod_spi pmod_miso_oe stayed low after Kria presence detected");
+            $finish;
+        end
+        pmod_cs_n = 1'b1;
+        repeat (4) @(posedge clk);
+
         // 1. Write & readback LINK_CTRL (0x00) including fallback_en [8] & pulses [2],[6]
         spi_write32(7'h00, 32'h0000_017E); // lb=1, retrain=1, tap_ov=1, prbs_tx=1, prbs_rx=1, clr=1, fb=1
         repeat (4) @(posedge clk);
@@ -250,7 +274,25 @@ module tb_pmod_spi;
         spi_read32(7'h34, rval);
         check_eq("FB_FIFO_EMPTY_AFTER", rval, 32'h0000_4000);
 
-        $display("PASS: tb_pmod_spi regs=13 fb_samples=8 mode=0");
+        // 5. Audit P2: CS_N held low with no SCLK edge > KRIA_LOSS_CYCLES clears kria_present
+        pmod_cs_n = 1'b0;
+        repeat (420) @(posedge clk);
+        if (pmod_miso_oe !== 1'b0) begin
+            $display("FAIL: tb_pmod_spi pmod_miso_oe did not clear after CS_N stuck low w/o SCLK");
+            $finish;
+        end
+        pmod_cs_n = 1'b1;
+        repeat (110) @(posedge clk);
+        pmod_cs_n = 1'b0;
+        repeat (6) @(posedge clk);
+        if (pmod_miso_oe !== 1'b1) begin
+            $display("FAIL: tb_pmod_spi pmod_miso_oe did not recover after CS_N returned high");
+            $finish;
+        end
+        pmod_cs_n = 1'b1;
+        repeat (4) @(posedge clk);
+
+        $display("PASS: tb_pmod_spi regs=13 fb_samples=8 mode=0 kria_present=1");
         $finish;
     end
 

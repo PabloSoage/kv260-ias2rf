@@ -26,7 +26,7 @@ synth_design -top artix_top -part xc7a50t-ftg256-2 -flatten_hierarchy rebuilt \
     -generic BUILD_TIME=32'h$build_time \
     -generic GIT_HASH=32'h$git_hash
 opt_design
-place_design
+place_design -directive AltSpreadLogic_high
 # Post-place physical optimisation without -dsp_register_opt: that pass pulled the AERIS mixer's AREG out of the
 # DSP48 into a slice, which left a fabric -> DSP multiplier path short of the 2.5 ns cycle (WNS -0.146 ns).
 phys_opt_design -fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime \
@@ -51,6 +51,11 @@ report_clock_utilization -file [file join $rpt_dir "clock_utilization.rpt"]
 report_drc               -file [file join $rpt_dir "drc.rpt"]
 report_methodology       -file [file join $rpt_dir "methodology.rpt"]
 report_cdc               -details -file [file join $rpt_dir "cdc.rpt"]
+
+set_operating_conditions -process typical -ambient_temp 25.0 -board_layers 8to11 -airflow 0
+report_power -file [file join $rpt_dir "power_25c_typ.rpt"]
+set_operating_conditions -process maximum -ambient_temp 70.0 -board_layers 8to11 -airflow 0
+report_power -file [file join $rpt_dir "power_70c_max.rpt"]
 
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]
 set whs [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -hold]]

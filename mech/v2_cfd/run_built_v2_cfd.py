@@ -105,13 +105,13 @@ COMPONENTS: List[ComponentSpec] = [
     ComponentSpec("U502_AD8352",      -48.90,  -1.20,  4.0, 0.20, 14.0, 20.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
     ComponentSpec("U503_AD8352",      -57.20,  -2.40,  4.0, 0.20, 14.0, 20.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
     ComponentSpec("U601_AD9253",      -70.25,  10.35,  8.0, 0.46, 12.0,  7.1, 150.0, rating_type="TA_85", ta_max_c=85.0),
-    ComponentSpec("U1101_XC7A50T",    -42.75,  40.00, 17.0, 0.73,  8.4,  4.24, 100.0, rating_type="Tj_100", ta_max_c=None),
+    ComponentSpec("U1101_XC7A50T",    -42.75,  40.00, 17.0, 1.249, 8.4,  4.24, 100.0, rating_type="Tj_100", ta_max_c=None),
     ComponentSpec("U1001_LMR33630",   -30.25,  94.00,  6.0, 0.88, 13.6, 22.0, 125.0, rating_type="Tj_125", ta_max_c=None),
-    ComponentSpec("U1002_TPS562201",  -54.75, 104.50,  4.0, 0.41, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
-    ComponentSpec("U1003_TPS562201",  -54.75,  95.50,  4.0, 0.20, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1002_TPS562201",  -54.75, 104.50,  4.0, 0.46, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1003_TPS562201",  -54.75,  95.50,  4.0, 0.38, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
     ComponentSpec("U1004_TPS562201",  -54.75,  86.50,  4.0, 0.10, 15.0, 28.0, 125.0, rating_type="Tj_125", ta_max_c=None),
     ComponentSpec("U1005_TPS7A8300",  -43.25,  81.00,  4.5, 0.50, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
-    ComponentSpec("U1006_TPS7A8300",  -35.25,  81.00,  4.5, 0.35, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
+    ComponentSpec("U1006_TPS7A8300",  -35.25,  81.00,  4.5, 0.44, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
     ComponentSpec("U1007_TPS7A8300",  -27.25,  81.00,  4.5, 0.17, 12.3, 25.0, 125.0, rating_type="Tj_125", ta_max_c=None),
     ComponentSpec("U1201_RTL8211FSI", -18.20,  -1.00,  6.0, 0.50,  5.0, 18.0, 125.0, rating_type="TA_85", ta_max_c=85.0),  # Rev06: 10 thermal vias (was 12.0 C/W)
     ComponentSpec("AD9708_AD9767",    -45.50,  71.00, 14.0, 0.30, 18.0, 30.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
@@ -133,7 +133,7 @@ REV08_COMPONENTS: List[ComponentSpec] = [
     ComponentSpec("U1501_TCA6416A_LEDs", -16.35, 93.80, 4.0, 0.05, 20.0, 40.0, 125.0, rating_type="TA_85", ta_max_c=85.0),
     ComponentSpec("CAM_IAS_module",   18.00,  62.00,  8.0, 0.35, 10.0, 20.0, 85.0, rating_type="camera", ta_max_c=None),
 ]
-REV08_POWER_W = {"U1001_LMR33630": 0.96, "U1002_TPS562201": 0.48}
+REV08_POWER_W = {"U1001_LMR33630": 0.96, "U1002_TPS562201": 0.46}
 BASE_COMPONENTS: List[ComponentSpec] = list(COMPONENTS)
 
 # Rev08 adapter outline east of x = -10 mm (the main body is ADAPTER_X0..X1): the free block, the tongue and the
@@ -157,7 +157,8 @@ REV08_LID_OPENINGS_MM = [
 def set_components(cfg: "BuiltCaseConfig") -> None:
     """COMPONENTS is read by generate_case and run_case: the Rev06 list, or the Rev08 one."""
     from dataclasses import replace
-    comps = list(BASE_COMPONENTS)
+    fpga_w = 1.604 if cfg.ambient_c >= 55.0 else 1.249
+    comps = [replace(c, power_w=fpga_w) if c.name == "U1101_XC7A50T" else c for c in BASE_COMPONENTS]
     if cfg.rev08:
         comps = [replace(c, power_w=REV08_POWER_W.get(c.name, c.power_w)) for c in comps] + REV08_COMPONENTS
     COMPONENTS[:] = comps
@@ -1483,12 +1484,14 @@ def build_suite() -> List[BuiltCaseConfig]:
         BuiltCaseConfig("v2_opt_combined_70C", ambient_c=70.0, with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, extra_exhaust_slots=True, tall_hs=True, pad_to_lid=True, keep_vtk=True),
         BuiltCaseConfig("v2_opt_combined_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, extra_exhaust_slots=True, tall_hs=True, pad_to_lid=True, keep_vtk=True),
         # 15 Nov adopted printable PETG-CF/ASA upgrade (OD5015 fan + wide spoke grille + 17 right slots + 9 back slots clearing J1001 + tall decoupled sinks, NO Al lid/pads)
+        BuiltCaseConfig("v2_adopted_clean_fine_25C", ambient_c=25.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
         BuiltCaseConfig("v2_adopted_clean_fine_45C", ambient_c=45.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
         BuiltCaseConfig("v2_adopted_clean_fine_55C", ambient_c=55.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
         BuiltCaseConfig("v2_adopted_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, keep_vtk=True),
         BuiltCaseConfig("v2_adopted_clogged_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=2.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True),
         # Rev08 (REV08_PLAN phase 8): the adopted enclosure with J961's notch, the lens window and LED slots, the
         # front end's 0.8 W and the camera module
+        BuiltCaseConfig("rev08_clean_fine_25C", ambient_c=25.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
         BuiltCaseConfig("rev08_clean_fine_45C", ambient_c=45.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
         BuiltCaseConfig("rev08_clean_fine_55C", ambient_c=55.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
         BuiltCaseConfig("rev08_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True, keep_vtk=True),

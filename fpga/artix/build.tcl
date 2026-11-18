@@ -25,10 +25,16 @@ synth_design -top artix_top -part xc7a50t-ftg256-2 -flatten_hierarchy rebuilt \
     -generic BUILD_TIME=32'h$build_time \
     -generic GIT_HASH=32'h$git_hash
 opt_design
-place_design
-phys_opt_design
+place_design -directive Explore
+phys_opt_design -fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime \
+    -shift_register_opt -bram_register_opt -hold_fix
 route_design
-phys_opt_design
+phys_opt_design -directive AggressiveExplore
+foreach dir {AlternateFlowWithRetiming AggressiveFanoutOpt Explore} {
+    if {[get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]] >= 0.050} { break }
+    puts "post-route phys_opt_design -directive $dir"
+    phys_opt_design -directive $dir
+}
 
 report_timing_summary    -delay_type min_max -report_unconstrained -check_timing_verbose -max_paths 10 -file [file join $rpt_dir "timing_summary.rpt"]
 report_pulse_width       -all_violators -file [file join $rpt_dir "pulse_width.rpt"]

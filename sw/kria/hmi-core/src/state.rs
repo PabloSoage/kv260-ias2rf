@@ -68,6 +68,8 @@ pub struct RadioView {
     pub mode: Option<Mode>,
     pub path: Option<Path>,
     pub lo_hz: Option<f64>,
+    pub covered: bool,
+    pub lna_forced: bool,
     pub audio_rate: f64,
     pub level_dbfs: f64,
     pub pilot: bool,
@@ -312,6 +314,8 @@ impl Hmi {
         r.mode = Some(mode);
         r.path = Some(p.path);
         r.lo_hz = p.lo_hz;
+        r.covered = p.covered;
+        r.lna_forced = p.lna_forced;
         r.audio_rate = p.audio_rate;
         if mode != Mode::Adsb {
             self.rds = RdsDecoder::default();

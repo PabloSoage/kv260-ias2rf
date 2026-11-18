@@ -314,6 +314,7 @@ module tb_artix_top;
     // -------------------------------------------------------------------------
     // DUT: artix_top
     // -------------------------------------------------------------------------
+    reg hk_alert_n = 1'b1;
     artix_top #(
         .DDC_POST_DECIM      (4),
         .LINK_AM_PERIOD      (64),
@@ -378,7 +379,7 @@ module tb_artix_top;
         .clk_sel       (clk_sel),
         .hk_scl        (hk_scl),
         .hk_sda        (hk_sda),
-        .hk_alert_n    (1'b1),
+        .hk_alert_n    (hk_alert_n),
         .fpga_irq      (fpga_irq),
         .conv_spi_csb_r(conv_spi_csb_r),
         .conv_spi_csb_s(conv_spi_csb_s),
@@ -594,6 +595,15 @@ module tb_artix_top;
         kria_tx_rst = 1'b0;
         wait (u_artix.sys_mmcm_locked === 1'b1);
         repeat (32) @(posedge rx_clkdiv);
+        // Audit 2.6: FPGA_IRQ must stay low before link training even with hk_alert_n asserted
+        hk_alert_n = 1'b0;
+        repeat (8) @(posedge rx_clkdiv);
+        if (fpga_irq !== 1'b0) begin
+            $display("FAIL: tb_artix_top fpga_irq asserted before link training");
+            $finish;
+        end
+        hk_alert_n = 1'b1;
+        repeat (8) @(posedge rx_clkdiv);
         kria_rx_rst = 1'b0;
 
         // 1. Wait for BOTH Uplink (Kria) and Downlink (Artix) links + eye training
@@ -611,6 +621,16 @@ module tb_artix_top;
 
         wait_c = 0;
         while (wait_c < 8000) begin @(posedge kria_tx_clk); wait_c = wait_c + 1; end
+
+        // Audit 2.6: FPGA_IRQ works once link_trained (dl_up_sync[1]) is high
+        hk_alert_n = 1'b0;
+        repeat (8) @(posedge rx_clkdiv);
+        if (fpga_irq !== 1'b1) begin
+            $display("FAIL: tb_artix_top fpga_irq did not assert on alert after link training");
+            $finish;
+        end
+        hk_alert_n = 1'b1;
+        repeat (8) @(posedge rx_clkdiv);
 
         // 2. Check ADCS_STATUS (0x38): aligned, conv_init_done, ad9253_id == 0x8F
         rd_reg(16'h0038, rval);

@@ -5,8 +5,10 @@
 //! * 30-170 MHz: the RX_VU front end straight to the AD9484 (`VU_CONV_ON` low), preselector A on the FM band-pass
 //!   (88-108 MHz) or the FM reject; the AERIS DDC's NCO through the radar NCO override (`RADAR_CTRL[2]`, a 24-bit
 //!   word at 400 MHz in `[31:8]`), stream 0x01 at 25 MS/s.
-//! * 170 MHz to 3 GHz: through the RFFC5072 converter to the 135 MHz IF; the LO above the signal up to 1 GHz, below
-//!   it above (RFFC5072_PROGRAMMING §4.1), preselector B on the UHF low-pass, the 1090 MHz SAW, or the 1 GHz high-pass.
+//! * 240 MHz to 3 GHz: through the RFFC5072 converter to the 135 MHz IF (a high-pass in front of preselector B cuts
+//!   the band below ~240 MHz; 170-240 MHz is not covered). The LO sits above the signal up to 1 GHz, below it above
+//!   (RFFC5072_PROGRAMMING §4.1), preselector B on the UHF low-pass, the 1090 MHz SAW, the 1 GHz high-pass, or the
+//!   LFCN-1000+ 1 GHz low-pass (where the gateware forces `VU_LNA_ON` = 1).
 //! The channel itself (`kria_channel_rx`) is set as the G-8 cases set it (FPGA_GATEWARE §6.1): CIC and FIR
 //! decimation, de-emphasis, pilot, CTCSS and RDS words. The AERIS DDC delivers the conjugate spectrum and a high
 //! LO inverts it again, so sidebands and the residual tuning offset are flipped when they need to be.
@@ -18,6 +20,24 @@ pub const HF_STREAM: f64 = 62.5e6 / 4.0;
 pub const VU_FS: f64 = 400e6;
 pub const VU_STREAM: f64 = 25e6;
 pub const IF_HZ: f64 = 135e6;
+pub const DIRECT_MAX_HZ: f64 = 170e6;
+pub const CONVERTED_MIN_HZ: f64 = 240e6;
+
+/// True when `freq_hz` is covered by the RF front end (170..240 MHz is excluded by the preselector-B high-pass).
+pub fn is_covered(freq_hz: f64) -> bool {
+    !(freq_hz > DIRECT_MAX_HZ && freq_hz < CONVERTED_MIN_HZ)
+}
+
+/// Gateware R3 rule: `VU_LNA_ON` (bit 5) is forced high whenever `VU_CONV_ON` (bit 6) = 1,
+/// preselector A = B (`V2V1` = `2'b11`), and preselector B = LFCN-1000+ (`V1V2V3` = `3'b011`).
+pub fn lna_forced_for_port0(p0: u8) -> bool {
+    (p0 & 0x40) != 0 && (p0 & 0x03) == 0x03 && ((p0 >> 2) & 0x07) == 0x03
+}
+
+/// Effective U1313 port 0 byte after applying the gateware's R3 LNA-force rule.
+pub fn effective_port0(p0: u8) -> u8 {
+    if lna_forced_for_port0(p0) { p0 | 0x20 } else { p0 }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -75,6 +95,8 @@ pub struct Plan {
     pub freq_hz: f64,
     pub mode: Mode,
     pub path: Path,
+    pub covered: bool,
+    pub lna_forced: bool,
     pub stream_rate: f64,
     pub audio_rate: f64,
     pub lo_hz: Option<f64>,
@@ -122,12 +144,14 @@ fn decim_word(cic: u32, fir: u32, n5: bool, gain_shift: i32) -> u32 {
 pub fn plan(freq_hz: f64, mode: Mode, gain_db: f64) -> Plan {
     let gain_shift = (gain_db / 6.02).round() as i32 + 4;
     let mut w = Vec::new();
+    let covered = is_covered(freq_hz);
+    let mut lna_forced = false;
     let (path, lo, inverted, stream, src) = if freq_hz < 31e6 {
         w.push(Write::Artix { addr: artix_reg::SDR_NCO_B, val: ftw32(freq_hz, HF_FS) });
         w.push(Write::Artix { addr: artix_reg::SDR_DECIM, val: 0x0040_0004 });
         (Path::Hf, None, false, HF_STREAM, 1u32)
     } else {
-        let conv = freq_hz > 170e6;
+        let conv = freq_hz >= CONVERTED_MIN_HZ;
         let lo = if !conv {
             None
         } else if freq_hz <= 1e9 {
@@ -144,7 +168,9 @@ pub fn plan(freq_hz: f64, mode: Mode, gain_db: f64) -> Plan {
         // front end: expander port 0 {bias off, converter, LNA, preselector B, preselector A}, port 1 idle lines
         let psa = if conv { 3 } else if (88e6..=108e6).contains(&freq_hz) { 1 } else { 2 };
         let psb = if !conv { 0 } else if (1080e6..=1100e6).contains(&freq_hz) { 1 } else if freq_hz > 1e9 { 2 } else { 0 };
-        let p0 = 0x80 | (conv as u32) << 6 | 1 << 5 | psb << 2 | psa;
+        let p0_raw = (0x80 | (conv as u32) << 6 | 1 << 5 | psb << 2 | psa) as u8;
+        lna_forced = lna_forced_for_port0(p0_raw);
+        let p0 = effective_port0(p0_raw) as u32;
         let p1 = 0x62 | if conv { 0x80 } else { 0 };
         w.push(fe_cmd(2, p1 << 8 | p0));
         if let Some(lo) = lo {
@@ -213,7 +239,7 @@ pub fn plan(freq_hz: f64, mode: Mode, gain_db: f64) -> Plan {
             w.push(Write::Kria { off: kria_reg::DSP_CTRL, val: 1 | src << 2 | code << 4 | DSP_OUT });
         }
     }
-    Plan { freq_hz, mode, path, stream_rate: stream, audio_rate, lo_hz: lo, inverted, writes: w }
+    Plan { freq_hz, mode, path, covered, lna_forced, stream_rate: stream, audio_rate, lo_hz: lo, inverted, writes: w }
 }
 
 /// The radar: the AD9484 at the 120 MHz IF, `kria_radar_proc` with the Hann window, CPIs on the Artix's marks.
@@ -283,5 +309,25 @@ mod tests {
         let p = plan(144.3e6, Mode::Usb, 0.0);
         assert!(p.inverted);
         assert_eq!((kria(&p, kria_reg::DSP_CTRL).unwrap() >> 4) & 7, 2);
+    }
+
+    #[test]
+    fn band_boundaries_and_lna_force_rule() {
+        // Direct sampling stays 30-170 MHz; 170-240 MHz is not covered; converted starts at 240 MHz
+        let direct = plan(170e6, Mode::Nbfm, 0.0);
+        assert_eq!((direct.path, direct.covered, direct.lo_hz), (Path::Direct, true, None));
+        let gap = plan(200e6, Mode::Nbfm, 0.0);
+        assert!(!gap.covered);
+        assert_eq!(gap.lo_hz, None);
+        let conv = plan(240e6, Mode::Nbfm, 0.0);
+        assert_eq!((conv.path, conv.covered, conv.lo_hz), (Path::Converted, true, Some(375e6)));
+
+        // Gateware R3 rule: VU_CONV_ON=1, PSA=B(11), PSB=LFCN-1000+(011) forces VU_LNA_ON=1
+        let raw_bypass: u8 = 0x80 | (1 << 6) | (0 << 5) | (3 << 2) | 3; // 0xCF
+        assert!(lna_forced_for_port0(raw_bypass));
+        assert_eq!(effective_port0(raw_bypass), raw_bypass | 0x20); // 0xEF
+        let other_psb: u8 = 0x80 | (1 << 6) | (0 << 5) | (0 << 2) | 3; // UHF LPF
+        assert!(!lna_forced_for_port0(other_psb));
+        assert_eq!(effective_port0(other_psb), other_psb);
     }
 }

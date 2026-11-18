@@ -262,45 +262,47 @@ This subsection verifies the exact printable **PETG-CF / ASA (`k = 0.25 W/m·K`,
 - **Exhaust vents:** Built `17` right-wall slots (`3.5 × 21 mm`, `y = 4..106 mm`, `z = 7.5..28.5 mm`) **plus `9` new back-wall slots** at `y = 112 mm` (`3.5 × 18 mm`, `z = 10..28 mm`, `567 mm²` open area) starting at `x = -85, -79, -73, -67, -61, -55` (`6` slots) and `-31, -25, -19.5` (`3` slots), leaving `x = [-51.5, -31.0]` solid around `J1001` (`back_slot_loss` Darcy-Forchheimer `f = 100.0`).
 - **Heatsinks:** Tall decoupled aluminum sinks: `U401` and `Y401` `9 × 7 × 8 mm` (`±1 mm` Y offset, `4 mm` air gap), `U501` `14 × 14 × 8.5 mm`.
 
-| Metric / Flow Summary | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
-| --- | ---: | ---: | ---: | ---: |
-| **50 mm `OD5015` Flow / Static ΔP** | `7.38 CFM` @ `24.68 Pa` | `7.44 CFM` @ `24.47 Pa` | **`7.52 CFM` @ `24.18 Pa`** | `6.77 CFM` @ `26.78 Pa` |
-| **KV260 Intake / Right (`17`) / Back (`9`) Slots** | `9.90 / 12.18 / 5.10 CFM` | `10.07 / 12.34 / 5.17 CFM` | `10.31 / 12.56 / 5.27 CFM` | `10.56 / 12.12 / 5.21 CFM` |
-| **Mean Cavity Pressure / Air `T_mean` / `T_max`** | `+5.30 Pa` / `47.12` / `61.39 °C` | `+5.28 Pa` / `57.16` / `71.87 °C` | **`+5.25 Pa`** / `72.22` / `87.12 °C` | **`+4.80 Pa`** / `72.30` / `88.88 °C` |
+| Metric / Flow Summary | `25 °C` Clean | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| **50 mm `OD5015` Flow / Static ΔP** | `7.25 CFM` @ `25.11 Pa` | `7.38 CFM` @ `24.68 Pa` | `7.44 CFM` @ `24.48 Pa` | **`7.52 CFM` @ `24.18 Pa`** | `6.76 CFM` @ `26.79 Pa` |
+| **KV260 Intake / Right (`17`) / Back (`9`) Slots** | `9.60 / 11.96 / 4.95 CFM` | `9.88 / 12.19 / 5.06 CFM` | `10.07 / 12.35 / 5.15 CFM` | `10.29 / 12.56 / 5.24 CFM` | `10.55 / 12.12 / 5.19 CFM` |
+| **Mean Cavity Pressure / Air `T_mean` / `T_max`** | `+5.34 Pa` / `27.16` / `41.67 °C` | `+5.30 Pa` / `47.25` / `61.88 °C` | `+5.28 Pa` / `57.34` / `72.35 °C` | **`+5.26 Pa`** / `72.40` / `87.70 °C` | `+4.80 Pa` / `72.37` / `89.52 °C` |
 
 #### Per-Part Fine-Mesh Temperatures (`Tb / Tj / Tair_local`, °C)
 
-| Component | Rating Class (`Limit`) | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
-| --- | --- | ---: | ---: | ---: | ---: |
-| `U401_ADCLK948` | `TA 85 °C` (`150 °C` abs) | 66.40 / 72.68 / 46.69 | 76.52 / 82.79 / 56.73 | **91.68** / 97.95 / 71.79 | **92.10** / 98.36 / 72.03 |
-| `Y401_Si549` | `TA 85 °C` (`125 °C Tj`) | 63.16 / 69.79 / 48.36 | 73.28 / 79.90 / 58.42 | **88.44** / 95.06 / 73.50 | **88.81** / 95.34 / 73.60 |
-| `U501_AD9484` | `TA 85 °C` (`150 °C` abs) | 61.92 / 65.03 / 48.38 | 72.04 / 75.14 / 58.47 | **87.20** / 90.30 / 73.59 | **87.56** / 90.65 / 73.88 |
-| `U502_AD8352` | `TA 85 °C` (`125 °C` abs) | 62.29 / 65.09 / 45.63 | 72.40 / 75.20 / 55.65 | **87.55** / 90.35 / 70.67 | **87.90** / 90.70 / 70.73 |
-| `U503_AD8352` | `TA 85 °C` (`125 °C` abs) | 59.72 / 62.52 / 45.57 | 69.82 / 72.62 / 55.59 | 84.97 / 87.77 / 70.61 | **85.30** / 88.10 / 70.64 |
-| `U601_AD9253` | `TA 85 °C` (`150 °C` abs) | 57.17 / 62.69 / 45.89 | 67.28 / 72.80 / 55.91 | 82.43 / 87.95 / 70.94 | 82.76 / 88.28 / 71.02 |
-| `U1101_XC7A50T` | `Tj 100 °C` (`-I` grade) | 56.39 / 62.52 / 46.05 | 66.50 / 72.63 / 56.07 | 81.65 / **87.78** / 71.10 | 82.00 / **88.13** / 71.45 |
-| `U1001_LMR33630` | `Tj 125 °C` | 70.32 / 84.33 / 48.36 | 80.49 / 94.50 / 58.43 | 95.75 / **109.76** / 73.55 | 96.46 / **110.47** / 73.78 |
-| `U1002_TPS562201` | `Tj 125 °C` | 62.50 / 68.65 / 47.23 | 72.65 / 78.80 / 57.27 | 87.86 / 94.01 / 72.34 | 88.27 / 94.42 / 72.30 |
-| `U1003_TPS562201` | `Tj 125 °C` | 60.19 / 63.19 / 47.00 | 70.34 / 73.34 / 57.04 | 85.56 / 88.56 / 72.10 | 86.04 / 89.04 / 72.28 |
-| `U1004_TPS562201` | `Tj 125 °C` | 58.17 / 59.67 / 46.64 | 68.32 / 69.82 / 56.66 | 83.53 / 85.03 / 71.71 | 84.04 / 85.54 / 72.02 |
-| `U1005_TPS7A8300` | `Tj 125 °C` | 64.09 / 70.24 / 46.96 | 74.24 / 80.39 / 57.02 | 89.47 / 95.62 / 72.11 | 90.01 / 96.16 / 72.86 |
-| `U1006_TPS7A8300` | `Tj 125 °C` | 64.52 / 68.83 / 47.51 | 74.67 / 78.98 / 57.57 | 89.91 / 94.21 / 72.67 | 90.38 / 94.69 / 72.83 |
-| `U1007_TPS7A8300` | `Tj 125 °C` | 62.25 / 64.34 / 47.48 | 72.40 / 74.49 / 57.53 | 87.64 / 89.74 / 72.62 | 88.15 / 90.24 / 72.69 |
-| `U1201_RTL8211FSI` | `TA 85 °C` (`125 °C Tj`) | 63.79 / 66.29 / 45.63 | 73.91 / 76.41 / 55.64 | **89.07** / 91.57 / 70.66 | **89.60** / 92.10 / 70.76 |
-| `AD9708_AD9767` | `TA 85 °C` (`125 °C` abs) | 58.11 / 63.51 / 46.52 | 68.25 / 73.65 / 56.58 | 83.46 / 88.86 / 71.67 | 83.98 / 89.38 / 72.42 |
-| **`K26_SOM`** (`sink / Tj`) | `XCK26-C 85` / `K26I 100` | 61.29 / **73.89** | 71.37 / **83.97** (`C:+1.03`) | 86.48 / **99.08** (`I:+0.92`) | 86.46 / **99.06** (`I:+0.94`) |
+Updated with Vivado `report_power` for `U1101` (`1.249 W` at `25–45 °C`, `1.604 W` at `55–70 °C`), `U1006 = 0.44 W` (on `+2V5`), `U1003 = 0.38 W`, and `U1002 = 0.46 W`:
 
-#### Honest Maximum Rated Ambient (`45 -> 55 -> 70 °C` Clean Adopted Upgrade)
+| Component | Rating Class (`Limit`) | `25 °C` Clean | `45 °C` Clean | `55 °C` Clean | `70 °C` Clean | `70 °C` `2×` Clogged |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `U401_ADCLK948` | `TA 85 °C` (`150 °C` abs) | 46.67 / 52.90 / 26.64 | 66.91 / 73.14 / 46.73 | 77.37 / 83.55 / 56.79 | **92.54** / 98.72 / 71.85 | **92.99** / 99.13 / 72.13 |
+| `Y401_Si549` | `TA 85 °C` (`125 °C Tj`) | 43.64 / 50.16 / 28.37 | 63.90 / 70.43 / 48.50 | 74.52 / 80.99 / 58.64 | **89.69** / 96.16 / 73.73 | **89.83** / 96.46 / 73.71 |
+| `U501_AD9484` | `TA 85 °C` (`150 °C` abs) | 42.40 / 45.38 / 28.32 | 62.64 / 65.61 / 48.52 | 73.23 / 76.11 / 58.70 | **88.41** / 91.28 / 73.83 | **88.56** / 91.66 / 73.99 |
+| `U502_AD8352` | `TA 85 °C` (`125 °C` abs) | 42.53 / 45.33 / 25.61 | 62.76 / 65.56 / 45.65 | 73.19 / 75.99 / 55.68 | **88.36** / 91.16 / 70.70 | **88.69** / 91.49 / 70.78 |
+| `U503_AD8352` | `TA 85 °C` (`125 °C` abs) | 39.90 / 42.70 / 25.56 | 60.12 / 62.92 / 45.59 | 70.51 / 73.31 / 55.61 | **85.67** / 88.47 / 70.64 | **86.03** / 88.83 / 70.67 |
+| `U601_AD9253` | `TA 85 °C` (`150 °C` abs) | 37.40 / 42.92 / 25.87 | 57.62 / 63.14 / 45.92 | 68.03 / 73.55 / 55.97 | 83.20 / 88.72 / 71.00 | 83.57 / 89.09 / 71.08 |
+| `U1101_XC7A50T` | `Tj 100 °C` (`-I` grade) | 39.93 / 50.42 / 26.11 | 60.18 / 70.67 / 46.17 | 72.79 / 86.27 / 56.28 | 87.98 / **101.45** / 71.32 | 88.39 / **101.86** / 71.74 |
+| `U1001_LMR33630` | `Tj 125 °C` | 51.64 / 65.65 / 28.51 | 72.05 / 86.05 / 48.70 | 82.60 / 96.61 / 58.93 | 97.89 / 111.89 / 74.05 | 98.39 / 112.64 / 74.08 |
+| `U1002_TPS562201` | `Tj 125 °C` | 45.25 / 52.15 / 27.42 | 65.60 / 72.50 / 47.53 | 76.03 / 82.93 / 57.67 | 91.28 / 98.18 / 72.74 | 91.11 / 98.01 / 72.72 |
+| `U1003_TPS562201` | `Tj 125 °C` | 43.52 / 49.22 / 27.16 | 63.86 / 69.56 / 47.27 | 74.33 / 80.03 / 57.40 | 89.58 / 95.28 / 72.47 | 90.62 / 96.32 / 72.89 |
+| `U1004_TPS562201` | `Tj 125 °C` | 39.93 / 41.43 / 26.76 | 60.26 / 61.76 / 46.83 | 70.78 / 72.28 / 56.94 | 86.04 / 87.54 / 71.99 | 86.46 / 87.96 / 72.34 |
+| `U1005_TPS7A8300` | `Tj 125 °C` | 45.75 / 51.90 / 27.05 | 66.12 / 72.27 / 47.19 | 76.76 / 82.91 / 57.38 | 92.03 / 98.18 / 72.49 | 92.95 / 99.10 / 73.19 |
+| `U1006_TPS7A8300` | `Tj 125 °C` | 46.57 / 51.98 / 27.61 | 66.93 / 72.34 / 47.77 | 77.58 / 82.99 / 57.98 | 92.85 / 98.26 / 73.10 | 94.76 / 100.17 / 73.44 |
+| `U1007_TPS7A8300` | `Tj 125 °C` | 43.66 / 45.75 / 27.54 | 64.02 / 66.11 / 47.66 | 74.65 / 76.74 / 57.80 | 89.92 / 92.01 / 72.89 | 90.51 / 92.61 / 73.04 |
+| `U1201_RTL8211FSI` | `TA 85 °C` (`125 °C Tj`) | 44.05 / 46.55 / 25.61 | 64.30 / 66.80 / 45.64 | 74.76 / 77.26 / 55.67 | **89.94** / 92.44 / 70.69 | **90.24** / 92.74 / 70.82 |
+| `AD9708_AD9767` | `TA 85 °C` (`125 °C` abs) | 39.53 / 44.93 / 26.55 | 59.85 / 65.25 / 46.70 | 70.66 / 76.06 / 56.89 | **85.92** / 91.32 / 72.00 | **86.47** / 91.87 / 72.62 |
+| **`K26_SOM`** (`sink / Tj`) | `XCK26-C 85` / `K26I 100` | 41.17 / **53.77** | 61.34 / **73.94** | 71.44 / **84.04** (`C:+0.96`) | 86.56 / **99.16** (`I:+0.84`) | 86.54 / **99.14** (`I:+0.86`) |
 
-| Governing Limit Criterion | Limiting Device (`45 -> 55 -> 70 °C`) | `55 °C` Value | `70 °C` Value | Max Rated `T_amb` |
+#### Honest Maximum Rated Ambient (`25 -> 45 -> 55 -> 70 °C` Clean Adopted Upgrade)
+
+| Governing Limit Criterion | Limiting Device (`55 -> 70 °C`) | `55 °C` Value | `70 °C` Value | Max Rated `T_amb` |
 | --- | --- | ---: | ---: | ---: |
-| **Stock commercial `KV260` (`XCK26-C Tj <= 85 °C`)** | `K26_SOM` (`Tj`) | `83.97 °C` (PASS) | `99.08 °C` (`-14.08 °C`) | **`56.0 °C`** |
-| **`TA = -40..+85 °C` ICs checked at PCB pad (`Tb <= 85 °C`)** | `U401_ADCLK948` (`U1201` `66.0 °C`, `Y401` `66.6 °C`, `U502` `67.5 °C`, `U501` `67.8 °C`) | `76.52 °C` | `91.68 °C` | **`63.4 °C`** |
-| **Industrial `K26I` SOM (`Tj <= 100 °C`)** | `K26_SOM` (`Tj`) | `83.97 °C` (`+16.03 °C`) | `99.08 °C` (`+0.92 °C`) | **`70.9 °C`** (passes **`70 °C` clogged** at `99.06 °C`) |
-| **`TA = -40..+85 °C` ICs checked at local cavity air (`Tair_loc <= 85 °C`)** | `U501_AD9484` (`Y401` `81.4 °C`, `U401` `83.2 °C`) | `58.47 °C` | `73.59 °C` | **`81.3 °C`** |
-| **Adapter silicon `Tj`-only limits (`U1101 <= 100`, `U1001/Y401 <= 125`)** | `U1101_XC7A50T` (`100`), `U1001_LMR33630` (`125`), `Y401_Si549` (`125`) | `72.6 / 94.5 / 79.9` | `87.8 / 109.8 / 95.1` | **`82.1 °C`** (`U1101`) / `85.0 °C` (`LMR`) / `99.6 °C` (`Y401`) |
+| **Stock commercial `KV260` (`XCK26-C Tj <= 85 °C`)** | `K26_SOM` (`Tj`) | `84.04 °C` (PASS) | `99.16 °C` (`-14.16 °C`) | **`56.0 °C`** (unchanged) |
+| **`TA = -40..+85 °C` ICs checked at PCB pad (`Tb <= 85 °C`)** | `U401_ADCLK948` | `77.37 °C` | `92.54 °C` | **`62.5 °C`** (dropped from `63.4 °C`) |
+| **Industrial `K26I` + Adapter silicon (`Tj <= 100 °C`)** | **`U1101_XC7A50T`** (no `HS4`; `K26I` alone `70.8 °C`) | `86.27 °C` (`K26: 84.04 °C`) | **`101.45 °C`** (`K26: 99.16 °C`) | **`68.6 °C`** (dropped from `70.9 °C`) |
+| **`TA = -40..+85 °C` ICs checked at local cavity air (`Tair_loc <= 85 °C`)** | `U501_AD9484` | `58.70 °C` | `73.83 °C` | **`81.1 °C`** |
+| **Adapter regulators (`U1001..U1007 <= 125 °C`)** | `U1001_LMR33630` | `96.61 °C` | `111.89 °C` | **`82.9 °C`** |
 
-- **Adopted upgrade conclusion:** Even strictly inside printable **PETG-CF/ASA** (no aluminium lid, no pads), every silicon junction passes **`70 °C` clean AND `2×` clogged** when paired with the industrial **`K26I` SOM** (`99.08 °C` clean, `99.06 °C` clogged, `LMR33630 = 109.76 °C` vs `125 °C`, `Y401 = 95.06 °C` vs `125 °C`, `XC7A50T = 87.78 °C` vs `100 °C`), while holding `+5.25 Pa` (`+4.80 Pa` clogged) positive enclosure overpressure. With a stock commercial **`KV260` (`XCK26-C`)**, the continuous ambient rating increases from `51.3 °C` (as first built) to **`56.0 °C`** (`63.4 °C` under strict `T_board <= 85 °C` on all `TA`-rated adapter parts).
+- **Adopted upgrade conclusion (with real Vivado FPGA power):** With `XC7A50T` at `1.249 W` (`25–45 °C`) and `1.604 W` (`55–70 °C`) plus `U1006 = 0.44 W`, `U1003 = 0.38 W`, and `U1002 = 0.46 W`, **the `K26I` industrial assembly rating drops from `70.9 °C` to `68.6 °C`** because **`U1101` (`XC7A50T`) reaches `101.45 °C` at `70 °C` clean (`101.86 °C` clogged)** without `HS4` fitted (`K26I` itself remains `99.16 °C <= 100 °C`). Stock commercial **`KV260` (`XCK26-C`)** remains at **`56.0 °C`**, and strict `T_board <= 85 °C` drops slightly from `63.4 °C` to **`62.5 °C`**.
 
 ### 8. Rev08 (17 Nov): the front end, the camera and the new openings
 
@@ -325,40 +327,35 @@ The adopted enclosure of section 7, re-run on the same fine mesh with the Rev08 
   to 0.38 CFM out of the box; the cavity stays at +5.2 Pa (+4.8 Pa clogged). `J961`'s notch is closed by the
   SMA's body, as the other twelve.
 
-**Results (fine mesh, 428,139 air cells):**
+**Results (fine mesh, 428,139 air cells, updated with Vivado `XC7A50T` power `1.249 / 1.604 W`, `U1006 = 0.44 W`, `U1003 = 0.38 W`, `U1002 = 0.46 W`):**
 
 | Case | Fan | `K26` Tj | LMR33630 Tj | ADCLK948 Tb / Tj | XC7A50T Tj | RFFC5072 Tb / Tj | Camera (board under it) |
 |---|---|---|---|---|---|---|---|
-| 45 °C clean | 7.39 CFM | 73.8 | 87.5 | 65.7 / 72.1 | 62.8 | 59.6 / 64.1 | 62.1 |
-| 55 °C clean | 7.45 CFM | 83.9 | 97.7 | 75.8 / 82.2 | 72.9 | 69.7 / 74.2 | 72.2 |
-| 70 °C clean | 7.60 CFM | 98.9 | 113.4 | 90.9 / 97.2 | 88.2 | 85.2 / 89.7 | 87.6 |
-| 70 °C, filter clogged twice | 6.77 CFM | 99.2 | 113.5 | 91.4 / 97.7 | 88.4 | 85.0 / 89.5 | 87.3 |
-| Section 7, 70 °C clean, for comparison | 7.52 CFM | 99.1 | 109.8 | 91.7 / 98.0 | 87.8 | — | — |
+| 25 °C clean | 7.26 CFM | 53.75 | 68.46 | 45.95 / 52.26 | 50.59 | 39.96 / 44.46 | 42.04 |
+| 45 °C clean | 7.46 CFM | 73.80 | 89.43 | 66.07 / 72.39 | 70.95 | 60.76 / 65.26 | 62.61 |
+| 55 °C clean | 7.45 CFM | 84.01 | 99.45 | 76.60 / 82.87 | 86.44 | 70.86 / 75.36 | 72.77 |
+| 70 °C clean | 7.53 CFM | 99.10 | 114.77 | 91.77 / 98.03 | **101.63** | 86.12 / 90.62 | 88.02 |
+| 70 °C, filter clogged twice | 6.77 CFM | 99.25 | 115.37 | 92.18 / 98.43 | **102.03** | 86.25 / 90.75 | 87.64 |
+| Section 7, 70 °C clean, for comparison | 7.52 CFM | 99.16 | 111.89 | 92.54 / 98.72 | **101.45** | — | — |
 
 ![Rev08 adapter board at 70 °C and its change against Rev06/07](sim/rev08_thermal_70c.png)
 
 **Rated ambient (interpolated between the 55 and 70 °C runs):**
 
-| Limit | Governing part | Rated ambient | Section 7 |
+| Limit | Governing part | Rated ambient (new) | Previous (0.73 W FPGA) |
 |---|---|---|---|
-| Stock KV260, commercial K26 (Tj ≤ 85 °C) | `K26` | **56.1 °C** | 56.0 °C |
-| `TA`-rated adapter parts on their board temperature (Tb ≤ 85 °C) | `U401` ADCLK948; the new parts follow at 66.7 °C (LEDs and expanders) and 69.8 °C (RFFC5072) | **64.1 °C** | 63.4 °C |
-| `TA`-rated parts on the local cavity air (≤ 85 °C) | the LEDs and expanders at `U1501` | 80.1 °C | 81.3 °C |
-| Adapter junctions | `U1001` LMR33630 (125 °C) | 81.1 °C | 85.0 °C |
-| Industrial K26I (Tj ≤ 100 °C) | `K26` | **71.1 °C** (passes 70 °C clogged at 99.2 °C) | 70.9 °C |
+| Stock KV260, commercial K26 (Tj ≤ 85 °C) | `K26` | **56.0 °C** | 56.1 °C |
+| `TA`-rated adapter parts on their board temperature (Tb ≤ 85 °C) | `U401` ADCLK948 (`Tb = 76.60 -> 91.77 °C`) | **63.3 °C** (dropped `-0.8 °C`) | 64.1 °C |
+| `TA`-rated parts on the local cavity air (≤ 85 °C) | `U1501` (`Tair = 59.50 -> 74.67 °C`) | 80.2 °C | 80.1 °C |
+| Adapter regulators | `U1001` LMR33630 (125 °C) | 80.0 °C | 81.1 °C |
+| Industrial K26I + Adapter (`Tj ≤ 100 °C`) | **`U1101` XC7A50T** (`Tj = 86.44 -> 101.63 °C`, no `HS4`; `K26I` alone **70.9 °C**) | **68.4 °C** (dropped `-2.7 °C`) | 71.1 °C |
 
 **What it shows.**
-- **The rating does not move.** The K26 sets it, and it sits 0.1 to 0.2 °C cooler than before: the lens window
-  lets a little warm air out over the tongue and the KV260's fan draws 0.2 CFM more.
-- **The front end warms its own corner.** The board around the RFFC5072 rises by up to 5.9 K. The RFFC5072 is
-  at 89.7 °C junction at 70 °C, far from its limit; its board temperature reaches its 85 °C rating at 69.8 °C
-  ambient, above the rating the K26 already sets.
-- **The front edge cools.** With the board now running east of X = −10, the Ethernet PHY's and the clock's corner
-  spreads into it: the board there falls by up to 4.9 K.
-- **The LMR33630** carries 9 % more current and rises from 109.8 to 113.4 °C at 70 °C, 11.6 °C under its limit.
-- **The camera.** The board under the module sits about 17 °C above ambient. The module's own rating is the
-  sensor's, typically 70 °C operating, so the camera, not the board, is the first to run out of margin in a hot
-  vehicle: at 45 °C ambient it sees about 62 °C.
+- **The `K26I` assembly rating drops below 70 °C.** With the real Vivado `XC7A50T` power (`1.604 W` at `70 °C` max process), `U1101` reaches `101.63 °C` clean (`102.03 °C` clogged) without `HS4`, dropping the `K26I`-paired ambient rating from `71.1 °C` to **`68.4 °C`** (`K26I` itself still passes at `99.10 °C`, `70.9 °C` limit). Stock commercial `KV260` stays at **`56.0 °C`**, and adapter-limited `Tb <= 85 °C` drops slightly from `64.1 °C` to **`63.3 °C`**.
+- **The front end warms its own corner.** The board around the RFFC5072 rises by up to 5.15 K. The RFFC5072 is at 90.62 °C junction at 70 °C, far from its limit; its board temperature reaches its 85 °C rating at 68.9 °C ambient.
+- **The front edge cools.** With the board now running east of X = −10, the Ethernet PHY's and the clock's corner spreads into it: the board there falls by up to 4.9 K.
+- **The LMR33630** rises from `111.89 °C` (Section 7) to `114.77 °C` at `70 °C`, `10.2 °C` under its `125 °C` limit.
+- **The camera.** The board under the module sits about 17 °C above ambient. The module's own rating is the sensor's, typically 70 °C operating, so the camera, not the board, is the first to run out of margin in a hot vehicle: at 45 °C ambient it sees about 62 °C.
 
 ---
 

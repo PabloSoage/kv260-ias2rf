@@ -196,9 +196,20 @@ module tb_fe_ctrl;
         // expander outputs, write on change
         cmd({4'h2, 12'd0, 8'h20, 8'h45});
         check(u13_out[7:0] == 8'h45, "U1313 port 0 = 0x45");
+        check(stat[27] == 1'b0, "FE_STAT[27] clear when not on LFCN-1000+ path");
         w0 = u13_wr;
         cmd({4'h2, 12'd0, 8'h20, 8'h45});
         check(u13_wr == w0, "unchanged EXP_OUT: no I2C write");
+
+        // Audit R3: converter on + PSA=B (2'b11) + PSB=LFCN-1000+ (3'b011) forces VU_LNA_ON (bit 5) = 1
+        cmd({4'h2, 12'd0, 8'h20, 8'h4F});         // software asks LNA=0 on 0x4F
+        check(u13_out[7:0] == 8'h6F, "Audit R3: LFCN-1000+ forces VU_LNA_ON=1 (0x6F)");
+        check(stat[27] == 1'b1, "Audit R3: FE_STAT[27] reports LNA forced");
+        w0 = u13_wr;
+        cmd({4'h2, 12'd0, 8'h20, 8'h6F});         // equivalent effective word hits shadow
+        check(u13_wr == w0, "Audit R3: shadow hit on forced LNA");
+        cmd({4'h2, 12'd0, 8'h20, 8'h45});         // restore 0x45 for downstream checks
+        check(stat[27] == 1'b0, "Audit R3: FE_STAT[27] clears off LFCN-1000+ path");
 
         // LEDs, write on change
         cmd({4'h7, 20'd0, 8'hA5});

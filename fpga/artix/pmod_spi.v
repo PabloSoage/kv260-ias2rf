@@ -45,7 +45,9 @@
 `timescale 1ns/1ps
 
 module pmod_spi #(
-    parameter integer FB_FIFO_DEPTH = 64
+    parameter integer FB_FIFO_DEPTH    = 64,
+    parameter integer KRIA_HIGH_CYCLES = 125000,    // >= 1 ms continuous CS_N high (up to 125 MHz link_clk)
+    parameter integer KRIA_LOSS_CYCLES = 12500000   // > 100 ms continuous CS_N low w/o SCLK
 ) (
     input  wire        clk,
     input  wire        rst,
@@ -148,7 +150,41 @@ module pmod_spi #(
     wire shift_edge  = sclk_fall;
 `endif
 
+    // Audit P2: detect Kria presence before driving PMOD_MISO.
+    // Set after PMOD_CS stays high continuously for >= 1 ms; cleared if CS stays low > 100 ms with no SCLK edge.
+    reg        kria_present;
+    reg [31:0] cs_high_cnt;
+    reg [31:0] cs_low_idle_cnt;
+
+    always @(posedge clk) begin
+        if (rst) begin
+            kria_present    <= 1'b0;
+            cs_high_cnt     <= 32'd0;
+            cs_low_idle_cnt <= 32'd0;
+        end else if (cs_n_sync[1]) begin
+            cs_low_idle_cnt <= 32'd0;
+            if (cs_high_cnt >= KRIA_HIGH_CYCLES - 1) begin
+                kria_present <= 1'b1;
+            end else begin
+                cs_high_cnt <= cs_high_cnt + 32'd1;
+            end
+        end else begin
+            cs_high_cnt <= 32'd0;
+            if (sclk_rise || sclk_fall) begin
+                cs_low_idle_cnt <= 32'd0;
+            end else if (cs_low_idle_cnt > KRIA_LOSS_CYCLES) begin
+                kria_present <= 1'b0;
+            end else begin
+                cs_low_idle_cnt <= cs_low_idle_cnt + 32'd1;
+            end
+        end
+    end
+
+`ifdef MUTATE_MISO_ALWAYS_OE
     assign pmod_miso_oe = cs_active;
+`else
+    assign pmod_miso_oe = cs_active & kria_present;
+`endif
 
     // -------------------------------------------------------------------------
     // Fallback DDC Synchronous FIFO (32-bit packed {Q[15:0], I[15:0]})

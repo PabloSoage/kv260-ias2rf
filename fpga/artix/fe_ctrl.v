@@ -82,7 +82,7 @@ module fe_ctrl #(
     reg        done_tog_cfg = 1'b0;
 
     // ------------------------------------------------------------------ cfg -> link: result snapshot
-    reg        res_err = 1'b0, res_init = 1'b0;
+    reg        res_err = 1'b0, res_init = 1'b0, res_lna_forced = 1'b0;
     reg [7:0]  res_ops = 8'd0;           // I2C transactions of the last command
     reg [15:0] res_inputs = 16'd0;
     reg [15:0] res_rffc = 16'd0;
@@ -101,7 +101,7 @@ module fe_ctrl #(
             if (done_tog_ls[2] ^ done_tog_ls[1]) begin
                 busy_link <= 1'b0;
                 // the cfg side holds these steady from its done toggle until the next command starts
-                stat_link <= {res_err, res_init, overrun_link, 5'd0, res_ops, res_inputs};
+                stat_link <= {res_err, res_init, overrun_link, 1'b0, res_lna_forced, 3'd0, res_ops, res_inputs};
                 rffc_link <= res_rffc;
             end
             if (cmd_p) begin
@@ -137,6 +137,18 @@ module fe_ctrl #(
 `else
     wire [7:0] le_idle = 8'h00;
 `endif
+    // Audit R3: force VU_LNA_ON (bit 5) = 1 when converter is on (bit 6), preselector A = B (bits 1:0 = 2'b11),
+    // and preselector B = LFCN-1000+ LPF (bits 4:2 = 3'b011) so LO leakage stays below -57 dBm.
+    wire       lna_force_cmd = cmd_hold_link[6] && (cmd_hold_link[1:0] == 2'b11) && (cmd_hold_link[4:2] == 3'b011);
+    wire       lna_force_arg = arg[6] && (arg[1:0] == 2'b11) && (arg[4:2] == 3'b011);
+`ifdef MUTATE_NO_LNA_FORCE
+    wire [7:0] p0_cmd_eff    = cmd_hold_link[7:0];
+    wire [7:0] p0_arg_eff    = arg[7:0];
+`else
+    wire [7:0] p0_cmd_eff    = lna_force_cmd ? (cmd_hold_link[7:0] | 8'h20) : cmd_hold_link[7:0];
+    wire [7:0] p0_arg_eff    = lna_force_arg ? (arg[7:0] | 8'h20) : arg[7:0];
+`endif
+
     wire [7:0] base = (p1_user & (B_RESETX | B_ENBL)) | le_idle;
     wire [7:0] idle = base | B_ENX;
 
@@ -174,7 +186,7 @@ module fe_ctrl #(
         end else begin
             case (op)
                 OP_EXP: if (k == 7'd0) begin kind_c = 3'd3; dev_c = EXP_ADDR;
-                            wr3_c = {(arg[15:8] & (B_RESETX | B_ENBL)) | B_ENX | le_idle, arg[7:0], 8'h02}; end
+                            wr3_c = {(arg[15:8] & (B_RESETX | B_ENBL)) | B_ENX | le_idle, p0_arg_eff, 8'h02}; end
                 OP_LED: if (k == 7'd0) begin kind_c = 3'd3; dev_c = LED_ADDR; wr3_c = {8'hFF, ~arg[7:0], 8'h02}; end
                 OP_POLL: if (k == 7'd0) kind_c = 3'd2;
                 OP_RFW: begin
@@ -257,6 +269,7 @@ module fe_ctrl #(
             done_tog_cfg  <= 1'b0;
             res_err       <= 1'b0;
             res_init      <= 1'b0;
+            res_lna_forced <= 1'b0;
             res_ops       <= 8'd0;
             res_inputs    <= 16'd0;
             res_rffc      <= 16'd0;
@@ -276,7 +289,7 @@ module fe_ctrl #(
                     // write-on-change: an unchanged EXP_OUT or LED costs no bus traffic
 `ifndef MUTATE_NO_SHADOW
                     if (init_done && cmd_hold_link[31:28] == OP_EXP &&
-                        cmd_hold_link[7:0] == p0_sh &&
+                        p0_cmd_eff == p0_sh &&
                         (cmd_hold_link[15:8] & (B_RESETX | B_ENBL)) == p1_user)
                         st <= S_DONE;
                     if (init_done && cmd_hold_link[31:28] == OP_LED && cmd_hold_link[7:0] == led_sh)
@@ -320,8 +333,9 @@ module fe_ctrl #(
                             rd_shift   <= {rd_shift[14:0], gen_resp_rdata[11]};   // P13 = SDATA
                         end
                         if (kind == 3'd3 && !pre_init && op == OP_EXP) begin
-                            p0_sh   <= arg[7:0];
-                            p1_user <= arg[15:8] & (B_RESETX | B_ENBL);
+                            p0_sh          <= p0_arg_eff;
+                            p1_user        <= arg[15:8] & (B_RESETX | B_ENBL);
+                            res_lna_forced <= lna_force_arg;
                         end
                         if (kind == 3'd3 && !pre_init && op == OP_LED)
                             led_sh <= arg[7:0];

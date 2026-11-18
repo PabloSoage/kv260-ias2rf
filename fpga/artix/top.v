@@ -3026,8 +3026,15 @@ module artix_top #(
     );
 
     // Active-high interrupt to KV260 carrier (Bank 35, LVCMOS18)
-    assign fpga_irq = ~alert_sync_r[1] | hk_alert_active | xadc_overtemp |
-                      adc_err_sync[1] | adcs_ie_s[1] | adcs_be_s[1] |
-                      (dl_crc_sync2 != 32'd0);
+    // Audit 2.6: gate with link_trained (dl_up_sync[1]) so an unpowered K26 never sees clamp current.
+`ifdef MUTATE_IRQ_UNGATED
+    wire irq_link_gate = 1'b1;
+`else
+    wire irq_link_gate = dl_up_sync[1];
+`endif
+    assign fpga_irq = irq_link_gate &
+                      (~alert_sync_r[1] | hk_alert_active | xadc_overtemp |
+                       adc_err_sync[1] | adcs_ie_s[1] | adcs_be_s[1] |
+                       (dl_crc_sync2 != 32'd0));
 
 endmodule
