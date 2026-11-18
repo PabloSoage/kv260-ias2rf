@@ -3,7 +3,7 @@
 The board changes made before the Rev08 tag (18 November 2026), as text edits (pcbnew is not used).
 
   1. J1501 becomes the HRO TYPE-C-31-E-17 (surface mount only), at the same point and angle; the copper of its
-     nets under and round it is lifted, to be routed again (fastroute.py, the commands in docs/LAYOUT.md 6.8).
+     nets under and round it is lifted, to be routed again (docs/LAYOUT.md 6.8).
   2. The GPS PPS path of the STATUS sheet: J1502 (15-way 1 mm FPC to the KV260's J9) at the board's top edge east
      of the IAS1 tongue, the cable leaving towards the carrier; J1503 (the GPS receiver's JST-SH) below it; the
      buffer, ESD, PTC and passives on the bottom face of the same corner, which lies beyond the carrier's edge
