@@ -9,7 +9,7 @@ The vehicle CAN on the board (18 November 2026, before the Rev08 tag), as text e
   2. J1502 again, for its new pad nets: FPC pins 6 and 10 (were ground) carry the K26's CAN TX, whichever cable
      type is fitted, and pin 8 brings CAN RX; their via stubs are redone with those nets.
   3. The transceiver, the NOR pair, the ESD diode and the passives on the bottom of the same corner, beyond the
-     carrier's edge (KiCad y > 107.25), in the free L below the GPS circuit.
+     carrier's edge (KiCad y > 107.25), in the free area south of the GPS circuit.
 
 Usage:  py _work/rev08_can_pcb.py <in.kicad_pcb> <out.kicad_pcb>
 """
@@ -28,13 +28,13 @@ J1502_AT = (197.4, 106.65, 180)
 J1503_AT = (193.8, 112.6, 180)
 H2 = (203.0, 112.25, 3.2)
 VIA_Y_FPC, VIA_Y_JST = 109.5, 115.8
-BOTTOM_BOX = (185.6, 107.6, 207.5, 118.7)
-BOTTOM = [  # ref, anchor: near the pin each one serves
-    ("D1531", (192.6, 117.4)), ("U1506", (189.0, 117.0)), ("C1550", (187.0, 115.0)),
-    ("R1556", (187.0, 114.0)), ("R1557", (188.0, 114.0)),
-    ("Q1530", (196.0, 117.6)), ("Q1531", (198.4, 117.6)),
-    ("R1551", (197.4, 116.4)), ("R1552", (195.0, 116.4)), ("R1553", (196.2, 116.4)), ("R1554", (198.6, 116.4)),
-    ("R1555", (193.8, 117.6)),
+BOTTOM_BOX = (185.6, 107.6, 207.5, 127.5)
+BOTTOM = [  # ref, anchor: the free area south of the GPS circuit (x 186 to 194, y 119 to 127)
+    ("U1506", (190.0, 121.0)), ("D1531", (193.0, 119.8)), ("C1550", (187.4, 120.2)),
+    ("R1556", (187.4, 122.0)), ("R1557", (187.4, 123.2)),
+    ("Q1530", (188.6, 125.0)), ("Q1531", (192.0, 125.0)),
+    ("R1551", (187.2, 126.6)), ("R1552", (193.6, 126.6)), ("R1553", (189.4, 126.8)), ("R1554", (191.0, 126.8)),
+    ("R1555", (190.2, 123.4)),
 ]
 
 
