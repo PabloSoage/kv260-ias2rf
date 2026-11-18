@@ -606,12 +606,8 @@ function calibrateMaterial(mat) {
     pbr.baseColorFactor = [0.86, 0.68, 0.36, 1.0];
     pbr.metallicFactor = 0.95;
     pbr.roughnessFactor = 0.32;
-  } else if (sat < 0.24 && L > 0.55) {
-    pbr.baseColorFactor = [0.24, 0.21, 0.16, a];
-    pbr.metallicFactor = 0.0;
-    pbr.roughnessFactor = 0.54;
-  } else if (sat < 0.12 && L > 0.34 && L <= 0.55) {
-    const v = Math.max(0.45, Math.min(0.68, L * 1.1));
+  } else if (sat < 0.14 && L > 0.34) {
+    const v = Math.max(0.45, Math.min(0.68, L * 0.92));
     pbr.baseColorFactor = [v, v, v * 0.98, 1.0];
     pbr.metallicFactor = 0.92;
     pbr.roughnessFactor = 0.28;
@@ -672,6 +668,12 @@ function buildBoardGlb(compJson) {
     ceramic: gb.addMaterial("proc_ceramic", [0.38, 0.36, 0.32, 1.0], 0.0, 0.45),
   };
 
+  // Tint only explicit white-plastic connector bodies (never metal by colour alone)
+  const WHITE_PLASTIC_REFS = new Set(["J1503", "J1502", "J1002"]);
+  const METAL_CAN_REFS = new Set(["Y1201", "Y1301", "Y401"]);
+  const ivoryPlasticMatIdx = gb.addMaterial("plastic_ivory", [0.24, 0.21, 0.16, 1.0], 0.0, 0.54);
+  const metalCanMatIdx = gb.addMaterial("metal_can", [0.48, 0.48, 0.49, 1.0], 0.92, 0.26);
+
   let boardYMin = 0.0;
   let boardYMax = 0.00145;
   let totalFixedTris = 0;
@@ -679,8 +681,11 @@ function buildBoardGlb(compJson) {
   const dedupCache = new Map();
   const rebuiltMeshMap = new Map();
 
-  function buildCleanMesh(srcMeshIdx, flipMirror = false) {
-    const cacheKey = `${srcMeshIdx}:${flipMirror ? 1 : 0}`;
+  function buildCleanMesh(srcMeshIdx, flipMirror = false, refName = "") {
+    const isWhitePlastic = WHITE_PLASTIC_REFS.has(refName);
+    const isMetalCan = METAL_CAN_REFS.has(refName);
+    const matMode = isWhitePlastic ? "ivory" : isMetalCan ? "can" : "";
+    const cacheKey = `${srcMeshIdx}:${flipMirror ? 1 : 0}:${matMode}`;
     if (rebuiltMeshMap.has(cacheKey)) return rebuiltMeshMap.get(cacheKey);
     const srcM = srcMeshes[srcMeshIdx];
     const rm = (srcM.name || "").match(boardRoleRe);
@@ -691,7 +696,13 @@ function buildBoardGlb(compJson) {
 
     const byMat = new Map();
     for (const p of srcM.primitives) {
-      const mIdx = p.material ?? 0;
+      let mIdx = p.material ?? 0;
+      if (isWhitePlastic || isMetalCan) {
+        const rc = srcMats[mIdx]?.pbrMetallicRoughness?.baseColorFactor || [0, 0, 0];
+        const rL = 0.2126 * rc[0] + 0.7152 * rc[1] + 0.0722 * rc[2];
+        if (isWhitePlastic && rL > 0.70) mIdx = ivoryPlasticMatIdx;
+        else if (isMetalCan && rL > 0.16 && rL <= 0.34) mIdx = metalCanMatIdx;
+      }
       const pos = readAccessorArray(gltf, bin, p.attributes.POSITION);
       let norm = p.attributes.NORMAL !== undefined ? readAccessorArray(gltf, bin, p.attributes.NORMAL) : null;
       let idx = p.indices !== undefined ? readAccessorArray(gltf, bin, p.indices) : (() => {
@@ -743,7 +754,7 @@ function buildBoardGlb(compJson) {
     }
 
     if (!boardRole) {
-      const digest = h.digest("hex");
+      const digest = matMode + ":" + h.digest("hex");
       if (dedupCache.has(digest)) {
         const cached = dedupCache.get(digest);
         rebuiltMeshMap.set(cacheKey, cached);
@@ -765,8 +776,9 @@ function buildBoardGlb(compJson) {
   function nArrSet(arr, off, x, y, z) { arr[off] = x; arr[off + 1] = y; arr[off + 2] = z; }
 
   const existingRefs = new Set();
-  function cloneNode(srcIdx, parentDet = 1) {
+  function cloneNode(srcIdx, parentDet = 1, activeRef = "") {
     const sn = srcNodes[srcIdx];
+    const refForNode = (WHITE_PLASTIC_REFS.has(sn.name) || METAL_CAN_REFS.has(sn.name)) ? sn.name : activeRef;
     const nd = {};
     if (sn.name) nd.name = sn.name;
     const localMat = mat4FromNode(sn);
@@ -788,7 +800,7 @@ function buildBoardGlb(compJson) {
       const srcMName = (srcMeshes[sn.mesh] && srcMeshes[sn.mesh].name) || "";
       const rm = srcMName.match(boardRoleRe);
       if (rm) nd.name = `PCB_LAYER_${rm[1].toUpperCase()}`;
-      const builtIdx = buildCleanMesh(sn.mesh, worldDet < 0);
+      const builtIdx = buildCleanMesh(sn.mesh, worldDet < 0, refForNode);
       if (builtIdx === null) return null;
       nd.mesh = builtIdx;
     }
@@ -796,7 +808,7 @@ function buildBoardGlb(compJson) {
       const kids = [];
       for (const c of sn.children) {
         const cn = srcNodes[c];
-        const cloned = cloneNode(c, worldDet);
+        const cloned = cloneNode(c, worldDet, refForNode);
         if (cloned !== null) {
           if (cn.name) existingRefs.add(cn.name);
           kids.push(cloned);
@@ -911,7 +923,13 @@ function extractConnTemplates(glbPath) {
               norm[i] = nwx / nl; norm[i + 1] = nwy / nl; norm[i + 2] = nwz / nl;
             }
             const fixed = fixWindingAndNormals(pos, norm, rawIdx, det3(wm) < 0);
-            byMat.push({ mat: mats[p.material ?? 0], ...fixed });
+            const rawSrcMat = (gltf.materials || [])[p.material ?? 0];
+            const rc = rawSrcMat?.pbrMetallicRoughness?.baseColorFactor || [0, 0, 0];
+            const rL = 0.2126 * rc[0] + 0.7152 * rc[1] + 0.0722 * rc[2];
+            const mat = (name === "CONN_J_FAN" && rL > 0.70)
+              ? { name: "kv_ivory_plastic", pbrMetallicRoughness: { baseColorFactor: [0.24, 0.21, 0.16, 1.0], metallicFactor: 0.0, roughnessFactor: 0.54 } }
+              : mats[p.material ?? 0];
+            byMat.push({ mat, ...fixed });
           }
         }
         for (const ci of cur.children || []) collect(ci, wm);

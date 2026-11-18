@@ -485,9 +485,26 @@ async function run() {
     await client.evalJs(`
       window.__SITE_API.isolate("board");
       window.__SITE_API.setExplode(0);
-      window.__SITE_API.selectPart("J1503", true);
+      window.__SITE_API.selectPart("J1503", false);
+      window.__SITE_API.setCameraLookAt(-0.0060, 0.0045, -0.0036, 0.014, 0.018, -0.022);
     `);
     await snap("j1503_vertical_closeup.png", 700);
+
+    await client.evalJs(`
+      window.__SITE_API.clearSelection();
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraLookAt(-0.1054, 0.005, -0.0545, -0.165, 0.042, -0.095);
+    `);
+    await snap("sma_row_closeup.png", 500);
+
+    await client.evalJs(`
+      window.__SITE_API.clearSelection();
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraLookAt(-0.007, 0.003, -0.072, -0.032, 0.032, -0.095);
+    `);
+    await snap("rf_shield_corner_closeup.png", 500);
 
     await client.evalJs(`
       window.__SITE_API.isolate("board");
