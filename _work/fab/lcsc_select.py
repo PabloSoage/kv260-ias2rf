@@ -205,6 +205,10 @@ RULES = {
     ("SM04B-SRSS-TB", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal"): (
         "P", "SM04B-SRSS-TB", r"^SM04B-SRSS-TB\(LF\)\(SN\)$"),
     ("SN74LVC1G17DCKR", "SOT-353_SC-70-5"): ("P", "SN74LVC1G17DCKR", r"^SN74LVC1G17DCKR$"),
+    ("SM06B-SRSS-TB", "JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal"): (
+        "P", "SM06B-SRSS-TB", r"^SM06B-SRSS-TB\(LF\)\(SN\)$"),
+    ("TCAN330DCNT", "SOT-23-8"): ("P", "TCAN330DCNT", r"^TCAN330DCN[TR]$"),
+    ("PESD1CAN", "SOT-23"): ("P", "PESD1CAN", r"^PESD1CAN(,215|-U)?$"),
     ("PTC 0.2A hold", "Fuse_0805_2012Metric"): ("P", "JK-SMD0805-020", r"^JK-SMD0805-020"),
     ("CH340X", "MSOP-10_L3.0-W3.0-P0.50-LS5.0-BL"): ("P", "CH340X", r"^CH340X$"),
     ("USBLC6-2SC6", "SOT-23-6"): ("P", "USBLC6-2SC6", r"^USBLC6-2SC6"),
