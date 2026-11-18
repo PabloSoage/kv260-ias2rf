@@ -770,6 +770,7 @@ def is_table_sep(line: str) -> bool:
 def md_to_html(md_text: str, md_path: Path, packer: AssetPacker) -> str:
     """Convert GitHub-flavored Markdown into clean print HTML for PyMuPDF Story."""
     base_dir = md_path.parent
+    brk = breakable if md_path.name in BREAKABLE_DOCS else (lambda h: h)
     lines = md_text.replace("\r\n", "\n").split("\n")
     out: list[str] = []
     i = 0
@@ -856,7 +857,7 @@ def md_to_html(md_text: str, md_path: Path, packer: AssetPacker) -> str:
             for r in rows:
                 padded = r + [""] * max(0, ncols - len(r))
                 body_html.append("".join(
-                    f"<td>{inline_md(c, base_dir, packer, table_cols=ncols)}</td>" for c in padded[:ncols]
+                    f"<td>{brk(inline_md(c, base_dir, packer, table_cols=ncols))}</td>" for c in padded[:ncols]
                 ))
             out.append(register_table(tbl_cls, th_html, body_html))
             continue
@@ -964,6 +965,22 @@ ALT = " class='alt'"
 TABLE_REPORT: list[str] = []
 
 
+# Documents whose tables hold part numbers longer than their columns. Only these get break points: put in every
+# table of the book, the break points made Story's table layout run for over two hours and 30 GB without finishing.
+BREAKABLE_DOCS = {"JLCPCB_QUOTE.md"}
+_LONG_WORD = re.compile(r"(?=[^\s<>&;]*\d)[^\s<>&;]{12,}")
+
+
+def breakable(cell_html: str) -> str:
+    """Zero-width spaces every 8 characters in words of 12 or more that hold a digit (manufacturer part numbers) in a
+    cell's text, never inside a tag or an entity: Story cannot break a word, so such a word ran over its column's
+    border (pdf_table_check.py (b)). Text only; the Markdown sources are unchanged."""
+    def text_part(m: re.Match) -> str:
+        return _LONG_WORD.sub(lambda w: "​".join(w.group(0)[i:i + 8] for i in range(0, len(w.group(0)), 8)),
+                              m.group(0))
+    return re.sub(r"(?<=>)[^<]+|^[^<]+", text_part, cell_html)
+
+
 def register_table(tbl_cls: str, header_cells: str | None, rows_cells: list[str]) -> str:
     k = len(_TABLES)
     _TABLES[k] = (tbl_cls, header_cells, rows_cells)
@@ -1014,6 +1031,7 @@ def render_html_pages(html_body: str, tmp_dir: Path, doc_label: str, user_css: s
     tables = [int(m) for m in _TABLE_TOKEN.findall(html_body)]
     splits: dict[int, set[int]] = {}
     spacers: dict[tuple[int, int], float] = {}
+    seen_split: dict[tuple[int, int], int] = {}
     # Each pass fixes only the first problem in reading order, so everything above it is final: a row
     # that starts a page without a split, a split that is no longer at a page top, or a header left alone
     # at the foot of a page. Story lays out the rows of a table that runs over a page taller than they
@@ -1044,6 +1062,12 @@ def render_html_pages(html_body: str, tmp_dir: Path, doc_label: str, user_css: s
         _, y, kind, k, j = min(issues)
         if kind == "split":
             splits.setdefault(k, set()).add(j)
+            seen_split[(k, j)] = seen_split.get((k, j), 0) + 1
+        elif kind == "unsplit" and seen_split.get((k, j), 0) >= 3 and pages.get(f"t{k}h{j}"):
+            # A cycle: cut at j, the rows from j fit on this page; uncut, row j starts the next one (the cut
+            # tables lay out a little tighter than the whole). Keep the cut and push its part to the next page
+            # with a spacer, as for an orphan header.
+            spacers[(k, j)] = CONTENT_RECT.y1 - pages[f"t{k}h{j}"][1] - 1.0
         elif kind == "unsplit":
             splits[k].discard(j)
             if j + 1 < len(_TABLES[k][2]):
