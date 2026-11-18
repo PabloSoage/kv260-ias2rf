@@ -141,8 +141,7 @@ def place(text, lib_id, ref, comp, nets, x, y, a, bottom):
     t = re.sub(r'\(property "Reference" "[^"]*"', f'(property "Reference" "{ref}"', t, count=1)
     # the new blocks are dense: their references go on the assembly (Fab) drawing only, as most passives do
     t = re.sub(r'(\(property "Reference" "[^"]*"\s*\(at [^)]*\)\s*\(layer "[^"]+"\))(?!\s*\(hide yes\))',
-               r'
-		(hide yes)', t, count=1)
+               r'\1\n\t\t(hide yes)', t, count=1)
     t = re.sub(r'\(property "Value" "[^"]*"', f'(property "Value" "{comp["value"]}"', t, count=1)
     t = re.sub(r'\(uuid "[^"]+"\)', lambda m: f'(uuid "{U()}")', t)
     if "\n\t(path " not in t:

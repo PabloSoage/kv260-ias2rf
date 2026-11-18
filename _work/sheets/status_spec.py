@@ -9,7 +9,18 @@ STATUS sheet (Rev08) - the connection specification. See docs/REV08_PLAN.md sect
 * The debug USB bridge: a vertical USB-C (J1501, on the IAS0 tongue), ESD array, CH340X at 3.3 V from the cable
   through its own LP5907-3.3, so it enumerates with the board off. Its TXD reaches PMOD_SPARE1 (an FPGA input)
   through 1 k, so a Kria driving the same line through the Pmod cable wins; PMOD_SPARE2 reaches its RXD through 1 k,
-  which also limits what an unpowered bridge can draw from the FPGA.
+  which also limits what an unpowered bridge can draw from the FPGA. The receptacle is the HRO TYPE-C-31-E-17
+  (18 November): surface-mount contacts and shell tabs, plastic pegs 0.7 mm long, so nothing reaches through the
+  tongue towards the carrier 0.8 mm below. The first choice, HX-TYPE-C 16P 180 LT H10.0, has four through-hole
+  shell legs 2.1 mm long (the maker's drawing), which the tongue cannot take.
+* The GPS PPS path to the K26 (INTEGRATIONS 2.1): a JST-SH header for the GPS receiver (3.3 V through a PTC, PPS,
+  ground), ESD, a Schmitt buffer, and a 15-way 1 mm FPC receptacle that a short FFC joins to the KV260's J9
+  (the Raspberry Pi camera connector), whose pin 12 is HDA10, a PL pin. An FFC's two cable types reverse the pin
+  order (n to 16 - n), so the buffer drives both pin 12 and pin 4 through 220 ohm each, and only pins 6, 7, 9 and
+  10 are grounded: whichever way the cable maps, pin 12 of J9 gets the pulse, and the other copy lands on a ground
+  pin of J9 through 220 ohm (15 mA while the pulse is high). Ground lands on J9's 7 and 10 or 9 and 6; 6 and 9 are
+  MIPI receiver pins that the design leaves unused. Pins 11, 13, 14 and 15 of J9 (a reset supervisor, the I2C
+  pair, 3.3 V) meet nothing either way.
 
 These parts were first planned on the CONTROL sheet; that A1 sheet has no free area large enough to draw them
 legibly, so they have their own sheet, joined to CONTROL by PMOD_SPARE1/2 and to CLOCK by XO_SCL/XO_SDA.
@@ -31,8 +42,19 @@ def LED(value, why):
 PARTS = {
     "U1501": ("kv260-ias2rf:TCA6416ARTW", "TCA6416ARTWR", FP + "WQFN-24_L4.0-W4.0-P0.50-TL-EP2.5",
               "LED expander at 0x21 on XO_SCL/XO_SDA; P00-P07 sink the status LEDs"),
-    "J1501": ("Connector:USB_C_Receptacle_USB2.0_16P", "HX-TYPE-C 16P 180 LT H10.0", FP + "USB_C_HX_16P_180_LT_H10",
-              "Debug USB, vertical, on the IAS0 tongue (inside the box)"),
+    "J1501": ("Connector:USB_C_Receptacle_USB2.0_16P", "TYPE-C-31-E-17", FP + "USB_C_HRO_TYPE-C-31-E-17",
+              "Debug USB, vertical, surface mount only, on the IAS0 tongue (inside the box)"),
+    "J1502": ("Connector_Generic_MountingPin:Conn_01x15_MountingPin", "FPC-1.0FX-15PWCR-H20",
+              FP + "FPC_1.0_15P_XUNPU_FPC-1.0FX-15PWCR-H20",
+              "To KV260 J9 (Raspberry Pi camera connector) by a 15-way 1 mm FFC, 100 mm; J9 pin 12 = HDA10 (PL)"),
+    "J1503": ("Connector_Generic_MountingPin:Conn_01x04_MountingPin", "SM04B-SRSS-TB",
+              "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+              "GPS receiver: 1 = 3.3 V out, 2 = PPS in (3.3 V CMOS), 3, 4 = ground"),
+    "U1505": ("74xGxx:74LVC1G17", "SN74LVC1G17DCKR", "Package_TO_SOT_SMD:SOT-353_SC-70-5",
+              "PPS Schmitt buffer: drives J9 pin 12 through either cable type"),
+    "D1530": ("Device:D_TVS", "PESD5V0F1BL", "Diode_SMD:D_SOD-882", "ESD on the GPS PPS input"),
+    "F1501": ("Device:Polyfuse", "PTC 0.2A hold", "Fuse:Fuse_0805_2012Metric",
+              "GPS receiver supply from +3V3_D; a shorted cable cannot pull the rail down"),
     "U1503": ("Power_Protection:USBLC6-2SC6", "USBLC6-2SC6", "Package_TO_SOT_SMD:SOT-23-6", "USB ESD"),
     "U1502": ("Interface_USB:CH340X", "CH340X", FP + "MSOP-10_L3.0-W3.0-P0.50-LS5.0-BL", "USB-UART bridge at 3.3 V"),
     "U1504": ("Regulator_Linear:LP5907MFX-3.3", "LP5907MFX-3.3", "Package_TO_SOT_SMD:SOT-23-5",
@@ -55,7 +77,13 @@ PINS = {
               **{str(10 + k): "NC" for k in range(8)}},
     "J1501": {"A1": GND, "A12": GND, "B1": GND, "B12": GND, "A4": "VBUS_USB", "A9": "VBUS_USB", "B4": "VBUS_USB",
               "B9": "VBUS_USB", "A5": "USB_CC1", "B5": "USB_CC2", "A6": "USB_DP", "B6": "USB_DP", "A7": "USB_DN",
-              "B7": "USB_DN", "A8": "NC", "B8": "NC", "SH": "NC"},
+              "B7": "USB_DN", "A8": "NC", "B8": "NC", "SH": GND},
+    "J1502": {"12": "J9_PPS12", "4": "J9_PPS4", "6": GND, "7": GND, "9": GND, "10": GND, "MP": GND,
+              **{str(n): "NC" for n in (1, 2, 3, 5, 8, 11, 13, 14, 15)}},
+    "J1503": {"1": "GPS_3V3", "2": "GPS_PPS_IN", "3": GND, "4": GND, "MP": GND},
+    "U1505": {"1": "NC", "2": "GPS_PPS_R", "3": GND, "4": "GPS_PPS_Y", "5": V3D},
+    "D1530": {"1": "GPS_PPS_IN", "2": GND},
+    "F1501": {"1": V3D, "2": "GPS_3V3"},
     "U1503": {"1": "USB_DP", "6": "USB_DP_C", "3": "USB_DN", "4": "USB_DN_C", "5": "VBUS_USB", "2": GND},
     "U1502": {"1": "USB_DP_C", "2": "USB_DN_C", "3": GND, "4": "NC", "5": "NC", "6": "NC", "7": "+3V3_USB",
               "8": "USB_TXD", "9": "USB_RXD", "10": "USB_V3"},
@@ -99,6 +127,14 @@ two("R1535", R("0", "V3 to VCC: the CH340X at 3.3 V (data sheet); at 5 V this is
 two("C1531", C("1u", "LP5907 input"), "VBUS_USB", GND)
 two("C1532", C("1u", "LP5907 output"), "+3V3_USB", GND)
 two("C1533", C("100n", "CH340X VCC"), "+3V3_USB", GND)
+# GPS PPS to KV260 J9
+two("R1540", R("100", "PPS input series, with D1530"), "GPS_PPS_IN", "GPS_PPS_R")
+two("R1541", R("100k", "holds the buffer low with no receiver"), "GPS_PPS_R", GND)
+two("R1542", R("220", "PPS to J1502 pin 12 (J9 pin 12 with a straight cable)"), "GPS_PPS_Y", "J9_PPS12")
+two("R1543", R("220", "PPS to J1502 pin 4 (J9 pin 12 with a reversing cable)"), "GPS_PPS_Y", "J9_PPS4")
+two("C1540", C("1u", "GPS supply"), "GPS_3V3", GND)
+two("C1541", C("100n", "GPS supply"), "GPS_3V3", GND)
+two("C1542", C("100n", "U1505 VCC"), V3D, GND)
 
 FILTERS = {}
 HIER = {"XO_SCL": "input", "XO_SDA": "bidirectional", "PMOD_SPARE1": "output", "PMOD_SPARE2": "input"}

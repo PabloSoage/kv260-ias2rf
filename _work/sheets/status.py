@@ -12,7 +12,7 @@ sys.path.insert(0, HERE)
 import labdraw as D                                               # noqa: E402
 import status_spec as S                                           # noqa: E402
 
-s, PATH, BLOCK_UUID = D.setup(S, "STATUS", "STATUS - LEDs and the debug USB bridge", "A2", 2400, {"VBUS_USB"})
+s, PATH, BLOCK_UUID = D.setup(S, "STATUS", "STATUS - LEDs, the debug USB bridge and the GPS PPS", "A2", 2400, {"VBUS_USB"})
 ROOT_UUID = D.ROOT_UUID
 LEDS = [r for d, *_ in S.STATUS for r in (f"R15{11 + int(d[-1]) - 1}", d)] + ["R1519", "D1509"]
 GROUPS = [
@@ -21,6 +21,7 @@ GROUPS = [
                           "R1524", "D1524", "R1526"]),
     (["J1501", "U1503"], ["R1531", "R1532"]),
     (["U1502", "U1504"], ["R1533", "R1534", "R1535", "C1531", "C1532", "C1533"]),
+    (["J1503", "U1505", "J1502"], ["F1501", "C1540", "C1541", "D1530", "R1540", "R1541", "C1542", "R1542", "R1543"]),
 ]
 D.X0 = 20.32
 y = D.layout(GROUPS, x1=570.0)
@@ -30,6 +31,7 @@ notes = [
     "2. D1509 on PMOD_SPARE2 (the debug UART's TX): lit while the line is low, so it flickers once a second (heartbeat).",
     "3. Rail LEDs: dark = dead rail. +1V8_D and +1V0 drive an NPN that switches their LED from +3V3_D.",
     "4. J1501 USB-C -> U1503 ESD -> U1502 CH340X at 3.3 V from the cable (U1504): /dev/ttyUSBx at 115200 8N1.",
+    "5. GPS PPS: J1503 -> D1530, R1540 -> U1505 -> R1542 (J1502 pin 12), R1543 (pin 4); FFC to KV260 J9, pin 12 = HDA10 (PL).",
 ]
 for i, t in enumerate(notes):
     s.text(t, (20.32, y + 6.35 + 4.5 * i), size=1.524 if i == 0 else 1.27)

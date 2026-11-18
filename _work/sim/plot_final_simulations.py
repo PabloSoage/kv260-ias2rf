@@ -174,13 +174,13 @@ def plot_eyes(metrics):
 
 def plot_lvds_skew():
     skew_data = json.load(open(os.path.join(SIM_WORK, "lvds_skew_8layer.json"), encoding="utf-8"))
-    # High-speed differential pairs (excluding slow CLK_FPGA reference)
+    # every differential pair of the board (CLK_FPGA, the Artix's reference, since the 18 Nov skew fix)
     order = [
         "ETH_SGTX", "ETH_SGRX",
         "LINK_RX_D0", "LINK_RX_D1", "LINK_RX_CLK", "LINK_TX_D0", "LINK_TX_CLK",
         "ADCS_D0", "ADCS_D1", "ADCS_FCO", "ADCS_DCO",
         "ADCR_D0", "ADCR_D1", "ADCR_D2", "ADCR_D3", "ADCR_D4", "ADCR_D5", "ADCR_D6", "ADCR_D7", "ADCR_OR", "ADCR_DCO",
-        "CLK_ADCR", "CLK_ADCS",
+        "CLK_ADCR", "CLK_ADCS", "CLK_FPGA",
         "ETH_MDI0", "ETH_MDI1", "ETH_MDI2", "ETH_MDI3",
     ]
     pairs = [k for k in order if k in skew_data]
@@ -201,7 +201,7 @@ def plot_lvds_skew():
     ax1.invert_yaxis()
     ax1.set_xlim(-32, 32)
     ax1.set_xlabel("Intra-Pair Skew (P - N, incl. BGA Pkg Flight Time) [ps]")
-    ax1.set_title("Intra-Pair Skew Across 27 High-Speed & MDI Pairs")
+    ax1.set_title(f"Intra-Pair Skew Across {len(pairs)} High-Speed & MDI Pairs")
     for idx, v in enumerate(intra_ps):
         off = 0.8 if v >= 0 else -0.8
         ha = "left" if v >= 0 else "right"

@@ -54,7 +54,15 @@ The KV260's own Gigabit port (`J10`) already carries this board's Ethernet link,
 - **`J9` pin 12 is `HDA10`**, SOM240 `A16`, ball `J12`, bank 45 at 3.3 V `[V]`. The source is the KV260 schematic (XTP682 rev 2, page 13), with the ball from AMD's K26 board file `part0_pins.xml`.
 - Pin 11 next to it goes through a reset supervisor and is not usable.
 
-A 15-way 1 mm FFC breakout takes the receiver's 3.3 V PPS to pin 12 and ground to pin 10 `[E: the ground pin is from the Raspberry Pi pinout; check with a meter]`. Any GPS module with a PPS output works, and it can share the USB link for its position and time.
+**On the board (since 18 November).** The receiver plugs into `J1503`, a 4-way JST-SH on the adapter (1: 3.3 V out through a 0.2 A PTC, 2: PPS in, 3 and 4: ground). The pulse passes an ESD diode and 100 Ω into a 74LVC1G17 Schmitt buffer, and the buffer drives two contacts of `J1502`, a 15-way 1 mm FPC receptacle: pin 12 and pin 4, through 220 Ω each. A 100 mm 15-way FFC joins `J1502` to the KV260's `J9` (STATUS sheet, [LAYOUT §6.8](LAYOUT.md)).
+
+Why two contacts: the two FFC types (contacts on the same side, or on opposite sides) reverse the order, pin *n* to pin 16 − *n*. Whichever cable is fitted:
+- one copy of the pulse meets `J9` pin 12;
+- the other copy meets `J9` pin 4, a ground, through its 220 Ω (15 mA while the pulse is high).
+
+Only pins 6, 7, 9 and 10 are grounded on the adapter. They land on `J9`'s grounds 7 and 10, or on 9 and 6, two MIPI receiver pins that the design leaves unused. `J9`'s pins 11, 13, 14 and 15 (the reset supervisor, the I²C pair and 3.3 V) meet nothing in either case. So a wrong cable cannot harm the KV260, and either cable works. `[E: J9's ground pins are from the Raspberry Pi pinout; check with a meter before the first power-up]`
+
+Any GPS module with a 3.3 V PPS output works, and it can share the USB link for its position and time.
 
 **`kria_pps`** ([`fpga/kria/kria_pps.v`](../fpga/kria/kria_pps.v)) is an AXI-Lite slave at `0x8002_0000`:
 - It timestamps each GPS edge on a 64-bit counter at `clk_pl_0` (10 ns). The pulse must first stay high for 1 µs, so a glitch is flagged and never captured.

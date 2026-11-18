@@ -91,7 +91,7 @@ Register-level bring-up and the LO settings of every band: [RFFC5072_PROGRAMMING
 | D1501–D1508 | CFG (green), CLK (yellow: on = 500 MHz), LINK (green), ADC-R, ADC-S (red, sticky clip), LO (green), TX (red), ERR (red) |
 | D1509 | Heartbeat (blue) on `PMOD_SPARE2`, the debug UART's transmit line: lit while it is low |
 | D1520–D1524 | Rail LEDs: `+12V`, `+5V0`, `+3V3_D` direct; `+1V8_D` and `+1V0` switched from `+3V3_D` by Q1520/Q1521 (MMBT3904, 10 k base) |
-| J1501 | Vertical USB-C, HX-TYPE-C 16P 180 LT H10.0, on the IAS0 tongue |
+| J1501 | Vertical USB-C, HRO TYPE-C-31-E-17 (surface mount only; the HX-TYPE-C 16P 180 LT H10.0 until 18 Nov, LAYOUT 6.8), on the IAS0 tongue |
 | U1503 | USBLC6-2SC6 on D+/D− |
 | U1502 | CH340X at 3.3 V; V3 tied to VCC through R1535 (0 Ω; 100 nF instead if ever run at 5 V) |
 | U1504 | LP5907-3.3 from the cable's VBUS: the bridge enumerates with the board off |

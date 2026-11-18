@@ -26,7 +26,7 @@ Organised by **stage** (the reasoning behind the order is in
 | ☐ | **SDRplay RSPdx-R2** (1 kHz – 2 GHz, 14-bit, RX only) | HF, AM, airband and weak signals; replaces the HF upconverter | €200 |
 | ☐ | **KrakenSDR** (5 coherent channels, 24 MHz – 1.766 GHz) | **Direction finding, ready to use** | €500 |
 | ☐ | Antenna set: discone, HF whip, 5× VHF/UHF for the Kraken | Coverage and DF | €200 |
-| ☐ | USB GPS (u-blox) + IMU | Position and heading for triangulation and SLAM | €80 |
+| ☐ | USB GPS (u-blox) + IMU, with a 3.3 V PPS output | Position and heading for triangulation and SLAM; its PPS and 3.3 V supply on `J1503` (JST-SH 4-pin: 1 3.3 V, 2 PPS, 3 and 4 GND) | €80 |
 | | | **Subtotal** | **~€1,600** |
 
 > **Updated 29 September 2026.** Stage 0 used to be a HackRF One plus an HF upconverter
@@ -150,7 +150,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
-| ◆ | **Board design and fabrication** | 8 layers, short run with assembly. **Quoted 17 Nov 2026 (Rev08): ≈ $2,417 for two assembled boards, parts included** (≈ $2,030 on 10 Nov, 6 layers) ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)); the chip lines below are inside that figure | €400 – 800 |
+| ◆ | **Board design and fabrication** | 8 layers, short run with assembly. **Quoted 18 Nov 2026 (Rev08): ≈ $2,372 for two assembled boards, parts included** (≈ $2,030 on 10 Nov, 6 layers) ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)); the chip lines below are inside that figure | €400 – 800 |
 | ☐ | ADC **AD9253BCPZ-125** | 14 b, 2 of 4 channels at 62.5 MSPS, 1-lane | €40 |
 | ☐ | Clock: **ADCLK948BCPZ** (select + 1:8 fan-out) + **Si549** programmable XO | Si549 ordered configured: LVPECL, 3.3 V, 5×7 mm, pinout C. See docs/CLOCK_SPEC.md | €50 – 70 |
 | ☐ | Differential drivers **AD8352ACPZ** ×2 | The ones AERIS uses | €30 |
@@ -159,6 +159,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 | ☐ | Power: bucks, LDOs, reverse-polarity protection | See §9 of the master document | €40 |
 | ☐ | Connectors: Hirose BM20B(0.8)-34DP ×2, SMA, Pmod | | €60 |
 | ☐ | FFC/Pmod cable to the KV260 | | €20 |
+| ☐ | 15-way 1 mm FFC, 100 mm, from `J1502` to the KV260's `J9` (GPS PPS) | Either type works (the board drives both positions pin 12 can land on, INTEGRATIONS §2.1): JUSHUO JS10A-15P-100-4-8 (same side, LCSC C2857591) or JS10B-15P-100-4-8 (reverse, C2857806). Not assembled | €2 |
 | | | **Subtotal** | **~€700 – 1,100** |
 
 **Prerequisites before ordering anything**

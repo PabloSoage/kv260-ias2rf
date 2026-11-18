@@ -440,3 +440,41 @@ refilled and schematic parity, **0 violations, 0 unconnected pads, 0 footprint e
 the same delay, skew, stub and coupling for all 29 pairs as `_work/sim/lvds_skew_8layer.json` (§6.6 and
 SIGNAL_INTEGRITY §8), field for field: Rev08 moved no LVDS copper. Every part, connector and LED with its use is in
 the [board manual](BOARD_MANUAL.md).
+
+### 6.8 Before the tag (18 November 2026)
+
+Three changes, made on the routed board and checked like the rest.
+
+**Skew.** Three pairs had a short leg that the others did not: `CLK_ADCS` (+23.4 ps), `ETH_MDI2` (+17.7 ps) and
+`CLK_FPGA` (−41 ps, left out of the old figure). Each short leg gained rectangular bumps on one straight stretch, on
+the side away from its partner (`meander.py`):
+
+| Pair | Leg, layer, stretch | Added | P − N before | P − N now |
+|---|---|---|---|---|
+| `CLK_ADCS` | N, L6 (In5), x 193.4, y 155.4 to 159.0 | 3.4 mm in 2 bumps | +23.4 ps | −0.1 ps |
+| `ETH_MDI2` | N, L6 (In5), y 128.4, x 206.0 to 210.6 | 2.6 mm in 2 bumps | +17.7 ps | −0.2 ps |
+| `CLK_FPGA` | P, L3 (In2), y 136.6, x 175.7 to 184.1 | 5.9 mm in 3 bumps | −41.4 ps | −0.7 ps |
+
+All 28 pairs are now within ±9 ps ([figure](sim/lvds_skew.png), `_work/sim/lvds_skew_8layer.json`).
+
+**`J1501` is now surface mount throughout.** The maker's drawing of the HX-TYPE-C 16P 180 LT H10.0 shows four
+through-hole shell legs reaching 2.1 mm below its seat, and two pegs on a diagonal; the land pattern had neither, and
+on the IAS0 tongue, 0.8 mm above the carrier, the legs would have reached it. It is now the HRO TYPE-C-31-E-17 (LCSC
+C7424785), surface-mount contacts and shell tabs, plastic pegs 0.7 mm long, 6.0 mm tall, sealed to IPX5
+(`_work/rev08_final_footprints.py`). Its 0.5 mm contacts were routed again by hand:
+- `VBUS` crosses between the two rows on the lines of A9/B4 and A4/B9, with a via in the gap on each.
+- B5, B6 and B7 leave east. `USB_CC2` goes on the top to `R1532`; `USB_DP` and `USB_DN` go through vias and L3 to `U1503`, under `+3V3_USB`.
+- A5, A6 and A7 leave west to three vias, staggered at x 131.45 and 131.95 between the shell tabs, and cross under the receptacle on L3.
+- The four shell tabs are grounded.
+
+**The GPS PPS path.** `J1502`, a 15-way 1 mm FPC receptacle (XUNPU FPC-1.0FX-15PWCR-H20), sits on the top edge east
+of the IAS1 tongue (x 187 to 208, y 102.3 to 108.8), its cable side on the edge, so a 100 mm FFC runs over the
+carrier to the KV260's `J9`, about 67 mm away (located from AMD's STEP model, `kv260_step_locate.py`: TE 1-1734248-5 at
+KiCad x 195, y 18). `J1503`, the GPS receiver's JST-SH, is below it. The buffer, the ESD diode, the PTC and seven
+passives are on the bottom of the same corner, which lies beyond the carrier's edge (y > 107.25). Its contact pads are 0.35 mm
+from the ring of the mounting hole `H2`; the stitching via under its east tab moved 0.85 mm. What the circuit does is
+in [INTEGRATIONS §2.1](INTEGRATIONS.md).
+
+The board after these changes: 783 footprints, 13,580 track segments, 2,589 vias. DRC with zones refilled and schematic
+parity: **0 violations, 0 unconnected pads, 0 footprint errors**; ERC 0 errors and the same 7 warnings. The warnings
+are those of the board before, plus three silkscreen overlaps between the new bottom-side passives.

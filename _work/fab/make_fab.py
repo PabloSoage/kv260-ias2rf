@@ -57,7 +57,7 @@ ORDER = [
     ("Impedance control", "Yes, stackup JLC08161H-2116C"),
     ("Outer / inner copper", "1 oz / 0.5 oz"),
     ("Material", "FR-4 (the stackup's laminate: NP-155F)"),
-    ("Via covering", "Epoxy filled & capped (POFV): 765 vias are in pads (17 Nov 2026: BGA balls under the bottom-side terminations and caps, exposed pads, the Rev08 fan-outs)"),
+    ("Via covering", "Epoxy filled & capped (POFV): 776 vias are in pads (18 Nov 2026: BGA balls under the bottom-side terminations and caps, exposed pads, the Rev08 fan-outs, the GPS PPS block)"),
     ("Min via hole / diameter", "0.20 / 0.45 mm"),
     ("Min track / spacing", "0.09 / 0.10 mm (LVDS necks under the FPGA)"),
     ("Surface finish", "ENIG (flat pads for the 1.0 mm BGA and the LFCSPs)"),

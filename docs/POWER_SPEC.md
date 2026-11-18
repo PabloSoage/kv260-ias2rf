@@ -11,8 +11,8 @@ for the tree as drawn.
 ```
 12 V jack ─ PTC ─ SMCJ33CA ─ Q1001 ┐ back-to-back N-FETs, LM74502-Q1 (U1009): reverse battery,
                               Q1003 ┘ overvoltage cut-off at 18.3 V ─ SMBJ18CA ─► +12V   (§1.1, Rev05)
-+12V   ─ U1001 LMR33630  buck ─► +5V0    1730 mA   (3 A part)
-+5V0   ─ U1002 TPS562201 buck ─► +3V3_D  1326 mA   (2 A part)
++12V   ─ U1001 LMR33630  buck ─► +5V0    1775 mA   (3 A part)
++5V0   ─ U1002 TPS562201 buck ─► +3V3_D  1388 mA   (2 A part)
        ─ U1003 TPS562201 buck ─► +2V5     601 mA   FPGA LVDS banks, and feeds +1V8_A
        ─ U1004 TPS562201 buck ─► +1V0     700 mA   FPGA VCCINT
        ─ U1007 TPS7A8300 LDO  ─► +3V3_A   100 mA   DACs' AVDD
@@ -23,7 +23,7 @@ for the tree as drawn.
        ─ U1315 LP5907 LDO     ─► +3V0_FE  180 mA   Rev08 VHF/UHF front end (RX_VU sheet)
 ```
 
-Input: **802 mA at 12 V, 9.6 W**; 1.04 A and 12.5 W with the 30 % margin (Rev08's front end, LEDs and expanders added, 17 November; 733 mA and 8.8 W before).
+Input: **823 mA at 12 V, 9.9 W**; 1.07 A and 12.8 W with the 30 % margin (Rev08's front end, LEDs and expanders added, 17 November; the GPS receiver on `J1503`, 18 November; 733 mA and 8.8 W before).
 
 ---
 

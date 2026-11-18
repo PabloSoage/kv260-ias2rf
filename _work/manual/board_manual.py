@@ -47,13 +47,15 @@ CONNECTORS = [
     ("J951", "SDR_RX_C", "HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input"),
     ("J952", "SDR_TX_C", "HF transmit (SMA), no switch: AD9767 DAC2. The default HF output"),
     ("J961", "VU_ANT", "VHF/UHF antenna (SMA, back wall): the Rev08 front end, 30 MHz-3 GHz (direct below 170 MHz, converted above), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed"),
-    ("J1001", "12V IN", "12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.6 W, 12.5 W with margin"),
+    ("J1001", "12V IN", "12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.9 W, 12.8 W with margin (the GPS receiver included)"),
     ("J1002", "FAN 5V", "Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND"),
     ("J1101", "JTAG 2x7 2mm", "Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter)"),
     ("J1102", "Pmod", "Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below"),
     ("J1103", "AERIS ADAR", "AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines"),
     ("J1201", "HR911130C", "Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone"),
-    ("J1501", "HX-TYPE-C 16P 180 LT H10.0", "Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off"),
+    ("J1501", "TYPE-C-31-E-17", "Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off"),
+    ("J1502", "FPC-1.0FX-15PWCR-H20", "GPS PPS to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`)"),
+    ("J1503", "SM04B-SRSS-TB", "GPS receiver, JST-SH 4-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 and 4 GND"),
 ]
 SWITCHES = [
     ("SW1101", "PROG", "Pulls the FPGA's PROG_B: reloads the bitstream from the flash"),
@@ -130,6 +132,7 @@ ICS = [
     ("U1502", "CH340X", "STATUS", "USB to UART bridge for the debug console"),
     ("U1503", "USBLC6-2SC6", "STATUS", "ESD on the USB data lines"),
     ("U1504", "LP5907MFX-3.3", "STATUS", "3.3 V LDO for the USB bridge, from the cable"),
+    ("U1505", "SN74LVC1G17DCKR", "STATUS", "GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4"),
 ]
 OTHER = [   # oscillators, filters, transformers: in the chip table, one line each
     ("Y401", "Si549 LVPECL 3V3 pinout C", "CLOCK", "Programmable master oscillator, 400 or 500 MHz"),
@@ -181,6 +184,7 @@ USES = [
     ("Camera on the KV260", "IAS camera module on `J103`, as on the carrier's `J7`", "Nothing on this board; the camera talks to the SOM as before"),
     ("Standalone over Ethernet", "RJ45 `J1201` to a PC; 12 V on `J1001`", "The FPGA streams over UDP without the Kria"),
     ("Debug", "USB-C `J1501` (lid off), 115,200 8N1; JTAG `J1101`", "Boot banner, one status line a second, `r`/`w` register commands"),
+    ("GPS time", "GPS receiver on `J1503`; FFC from `J1502` to the KV260's `J9`", "`kria_pps` timestamps the pulse; R5F core 0 disciplines the converters' clock to it"),
 ]
 
 

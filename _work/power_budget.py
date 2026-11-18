@@ -137,6 +137,10 @@ LOADS = [
     ("+12V", "Rail LED on +12V", 12.0, 1, "V", "REV08_PLAN 3.1: 1 mA each"),
     ("+3V3_D", "Rail LED on +1V0 (through its transistor, from +3V3_D)", 3.3, 1, "E",
      "REV08_PLAN 3.1: +1V0 is below an LED's forward voltage"),
+    ("+3V3_D", "GPS receiver on J1503 (module and active antenna; the PTC holds 200 mA)", 3.3, 60, "E",
+     "u-blox NEO-M9N about 32 mA plus an active antenna about 20 mA; INTEGRATIONS 2.1 (18 Nov)"),
+    ("+3V3_D", "GPS PPS buffer SN74LVC1G17 and its two 220 ohm outputs (one into a J9 ground)", 3.3, 2, "E",
+     "15 mA while the pulse is high, 10 % duty: 1.5 mA mean"),
     # Not counted: the bias tee's external load (AP22652, limited to 100 mA,
     # off by default) and the CH340X, which draws from the USB cable.
 ]

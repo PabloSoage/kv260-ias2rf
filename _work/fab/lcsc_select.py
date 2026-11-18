@@ -199,6 +199,13 @@ RULES = {
         "P", "BM20B(0.8)-34DS-0.4V", r"^BM20B\(0\.8\)-34DS-0\.4V"),
     ("HX-TYPE-C 16P 180 LT H10.0", "USB_C_HX_16P_180_LT_H10"): (
         "P", "HX-TYPE-C 16P 180 LT H10.0", r"^HX-TYPE-C 16P 180 LT H10"),
+    ("TYPE-C-31-E-17", "USB_C_HRO_TYPE-C-31-E-17"): ("P", "TYPE-C-31-E-17", r"^TYPE-C-31-E-17$"),
+    ("FPC-1.0FX-15PWCR-H20", "FPC_1.0_15P_XUNPU_FPC-1.0FX-15PWCR-H20"): (
+        "P", "FPC-1.0FX-15PWCR-H20", r"^FPC-1\.0FX-15PWCR-H20$"),
+    ("SM04B-SRSS-TB", "JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal"): (
+        "P", "SM04B-SRSS-TB", r"^SM04B-SRSS-TB\(LF\)\(SN\)$"),
+    ("SN74LVC1G17DCKR", "SOT-353_SC-70-5"): ("P", "SN74LVC1G17DCKR", r"^SN74LVC1G17DCKR$"),
+    ("PTC 0.2A hold", "Fuse_0805_2012Metric"): ("P", "JK-SMD0805-020", r"^JK-SMD0805-020"),
     ("CH340X", "MSOP-10_L3.0-W3.0-P0.50-LS5.0-BL"): ("P", "CH340X", r"^CH340X$"),
     ("USBLC6-2SC6", "SOT-23-6"): ("P", "USBLC6-2SC6", r"^USBLC6-2SC6"),
     ("MMBT3904", "SOT-23"): ("P", "MMBT3904", r"^MMBT3904(LT1G|-7-F|,215|$)"),

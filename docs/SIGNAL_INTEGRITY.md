@@ -757,7 +757,9 @@ no plane to reach. The impedance is inside the target with margin (+1V0: 41 / 63
   layers 15–23 %, the signal layers 5–7 %. Both faces cool by natural convection.
 - **The heat.** 8.2 W, from the power budget (POWER_AND_STACKUP §1.3–1.4), spread over each part's
   pads. It was 7.5 W before Rev08 (6.9 W until 13 Nov, when the Ethernet PHY added 0.5 W and its
-  load 0.1 W more in the bucks). Rev08 adds 0.7 W:
+  load 0.1 W more in the bucks). The GPS receiver of 18 November (`J1503`, POWER_AND_STACKUP §1.3) draws
+  0.2 W, but in the receiver, off the board; on the board it adds about 0.03 W of buck loss, so the maps below stand.
+  Rev08 adds 0.7 W:
   - the RFFC5072, 0.38 W (125 mA at 3.0 V);
   - the two SPF5043Z, 0.08 W each;
   - the LP5907's drop, 0.05 W;

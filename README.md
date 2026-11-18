@@ -70,8 +70,8 @@ flowchart LR
 |---|---|
 | ![Top](docs/img/board_top.png) | ![Bottom](docs/img/board_bottom.png) |
 
-The renders come from KiCad. Two things show only their pads: the debug USB-C `J1501`, for which no
-model exists, and the shield frames' walls ([3D_MODELS](docs/3D_MODELS.md)).
+The renders come from KiCad. The shield frames' walls show only their pads; the debug USB-C `J1501` has a model
+drawn from its maker's drawing, since no library has one ([3D_MODELS](docs/3D_MODELS.md)).
 
 ---
 
@@ -100,31 +100,33 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | 14 | `J951` | top | SDR_RX_C | HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input |
 | 15 | `J952` | top | SDR_TX_C | HF transmit (SMA), no switch: AD9767 DAC2. The default HF output |
 | 16 | `J961` | top | VU_ANT | VHF/UHF antenna (SMA, back wall): the Rev08 front end, 30 MHz-3 GHz (direct below 170 MHz, converted above), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed |
-| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.6 W, 12.5 W with margin |
+| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.9 W, 12.8 W with margin (the GPS receiver included) |
 | 18 | `J1002` | top | FAN 5V | Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND |
 | 19 | `J1101` | top | JTAG 2x7 2mm | Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter) |
 | 20 | `J1102` | top | Pmod | Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below |
 | 21 | `J1103` | top | AERIS ADAR | AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines |
 | 22 | `J1201` | top | HR911130C | Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone |
-| 23 | `J1501` | top | HX-TYPE-C 16P 180 LT H10.0 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
+| 23 | `J1501` | top | TYPE-C-31-E-17 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
+| 24 | `J1502` | top | FPC-1.0FX-15PWCR-H20 | GPS PPS to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`) |
+| 25 | `J1503` | top | SM04B-SRSS-TB | GPS receiver, JST-SH 4-pin: 1 +3.3 V out (0.2 A PTC), 2 PPS in (3.3 V), 3 and 4 GND |
 
 | No. | LED | Meaning when lit |
 |---|---|---|
-| 27 | `D1501` CFG green | FPGA configured and the clock sequencer finished |
-| 27 | `D1502` CLK yellow | Master clock mode: on 500 MHz, off 400 MHz |
-| 27 | `D1503` LINK green | IAS1 link to the Kria trained |
-| 27 | `D1504` ADCR red | The radar ADC (AD9484) clipped since the last read (sticky) |
-| 27 | `D1505` ADCS red | The SDR ADC (AD9253) clipped since the last read (sticky) |
-| 27 | `D1506` LO green | The RFFC5072 synthesiser is locked |
-| 27 | `D1507` TX red | A DAC is driving an SMA |
-| 27 | `D1508` ERR red | Any sticky error: CRC, FIFO overflow, I2C no-acknowledge, over-temperature |
-| 27 | `D1509` HB blue | Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second |
-| 28 | `D1520` +12V green | +12V present (after the input protection) |
-| 28 | `D1521` +5V0 green | +5V0 present |
-| 28 | `D1522` +3V3_D green | +3V3_D present |
-| 28 | `D1523` +1V8_D green | +1V8_D present (switched from +3V3_D by `Q1520`) |
-| 28 | `D1524` +1V0 green | +1V0 (FPGA core) present (switched from +3V3_D by `Q1521`) |
-| 29 | `D1101` green | DONE: the FPGA has loaded a bitstream |
+| 29 | `D1501` CFG green | FPGA configured and the clock sequencer finished |
+| 29 | `D1502` CLK yellow | Master clock mode: on 500 MHz, off 400 MHz |
+| 29 | `D1503` LINK green | IAS1 link to the Kria trained |
+| 29 | `D1504` ADCR red | The radar ADC (AD9484) clipped since the last read (sticky) |
+| 29 | `D1505` ADCS red | The SDR ADC (AD9253) clipped since the last read (sticky) |
+| 29 | `D1506` LO green | The RFFC5072 synthesiser is locked |
+| 29 | `D1507` TX red | A DAC is driving an SMA |
+| 29 | `D1508` ERR red | Any sticky error: CRC, FIFO overflow, I2C no-acknowledge, over-temperature |
+| 29 | `D1509` HB blue | Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second |
+| 30 | `D1520` +12V green | +12V present (after the input protection) |
+| 30 | `D1521` +5V0 green | +5V0 present |
+| 30 | `D1522` +3V3_D green | +3V3_D present |
+| 30 | `D1523` +1V8_D green | +1V8_D present (switched from +3V3_D by `Q1520`) |
+| 30 | `D1524` +1V0 green | +1V0 (FPGA core) present (switched from +3V3_D by `Q1521`) |
+| 31 | `D1101` green | DONE: the FPGA has loaded a bitstream |
 <!-- board-manual:end -->
 
 ---
@@ -181,7 +183,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 6. **3-D full-wave EM, RF cascade & thermal envelope.** openEMS 3-D sub-models cover L1–L6 vias (`S11 < -29 dB`), BGA escapes (`< -24 dB`), adjacent-pair NEXT (`1.9%`), and `J101` launch (`< -25 dB`). Receive cascades (`cascade.py`) give `NF = 26.8 dB` (radar) / `22 dB` (SDR). Enclosure v2 (`50 × 50 × 15 mm` filtered lid fan + `HS1`–`HS3` heatsinks) is rated for `56 °C` ambient with the stock KV260, whose commercial K26 is the limit (`Tj` `85 °C`), and `70 °C` with an industrial K26I SOM, unchanged by Rev08's front end and camera ([ENCLOSURE_V2_THERMAL.md §8](docs/ENCLOSURE_V2_THERMAL.md)).
 7. **Dual-FPGA Vivado 2026.1 gateware & XSim verification.** Full RTL, constraints, Vivado post-route floorplans/schematics, and XSim end-to-end testbenches live in `fpga/` ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)). *(Design evolution history is archived in [docs/history/README.md](docs/history/README.md).)*
 
-**Estimated cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md)): about **$2,417 for two assembled boards** and **$4,804 for five** (Rev08, 17 Nov) (parts + assembly + `JLC08161H-2116C` bare boards).
+**Estimated cost** ([docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md)): about **$2,372 for two assembled boards** and **$4,679 for five** (Rev08, 18 Nov) (parts + assembly + `JLC08161H-2116C` bare boards).
 
 ---
 

@@ -153,6 +153,9 @@ y 107.8–117.2, seen through a small window in the lid; the five rail LEDs besi
 - Chosen after the trial (section 11.4): **HX-TYPE-C 16P 180 LT H10.0** (LCSC C49261569, 3,635 in stock),
   surface-mount legs and two locating pegs. `U262-161N-4BVC11` was rejected: through-hole shell legs and not a
   vertical part. Fallback if the pegs do not clear the carrier: a 1 × 4 header for a USB-TTL cable, same position.
+- **Replaced on 18 November** ([LAYOUT §6.8](LAYOUT.md)): the HX part's drawing shows four through-hole shell legs
+  2.1 mm long, which the land pattern had missed and which would have reached the carrier. `J1501` is now the HRO
+  TYPE-C-31-E-17 (LCSC C7424785): contacts and shell tabs surface mount, pegs 0.7 mm long, 6.0 mm tall.
 
 Stock: CH340X 43 k ($0.66), USBLC6-2SC6 38 k.
 
@@ -752,12 +755,12 @@ Each row of section 11.1, with what was redone and where the result is. The phas
 |---|---|
 | Board electrical checks | **Done.** ERC 0 errors, the same 7 warnings. DRC with zones refilled and schematic parity 0 / 0 / 0 (`make_fab`). LVDS skew table re-run: all 29 pairs identical to the 8-layer table (LAYOUT 6.7) |
 | Signal integrity | **Done in phase 6** (section 11.7, SIGNAL_INTEGRITY 9.10): `J961`'s launch, the IF line, coupling and isolation with the new aggressors, the bias tee and LNA feed; the three new filters' Monte Carlo in phase 3 (section 5.4) |
-| Power | **Done.** `power_budget.py` with every Rev08 load: 802 mA at 12 V, 9.6 W (1.04 A, 12.5 W with margin); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
+| Power | **Done.** `power_budget.py` with every Rev08 load: 823 mA at 12 V, 9.9 W (1.07 A, 12.8 W with margin; the GPS receiver of 18 November included); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
 | Thermal | **Done.** Enclosure CFD at the rated ambients with the front end and camera (phase 8: 56.1 °C stock, 71.1 °C K26I); the 2-D board map and the five cooling cases at 8.2 W (SIGNAL_INTEGRITY 9.6: the LMR33630 is now the hottest junction, 87 °C at 25 °C in still air; every junction under 92 °C at 70 °C with sink and fan); the heatsink map |
 | Mechanical strength | **Done in phase 8.** 50 g in three axes with the new notch, lug, slots, lens window and clamps; SF 8.3 / 5.0 at 23 / 70 °C, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE 5.3) |
 | Gateware | **Done.** Artix rebuilt with the corrected constraints (25,068 LUT, `WNS +0.076 ns`, `WHS +0.049 ns` over both clock modes); K26 rebuilt on 18 November with the integrations of section 14 (51,870 LUT, `WNS +1.125 ns`, `WHS +0.010 ns`, no new clock crossings); utilisation, timing, pulse-width, methodology and CDC reports, floorplans and schematics regenerated from the routed designs. `tb_system` passes at both clock modes; the G-8 campaign re-run on the final RTL passes all 8 cases (FPGA_GATEWARE 6.1, figures moved by 0.9 dB at most); the two new benches pass bit-exact and their mutations fail |
 | Renders and 3-D | **Done.** Board renders (top, iso, bottom, 4K) with the 22 Rev08 part models; mount, case v1 and v2, the camera on the tongue, `J961`'s notch, the 4K case views, the heatsink renders; each checked against the render rules. `check_case`: the same 15 / 16 intended contacts |
-| Fabrication | **Done.** BOM 214 lines / 739 parts, CPL 739, 765 vias in pads; LCSC codes for 212 of 214 lines on live stock; quote about $2,417 for two boards, $4,804 for five. Nine lines are short at the moment, the SMA among them (5 in stock): to be re-checked at order (decision 5) |
+| Fabrication | **Done.** BOM 219 lines / 751 parts, CPL 751, 776 vias in pads (after the 18 November changes, LAYOUT 6.8); LCSC codes for 217 of 219 lines on live stock; quote about $2,372 for two boards, $4,679 for five (18 November). Nine lines are short at the moment, the SMA among them (5 in stock): to be re-checked at order (decision 5) |
 | Documents | **Done.** Every document reviewed against the final design on 17 November (the list in the phase 9 commit), then again where the 18 November additions touched them: INTEGRATIONS, HMI, FPGA_GATEWARE, the READMEs, this plan |
 | Documentation PDF layout | **Done.** The table defects of section 11.2 stay fixed. A further fault, found on 18 November: the pagination of JLCPCB_QUOTE's parts table never settled. Cut at row 96, the rows from 96 fit on the page; uncut, row 96 started the next one; the cut came and went for all 3,000 passes, which is also what made a build run 2 hours and 30 GB without finishing. The cut is now held after three returns, with a spacer that moves its part to the next page (55 passes). Long part numbers in that document's tables get break points. Final book: 250 pages, `pdf_table_check` 0 (a) and 0 (b) defects; every page inspected as an image, the (c) pages and the held cut (rows 94 to 97, each once) by eye |
 | Board manual | **Done.** BOARD_MANUAL.md and the README section, drawn from the `.kicad_pcb` (90 callouts); its check passes both ways. Chapter 2 of the book |
@@ -765,7 +768,7 @@ Each row of section 11.1, with what was redone and where the result is. The phas
 | This plan | **Done.** Sections 8 and 12 marked; the additions of 17 and 18 November in section 14 |
 
 **Known gaps, carried over on purpose:**
-- **`J1501` has no 3-D model.** No vendor or EasyEDA model exists for it; the renders show its footprint only. `SH1` and `SH2`, the shield frames, are drawn as walls.
+- **`J1501`'s 3-D model is our own** (no vendor or EasyEDA model exists), drawn from the maker's drawing; `SH1` and `SH2`, the shield frames, are drawn as walls.
 - **Nothing has run on hardware.** The board is not built; the gateware, the R5F firmware and `kria-sdrd` run in simulation and on the host only.
 - **Open, for the owner:** HMI.md names Qt Quick for the in-car application, while the rule for user interfaces on the Kria is Compose Multiplatform. The screens are HTML mock-ups either way; the framework is not chosen here.
 

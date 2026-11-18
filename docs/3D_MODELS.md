@@ -9,9 +9,11 @@
 > from `_work/mech/cache/models3d` (outside git, like the other EasyEDA models). EasyEDA paints ceramic bodies pure
 > white and the filters a light grey that the top view burns out, so the script gives both an off-white ceramic tone
 > (0.62, 0.60, 0.55). Still without a model, counted on the final file: the 28 intentionally unmodelled items
-> (6 fiducials, 5 mounting holes, 15 test points, 2 solder jumpers), `J1501` (EasyEDA has no model of the HX
-> vertical USB-C and KiCad's library has no vertical receptacle; no placeholder box is used) and the shield frames'
-> copper walls `SH1`, `SH2`. The audit below is the Rev06 one (570 footprints).
+> (6 fiducials, 5 mounting holes, 15 test points, 2 solder jumpers) and the shield frames' copper walls `SH1`, `SH2`.
+> `J1501`, now the HRO TYPE-C-31-E-17 (18 Nov, LAYOUT 6.8), has no EasyEDA or KiCad model either; its model is drawn
+> from the maker's drawing by `_work/mech/usbc_hro_model.py` (housing, steel shell, seal ring, tongue, contacts) and,
+> being ours, is in the repository: `mech/models3d/USB_C_HRO_TYPE-C-31-E-17.wrl`. `J1502`, the 15-way FPC receptacle,
+> uses its EasyEDA model from the cache; `J1503`, `U1505`, `D1530`, `F1501` and the passives use KiCad's. The audit below is the Rev06 one (570 footprints).
 
 An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (KiCad's stock `share/kicad/3dmodels` library) identified:
 
