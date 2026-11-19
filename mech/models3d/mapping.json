@@ -641,6 +641,30 @@
         1
       ],
       "notes": "RJ45 magnetics jack facing right board edge"
+    },
+    {
+      "ref": "L1004",
+      "value": "ZEGMCM9070-501T",
+      "footprint": "kv260-ias2rf:CMC_9070_SMD-4P_9.0x7.0mm",
+      "bucket": "repo",
+      "model_path": "mech/models3d/CMC_9070_SMD-4P_9.0x7.0mm.step",
+      "source": "Project parametric CAD (_work/mech/cmc_9070_model.py, Apache-2.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "Common-mode power choke (Coilmaster SMM9070-501 / ZEGMCM9070-501T, 9.0 x 7.0 x 4.58 mm)"
     }
   ]
 }
