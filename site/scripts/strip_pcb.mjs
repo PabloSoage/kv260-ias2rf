@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Copy CSI2-KRIA-KV260_Rev01.kicad_pcb to a temporary file where:
+ * Copy KV260-IAS2RF.kicad_pcb to a temporary file where:
  *  - Any cached EasyEDA / _work model that has an official KiCad 10 STEP equivalent is
  *    rewritten to reference ${KICAD10_3DMODEL_DIR}/.../*.step (CC-BY-SA 4.0 + KiCad Exception),
  *  - Remaining EasyEDA / _work models without a KiCad STEP equivalent are stripped cleanly so

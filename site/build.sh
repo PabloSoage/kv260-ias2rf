@@ -4,7 +4,7 @@ set -euo pipefail
 
 SITE_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SITE_DIR/.." && pwd)"
-PCB="$ROOT_DIR/CSI2-KRIA-KV260_Rev01.kicad_pcb"
+PCB="$ROOT_DIR/KV260-IAS2RF.kicad_pcb"
 
 find_kicad_cli() {
   if [ -n "${KICAD_CLI:-}" ] && [ -x "$KICAD_CLI" ]; then

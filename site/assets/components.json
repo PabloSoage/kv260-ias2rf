@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-11-19T15:20:56.093Z",
-  "pcb_file": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
+  "pcb_file": "KV260-IAS2RF.kicad_pcb",
   "registration": {
     "note": "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
     "translation_mm": [

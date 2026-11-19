@@ -140,6 +140,12 @@
           </div>
 
           <div class="panel-card">
+            <h3>Nets</h3>
+            <p class="muted" style="margin:0 0 6px;font-size:12px;">Every routed net of the adapter at once, each in its own colour (power and ground dimmed). Tap a part to follow a single net.</p>
+            <button id="btn-all-nets" class="btn btn-sm" type="button" aria-pressed="false">Select All Nets</button>
+          </div>
+
+          <div class="panel-card">
             <h3>Isolate Assembly (or double-click)</h3>
             <div class="btn-grid">
               <button class="btn btn-sm active" data-iso="all" type="button">Full Assembly</button>
@@ -327,9 +333,23 @@
           <div class="doc-card">
             <div>
               <strong>Complete Hardware &amp; Software Documentation (PDF)</strong>
-              <p>278-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
+              <p>298-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
             </div>
-            <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1" target="_blank" rel="noopener">Open Documentation PDF</a>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1" target="_blank" rel="noopener">Open Documentation PDF</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation-Lite.pdf#page=1" target="_blank" rel="noopener">Lite PDF (normal renders)</a>
+            </div>
+          </div>
+          <div class="doc-card">
+            <div>
+              <strong>PSU Board: Vehicle Supply for Both Boards (<code>docs/PSU_SPEC.md</code>)</strong>
+              <p>LTC4364 surge stopper + LM5177 buck-boost feeding the adapter and the KV260 by their own cables: ISO 7637-2 / 16750-2 events, loop, thermal, conducted noise and its audit (p.146).</p>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=146" target="_blank" rel="noopener">PSU_SPEC (p.146)</a>
+              <a class="btn btn-sm" href="psu.html" target="_blank" rel="noopener">PSU in 3-D</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_PSU_schematic.pdf#page=1" target="_blank" rel="noopener">PSU Schematic PDF</a>
+            </div>
           </div>
           <div class="doc-card">
             <div>
@@ -344,33 +364,33 @@
           <div class="doc-card">
             <div>
               <strong>Rev08 RF &amp; Power Audit (<code>docs/AUDIT_Rev08.md</code>)</strong>
-              <p>Full pre-order RF &amp; power audit: R1 HP300 high-pass (84-99 dB IF rejection), P1 TCAN3403, P2 Pmod gating, P3 F1001 2 A PTC, P4-P8 power fixes, and final re-audit (p.180).</p>
+              <p>Full pre-order RF &amp; power audit: R1 HP300 high-pass (84-99 dB IF rejection), P1 TCAN3403, P2 Pmod gating, P3 F1001 2 A PTC, P4-P8 power fixes, and final re-audit (p.195).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=180" target="_blank" rel="noopener">AUDIT_Rev08 (p.180)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=212" target="_blank" rel="noopener">v2 Thermal (p.212)</a>
+              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=195" target="_blank" rel="noopener">AUDIT_Rev08 (p.195)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=228" target="_blank" rel="noopener">v2 Thermal (p.228)</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>Board Manual &amp; Project Overview</strong>
-              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.26).</p>
+              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.27).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=6" target="_blank" rel="noopener">Overview (p.6)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=26" target="_blank" rel="noopener">Board Manual (p.26)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=27" target="_blank" rel="noopener">Board Manual (p.27)</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>FPGA Co-Simulation &amp; Vehicle Integrations</strong>
-              <p>XSim <code>tb_system</code> verification (p.59), LVDS/pin map (p.69), CAN/GPS/LiDAR/Radar integrations (p.89), and Mechanical/Enclosure (p.194).</p>
+              <p>XSim <code>tb_system</code> verification (p.62), LVDS/pin map (p.72), CAN/GPS/LiDAR/Radar integrations (p.92), and Mechanical/Enclosure (p.210).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=59" target="_blank" rel="noopener">System Sim (p.59)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=89" target="_blank" rel="noopener">Integrations (p.89)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=152" target="_blank" rel="noopener">SI (p.152)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=194" target="_blank" rel="noopener">Mechanical (p.194)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=62" target="_blank" rel="noopener">System Sim (p.62)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=92" target="_blank" rel="noopener">Integrations (p.92)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=167" target="_blank" rel="noopener">SI (p.167)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=210" target="_blank" rel="noopener">Mechanical (p.210)</a>
             </div>
           </div>
         </div>

@@ -14,28 +14,40 @@ const BOARD_REG_ROTY = -Math.PI / 2;
 
 const DOC_PDF_PAGE_MAP = {
   "README.md": 6,
-  "docs/BOARD_MANUAL.md": 26,
-  "docs/FPGA_GATEWARE.md": 33,
-  "docs/SYSTEM_SIM.md": 59,
-  "fpga/SYSTEM_SIM.md": 59,
-  "docs/LINK_PROTOCOL.md": 63,
-  "docs/PINMAP.md": 69,
-  "docs/HMI.md": 81,
-  "docs/INTEGRATIONS.md": 89,
-  "docs/IAS_LINK_SPEC.md": 109,
-  "docs/CLOCK_SPEC.md": 113,
-  "docs/CONTROL_SPEC.md": 127,
-  "docs/POWER_SPEC.md": 134,
-  "docs/POWER_AND_STACKUP.md": 134,
-  "docs/LAYOUT.md": 142,
-  "docs/SIGNAL_INTEGRITY.md": 152,
-  "docs/AUDIT_Rev08.md": 180,
-  "docs/3D_MODELS.md": 190,
-  "docs/MECHANICAL.md": 194,
-  "docs/ENCLOSURE.md": 198,
-  "docs/ENCLOSURE_V2_THERMAL.md": 212,
-  "docs/FABRICATION.md": 234,
-  "docs/JLCPCB_QUOTE.md": 237,
+  "docs/BOARD_MANUAL.md": 27,
+  "docs/FPGA_GATEWARE.md": 36,
+  "docs/SYSTEM_SIM.md": 62,
+  "fpga/SYSTEM_SIM.md": 62,
+  "docs/LINK_PROTOCOL.md": 66,
+  "docs/PINMAP.md": 72,
+  "docs/HMI.md": 84,
+  "docs/INTEGRATIONS.md": 92,
+  "docs/IAS_LINK_SPEC.md": 112,
+  "docs/CLOCK_SPEC.md": 116,
+  "docs/CONTROL_SPEC.md": 130,
+  "docs/POWER_SPEC.md": 137,
+  "docs/POWER_AND_STACKUP.md": 137,
+  "docs/LAYOUT.md": 157,
+  "docs/SIGNAL_INTEGRITY.md": 167,
+  "docs/AUDIT_Rev08.md": 195,
+  "docs/3D_MODELS.md": 206,
+  "docs/MECHANICAL.md": 210,
+  "docs/ENCLOSURE.md": 214,
+  "docs/ENCLOSURE_V2_THERMAL.md": 228,
+  "docs/FABRICATION.md": 250,
+  "docs/JLCPCB_QUOTE.md": 253,
+  "fpga/README.md": 60,
+  "fpga/eth/REV06.md": 76,
+  "fpga/eth/REDUNDANCY.md": 78,
+  "sw/README.md": 83,
+  "docs/ADC_RADAR_SPEC.md": 119,
+  "docs/ADC_SDR_SPEC.md": 122,
+  "docs/DAC_RADAR_SPEC.md": 124,
+  "docs/DAC_SDR_SPEC.md": 126,
+  "docs/ROUTING_SPEC.md": 128,
+  "docs/PSU_SPEC.md": 146,
+  "docs/SYMBOLS.md": 152,
+  "docs/img/highres/README.md": 261,
 };
 
 function docToPdfHref(docPath) {
@@ -98,6 +110,7 @@ const state = {
   selectedId: null,
   activeNet: null,
   activeNetIsPower: false,
+  allNets: false,
   useWasmPicker: true,
 };
 
@@ -1336,6 +1349,11 @@ function rebuildNetHighlightBoxes() {
   activeTraceSegs = [];
   activePulseMesh = null;
 
+  if (state.allNets && adapterGroup.visible) {
+    buildAllNetTraces();
+    requestRender();
+    return;
+  }
   if (!state.activeNet || !adapterGroup.visible) {
     requestRender();
     return;
@@ -1388,6 +1406,40 @@ function rebuildNetHighlightBoxes() {
     stepPulseDots(performance.now());
   }
   requestRender();
+}
+
+// Every routed net at once, each in its own colour (power and ground dimmed): what connects to what, board-wide
+function netHue(name) {
+  let h = 2166136261;
+  for (let i = 0; i < name.length; i++) h = Math.imul(h ^ name.charCodeAt(i), 16777619);
+  return ((h >>> 0) % 360) / 360;
+}
+
+function buildAllNetTraces() {
+  const names = Object.keys(netTraces);
+  let total = 0;
+  for (const n of names) total += netTraces[n].length;
+  const verts = new Float32Array(total * 6);
+  const cols = new Float32Array(total * 6);
+  const c = new THREE.Color();
+  let o = 0;
+  for (const n of names) {
+    const power = isPowerNetName(n);
+    if (power) c.setHSL(0.58, 0.35, 0.32);
+    else c.setHSL(netHue(n), 0.85, 0.58);
+    for (const [x1, y1, x2, y2, lIdx] of netTraces[n]) {
+      const yLocal = lIdx <= 3 ? 0.00172 : -0.00009;
+      verts.set([x1 * 0.001, yLocal, y1 * 0.001, x2 * 0.001, yLocal, y2 * 0.001], o);
+      cols.set([c.r, c.g, c.b, c.r, c.g, c.b], o);
+      o += 6;
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+  geo.setAttribute("color", new THREE.BufferAttribute(cols, 3));
+  netPulseGroup.add(new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 })));
+  const st = $("#hud-status");
+  if (st) st.textContent = `All nets: ${names.length} nets, ${total} copper segments`;
 }
 
 function stepPulseDots(now) {
@@ -2114,6 +2166,16 @@ function wireUiEvents() {
   });
 
   $("#btn-layer-peel").addEventListener("click", startLayerPeel);
+  $("#btn-all-nets")?.addEventListener("click", () => {
+    state.allNets = !state.allNets;
+    const b = $("#btn-all-nets");
+    b.classList.toggle("active", state.allNets);
+    b.setAttribute("aria-pressed", String(state.allNets));
+    b.textContent = state.allNets ? "Clear All Nets" : "Select All Nets";
+    if (state.allNets) setIsolate("board", true);   // the copper is only visible with the case and the KV260 away
+    if (!state.allNets) { const st = $("#hud-status"); if (st) st.textContent = "Hover or tap any component"; }
+    rebuildNetHighlightBoxes();
+  });
   $("#range-layer-spread").addEventListener("input", () => updateLayerStackVisuals());
   $("#range-layer-opacity").addEventListener("input", () => updateLayerStackVisuals());
   $("#btn-layers-all").addEventListener("click", () => {

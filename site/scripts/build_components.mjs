@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build site/assets/components.json by parsing CSI2-KRIA-KV260_Rev01.kicad_pcb as text
+ * Build site/assets/components.json by parsing KV260-IAS2RF.kicad_pcb as text
  * (never pcbnew) and joining with BOM CSVs, _work/sheets/*_spec.py (read as text),
  * _work/manual/board_manual.py (read as text), and the measured KV260 part catalogue.
  */
@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SITE_DIR = path.dirname(HERE);
 const ROOT_DIR = path.dirname(SITE_DIR);
-const PCB_PATH = path.join(ROOT_DIR, "CSI2-KRIA-KV260_Rev01.kicad_pcb");
+const PCB_PATH = path.join(ROOT_DIR, "KV260-IAS2RF.kicad_pcb");
 const OUT_PATH = path.join(SITE_DIR, "assets", "components.json");
 
 function readText(p) {
@@ -1130,7 +1130,7 @@ function build() {
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
   const payload = {
     generated_at: new Date().toISOString(),
-    pcb_file: "CSI2-KRIA-KV260_Rev01.kicad_pcb",
+    pcb_file: "KV260-IAS2RF.kicad_pcb",
     registration: {
       note: "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
       translation_mm: [107.247, 198.004, 0.8],

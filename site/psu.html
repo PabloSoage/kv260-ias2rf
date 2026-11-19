@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PSU Board 3-D</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root { --psu-bg: #0b1118; --psu-panel: rgba(13, 20, 29, 0.88); --psu-ink: #e6edf3; --psu-muted: #9fb0c0; --psu-accent: #4cc2ff; }
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) { --psu-bg: #eef2f6; --psu-panel: rgba(255, 255, 255, 0.92); --psu-ink: #16202a; --psu-muted: #4a5a6a; --psu-accent: #0b6aa8; }
+    }
+    :root[data-theme="light"] { --psu-bg: #eef2f6; --psu-panel: rgba(255, 255, 255, 0.92); --psu-ink: #16202a; --psu-muted: #4a5a6a; --psu-accent: #0b6aa8; }
+    html, body { margin: 0; height: 100%; background: var(--psu-bg); color: var(--psu-ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    #view { position: fixed; inset: 0; }
+    .psu-panel { position: fixed; left: 16px; top: 16px; max-width: 360px; background: var(--psu-panel); border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 1.45; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); }
+    .psu-panel h1 { font-size: 17px; margin: 0 0 6px; }
+    .psu-panel p { margin: 0 0 8px; color: var(--psu-muted); }
+    .psu-panel ul { margin: 0 0 10px; padding-left: 18px; }
+    .psu-panel a { color: var(--psu-accent); }
+    .psu-links { display: flex; gap: 6px; flex-wrap: wrap; }
+    .psu-links a { border: 1px solid var(--psu-accent); border-radius: 6px; padding: 4px 8px; text-decoration: none; font-size: 12px; }
+    #status { position: fixed; right: 16px; bottom: 16px; font-size: 12px; color: var(--psu-muted); }
+    @media (max-width: 600px) { .psu-panel { left: 16px; right: 16px; max-width: none; top: auto; bottom: 16px; } #status { top: 16px; bottom: auto; } }
+  </style>
+</head>
+<body>
+  <div id="view" aria-label="PSU board 3-D view"></div>
+  <div class="psu-panel">
+    <h1>PSU board</h1>
+    <p>Feeds the adapter and the KV260 from the car's battery or a 6 to 36 V bench supply, each by its own cable from one ground.</p>
+    <ul>
+      <li>LTC4364 surge stopper: Load Dump A clamped at 48 V, reverse input to -40 V</li>
+      <li>LM5177 four-switch buck-boost to 12.0 V, 2.9 to 60 V in</li>
+      <li>TPS26631 eFuses: 2.0 A to the adapter (J2), 3.0 A to the KV260 (J3)</li>
+      <li>110 x 70 mm, 4 layers; ERC 0, DRC 0 / 0</li>
+    </ul>
+    <div class="psu-links">
+      <a href="index.html">Back to the adapter</a>
+      <a href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=146" target="_blank" rel="noopener">PSU_SPEC (p.146)</a>
+      <a href="pdf.html?file=docs/KV260-IAS2RF_PSU_schematic.pdf#page=1" target="_blank" rel="noopener">Schematic</a>
+    </div>
+  </div>
+  <div id="status">Loading the board...</div>
+  <script type="module">
+    import * as THREE from "./vendor/three-0.170.0/three.module.min.js";
+    import { OrbitControls } from "./vendor/three-0.170.0/OrbitControls.js";
+    import { GLTFLoader } from "./vendor/three-0.170.0/GLTFLoader.js";
+    import { RoomEnvironment } from "./vendor/three-0.170.0/RoomEnvironment.js";
+
+    const host = document.getElementById("view");
+    const status = document.getElementById("status");
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(host.clientWidth, host.clientHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    host.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.45;
+    renderer.toneMappingExposure = 0.9;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x334455, 0.6));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+    sun.position.set(0.1, 0.25, 0.15);
+    scene.add(sun);
+
+    const camera = new THREE.PerspectiveCamera(35, host.clientWidth / host.clientHeight, 0.001, 10);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    new GLTFLoader().load("assets/psu_board.glb", (gltf) => {
+      const model = gltf.scene;
+      // the project's render rules: the board KV260 green, nothing white. KiCad exports a pale substrate, a
+      // translucent mask and pure-white silkscreen; every flat mesh as large as the board becomes the green board
+      const whole = new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3());
+      const green = new THREE.MeshStandardMaterial({ color: 0x1e6b30, roughness: 0.5, metalness: 0.0 });
+      model.traverse((o) => {
+        if (!o.isMesh) return;
+        const sz = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());
+        if (sz.x > 0.8 * whole.x && sz.z > 0.6 * whole.z) { o.material = green; return; }
+        for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+          if (m.color && m.color.r > 0.9 && m.color.g > 0.9 && m.color.b > 0.9) {
+            m.color.set(0xb9c2bb); m.transparent = false; m.opacity = 1;
+          }
+        }
+      });
+      const box = new THREE.Box3().setFromObject(model);
+      const centre = box.getCenter(new THREE.Vector3());
+      model.position.sub(centre);
+      scene.add(model);
+      const size = box.getSize(new THREE.Vector3()).length();
+      camera.position.set(size * 0.35, size * 0.95, size * 0.95);
+      controls.target.set(0, 0, 0);
+      controls.update();
+      status.textContent = "Drag to turn, scroll to zoom";
+    }, undefined, () => { status.textContent = "Could not load assets/psu_board.glb"; });
+
+    window.addEventListener("resize", () => {
+      renderer.setSize(host.clientWidth, host.clientHeight);
+      camera.aspect = host.clientWidth / host.clientHeight;
+      camera.updateProjectionMatrix();
+    });
+    renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+  </script>
+</body>
+</html>
