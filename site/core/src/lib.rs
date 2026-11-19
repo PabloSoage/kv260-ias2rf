@@ -634,7 +634,7 @@ mod tests {
     fn spatial_grid_prefers_component_over_carrier() {
         let mut core = SiteCore::new();
         core.add_part(0, "KV260_CARRIER", "KV260", "Carrier", "", "Carrier card", "", 1, -0.01, -0.002, -0.109, 0.13, 0.0, 0.01);
-        core.add_part(1, "U1506", "U1506", "TCAN330DCNT", "TCAN330DCNT", "Vehicle CAN transceiver", "CAN_H\nCAN_L\n+3V3_D", 0, -0.014, 0.0005, -0.010, -0.011, 0.0018, -0.006);
+        core.add_part(1, "U1506", "U1506", "TCAN3403DDFRQ1", "TCAN3403DDFRQ1", "Vehicle CAN transceiver", "CAN_H\nCAN_L\n+3V3_D", 0, -0.014, 0.0005, -0.010, -0.011, 0.0018, -0.006);
         let y = [0.0f32; 8];
         core.set_group_transforms(&y, 0xff);
 

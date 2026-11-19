@@ -1295,12 +1295,37 @@ input[type="range"] {
 }
 
 .sim-fig-box {
+  min-width: 0;
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
   background: var(--bg-input);
   transition: border-color 0.16s var(--ease);
+}
+
+.audit-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, #f59e0b 55%, var(--border));
+  background: color-mix(in srgb, #f59e0b 10%, var(--bg-input));
+}
+
+.audit-callout strong {
+  font-size: 11px;
+  color: #f59e0b;
+}
+
+.audit-callout a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+.audit-callout a:hover {
+  text-decoration: underline;
 }
 
 .sim-fig-box:hover {

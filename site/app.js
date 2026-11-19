@@ -14,17 +14,28 @@ const BOARD_REG_ROTY = -Math.PI / 2;
 
 const DOC_PDF_PAGE_MAP = {
   "README.md": 6,
-  "docs/BOARD_MANUAL.md": 23,
-  "docs/FPGA_GATEWARE.md": 50,
-  "fpga/SYSTEM_SIM.md": 50,
-  "docs/INTERFACE_SPEC.md": 59,
-  "docs/INTEGRATIONS.md": 78,
-  "docs/POWER_AND_STACKUP.md": 120,
-  "docs/SIGNAL_INTEGRITY.md": 136,
-  "docs/3D_MODELS.md": 163,
-  "docs/MECHANICAL.md": 167,
-  "docs/ENCLOSURE.md": 171,
-  "docs/ENCLOSURE_V2_THERMAL.md": 184,
+  "docs/BOARD_MANUAL.md": 26,
+  "docs/FPGA_GATEWARE.md": 33,
+  "docs/SYSTEM_SIM.md": 59,
+  "fpga/SYSTEM_SIM.md": 59,
+  "docs/LINK_PROTOCOL.md": 63,
+  "docs/PINMAP.md": 69,
+  "docs/HMI.md": 81,
+  "docs/INTEGRATIONS.md": 89,
+  "docs/IAS_LINK_SPEC.md": 109,
+  "docs/CLOCK_SPEC.md": 113,
+  "docs/CONTROL_SPEC.md": 127,
+  "docs/POWER_SPEC.md": 134,
+  "docs/POWER_AND_STACKUP.md": 134,
+  "docs/LAYOUT.md": 142,
+  "docs/SIGNAL_INTEGRITY.md": 152,
+  "docs/AUDIT_Rev08.md": 180,
+  "docs/3D_MODELS.md": 190,
+  "docs/MECHANICAL.md": 194,
+  "docs/ENCLOSURE.md": 198,
+  "docs/ENCLOSURE_V2_THERMAL.md": 212,
+  "docs/FABRICATION.md": 234,
+  "docs/JLCPCB_QUOTE.md": 237,
 };
 
 function docToPdfHref(docPath) {
@@ -67,7 +78,7 @@ const GALLERY_SECTIONS = [
     items: [
       { src: "assets/img/board_iso.png", title: "Rev08 Final Adapter Isometric", cap: "Updated Rev08 board with routed vehicle CAN (U1506, Q1530/Q1531, J1503 6-way JST-SH)." },
       { src: "assets/img/board_top.png", title: "Rev08 Final Top Side", cap: "Front SMA launch panel, ADAR1000 header, J1502 15-way FFC, J1503 6-pin CAN+PPS & Artix-7." },
-      { src: "assets/img/board_bottom.png", title: "Rev08 Final Bottom Side", cap: "U1506 TCAN330DCNT CAN transceiver, Q1530/Q1531 NOR pair, D1531 PESD1CAN, J101/J102 plugs." },
+      { src: "assets/img/board_bottom.png", title: "Rev08 Final Bottom Side", cap: "U1506 TCAN3403DDFRQ1 CAN transceiver, Q1530/Q1531 NOR pair, D1531 PESD1CAN, J101/J102 plugs." },
       { src: "assets/img/case_v2_closed.jpg", title: "Closed Enclosure v2 (PETG-CF + TPU)", cap: "Dual-fan intake/exhaust enclosure with printable filter frame and corner bumpers." },
       { src: "assets/img/case_v2_open.jpg", title: "Closed Enclosure v2 (Open Service View)", cap: "Internal heatsink clearance, dual OD5015 lid fan and captive connector exits." },
     ],
@@ -1423,6 +1434,7 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
 
   if (entry.kind === "board") {
     const c = entry.data;
+    const auditLine = simCtrl?.getPartAuditLine?.(id) || null;
     const padRows = Object.entries(c.pads || {}).slice(0, 28).map(
       ([pin, net]) => `<tr><td class="mono">${escapeHtml(pin)}</td><td><button type="button" class="net-chip ${state.activeNet === net ? "active" : ""}" data-net="${escapeHtml(net)}">${escapeHtml(net)}</button></td></tr>`
     ).join("");
@@ -1438,6 +1450,17 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
         </div>
         <h2 style="margin:0;font-size:17px;">${escapeHtml(c.ref)} <small style="font-weight:500;color:var(--text-muted)">${escapeHtml(c.value)}</small></h2>
         <p style="margin:0;font-size:12px;">${escapeHtml(c.description || "no description yet")}</p>
+        ${auditLine ? `
+        <div class="audit-callout">
+          <div class="control-row">
+            <strong>Rev08 Audit (${escapeHtml(auditLine.code)}): ${escapeHtml(auditLine.title)}</strong>
+            <button type="button" class="net-chip sim-jump-btn" data-sim-jump-domain="audit" data-sim-jump-target="${escapeHtml(id)}">Audit 3-D</button>
+          </div>
+          <p style="margin:0;font-size:11px;line-height:1.4;">${escapeHtml(auditLine.summary)}</p>
+          <div class="mono" style="font-size:10px;color:var(--text-muted);">
+            <a href="${docToPdfHref(auditLine.doc_link || "docs/AUDIT_Rev08.md")}" target="_blank" rel="noopener">docs/AUDIT_Rev08.md (p.180)</a> &middot; ${escapeHtml(auditLine.source_file)}
+          </div>
+        </div>` : ""}
         ${c.callout ? `<p style="margin:0;font-size:11px;color:var(--cyan)"><strong>Manual callout:</strong> ${escapeHtml(c.callout)}</p>` : ""}
         <div class="btn-grid-3">
           <button id="insp-focus-btn" class="btn btn-sm btn-primary" type="button">Focus Camera</button>
@@ -2288,6 +2311,7 @@ window.__SITE_API = {
   setSimMode: (flag, domain, targetId) => (flag ? simCtrl?.activateDomain(domain || "rf", targetId || null) : simCtrl?.setEnabled(false)),
   getSimState: () => simCtrl?.getState() || null,
   getPartSims: (ref) => simCtrl?.getPartSimulations(ref) || [],
+  getPartAuditLine: (ref) => simCtrl?.getPartAuditLine(ref) || null,
   getStats: () => ({
     ready: state.ready,
     tab: state.tab,

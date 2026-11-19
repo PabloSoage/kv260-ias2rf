@@ -487,7 +487,7 @@ const KV260_PARTS = [
     assembly: "kv260",
     subassembly: "som",
     bbox_mm: [80.57, 26.95, 103.57, 49.95, 6.91, 10.03],
-    role: "Main SoC: 4x A53 (Linux, kria-hmid, kria-vehicled, kria-sdrd), 2x R5F (kria-r5f0 interlock/PPS/watchdog, kria-r5f1 radar scan/BEV grid/CAN1), Mali-400 GPU, VCU, and PL (53,294 LUTs = 45.5%, 229 DSP48E2, WNS +0.991 ns).",
+    role: "Main SoC: 4x A53 (Linux, kria-hmid, kria-vehicled, kria-sdrd), 2x R5F (kria-r5f0 interlock/PPS/watchdog, kria-r5f1 radar scan/BEV grid/CAN1), Mali-400 GPU, VCU, and PL (53,336 LUTs = 45.5%, 229 DSP48E2, WNS +1.043 ns, WHS +0.010 ns).",
     citation: "AMD DS987 / DS891 / UG1085",
     manual_link: "docs/HMI.md#5-processing-partition",
   },
@@ -791,7 +791,7 @@ const EXTRA_PARTS = [
     part: "Low-Profile Heatsink on XC7A50T FPGA",
     assembly: "heatsinks",
     bbox_mm: [-49.75, 33.0, -35.75, 47.0, 3.84, 8.84],
-    role: "8-fin low-profile copper heatsink on U1101 (XC7A50T front-end FPGA, ~0.73 W).",
+    role: "8-fin low-profile copper heatsink on U1101 (XC7A50T front-end FPGA, 1.25/1.60 W; required in a vehicle: 102.1 -> 93.4 C clean / 94.2 C clogged at 70 C).",
     manual_link: "docs/ENCLOSURE_V2_THERMAL.md",
   },
   {
@@ -958,7 +958,81 @@ function build() {
       (/1\s*(?:GND|ground)/i.test(manualInfo.desc) && /1\s*=\s*(?:GND|ground)/i.test(specInfo.desc)) ||
       specInfo.desc.split(/\W+/).filter((w) => w.length > 3).filter((w) => manualInfo.desc.toLowerCase().includes(w.toLowerCase())).length >= 5
     );
-    if (manualInfo && meaningfulSpec && !specOverlapsManual) {
+    const REV08_AUDIT_OVERRIDES = {
+      C1441: {
+        desc: "11 pF C0G 0402 series input capacitor, preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      L1441: {
+        desc: "24 nH LQW15AN 0402 shunt inductor with C1442 (36 pF), preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      C1442: {
+        desc: "36 pF C0G 0402 shunt capacitor with L1441 (24 nH), preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      C1443: {
+        desc: "5.6 pF C0G 0402 series arm capacitor, preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      L1442: {
+        desc: "22 nH LQW15AN 0402 shunt inductor with C1444 (91 pF), preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      C1444: {
+        desc: "91 pF C0G 0402 shunt capacitor with L1442 (22 nH), preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      C1445: {
+        desc: "8.2 pF C0G 0402 output capacitor to VU_PSB_HP, preselector B high-pass (Rev08 audit R1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      U1002: {
+        desc: "TPS563201 (3 A) synchronous buck converter for +3V3_D (upgraded from 2 A TPS562201, 63% worst-case use; Rev08 audit P5)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      U1006: {
+        desc: "TPS7A8300RGR low-noise LDO for +1V8_D set to 1.85 V (pin 5 ANY-OUT grounded; VCCAUX 1.714-1.873 V at balls, 0.91 W worst; Rev08 audit P4)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      U1315: {
+        desc: "LP5907MFX-2.8 ultra-low-noise LDO for +2V8_RF front-end rail (232 mV worst-case headroom vs 180 mV dropout; Rev08 audit P8)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      U1506: {
+        desc: "TCAN3403DDFRQ1 3.3 V CAN transceiver (+-58 V bus fault protection, pin 5 VIO on +3V3_D, STB low; Rev08 audit P1)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      F1001: {
+        desc: "mSMD200-24V 1812 PTC resettable fuse, 2.0 A hold (trips above 83.9 C at 12 V / 73.1 C at 10.5 V worst case; Rev08 audit P3)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      R1031: {
+        desc: "3.24 kOhm 0402 1% feedback divider resistor setting +1V0 buck to 1.017 V nominal (0.983 V at balls at full load; Rev08 audit P7)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      R1542: {
+        desc: "330 Ohm 0402 series resistor on GPS PPS line limiting back-powering into unpowered K26 to 7.6 mA (Rev08 audit P2b)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      R1543: {
+        desc: "330 Ohm 0402 series resistor on GPS PPS line copy limiting back-powering into unpowered K26 to 7.6 mA (Rev08 audit P2b)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      J961: {
+        desc: "VHF/UHF SMA antenna input: direct 30-170 MHz and converted from 300 MHz to 3 GHz (170-300 MHz not covered); selectable 3.3/5 V bias tee via AP22652 (Rev08 audit R1/R6/R7)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      J1102: {
+        desc: "12-pin 2x6 Pmod header (Artix bank 15 <-> K26 HDA); Pmod back-powering gated in gateware on both FPGAs (kria_present / adapter_alive, PMOD_SPARE2 open-drain; Rev08 audit P2)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+    };
+
+    const auditOv = REV08_AUDIT_OVERRIDES[ref] || null;
+    if (auditOv) {
+      description = auditOv.desc;
+    } else if (manualInfo && meaningfulSpec && !specOverlapsManual) {
       description = `${manualInfo.desc}. Spec: ${specInfo.desc}`;
     } else if (manualInfo) {
       description = manualInfo.desc;
@@ -967,6 +1041,10 @@ function build() {
     } else if (cleanBomDesc) {
       description = cleanBomDesc;
     }
+    description = description.replace(/\+3V0_RF/g, "+2V8_RF").replace(/\bTCAN330\b/g, "TCAN3403");
+    const calloutText = manualInfo
+      ? (typeof manualInfo.callout === "string" ? manualInfo.callout.replace(/\+3V0_RF/g, "+2V8_RF") : manualInfo.callout)
+      : null;
 
     // Registration into KV260 model frame: k2m(x, y) = (107.247 - y, 198.004 - x)
     const mx = +(107.247 - y).toFixed(3);
@@ -1003,8 +1081,8 @@ function build() {
       manufacturer: bomInfo ? bomInfo.manufacturer : "",
       bom_desc: cleanBomDesc,
       description,
-      callout: manualInfo ? manualInfo.callout : null,
-      manual_link: (manualInfo && manualInfo.manual_section) || sheetLink(sheet, ref),
+      callout: calloutText,
+      manual_link: (auditOv && auditOv.link) || (manualInfo && manualInfo.manual_section) || sheetLink(sheet, ref),
       nets: [...compNets].sort(),
       pads,
     });

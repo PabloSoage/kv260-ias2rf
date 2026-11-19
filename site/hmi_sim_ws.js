@@ -85,8 +85,9 @@ export function installHmiSimWebSocket() {
     else if (simState.speed_kmh >= 3.0) simState.parked_s = 0;
 
     const isHf = simState.freq_hz < 30e6;
-    const isDirect = simState.freq_hz >= 30e6 && simState.freq_hz < 170e6;
-    const path = isHf ? "hf" : isDirect ? "direct" : "converted";
+    const isDirect = simState.freq_hz >= 30e6 && simState.freq_hz <= 170e6;
+    const isGap = simState.freq_hz > 170e6 && simState.freq_hz < 300e6;
+    const path = isHf ? "hf" : isDirect ? "direct" : isGap ? "uncovered" : "converted";
     const span = isHf ? 2.5e6 : 2.5e6;
 
     const trace = [];

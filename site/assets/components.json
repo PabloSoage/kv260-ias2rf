@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18T18:16:31.996Z",
+  "generated_at": "2026-11-19T09:17:42.328Z",
   "pcb_file": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
   "registration": {
     "note": "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
@@ -96,12 +96,12 @@
     ]
   },
   "counts": {
-    "total_components": 795,
-    "described": 767,
+    "total_components": 802,
+    "described": 774,
     "undescribed": 28,
-    "kicad_step_models": 755,
+    "kicad_step_models": 762,
     "procedural_replacements": 9,
-    "unique_nets": 587,
+    "unique_nets": 592,
     "kv260_parts": 23
   },
   "layer_stack": [
@@ -195,6 +195,370 @@
     }
   ],
   "components": [
+    {
+      "id": "C1441",
+      "ref": "C1441",
+      "value": "11p",
+      "footprint": "C_0402_1005Metric",
+      "side": "top",
+      "x_mm": 118.4,
+      "y_mm": 117.8,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        117.94,
+        116.89,
+        118.86,
+        118.71
+      ],
+      "model_pos_mm": [
+        -10.553,
+        79.604,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -11.463,
+        79.144,
+        -9.643,
+        80.064,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.82,
+        0.92,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C527000",
+      "mpn": "CC0402JRNPO9BN110",
+      "manufacturer": "YAGEO",
+      "bom_desc": "11pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "11 pF C0G 0402 series input capacitor, preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "/RX_VU/VU_PSB_IN",
+        "Net-(C1441-Pad2)"
+      ],
+      "pads": {
+        "1": "/RX_VU/VU_PSB_IN",
+        "2": "Net-(C1441-Pad2)"
+      }
+    },
+    {
+      "id": "L1441",
+      "ref": "L1441",
+      "value": "24n",
+      "footprint": "L_0402_1005Metric",
+      "side": "top",
+      "x_mm": 119.4,
+      "y_mm": 117.8,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        118.93,
+        116.87,
+        119.87,
+        118.73
+      ],
+      "model_pos_mm": [
+        -10.553,
+        78.604,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -11.483,
+        78.134,
+        -9.623,
+        79.074,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C167472",
+      "mpn": "LQW15AN24NG00D",
+      "manufacturer": "Murata Electronics",
+      "bom_desc": "24nH 280mA 520mΩ Unshielded Inductor ±2% 0402 Inductors (SMD) ROHS",
+      "description": "24 nH LQW15AN 0402 shunt inductor with C1442 (36 pF), preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "Net-(C1441-Pad2)",
+        "Net-(C1442-Pad1)"
+      ],
+      "pads": {
+        "1": "Net-(C1441-Pad2)",
+        "2": "Net-(C1442-Pad1)"
+      }
+    },
+    {
+      "id": "C1442",
+      "ref": "C1442",
+      "value": "36p",
+      "footprint": "C_0402_1005Metric",
+      "side": "top",
+      "x_mm": 119.4,
+      "y_mm": 119.8,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        118.94,
+        118.89,
+        119.86,
+        120.71
+      ],
+      "model_pos_mm": [
+        -12.553,
+        78.604,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -13.463,
+        78.144,
+        -11.643,
+        79.064,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.82,
+        0.92,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C114394",
+      "mpn": "CC0402JRNPO9BN360",
+      "manufacturer": "YAGEO",
+      "bom_desc": "36pF 50V NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "36 pF C0G 0402 shunt capacitor with L1441 (24 nH), preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "GND",
+        "Net-(C1442-Pad1)"
+      ],
+      "pads": {
+        "1": "Net-(C1442-Pad1)",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "C1443",
+      "ref": "C1443",
+      "value": "5.6p",
+      "footprint": "C_0402_1005Metric",
+      "side": "top",
+      "x_mm": 118.4,
+      "y_mm": 115.8,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        117.94,
+        114.89,
+        118.86,
+        116.71
+      ],
+      "model_pos_mm": [
+        -8.553,
+        79.604,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -9.463,
+        79.144,
+        -7.643,
+        80.064,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.82,
+        0.92,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C505468",
+      "mpn": "CC0402BRNPO9BN5R6",
+      "manufacturer": "YAGEO",
+      "bom_desc": "5.6pF 50V NP0 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "5.6 pF C0G 0402 series arm capacitor, preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "Net-(C1441-Pad2)",
+        "Net-(C1443-Pad2)"
+      ],
+      "pads": {
+        "1": "Net-(C1441-Pad2)",
+        "2": "Net-(C1443-Pad2)"
+      }
+    },
+    {
+      "id": "L1442",
+      "ref": "L1442",
+      "value": "22n",
+      "footprint": "L_0402_1005Metric",
+      "side": "top",
+      "x_mm": 119.4,
+      "y_mm": 115.05,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        118.93,
+        114.12,
+        119.87,
+        115.98
+      ],
+      "model_pos_mm": [
+        -7.803,
+        78.604,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -8.733,
+        78.134,
+        -6.873,
+        79.074,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.86,
+        0.94,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C86129",
+      "mpn": "LQW15AN22NG00D",
+      "manufacturer": "Murata Electronics",
+      "bom_desc": "22nH 300mΩ 310mA Unshielded Inductor ±2% 0402 Power Inductors ROHS",
+      "description": "22 nH LQW15AN 0402 shunt inductor with C1444 (91 pF), preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "Net-(C1443-Pad2)",
+        "Net-(C1444-Pad1)"
+      ],
+      "pads": {
+        "1": "Net-(C1443-Pad2)",
+        "2": "Net-(C1444-Pad1)"
+      }
+    },
+    {
+      "id": "C1444",
+      "ref": "C1444",
+      "value": "91p",
+      "footprint": "C_0402_1005Metric",
+      "side": "top",
+      "x_mm": 119.4,
+      "y_mm": 113.15,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        118.94,
+        112.24,
+        119.86,
+        114.06
+      ],
+      "model_pos_mm": [
+        -5.903,
+        78.604,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -6.813,
+        78.144,
+        -4.993,
+        79.064,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.82,
+        0.92,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C541365",
+      "mpn": "CC0402JRNPO9BN910",
+      "manufacturer": "YAGEO",
+      "bom_desc": "50V 91pF NP0 ±5% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "91 pF C0G 0402 shunt capacitor with L1442 (22 nH), preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "GND",
+        "Net-(C1444-Pad1)"
+      ],
+      "pads": {
+        "1": "Net-(C1444-Pad1)",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "C1445",
+      "ref": "C1445",
+      "value": "8.2p",
+      "footprint": "C_0402_1005Metric",
+      "side": "top",
+      "x_mm": 117.35,
+      "y_mm": 116,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        116.89,
+        115.09,
+        117.81,
+        116.91
+      ],
+      "model_pos_mm": [
+        -8.753,
+        80.654,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -9.663,
+        80.194,
+        -7.843,
+        81.114,
+        2.4,
+        2.95
+      ],
+      "local_size_mm": [
+        1.82,
+        0.92,
+        0.55
+      ],
+      "sheet": "RX_VU",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C327205",
+      "mpn": "CC0402BRNPO9BN8R2",
+      "manufacturer": "YAGEO",
+      "bom_desc": "50V 8.2pF NP0 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "8.2 pF C0G 0402 output capacitor to VU_PSB_HP, preselector B high-pass (Rev08 audit R1)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "/RX_VU/VU_PSB_HP",
+        "Net-(C1443-Pad2)"
+      ],
+      "pads": {
+        "1": "Net-(C1443-Pad2)",
+        "2": "/RX_VU/VU_PSB_HP"
+      }
+    },
     {
       "id": "R1010",
       "ref": "R1010",
@@ -1966,11 +2330,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -3803,11 +4167,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -4477,10 +4841,10 @@
       "callout": 80,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_HP1G_IN",
         "/RX_VU/VU_LP1G_IN",
-        "/RX_VU/VU_PSB_IN",
+        "/RX_VU/VU_PSB_HP",
         "/RX_VU/VU_PSB_V1",
         "/RX_VU/VU_PSB_V2",
         "/RX_VU/VU_PSB_V3",
@@ -4492,7 +4856,7 @@
         "1": "(nc)",
         "2": "/RX_VU/VU_HP1G_IN",
         "3": "/RX_VU/VU_UHF_IN",
-        "4": "+3V0_RF",
+        "4": "+2V8_RF",
         "5": "/RX_VU/VU_PSB_V3",
         "6": "/RX_VU/VU_PSB_V2",
         "7": "/RX_VU/VU_PSB_V1",
@@ -4501,7 +4865,7 @@
         "10": "/RX_VU/VU_LP1G_IN",
         "11": "(nc)",
         "12": "(nc)",
-        "13": "/RX_VU/VU_PSB_IN",
+        "13": "/RX_VU/VU_PSB_HP",
         "14": "(nc)",
         "15": "GND"
       }
@@ -9822,7 +10186,7 @@
       "callout": 78,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_FMBP_IN",
         "/RX_VU/VU_FMREJ_IN",
         "/RX_VU/VU_PSA_IN",
@@ -9848,7 +10212,7 @@
         "13": "GND",
         "14": "/RX_VU/VU_PSA_THRU",
         "15": "GND",
-        "16": "+3V0_RF",
+        "16": "+2V8_RF",
         "17": "/RX_VU/VU_PSA_V1",
         "18": "/RX_VU/VU_PSA_V2",
         "19": "GND",
@@ -10528,7 +10892,7 @@
       "callout": 86,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_ENBL",
         "/RX_VU/VU_ENX",
         "/RX_VU/VU_LD",
@@ -10551,7 +10915,7 @@
         "2": "(nc)",
         "3": "(nc)",
         "4": "/RX_VU/VU_REXT",
-        "5": "+3V0_RF",
+        "5": "+2V8_RF",
         "6": "/RX_VU/VU_LF1",
         "7": "/RX_VU/VU_LF2",
         "8": "/RX_VU/VU_LF3",
@@ -10565,10 +10929,10 @@
         "16": "(nc)",
         "17": "(nc)",
         "18": "(nc)",
-        "19": "+3V0_RF",
+        "19": "+2V8_RF",
         "20": "(nc)",
         "21": "(nc)",
-        "22": "+3V0_RF",
+        "22": "+2V8_RF",
         "23": "/RX_VU/VU_MIX_IPP",
         "24": "/RX_VU/VU_MIX_IPN",
         "25": "(nc)",
@@ -11979,7 +12343,7 @@
       "callout": 76,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_LNA_BYPASS",
         "/RX_VU/VU_LNA_IN_SW",
         "/RX_VU/VU_LNA_ON",
@@ -11992,7 +12356,7 @@
         "3": "/RX_VU/VU_LNA_BYPASS",
         "4": "/RX_VU/VU_LNA_ON",
         "5": "/RX_VU/VU_LNA_SW_IN",
-        "6": "+3V0_RF"
+        "6": "+2V8_RF"
       }
     },
     {
@@ -12310,7 +12674,7 @@
     {
       "id": "R1031",
       "ref": "R1031",
-      "value": "3.09k",
+      "value": "3.24k",
       "footprint": "R_0402_1005Metric",
       "side": "top",
       "x_mm": 116.15,
@@ -12343,13 +12707,13 @@
       "sheet": "POWER",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C11460",
-      "mpn": "0402WGF3091TCE",
+      "lcsc": "C11457",
+      "mpn": "0402WGF3241TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
-      "bom_desc": "-55℃~+155℃ 3.09kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "-55℃~+155℃ 3.09kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "bom_desc": "-55℃~+155℃ 3.24kΩ 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "3.24 kOhm 0402 1% feedback divider resistor setting +1V0 buck to 1.017 V nominal (0.983 V at balls at full load; Rev08 audit P7)",
       "callout": null,
-      "manual_link": "docs/POWER_SPEC.md",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+1V0",
         "Net-(U1004-VFB)"
@@ -13693,11 +14057,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -13963,7 +14327,7 @@
       "callout": 79,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_FMBP_OUT",
         "/RX_VU/VU_FMREJ_OUT",
         "/RX_VU/VU_PSA_OUT",
@@ -13989,7 +14353,7 @@
         "13": "GND",
         "14": "/RX_VU/VU_PSA_THRU",
         "15": "GND",
-        "16": "+3V0_RF",
+        "16": "+2V8_RF",
         "17": "/RX_VU/VU_PSA_V1",
         "18": "/RX_VU/VU_PSA_V2",
         "19": "GND",
@@ -15974,7 +16338,7 @@
     {
       "id": "F1001",
       "ref": "F1001",
-      "value": "PTC 1.5A hold",
+      "value": "PTC 2A hold",
       "footprint": "Fuse_1812_4532Metric",
       "side": "top",
       "x_mm": 107.5,
@@ -16007,13 +16371,13 @@
       "sheet": "POWER",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C142805",
-      "mpn": "1812L150/24MR",
-      "manufacturer": "Littelfuse",
-      "bom_desc": "-40℃~+85℃ 1.5A 1.5s 1.8mm 120mΩ 20A 24V 3.41mm 3A 4.73mm 40mΩ 800mW 1812 Resettable Fuses ROHS",
-      "description": "Judgement: input 0.96 A with margin (POWER_AND_STACKUP §1.3); 1.5 A hold. Part to choose",
+      "lcsc": "C143954",
+      "mpn": "mSMD200-24V",
+      "manufacturer": "TECHFUSE",
+      "bom_desc": "-40℃~+85℃ 100A 100mΩ 200A 20mΩ 24V 4A 800mW 8s 1812 Resettable Fuses ROHS",
+      "description": "mSMD200-24V 1812 PTC resettable fuse, 2.0 A hold (trips above 83.9 C at 12 V / 73.1 C at 10.5 V worst case; Rev08 audit P3)",
       "callout": null,
-      "manual_link": "docs/POWER_SPEC.md",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "/POWER/VIN_F",
         "Net-(F1001-Pad1)"
@@ -17593,11 +17957,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -19131,9 +19495,9 @@
       "mpn": "TPS7A8300RGRR",
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 200mV@(2A) 2A 40dB@(1MHz) 6.5V 6uVrms 800mV~5V Adjustable PG Pin、Over Current Protection、Over Temperature Protection、Soft Start、Thermal Shutdown VQFN-20-EP(3.5x3.5) Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
-      "description": "+3V3_D to +1V8_D LDO (FPGA VCCAUX, the ADCs' outputs)",
+      "description": "TPS7A8300RGR low-noise LDO for +1V8_D set to 1.85 V (pin 5 ANY-OUT grounded; VCCAUX 1.714-1.873 V at balls, 0.91 W worst; Rev08 audit P4)",
       "callout": 71,
-      "manual_link": "docs/BOARD_MANUAL.md#4-chips",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+1V8_D",
         "+3V3_D",
@@ -19145,7 +19509,7 @@
         "2": "+1V8_D",
         "3": "Net-(U1006-FB)",
         "4": "(nc)",
-        "5": "(nc)",
+        "5": "GND",
         "6": "(nc)",
         "7": "GND",
         "8": "GND",
@@ -20592,7 +20956,7 @@
     {
       "id": "U1002",
       "ref": "U1002",
-      "value": "TPS562201",
+      "value": "TPS563201",
       "footprint": "SOT-23-6",
       "side": "top",
       "x_mm": 93.5,
@@ -20625,13 +20989,13 @@
       "sheet": "POWER",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C90061",
-      "mpn": "TPS562201DDCR",
+      "lcsc": "C116592",
+      "mpn": "TPS563201DDCR",
       "manufacturer": "Texas Instruments",
-      "bom_desc": "-40℃~+125℃@(TJ) 1 2A 380uA 4.5V~17V 580kHz 768mV~7V Adjustable Buck Built-in Overcurrent Protection、Light load efficient mode、Cycle-by-cycle current limiting、Hiccup current limiting Step-down type Yes TSOT-23-6 DC-DC Converters ROHS",
-      "description": "+5V0 to +3V3_D buck",
+      "bom_desc": "-40℃~+125℃@(TJ) 1 3A 4.5V~17V 580kHz 768mV~7V Adjustable Buck Buck Built-in Yes SOT-23-THIN-6 DC-DC Converters ROHS",
+      "description": "TPS563201 (3 A) synchronous buck converter for +3V3_D (upgraded from 2 A TPS562201, 63% worst-case use; Rev08 audit P5)",
       "callout": 67,
-      "manual_link": "docs/BOARD_MANUAL.md#4-chips",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+5V0",
         "GND",
@@ -20901,11 +21265,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -21057,11 +21421,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -22267,9 +22631,9 @@
       "mpn": "SMA-J-P-H-ST-EM1",
       "manufacturer": "Samtec",
       "bom_desc": "-65℃~+125℃ 1 20GHz 335V 50Ω Board Side Inner pin Positive Pin SMA SMD Coaxial Connectors (RF) ROHS",
-      "description": "VHF/UHF antenna (SMA, back wall): the Rev08 front end, 30 MHz-3 GHz (direct below 170 MHz, converted above), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed. Spec: The thirteenth SMA: VHF/UHF antenna, 30 MHz - 3 GHz; bias tee up to 125 mA at 5 V (JP1301)",
+      "description": "VHF/UHF SMA antenna input: direct 30-170 MHz and converted from 300 MHz to 3 GHz (170-300 MHz not covered); selectable 3.3/5 V bias tee via AP22652 (Rev08 audit R1/R6/R7)",
       "callout": 16,
-      "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "/RX_VU/VU_ANT",
         "GND"
@@ -23069,11 +23433,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -23589,7 +23953,7 @@
       "callout": 106,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_MIX_OPN",
         "/RX_VU/VU_MIX_OPP",
         "/RX_VU/VU_MIX_OUT",
@@ -23597,7 +23961,7 @@
       ],
       "pads": {
         "1": "/RX_VU/VU_MIX_OPP",
-        "2": "+3V0_RF",
+        "2": "+2V8_RF",
         "3": "/RX_VU/VU_MIX_OPN",
         "4": "/RX_VU/VU_MIX_OUTR",
         "6": "/RX_VU/VU_MIX_OUT"
@@ -24653,7 +25017,7 @@
       "callout": 81,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_HP1G_OUT",
         "/RX_VU/VU_LP1G_OUT",
         "/RX_VU/VU_PSB_OUT",
@@ -24668,7 +25032,7 @@
         "1": "(nc)",
         "2": "/RX_VU/VU_HP1G_OUT",
         "3": "/RX_VU/VU_UHF_OUT",
-        "4": "+3V0_RF",
+        "4": "+2V8_RF",
         "5": "/RX_VU/VU_PSB_V3",
         "6": "/RX_VU/VU_PSB_V2",
         "7": "/RX_VU/VU_PSB_V1",
@@ -25778,7 +26142,7 @@
       "callout": 82,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_CONV_BYPASS",
         "/RX_VU/VU_CONV_ON",
         "/RX_VU/VU_MIX_IN_SW",
@@ -25791,7 +26155,7 @@
         "3": "/RX_VU/VU_CONV_BYPASS",
         "4": "/RX_VU/VU_CONV_ON",
         "5": "/RX_VU/VU_PSA_OUT",
-        "6": "+3V0_RF"
+        "6": "+2V8_RF"
       }
     },
     {
@@ -26254,11 +26618,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -28299,7 +28663,7 @@
       "callout": 83,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_AA_IN",
         "/RX_VU/VU_CONV_BYPASS",
         "/RX_VU/VU_CONV_ON",
@@ -28312,7 +28676,7 @@
         "3": "/RX_VU/VU_CONV_BYPASS",
         "4": "/RX_VU/VU_CONV_ON",
         "5": "/RX_VU/VU_AA_IN",
-        "6": "+3V0_RF"
+        "6": "+2V8_RF"
       }
     },
     {
@@ -28931,11 +29295,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -29083,9 +29447,9 @@
       "mpn": "HX PZ2.54-2x6P ZZ",
       "manufacturer": "hanxia",
       "bom_desc": "-40℃~+105℃ 12P 1kV 2 2.54mm 2.54mm 2.5mm 2x6P 3A 3mm 6mm Black Copper Alloy Gold Square pin Through Hole Plugin,P=2.54mm Pin Headers ROHS",
-      "description": "Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below. Spec: Cable to the KV260's Pmod J2 (INTERFACE_SPEC §4.2)",
+      "description": "12-pin 2x6 Pmod header (Artix bank 15 <-> K26 HDA); Pmod back-powering gated in gateware on both FPGAs (kria_present / adapter_alive, PMOD_SPARE2 open-drain; Rev08 audit P2)",
       "callout": 20,
-      "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "/CONTROL/BEAM_STROBE",
         "/CONTROL/PMOD_CS",
@@ -30215,11 +30579,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -30631,7 +30995,7 @@
       "callout": 77,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_LNA_BYPASS",
         "/RX_VU/VU_LNA_ON",
         "/RX_VU/VU_LNA_OUT_SW",
@@ -30644,7 +31008,7 @@
         "3": "/RX_VU/VU_LNA_BYPASS",
         "4": "/RX_VU/VU_LNA_ON",
         "5": "/RX_VU/VU_PSA_IN",
-        "6": "+3V0_RF"
+        "6": "+2V8_RF"
       }
     },
     {
@@ -32365,11 +32729,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -33474,11 +33838,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -35026,11 +35390,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -35304,11 +35668,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -35760,11 +36124,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_BIAS_FLT_N"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_BIAS_FLT_N"
       }
     },
@@ -36065,11 +36429,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_TCXO_VCC"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_TCXO_VCC"
       }
     },
@@ -36180,7 +36544,7 @@
     {
       "id": "R1543",
       "ref": "R1543",
-      "value": "220",
+      "value": "330",
       "footprint": "R_0402_1005Metric",
       "side": "bottom",
       "x_mm": 196,
@@ -36213,13 +36577,13 @@
       "sheet": "STATUS",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C25091",
-      "mpn": "0402WGF2200TCE",
+      "lcsc": "C25104",
+      "mpn": "0402WGF3300TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
-      "bom_desc": "-55℃~+155℃ 220Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "PPS to J1502 pin 4 (J9 pin 12 with a reversing cable)",
+      "bom_desc": "-55℃~+155℃ 330Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "330 Ohm 0402 series resistor on GPS PPS line copy limiting back-powering into unpowered K26 to 7.6 mA (Rev08 audit P2b)",
       "callout": null,
-      "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "/STATUS/GPS_PPS_Y",
         "/STATUS/J9_PPS4"
@@ -36495,7 +36859,7 @@
     {
       "id": "R1542",
       "ref": "R1542",
-      "value": "220",
+      "value": "330",
       "footprint": "R_0402_1005Metric",
       "side": "bottom",
       "x_mm": 192.55,
@@ -36528,13 +36892,13 @@
       "sheet": "STATUS",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C25091",
-      "mpn": "0402WGF2200TCE",
+      "lcsc": "C25104",
+      "mpn": "0402WGF3300TCE",
       "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
-      "bom_desc": "-55℃~+155℃ 220Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
-      "description": "PPS to J1502 pin 12 (J9 pin 12 with a straight cable)",
+      "bom_desc": "-55℃~+155℃ 330Ω 50V 62.5mW Thick Film Resistor ±1% ±100ppm/℃ 0402 Chip Resistor - Surface Mount ROHS",
+      "description": "330 Ohm 0402 series resistor on GPS PPS line limiting back-powering into unpowered K26 to 7.6 mA (Rev08 audit P2b)",
       "callout": null,
-      "manual_link": "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "/STATUS/GPS_PPS_Y",
         "/STATUS/J9_PPS12"
@@ -36900,7 +37264,7 @@
       "callout": 87,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "+3V3_D",
         "/RX_VU/VU_ATT_LE",
         "/RX_VU/VU_BIAS_EN_N",
@@ -36944,7 +37308,7 @@
         "18": "GND",
         "19": "/XO_SCL",
         "20": "/XO_SDA",
-        "21": "+3V0_RF",
+        "21": "+2V8_RF",
         "22": "(nc)",
         "23": "+3V3_D",
         "24": "/RX_VU/VU_EXP_RST",
@@ -37355,15 +37719,15 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "+3V0_RF",
+      "description": "+2V8_RF",
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -37673,11 +38037,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_RESETX"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_RESETX"
       }
     },
@@ -38312,11 +38676,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -38520,11 +38884,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -38780,11 +39144,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -38988,11 +39352,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -39664,11 +40028,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -39820,11 +40184,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_BIAS_EN_N"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_BIAS_EN_N"
       }
     },
@@ -40184,7 +40548,7 @@
       "callout": 85,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/IF_VU",
         "/RX_VU/VU_ATT_DATA",
         "/RX_VU/VU_ATT_IN",
@@ -40193,26 +40557,26 @@
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_ATT_IN",
         "3": "/RX_VU/VU_ATT_DATA",
         "4": "/RX_VU/VU_SCLK",
         "5": "/RX_VU/VU_ATT_LE",
-        "6": "+3V0_RF",
+        "6": "+2V8_RF",
         "7": "GND",
         "8": "GND",
-        "9": "+3V0_RF",
+        "9": "+2V8_RF",
         "10": "GND",
         "11": "GND",
         "12": "GND",
-        "13": "+3V0_RF",
+        "13": "+2V8_RF",
         "14": "/IF_VU",
-        "15": "+3V0_RF",
-        "16": "+3V0_RF",
-        "17": "+3V0_RF",
+        "15": "+2V8_RF",
+        "16": "+2V8_RF",
+        "17": "+2V8_RF",
         "18": "GND",
-        "19": "+3V0_RF",
-        "20": "+3V0_RF",
+        "19": "+2V8_RF",
+        "20": "+2V8_RF",
         "21": "GND"
       }
     },
@@ -40520,11 +40884,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_ENX"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_ENX"
       }
     },
@@ -40884,11 +41248,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_IFA_OUT"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_IFA_OUT"
       }
     },
@@ -40988,11 +41352,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_LNA_BIAS"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_LNA_BIAS"
       }
     },
@@ -41103,7 +41467,7 @@
     {
       "id": "U1315",
       "ref": "U1315",
-      "value": "LP5907MFX-3.0",
+      "value": "LP5907MFX-2.8",
       "footprint": "SOT-23-5",
       "side": "bottom",
       "x_mm": 97.862,
@@ -41136,15 +41500,15 @@
       "sheet": "RX_VU",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C475492",
-      "mpn": "LP5907MFX-3.0/NOPB",
+      "lcsc": "C186700",
+      "mpn": "LP5907MFX-2.8/NOPB",
       "manufacturer": "Texas Instruments",
-      "bom_desc": "-40℃~+125℃@(Tj) 1 120mV@(250mA) 12uA 250mA 3V 5.5V 6.5uVrms 82dB@(1kHz) Fixed Over Temperature Protection、Enable、Short Circuit Protection Positive SOT-23-5 Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
-      "description": "+3V0 LDO for the front end. Spec: +3V0_RF for the whole block, 250 mA, low noise",
+      "bom_desc": "-40℃~+125℃@(Tj) 1 120mV@(250mA) 12uA 2.8V 250mA 5.5V 6.5uVrms 82dB@(1kHz) Fixed Positive Short Circuit Protection、Thermal shutdown、Enable control、Input under-voltage protection、Output discharge SOT-23-5 Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
+      "description": "LP5907MFX-2.8 ultra-low-noise LDO for +2V8_RF front-end rail (232 mV worst-case headroom vs 180 mV dropout; Rev08 audit P8)",
       "callout": 89,
-      "manual_link": "docs/BOARD_MANUAL.md#4-chips",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_LDO_IN",
         "GND"
       ],
@@ -41153,7 +41517,7 @@
         "2": "GND",
         "3": "/RX_VU/VU_LDO_IN",
         "4": "(nc)",
-        "5": "+3V0_RF"
+        "5": "+2V8_RF"
       }
     },
     {
@@ -42424,11 +42788,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "/RX_VU/VU_MODE"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "/RX_VU/VU_MODE"
       }
     },
@@ -42580,11 +42944,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -42632,11 +42996,11 @@
       "callout": null,
       "manual_link": "docs/RX_VU_SPEC.md",
       "nets": [
-        "+3V0_RF",
+        "+2V8_RF",
         "GND"
       ],
       "pads": {
-        "1": "+3V0_RF",
+        "1": "+2V8_RF",
         "2": "GND"
       }
     },
@@ -42803,7 +43167,7 @@
     {
       "id": "U1506",
       "ref": "U1506",
-      "value": "TCAN330DCNT",
+      "value": "TCAN3403DDFRQ1",
       "footprint": "SOT-23-8",
       "side": "bottom",
       "x_mm": 189.85,
@@ -42836,13 +43200,13 @@
       "sheet": "STATUS",
       "dnp": false,
       "model_source": "kicad-step",
-      "lcsc": "C2671056",
-      "mpn": "TCAN330DCNT",
+      "lcsc": "C35926232",
+      "mpn": "TCAN3403DDFRQ1",
       "manufacturer": "Texas Instruments",
-      "bom_desc": "-40℃~+125℃ 1 1Mbps 2.5mA 3V~3.6V 60mA CAN Transceiver Low-power mode、Wake-up function、TXD dominant timeout、ESD protection、Undervoltage Protection、Thermal shutdown protection、Bus fault protection、Short-Circuit Protection、Silent mode SOT-23-8 CAN Transceivers ROHS",
-      "description": "Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8. Spec: Vehicle CAN transceiver, 3.3 V, TXD and RXD dominant time-out; S and SHDN low: normal mode",
+      "bom_desc": "-40℃~+150℃ 1 15uA 3.3V 60mA 8Mbps CAN FD Transceiver TSOT-23-8 CAN Transceivers ROHS",
+      "description": "TCAN3403DDFRQ1 3.3 V CAN transceiver (+-58 V bus fault protection, pin 5 VIO on +3V3_D, STB low; Rev08 audit P1)",
       "callout": 95,
-      "manual_link": "docs/BOARD_MANUAL.md#4-chips",
+      "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+3V3_D",
         "/STATUS/CAN_H",
@@ -42856,7 +43220,7 @@
         "2": "GND",
         "3": "+3V3_D",
         "4": "/STATUS/CAN_RXD",
-        "5": "GND",
+        "5": "+3V3_D",
         "6": "/STATUS/CAN_L",
         "7": "/STATUS/CAN_H",
         "8": "GND"
@@ -42956,7 +43320,7 @@
       "mpn": "CL05B104KO5NNNC",
       "manufacturer": "Samsung Electro-Mechanics",
       "bom_desc": "100nF 16V X7R ±10% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
-      "description": "TCAN330 VCC",
+      "description": "TCAN3403 VCC",
       "callout": null,
       "manual_link": "docs/INTEGRATIONS.md#22-the-vehicles-can-bus-on-r5f-core-1",
       "nets": [
@@ -43495,7 +43859,7 @@
         6.91,
         10.03
       ],
-      "role": "Main SoC: 4x A53 (Linux, kria-hmid, kria-vehicled, kria-sdrd), 2x R5F (kria-r5f0 interlock/PPS/watchdog, kria-r5f1 radar scan/BEV grid/CAN1), Mali-400 GPU, VCU, and PL (53,294 LUTs = 45.5%, 229 DSP48E2, WNS +0.991 ns).",
+      "role": "Main SoC: 4x A53 (Linux, kria-hmid, kria-vehicled, kria-sdrd), 2x R5F (kria-r5f0 interlock/PPS/watchdog, kria-r5f1 radar scan/BEV grid/CAN1), Mali-400 GPU, VCU, and PL (53,336 LUTs = 45.5%, 229 DSP48E2, WNS +1.043 ns, WHS +0.010 ns).",
       "citation": "AMD DS987 / DS891 / UG1085",
       "manual_link": "docs/HMI.md#5-processing-partition"
     },
@@ -43946,7 +44310,7 @@
         3.84,
         8.84
       ],
-      "role": "8-fin low-profile copper heatsink on U1101 (XC7A50T front-end FPGA, ~0.73 W).",
+      "role": "8-fin low-profile copper heatsink on U1101 (XC7A50T front-end FPGA, 1.25/1.60 W; required in a vehicle: 102.1 -> 93.4 C clean / 94.2 C clogged at 70 C).",
       "manual_link": "docs/ENCLOSURE_V2_THERMAL.md"
     },
     {

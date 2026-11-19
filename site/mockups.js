@@ -525,7 +525,7 @@ Verdict -> ${reasonText}`;
 
       ctx.fillStyle = "#93a1b3";
       ctx.font = "10px monospace";
-      ctx.fillText("U1506 TCAN330 CANH (3.5V) / CANL (1.5V)", 8, 13);
+      ctx.fillText("U1506 TCAN3403 CANH (3.5V) / CANL (1.5V)", 8, 13);
     }
   }
 

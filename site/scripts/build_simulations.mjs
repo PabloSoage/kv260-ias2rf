@@ -71,6 +71,12 @@ function copySimImages() {
     "v2_thermal_3d_cutaway.png",
     "v2_thermal_3d_heatsinks_compare.png",
     "v2_built_margins_70c.png",
+    "v2_built_flow_and_pcb.png",
+    "v2_built_fan_pq_and_ambient.png",
+    "rf_audit_uhf_path.png",
+    "power_budget_ptc.png",
+    "power_startup.png",
+    "power_transients.png",
     "case_materials.png",
   ];
   const fromDocsImg = ["case3d_v2_stress.jpg", "case3d_v2_boards.jpg"];
@@ -289,20 +295,32 @@ function build() {
   // -------------------------------------------------------------------------
   // 2. Electrical / Power & PDN
   // -------------------------------------------------------------------------
+  const rfAudit = readJson("docs/sim/rf_audit.json");
+  const pwrAudit = readJson("docs/sim/power_audit.json");
+  const pwrByRail = new Map((pwrAudit.budget?.rows || []).map((r) => [r.rail, r]));
   const fb401 = readJson("docs/sim/fb401_filter.json");
   const fb401Bead = fb401.beads["220R, 2 A (proposed)"];
   const fb401Nom = fb401Bead.cases["30% of L left"];
+  const r1v0 = pwrByRail.get("+1V0") || { worst_ma: 735 };
+  const r1v8d = pwrByRail.get("+1V8_D") || { worst_ma: 629 };
+  const r2v5 = pwrByRail.get("+2V5") || { worst_ma: 601 };
+  const r3v3d = pwrByRail.get("+3V3_D") || { worst_ma: 1890 };
+  const r5v0 = pwrByRail.get("+5V0") || { worst_ma: 2409 };
+  const r1v8a = pwrByRail.get("+1V8_A") || { worst_ma: 500 };
+  const r3v3a = pwrByRail.get("+3V3_A") || { worst_ma: 100 };
+  const r2v8rf = pwrByRail.get("+2V8_RF") || { worst_ma: 180 };
+  const rm3v3 = pwrByRail.get("-3V3") || { worst_ma: 8 };
   const pdnConfigs = [
-    { rail: "+1V0", label: "+1V0 VCCINT Core", voltage_V: 1.0, current_mA: 700, power_W: 0.70, reg: "U1004", ind: "L1030", loads: ["U1101"], target_z_mohm: 120, sim_z_band_mohm: 51, sim_z_100MHz_mohm: 61, dc_res_mohm: 36, dc_drop_mV: 25, dc_drop_pct: 2.5, csv: "docs/sim/pdn_1V0.csv", figure: "assets/img/sim_results/pdn_1V0.png" },
-    { rail: "+1V8_D", label: "+1V8_D Digital & ADC", voltage_V: 1.8, current_mA: 333, power_W: 0.60, reg: "U1006", ind: "L1020", loads: ["U1101", "U501", "U601"], target_z_mohm: 700, sim_z_band_mohm: 109, sim_z_100MHz_mohm: 109, dc_res_mohm: 224, dc_drop_mV: 34, dc_drop_pct: 1.9, csv: "docs/sim/pdn_1V8_D.csv", figure: "assets/img/sim_results/pdn_1V8_D.png" },
-    { rail: "+2V5", label: "+2V5 LVDS & I/O Bank 34", voltage_V: 2.5, current_mA: 601, power_W: 1.50, reg: "U1003", ind: "L1020", loads: ["U1101", "U1005", "U1006"], target_z_mohm: 2000, sim_z_band_mohm: 146, sim_z_100MHz_mohm: 146, dc_res_mohm: 297, dc_drop_mV: 30, dc_drop_pct: 1.2, csv: "docs/sim/pdn_2V5.csv", figure: "assets/img/sim_results/pdn_2V5.png" },
-    { rail: "+3V3_D", label: "+3V3_D Digital I/O & Clock", voltage_V: 3.3, current_mA: 1388, power_W: 4.58, reg: "U1002", ind: "L1010", loads: ["U1101", "U1201", "U701", "U801", "U1501", "U1506", "FB401"], target_z_mohm: 1000, sim_z_band_mohm: 37, sim_z_100MHz_mohm: 37, dc_res_mohm: 110, dc_drop_mV: 39, dc_drop_pct: 1.2, csv: "docs/sim/pdn_3V3_D.csv", figure: "assets/img/sim_results/pdn_3V3_D.png" },
+    { rail: "+1V0", label: "+1V0 VCCINT Core (R1031 3.24k -> 1.017 V)", voltage_V: 1.017, current_mA: r1v0.worst_ma, power_W: +(1.017 * r1v0.worst_ma / 1000).toFixed(2), reg: "U1004", ind: "L1030", loads: ["U1101"], target_z_mohm: 120, sim_z_band_mohm: 51, sim_z_100MHz_mohm: 61, dc_res_mohm: 36, dc_drop_mV: 25, dc_drop_pct: 2.5, csv: "docs/sim/pdn_1V0.csv", figure: "assets/img/sim_results/pdn_1V0.png" },
+    { rail: "+1V8_D", label: "+1V8_D Digital & ADC (1.85 V ANY-OUT)", voltage_V: 1.85, current_mA: r1v8d.worst_ma, power_W: +(1.85 * r1v8d.worst_ma / 1000).toFixed(2), reg: "U1006", ind: "L1020", loads: ["U1101", "U501", "U601"], target_z_mohm: 700, sim_z_band_mohm: 109, sim_z_100MHz_mohm: 109, dc_res_mohm: 224, dc_drop_mV: 34, dc_drop_pct: 1.9, csv: "docs/sim/pdn_1V8_D.csv", figure: "assets/img/sim_results/pdn_1V8_D.png" },
+    { rail: "+2V5", label: "+2V5 LVDS & I/O Bank 34", voltage_V: 2.5, current_mA: r2v5.worst_ma, power_W: +(2.5 * r2v5.worst_ma / 1000).toFixed(2), reg: "U1003", ind: "L1020", loads: ["U1101", "U1005", "U1006"], target_z_mohm: 2000, sim_z_band_mohm: 146, sim_z_100MHz_mohm: 146, dc_res_mohm: 297, dc_drop_mV: 30, dc_drop_pct: 1.2, csv: "docs/sim/pdn_2V5.csv", figure: "assets/img/sim_results/pdn_2V5.png" },
+    { rail: "+3V3_D", label: "+3V3_D Digital I/O & Clock (TPS563201 3 A)", voltage_V: 3.3, current_mA: r3v3d.worst_ma, power_W: +(3.3 * r3v3d.worst_ma / 1000).toFixed(2), reg: "U1002", ind: "L1010", loads: ["U1101", "U1201", "U701", "U801", "U1501", "U1506", "FB401"], target_z_mohm: 1000, sim_z_band_mohm: 37, sim_z_100MHz_mohm: 37, dc_res_mohm: 110, dc_drop_mV: 39, dc_drop_pct: 1.2, csv: "docs/sim/pdn_3V3_D.csv", figure: "assets/img/sim_results/pdn_3V3_D.png" },
     { rail: "+3V3_CLK", label: "+3V3_CLK Filtered Clock Rail (FB401)", voltage_V: 3.3, current_mA: 340, power_W: 1.12, reg: "FB401", ind: "FB401", loads: ["Y401", "U401"], target_z_mohm: 1000, sim_z_band_mohm: 37, sim_z_100MHz_mohm: null, dc_res_mohm: +(fb401Bead.dcr_max_ohm * 1e3).toFixed(0), dc_drop_mV: +fb401Bead.dc_drop_max_mV.toFixed(1), dc_drop_pct: +((fb401Bead.dc_drop_max_mV / 3300) * 100).toFixed(2), csv: null, figure: "assets/img/sim_results/fb401_filter.png", extra: { fsw_kHz: fb401.buck.fsw_Hz / 1e3, ripple_atten_dB: +fb401Nom.atten_580k_dB.toFixed(1), output_ripple_uVpp: +fb401Nom.clk_ripple_580k_uVpp.toFixed(1), spur_dBc: +fb401Nom.si549_spur_dBc.toFixed(1), si549_margin_mV: +fb401Bead.si549_margin_mV.toFixed(1), fb_source: "docs/sim/fb401_filter.json" } },
-    { rail: "+5V0", label: "+5V0 Main Buck (LMR33630)", voltage_V: 5.0, current_mA: 1775, power_W: 8.88, reg: "U1001", ind: "L1001", loads: ["U1002", "U1003", "U1004", "U1007", "U502", "U503", "U602", "U603", "U1301"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
-    { rail: "+1V8_A", label: "+1V8_A Low-Noise Analog LDO", voltage_V: 1.8, current_mA: 500, power_W: 0.90, reg: "U1005", ind: null, loads: ["U501", "U601"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
-    { rail: "+3V3_A", label: "+3V3_A Analog / DAC LDO", voltage_V: 3.3, current_mA: 100, power_W: 0.33, reg: "U1007", ind: null, loads: ["U701", "U801"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
-    { rail: "+3V0_RF", label: "+3V0_RF Front-End LDO (RFFC5072)", voltage_V: 3.0, current_mA: 180, power_W: 0.54, reg: "U1315", ind: null, loads: ["U1312", "U1310"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
-    { rail: "-3V3", label: "-3V3 Charge-Pump Bias", voltage_V: -3.3, current_mA: 8, power_W: 0.03, reg: "U1008", ind: null, loads: ["U1304", "U1305", "U1306", "U1307"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
+    { rail: "+5V0", label: "+5V0 Main Buck (LMR33630)", voltage_V: 5.0, current_mA: r5v0.worst_ma, power_W: +(5.0 * r5v0.worst_ma / 1000).toFixed(2), reg: "U1001", ind: "L1001", loads: ["U1002", "U1003", "U1004", "U1007", "U502", "U503", "U602", "U603", "U1301"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
+    { rail: "+1V8_A", label: "+1V8_A Low-Noise Analog LDO", voltage_V: 1.8, current_mA: r1v8a.worst_ma, power_W: +(1.8 * r1v8a.worst_ma / 1000).toFixed(2), reg: "U1005", ind: null, loads: ["U501", "U601"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
+    { rail: "+3V3_A", label: "+3V3_A Analog / DAC LDO", voltage_V: 3.3, current_mA: r3v3a.worst_ma, power_W: +(3.3 * r3v3a.worst_ma / 1000).toFixed(2), reg: "U1007", ind: null, loads: ["U701", "U801"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
+    { rail: "+2V8_RF", label: "+2V8_RF Front-End LDO (LP5907MFX-2.8 / RFFC5072)", voltage_V: 2.8, current_mA: r2v8rf.worst_ma, power_W: +(2.8 * r2v8rf.worst_ma / 1000).toFixed(2), reg: "U1315", ind: null, loads: ["U1312", "U1310"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
+    { rail: "-3V3", label: "-3V3 Charge-Pump Bias", voltage_V: -3.3, current_mA: rm3v3.worst_ma, power_W: +(3.3 * rm3v3.worst_ma / 1000).toFixed(2), reg: "U1008", ind: null, loads: ["U1304", "U1305", "U1306", "U1307"], target_z_mohm: null, sim_z_band_mohm: null, sim_z_100MHz_mohm: null, dc_res_mohm: null, dc_drop_mV: null, dc_drop_pct: null, csv: null, figure: "assets/img/sim_results/pdn_impedance.png" },
   ];
 
   const rails = pdnConfigs.map((cfg) => {
@@ -361,17 +379,29 @@ function build() {
     U601_AD9253: { refs: ["U601"], limit_C: 85, label: "AD9253 Dual 14-bit ADC" },
     U1101_XC7A50T: { refs: ["U1101", "HS4_U1101_XC7A50T"], limit_C: 100, label: "XC7A50T-2I FPGA" },
     U1001_LMR33630: { refs: ["U1001"], limit_C: 125, label: "LMR33630 12V->5V Buck" },
-    U1002_TPS562201: { refs: ["U1002"], limit_C: 125, label: "TPS562201 +3V3_D Buck" },
+    U1002_TPS562201: { refs: ["U1002"], limit_C: 125, label: "TPS563201 +3V3_D Buck" },
+    U1002_TPS563201: { refs: ["U1002"], limit_C: 125, label: "TPS563201 +3V3_D Buck" },
     U1003_TPS562201: { refs: ["U1003"], limit_C: 125, label: "TPS562201 +2V5 Buck" },
     U1004_TPS562201: { refs: ["U1004"], limit_C: 125, label: "TPS562201 +1V0 Buck" },
     U1005_TPS7A8300: { refs: ["U1005"], limit_C: 125, label: "TPS7A8300 +1V8_A LDO" },
-    U1006_TPS7A8300: { refs: ["U1006"], limit_C: 125, label: "TPS7A8300 +1V8_D LDO" },
+    U1006_TPS7A8300: { refs: ["U1006"], limit_C: 125, label: "TPS7A8300 +1V8_D LDO (1.85 V)" },
     U1007_TPS7A8300: { refs: ["U1007"], limit_C: 125, label: "TPS7A8300 +3V3_A LDO" },
     U1201_RTL8211FSI: { refs: ["U1201"], limit_C: 85, label: "RTL8211FSI GbE PHY" },
     AD9708_AD9767: { refs: ["U701", "U801"], limit_C: 85, label: "AD9708 + AD9767 DACs" },
+    U1312_RFFC5072: { refs: ["U1312"], limit_C: 85, label: "RFFC5072 Mixer / Synth" },
+    U1301_SPF5043Z: { refs: ["U1301"], limit_C: 85, label: "SPF5043Z LNA 1" },
+    U1310_SPF5043Z: { refs: ["U1310"], limit_C: 85, label: "SPF5043Z LNA 2" },
+    U1315_LP5907: { refs: ["U1315"], limit_C: 125, label: "LP5907MFX-2.8 +2V8_RF LDO" },
+    U1501_TCA6416A_LEDs: { refs: ["U1501"], limit_C: 85, label: "TCA6416A I/O Expander" },
   };
 
   const cfdCaseTitles = {
+    rev08_hs4_clean_fine_70C: "Rev08 + HS4 Thermal Design @ 70 °C (Clean)",
+    rev08_hs4_clogged_fine_70C: "Rev08 + HS4 Thermal Design @ 70 °C (Clogged)",
+    rev08_clean_fine_70C: "Rev08 NO HS4 @ 70 °C (Clean, U1101 102.1 °C)",
+    rev08_clogged_fine_70C: "Rev08 NO HS4 @ 70 °C (Clogged)",
+    rev08_clean_fine_45C: "Rev08 Adopted Thermal Design @ 45 °C (Clean)",
+    rev08_clean_fine_25C: "Rev08 Adopted Thermal Design @ 25 °C (Clean)",
     v2_built_hs_clean_25C: "Built v2 + Heatsinks @ 25 °C (Clean)",
     v2_built_hs_clean_45C: "Built v2 + Heatsinks @ 45 °C (Clean)",
     v2_built_hs_clean_70C: "Built v2 + Heatsinks @ 70 °C (Clean)",
@@ -379,9 +409,6 @@ function build() {
     v2_built_nohs_clean_70C: "Built v2 NO Heatsinks @ 70 °C (Baseline Failure)",
     v2_opt_fan5015_70C: "Opt: + OD5015 50 mm Lid Blower @ 70 °C",
     v2_opt_combined_fine_70C: "Opt: Combined (Airflow + 50 mm Fan, Fine) @ 70 °C",
-    rev08_clean_fine_45C: "Rev08 Adopted Thermal Design @ 45 °C (Clean)",
-    rev08_clean_fine_70C: "Rev08 Adopted Thermal Design @ 70 °C (Clean)",
-    rev08_clogged_fine_70C: "Rev08 Adopted Thermal Design @ 70 °C (Clogged)",
     sealed_petg_45C: "v1 Sealed PETG Enclosure @ 45 °C (Overheats)",
     sealed_alu_70C: "v3 Sealed Al Spreader @ 70 °C",
   };
@@ -453,9 +480,12 @@ function build() {
   };
 
   const selectedBuiltNames = [
+    "rev08_hs4_clean_fine_70C",
+    "rev08_hs4_clogged_fine_70C",
     "rev08_clean_fine_70C",
     "rev08_clogged_fine_70C",
     "rev08_clean_fine_45C",
+    "rev08_clean_fine_25C",
     "v2_built_hs_clean_70C",
     "v2_built_hs_clogged_70C",
     "v2_built_hs_clean_45C",
@@ -475,13 +505,15 @@ function build() {
   }
 
   const thermal = {
-    default_case: "rev08_clean_fine_70C",
+    default_case: "rev08_hs4_clean_fine_70C",
     cases: thermalCases,
     figures: [
       { id: "cutaway", title: "3-D CHT Temperature Cutaway", src: "assets/img/sim_results/v2_thermal_3d_cutaway.png", cap: "OpenFOAM 3-D conjugate heat transfer slice across K26 + adapter heatsinks.", source_file: "docs/sim/v2_thermal_3d_cutaway.png" },
-      { id: "rev08", title: "Rev08 Board 70 °C Thermal Map", src: "assets/img/sim_results/rev08_thermal_70c.png", cap: "Continuous 2-D PCB copper/FR4 contour from OpenFOAMchtMultiRegionFoam.", source_file: "docs/sim/rev08_thermal_70c.png" },
-      { id: "board", title: "Adapter Board Surface Contours", src: "assets/img/sim_results/board_thermal.png", cap: "Comparison of peak IC hotspots on adapter top surface.", source_file: "docs/sim/board_thermal.png" },
+      { id: "rev08", title: "Rev08 Board 70 °C Thermal Map", src: "assets/img/sim_results/rev08_thermal_70c.png", cap: "Continuous 2-D PCB copper/FR4 contour from OpenFOAM chtMultiRegionFoam.", source_file: "docs/sim/rev08_thermal_70c.png" },
+      { id: "board", title: "Adapter Board Surface Contours", src: "assets/img/sim_results/board_thermal.png", cap: "Updated with Vivado 1.25/1.60 W FPGA power and 0.91 W U1006; HS4 brings U1101 to 93.4 °C at 70 °C.", source_file: "docs/sim/board_thermal.png" },
       { id: "margins", title: "70 °C Component Margin Ladder", src: "assets/img/sim_results/v2_built_margins_70c.png", cap: "All 16 ICs and K26 SOM margins vs Ta/Tj limits.", source_file: "docs/sim/v2_built_margins_70c.png" },
+      { id: "flow_pcb", title: "v2 Built Flow & PCB Temperature", src: "assets/img/sim_results/v2_built_flow_and_pcb.png", cap: "Airflow streamlines and PCB surface contours in v2 enclosure.", source_file: "docs/sim/v2_built_flow_and_pcb.png" },
+      { id: "fan_pq", title: "v2 Fan P-Q & Ambient Sweep", src: "assets/img/sim_results/v2_built_fan_pq_and_ambient.png", cap: "Clean vs clogged filter operating point and ambient derating curve.", source_file: "docs/sim/v2_built_fan_pq_and_ambient.png" },
     ],
     provenance_note: "Per-IC Tj, T_board, local air, and margin values are loaded directly from mech/v2_cfd/results_built_v2.json and mech/v2_cfd/results.json. Continuous CFD slice contours are displayed from the real OpenFOAM PNG plots rather than fabricated per-vertex mesh colours.",
   };
@@ -771,6 +803,174 @@ function build() {
     }
   }
 
+  // -------------------------------------------------------------------------
+  // 7. Rev08 RF & Power Audit Domain + 14 Audited Part Summaries
+  // -------------------------------------------------------------------------
+  const hr1v8d = (pwrAudit.headroom || []).find((h) => h.ldo.includes("U1006")) || { worst_headroom: 1.265, typ_headroom: 1.455 };
+  const hr2v8 = (pwrAudit.headroom || []).find((h) => h.ldo.includes("U1315")) || { worst_headroom: 0.232, dropout: 0.18 };
+  const winVccaux = (pwrAudit.windows || []).find((w) => w.part.includes("VCCAUX")) || { vmin: 1.714, vmax: 1.873, rmin: 1.71, rmax: 1.89 };
+  const winRffc = (pwrAudit.windows || []).find((w) => w.part.includes("RFFC5072")) || { vmin: 2.701, vmax: 2.889 };
+  const pwrIn = pwrAudit.input || { p_typ_w: 11.68, p_worst_w: 13.4, ptc_hold_a: 2.0, ptc_trip_c_worst_12v: 83.9, ptc_trip_c_worst_10v5: 73.1 };
+  const hp = rfAudit.hp300 || { loss_db: 1.13, rl_db: 12.7, stop_db: 52.8, loss_p99: 1.51, rl_p1: 10.7, stop_p1: 51.7 };
+  const ifRejBefore = rfAudit.if_rejection_db ? `${Math.round(rfAudit.if_rejection_db[0][0])}-${Math.round(rfAudit.if_rejection_db[1][0])}` : "31-46";
+  const ifRejAfter = rfAudit.if_rejection_db ? `${Math.round(rfAudit.if_rejection_db[0][1])}-${Math.round(rfAudit.if_rejection_db[1][1])}` : "84-99";
+
+  const partAuditList = [
+    {
+      ref: "U1506",
+      code: "P1",
+      title: "TCAN3403DDFRQ1 +-58 V CAN Transceiver",
+      summary: `Replaced TCAN330 (+-14 V abs max) with TCAN3403-Q1 (+-58 V bus fault, pin 5 VIO moved to +3V3_D, STB low): survives 12-24 V battery/jump-start shorts with ${(pwrByRail.get("+3V3_D")?.worst_ma ?? 1890)} mA +3V3_D rail inside 3.0-3.6 V.`,
+      source_file: "docs/sim/power_audit.json",
+    },
+    {
+      ref: "U1002",
+      code: "P5",
+      title: "+3V3_D TPS563201 (3 A) Buck",
+      summary: `Upgraded from 2 A TPS562201 (89-95% use) to pin-compatible 3 A TPS563201: ${r3v3d.typ_ma ?? 1778} mA typ / ${r3v3d.worst_ma} mA worst (${Math.round((r3v3d.use ?? 0.63) * 100)}% use, ${r3v3d.worst_w ?? 0.693} W dissipation).`,
+      source_file: "docs/sim/power_audit.json",
+    },
+    {
+      ref: "U1006",
+      code: "P4",
+      title: "+1V8_D LDO Set to 1.85 V",
+      summary: `Pin 5 ANY-OUT grounded to raise +1V8_D to 1.85 V: XC7A50T VCCAUX reaches ${winVccaux.vmin}-${winVccaux.vmax} V at balls (spec ${winVccaux.rmin}-${winVccaux.rmax} V); carries ${r1v8d.worst_ma} mA (${r1v8d.worst_w ?? 0.912} W worst, ${hr1v8d.worst_headroom} V headroom).`,
+      source_file: "docs/sim/power_audit.json",
+    },
+    {
+      ref: "U1315",
+      code: "P8",
+      title: "+2V8_RF LP5907MFX-2.8 LDO",
+      summary: `Renamed +3V0_RF to +2V8_RF (LP5907MFX-2.8): worst-case headroom rises from 26 mV to ${Math.round(hr2v8.worst_headroom * 1000)} mV vs ${Math.round(hr2v8.dropout * 1000)} mV dropout; RFFC5072 sees ${winRffc.vmin}-${winRffc.vmax} V (${r2v8rf.worst_ma} mA, 72% use).`,
+      source_file: "docs/sim/power_audit.json",
+    },
+    {
+      ref: "F1001",
+      code: "P3",
+      title: "mSMD200-24V 2.0 A Hold PTC",
+      summary: `Upgraded from 1.5 A hold (tripped >56 C) to ${pwrIn.ptc_hold_a.toFixed(1)} A hold: worst input ${pwrAudit.budget?.input_worst_ma ?? 1116} mA (${pwrIn.p_worst_w} W) trips only above ${pwrIn.ptc_trip_c_worst_12v} C @ 12 V and ${pwrIn.ptc_trip_c_worst_10v5.toFixed(1)} C @ 10.5 V; typical (85+ C) never trips.`,
+      source_file: "docs/sim/power_audit.json",
+    },
+    {
+      ref: "C1441",
+      code: "R1",
+      title: "HP300 11 pF Series Input Cap (Frame A)",
+      summary: `Preselector B 300 MHz 5th-order elliptic high-pass (0402 C0G): <=${hp.loss_db} dB nom (${hp.loss_p99} dB p99) 300 MHz-3 GHz, RL ${hp.rl_db} dB (${hp.rl_p1} dB p1), >=${hp.stop_db} dB (${hp.stop_p1} dB p1) <=175 MHz; IF rej ${ifRejBefore} -> ${ifRejAfter} dB.`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "L1441",
+      code: "R1",
+      title: "HP300 24 nH Shunt Inductor 1 (Frame A)",
+      summary: `Shunt trap branch 1 with C1442 (36 pF) in preselector B 300 MHz high-pass (0402 LQW15AN, 3,000-board MC): <=${hp.loss_db} dB passband, >=${hp.stop_p1} dB p1 rejection <=175 MHz; IF rej ${ifRejBefore} -> ${ifRejAfter} dB.`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "C1442",
+      code: "R1",
+      title: "HP300 36 pF Shunt Capacitor 1 (Frame A)",
+      summary: `Shunt trap branch 1 with L1441 (24 nH) in preselector B 300 MHz high-pass (0402 C0G): <=${hp.loss_db} dB (${hp.loss_p99} dB p99) passband, >=${hp.stop_p1} dB p1 stopband <=175 MHz; IF rej ${ifRejBefore} -> ${ifRejAfter} dB.`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "C1443",
+      code: "R1",
+      title: "HP300 5.6 pF Series Mid Cap (Frame A)",
+      summary: `Center series 0402 C0G capacitor of the preselector B 300 MHz high-pass between L1441/C1442 and L1442/C1444: <=${hp.loss_p99} dB p99 above 300 MHz, ${hp.rl_p1} dB p1 RL, IF rej ${ifRejBefore} -> ${ifRejAfter} dB.`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "L1442",
+      code: "R1",
+      title: "HP300 22 nH Shunt Inductor 2 (Frame A)",
+      summary: `Shunt trap branch 2 with C1444 (91 pF) in preselector B 300 MHz high-pass (0402 LQW15AN): suppresses 88-170 MHz by 53.4-70.3 dB (51.7 dB p1 <=175 MHz), lifting IF rej from ${ifRejBefore} to ${ifRejAfter} dB.`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "C1444",
+      code: "R1",
+      title: "HP300 91 pF Shunt Capacitor 2 (Frame A)",
+      summary: `Shunt trap branch 2 with L1442 (22 nH) in preselector B 300 MHz high-pass (0402 C0G): suppresses FM/airband/VHF <=170 MHz by >=53.4 dB nominal (>=51.7 dB p1 <=175 MHz).`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "C1445",
+      code: "R1",
+      title: "HP300 8.2 pF Series Output Cap to VU_PSB_HP",
+      summary: `Output series 0402 C0G capacitor feeding preselector B switches (VU_PSB_HP): <=${hp.loss_db} dB nom (${hp.loss_p99} dB p99) 300 MHz-3 GHz, RL ${hp.rl_db} dB (${hp.rl_p1} dB p1), IF rej ${ifRejBefore} -> ${ifRejAfter} dB.`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+    {
+      ref: "J1102",
+      code: "P2",
+      title: "Pmod Header Back-Powering Gate (Both FPGAs)",
+      summary: `Gateware gating eliminates up to 108 mA Pmod back-powering (8x 0-ohm lines -> 0.0 mA built): Artix gates PMOD_MISO on kria_present & makes PMOD_SPARE2 open-drain; K26 holds outputs high-Z until adapter_alive.`,
+      source_file: "docs/sim/power_audit.json",
+    },
+    {
+      ref: "J961",
+      code: "R1/R6/R7",
+      title: "VHF/UHF SMA Input (30-170 MHz & 300 MHz-3 GHz)",
+      summary: `Direct 30-170 MHz, converted 300 MHz-3 GHz (170-300 MHz not covered due to 135 MHz IF + HP300); AP22652 bias tee limits 5 V short to 95-155 mA (FB1302 250 mA / L1301 170 mA safe); prefer JP1301 3.3 V; external limiter for co-sited TX (+25 dBm LNA abs max).`,
+      source_file: "docs/sim/rf_audit.json",
+    },
+  ];
+
+  const partAudit = {};
+  for (const item of partAuditList) {
+    partAudit[item.ref] = {
+      ...item,
+      doc_link: "docs/AUDIT_Rev08.md",
+    };
+    addCompSim(item.ref, {
+      domain: "audit",
+      domain_label: "RF & Power Audit",
+      target_id: item.ref,
+      title: `${item.code}: ${item.title}`,
+      metric: item.summary,
+      status: "PASS",
+      source_file: item.source_file,
+    });
+  }
+
+  const auditFigures = [
+    {
+      id: "rf_uhf",
+      title: "UHF Preselection: Before & After HP300 (R1)",
+      src: "assets/img/sim_results/rf_audit_uhf_path.png",
+      cap: "Preselection before and after the 300 MHz 5th-order elliptic high-pass (IF rejection 31-46 -> 84-99 dB).",
+      source_file: "docs/sim/rf_audit_uhf_path.png",
+    },
+    {
+      id: "pwr_ptc",
+      title: "Regulator Use & F1001 PTC Hold Current (P3, P5)",
+      src: "assets/img/sim_results/power_budget_ptc.png",
+      cap: "TPS563201 3 A upgrade (63% use) and mSMD200-24V 2 A PTC (trips >83.9 C @ 12 V / >73.1 C @ 10.5 V).",
+      source_file: "docs/sim/power_budget_ptc.png",
+    },
+    {
+      id: "pwr_startup",
+      title: "Start-Up Sequencing & VCCO-VCCAUX Window (P4, P7)",
+      src: "assets/img/sim_results/power_startup.png",
+      cap: "Slow-LDO corner VCCO-VCCAUX > 2.625 V for 0.26 ms max (DS181 limit 300 ms).",
+      source_file: "docs/sim/power_startup.png",
+    },
+    {
+      id: "pwr_transients",
+      title: "Vehicle Transients ISO 7637-2 & ISO 16750-2",
+      src: "assets/img/sim_results/power_transients.png",
+      cap: "Passes ISO 7637-2 pulses 1/2a/3a/3b, load dump B (35 V), 24 V jump start, and -14 V reverse battery.",
+      source_file: "docs/sim/power_transients.png",
+    },
+    {
+      id: "board_thermal",
+      title: "Updated Rev08 Board Thermal Map (P6)",
+      src: "assets/img/sim_results/board_thermal.png",
+      cap: "Updated Vivado 1.25/1.60 W FPGA + 0.91 W U1006; HS4 brings U1101 from 102.1 C to 93.4 C at 70 C ambient.",
+      source_file: "docs/sim/board_thermal.png",
+    },
+  ];
+
 function parseAsciiPly(filePath) {
   const txt = fs.readFileSync(filePath, "utf8");
   const lines = txt.split(/\r?\n/);
@@ -929,7 +1129,7 @@ function buildFea3dBinary() {
     power: {
       rails,
       overview_figure: "assets/img/sim_results/pdn_impedance.png",
-      source_files: ["docs/sim/pdn_1V0.csv", "docs/sim/pdn_1V8_D.csv", "docs/sim/pdn_2V5.csv", "docs/sim/pdn_3V3_D.csv", "docs/sim/fb401_filter.json", "docs/SIGNAL_INTEGRITY.md", "docs/POWER_AND_STACKUP.md"],
+      source_files: ["docs/sim/power_audit.json", "docs/sim/pdn_1V0.csv", "docs/sim/pdn_1V8_D.csv", "docs/sim/pdn_2V5.csv", "docs/sim/pdn_3V3_D.csv", "docs/sim/fb401_filter.json", "docs/SIGNAL_INTEGRITY.md", "docs/POWER_AND_STACKUP.md"],
     },
     thermal,
     mechanical: {
@@ -943,13 +1143,33 @@ function buildFea3dBinary() {
       overview_figure: "assets/img/sim/g8_overview.png",
       source_file: "fpga/sim/signals/results.json",
     },
+    audit: {
+      title: "RF and power audit",
+      doc_link: "docs/AUDIT_Rev08.md",
+      rf: rfAudit,
+      power: pwrAudit,
+      figures: auditFigures,
+      part_audit: partAudit,
+      audited_parts: partAuditList.map((p) => p.ref),
+      highlight_nets: ["/RX_VU/VU_PSB_HP", "/RX_VU/VU_PSB_IN", "+2V8_RF"].filter((n) => netTraces[n]),
+      source_files: [
+        "docs/sim/rf_audit.json",
+        "docs/sim/power_audit.json",
+        "docs/sim/rf_audit_uhf_path.png",
+        "docs/sim/power_budget_ptc.png",
+        "docs/sim/power_startup.png",
+        "docs/sim/power_transients.png",
+        "docs/sim/board_thermal.png",
+        "docs/AUDIT_Rev08.md",
+      ],
+    },
     component_sim_index: compSim,
   };
 
   const outPath = path.join(ASSETS_DIR, "simulations.json");
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2));
   const szKb = (fs.statSync(outPath).size / 1024).toFixed(1);
-  console.log(`Wrote ${outPath} (${szKb} KB), copied ${copiedImages} sim images, indexed ${Object.keys(compSim).length} components across 5 simulation domains.`);
+  console.log(`Wrote ${outPath} (${szKb} KB), copied ${copiedImages} sim images, indexed ${Object.keys(compSim).length} components across 6 simulation domains.`);
 }
 
 build();

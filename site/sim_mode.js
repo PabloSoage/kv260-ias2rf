@@ -44,19 +44,21 @@ export function createSimController(ctx) {
 
   let sims = null;
   let enabled = false;
-  let domain = "rf"; // rf | power | thermal | mech | g8
+  let domain = "rf"; // rf | power | thermal | mech | g8 | audit
 
   const sel = {
     rfMetric: "skew", // skew | eye
     rfFocusType: "all", // all | pair | sparam | crosstalk
     rfFocusId: null,
     powerRail: "+1V0",
-    thermalCase: "rev08_clean_fine_70C",
+    thermalCase: "rev08_hs4_clean_fine_70C",
     thermalMetric: "Tj", // Tj | margin
     mechLoad: "Zm", // Zm | Xp | Yp
     mechMat: "PETG-CF",
     mechTemp: 70,
     g8Mode: "radar",
+    auditView: "rf", // rf | power | transients
+    auditFocusRef: null,
   };
 
   let g8PulseMesh = null;
@@ -72,6 +74,7 @@ export function createSimController(ctx) {
     { id: "thermal", label: "Thermal CFD" },
     { id: "mech", label: "Mech FEA" },
     { id: "g8", label: "Gateware G-8" },
+    { id: "audit", label: "RF and power audit" },
   ];
 
   // Board KiCad mm -> PCB heatmap rectangle covering the 140x132 mm board
@@ -252,6 +255,8 @@ export function createSimController(ctx) {
       buildMech3D();
     } else if (domain === "g8") {
       buildG83D();
+    } else if (domain === "audit") {
+      buildAudit3D();
     }
     updateLegendBar();
   }
@@ -590,6 +595,12 @@ export function createSimController(ctx) {
         const col = idx === 0 ? 0xfbbf24 : idx === arr.length - 1 ? 0x3fb950 : 0x22d3ee;
         addWorldBoxCage(r, col, idx < 3 || idx >= arr.length - 3 || r === "U1101" || r === "U501" || r === "U601" || r === "U1312", 0.010);
       });
+    } else if (domain === "audit") {
+      const rfParts = new Set(["C1441", "L1441", "C1442", "C1443", "L1442", "C1444", "C1445", "J961"]);
+      for (const ref of sims.audit?.audited_parts || []) {
+        const col = ref === sel.auditFocusRef ? 0x3fb950 : rfParts.has(ref) ? 0x22d3ee : 0xfbbf24;
+        addWorldBoxCage(ref, col, true, 0.0085);
+      }
     }
   }
 
@@ -627,6 +638,14 @@ export function createSimController(ctx) {
       simBoardGroup.add(g8PulseMesh);
       stepAnimation(performance.now());
     }
+    populateWorldOverlays();
+  }
+
+  function buildAudit3D() {
+    const nets = sims?.audit?.highlight_nets || [];
+    const rfNets = nets.filter((n) => n.includes("VU_PSB"));
+    if (rfNets.length) addTraceLines(rfNets, 0x22d3ee, 0.96, 0.00022);
+    if (nets.includes("+2V8_RF")) addTraceLines(["+2V8_RF"], 0xfbbf24, 0.90, 0.00018);
     populateWorldOverlays();
   }
 
@@ -824,6 +843,38 @@ export function createSimController(ctx) {
         g.font = "12px monospace";
         g.fillText(`${passed}/${total} RTL checks PASSED`, pad.l + 30, pad.t + ph * 0.52);
       }
+    } else if (domain === "audit") {
+      if (sel.auditView === "rf") {
+        const entries = Object.entries(sims.audit?.rf?.uhf_path_db || {})
+          .map(([f, pair]) => [parseFloat(f), pair[0], pair[1]])
+          .filter((d) => Number.isFinite(d[0]))
+          .sort((a, b) => a[0] - b[0]);
+        if (entries.length) {
+          const xMin = entries[0][0];
+          const xMax = entries[entries.length - 1][0];
+          const l0 = Math.log10(xMin);
+          const l1 = Math.log10(xMax);
+          drawAxes(g, pad, pw, ph, grid, txt, "UHF Atten: Before (amber) vs HP300 [dB]", `${xMin} MHz`, `${xMax} MHz`, "0 dB", "75 dB");
+          g.save();
+          g.setLineDash([4, 3]);
+          plotSeries(g, pad, pw, ph, entries, (d) => (Math.log10(d[0]) - l0) / (l1 - l0 || 1), (d) => d[1] / 75, "#f59e0b", 1.8);
+          g.restore();
+          plotSeries(g, pad, pw, ph, entries, (d) => (Math.log10(d[0]) - l0) / (l1 - l0 || 1), (d) => d[2] / 75, "#22d3ee", 2.2);
+        }
+      } else {
+        const rows = sims.audit?.power?.budget?.rows || [];
+        drawAxes(g, pad, pw, ph, grid, txt, "Regulator Worst-Case Utilization (% of Rated A)", "", "", "0%", "100%");
+        const bw = pw / Math.max(1, rows.length);
+        rows.forEach((r, idx) => {
+          const pct = Math.min(1, r.use || 0);
+          const bh = Math.max(3, pct * ph);
+          g.fillStyle = pct > 0.7 ? "#f59e0b" : "#22d3ee";
+          g.fillRect(pad.l + idx * bw + 3, pad.t + ph - bh, Math.max(6, bw - 6), bh);
+          g.fillStyle = hi;
+          g.font = "9px monospace";
+          g.fillText(`${Math.round(pct * 100)}%`, pad.l + idx * bw + 2, Math.max(pad.t + 10, pad.t + ph - bh - 3));
+        });
+      }
     }
   }
 
@@ -887,6 +938,8 @@ export function createSimController(ctx) {
     } else if (domain === "g8") {
       const gm = sims.gateware_g8.modes.find((m) => m.id === sel.g8Mode);
       bar.innerHTML = `<strong>Gateware G-8:</strong><span>${escapeHtml(gm?.title || "")}</span><span class="mono" style="color:var(--green)">${gm?.passed ? "PASS" : "FAIL"}</span>`;
+    } else if (domain === "audit") {
+      bar.innerHTML = `<strong>RF &amp; Power Audit:</strong><span>14 audited parts &middot; IF rej 84-99 dB &middot; 13.4 W worst</span><span class="mono" style="color:var(--cyan)">Src: docs/sim/rf_audit.json, docs/sim/power_audit.json</span>`;
     }
   }
 
@@ -980,6 +1033,26 @@ export function createSimController(ctx) {
         sel.g8Mode = ev.target.value;
         updateAll();
       });
+    } else if (domain === "audit") {
+      sub.innerHTML = `
+        <div class="btn-grid-3">
+          <button class="btn btn-sm ${sel.auditView === "rf" ? "active" : ""}" id="sim-aud-rf" type="button">RF HP300</button>
+          <button class="btn btn-sm ${sel.auditView === "power" ? "active" : ""}" id="sim-aud-pwr" type="button">Power/PTC</button>
+          <button class="btn btn-sm ${sel.auditView === "transients" ? "active" : ""}" id="sim-aud-trn" type="button">Transients</button>
+        </div>
+        <select id="sim-aud-part" class="sim-select" aria-label="Select audited part">
+          <option value="">All 14 audited parts</option>
+          ${(sims.audit?.audited_parts || []).map((r) => `<option value="${escapeHtml(r)}" ${sel.auditFocusRef === r ? "selected" : ""}>${escapeHtml(r)}: ${escapeHtml(sims.audit.part_audit[r]?.code || "")} ${escapeHtml(sims.audit.part_audit[r]?.title || "")}</option>`).join("")}
+        </select>`;
+      sub.querySelector("#sim-aud-rf").addEventListener("click", () => { sel.auditView = "rf"; updateAll(); });
+      sub.querySelector("#sim-aud-pwr").addEventListener("click", () => { sel.auditView = "power"; updateAll(); });
+      sub.querySelector("#sim-aud-trn").addEventListener("click", () => { sel.auditView = "transients"; updateAll(); });
+      sub.querySelector("#sim-aud-part").addEventListener("change", (ev) => {
+        const ref = ev.target.value || null;
+        sel.auditFocusRef = ref;
+        if (ref) selectPart(ref, true);
+        updateAll();
+      });
     }
   }
 
@@ -987,7 +1060,7 @@ export function createSimController(ctx) {
     if (!src) return "";
     return `
       <div class="sim-fig-box" data-open-fig="${escapeHtml(src)}" data-fig-cap="${escapeHtml(title)} (${escapeHtml(srcFile)})">
-        <img src="${escapeHtml(src)}" alt="${escapeHtml(title)}" loading="lazy">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(title)}">
         <div class="sim-fig-meta">
           <strong>${escapeHtml(title)}</strong>
           ${cap ? `<span>${escapeHtml(cap)}</span>` : ""}
@@ -1116,6 +1189,8 @@ export function createSimController(ctx) {
         <div class="sim-fig-pair">
           ${figThumbHtml(sims.thermal.figures[0].src, sims.thermal.figures[0].title, sims.thermal.figures[0].source_file)}
           ${figThumbHtml(sims.thermal.figures[1].src, sims.thermal.figures[1].title, sims.thermal.figures[1].source_file)}
+          ${sims.thermal.figures[2] ? figThumbHtml(sims.thermal.figures[2].src, sims.thermal.figures[2].title, sims.thermal.figures[2].source_file) : ""}
+          ${sims.thermal.figures[3] ? figThumbHtml(sims.thermal.figures[3].src, sims.thermal.figures[3].title, sims.thermal.figures[3].source_file) : ""}
         </div>`;
     } else if (domain === "mech") {
       const ld = sims.mechanical.load_cases.find((x) => x.id === sel.mechLoad) || sims.mechanical.load_cases[0];
@@ -1175,6 +1250,66 @@ export function createSimController(ctx) {
           </table>
         </div>
         ${figThumbHtml(gm.figure, gm.title, gm.figure, "Real XSim G-8 RTL vs floating-point verification plot.")}`;
+    } else if (domain === "audit") {
+      const aud = sims.audit || {};
+      const hp = aud.rf?.hp300 || {};
+      const pIn = aud.power?.input || {};
+      const bdg = aud.power?.budget || {};
+      const figs = aud.figures || [];
+      let tblHead = "";
+      let tblRows = "";
+      if (sel.auditView === "rf") {
+        tblHead = "<tr><th>Freq (MHz)</th><th>Low-Pass Only</th><th>With HP300</th></tr>";
+        tblRows = ["88", "108", "137", "145", "170", "200", "250", "300", "446", "660", "1000"]
+          .filter((k) => aud.rf?.uhf_path_db?.[k])
+          .map((k) => {
+            const [bef, aft] = aud.rf.uhf_path_db[k];
+            return `<tr><td class="mono">${k} MHz</td><td class="mono">${bef} dB</td><td class="mono" style="color:${Number(k) <= 170 ? "var(--green)" : "var(--cyan)"}">${aft} dB</td></tr>`;
+          }).join("");
+      } else if (sel.auditView === "power") {
+        tblHead = "<tr><th>Rail (Reg)</th><th>Typ / Worst</th><th>Use</th></tr>";
+        tblRows = (bdg.rows || []).map((r) => `
+          <tr>
+            <td class="mono">${escapeHtml(r.rail)} (${escapeHtml(r.part)})</td>
+            <td class="mono">${r.typ_ma} / ${r.worst_ma} mA</td>
+            <td class="mono" style="color:${r.use > 0.75 ? "#f59e0b" : "var(--green)"}">${Math.round(r.use * 100)}%</td>
+          </tr>`).join("");
+      } else {
+        tblHead = "<tr><th>Pulse / Stress Case</th><th>Peak VIN_F</th><th>Status</th></tr>";
+        tblRows = (aud.power?.transients || []).map((t) => `
+          <tr>
+            <td>${escapeHtml(String(t.kind).split("(")[0].trim())}</td>
+            <td class="mono">${t.vin_max.toFixed(1)} V</td>
+            <td class="mono" style="color:${t.ok ? "var(--green)" : "#ef4444"}">${t.ok ? "PASS" : "FAIL"}</td>
+          </tr>`).join("");
+      }
+
+      bodyHtml = `
+        <div class="control-row">
+          <span class="badge" style="border-color:#f59e0b;color:#f59e0b;background:rgba(245,158,11,0.14)">RF AND POWER AUDIT</span>
+          <a class="mono" style="font-size:10px;color:var(--cyan);text-decoration:none" href="pdf.html?file=docs%2FKV260-IAS2RF_Documentation.pdf#page=180" target="_blank" rel="noopener">AUDIT_Rev08.md (p.180)</a>
+        </div>
+        <div class="sim-highlight-box">
+          <strong>Pre-Order RF &amp; Power Audit Closure (18-19 Nov 2026)</strong>
+          <div class="mono">HP300: loss ${hp.loss_db ?? 1.13} dB (${hp.loss_p99 ?? 1.51} dB p99) · RL ${hp.rl_db ?? 12.7} dB · Stop &lt;=175 MHz ${hp.stop_db ?? 52.8} dB (${hp.stop_p1 ?? 51.7} dB p1) · IF rej 31-46 -&gt; 84-99 dB</div>
+          <div class="mono">Input: ${bdg.input_typ_ma ?? 973} mA (${pIn.p_typ_w ?? 11.68} W) typ · ${bdg.input_worst_ma ?? 1116} mA (${pIn.p_worst_w ?? 13.4} W) worst · F1001 2.0 A trips &gt;${pIn.ptc_trip_c_worst_12v ?? 83.9} C @ 12 V</div>
+          <div class="sim-chips">
+            ${(aud.audited_parts || []).map((r) => `<button type="button" class="net-chip pick-sim-part ${sel.auditFocusRef === r ? "active" : ""}" data-ref="${escapeHtml(r)}">${escapeHtml(r)}</button>`).join("")}
+          </div>
+          <div class="mono sim-src-line">Sources: docs/sim/rf_audit.json, docs/sim/power_audit.json</div>
+        </div>
+        <canvas id="sim-chart-canvas" class="sim-chart-canvas"></canvas>
+        <div class="sim-table-scroll">
+          <table class="kv-table">
+            <thead>${tblHead}</thead>
+            <tbody>${tblRows}</tbody>
+          </table>
+        </div>
+        ${figs[0] ? figThumbHtml(figs[0].src, figs[0].title, figs[0].source_file, figs[0].cap) : ""}
+        <div class="sim-fig-pair">
+          ${figs.slice(1).map((f) => figThumbHtml(f.src, f.title, f.source_file, f.cap)).join("")}
+        </div>
+        <div class="mono sim-src-line">Figures: ${(figs || []).map((f) => f.source_file).join(" · ")}</div>`;
     }
 
     card.innerHTML = bodyHtml;
@@ -1231,17 +1366,28 @@ export function createSimController(ctx) {
     return sims.component_sim_index?.[ref] || [];
   }
 
+  function getPartAuditLine(ref) {
+    if (!sims || !ref) return null;
+    return sims.audit?.part_audit?.[ref] || null;
+  }
+
   function buildHoverHtml(ref) {
     if (!enabled || !sims) return "";
+    const audit = getPartAuditLine(ref);
     const list = getPartSimulations(ref);
-    if (!list.length) return `<div class="sim-tip-row" style="color:var(--text-muted)">No direct sim entries mapped for ${escapeHtml(ref)}</div>`;
+    if (!list.length && !audit) return `<div class="sim-tip-row" style="color:var(--text-muted)">No direct sim entries mapped for ${escapeHtml(ref)}</div>`;
     const grouped = new Map();
     for (const s of list) {
       if (!grouped.has(s.domain_label)) grouped.set(s.domain_label, s);
     }
-    const lines = Array.from(grouped.values()).slice(0, 4).map((s) =>
-      `<div class="sim-tip-row"><strong style="color:var(--cyan)">${escapeHtml(s.domain_label)}:</strong> ${escapeHtml(s.metric)}</div>`
-    );
+    const lines = [];
+    if (audit) {
+      lines.push(`<div class="sim-tip-row"><strong style="color:#f59e0b">Audit (${escapeHtml(audit.code)}):</strong> ${escapeHtml(audit.title)}</div>`);
+    }
+    Array.from(grouped.values()).slice(0, 3).forEach((s) => {
+      if (s.domain === "audit" && audit) return;
+      lines.push(`<div class="sim-tip-row"><strong style="color:var(--cyan)">${escapeHtml(s.domain_label)}:</strong> ${escapeHtml(s.metric)}</div>`);
+    });
     if (list.length > grouped.size) {
       lines.push(`<div class="sim-tip-row" style="color:var(--accent)">+${list.length - lines.length} more simulation entries (click to inspect)</div>`);
     }
@@ -1301,6 +1447,12 @@ export function createSimController(ctx) {
         sel.mechLoad = targetId;
       } else if (domain === "g8") {
         sel.g8Mode = targetId;
+      } else if (domain === "audit") {
+        if (targetId === "rf" || targetId === "power" || targetId === "transients") {
+          sel.auditView = targetId;
+        } else if (sims?.audit?.part_audit?.[targetId]) {
+          sel.auditFocusRef = targetId;
+        }
       }
     }
     if (domain === "mech") {
@@ -1309,7 +1461,7 @@ export function createSimController(ctx) {
     } else if (domain === "thermal") {
       setEnclosure("open", true);
       setIsolate("all", true);
-    } else if (domain === "rf" || domain === "power" || domain === "g8") {
+    } else if (domain === "rf" || domain === "power" || domain === "g8" || domain === "audit") {
       setEnclosure("hidden", true);
       setIsolate("board", true);
     }
@@ -1340,6 +1492,7 @@ export function createSimController(ctx) {
     else if (domain === "thermal") params.set("simcase", sel.thermalCase);
     else if (domain === "mech") params.set("simcase", sel.mechLoad);
     else if (domain === "g8") params.set("simcase", sel.g8Mode);
+    else if (domain === "audit") params.set("simcase", sel.auditFocusRef || sel.auditView);
   }
 
   function applyHashParams(params) {
@@ -1389,6 +1542,7 @@ export function createSimController(ctx) {
     buildInspectorSectionHtml,
     wireInspectorButtons,
     getPartSimulations,
+    getPartAuditLine,
     getHashParams,
     applyHashParams,
     wireDomEvents,

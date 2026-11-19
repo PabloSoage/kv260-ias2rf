@@ -262,13 +262,16 @@ async function run() {
     const stats = await client.evalJs("window.__SITE_API.getStats()");
     console.log("Site ready stats:", stats);
 
-    // Check Rust WASM search & CAN part specs
+    // Check Rust WASM search & audited CAN / HP300 part specs
     const canSearch = await client.evalJs(`JSON.stringify({
       u1506: window.__SITE_API.searchCore("U1506").slice(0, 3),
       j1503: window.__SITE_API.searchCore("J1503").slice(0, 3),
-      tcan: window.__SITE_API.searchCore("TCAN330").slice(0, 3)
+      tcan: window.__SITE_API.searchCore("TCAN3403").slice(0, 3),
+      hp300: window.__SITE_API.searchCore("preselector B high-pass").slice(0, 8),
+      u1506_audit: window.__SITE_API.getPartAuditLine("U1506"),
+      c1443_audit: window.__SITE_API.getPartAuditLine("C1443")
     })`);
-    console.log("Rust Core CAN search:", canSearch);
+    console.log("Rust Core CAN & Audit search:", canSearch);
 
     // Benchmark 60 Info-Mode hover frames & full-assembly AFTER metrics on Desktop (1440x900)
     await client.evalJs(`
@@ -464,6 +467,32 @@ async function run() {
     `);
     await snap("sim_mode_g8.png", 600);
 
+    // Required shot 3: Audit group ("RF and power audit") in Simulations mode on Desktop
+    await client.evalJs(`
+      window.__SITE_API.setTheme("dark");
+      window.__SITE_API.clearSelection();
+      window.__SITE_API.setSimMode(true, "audit", "rf");
+      window.__SITE_API.setCameraPreset("top");
+      window.__SITE_API.scrollToExplorer();
+    `);
+    await waitFor(async () => {
+      return await client.evalJs(`(() => {
+        const imgs = Array.from(document.querySelectorAll("#sim-inspector-card img"));
+        return imgs.length === 5 && imgs.every((im) => im.complete && im.naturalWidth > 0);
+      })()`);
+    }, 10000, 150);
+    const auditDomStats = await client.evalJs(`(() => {
+      const card = document.getElementById("sim-inspector-card");
+      const imgs = Array.from(card?.querySelectorAll("img") || []).map((im) => ({
+        src: im.getAttribute("src"),
+        ok: im.complete && im.naturalWidth > 0,
+        w: im.naturalWidth,
+      }));
+      return { cardVisible: card?.style.display, imgCount: imgs.length, imgs };
+    })()`);
+    console.log("Audit Desktop panel check:", JSON.stringify(auditDomStats));
+    await snap("sim_audit_desktop.png", 400);
+
     await client.evalJs(`window.__SITE_API.setSimMode(false);`);
 
     // Behavioral checks: single scrollbar, copper-flow auto-highlight & clear, sim overlay clearing
@@ -505,6 +534,24 @@ async function run() {
       window.__SITE_API.setCameraLookAt(-0.007, 0.003, -0.072, -0.032, 0.032, -0.095);
     `);
     await snap("rf_shield_corner_closeup.png", 500);
+
+    // Required shot 1: HP300 filter close-up in Frame A, top view
+    await client.evalJs(`
+      window.__SITE_API.clearSelection();
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.setCameraLookAt(-0.0092, 0.0024, -0.0792, -0.0092, 0.028, -0.0755);
+    `);
+    await snap("hp300_frame_a_closeup.png", 600);
+
+    // Required shot 2: U1506 with its TCAN3403DDFRQ1 description and Rev08 audit line
+    await client.evalJs(`
+      window.__SITE_API.isolate("board");
+      window.__SITE_API.setExplode(0);
+      window.__SITE_API.selectPart("U1506", false);
+      window.__SITE_API.setCameraLookAt(-0.0138, 0.0005, -0.0082, -0.025, -0.024, 0.006);
+    `);
+    await snap("u1506_tcan3403.png", 650);
 
     await client.evalJs(`
       window.__SITE_API.isolate("board");
@@ -590,11 +637,36 @@ async function run() {
 
     await client.evalJs(`
       window.__SITE_API.setTheme("dark");
-      window.__SITE_API.setSimMode(true, "thermal", "rev08_clean_fine_70C");
+      window.__SITE_API.setSimMode(true, "thermal", "rev08_hs4_clean_fine_70C");
       window.__SITE_API.setCameraPreset("iso");
       window.__SITE_API.scrollToExplorer();
     `);
     await snap("sim_mode_phone.png", 550);
+
+    // Required shot 4: Audit group ("RF and power audit") on 390 px phone
+    await client.evalJs(`
+      window.__SITE_API.setTheme("dark");
+      window.__SITE_API.clearSelection();
+      window.__SITE_API.setSimMode(true, "audit", "rf");
+      window.__SITE_API.setCameraPreset("top");
+      window.__SITE_API.scrollToExplorer();
+      document.getElementById("sim-inspector-card")?.scrollIntoView({ behavior: "auto", block: "start" });
+    `);
+    const auditPhoneStats = await client.evalJs(`(() => {
+      const card = document.getElementById("sim-inspector-card");
+      const imgs = Array.from(card?.querySelectorAll("img") || []).map((im) => ({
+        src: im.getAttribute("src"),
+        ok: im.complete && im.naturalWidth > 0,
+      }));
+      return {
+        scrollW: document.documentElement.scrollWidth,
+        innerW: window.innerWidth,
+        imgCount: imgs.length,
+        imgs,
+      };
+    })()`);
+    console.log("Audit Phone (390px) check:", JSON.stringify(auditPhoneStats));
+    await snap("sim_audit_phone.png", 650);
     await client.evalJs(`window.__SITE_API.setSimMode(false);`);
 
     // 13. Side-by-side comparison renders + Custom KV260 model shot (Desktop 1440x900)
@@ -706,8 +778,8 @@ async function run() {
     await composeSideBySide(j1501B64, "assets/img/board_iso.png", "compare_j1501_usbc.png", "LIVE WEBGL: J1501 USB-C TAB", "REF: board_iso.png (J1501)", [0.20, 0.08, 0.56, 0.90], [0.20, 0.06, 0.28, 0.32]);
     try { fs.unlinkSync(path.join(SHOTS_DIR, "tmp_j1501.png")); } catch {}
 
-    // 14. Vendored PDF.js Streaming Reader Verification (Desktop #page=214 & Phone #page=1)
-    const pdfDeskUrl = `http://127.0.0.1:${port}/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=214`;
+    // 14. Vendored PDF.js Streaming Reader Verification (Desktop #page=180 & Phone #page=1)
+    const pdfDeskUrl = `http://127.0.0.1:${port}/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=180`;
     const tPdf0 = Date.now();
     await client.send("Page.navigate", { url: pdfDeskUrl });
     await waitFor(async () => {
@@ -721,7 +793,7 @@ async function run() {
     const pdfDeskStats = await client.evalJs("window.__PDF_API.getStats()");
     await client.evalJs("window.scrollBy(0, 120)");
     await snap("pdf_viewer_desktop.png", 500);
-    console.log(`PDF Desktop (#page=214) ready in ${pdfDeskMs} ms:`, pdfDeskStats);
+    console.log(`PDF Desktop (#page=180) ready in ${pdfDeskMs} ms:`, pdfDeskStats);
 
     await setViewport(390, 844, true);
     const pdfPhoneUrl = `http://127.0.0.1:${port}/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1`;
