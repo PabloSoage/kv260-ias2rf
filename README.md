@@ -389,6 +389,24 @@ All electromagnetic, transient SPICE, thermal, and power integrity checks are ru
 
 ---
 
+## PSU board
+
+A separate 110 x 70 mm, 4-layer board feeds both boards from the car's battery or a 6 to 36 V bench supply, each by
+its own cable from one ground: an LTC4364 surge stopper (Load Dump A clamped at 48 V, reverse input to -40 V), an
+LM5177 four-switch buck-boost to 12.0 V, and one TPS26631 eFuse per output (2.0 A to the adapter's `J1001`, 3.0 A to
+the KV260's `J12`). Both boards keep running through ISO 16750-2 Load Dump A and B, a 24 V jump start and cranking
+Levels I, II and IV; with two cables, the BM20 link carries 38 mA a contact at the worst load instead of 132 mA.
+Design values, simulations (steady state, loop, input filter, vehicle events, thermal, conducted noise), layout and
+installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); KiCad project in `psu/`.
+
+![The PSU board, 3D render](docs/img/psu/psu_iso.png)
+
+| Top | Board temperature, 70 C air |
+|---|---|
+| ![PSU top](docs/img/psu/psu_top.png) | ![PSU thermal](docs/sim/psu_thermal.png) |
+
+---
+
 ## Mounted on the KV260
 
 A printed base holds the KV260 and the adapter together: posts in place of the carrier's rubber feet,
