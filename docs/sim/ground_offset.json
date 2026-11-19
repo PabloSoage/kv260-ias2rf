@@ -160,5 +160,76 @@
     "adapter_ground_drop_uV": 4045.8644575286226
    }
   }
+ },
+ "vfe_two_cables": {
+  "0.5m/0.5m": {
+   "link_A": 0.8380498170392662,
+   "per_contact_A": 0.0359290421736408,
+   "adapter_ground_V": 0.09486751363555222,
+   "kv260_ground_V": 0.09594538490076145
+  },
+  "0.5m/0.5m contacts at max": {
+   "link_A": 0.8154518475332129,
+   "per_contact_A": 0.030868307542972758,
+   "adapter_ground_V": 0.09377264201298421,
+   "kv260_ground_V": 0.09685947276728149
+  },
+  "1.0m/1.0m": {
+   "link_A": 0.8769858878004658,
+   "per_contact_A": 0.03759831731696973,
+   "adapter_ground_V": 0.11762246879144735,
+   "kv260_ground_V": 0.11875041831095644
+  },
+  "1.0m/1.0m contacts at max": {
+   "link_A": 0.8576892775664671,
+   "per_contact_A": 0.0324671732320203,
+   "adapter_ground_V": 0.1164858984486648,
+   "kv260_ground_V": 0.11973261577186683
+  },
+  "0.3m/2.0m": {
+   "link_A": 1.5414239064786988,
+   "per_contact_A": 0.06608423916729575,
+   "adapter_ground_V": 0.11782123633981172,
+   "kv260_ground_V": 0.11980376351483059
+  },
+  "0.3m/2.0m contacts at max": {
+   "link_A": 1.509281719653949,
+   "per_contact_A": 0.057132707997656906,
+   "adapter_ground_V": 0.11639830172908057,
+   "kv260_ground_V": 0.12211157252884626
+  },
+  "2.0m/0.3m": {
+   "link_A": 0.23050088375275093,
+   "per_contact_A": 0.009882080760631,
+   "adapter_ground_V": 0.10776997052346916,
+   "kv260_ground_V": 0.1080664329462881
+  },
+  "2.0m/0.3m contacts at max": {
+   "link_A": 0.22569441718783204,
+   "per_contact_A": 0.008543489970083418,
+   "adapter_ground_V": 0.10738641449158905,
+   "kv260_ground_V": 0.10824076348859739
+  },
+  "KV260 cable ground open": {
+   "link_A": 3.209999740834411,
+   "per_contact_A": 0.137619761642895,
+   "adapter_ground_V": 0.25503698473514685,
+   "kv260_ground_V": 0.2591655775844337
+  },
+  "adapter cable ground open": {
+   "link_A": -1.11999977816249,
+   "per_contact_A": 0.04801685824147492,
+   "adapter_ground_V": 0.22183749445571643,
+   "kv260_ground_V": 0.22039698870847219
+  },
+  "0.3m/2.0m one contact at a third": {
+   "per_contact_A": 0.17794075059807718,
+   "worst_contact_W": 0.0004749436608511066
+  },
+  "home earthed monitor 1 V, 1 m/1 m": {
+   "loop_A": 3.0830182136636957,
+   "link_ac_A": 1.4126477903063626,
+   "per_contact_A": 0.07128498858535014
+  }
  }
 }

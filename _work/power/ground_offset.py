@@ -70,6 +70,8 @@ I_KV_TYP, I_KV_MAX = 0.92, 3.0
 I_KV_LIMIT = 3.0 * 1.07           # U1010's current limit at its tolerance: the KV260 cannot draw more
 R_JUMPER = 0.15 * 0.0209 + 0.010 + R_JACK     # J1004 contact + 18 AWG + barrel plug, one conductor
 R_L1004 = 0.008
+R_18AWG = 0.0209                  # ohm/m [V]
+R_VH = 0.010                      # JST VH contact, maximum [V]
 
 
 def par(*rs):
@@ -230,6 +232,45 @@ def main():
                            "adapter_ground_drop_uV": i_link_ac * r_link_typ * 1e6}
     res["home_single_entry_50Hz"] = {"loop_ohm": r_loop1, "cases": home1}
 
+    # 7. the vehicle power board (VFE) feeding both boards by their own cables from one ground: the two returns
+    # meet on the VFE, so the link carries only the difference of the two cables' drops. 18 AWG both ways, a JST VH
+    # contact on the VFE and the barrel plug at each board; the adapter's return also crosses L1004.
+    def y_feed(l_a, l_k, i_a, i_k, r_c, open_a=False, open_k=False, v_dp=0.0):
+        r_l, _ = link(r_c)
+        r_a = 1e6 if open_a else l_a * R_18AWG + R_VH + R_JACK + R_L1004
+        r_k = 1e6 if open_k else l_k * R_18AWG + R_VH + R_JACK
+        # nodal: [1/r_a + 1/r_l, -1/r_l; -1/r_l, 1/r_k + 1/r_l] [v_a, v_k] = [i_a, i_k]
+        g = np.array([[1 / r_a + 1 / r_l, -1 / r_l], [-1 / r_l, 1 / r_k + 1 / r_l]])
+        v_a, v_k = np.linalg.solve(g, np.array([i_a, i_k]))
+        i_link = (v_k - v_a) / r_l
+        return {"link_A": float(i_link), "per_contact_A": per_contact(i_link, r_c), "adapter_ground_V": float(v_a),
+                "kv260_ground_V": float(v_k)}
+    y = {}
+    for la, lk in ((0.5, 0.5), (1.0, 1.0), (0.3, 2.0), (2.0, 0.3)):
+        y[f"{la}m/{lk}m"] = y_feed(la, lk, I_ADAPTER_MAX, I_KV_LIMIT, R_BM20_TYP)
+        y[f"{la}m/{lk}m contacts at max"] = y_feed(la, lk, I_ADAPTER_MAX, I_KV_LIMIT, R_BM20_MAX)
+    y["KV260 cable ground open"] = y_feed(1.0, 1.0, I_ADAPTER_MAX, I_KV_LIMIT, R_BM20_TYP, open_k=True)
+    y["adapter cable ground open"] = y_feed(1.0, 1.0, I_ADAPTER_MAX, I_KV_LIMIT, R_BM20_TYP, open_a=True)
+    # one contact at a third of the others, the worst lengths: the low contact's current and heat
+    i_l = y_feed(0.3, 2.0, I_ADAPTER_MAX, I_KV_LIMIT, R_BM20_TYP)["link_A"]
+    r_o, r_low = 1.5 * R_BM20_TYP, R_BM20_TYP / 2
+    r_par = 1.0 / ((N_BM20 - 1) / r_o + 1.0 / r_low + 2 / R_FFC + 2 / R_PMOD)
+    i_low = abs(i_l) * r_par / r_low
+    y["0.3m/2.0m one contact at a third"] = {"per_contact_A": i_low, "worst_contact_W": i_low ** 2 * r_low}
+    # home: an earthed monitor on the KV260's DisplayPort, 1 V rms between the earths; the loop enters at the
+    # KV260 and leaves by the VFE's input; at the KV260 it splits between its cable and link + adapter cable
+    r_l_typ = link(R_BM20_TYP)[0]
+    r_k1 = 1.0 * R_18AWG + R_VH + R_JACK
+    r_a1 = 1.0 * R_18AWG + R_VH + R_JACK + R_L1004
+    r_loop_y = (1.8 * R_WIRE + R_JACK) + par(r_k1, r_l_typ + r_a1) + 0.060 + 0.036 + 10 * 0.0074 + 2 * 0.020
+    i_loop = 1.0 / r_loop_y
+    i_link_ac = i_loop * r_k1 / (r_k1 + r_l_typ + r_a1)
+    dc = y_feed(1.0, 1.0, I_ADAPTER_MAX, I_KV_LIMIT, R_BM20_TYP)["link_A"]
+    y["home earthed monitor 1 V, 1 m/1 m"] = {"loop_A": i_loop, "link_ac_A": i_link_ac,
+                                              "per_contact_A": per_contact((dc ** 2 + i_link_ac ** 2) ** 0.5,
+                                                                           R_BM20_TYP)}
+    res["vfe_two_cables"] = y
+
     os.makedirs(os.path.dirname(OUT_PNG), exist_ok=True)
     with open(OUT_JSON, "w") as f:
         json.dump(res, f, indent=1)
@@ -295,6 +336,7 @@ def main():
     print("home single entry 50 Hz:", {k: (round(v['loop_A'], 2), round(v['per_contact_A'] * 1000), round(v['adapter_ground_drop_uV']))
                                        for k, v in home1.items()}, "(A loop, mA a contact, uV)")
     print("home 50 Hz:", {k: (round(v['loop_A'], 2), round(v['per_contact_A'] * 1000), round(v['adapter_ground_drop_uV'])) for k, v in home.items()}, "(A loop, mA a contact, uV)")
+    print("VFE, two cables:", {k: round(v['per_contact_A'] * 1000) for k, v in res["vfe_two_cables"].items()}, "mA a contact")
     print("wrote", OUT_PNG)
 
 
