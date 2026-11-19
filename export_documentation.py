@@ -1013,16 +1013,46 @@ def _layout(full_html: str, user_css: str, arch: fitz.Archive) -> tuple[bytes, d
         if pos.id and pos.id not in pages:
             pages[pos.id] = (pos.page, pos.rect[1])
 
-    more, pno = 1, 0
+    more, pno, idle = 1, 0, 0
     while more:
         dev = writer.begin_page(fitz.Rect(0, 0, A4_W, A4_H))
+        seen = len(pages)
         more, _ = story.place(CONTENT_RECT)
         story.element_positions(where, {"page": pno})
         story.draw(dev, None)
         writer.end_page()
         pno += 1
+        # Story never gives up on a table chunk it cannot start (a header and first row that do not fit at the
+        # foot of a page): it emits empty pages for ever, and the process ran to 47 GB. Stop after 30 pages
+        # that place nothing new, and let the caller move that chunk to the next page.
+        idle = idle + 1 if more and len(pages) == seen else 0
+        if idle >= 30 or pno > 3000:
+            raise _StuckLayout(pages)
     writer.close()
     return buf.getvalue(), pages
+
+
+class _StuckLayout(Exception):
+    def __init__(self, pages: dict[str, tuple[int, float]]):
+        super().__init__("Story layout made no progress")
+        self.pages = pages
+
+
+def _unstick(pages: dict[str, tuple[int, float]], tables: list[int], splits: dict[int, set[int]],
+             spacers: dict[tuple[int, int], float]) -> bool:
+    """The first table chunk that was never placed. What Story cannot finish is the chunk above it, whose last row
+    ends flush with the foot of the page (the table's closing edge has nowhere to go, on that page or any after).
+    Move the cut one row up, so that row opens the next chunk on the next page, and lay out again."""
+    for k in tables:
+        for j in sorted(splits.get(k, ())):
+            if f"t{k}r{j}" in pages or f"t{k}r{j - 1}" not in pages:
+                continue
+            splits[k].discard(j)
+            spacers.pop((k, j), None)
+            if j - 1 > max([0] + [s for s in splits[k] if s < j]):
+                splits[k].add(j - 1)
+            return True
+    return False
 
 
 def render_html_pages(html_body: str, tmp_dir: Path, doc_label: str, user_css: str, has_ttf: bool) -> fitz.Document:
@@ -1041,7 +1071,12 @@ def render_html_pages(html_body: str, tmp_dir: Path, doc_label: str, user_css: s
     for _ in range(3000):
         body = _TABLE_TOKEN.sub(lambda m: _table_html(int(m.group(1)), splits, spacers), html_body)
         full_html = f"<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>{header_tag}{body}</body></html>"
-        pdf_bytes, pages = _layout(full_html, user_css, arch)
+        try:
+            pdf_bytes, pages = _layout(full_html, user_css, arch)
+        except _StuckLayout as e:
+            if not _unstick(e.pages, tables, splits, spacers):
+                raise RuntimeError(f"{doc_label}: Story layout made no progress and no table chunk explains it")
+            continue
         issues: list[tuple[int, float, str, int, int]] = []
         for k in tables:
             cuts = splits.get(k, set())
