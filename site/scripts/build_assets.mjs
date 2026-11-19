@@ -23,11 +23,14 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SITE_DIR = path.dirname(HERE);
 const ROOT_DIR = path.dirname(SITE_DIR);
 const ASSETS_DIR = path.join(SITE_DIR, "assets");
-const RAW_BOARD_PATH = process.argv[2];
-const KV260_CONN_PATH = process.argv[3] || "";
+// `--psu <raw_psu.glb>` builds only site/assets/psu_board.glb (the PSU board, from _work/psu/psu_site.py)
+const PSU_MODE = process.argv[2] === "--psu";
+const RAW_BOARD_PATH = PSU_MODE ? process.argv[3] : process.argv[2];
+const KV260_CONN_PATH = PSU_MODE ? "" : process.argv[3] || "";
 
 if (!RAW_BOARD_PATH || !fs.existsSync(RAW_BOARD_PATH)) {
-  console.error("Usage: node site/scripts/build_assets.mjs <raw_board.glb> [kv260_conn.glb]");
+  console.error("Usage: node site/scripts/build_assets.mjs <raw_board.glb> [kv260_conn.glb]\n" +
+    "       node site/scripts/build_assets.mjs --psu <raw_psu.glb>");
   process.exit(1);
 }
 
@@ -625,8 +628,8 @@ function calibrateMaterial(mat) {
 // 2. Build Fast Textured board.glb (3-D FR4 + Pads/Vias + Packages)
 // ---------------------------------------------------------------------------
 
-function buildBoardGlb(compJson) {
-  const { gltf, bin } = readGlb(RAW_BOARD_PATH);
+function buildBoardGlb(compJson, rawPath = RAW_BOARD_PATH, outName = "board.glb") {
+  const { gltf, bin } = readGlb(rawPath);
   const gb = new GlbBuilder();
 
   const srcNodes = gltf.nodes || [];
@@ -869,11 +872,11 @@ function buildBoardGlb(compJson) {
   }
   gb.nodes[outRootIdx].children = rootChildren;
 
-  const outBoardPath = path.join(ASSETS_DIR, "board.glb");
+  const outBoardPath = path.join(ASSETS_DIR, outName);
   gb.save(outBoardPath, [outRootIdx]);
   const stat = fs.statSync(outBoardPath);
   console.log(
-    `Built board.glb (${(stat.size / 1e6).toFixed(2)} MB, ${gb.meshes.length} meshes, fixed ${totalFixedTris} inverted tris, ${addedVrml} VRML, ${addedProc} centered procedural)`
+    `Built ${outName} (${(stat.size / 1e6).toFixed(2)} MB, ${gb.meshes.length} meshes, fixed ${totalFixedTris} inverted tris, ${addedVrml} VRML, ${addedProc} centered procedural)`
   );
 }
 
@@ -1330,7 +1333,11 @@ function buildEnclosureGlb() {
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
-const compJson = JSON.parse(fs.readFileSync(path.join(ASSETS_DIR, "components.json"), "utf8"));
-buildBoardGlb(compJson);
-buildKv260Glb(compJson);
-buildEnclosureGlb();
+if (PSU_MODE) {
+  buildBoardGlb(JSON.parse(fs.readFileSync(path.join(ASSETS_DIR, "psu.json"), "utf8")), RAW_BOARD_PATH, "psu_board.glb");
+} else {
+  const compJson = JSON.parse(fs.readFileSync(path.join(ASSETS_DIR, "components.json"), "utf8"));
+  buildBoardGlb(compJson);
+  buildKv260Glb(compJson);
+  buildEnclosureGlb();
+}

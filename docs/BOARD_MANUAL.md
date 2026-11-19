@@ -210,6 +210,8 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 
 ## 6. Powering the KV260 together with the board
 
+![The two ways to power the boards](img/power_options.png)
+
 ![Power and grounding wiring](img/power_wiring.png)
 
 ![Ground offset and earth loops](sim/ground_offset.png)

@@ -407,6 +407,8 @@ def md(parts, nums):
     w("")
     w("## 6. Powering the KV260 together with the board")
     w("")
+    w("![The two ways to power the boards](img/power_options.png)")
+    w("")
     w("![Power and grounding wiring](img/power_wiring.png)")
     w("")
     w("![Ground offset and earth loops](sim/ground_offset.png)")

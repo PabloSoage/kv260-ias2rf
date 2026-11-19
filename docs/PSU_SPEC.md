@@ -191,11 +191,20 @@ drill, BOM of 65 lines and 102 parts, every one with an LCSC code, CPL) into `fa
 (`_work/mech/xt30pw_model.py`), `J2`/`J3` the adapter's VH model, and the SON-8 MOSFETs and the electrolytics use
 copies of KiCad's models with their near-white metal toned to grey (`psu_pcb.py`, `tone_models`).
 
-![PSU board, top](img/psu/psu_top.png)
+Reference designators are on the top silkscreen, placed clear of every pad and courtyard by
+`_work/psu/psu_silk.py` (C27 and R12 have no room and stay on the assembly drawing); the solder mask is a green that
+lets the pours show through. `_work/psu/psu_render.py` renders these views from a refilled copy, and
+`_work/psu/psu_site.py` puts the board, its nets and its analysis in the site's 3-D explorer.
 
 ![PSU board](img/psu/psu_iso.png)
 
+![PSU board, top](img/psu/psu_top.png)
+
+![PSU board, bottom](img/psu/psu_bottom.png)
+
 ## 8. Installation
+
+![The two ways to power the boards](img/power_options.png)
 
 - **Vehicle:** `J1` to the battery by 16 AWG, a 20 A fuse at the battery, the ground to the same chassis point as the
   CAN cable's ground (`J1503`). `J2` to the adapter's `J1001` and `J3` to the KV260's `J12`, each by its own 18 AWG

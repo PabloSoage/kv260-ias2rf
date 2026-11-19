@@ -41,3 +41,5 @@ _scratch/
 
 # Vivado routed checkpoints for the floorplan export
 fpga/artix/.build_rev06/
+_render_psu/
+_site_psu/

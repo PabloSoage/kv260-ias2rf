@@ -402,9 +402,21 @@ installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); schematic [PDF](docs/KV260-I
 
 ![The PSU board, 3D render](docs/img/psu/psu_iso.png)
 
-| Top | Board temperature, 70 C air |
+| Top | Bottom |
 |---|---|
-| ![PSU top](docs/img/psu/psu_top.png) | ![PSU thermal](docs/sim/psu_thermal.png) |
+| ![PSU top](docs/img/psu/psu_top.png) | ![PSU bottom](docs/img/psu/psu_bottom.png) |
+
+![PSU board temperature at 70 C air](docs/sim/psu_thermal.png)
+
+The PSU board is also in the [3-D explorer](https://pablosoage.github.io/kv260-ias2rf/#view=psu), with every part's
+nets, its audit row and its thermal results.
+
+### Powering the two boards
+
+One supply and one ground for both boards: a 12 V brick on the adapter's `J1001` with the short jumper from `J1004`
+to the KV260's `J12`, or the PSU board with its own cable to each ([BOARD_MANUAL §6](docs/BOARD_MANUAL.md)).
+
+![The two ways to power the adapter and the KV260](docs/img/power_options.png)
 
 ---
 

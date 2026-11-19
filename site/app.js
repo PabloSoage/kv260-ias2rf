@@ -14,40 +14,40 @@ const BOARD_REG_ROTY = -Math.PI / 2;
 
 const DOC_PDF_PAGE_MAP = {
   "README.md": 6,
-  "docs/BOARD_MANUAL.md": 27,
-  "docs/FPGA_GATEWARE.md": 36,
-  "docs/SYSTEM_SIM.md": 62,
-  "fpga/SYSTEM_SIM.md": 62,
-  "docs/LINK_PROTOCOL.md": 66,
-  "docs/PINMAP.md": 72,
-  "docs/HMI.md": 84,
-  "docs/INTEGRATIONS.md": 92,
-  "docs/IAS_LINK_SPEC.md": 112,
-  "docs/CLOCK_SPEC.md": 116,
-  "docs/CONTROL_SPEC.md": 130,
-  "docs/POWER_SPEC.md": 137,
-  "docs/POWER_AND_STACKUP.md": 137,
-  "docs/LAYOUT.md": 157,
-  "docs/SIGNAL_INTEGRITY.md": 167,
-  "docs/AUDIT_Rev08.md": 195,
-  "docs/3D_MODELS.md": 206,
-  "docs/MECHANICAL.md": 210,
-  "docs/ENCLOSURE.md": 214,
-  "docs/ENCLOSURE_V2_THERMAL.md": 228,
-  "docs/FABRICATION.md": 250,
-  "docs/JLCPCB_QUOTE.md": 253,
-  "fpga/README.md": 60,
-  "fpga/eth/REV06.md": 76,
-  "fpga/eth/REDUNDANCY.md": 78,
-  "sw/README.md": 83,
-  "docs/ADC_RADAR_SPEC.md": 119,
-  "docs/ADC_SDR_SPEC.md": 122,
-  "docs/DAC_RADAR_SPEC.md": 124,
-  "docs/DAC_SDR_SPEC.md": 126,
-  "docs/ROUTING_SPEC.md": 128,
-  "docs/PSU_SPEC.md": 146,
-  "docs/SYMBOLS.md": 152,
-  "docs/img/highres/README.md": 261,
+  "docs/BOARD_MANUAL.md": 28,
+  "docs/FPGA_GATEWARE.md": 37,
+  "docs/SYSTEM_SIM.md": 63,
+  "fpga/SYSTEM_SIM.md": 63,
+  "docs/LINK_PROTOCOL.md": 67,
+  "docs/PINMAP.md": 73,
+  "docs/HMI.md": 85,
+  "docs/INTEGRATIONS.md": 93,
+  "docs/IAS_LINK_SPEC.md": 113,
+  "docs/CLOCK_SPEC.md": 117,
+  "docs/CONTROL_SPEC.md": 131,
+  "docs/POWER_SPEC.md": 138,
+  "docs/POWER_AND_STACKUP.md": 138,
+  "docs/LAYOUT.md": 159,
+  "docs/SIGNAL_INTEGRITY.md": 169,
+  "docs/AUDIT_Rev08.md": 197,
+  "docs/3D_MODELS.md": 208,
+  "docs/MECHANICAL.md": 212,
+  "docs/ENCLOSURE.md": 216,
+  "docs/ENCLOSURE_V2_THERMAL.md": 230,
+  "docs/FABRICATION.md": 252,
+  "docs/JLCPCB_QUOTE.md": 255,
+  "fpga/README.md": 61,
+  "fpga/eth/REV06.md": 77,
+  "fpga/eth/REDUNDANCY.md": 79,
+  "sw/README.md": 84,
+  "docs/ADC_RADAR_SPEC.md": 120,
+  "docs/ADC_SDR_SPEC.md": 123,
+  "docs/DAC_RADAR_SPEC.md": 125,
+  "docs/DAC_SDR_SPEC.md": 127,
+  "docs/ROUTING_SPEC.md": 129,
+  "docs/PSU_SPEC.md": 147,
+  "docs/SYMBOLS.md": 154,
+  "docs/img/highres/README.md": 263,
 };
 
 function docToPdfHref(docPath) {
@@ -106,11 +106,12 @@ const state = {
   showKvFan: true,
   showKvHs: true,
   somLiftMm: 0,
-  isolateMode: "all", // all | board | kv260 | thermal | enclosure
+  isolateMode: "all", // all | board | kv260 | thermal | enclosure | psu
   selectedId: null,
   activeNet: null,
   activeNetIsPower: false,
   allNets: false,
+  partAllNets: null, // a part whose every net is shown at once ("Select All Nets" in its inspector)
   useWasmPicker: true,
 };
 
@@ -132,6 +133,7 @@ let tweenHandles = {
 
 let catalogue = null;
 let netTraces = {};
+let psuData = null; // assets/psu.json: the PSU board (parts, nets, copper, analysis); ids and nets prefixed "PSU:"
 let siteCore = null;
 const partList = [];
 const partIndexById = new Map();
@@ -156,6 +158,12 @@ let hoverBox = null;
 let selectBox = null;
 const netHighlightGroup = new THREE.Group();
 const netPulseGroup = new THREE.Group();
+const psuGroup = new THREE.Group(); // the PSU board, beside the assembly; KiCad mm map to (x, -, y) as on the adapter
+const psuPulseGroup = new THREE.Group();
+let psuModel = null;
+const PSU_CENTRE_MM = [155, 135];
+const psuNet = (n) => String(n || "").startsWith("PSU:");
+const netLabel = (n) => String(n || "").replace(/^PSU:/, "");
 let activeTraceSegs = [];
 let activePulseMesh = null;
 
@@ -210,16 +218,25 @@ async function boot() {
   renderGallery();
   setLoadProgress(10, "Loading Rust/WASM Core & Component Catalogue...", "site/core/pkg/ias2rf_site_core_bg.wasm");
 
-  const [_, catResp, traceResp, simResp] = await Promise.all([
+  const [_, catResp, traceResp, simResp, psuResp] = await Promise.all([
     initCore(),
     fetch("assets/components.json"),
     fetch("assets/net_traces.json"),
     fetch("assets/simulations.json"),
+    fetch("assets/psu.json").catch(() => null),
   ]);
   if (!catResp.ok) throw new Error(`components.json HTTP ${catResp.status}`);
   catalogue = await catResp.json();
   if (traceResp.ok) netTraces = await traceResp.json();
   const simData = simResp.ok ? await simResp.json() : null;
+  if (psuResp && psuResp.ok) {
+    psuData = await psuResp.json();
+    for (const [n, segs] of Object.entries(psuData.traces || {})) netTraces[`PSU:${n}`] = segs;
+    for (const c of psuData.components) {
+      c.nets = (c.nets || []).map((n) => `PSU:${n}`);
+      for (const k of Object.keys(c.pads || {})) if (c.pads[k] !== "(nc)") c.pads[k] = `PSU:${c.pads[k]}`;
+    }
+  }
 
   setLoadProgress(28, "Building Spatial BVH/Grid in Rust WASM...", `${catalogue.components.length} board + ${catalogue.kv260_parts.length} KV260 parts`);
   siteCore = new SiteCore();
@@ -317,6 +334,34 @@ function indexAndLoadCore(cat) {
     const gid = ex.id === "FAN2_5015" ? 6 : 7;
     pushPart(ex.id, "extra", ex, gid, [kx0 * 0.001, kz0 * 0.001, -ky1 * 0.001], [kx1 * 0.001, kz1 * 0.001, -ky0 * 0.001]);
   }
+  // the PSU board: group 8, bounds set from its meshes once it is placed (refreshPsuPickerBounds)
+  for (const c of psuData?.components || []) {
+    const [x0, y0, x1, y1] = c.bbox_board_mm;
+    pushPart(c.id, "psu", c, 8, [x0 * 0.001, 0, y0 * 0.001], [x1 * 0.001, 0.003, y1 * 0.001]);
+  }
+}
+
+function refreshPsuPickerBounds() {
+  if (!siteCore || !psuData) return;
+  scene.updateMatrixWorld(true);
+  const box = new THREE.Box3();
+  for (const c of psuData.components) {
+    const idx = partIndexById.get(c.id);
+    if (idx === undefined) continue;
+    const [bx0, by0, bx1, by1] = c.bbox_board_mm;
+    box.makeEmpty();
+    box.expandByPoint(psuGroup.localToWorld(new THREE.Vector3(bx0 * 0.001, 0.0016, by0 * 0.001)));
+    box.expandByPoint(psuGroup.localToWorld(new THREE.Vector3(bx1 * 0.001, 0.0019, by1 * 0.001)));
+    const obj = nodeById.get(c.id);
+    if (obj) box.union(new THREE.Box3().setFromObject(obj));
+    const cx = (box.min.x + box.max.x) / 2;
+    const cz = (box.min.z + box.max.z) / 2;
+    box.min.x = Math.min(box.min.x, cx - 0.00065);
+    box.max.x = Math.max(box.max.x, cx + 0.00065);
+    box.min.z = Math.min(box.min.z, cz - 0.00065);
+    box.max.z = Math.max(box.max.z, cz + 0.00065);
+    siteCore.set_part_bounds(idx, 1, box.min.x, box.min.y, box.min.z, box.max.x, box.max.y, box.max.z);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -376,6 +421,9 @@ function initExplorerThree() {
   adapterGroup.add(netPulseGroup);
 
   assemblyRoot.add(adapterGroup);
+  psuGroup.add(psuPulseGroup);
+  psuGroup.visible = false;
+  assemblyRoot.add(psuGroup);
   scene.add(assemblyRoot);
   scene.add(netHighlightGroup);
 
@@ -676,12 +724,12 @@ async function bakePcbSideTexture({ cuSvg, maskSvg, silkSvg, edgeSvg, outline, s
   return tex;
 }
 
-async function bakePcbSurfaceTextures(boardRoot) {
+async function bakePcbSurfaceTextures(boardRoot, outline = catalogue?.board_outline, layerDir = "assets/layers") {
   let pcbNode = null;
   boardRoot.traverse((o) => {
     if (!pcbNode && (o.name === "PCB_LAYER_PCB" || o.name === "PCB_PCB")) pcbNode = o;
   });
-  if (!pcbNode || !catalogue?.board_outline) return;
+  if (!pcbNode || !outline) return;
 
   boardRoot.updateMatrixWorld(true);
   const rootInv = boardRoot.matrixWorld.clone().invert();
@@ -700,14 +748,14 @@ async function bakePcbSurfaceTextures(boardRoot) {
 
   const [edgeSvg, fCuSvg, fMaskSvg, fSilkSvg, bCuSvg, bMaskSvg, bSilkSvg] = await Promise.all(
     ["Edge_Cuts.svg", "F_Cu.svg", "F_Mask.svg", "F_SilkS.svg", "B_Cu.svg", "B_Mask.svg", "B_SilkS.svg"].map(
-      (f) => fetch(`assets/layers/${f}`).then((r) => (r.ok ? r.text() : ""))
+      (f) => fetch(`${layerDir}/${f}`).then((r) => (r.ok ? r.text() : ""))
     )
   );
   if (!fCuSvg || !bCuSvg) return;
 
   const [topTex, botTex] = await Promise.all([
-    bakePcbSideTexture({ cuSvg: fCuSvg, maskSvg: fMaskSvg, silkSvg: fSilkSvg, edgeSvg, outline: catalogue.board_outline, flipY: true }),
-    bakePcbSideTexture({ cuSvg: bCuSvg, maskSvg: bMaskSvg, silkSvg: bSilkSvg, edgeSvg, outline: catalogue.board_outline, flipY: false }),
+    bakePcbSideTexture({ cuSvg: fCuSvg, maskSvg: fMaskSvg, silkSvg: fSilkSvg, edgeSvg, outline, flipY: true }),
+    bakePcbSideTexture({ cuSvg: bCuSvg, maskSvg: bMaskSvg, silkSvg: bSilkSvg, edgeSvg, outline, flipY: false }),
   ]);
 
   const w = pcbLocalBox.max.x - pcbLocalBox.min.x;
@@ -819,8 +867,42 @@ async function loadModelsWithProgress() {
   batchStaticGroupByMaterial(encNodes.ENCLOSURE_LID_GROUP, { batchName: "ENC_LID_BATCH" });
   batchStaticGroupByMaterial(encNodes.ADAPTER_HEATSINKS_GROUP, { batchName: "ENC_HS_BATCH" });
 
+  if (psuData) {
+    try {
+      const pGltf = await loadGlb("assets/psu_board.glb", "psu", "psu_board.glb");
+      psuModel = pGltf.scene;
+      psuModel.traverse((o) => {
+        if (o.name && partById.has(`PSU:${o.name}`) && !nodeById.has(`PSU:${o.name}`)) {
+          o.name = `PSU:${o.name}`;
+          nodeById.set(o.name, o);
+        }
+      });
+      psuGroup.add(psuModel);
+      await bakePcbSurfaceTextures(psuModel, psuData.board_outline, "assets/psu_layers");
+      placePsuBeside();
+    } catch (err) {
+      console.warn("PSU board not loaded", err);
+    }
+  }
+
   setCameraPreset("iso", true);
   requestRender();
+}
+
+// The PSU board lies beside the assembly on the same floor, 40 mm clear of it, J1 (the battery) towards the case
+function placePsuBeside() {
+  const wasVisible = psuGroup.visible;
+  psuGroup.visible = false;
+  scene.updateMatrixWorld(true);
+  const box = new THREE.Box3();
+  for (const o of [adapterGroup, kv260Model, enclosureModel]) if (o) box.expandByObject(o);
+  psuGroup.visible = wasVisible;
+  const [cx, cy] = PSU_CENTRE_MM;
+  const halfW = 0.055;
+  psuGroup.position.set(box.max.x + 0.04 + halfW - cx * 0.001, box.min.y, (box.min.z + box.max.z) / 2 - cy * 0.001);
+  applyAnimatedScene();
+  refreshPsuPickerBounds();
+  applyAnimatedScene();
 }
 
 // ---------------------------------------------------------------------------
@@ -914,6 +996,8 @@ function applyAnimatedScene() {
   const showBoard = state.isolateMode === "all" || state.isolateMode === "board";
   const showKv = state.isolateMode === "all" || state.isolateMode === "kv260";
   const showThermal = state.isolateMode === "all" || state.isolateMode === "thermal";
+  const showPsu = !!psuModel && (state.isolateMode === "all" || state.isolateMode === "psu");
+  psuGroup.visible = showPsu;
 
   const yBoard = 0.072 * t;
   adapterGroup.visible = showBoard;
@@ -983,7 +1067,8 @@ function applyAnimatedScene() {
       (hsVis ? 1 << 4 : 0) |
       (caseVis ? 1 << 5 : 0) |
       (caseVis ? 1 << 6 : 0) |
-      (showThermal ? 1 << 7 : 0);
+      (showThermal ? 1 << 7 : 0) |
+      (showPsu ? 1 << 8 : 0);
     const offsets = new Float32Array([
       yBoard,
       0.0,
@@ -993,6 +1078,7 @@ function applyAnimatedScene() {
       yBottom,
       yLid,
       yAdpHs,
+      0.0,
     ]);
     siteCore.set_group_transforms(offsets, mask);
   }
@@ -1083,6 +1169,7 @@ function getActiveBounds() {
     encNodes.ENCLOSURE_BOTTOM_GROUP,
     encNodes.ENCLOSURE_LID_GROUP,
     encNodes.ADAPTER_HEATSINKS_GROUP,
+    psuModel ? psuGroup : null,
   ];
   for (const obj of candidates) {
     if (obj && isObjectEffectivelyVisible(obj)) box.expandByObject(obj);
@@ -1215,11 +1302,12 @@ function wireViewportPicking(canvas) {
     const nextId = found && found.object ? found.id : null;
     if (found && found.object) {
       const entry = partById.get(found.id);
-      const label = entry.kind === "board"
-        ? `${entry.data.ref} &middot; ${escapeHtml(entry.data.value)}`
+      const pcbPart = entry.kind === "board" || entry.kind === "psu";
+      const label = pcbPart
+        ? `${entry.kind === "psu" ? "PSU " : ""}${entry.data.ref} &middot; ${escapeHtml(entry.data.value)}`
         : `${entry.data.ref || entry.data.id} &middot; ${escapeHtml(entry.data.part || entry.data.value)}`;
-      const role = entry.kind === "board" ? entry.data.description : entry.data.role;
-      const simTip = simCtrl ? simCtrl.buildHoverHtml(found.id) : "";
+      const role = pcbPart ? entry.data.description : entry.data.role;
+      const simTip = entry.kind === "psu" ? psuHoverHtml(entry.data) : simCtrl ? simCtrl.buildHoverHtml(found.id) : "";
       tip.innerHTML = `<strong>${label}</strong><br><span style="color:var(--text-muted)">${escapeHtml((role || "").slice(0, 88))}</span>${simTip}`;
       tip.style.left = `${Math.min(rect.width - 210, Math.max(8, ev.clientX - rect.left + 12))}px`;
       tip.style.top = `${Math.min(rect.height - 65, Math.max(8, ev.clientY - rect.top + 12))}px`;
@@ -1275,6 +1363,7 @@ function wireViewportPicking(canvas) {
     let cur = hits[0].object;
     while (cur) {
       if (cur === adapterGroup) { setIsolate(state.isolateMode === "board" ? "all" : "board"); return; }
+      if (cur === psuGroup) { setIsolate(state.isolateMode === "psu" ? "all" : "psu"); return; }
       if (cur === kv260Model) { setIsolate(state.isolateMode === "kv260" ? "all" : "kv260"); return; }
       if (cur === encNodes.ADAPTER_HEATSINKS_GROUP) { setIsolate(state.isolateMode === "thermal" ? "all" : "thermal"); return; }
       if (cur === enclosureModel) { setIsolate(state.isolateMode === "enclosure" ? "all" : "enclosure"); return; }
@@ -1314,11 +1403,12 @@ function isObjectEffectivelyVisible(obj) {
 }
 
 function isPowerNetName(n) {
+  if (psuNet(n)) return netLabel(n) === "GND"; // on the PSU board the power nets are the signals that matter
   return /^(?:\+|-)\d|^(?:VCC|VDD|VBUS|VREF|VIN|VBAT|GND|AGND|DGND)/i.test(String(n || "").trim());
 }
 
 function pickPrimaryNetForComponent(c) {
-  const nonGnd = (c.nets || []).filter((n) => n && !/^(?:GND|AGND|DGND)$/i.test(n.trim()));
+  const nonGnd = (c.nets || []).filter((n) => n && !/^(?:GND|AGND|DGND)$/i.test(netLabel(n).trim()));
   const sig = nonGnd.find((n) => !isPowerNetName(n) && (netTraces[n]?.length || 0) > 0);
   if (sig) return { net: sig, isPower: false };
   const pwr = nonGnd.find((n) => (netTraces[n]?.length || 0) > 0);
@@ -1328,6 +1418,7 @@ function pickPrimaryNetForComponent(c) {
 
 function clearSelection() {
   state.selectedId = null;
+  state.partAllNets = null;
   state.activeNet = null;
   state.activeNetIsPower = false;
   updateSelectionBox();
@@ -1344,24 +1435,33 @@ function clearSelection() {
 }
 
 function rebuildNetHighlightBoxes() {
-  while (netHighlightGroup.children.length) netHighlightGroup.remove(netHighlightGroup.children[0]);
-  while (netPulseGroup.children.length) netPulseGroup.remove(netPulseGroup.children[0]);
+  for (const g of [netHighlightGroup, netPulseGroup, psuPulseGroup]) {
+    while (g.children.length) g.remove(g.children[0]);
+  }
   activeTraceSegs = [];
   activePulseMesh = null;
 
-  if (state.allNets && adapterGroup.visible) {
-    buildAllNetTraces();
+  if (state.allNets) {
+    buildAllNetTraces(Object.keys(netTraces));
     requestRender();
     return;
   }
-  if (!state.activeNet || !adapterGroup.visible) {
+  if (state.partAllNets && partById.get(state.partAllNets)) {
+    const nets = partById.get(state.partAllNets).data.nets || [];
+    buildAllNetTraces(nets, true);
+    const st = $("#hud-status");
+    if (st) st.innerHTML = `<strong>${escapeHtml(netLabel(state.partAllNets))}</strong>: all ${nets.length} nets`;
+    requestRender();
+    return;
+  }
+  const onPsu = psuNet(state.activeNet);
+  const host = onPsu ? psuGroup : adapterGroup;
+  if (!state.activeNet || !host.visible) {
     requestRender();
     return;
   }
   const dimPower = !!state.activeNetIsPower;
-  const refs = siteCore
-    ? Array.from(siteCore.net_mates(state.activeNet)).map((idx) => partList[idx]).filter(Boolean)
-    : (compByNet.get(state.activeNet) || []);
+  const refs = netMates(state.activeNet);
 
   const boxColor = dimPower ? 0x3b82b8 : 0x4cc2ff;
   for (const ref of refs) {
@@ -1371,9 +1471,10 @@ function rebuildNetHighlightBoxes() {
     if (!bx.isEmpty()) netHighlightGroup.add(new THREE.Box3Helper(bx, boxColor));
   }
 
-  // Build real routed KiCad copper traces + traveling signal pulses inside adapterGroup
+  // Real routed KiCad copper (tracks, and the outline of each pour on the PSU board) + travelling pulses
   const rawSegs = netTraces[state.activeNet] || [];
   if (rawSegs.length) {
+    const target = onPsu ? psuPulseGroup : netPulseGroup;
     const verts = new Float32Array(rawSegs.length * 6);
     activeTraceSegs = [];
     for (let i = 0; i < rawSegs.length; i++) {
@@ -1396,50 +1497,82 @@ function rebuildNetHighlightBoxes() {
       transparent: true,
       opacity: dimPower ? 0.44 : 0.92,
     });
-    netPulseGroup.add(new THREE.LineSegments(lineGeo, lineMat));
+    target.add(new THREE.LineSegments(lineGeo, lineMat));
 
     const dotCount = dimPower ? Math.min(12, Math.max(4, activeTraceSegs.length)) : Math.min(28, Math.max(8, activeTraceSegs.length));
     const dotGeo = new THREE.SphereGeometry(dimPower ? 0.00036 : 0.00045, 8, 8);
     const dotMat = new THREE.MeshBasicMaterial({ color: dimPower ? 0x93c5fd : 0xffb020 });
     activePulseMesh = new THREE.InstancedMesh(dotGeo, dotMat, dotCount);
-    netPulseGroup.add(activePulseMesh);
+    target.add(activePulseMesh);
     stepPulseDots(performance.now());
   }
   requestRender();
 }
 
-// Every routed net at once, each in its own colour (power and ground dimmed): what connects to what, board-wide
+function netMates(net) {
+  return siteCore
+    ? Array.from(siteCore.net_mates(net)).map((idx) => partList[idx]).filter(Boolean)
+    : (compByNet.get(net) || []);
+}
+
+// Several nets at once, each in its own colour (power and ground dimmed): every routed net of the boards on show
+// (the Nets panel), or every net of one part with a box round each part it reaches (its inspector)
 function netHue(name) {
   let h = 2166136261;
   for (let i = 0; i < name.length; i++) h = Math.imul(h ^ name.charCodeAt(i), 16777619);
   return ((h >>> 0) % 360) / 360;
 }
 
-function buildAllNetTraces() {
-  const names = Object.keys(netTraces);
-  let total = 0;
-  for (const n of names) total += netTraces[n].length;
-  const verts = new Float32Array(total * 6);
-  const cols = new Float32Array(total * 6);
+function buildAllNetTraces(names, withParts = false) {
   const c = new THREE.Color();
-  let o = 0;
-  for (const n of names) {
-    const power = isPowerNetName(n);
-    if (power) c.setHSL(0.58, 0.35, 0.32);
-    else c.setHSL(netHue(n), 0.85, 0.58);
-    for (const [x1, y1, x2, y2, lIdx] of netTraces[n]) {
-      const yLocal = lIdx <= 3 ? 0.00172 : -0.00009;
-      verts.set([x1 * 0.001, yLocal, y1 * 0.001, x2 * 0.001, yLocal, y2 * 0.001], o);
-      cols.set([c.r, c.g, c.b, c.r, c.g, c.b], o);
-      o += 6;
+  const groups = [
+    { host: adapterGroup, target: netPulseGroup, psu: false },
+    { host: psuGroup, target: psuPulseGroup, psu: true },
+  ];
+  let nNets = 0;
+  let total = 0;
+  const seenParts = new Set();
+  for (const g of groups) {
+    if (!g.host.visible) continue;
+    const mine = names.filter((n) => psuNet(n) === g.psu);
+    let count = 0;
+    for (const n of mine) count += (netTraces[n] || []).length;
+    const verts = new Float32Array(count * 6);
+    const cols = new Float32Array(count * 6);
+    let o = 0;
+    for (const n of mine) {
+      const power = isPowerNetName(n);
+      if (power) c.setHSL(0.58, 0.35, 0.32);
+      else c.setHSL(netHue(n), 0.85, 0.58);
+      for (const [x1, y1, x2, y2, lIdx] of netTraces[n] || []) {
+        const yLocal = lIdx <= 3 ? 0.00172 : -0.00009;
+        verts.set([x1 * 0.001, yLocal, y1 * 0.001, x2 * 0.001, yLocal, y2 * 0.001], o);
+        cols.set([c.r, c.g, c.b, c.r, c.g, c.b], o);
+        o += 6;
+      }
+      if (withParts) {
+        for (const ref of netMates(n)) {
+          if (seenParts.has(ref) || ref === state.partAllNets) continue;
+          seenParts.add(ref);
+          const obj = nodeById.get(ref);
+          if (!obj) continue;
+          const bx = new THREE.Box3().setFromObject(obj);
+          if (!bx.isEmpty()) netHighlightGroup.add(new THREE.Box3Helper(bx, power ? 0x3b82b8 : c.getHex()));
+        }
+      }
+      nNets++;
+    }
+    total += count;
+    if (count) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+      geo.setAttribute("color", new THREE.BufferAttribute(cols, 3));
+      g.target.add(new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 })));
     }
   }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-  geo.setAttribute("color", new THREE.BufferAttribute(cols, 3));
-  netPulseGroup.add(new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 })));
   const st = $("#hud-status");
-  if (st) st.textContent = `All nets: ${names.length} nets, ${total} copper segments`;
+  if (st && !withParts) st.textContent = `All nets: ${nNets} nets, ${total} copper segments`;
+  return { nNets, total, parts: seenParts.size };
 }
 
 function stepPulseDots(now) {
@@ -1463,9 +1596,12 @@ function stepPulseDots(now) {
 function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
   const entry = partById.get(id);
   if (!entry) return;
+  if (state.partAllNets && state.partAllNets !== id) state.partAllNets = null;
   state.selectedId = id;
+  const pcbPart = entry.kind === "board" || entry.kind === "psu";
+  if (entry.kind === "psu" && !psuGroup.visible) setIsolate("psu", true);
   if (autoHighlightNet && !applyingHash) {
-    if (entry.kind === "board") {
+    if (pcbPart) {
       const picked = pickPrimaryNetForComponent(entry.data);
       state.activeNet = picked.net;
       state.activeNetIsPower = picked.isPower;
@@ -1484,20 +1620,22 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
   const body = $("#inspector-body");
   body.style.display = "flex";
 
-  if (entry.kind === "board") {
+  if (pcbPart) {
     const c = entry.data;
-    const auditLine = simCtrl?.getPartAuditLine?.(id) || null;
-    const padRows = Object.entries(c.pads || {}).slice(0, 28).map(
-      ([pin, net]) => `<tr><td class="mono">${escapeHtml(pin)}</td><td><button type="button" class="net-chip ${state.activeNet === net ? "active" : ""}" data-net="${escapeHtml(net)}">${escapeHtml(net)}</button></td></tr>`
+    const isPsu = entry.kind === "psu";
+    const auditLine = isPsu ? null : simCtrl?.getPartAuditLine?.(id) || null;
+    const padRows = Object.entries(c.pads || {}).slice(0, 40).map(
+      ([pin, net]) => `<tr><td class="mono">${escapeHtml(pin)}</td><td>${net === "(nc)" ? '<span class="mono" style="color:var(--text-muted)">(nc)</span>' : `<button type="button" class="net-chip ${state.activeNet === net ? "active" : ""}" data-net="${escapeHtml(net)}">${escapeHtml(netLabel(net))}</button>`}</td></tr>`
     ).join("");
     const netButtons = (c.nets || []).map(
-      (n) => `<button type="button" class="net-chip ${state.activeNet === n ? "active" : ""}" data-net="${escapeHtml(n)}">${escapeHtml(n)}</button>`
+      (n) => `<button type="button" class="net-chip ${state.activeNet === n || state.partAllNets === id ? "active" : ""}" data-net="${escapeHtml(n)}">${escapeHtml(netLabel(n))}</button>`
     ).join("");
+    const allOn = state.partAllNets === id;
 
     body.innerHTML = `
       <div class="panel-card">
         <div class="control-row">
-          <span class="badge">REV08 ADAPTER</span>
+          <span class="badge ${isPsu ? "badge-cyan" : ""}">${isPsu ? "PSU BOARD" : "REV08 ADAPTER"}</span>
           <span class="mono" style="color:var(--text-muted)">${escapeHtml(c.side)} &middot; ${escapeHtml(c.sheet || "-")}</span>
         </div>
         <h2 style="margin:0;font-size:17px;">${escapeHtml(c.ref)} <small style="font-weight:500;color:var(--text-muted)">${escapeHtml(c.value)}</small></h2>
@@ -1516,7 +1654,7 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
         ${c.callout ? `<p style="margin:0;font-size:11px;color:var(--cyan)"><strong>Manual callout:</strong> ${escapeHtml(c.callout)}</p>` : ""}
         <div class="btn-grid-3">
           <button id="insp-focus-btn" class="btn btn-sm btn-primary" type="button">Focus Camera</button>
-          <a class="btn btn-sm" style="text-align:center" href="${docToPdfHref(c.manual_link || "docs/BOARD_MANUAL.md")}" target="_blank" rel="noopener">Manual</a>
+          <a class="btn btn-sm" style="text-align:center" href="${docToPdfHref(c.manual_link || "docs/BOARD_MANUAL.md")}" target="_blank" rel="noopener">${isPsu ? "PSU_SPEC" : "Manual"}</a>
           <button id="insp-copy-link" class="btn btn-sm" type="button">Copy Link</button>
         </div>
       </div>
@@ -1531,14 +1669,18 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
           <tr><th>3-D Source</th><td class="mono">${escapeHtml(c.model_source)}</td></tr>
         </table>
       </div>
+      ${isPsu ? psuAnalysisHtml(c) : ""}
 
       <div class="panel-card">
         <div class="control-row">
           <h3>Nets (${(c.nets || []).length})</h3>
-          ${state.activeNet ? `<button id="insp-clear-net" class="btn btn-sm" type="button">Clear Net</button>` : ""}
+          <span style="display:flex;gap:6px;">
+            ${(c.nets || []).length > 1 ? `<button id="insp-all-nets" class="btn btn-sm ${allOn ? "active" : ""}" type="button" aria-pressed="${allOn}">${allOn ? "Clear All Nets" : "Select All Nets"}</button>` : ""}
+            ${state.activeNet && !allOn ? `<button id="insp-clear-net" class="btn btn-sm" type="button">Clear Net</button>` : ""}
+          </span>
         </div>
         <div class="net-list">${netButtons || '<span style="color:var(--text-muted)">No connected nets</span>'}</div>
-        ${state.activeNet ? `<div id="insp-net-mates" style="font-size:11px;color:var(--cyan);"></div>` : ""}
+        ${state.activeNet || allOn ? `<div id="insp-net-mates" style="font-size:11px;color:var(--cyan);"></div>` : ""}
       </div>
 
       ${padRows ? `
@@ -1549,16 +1691,40 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
       ${simCtrl ? simCtrl.buildInspectorSectionHtml(id) : ""}
     `;
 
-    if (state.activeNet) {
-      const siblings = (compByNet.get(state.activeNet) || []).slice(0, 12);
-      const mateBox = body.querySelector("#insp-net-mates");
-      if (mateBox) {
-        const segCount = (netTraces[state.activeNet] || []).length;
-        mateBox.innerHTML = `Connected on <code>${escapeHtml(state.activeNet)}</code> (${(compByNet.get(state.activeNet) || []).length} parts, ${segCount} trace segs): ` +
-          siblings.map((r) => `<button type="button" class="net-chip pick-ref" data-ref="${escapeHtml(r)}">${escapeHtml(r)}</button>`).join(" ");
-        mateBox.querySelectorAll(".pick-ref").forEach((b) => b.addEventListener("click", () => selectPart(b.dataset.ref, true)));
+    const mateBox = body.querySelector("#insp-net-mates");
+    if (mateBox && allOn) {
+      const parts = new Set();
+      let segs = 0;
+      for (const n of c.nets || []) {
+        segs += (netTraces[n] || []).length;
+        if (!/^(?:GND|AGND|DGND)$/i.test(netLabel(n))) for (const r of netMates(n)) if (r !== id) parts.add(r);
       }
+      const list = [...parts].sort();
+      mateBox.innerHTML = `All ${(c.nets || []).length} nets of <code>${escapeHtml(c.ref)}</code> (${segs} copper segments) reach ${list.length} parts besides ground: ` +
+        list.slice(0, 60).map((r) => `<button type="button" class="net-chip pick-ref" data-ref="${escapeHtml(r)}">${escapeHtml(netLabel(r))}</button>`).join(" ") +
+        (list.length > 60 ? ` +${list.length - 60} more` : "");
+    } else if (mateBox && state.activeNet) {
+      const mates = compByNet.get(state.activeNet) || [];
+      const segCount = (netTraces[state.activeNet] || []).length;
+      mateBox.innerHTML = `Connected on <code>${escapeHtml(netLabel(state.activeNet))}</code> (${mates.length} parts, ${segCount} copper segments): ` +
+        mates.slice(0, 24).map((r) => `<button type="button" class="net-chip pick-ref" data-ref="${escapeHtml(r)}">${escapeHtml(netLabel(r))}</button>`).join(" ") +
+        (mates.length > 24 ? ` +${mates.length - 24} more` : "");
     }
+    mateBox?.querySelectorAll(".pick-ref").forEach((b) => b.addEventListener("click", () => selectPart(b.dataset.ref, true)));
+    body.querySelector("#insp-all-nets")?.addEventListener("click", () => {
+      state.partAllNets = state.partAllNets === id ? null : id;
+      if (state.partAllNets) state.activeNet = null;
+      rebuildNetHighlightBoxes();
+      selectPart(id, false, false);
+      if (!state.partAllNets) { const st = $("#hud-status"); if (st) st.innerHTML = `Selected <strong>${escapeHtml(netLabel(id))}</strong>`; }
+    });
+    body.querySelectorAll("[data-psu-fig]").forEach((b) => b.addEventListener("click", () => {
+      const f = psuData?.figures?.[Number(b.dataset.psuFig)];
+      if (!f) return;
+      $("#img-modal-img").src = f.src;
+      $("#img-modal-cap").textContent = `${f.title}: ${f.cap}`;
+      $("#img-modal").classList.add("open");
+    }));
   } else {
     const k = entry.data;
     const isKv = entry.kind !== "extra";
@@ -1606,6 +1772,7 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
   body.querySelectorAll("[data-net]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const next = state.activeNet === btn.dataset.net ? null : btn.dataset.net;
+      state.partAllNets = null;
       state.activeNet = next;
       state.activeNetIsPower = !!(next && isPowerNetName(next));
       rebuildNetHighlightBoxes();
@@ -1614,8 +1781,52 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
     });
   });
 
-  $("#hud-status").innerHTML = `Selected <strong>${escapeHtml(id)}</strong>`;
+  if (state.partAllNets !== id) $("#hud-status").innerHTML = `Selected <strong>${escapeHtml(netLabel(id))}</strong>`;
   syncHash();
+}
+
+// PSU board parts: the audit row (psu_audit.py), the IC pins against their absolute maxima, the thermal results
+// (psu_thermal.py) and the board's simulation figures
+function psuHoverHtml(c) {
+  const rows = [];
+  if (c.audit) {
+    const a = c.audit;
+    const txt = a.rating_V ? `${a.stress_V} V of ${a.rating_V} V (${Math.round((a.use || 0) * 100)} %)` : a.rating_W ? `${a.worst_W} W of ${a.rating_W} W` : `${a.stress_V ?? ""} V`;
+    rows.push(`<div class="sim-tip-row"><strong style="color:#f59e0b">Audit:</strong> ${escapeHtml(txt)} ${a.ok ? "ok" : "FAIL"}</div>`);
+  }
+  if (c.thermal) {
+    const worst = Object.entries(c.thermal).sort((x, y) => (y[1].junction_C || 0) - (x[1].junction_C || 0))[0];
+    if (worst) rows.push(`<div class="sim-tip-row"><strong style="color:var(--cyan)">Thermal:</strong> ${worst[1].junction_C.toFixed(0)} C of ${worst[1].limit_C} C (${escapeHtml(worst[0])})</div>`);
+  }
+  return rows.join("");
+}
+
+function psuAnalysisHtml(c) {
+  const parts = [];
+  if (c.audit) {
+    const a = c.audit;
+    parts.push(`<table class="kv-table">
+      <tr><th>Checked</th><td>${escapeHtml(a.what || "")}</td></tr>
+      ${a.stress_V !== undefined ? `<tr><th>Worst voltage</th><td class="mono">${a.stress_V} V${a.rating_V ? ` of ${a.rating_V} V (${Math.round((a.use || 0) * 100)} %)` : ""}</td></tr>` : ""}
+      ${a.worst_W !== undefined ? `<tr><th>Worst power</th><td class="mono">${a.worst_W} W of ${a.rating_W} W</td></tr>` : ""}
+      <tr><th>Result</th><td>${a.ok ? "within rating" : "<strong>over rating</strong>"}</td></tr>
+    </table>`);
+  }
+  if (c.ic_pins && c.ic_pins.length) {
+    const rows = c.ic_pins.map((p) => `<tr><td class="mono">${escapeHtml(p.pin)}</td><td class="mono">${escapeHtml(p.name || "")}</td><td class="mono">${escapeHtml(p.net || "")}</td><td class="mono">${p.net_max_V ?? "-"} / ${p.absmax_V ?? "-"} V</td></tr>`).join("");
+    parts.push(`<table class="kv-table"><thead><tr><th>Pin</th><th>Name</th><th>Net</th><th>Max / abs max</th></tr></thead><tbody>${rows}</tbody></table>`);
+  }
+  if (c.thermal) {
+    const rows = Object.entries(c.thermal).map(([k, v]) => `<tr><td>${escapeHtml(k)}</td><td class="mono">${(v.loss_W ?? 0).toFixed(2)} W</td><td class="mono">${(v.junction_C ?? v.board_C ?? 0).toFixed(0)} / ${v.limit_C ?? "-"} C</td></tr>`).join("");
+    parts.push(`<table class="kv-table"><thead><tr><th>Thermal case (70 C air)</th><th>Loss</th><th>Junction / limit</th></tr></thead><tbody>${rows}</tbody></table>`);
+  }
+  const figs = (psuData?.figures || []).map((f, i) => `<button type="button" class="net-chip" data-psu-fig="${i}">${escapeHtml(f.title)}</button>`).join(" ");
+  return `
+      <div class="panel-card">
+        <h3>Analysis (psu_audit, psu_thermal)</h3>
+        ${parts.join("") || '<p style="margin:0;font-size:12px;color:var(--text-muted)">No part-level result: see the figures.</p>'}
+        <div class="net-list" style="margin-top:6px;">${figs}</div>
+      </div>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -2040,7 +2251,7 @@ function applyTeardownPreset({ fan = false, hs = false, somLiftMm = 20, isolate 
 function updateStatsPill() {
   if (!catalogue) return;
   const nets = catalogue.counts?.unique_nets ?? compByNet.size;
-  $("#hud-stats").textContent = `${catalogue.components.length} Board | ${catalogue.kv260_parts.length} KV260 | ${nets} Nets`;
+  $("#hud-stats").textContent = `${catalogue.components.length} Board | ${psuData ? `${psuData.components.length} PSU | ` : ""}${catalogue.kv260_parts.length} KV260 | ${nets} Nets`;
 }
 
 function wireUiEvents() {
@@ -2172,7 +2383,7 @@ function wireUiEvents() {
     b.classList.toggle("active", state.allNets);
     b.setAttribute("aria-pressed", String(state.allNets));
     b.textContent = state.allNets ? "Clear All Nets" : "Select All Nets";
-    if (state.allNets) setIsolate("board", true);   // the copper is only visible with the case and the KV260 away
+    if (state.allNets && state.isolateMode !== "psu") setIsolate("board", true);   // the copper shows with the case away
     if (!state.allNets) { const st = $("#hud-status"); if (st) st.textContent = "Hover or tap any component"; }
     rebuildNetHighlightBoxes();
   });

@@ -141,7 +141,7 @@
 
           <div class="panel-card">
             <h3>Nets</h3>
-            <p class="muted" style="margin:0 0 6px;font-size:12px;">Every routed net of the adapter at once, each in its own colour (power and ground dimmed). Tap a part to follow a single net.</p>
+            <p class="muted" style="margin:0 0 6px;font-size:12px;">Every routed net of the boards on show at once, each in its own colour (power and ground dimmed). Tap a part to follow one net, or use Select All Nets in its inspector for all of its nets.</p>
             <button id="btn-all-nets" class="btn btn-sm" type="button" aria-pressed="false">Select All Nets</button>
           </div>
 
@@ -153,7 +153,10 @@
               <button class="btn btn-sm" data-iso="kv260" type="button">KV260 + SOM</button>
               <button class="btn btn-sm" data-iso="thermal" type="button">Heatsinks</button>
             </div>
-            <button class="btn btn-sm" data-iso="enclosure" type="button">Enclosure Only</button>
+            <div class="btn-grid">
+              <button class="btn btn-sm" data-iso="enclosure" type="button">Enclosure Only</button>
+              <button class="btn btn-sm" data-iso="psu" type="button">PSU Board</button>
+            </div>
           </div>
 
           <div class="panel-card">
@@ -211,13 +214,15 @@
           <div id="inspector-empty" class="panel-card">
             <h3>Component &amp; KV260 Inspector</h3>
             <p style="margin:0;color:var(--text-muted)">
-              Click or tap any component on the Rev08 board (e.g. <strong>U1506</strong> TCAN3403 CAN, <strong>U501</strong> AD9484, <strong>U1101</strong> XC7A50T, <strong>J1502/J1503</strong>), any KV260 part (<strong>K26_XCK26</strong>, <strong>KV260_J9_RPI</strong>, <strong>SOM240_1</strong>), or heatsink <strong>HS1..HS4</strong>.
+              Click or tap any component on the Rev08 board (e.g. <strong>U1506</strong> TCAN3403 CAN, <strong>U501</strong> AD9484, <strong>U1101</strong> XC7A50T, <strong>J1502/J1503</strong>), any KV260 part (<strong>K26_XCK26</strong>, <strong>KV260_J9_RPI</strong>, <strong>SOM240_1</strong>), heatsink <strong>HS1..HS4</strong>, or any part of the PSU board (<strong>U2</strong> LM5177, <strong>U1</strong> LTC4364).
             </p>
             <div class="btn-grid">
               <button class="btn btn-sm quick-pick" data-ref="U501" type="button">U501 (AD9484)</button>
               <button class="btn btn-sm quick-pick" data-ref="U1506" type="button">U1506 (TCAN3403)</button>
               <button class="btn btn-sm quick-pick" data-ref="J1503" type="button">J1503 (6p CAN+PPS)</button>
               <button class="btn btn-sm quick-pick" data-ref="KV260_J9_RPI" type="button">KV260 J9 RPi</button>
+              <button class="btn btn-sm quick-pick" data-ref="PSU:U2" type="button">PSU U2 (LM5177)</button>
+              <button class="btn btn-sm quick-pick" data-ref="PSU:U1" type="button">PSU U1 (LTC4364)</button>
             </div>
           </div>
           <div id="inspector-body" style="display:none;flex-direction:column;gap:10px;"></div>
@@ -333,7 +338,7 @@
           <div class="doc-card">
             <div>
               <strong>Complete Hardware &amp; Software Documentation (PDF)</strong>
-              <p>298-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
+              <p>300-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1" target="_blank" rel="noopener">Open Documentation PDF</a>
@@ -343,11 +348,11 @@
           <div class="doc-card">
             <div>
               <strong>PSU Board: Vehicle Supply for Both Boards (<code>docs/PSU_SPEC.md</code>)</strong>
-              <p>LTC4364 surge stopper + LM5177 buck-boost feeding the adapter and the KV260 by their own cables: ISO 7637-2 / 16750-2 events, loop, thermal, conducted noise and its audit (p.146).</p>
+              <p>LTC4364 surge stopper + LM5177 buck-boost feeding the adapter and the KV260 by their own cables: ISO 7637-2 / 16750-2 events, loop, thermal, conducted noise and its audit (p.147).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=146" target="_blank" rel="noopener">PSU_SPEC (p.146)</a>
-              <a class="btn btn-sm" href="psu.html" target="_blank" rel="noopener">PSU in 3-D</a>
+              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=147" target="_blank" rel="noopener">PSU_SPEC (p.147)</a>
+              <a class="btn btn-sm" href="#tab=explorer&amp;view=psu">PSU in 3-D Explorer</a>
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_PSU_schematic.pdf#page=1" target="_blank" rel="noopener">PSU Schematic PDF</a>
             </div>
           </div>
@@ -364,33 +369,33 @@
           <div class="doc-card">
             <div>
               <strong>Rev08 RF &amp; Power Audit (<code>docs/AUDIT_Rev08.md</code>)</strong>
-              <p>Full pre-order RF &amp; power audit: R1 HP300 high-pass (84-99 dB IF rejection), P1 TCAN3403, P2 Pmod gating, P3 F1001 2 A PTC, P4-P8 power fixes, and final re-audit (p.195).</p>
+              <p>Full pre-order RF &amp; power audit: R1 HP300 high-pass (84-99 dB IF rejection), P1 TCAN3403, P2 Pmod gating, P3 F1001 2 A PTC, P4-P8 power fixes, and final re-audit (p.197).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=195" target="_blank" rel="noopener">AUDIT_Rev08 (p.195)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=228" target="_blank" rel="noopener">v2 Thermal (p.228)</a>
+              <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=197" target="_blank" rel="noopener">AUDIT_Rev08 (p.197)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=230" target="_blank" rel="noopener">v2 Thermal (p.230)</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>Board Manual &amp; Project Overview</strong>
-              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.27).</p>
+              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.28).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=6" target="_blank" rel="noopener">Overview (p.6)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=27" target="_blank" rel="noopener">Board Manual (p.27)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=28" target="_blank" rel="noopener">Board Manual (p.28)</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>FPGA Co-Simulation &amp; Vehicle Integrations</strong>
-              <p>XSim <code>tb_system</code> verification (p.62), LVDS/pin map (p.72), CAN/GPS/LiDAR/Radar integrations (p.92), and Mechanical/Enclosure (p.210).</p>
+              <p>XSim <code>tb_system</code> verification (p.63), LVDS/pin map (p.73), CAN/GPS/LiDAR/Radar integrations (p.93), and Mechanical/Enclosure (p.212).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=62" target="_blank" rel="noopener">System Sim (p.62)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=92" target="_blank" rel="noopener">Integrations (p.92)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=167" target="_blank" rel="noopener">SI (p.167)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=210" target="_blank" rel="noopener">Mechanical (p.210)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=63" target="_blank" rel="noopener">System Sim (p.63)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=93" target="_blank" rel="noopener">Integrations (p.93)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=169" target="_blank" rel="noopener">SI (p.169)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=212" target="_blank" rel="noopener">Mechanical (p.212)</a>
             </div>
           </div>
         </div>
