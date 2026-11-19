@@ -1,0 +1,124 @@
+{
+ "params": {
+  "bm20_rated_A": 0.3,
+  "bm20_contact_ohm_typ": 0.03,
+  "bm20_contact_ohm_max": 0.1,
+  "wire_ohm_per_m": 0.0371,
+  "jack_ohm": 0.02,
+  "ffc_ohm": 0.122,
+  "pmod_ohm": 0.07200000000000001,
+  "i_adapter_A": [
+   0.97,
+   1.12
+  ],
+  "i_kv260_A": [
+   0.92,
+   3.0
+  ]
+ },
+ "link_ohm": {
+  "typ": 0.0012861661005036898,
+  "max": 0.0037854237054402544,
+  "bm20_share_typ": 0.943188473702706,
+  "bm20_share_max": 0.8327932151968559
+ },
+ "same_point": {
+  "1.0m/1.0m": {
+   "link_A": -0.9295312471155982,
+   "per_contact_A": 0.03985105264663336
+  },
+  "0.3m/2.0m": {
+   "link_A": -1.9565779602215763,
+   "per_contact_A": 0.08388280818098828
+  },
+  "2.0m/0.3m": {
+   "link_A": 0.09567498663942112,
+   "per_contact_A": 0.004101797482725563
+  }
+ },
+ "ground_loss": {
+  "KV260 wire lost": {
+   "link_A": 3.0000000000000098,
+   "per_contact_A": 0.12861661005036942,
+   "surviving_jack_A": 4.12
+  },
+  "adapter wire lost": {
+   "link_A": 1.119999999999995,
+   "per_contact_A": 0.048016867752137544,
+   "surviving_jack_A": 4.12
+  }
+ },
+ "single_entry": {
+  "jumper_ohm": 0.033135,
+  "per_contact_A": 0.13247753306456314,
+  "input_A": 4.33,
+  "link_A": -3.090056556754578,
+  "typical_load": {
+   "link_A": -0.8856236860480465,
+   "per_contact_A": 0.03796863875993734
+  },
+  "contacts_at_max": {
+   "link_A": -2.880881076788053,
+   "per_contact_A": 0.10905355520627741
+  },
+  "jumper_ground_open": {
+   "link_A": -3.20999999587139,
+   "per_contact_A": 0.1376197725768922
+  },
+  "jumper_ground_open_contacts_at_max": {
+   "link_A": -3.209999987848787,
+   "per_contact_A": 0.12151210048465727
+  },
+  "uneven": {
+   "limit_one_at_half": 0.2544536960566216,
+   "limit_one_at_third": 0.3521566422323929,
+   "typical_one_at_half": 0.07292753905672644,
+   "load_2A_one_at_third": 0.21941223815102362
+  }
+ },
+ "offset_at_rating_V": {
+  "separate_0p3m_typ": 0.40000000000000036,
+  "separate_1m_typ": 0.75,
+  "separate_3m_typ": 1.6,
+  "separate_1m_max": 0.8500000000000001
+ },
+ "per_contact_at_1V": {
+  "separate_1m_typ": 0.411083424434026,
+  "separate_1m_max": 0.3552795962183397,
+  "separate_0p3m_typ": 0.7141465191793411,
+  "separate_3m_typ": 0.20256821455931034,
+  "single_entry": 0.13247753306456314
+ },
+ "home_50Hz": {
+  "loop_ohm": 0.28884616610050373,
+  "cases": {
+   "0.1 V": {
+    "loop_A": 0.3462050452322954,
+    "per_contact_A": 0.014842573100037499,
+    "adapter_ground_drop_uV": 173.1025226161477
+   },
+   "1.0 V": {
+    "loop_A": 3.462050452322954,
+    "per_contact_A": 0.14842573100037498,
+    "adapter_ground_drop_uV": 1731.025226161477
+   }
+  }
+ },
+ "home_single_entry_50Hz": {
+  "loop_ohm": 0.30601810778565014,
+  "cases": {
+   "0.1 V": {
+    "loop_A": 0.3267780482782569,
+    "link_ac_A": 0.31456780395192946,
+    "per_contact_A": 0.13316221220030902,
+    "adapter_ground_drop_uV": 404.58644575286235
+   },
+   "1.0 V": {
+    "loop_A": 3.2677804827825687,
+    "link_ac_A": 3.145678039519294,
+    "per_contact_A": 0.1890452218059024,
+    "adapter_ground_drop_uV": 4045.8644575286226
+   }
+  }
+ }
+}

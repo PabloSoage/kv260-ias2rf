@@ -1,0 +1,214 @@
+(footprint "CMC_9070_SMD-4P_9.0x7.0mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Power common-mode choke 9.0 x 7.0 x 4.8 mm, 4 pads; windings pads 1-2 and 3-4 (part pins 1-4 and 2-3); pads 1 and 3 dotted. Coilmaster SMM9070-501, ZE ZEGMCM9070-501T (LCSC C53154905)")
+	(property "Reference" "REF**"
+		(at 0 -4.6 0)
+		(layer "F.SilkS")
+		(uuid "5edbdd1f-bbd6-5922-a6d8-06f02dbe5b84")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "CMC_9070_SMD-4P_9.0x7.0mm"
+		(at 0 4.6 0)
+		(layer "F.Fab")
+		(uuid "b87134ad-2ed6-57d1-9e37-d13d6d551292")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b11d218c-3518-5468-8065-87f8e71afab5")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -4.5 -3.5)
+		(end 4.5 -3.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "7cca656b-1fee-5189-8b11-16231af28f73")
+	)
+	(fp_line
+		(start 4.5 -3.5)
+		(end 4.5 3.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "920016dc-43be-582e-93d7-e32310931ff3")
+	)
+	(fp_line
+		(start 4.5 3.5)
+		(end -4.5 3.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "da33404b-3d76-5aa6-a764-e01392254246")
+	)
+	(fp_line
+		(start -4.5 3.5)
+		(end -4.5 -3.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "0ca6e648-88f2-5701-bc4b-fccf3c308304")
+	)
+	(fp_line
+		(start -4.5 -2.6)
+		(end -3.6 -3.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "491ef501-a344-511b-9ac1-e05037045c02")
+	)
+	(fp_line
+		(start -2.8 -3.62)
+		(end 2.8 -3.62)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "8e250895-179a-549e-84c1-a63fcaed4219")
+	)
+	(fp_line
+		(start -2.8 3.62)
+		(end 2.8 3.62)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "aab464e5-13e0-54e1-b7ae-cba09ce3b6a4")
+	)
+	(fp_circle
+		(center -6.0 -1.75)
+		(end -5.75 -1.75)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "e0894e06-3af6-5eae-86cd-68dd2e099173")
+	)
+	(fp_line
+		(start -5.75 -3.75)
+		(end 5.75 -3.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "f351e7b9-655f-5260-86b8-a2460161acab")
+	)
+	(fp_line
+		(start 5.75 -3.75)
+		(end 5.75 3.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "b7160512-beac-5d41-aa7b-8495e79abf19")
+	)
+	(fp_line
+		(start 5.75 3.75)
+		(end -5.75 3.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "ee23056f-ccc6-5d43-a225-367dd084af24")
+	)
+	(fp_line
+		(start -5.75 3.75)
+		(end -5.75 -3.75)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "57e6a108-4f8c-5fc3-9f25-9dae04b68969")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "c60a1cbb-9c49-51ae-a706-b5fd4cdda234")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -4.25 -1.75)
+		(size 2.5 1.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.1)
+		(uuid "f7915b21-8ecc-52a6-af69-24f7939d8b3e")
+	)
+	(pad "2" smd roundrect
+		(at 4.25 -1.75)
+		(size 2.5 1.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.1)
+		(uuid "b164b903-6ba4-5e4b-ad50-68c74a9c1aa7")
+	)
+	(pad "3" smd roundrect
+		(at -4.25 1.75)
+		(size 2.5 1.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.1)
+		(uuid "c076f2d2-6bdc-50c1-ae1b-8c4a11faad97")
+	)
+	(pad "4" smd roundrect
+		(at 4.25 1.75)
+		(size 2.5 1.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.1)
+		(uuid "4847f3e5-4144-55ef-a76d-5cfead095a72")
+	)
+	(model "${KIPRJMOD}/mech/models3d/CMC_9070_SMD-4P_9.0x7.0mm.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

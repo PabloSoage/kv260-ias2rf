@@ -4484,16 +4484,6 @@
 	)
 	(wire
 		(pts
-			(xy 45.72 76.2) (xy 54.61 76.2)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2542da14-18b7-550e-9d23-b8966b088be5")
-	)
-	(wire
-		(pts
 			(xy 86.36 76.2) (xy 96.52 76.2)
 		)
 		(stroke
@@ -6497,75 +6487,8 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 45.72 81.28 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board no)
-		(in_pos_files no)
-		(dnp no)
-		(uuid "138d4c3f-568f-55fb-bc89-c37034ed7518")
-		(property "Reference" "#PWR1001"
-			(at 45.72 85.09 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 45.72 85.09 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 45.72 81.28 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 45.72 81.28 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" ""
-			(at 45.72 81.28 0)
-			(hide yes)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "53bbd9dd-957d-5999-aef5-b3bfc4c42ba8")
-		)
-		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
-				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
-					(reference "#PWR1001")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:PWR_FLAG")
-		(at 45.72 81.28 0)
+		(at 66.04 83.82 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6575,7 +6498,7 @@
 		(dnp no)
 		(uuid "68c374d9-b7ef-5711-9829-aab1fca4f686")
 		(property "Reference" "#FLG1002"
-			(at 45.72 85.09 0)
+			(at 66.04 87.63 0)
 			(hide yes)
 			(effects
 				(font
@@ -6584,7 +6507,7 @@
 			)
 		)
 		(property "Value" "PWR_FLAG"
-			(at 45.72 77.47 0)
+			(at 66.04 80.01 0)
 			(hide yes)
 			(effects
 				(font
@@ -6593,7 +6516,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 45.72 81.28 0)
+			(at 66.04 83.82 0)
 			(hide yes)
 			(effects
 				(font
@@ -6602,7 +6525,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 45.72 81.28 0)
+			(at 66.04 83.82 0)
 			(hide yes)
 			(effects
 				(font
@@ -6611,7 +6534,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 45.72 81.28 0)
+			(at 66.04 83.82 0)
 			(hide yes)
 			(effects
 				(font
@@ -18129,4 +18052,67 @@
 			)
 		)
 	)
-)
+
+	(wire
+		(pts
+			(xy 45.72 76.2) (xy 45.72 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6a145771-72ee-4761-b73b-77d6c78901bc")
+	)
+	(hierarchical_label "VIN_JACK"
+		(shape output)
+		(at 45.72 68.58 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5dbc9c81-a3f3-4ecb-bf03-acd8d9928a4c")
+	)
+	(wire
+		(pts
+			(xy 54.61 76.2) (xy 54.61 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6d2bab9f-6f4a-4c5e-acd1-7d694024cc0a")
+	)
+	(hierarchical_label "VIN_J"
+		(shape input)
+		(at 54.61 68.58 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9542b2fe-afd7-4dc5-be62-fa9e1b2a1694")
+	)
+	(wire
+		(pts
+			(xy 45.72 81.28) (xy 45.72 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "45387c12-c6db-407f-9ff4-0cde91c97fe5")
+	)
+	(hierarchical_label "GND_IN"
+		(shape passive)
+		(at 45.72 88.9 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "02af1801-a12b-42c8-b87d-bbfd5831254e")
+	))

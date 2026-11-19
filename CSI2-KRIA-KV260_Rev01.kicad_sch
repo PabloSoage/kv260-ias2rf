@@ -6882,6 +6882,36 @@
 				(justify left top)
 			)
 		)
+		(pin "VIN_JACK" output
+			(at 76.20 269.24 0)
+			(uuid "1e0f9758-6f61-42b1-a686-acd0f9ff67c5")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify right)
+			)
+		)
+		(pin "GND_IN" passive
+			(at 76.20 271.78 0)
+			(uuid "97ce5604-3e2b-48b9-8b99-a8d3e886da5c")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify right)
+			)
+		)
+		(pin "VIN_J" input
+			(at 76.20 274.32 0)
+			(uuid "8cbd86ab-54d9-49ab-88a8-bda255df3c99")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify right)
+			)
+		)
 		(instances
 			(project "CSI2-KRIA-KV260_Rev01"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
@@ -7255,5 +7285,113 @@
 			(justify left)
 		)
 		(uuid "1508177b-f87d-43cc-902a-335e63b92546")
+	)
+	(sheet
+		(at 101.6 266.7)
+		(size 50.8 12.70)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.254)
+			(type solid)
+			(color 30 64 128 1)
+		)
+		(fill
+			(color 245 248 255 0.9)
+		)
+		(uuid "4d331327-f20e-5f65-aa6f-a3bff82121fb")
+		(property "Sheetname" "KVPWR"
+			(at 101.6 265.70 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.524 1.524)
+					(bold yes)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "rev03/KVPWR.kicad_sch"
+			(at 101.6 280.20 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left top)
+			)
+		)
+		(pin "VIN_JACK" input
+			(at 101.60 269.24 180)
+			(uuid "8bb61b2c-6e56-4957-bb17-6320282d3308")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "GND_IN" passive
+			(at 101.60 271.78 180)
+			(uuid "12d00ce3-7c59-41ef-8b74-28786b3602ba")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(pin "VIN_J" output
+			(at 101.60 274.32 180)
+			(uuid "0c3f2092-c1ae-4344-a59d-332bb5694366")
+			(effects
+				(font
+					(size 1.143 1.143)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "CSI2-KRIA-KV260_Rev01"
+				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
+					(page "13")
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 76.2 269.24) (xy 101.6 269.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c537599f-be0b-41fc-8022-19a9520cd6bc")
+	)
+	(wire
+		(pts
+			(xy 76.2 271.78) (xy 101.6 271.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f9568654-ebd2-484d-a5ca-701c3fa66d51")
+	)
+	(wire
+		(pts
+			(xy 76.2 274.32) (xy 101.6 274.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3a3b4aef-c265-4b4f-bdda-574e99953a7f")
 	)
 )
