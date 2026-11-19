@@ -33040,7 +33040,7 @@
 			(drill 1.63)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net "GND")
+			(net "/CONTROL/ETH_SHIELD")
 			(uuid "d4d56c9a-f95f-5750-a5e5-42e4c5ad9a20")
 		)
 		(pad "SH" thru_hole circle
@@ -33049,7 +33049,7 @@
 			(drill 1.63)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net "GND")
+			(net "/CONTROL/ETH_SHIELD")
 			(uuid "c2c1fe6d-a433-57f6-9971-27b3885422b6")
 		)
 		(embedded_fonts no)
@@ -156660,6 +156660,254 @@
 		)
 		(embedded_fonts no)
 		(model "${KICAD10_3DMODEL_DIR}/Diode_SMD.3dshapes/D_SMA.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1206_3216Metric"
+		(layer "B.Cu")
+		(uuid "38c7c5d6-320d-490a-b35e-76809e85e3cf")
+		(at 216.15 122.65 270)
+		(descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
+		(tags "capacitor")
+		(property "Reference" "C1223"
+			(at 0 1.85 270)
+			(layer "B.SilkS")
+			(hide yes)
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+				(justify mirror)
+			)
+		)
+		(property "Value" "1n 2kV"
+			(at 0 -1.85 270)
+			(layer "B.Fab")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+				(justify mirror)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 0 -0 270)
+			(layer "B.SilkS")
+			(hide yes)
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+				(justify mirror)
+			)
+		)
+		(path "/bc106418-3615-506a-a32b-ff6e1a94f8d2/b163105f-8226-5d50-89df-e6613babb60d")
+		(sheetname "/CONTROL/")
+		(sheetfile "rev03/CONTROL.kicad_sch")
+		(attr smd)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_line
+			(start -0.711252 0.91)
+			(end 0.711252 0.91)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "B.SilkS")
+		)
+		(fp_line
+			(start -0.711252 -0.91)
+			(end 0.711252 -0.91)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "B.SilkS")
+		)
+		(fp_rect
+			(start -2.3 1.15)
+			(end 2.3 -1.15)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "B.CrtYd")
+		)
+		(fp_rect
+			(start -1.6 0.8)
+			(end 1.6 -0.8)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "B.Fab")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 -0 270)
+			(layer "B.Fab")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+				(justify mirror)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 -0 270)
+			(size 1.15 1.8)
+			(layers "B.Cu" "B.Mask" "B.Paste")
+			(roundrect_rratio 0.217391)
+			(net "/CONTROL/ETH_SHIELD")
+			(uuid "74170222-0737-4898-ba2a-e1d099e99cbb")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 -0 270)
+			(size 1.15 1.8)
+			(layers "B.Cu" "B.Mask" "B.Paste")
+			(roundrect_rratio 0.217391)
+			(net "GND")
+			(uuid "81232399-e9ec-4737-95a1-dadcdd2baebb")
+		)
+		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1206_3216Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0603_1608Metric"
+		(layer "B.Cu")
+		(uuid "6ab9370b-3cca-41fb-ba03-4c556ff842fb")
+		(at 214.25 122.05 270)
+		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
+		(tags "resistor")
+		(property "Reference" "R1218"
+			(at 0 1.43 270)
+			(layer "B.SilkS")
+			(hide yes)
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+				(justify mirror)
+			)
+		)
+		(property "Value" "1M"
+			(at 0 -1.43 270)
+			(layer "B.Fab")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+				(justify mirror)
+			)
+		)
+		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
+			(at 0 -0 270)
+			(layer "B.SilkS")
+			(hide yes)
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+				(justify mirror)
+			)
+		)
+		(path "/bc106418-3615-506a-a32b-ff6e1a94f8d2/a0ed39f6-4e57-5419-9759-81cf6a6cc547")
+		(sheetname "/CONTROL/")
+		(sheetfile "rev03/CONTROL.kicad_sch")
+		(attr smd)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_line
+			(start -0.237258 0.5225)
+			(end 0.237258 0.5225)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "B.SilkS")
+		)
+		(fp_line
+			(start -0.237258 -0.5225)
+			(end 0.237258 -0.5225)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "B.SilkS")
+		)
+		(fp_rect
+			(start -1.48 0.73)
+			(end 1.48 -0.73)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "B.CrtYd")
+		)
+		(fp_rect
+			(start -0.8 0.4125)
+			(end 0.8 -0.4125)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "B.Fab")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 -0 270)
+			(layer "B.Fab")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+				(justify mirror)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.825 -0 270)
+			(size 0.8 0.95)
+			(layers "B.Cu" "B.Mask" "B.Paste")
+			(roundrect_rratio 0.25)
+			(net "/CONTROL/ETH_SHIELD")
+			(uuid "3d7ada35-cbee-467e-a89f-7dd09b937631")
+		)
+		(pad "2" smd roundrect
+			(at 0.825 -0 270)
+			(size 0.8 0.95)
+			(layers "B.Cu" "B.Mask" "B.Paste")
+			(roundrect_rratio 0.25)
+			(net "GND")
+			(uuid "d32d4556-7c3b-4bdd-b180-d2f853410da3")
+		)
+		(embedded_fonts no)
+		(model "${KICAD10_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0603_1608Metric.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -382462,6 +382710,94 @@
 				(xy 89.3 160) (xy 112.6 160) (xy 112.6 197) (xy 89.3 197)
 			)
 		)
+	)
+	(segment
+		(start 216.15 121.175)
+		(end 216.15 119.7)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "9c42bc3d-b467-4082-aaff-7987a51cbfb7")
+	)
+	(segment
+		(start 214.25 121.225)
+		(end 215.65 121.2)
+		(width 0.3)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "081a07fc-736d-440b-b699-8da37c446921")
+	)
+	(segment
+		(start 216.15 124.125)
+		(end 216.45 125.025)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "GND")
+		(uuid "b85e64ff-ac01-467e-9d48-3cecea85cb01")
+	)
+	(segment
+		(start 214.25 122.875)
+		(end 215.4 124)
+		(width 0.3)
+		(layer "B.Cu")
+		(net "GND")
+		(uuid "509a152f-a713-4437-a36d-7fb26fe9c14f")
+	)
+	(segment
+		(start 215.4 124)
+		(end 216 124)
+		(width 0.3)
+		(layer "B.Cu")
+		(net "GND")
+		(uuid "e3137f26-8210-4a6f-9496-6685e53dde38")
+	)
+	(segment
+		(start 216.15 134.495)
+		(end 216.15 126.25)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "b7944518-7341-40b9-bc21-27bdc0e85786")
+	)
+	(segment
+		(start 216.15 126.25)
+		(end 217.5 124.9)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "9ac49c31-5230-430c-ad22-6fd02fda2242")
+	)
+	(segment
+		(start 217.5 124.9)
+		(end 217.5 123.2)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "58862c4e-80c3-4ee5-936c-1a2fba7e6f50")
+	)
+	(segment
+		(start 217.5 123.2)
+		(end 216.2 121.9)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "a7daeceb-7e6a-40c8-90a6-c7d0a423c94b")
+	)
+	(segment
+		(start 216.2 121.9)
+		(end 216.2 121.35)
+		(width 0.4)
+		(layer "B.Cu")
+		(net "/CONTROL/ETH_SHIELD")
+		(uuid "0102bd17-dd60-4620-8af0-b9245fa0bdb9")
+	)
+	(via
+		(at 216.45 125.025)
+		(size 0.45)
+		(drill 0.2)
+		(layers "F.Cu" "B.Cu")
+		(net "GND")
+		(uuid "0a7ffc65-1dcd-44db-8432-e6f6cc7a008e")
 	)
 	(embedded_fonts no)
 	(segment
