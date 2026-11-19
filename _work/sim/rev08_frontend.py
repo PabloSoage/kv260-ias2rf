@@ -161,9 +161,11 @@ IFAMP = ("second SPF5043Z as IF amplifier", 21.0, 0.8)
 MIXER = ("RFFC5072 with its two baluns", -4.0, 12.0)        # -2 dB and 10-13 dB in the data sheet, 1 dB per balun
 
 
-def mode(name, pre, mixer, filt_loss, lna=LNA):
-    st = [loss("ESD, bias tee, DC block", 0.4), loss("LNA bypass switch", 0.3), lna, loss("LNA bypass switch", 0.3),
-          loss("SP8T", 0.6), loss(pre, filt_loss), loss("SP8T", 0.6)]
+def mode(name, pre, mixer, filt_loss, lna=LNA, hpf_loss=1.1):
+    st = [loss("ESD, bias tee, DC block", 0.4), loss("LNA bypass switch", 0.3), lna, loss("LNA bypass switch", 0.3)]
+    if mixer and hpf_loss:
+        st.append(loss("300 MHz IF-reject high-pass (HP300)", hpf_loss))
+    st += [loss("SP8T", 0.6), loss(pre, filt_loss), loss("SP8T", 0.6)]
     st += [loss("mixer bypass switch", 0.3)] + ([MIXER] if mixer else []) + [loss("mixer bypass switch", 0.3)]
     st += [loss("anti-alias low-pass", 1.3), IFAMP, loss("PE4312 at 0 dB", 1.5)] + IF_LINE
     g, nf_front = cascade(st)
@@ -173,21 +175,29 @@ def mode(name, pre, mixer, filt_loss, lna=LNA):
 
 def report_cascade():
     print("\nCASCADE (maximum gain; the PE4312 takes off up to 31.5 dB, the LNA bypass another 22 dB)\n")
-    print("  %-34s %8s %7s %12s %10s %10s %10s" % ("mode", "gain", "NF", "full scale", "8.33 kHz", "12.5 kHz", "200 kHz"))
-    for m in (mode("direct, 30-170 MHz", "no preselector", False, 0.0),
-              mode("direct, FM broadcast", "FM band-pass", False, 2.0),
-              mode("direct, airband and VHF", "FM-reject high-pass", False, 3.0),
-              mode("converted, UHF 400-480 MHz", "UHF low-pass", True, 1.6),
-              mode("converted, ADS-B 1090 MHz", "SAW TA1090EC", True, 2.5, LNA_1G),
-              mode("converted, general coverage", "LTCC high-pass", True, 1.0, LNA_1G)):
-        name, g, nf, fs = m
+    print("  %-38s %8s %7s %12s %10s %10s %10s" % ("mode", "gain", "NF", "full scale", "8.33 kHz", "12.5 kHz", "200 kHz"))
+    modes = [
+        ("direct, 30-170 MHz", "no preselector", False, 0.0, LNA),
+        ("direct, FM broadcast", "FM band-pass", False, 2.0, LNA),
+        ("direct, airband and VHF", "FM-reject high-pass", False, 3.0, LNA),
+        ("converted, UHF 300-480 MHz", "UHF low-pass", True, 1.6, LNA),
+        ("converted, ADS-B 1090 MHz", "SAW TA1090EC", True, 2.5, LNA_1G),
+        ("converted, gen. cov. 300 MHz-3 GHz", "LTCC high-pass", True, 1.0, LNA_1G),
+    ]
+    for label, pre, mx, fl, lna in modes:
+        name, g, nf, fs = mode(label, pre, mx, fl, lna=lna)
         mds = lambda bw: -174 + nf + 10 * math.log10(bw)
-        print("  %-34s %6.1f dB %5.1f dB %8.1f dBm %6.0f dBm %6.0f dBm %6.0f dBm"
-              % (name, g, nf, fs, mds(8330), mds(12500), mds(200e3)))
+        line = "  %-38s %6.1f dB %5.1f dB %8.1f dBm %6.0f dBm %6.0f dBm %6.0f dBm" % (
+            name, g, nf, fs, mds(8330), mds(12500), mds(200e3))
+        if mx:
+            _, g0, nf0, fs0 = mode(label, pre, mx, fl, lna=lna, hpf_loss=0.0)
+            line += "  [before HP300: gain %.1f, NF %.1f, FS %.1f]" % (g0, nf0, fs0)
+        print(line)
     print("\n  The three right-hand columns are the noise floor in that bandwidth: the weakest carrier that")
     print("  reaches 0 dB signal-to-noise. Add 10 dB for AM voice, 12 dB for narrow FM.")
     print("  Dynamic range in one channel, any gain setting: full scale minus the floor, about %d dB in 12.5 kHz."
           % (47 + 10 * math.log10(FS_ADC / 2 / 12500)))
+    print("  Gap: 170-300 MHz is not covered (direct ends at 170 MHz; converted starts at 300 MHz behind HP300).")
 
 
 # ---------------------------------------------------------------- frequency plan
@@ -215,7 +225,8 @@ def report_plan():
         print("    %-22s %7.1f MHz %7.1f MHz %10.1f MHz   %s" % (name, lo, im, alias(lo * 1e6) / 1e6, filt))
     print("\n  The LO reaches the ADC only through the anti-alias filter's stop band (>= 55 dB from 230 MHz),")
     print("  and it is a single known tone. Below 365 MHz of RF a high-side LO falls inside 230-500 MHz: fine.")
-    print("  From 170 to 480 MHz the converter works behind the UHF low-pass; below 170 MHz it is bypassed (direct sampling).")
+    print("  From 300 to 480 MHz the converter works behind the UHF low-pass (with the 300 MHz high-pass ahead")
+    print("  of preselector B; below 170 MHz it is bypassed for direct sampling; 170-300 MHz is not covered).")
 
 
 if __name__ == "__main__":

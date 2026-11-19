@@ -52,7 +52,7 @@ Because `J8` has only one `K→A` high-speed data pair (`LINK_TX_D0`) and Ethern
 | Metric | `IAS1` (`LINK_RX_D1`, 1-lane) | `ETH` (`1000BASE-T` SGMII) | Dual Mode Aggregate |
 |---|---|---|---|
 | **Line Rate** | `1.00 Gb/s` (nom.) / `1.25 Gb/s` (`-2` max) | `1.25 Gb/s` (8b/10b → `1.00 Gb/s` MAC) | `2.25` / `2.50 Gb/s` wire |
-| **Coding & Header Overhead** | `64/66` (`96.97%`) − AM & `/S/`/`/T/`/`CRC` (~`2%`) | `958 Mb/s` (`1500 B` UDP) / **`993 Mb/s`** (`9000 B` jumbo UDP) | — |
+| **Coding & Header Overhead** | `64/66` (`96.97%`) − AM & `/S/`/`/T/`/`CRC` (~`2%`) | `958 Mb/s` (`1500 B` UDP) / **`993 Mb/s`** (`9000 B` jumbo UDP) | n/a |
 | **Usable Uplink Payload** | **`~0.95 Gb/s`** (`1.0G`) / **`~1.19 Gb/s`** (`1.25G`) | **`~0.99 Gb/s`** (jumbo) | **`~1.94 Gb/s`** (`1.0G IAS1`) / **`~2.18 Gb/s`** (`1.25G IAS1`) |
 | **Radar + SDR Fit** | Radar `DDC_POST_DECIM=4` (`0.80 Gb/s`) fits 1 lane | Covers SDR I/Q (`<= 0.99 Gb/s`) + control | Covers `1.60 Gb/s` Radar (`DECIM=2`) OR simultaneous Radar (`0.80 Gb/s`) + SDR (`<= 1.19 Gb/s`) |
 | **Single-Path Failover** | Survives `RJ45`/switch/PHY fault (`~0.95–1.19 Gb/s` degraded uplink) | Survives `J8` `D1` contact/eye fault (`~0.99 Gb/s` degraded uplink + control) | **Eliminates single connector/cable SPOF** |
@@ -122,8 +122,8 @@ From `fpga/artix/reports/utilization.rpt`, `fpga/eth/test/reports/utilization.rp
 | **LUTs** | `32,600` | `4,441` (`13.6%`) | `287` (`0.88%`) | `~1,800–3,500` | **`~6,528–8,228` (`20.0%–25.2%`)** | `4,278 / 117,120` (`3.65%`) |
 | **Flip-Flops** | `65,200` | `6,311` (`9.7%`) | `364` (`0.56%`) | `~1,800–3,000` | **`~8,475–9,675` (`13.0%–14.8%`)** | `6,817 / 234,240` (`2.91%`) |
 | **`36 Kb` BRAM** | `75` (`337.5 KB`) | `0` (`0%`) | `0` (`0%`) | `~18–22` (`2–6` MAC/UDP + `15` for `64 KB` buffer) | **`~18–22` (`24.0%–29.3%`)** | none (`PS GEM3` uses PS DDR) |
-| **DSP48E1** | `120` | `87` (`72.5%`) | `0` | `0` | **`87` (`72.5%`)** | — |
-| **MMCM** | `5` | `2` (`40%`) | `1` (or shared) | `0` | **`3` (`60%`)** | — |
+| **DSP48E1** | `120` | `87` (`72.5%`) | `0` | `0` | **`87` (`72.5%`)** | n/a |
+| **MMCM** | `5` | `2` (`40%`) | `1` (or shared) | `0` | **`3` (`60%`)** | n/a |
 
 **Conclusion:** Even with a `64 KB` elastic failover buffer, MIT-licensed `verilog-ethernet` + custom 8b/10b PCS + `sgmii_lvds` uses **`~25%` of LUTs, `~15%` of FFs, and `< 30%` of BRAMs**, leaving over **70% headroom** in `XC7A50T-2FTG256I`. On the Kria side, `GEM3` is a hard PS peripheral requiring **zero PL LUTs**.
 

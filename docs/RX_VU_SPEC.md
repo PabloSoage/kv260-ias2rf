@@ -132,3 +132,12 @@ and leaked through it onto the UHF tuning. The 1 GHz low-pass path did the same.
 
 The expander's ports follow the rail (2.8 V): the PE4259's 0.7 × VDD and the RFFC5072's VDD / 1.5 are the same rail,
 and the PE42442 and SKY13418 thresholds (1.17 V, 1.35 V) are far below it.
+
+**Updated front-end simulations with `HP300` in the chain (`_work/sim/rev08_filters_mc.py`, `_work/sim/rev08_frontend.py`):**
+
+- **Monte Carlo cross-check (`HP300`, 3,000 runs):** `rev08_filters_mc.py` (seed 1, `<= 175 MHz`) gives **p99 passband loss `1.52 dB`**, **p1 return loss `10.7 dB`**, and **p1 stopband rejection `51.7 dB`**, agreeing within `0.01 dB` with `rev08_rf_audit.py` (`1.51 / 10.7 / 51.7 dB`). For `<= 170 MHz`, tight B/G yield is **`99.8 %`** against a `<= 1.6 dB / >= 50 dB` mask (`97.3 %` even with loose C/J tolerances: `p99 1.68 dB`, `p1 50.7 dB`).
+- **Cascade impact (`rev08_frontend.py`, `1.1 dB` `HP300` loss inserted ahead of preselector B):**
+  - Converted UHF (`300–480 MHz`): gain `29.3 -> 28.2 dB`, NF `3.7 -> 4.2 dB`, full scale `−46.3 -> −45.2 dBm` (12.5 kHz noise floor `−129 dBm`).
+  - Converted ADS-B (`1090 MHz`): gain `23.4 -> 22.3 dB`, NF `7.1 -> 7.9 dB`, full scale `−40.4 -> −39.3 dBm` (noise floor `−126 -> −125 dBm`).
+  - Converted general coverage (`300 MHz–3 GHz`): gain `24.9 -> 23.8 dB`, NF `6.1 -> 6.8 dB`, full scale `−41.9 -> −40.8 dBm` (noise floor `−127 -> −126 dBm`).
+- **openEMS 3-D layout model (`HP300`, optional):** dropped per the 1 h solver budget. On the 8-layer `JLC08161H-2116C` stack (`40 um` vertical cell, `dt = 74.5 fs`, `~2.36M–3.5M` cells), a single non-resonant capacitor sanity test ran ~`3.0 ms/TS` (`520 MC/s`); ringing down `HP300`'s `112.5 MHz` (`22 nH + 91 pF`, `Q = 45`, `tau = 127 ns`) and `171.2 MHz` resonators to `-40 dB` requires ~`7.8M` timesteps (`~10–15 h`).

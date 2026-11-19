@@ -30,8 +30,8 @@ protect the corners. Every board rests on a honeycomb or on a clamp post with a 
 | `case_pad_ring.stl`, `case_pad_rj45.stl` | 7 + 1 | TPU 95A | A1, from the external spool (TPU does not go through the AMS Lite) | Flat |
 | `case_grommet.stl` | 1 | TPU 95A | A1, external spool | Flange down. Split, so the crimped cable from `J1503` slips in sideways |
 | `case_bumper_l/rfront/back.stl` | 4 (optional) | TPU 95A, gyroid 20 % | A1, external spool | As exported |
-| Stainless M4 × 16 (M4 × 20 where a bumper is), DIN 934 nuts, Loctite 243 | 6 | A2/A4 | — | The nuts drop into the hex traps under the tray's lugs |
-| M5 screws for the vehicle ears | 4 | A2/A4 | — | Through rubber isolators (§3.3) |
+| Stainless M4 × 16 (M4 × 20 where a bumper is), DIN 934 nuts, Loctite 243 | 6 | A2/A4 | n/a | The nuts drop into the hex traps under the tray's lugs |
+| M5 screws for the vehicle ears | 4 | A2/A4 | n/a | Through rubber isolators (§3.3) |
 
 The Saturn 4 Ultra cannot print the shells: its build volume (about 218 × 123 mm) is smaller than either part,
 and the resins it prints lose most of their stiffness at 70 °C (§4).
@@ -364,18 +364,21 @@ screws and 4 × M2.5 × 6.
   - `Y401` drops to `94.72 °C`, `U401` to `97.80 °C`, `U501` to `90.26 °C`, `LMR33630` to `104.35 °C`,
     `XC7A50T` to `87.15 °C`, and `PHY` to `91.53 °C`.
 
-- **The upgrade as built (15 Nov, printed lid, no aluminium, no pads; [ENCLOSURE_V2_THERMAL §7](ENCLOSURE_V2_THERMAL.md)):**
+- **The upgrade as built (printed lid, no aluminium, no pads; [ENCLOSURE_V2_THERMAL §7](ENCLOSURE_V2_THERMAL.md)):**
   the OD5015 fan, the spoke intake, the 17 right-wall and 9 back-wall slots and the taller sinks give 7.5 CFM and
-  +5.3 Pa. **Rated ambient: 56 °C with the stock KV260** (its commercial K26 reaches its 85 °C junction limit there;
-  UG1090), 63 °C by the adapter's own parts on their board temperature, **70.9 °C with an industrial K26I SOM**
-  (99.1 °C at 70 °C, also with the filter clogged twice over). At 70 °C the adapter's hottest junctions are the
-  LMR33630 at 109.8 °C (of 125), the ADCLK948 at 98.0 °C, the Si549 at 95.1 °C (of 125) and the XC7A50T at
-  87.8 °C (of 100). The aluminium-lid study (pads from U1001 and the K26 to a metal top) is in the report, not built.
-- **Rev08 (17 Nov, [ENCLOSURE_V2_THERMAL §8](ENCLOSURE_V2_THERMAL.md)):** re-run with the front end's 0.8 W, the
-  camera module (0.35 W, estimated), the adapter's real outline and the lens window and LED slots. **The rating does
-  not move: 56.1 °C with the stock KV260, 64.1 °C by the adapter's own parts, 71.1 °C with a K26I.** At 70 °C the
-  LMR33630 rises to 113.4 °C (of 125) and the RFFC5072 runs at 89.7 °C junction. The camera module sits about
-  17 °C above ambient, so a sensor rated 70 °C sets its own, lower limit.
+  +5.3 Pa. With the Vivado `XC7A50T` power (`1.249 / 1.604 W`) and audited regulator losses, **rated ambient is
+  55.9 °C with the stock KV260** (its commercial K26 reaches its 85 °C junction limit there; UG1090), **62.5 °C** by
+  the adapter's own parts on their board temperature (`Tb <= 85 °C`), and **68.2 °C with an industrial K26I SOM**
+  without `HS4` (down from 70.9 °C because `XC7A50T` reaches 101.81 °C clean / 102.24 °C clogged at 70 °C; `K26I`
+  stays 99.20 °C). At 70 °C `LMR33630` reaches 114.55 °C and `U1006` reaches 110.06 °C (of 125 °C). The
+  aluminium-lid study (pads from U1001 and the K26 to a metal top) is in the report, not built.
+- **Rev08 ([ENCLOSURE_V2_THERMAL §8](ENCLOSURE_V2_THERMAL.md)):** re-run with the front end's 0.8 W, the camera
+  module (0.35 W, estimated), the adapter's real outline and the lens window and LED slots, plus Vivado FPGA power
+  and audited regulator losses: **56.1 °C with the stock KV260, 63.3 °C by the adapter's own parts (`Tb <= 85 °C`,
+  `U401`), and 70.9 °C with a K26I when `HS4` is fitted** (68.0 °C without `HS4`, where `XC7A50T` hits 102.08 °C at
+  70 °C; fitting `HS4` brings `XC7A50T` down to **93.38 °C clean / 94.24 °C clogged**). At 70 °C with `HS4` fitted
+  the `LMR33630` sits at 117.71 °C (of 125 °C), `U1006` at 111.09 °C, and the `RFFC5072` at 91.37 °C junction. The
+  camera module sits about 17 °C above ambient, so a sensor rated 70 °C sets its own, lower limit.
 
 ![Built v2 at 70 °C: no heatsinks, touching sinks, and the changes](sim/v2_thermal_3d_heatsinks_compare.png)
 

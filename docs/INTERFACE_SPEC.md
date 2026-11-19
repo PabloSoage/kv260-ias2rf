@@ -112,7 +112,7 @@ discovered on the bench.
 | `HK_SDA` | 22 | bidirectional | Same bus |
 | `FPGA_PROG_B` | 21 | Kria → adapter | Front-end FPGA reset / reconfigure (was `PWDN`) |
 | `FPGA_IRQ` | **15** | adapter → Kria | Interrupt: link error, overflow, beam-update done. Active high, 47 kΩ pull-down on the adapter (R1133). **Moved from pin 32 on 25 Sep**: §4.3 |
-| — | 1, 20, 32, 34 | — | Not taken. Left unconnected. Pin 32 is a clock the carrier drives (§4.3) |
+| n/a | 1, 20, 32, 34 | n/a | Not taken. Left unconnected. Pin 32 is a clock the carrier drives (§4.3) |
 
 ### 4.2 On the Pmod J2
 
@@ -141,10 +141,10 @@ it is not in the repository.
 | 21 | `IAS1_RESET_B` | The reset sequencer SLG7XL46528 (U19), `PL_RESET_OUT2_B`, from the SOM's `HDA04` | **1.8 V**, 10 kΩ pull-up to `PL_1V8` (R208) | `FPGA_PROG_B` |
 | 15 | `HPA13_FLASH` | **Input to the SOM** through the SN74AVC4T245 U72: A side on J8 at `PL_1V8`, B side on `HPA13_P` at `PL_1V2`, 2DIR tied high (A → B) | **1.8 V** | `FPGA_IRQ` |
 | 20 | `HPA13_TRIGGER` | **Output of the SOM** through the same U72: `HPA13_N`, 1DIR tied low (B → A) | 1.8 V | Not used |
-| 32 | `IAS1_EXTCLK` | The clock generator Si5332 U17, `OUT2b`, 48 MHz LVCMOS, enabled whenever the PL rails are good | — | **Not connected**: see below |
-| 1 | Test point TP31, not fitted | — | — | Not used |
-| 34 | `VDD_AF2V8_J8`: 2.8 V through the jumper J19, **not fitted** | — | — | Not used |
-| 13; 17, 18; 23, 24 | `PL_1V8`; `IAS_2V75`; `PL_1V2` | Carrier rails | — | Not used (ARCHITECTURE §9.1) |
+| 32 | `IAS1_EXTCLK` | The clock generator Si5332 U17, `OUT2b`, 48 MHz LVCMOS, enabled whenever the PL rails are good | n/a | **Not connected**: see below |
+| 1 | Test point TP31, not fitted | n/a | n/a | Not used |
+| 34 | `VDD_AF2V8_J8`: 2.8 V through the jumper J19, **not fitted** | n/a | n/a | Not used |
+| 13; 17, 18; 23, 24 | `PL_1V8`; `IAS_2V75`; `PL_1V2` | Carrier rails | n/a | Not used (ARCHITECTURE §9.1) |
 
 **Why FPGA_IRQ moved.** The Rev01 adapter called pin 32 `GPIO2`, and this spec put the interrupt
 there. On the carrier, pin 32 is the camera's master clock: the Si5332 drives it, and it does not

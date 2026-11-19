@@ -31,9 +31,9 @@ basis. Stock and prices are JLCPCB's parts API on 16 November 2026.
 | WP2 | Debug serial: UART on the two spare Pmod lines, USB bridge with a vertical USB-C inside the box | **Approved.** The gateware half needs no board change | 60 mm² | $1.1 | Low |
 | WP3 | IAS0: camera pass-through receptacle on the top face, pin for pin | **Approved**, fitted | 30 mm² | $0.2 | Low electrically, medium mechanically |
 | WP4 | VHF receive front end, 30–170 MHz, direct sampling on the AD9484: own SMA (the thirteenth), bias tee, LNA, three preselector paths, anti-alias filter, IF amplifier, step attenuator | **Approved** | 430 mm² | $32 | Medium |
-| WP5 | Converter for 170 MHz – 3 GHz: RFFC5072 mixer and synthesiser, second preselector | **Approved**, behind a bypass switch so the board works without it | 260 mm² | $34 | Medium–high |
-| WP6 | Corrections from the audit (section 8): two timing-constraint errors, a hard-coded NCO, documentation | **Approved**, first; independent of the board | — | — | Low |
-| WP7 | Board manual: a motherboard-manual style layout diagram of the final board, every connector, header, chip, LED, SMA, switch and test point labelled with its use (section 11.3) | **Approved** (owner, 16 November) | — | — | Low |
+| WP5 | Converter for 300 MHz – 3 GHz (was 170 MHz before the Rev08 audit, section 11.10): RFFC5072 mixer and synthesiser, second preselector behind a 300 MHz HPF | **Approved**, behind a bypass switch so the board works without it | 260 mm² | $34 | Medium–high |
+| WP6 | Corrections from the audit (section 8): two timing-constraint errors, a hard-coded NCO, documentation | **Approved**, first; independent of the board | n/a | n/a | Low |
+| WP7 | Board manual: a motherboard-manual style layout diagram of the final board, every connector, header, chip, LED, SMA, switch and test point labelled with its use (section 11.3) | **Approved** (owner, 16 November) | n/a | n/a | Low |
 
 Totals: about 820 mm² of the 1,090 mm² that is free in one block (section 1), about $68 of parts per board in
 some 17 new part types, and 0.8 W more at 12 V (+9 %).
@@ -62,8 +62,8 @@ Measured from `CSI2-KRIA-KV260_Rev01.kicad_pcb` as text, per copper layer [V].
 |---|---|---|---|---|---|
 | **Block north-west of the FPGA** | 89–150, 107.25–127 | 61 × 19.7 mm, 1,200 mm² | `J1002`, `C1092`, `F1002` (the fan header's parts), `FID1`, `H1` | Empty but for two tracks on L3 at its east end (`FPGA_PROG_B` and a DAC filter net) | Over the carrier for y < 117.75: 0.8 mm underneath, so no through-hole pins and nothing on the bottom there. `H1`'s clamp takes a 10 mm circle. Net free area about 1,090 mm² |
 | **IAS0 tongue** | 129.9–142.4, 82.75–107.25 | 12.5 × 24.5 mm | Empty | `J102` on the bottom, ground vias only | All of it is over the carrier. `J18` on the carrier (7.5 mm pins) stands 1.5 mm east of it |
-| Strip above the SMAs | 100–176, 188–200 | — | `IF_TX_A`, `IF_TX_B`, `T802`, the Rev07 filter, `IF_RX_B`, `H4` | L6 carries the AD9767's DAC2 outputs and `SW_CTRL0` | Not usable for new blocks; a route can cross it on L6 |
-| Left edge below the block | 89–100, 128–200 | — | The 5 V, 3.3 V and −3.3 V converters | **L6 empty** | A route on L6 passes under the converters between two ground planes |
+| Strip above the SMAs | 100–176, 188–200 | n/a | `IF_TX_A`, `IF_TX_B`, `T802`, the Rev07 filter, `IF_RX_B`, `H4` | L6 carries the AD9767's DAC2 outputs and `SW_CTRL0` | Not usable for new blocks; a route can cross it on L6 |
+| Left edge below the block | 89–100, 128–200 | n/a | The 5 V, 3.3 V and −3.3 V converters | **L6 empty** | A route on L6 passes under the converters between two ground planes |
 
 ![Placement study](img/rev08_floorplan.png)
 
@@ -270,35 +270,36 @@ filter. Above 200 MHz the board needs a mixer.
 | TV-tuner IC (R820T2, R828D, MSi001), IF into the AD9253 | 24–1766 MHz, 8 MHz wide, image-free | **None: 0 stock, consignment only** | Rejected: the simplest circuit, but not buyable through the board's assembly flow, and the R82xx data sheets are not public |
 | Quadrature demodulator (ADL5387, LTC5584, AD8348) + PLL, I and Q into the AD9253's two channels | 30 MHz – 2 GHz, 50 MHz wide, 14 bit | ADL5387: 7; the others: 0 | Rejected for stock. It would also take the HF channel away while in use |
 | Dual conversion through a 2.4 GHz IF (two RFFC5072, as the HackRF does with one plus a transceiver) | 30 MHz – 4 GHz, image-free | RFFC5072: 64 | Deferred: two synthesisers, twice the area and 0.8 W; section 6 |
-| **Direct sampling below 170 MHz, single conversion above, both into the AD9484** | 30 MHz – 3 GHz | All parts in stock | **Proposed** |
+| **Direct sampling 30–170 MHz, single conversion 300 MHz – 3 GHz (170–300 MHz not covered since the Rev08 audit), both into the AD9484** | 30–170 MHz & 300 MHz – 3 GHz | All parts in stock | **Adopted** |
 
 ### 5.3 Block diagram
 
 ```
-J961 ─ ESD ─ DC block ─┬─ LNA ─┬─ preselector ─┬─ RFFC5072 ─┬─ low-pass ─ IF amp ─ attenuator ─ L6 stripline ─ SW2 ─ AD8352 x2 ─ AD9484
- SMA     bias tee ─────┘ bypass┘  A or B        └─ bypass ───┘  170 MHz    +21 dB   0–31.5 dB     150 mm        RF2
-                                                  LO 85–4200 MHz, TCXO 26 MHz
+J961 ─ ESD ─ DC block ─┬─ LNA ─┬─ preselector A ─┬─ [300 MHz HPF] ─ preselector B ─┬─ RFFC5072 ─┬─ low-pass ─ IF amp ─ attenuator ─ L6 stripline ─ SW2 ─ AD8352 x2 ─ AD9484
+ SMA     bias tee ─────┘ bypass┘                 │                                 └─ bypass ───┘  170 MHz    +21 dB   0–31.5 dB     150 mm        RF2
+                                                 └────────────────────────────────── (direct 30-170 MHz bypasses B and mixer) ──────────────────────┘
+                                                                                     LO 85–4200 MHz, TCXO 26 MHz
 ```
 
 | Block | Part | Stock, price [V] | Key figures |
 |---|---|---|---|
 | Antenna connector `J961` | SMA-J-P-H-ST-EM1, as the other twelve | 114, $5.45 | Left edge, back wall |
-| Bias tee | AP22652 current-limited switch, a GHz ferrite bead and a 1 µH inductor (phase 6: the two inductors first drawn resonated in band, section 11.7), 3.0 or 5 V selectable | 8.5 k, $0.33 | Feeds an active antenna or a mast-head LNA; fault flag to an expander |
-| LNA and IF amplifier | SPF5043Z × 2, at 3.0 V | 5,923, $3.39 | 50–4000 MHz; 22.6 dB and NF 0.60 dB at 100 MHz, 18 dB at 900 MHz, 25 mA at 3 V |
+| Bias tee | AP22652 current-limited switch, a GHz ferrite bead and a 1 µH inductor (phase 6: the two inductors first drawn resonated in band, section 11.7), **3.3 V or 5 V** selectable (`JP1301`) | 8.5 k, $0.33 | Feeds an active antenna or a mast-head LNA; fault flag to an expander |
+| LNA and IF amplifier | SPF5043Z × 2, at **2.8 V (`+2V8_RF`)** (was 3.0 V pre-audit) | 5,923, $3.39 | 50–4000 MHz; 22.6 dB and NF 0.60 dB at 100 MHz, 18 dB at 900 MHz, 25 mA |
 | Bypass switches | PE4259 × 4 | 14.7 k, $1.19 | 10 MHz – 3 GHz SPDT |
 | Preselector A, 30 MHz up | PE42442 × 2 (SP4T, 30 MHz – 6 GHz) | 245, $4.95 | Paths: straight, FM band-pass, FM-reject high-pass, to preselector B |
-| Preselector B, 170 MHz up | SKY13418-485LF × 2 (SP8T, 0.1–6.0 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
+| Preselector B, **300 MHz up** (behind `HP300`; 170 MHz pre-audit) | SKY13418-485LF × 2 (SP8T, 0.1–6.0 GHz) | 4,562, $1.02 | Paths: UHF low-pass 480 MHz, SAW 1090 MHz (TA1090EC, 149), LTCC high-pass 1 GHz (HFCN-1000+, 302), LTCC low-pass 1 GHz (LFCN-1000+, 615); four spare |
 | Converter | **RFFC5072** (RFFC5072TR13) | **64**, $14.62 | LO 85–4200 MHz, mixer 30–6000 MHz in, 30–4500 MHz out; gain −2 dB into a 4:1 balun (−7 dB into a 1:1); NF 10 dB (low current) to 13 dB (high linearity); IIP3 +10 / +23 dBm; 100–125 mA at 2.7–3.3 V; reference 10–104 MHz, 0.5–1.5 V p-p AC-coupled; logic high ≥ VDD/1.5 |
-| Baluns | Input TC1-1-13M+ (1:1, 4.5–3000 MHz; the LCSC listing, 239 at $2.12, is HLT's 5-pad clone with other pin numbers, so the genuine Mini-Circuits part is ordered: RX_VU_SPEC §1.4); output **TC4-1W+** (1:4, 3–800 MHz, 2,136 in stock), the data sheet's 4:1 output arrangement, same 3.8 × 3.8 mm body | — | Mixer input 100 Ω differential |
+| Baluns | Input TC1-1-13M+ (1:1, 4.5–3000 MHz; the LCSC listing, 239 at $2.12, is HLT's 5-pad clone with other pin numbers, so the genuine Mini-Circuits part is ordered: RX_VU_SPEC §1.4); output **TC4-1W+** (1:4, 3–800 MHz, 2,136 in stock), the data sheet's 4:1 output arrangement, same 3.8 × 3.8 mm body | n/a | Mixer input 100 Ω differential |
 | Reference | 26 MHz TCXO (KDS 1XXD26000MAA) | 15.7 k, $0.61 | Not locked to the Si549: section 5.9 |
-| Anti-alias filter | 7th-order elliptic, 0402 | — | Section 5.4 |
+| Anti-alias filter | 7th-order elliptic, 0402 | n/a | Section 5.4 |
 | Step attenuator | PE4312 | 1,557, $2.84 | 0–31.5 dB in 0.5 dB steps, serial |
-| Supply | LP5907-3.0 from `+3V3_D` through a ferrite | 32 k, $0.28 | One 3.0 V rail for the whole block |
+| Supply | **LP5907-2.8** (`+2V8_RF`, was `-3.0` before audit P8) from `+3V3_D` through a ferrite | 32 k, $0.28 | One 2.8 V rail for the whole block |
 
 Read from the data sheets on 16 November (phase 3) [V]: PE42442 30 MHz–6 GHz, logic high ≥ 1.17 V, internal
-negative supply; PE4259 10 MHz–3 GHz, logic high ≥ 0.7·VDD; PE4312 1 MHz–4 GHz, 1.8 V logic; SKY13418
+negative supply; PE4259 10 MHz–3 GHz, logic high ≥ 0.7·VDD (1.96 V at 2.8 V); PE4312 1 MHz–4 GHz, 1.8 V logic; SKY13418
 0.1–6.0 GHz, logic high ≥ 1.35 V; SPF5043Z 50–4000 MHz; AP22652 enable high ≥ 1.5 V. Everything is driven from
-the expander at 3.0 V, so all levels are met. **Correction:** the RFFC5072's −2 dB is with a 4:1 output
+the expander at 2.8 V (was 3.0 V pre-audit), so all levels are met. **Correction:** the RFFC5072's −2 dB is with a 4:1 output
 balun; the output balun becomes a TC4-1W+ (it was a 1:1). **Loop filter:** the data sheet's wideband
 application schematic (26 MHz reference, active filter on LFILT1–3) is used as is; its phase noise is
 checked in phase 6.
@@ -322,9 +323,10 @@ pads 0.10 ± 0.05 pF) [V arithmetic on E parts data]:
 |---|---|---|---|---|
 | Anti-alias, 7th order | 11 pF, 56 nH ‖ 5.6 pF, 22 pF, 62 nH ‖ 7.5 pF, 24 pF, 75 nH ‖ 1.2 pF, 20 pF | 2.2 dB (at 170 MHz) | **56.0 dB** (mask 55) | Pass; 0.7 dB more edge loss than the ideal, after the mixer where it costs nothing |
 | UHF image, 7th order | 6.2 pF, 22 nH ‖ 1.8 pF, 6.8 pF, 27 nH ‖ 2 pF, 6.8 pF, 22 nH ‖ 0.4 pF, 1.3 pF | 2.4 dB | **50.7 dB** (mask 50) | Pass, 90 % yield; needs the ±0.1 pF parts (with ±0.25 pF: 45 dB) |
-| FM reject, 7th order | — | 7.3 dB | 34.4 dB | **Fails G2**: a 9 % transition does not survive ±2 % parts |
+| FM reject, 7th order | none | 7.3 dB | 34.4 dB | **Fails G2**: a 9 % transition does not survive ±2 % parts |
 | **FM reject, 9th order (adopted)** | 18 pF, 68 nH + 110 pF, 13 pF, 82 nH + 36 pF, 18 pF, 100 nH + 24 pF, 24 pF, 220 nH + 10 pF, 91 pF | ≤ 3.1 dB from 121.5 MHz up; 4.1–6.7 dB at 118–120 MHz | **42.5 dB** (gate 40) | **G2 passed.** 13 parts instead of 10. The edge costs about 1 dB of noise figure on the lowest 2 MHz of the airband in a worst-case unit |
 | FM band-pass, 3 poles (added in phase 5) | 16 nH ‖ 160 pF, 390 nH + 6.8 pF, 16 nH ‖ 160 pF | 3.1 dB | **24.3 dB** at 70 and 137 MHz (mask 21) | Pass; re-chosen from the first drawing's values (3.4 dB, 21.1 dB) |
+| **Preselector B high-pass `HP300`, 5th order (added by Rev08 audit R1)** | 11 pF, 24 nH + 36 pF, 5.6 pF, 22 nH + 91 pF, 8.2 pF (`C1441`–`C1445`, `L1441`–`L1442`) | **1.52 dB** (`1.51 dB` in `rev08_rf_audit.py`; `<= 1.13 dB` nominal) in 300–3000 MHz | **51.7 dB** below 175 MHz (`52.8 dB` nominal; mask 50) | **Pass (99.8 % tight / 97.3 % loose yield)** |
 
 No commercial FM band-stop filter is stocked (searched 16 November); higher inductor Q does not help, since the
 tolerances, not the losses, set the edge.
@@ -333,16 +335,16 @@ tolerances, not the losses, set the edge.
 
 ### 5.5 Sensitivity and range
 
-`_work/sim/rev08_frontend.py`, maximum gain [V arithmetic on E inputs]:
+`_work/sim/rev08_frontend.py`, maximum gain [V arithmetic on E inputs] (converted modes include the 1.1 dB `HP300` high-pass added ahead of preselector B by AUDIT_Rev08 R1; pre-audit without-HPF figures in parentheses):
 
 | Mode | Gain | Noise figure | Full scale at the antenna | Noise floor in 12.5 kHz |
 |---|---|---|---|---|
 | Direct, 30–170 MHz | 34.9 dB | 2.0 dB | −51.9 dBm | −131 dBm |
 | Direct, FM broadcast | 32.9 dB | 2.3 dB | −49.9 dBm | −131 dBm |
 | Direct, airband and VHF | 31.9 dB | 2.5 dB | −48.9 dBm | −131 dBm |
-| Converted, UHF 400–480 MHz | 29.3 dB | 3.7 dB | −46.3 dBm | −129 dBm |
-| Converted, ADS-B 1090 MHz | 23.4 dB | 7.1 dB | −40.4 dBm | −126 dBm |
-| Converted, general coverage | 24.9 dB | 6.1 dB | −41.9 dBm | −127 dBm |
+| Converted, UHF 300–480 MHz | 28.2 dB (was 29.3) | 4.2 dB (was 3.7) | −45.2 dBm (was −46.3) | −129 dBm |
+| Converted, ADS-B 1090 MHz | 22.3 dB (was 23.4) | 7.9 dB (was 7.1) | −39.3 dBm (was −40.4) | −125 dBm (was −126) |
+| Converted, general coverage (300 MHz–3 GHz) | 23.8 dB (was 24.9) | 6.8 dB (was 6.1) | −40.8 dBm (was −41.9) | −126 dBm (was −127) |
 
 - The attenuator takes off up to 31.5 dB and the LNA bypass another 22 dB, so full scale moves from −52 dBm
   to about +2 dBm.
@@ -355,16 +357,17 @@ tolerances, not the losses, set the edge.
 
 | Band | LO | Image | LO as seen by the ADC | Image rejection |
 |---|---|---|---|---|
-| 30–170 MHz | none | none | — | Aliases from 230 MHz up: ≥ 55 dB |
+| 30–170 MHz | none | none | n/a | Aliases from 230 MHz up: ≥ 55 dB |
 | PMR446, 446 MHz | 581 MHz | 716 MHz | 181 MHz | ≥ 50 dB (UHF low-pass) |
 | 70 cm, 435 MHz | 570 MHz | 705 MHz | 170 MHz | ≥ 50 dB |
 | TETRA, 390 MHz | 525 MHz | 660 MHz | 125 MHz | ≥ 50 dB |
 | ADS-B, 1090 MHz | 955 MHz | 820 MHz | 155 MHz | ≥ 40 dB (SAW) [E] |
-| 868 MHz, GNSS L1, 2.4 GHz | ±135 MHz | ±270 MHz | — | **None**: section 6 |
+| 868 MHz, GNSS L1, 2.4 GHz | ±135 MHz | ±270 MHz | n/a | **None**: section 6 |
 
 The IF is centred on 135 MHz and 100–170 MHz reaches the ADC: 70 MHz at once. The LO is always above 230 MHz,
-in the anti-alias filter's stop band, and it is one tone at a known frequency. From 170 to 480 MHz the
-converter works behind the UHF low-pass; below 390 MHz its image rejection falls with the filter's skirt.
+in the anti-alias filter's stop band, and it is one tone at a known frequency. From 300 to 480 MHz the
+converter works behind the UHF low-pass (and the 300 MHz IF-reject high-pass ahead of preselector B; 170–300 MHz is
+not covered); below 390 MHz its image rejection falls with the filter's skirt.
 
 ### 5.7 Getting the IF to the ADC
 
@@ -394,9 +397,9 @@ converter works behind the UHF low-pass; below 390 MHz its image rejection falls
 
 | Point | Why it is open | How it closes |
 |---|---|---|
-| RFFC5072 logic thresholds and serial timing | **Closed 16 November**: data sheet read (through JLC's copy). Input high ≥ VDD/1.5 = 2.0 V at 3.0 V; proprietary 3-wire bus with read-back (register map in Qorvo's programming guide, still to be fetched for G-3) | — |
+| RFFC5072 logic thresholds and serial timing | **Closed 16 November**: data sheet read (through JLC's copy). Input high ≥ VDD/1.5 = 2.0 V at 3.0 V; proprietary 3-wire bus with read-back (register map in Qorvo's programming guide, still to be fetched for G-3) | n/a |
 | RFFC5072 stock | 64 units today, and the A version has none. Nothing is bought during the design | Designed in as the RFFC5072; re-check stock when the board is ordered. Fallback, kept in the schematic as a note: MAX2871 (3,065) with an ADE-1+ mixer (139), about 60 mm² more |
-| Switches below their specified band | SKY13418 is specified from 100 MHz, so it only carries paths from 170 MHz up. PE42442 is specified from 30 MHz | Bench check of loss at 30–100 MHz on the first board |
+| Switches below their specified band | SKY13418 is specified from 100 MHz, so it only carries paths from 300 MHz up (was 170 MHz before the Rev08 audit). PE42442 is specified from 30 MHz | Bench check of loss at 30–100 MHz on the first board |
 | Reference not locked to the ADC clock | A separate TCXO: the LO and the sample clock drift apart by a few ppm. Harmless for voice and data reception; not for phase-coherent work | Option: feed the synthesiser's reference from `J401`'s 10 MHz when one is connected |
 | Shielding | An LO from 85 MHz to 4.2 GHz 40 mm from the JTAG and Pmod headers and 60 mm from the FPGA | Two shield-can frames (LNA and preselector; converter), ground-via fence, the 3.0 V rail's ferrite; coupling estimate as `txrx_isolation.py` |
 | Placement density | 820 mm² of blocks in 1,090 mm² | Gate G1 |
@@ -435,7 +438,7 @@ Transmit above 30 MHz is not part of this plan.
 | G-3 | RFFC5072 and PE4312 serial sequencers over the expander; lock detect read back | Bench model of both parts' serial ports |
 | G-4 | Tunable DDC for the AD9484 stream. The AERIS DDC's NCO is a constant (section 8, A-3): make it a register, default unchanged, and add a second decimation stage down to channel bandwidths | **Only 10 of 120 DSP48 are free** [V]: the second stage has to be CIC plus a distributed-arithmetic FIR. The NCO carries the one local correction to the AERIS code (its image fix, 17 November: `fpga/third_party/aeris/README.md`, "Local changes") |
 | G-5 | AGC: a clip and peak detector on the raw ADC codes drives the attenuator and the LNA bypass, in the FPGA or from Linux | Hold-off so that it does not chatter on bursts |
-| G-6 | Status-LED mapping, written on change | — |
+| G-6 | Status-LED mapping, written on change | n/a |
 
 **Sample-rate consequence.** The gateware closes timing for the AD9484 at 400 MSPS only (section 8, A-1). The
 front end is therefore planned at 400 MSPS, and in that mode the AD9253 runs at 50 MSPS: 25–30 MHz folds onto
@@ -486,10 +489,10 @@ A-1 to A-6 need no board change and are independent of everything else here.
 
 | Rail | Today [V, `power_budget.py`] | Added | After | Regulator |
 |---|---|---|---|---|
-| 3.0 V front end (new LDO from `+3V3_D`) | — | 25 + 25 mA amplifiers, 125 mA converter, 5 mA rest | 180 mA | LP5907, 250 mA |
-| `+3V3_D` | 1,128 mA | 180 mA + 15 mA of LEDs and expanders | 1,323 mA | 2 A |
-| `+5V0` | 1,584 mA | 140 mA | 1,724 mA | 3 A |
-| 12 V input | 8.8 W | **0.8 W** | 9.6 W | — |
+| 2.8 V front end (`+2V8_RF`, `U1315` from `+3V3_D`; planned at 3.0 V) | none | 25 + 25 mA amplifiers, 125 mA converter, 5 mA rest | 180 mA | `LP5907MFX-2.8`, 250 mA |
+| `+3V3_D` | 1,128 mA | 180 mA + 15 mA of LEDs and expanders | 1,890 mA (audit) | `U1002` `TPS563201`, 3 A (audit P5) |
+| `+5V0` | 1,584 mA | 140 mA (+ audit loads) | 2,409 mA (audit) | `LMR33630`, 3 A |
+| 12 V input | 8.8 W (Rev07) | **+0.8 W** (Rev08) + PHY/CAN/fan/Vivado (audit) | 11.7 W typ / **13.4 W** worst (9.6 W plan) | n/a |
 
 - The bias tee, when on, adds what the external load draws (limited to 100 mA).
 - The USB bridge draws from the USB cable.
@@ -531,7 +534,7 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 
 | Phase | What | Verification | Gate |
 |---|---|---|---|
-| 0 | Decisions (section 12) | — | Done, 16 November |
+| 0 | Decisions (section 12) | n/a | Done, 16 November |
 | 1 | Audit corrections A-1 to A-6, and G-1 (debug UART) | Rebuild: timing with the corrected clocks; the existing benches at both clock modes; a new bench for the UART with a mutation; documents and PDF regenerated | Independent of the rest; can be merged as Rev07 gateware |
 | 2 | Placement trial on a scratch copy: every block of section 5.3 as real footprints in the free block; `J961` on the edge; the IF line routed to `SW2`; `J103` and its vias; the vertical USB-C on the tongue | DRC on the scratch copy; the IF line's clearance to the DAC outputs; the USB-C's drawing confirms surface-mount legs | **G1: if the blocks do not fit with shield frames, the plan comes back to the owner before any schematic work.** Passed 16 November (section 11.4) |
 | 3 | Filters to catalogue values; tolerance Monte Carlo for the three; RFFC5072 data sheet read; loop filter designed | Masks met at the 1st percentile, as for the Rev07 filter | **G2: FM-reject filter ≥ 40 dB with real tolerances.** Passed 16 November with a 9th-order filter (section 5.4); the RFFC5072 data sheet and loop filter are still open |
@@ -539,9 +542,9 @@ two boards) that is about +9 % [E]; the real figure comes from re-running the qu
 | 5 | Layout | DRC with zones refilled and schematic parity: 0 / 0 / 0 | **Done 16 November** (section 11.6): 0 errors, 0 unconnected, 0 parity errors |
 | 6 | Simulation of the new copper: coupling of the IF line and the LO into the converters and the clock tree; return loss of `J961`'s launch | Numbers in SIGNAL_INTEGRITY, same method as §9.9 | **Done 17 November** (section 11.7): G3 passed; `J961` brought to the other SMAs' standard, bias tee and LNA bias fixed, DRC 0 / 0 / 0 |
 | 7 | Gateware G-2 to G-6, then G-7 | A bench for each block with models of the expander, the synthesiser and the attenuator; mutations; build at both clock modes | DSP48 count stays within 120 |
-| 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | **Done 17 November**: rated 56.1 °C stock, 71.1 °C K26I (ENCLOSURE_V2_THERMAL §8); 50 g FEA SF 8.3 / 5.0, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE §5.3) |
+| 8 | Enclosure: `J961` notch, LED slot, lug and slots moved, lens window and camera clamp; CFD and FEA re-run | Rated ambient and stress table updated from the runs | **Done**: rated 56.1 °C stock, 63.3 °C adapter `Tb <= 85 °C`, **70.9 °C K26I with `HS4` fitted** (`68.0 °C` without `HS4`; `XC7A50T` drops `102.08 -> 93.38 °C` @ 70 °C, ENCLOSURE_V2_THERMAL §8); 50 g FEA SF 8.3 / 5.0, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE §5.3) |
 | 9 | Regenerate every output and review every document (section 11.1); draw the board manual (section 11.3) | Section 11.1, item by item | **G4: Rev08 is not finished until all of 11.1 is done.** Passed 18 November (section 11.8) |
-| 10 | Tag `rev08`, push | — | — |
+| 10 | Tag `rev08`, push | n/a | n/a |
 
 Phases 1 and 2 can run in parallel. Nothing in phases 4–10 starts before G1.
 
@@ -755,8 +758,8 @@ Each row of section 11.1, with what was redone and where the result is. The phas
 |---|---|
 | Board electrical checks | **Done.** ERC 0 errors, the same 7 warnings. DRC with zones refilled and schematic parity 0 / 0 / 0 (`make_fab`). LVDS skew table re-run: all 29 pairs identical to the 8-layer table (LAYOUT 6.7) |
 | Signal integrity | **Done in phase 6** (section 11.7, SIGNAL_INTEGRITY 9.10): `J961`'s launch, the IF line, coupling and isolation with the new aggressors, the bias tee and LNA feed; the three new filters' Monte Carlo in phase 3 (section 5.4) |
-| Power | **Done.** (Revised by the RF and power audit, [AUDIT_Rev08.md](AUDIT_Rev08.md): 1.12 A, 13.4 W worst case.) `power_budget.py` with every Rev08 load: 823 mA at 12 V, 9.9 W (1.07 A, 12.8 W with margin; the GPS receiver of 18 November included); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
-| Thermal | **Done.** Enclosure CFD at the rated ambients with the front end and camera (phase 8: 56.1 °C stock, 71.1 °C K26I); the 2-D board map and the five cooling cases at 8.2 W (SIGNAL_INTEGRITY 9.6: the LMR33630 is now the hottest junction, 87 °C at 25 °C in still air; every junction under 92 °C at 70 °C with sink and fan); the heatsink map |
+| Power | **Done.** Revised by the RF and power audit ([AUDIT_Rev08.md](AUDIT_Rev08.md)): **1.12 A, 13.4 W worst case; 0.97 A, 11.7 W typical** (`power_budget.py` with Vivado FPGA rails + PHY, CAN, fan and bias tee; before the audit it showed 823 mA at 12 V, 9.9 W, with 1.07 A / 12.8 W margin); regulator dissipation and rail LED currents in POWER_AND_STACKUP |
+| Thermal | **Done.** Enclosure CFD at the rated ambients with the front end, camera, Vivado `XC7A50T` power and audited regulator losses: **56.1 °C stock, 63.3 °C adapter `Tb <= 85 °C`, 70.9 °C K26I with `HS4` fitted** (`68.0 °C` without `HS4`; [ENCLOSURE_V2_THERMAL §8](ENCLOSURE_V2_THERMAL.md)); the 2-D board map at 9.4 W (re-run) and 8.2 W (earlier) (SIGNAL_INTEGRITY 9.6); the heatsink map |
 | Mechanical strength | **Done in phase 8.** 50 g in three axes with the new notch, lug, slots, lens window and clamps; SF 8.3 / 5.0 at 23 / 70 °C, BGAs ≤ 96 µε after the honeycomb fix (ENCLOSURE 5.3) |
 | Gateware | **Done.** Artix rebuilt with the corrected constraints (25,068 LUT, `WNS +0.076 ns`, `WHS +0.049 ns` over both clock modes); K26 rebuilt on 18 November with the integrations of section 14, `kria_ps_framer`, `TX_KEY` and PS `CAN1` EMIO (53,294 LUT, `45.5%`, 44.0 BRAM36 eq., 1 URAM, 229 DSP48E2, `WNS +0.991 ns`, `WHS +0.010 ns`, 0 new methodology or CDC warnings); utilisation, timing, pulse-width, methodology and CDC reports, floorplans and schematics regenerated from the routed designs. `tb_system` passes at both clock modes (S1..S7, `TX_KEY` mutation fails at S7); the G-8 campaign re-run on the final RTL passes all 8 cases (FPGA_GATEWARE 6.1, figures moved by 0.9 dB at most); the two new benches pass bit-exact and their mutations fail |
 | Renders and 3-D | **Done.** Board renders (top, iso, bottom, 4K) with the 22 Rev08 part models; mount, case v1 and v2, the camera on the tongue, `J961`'s notch, the 4K case views, the heatsink renders; each checked against the render rules. `check_case`: the same 15 / 16 intended contacts |
@@ -796,7 +799,7 @@ The owner asked for four things before `rev08`: lower skew on the two worst pair
 
 **The HMI.** The owner chose Slint for the screens: a Rust core, light, and the same code on the KV260 (Linux KMS), a PC and a phone's browser (WebAssembly), knowing that a binary for an embedded device is GPL-3.0. The screens' source stays MIT. Behind them: `kria-hmi-core` (the decoders and register plans, no I/O), `kria-hmid` (DMA, audio, registers, recording, WebSocket) and two PL blocks that bring the DSP suite's results to the A53s, which were missing (`kria_dsp_out`, `kria_ps_framer`). Writing it found two faults that the mock-ups could not: the HMI's default transmitter setting (145.5 MHz NBFM) is outside what the board transmits (HF below 12.5 MHz), and a whole-register write of `DSP_CTRL` from Linux would have cleared R5F core 0's transmit enable. Both are fixed and tested.
 
-**Transmit key and the vehicle's CAN bus.** Transmit enable moved out of `DSP_CTRL[1]` into its own register `TX_KEY` (`0x38` in `kria_pl_link`, clocked on `pl_clk_100m`), requiring `24'h4B4559` (`"KEY"`) in `[31:8]` and full byte strobes; `DSP_CTRL[1]` is now a read-only reflection of `TX_KEY[0]`, owned only by R5F core 0 and tested by `tb_system.v` S7 (`-Mutate tx_key_from_dsp_ctrl`). In parallel, PS `CAN1` (`0xFF07_0000`, classic CAN 2.0 up to `1 Mbit/s`) was routed through EMIO to KV260 `J9` pins 6 and 8 (`can1_txn` on ball `G6`, `can1_rx` on ball `D6`, Bank 66 `LVCMOS12`) and an un-terminated `TCAN330DCNT` + mirror-safe dual-`MMBT3904` adapter circuit (`STATUS` sheet, `J1502` pins 6, 8, 10 and 6-way `J1503`; placed and routed, [LAYOUT §6.8](LAYOUT.md)). R5F core 1 polls `CAN1` in listen-only snoop mode by default (`kria-core::can`, `kria-r5f1`, `kria-vehicled --can`), so core 0 keeps live vehicle speed even without Linux, Wi-Fi or the phone ([INTEGRATIONS.md §2.2](INTEGRATIONS.md)).
+**Transmit key and the vehicle's CAN bus.** Transmit enable moved out of `DSP_CTRL[1]` into its own register `TX_KEY` (`0x38` in `kria_pl_link`, clocked on `pl_clk_100m`), requiring `24'h4B4559` (`"KEY"`) in `[31:8]` and full byte strobes; `DSP_CTRL[1]` is now a read-only reflection of `TX_KEY[0]`, owned only by R5F core 0 and tested by `tb_system.v` S7 (`-Mutate tx_key_from_dsp_ctrl`). In parallel, PS `CAN1` (`0xFF07_0000`, classic CAN 2.0 up to `1 Mbit/s`) was routed through EMIO to KV260 `J9` pins 6 and 8 (`can1_txn` on ball `G6`, `can1_rx` on ball `D6`, Bank 66 `LVCMOS12`) and an un-terminated `TCAN3403DDFRQ1` (`±58 V` bus, upgraded from the first drawing's `TCAN330DCNT` by the Rev08 audit P1) + mirror-safe dual-`MMBT3904` adapter circuit (`STATUS` sheet, `J1502` pins 6, 8, 10 and 6-way `J1503`; placed and routed, [LAYOUT §6.8](LAYOUT.md)). R5F core 1 polls `CAN1` in listen-only snoop mode by default (`kria-core::can`, `kria-r5f1`, `kria-vehicled --can`), so core 0 keeps live vehicle speed even without Linux, Wi-Fi or the phone ([INTEGRATIONS.md §2.2](INTEGRATIONS.md)).
 
 ### 11.10 The RF and power audit (18 November 2026)
 
@@ -829,7 +832,7 @@ Before the tag, a full RF and power audit of the board: [AUDIT_Rev08.md](AUDIT_R
 | 4 | Debug USB | **Vertical USB-C inside the box**, where it fits (section 3.2); a 4-pin header only if no surface-mount part places |
 | 5 | Buying parts | **Nothing is bought now**: the board is being designed. Parts that are useful and fit go in; their stock is re-checked at order time |
 | 6 | Starting the work | **Not yet.** First the analysis and this document; phase 1 starts when the owner says so |
-| — | Clock mode for the new receiver | Follows from 1: 400 MSPS first (G-4), the 500 MSPS path (G-7) in scope after it |
+| n/a | Clock mode for the new receiver | Follows from 1: 400 MSPS first (G-4), the 500 MSPS path (G-7) in scope after it |
 
 **State at the end of phase 9 (17 November 2026).** 1: done, WP1–WP7 and G-1 to G-8 all built. 2: done, `J961` on the
 back wall with its enclosure notch. 3: done, `J103` fitted. 4: done, the HX vertical USB-C placed (no header
@@ -874,4 +877,4 @@ The owner added these items before the `rev08` tag. Each is documentation and ve
 | HMI software (18 Nov) | `kria-hmi-core`, `kria-hmid` and the Slint screens: decoders, register plans, audio, I/Q recording, WebSocket, the browser build | [HMI.md §4](HMI.md), [`sw/kria`](../sw/kria/README.md) | Done on a PC against the simulated board (18 host tests); not run on a KV260 |
 | Receiver and radar figures (18 Nov) | The G-8 figures and a summary of every receive mode's sensitivity, shown in the README and in FPGA_GATEWARE §6.1 | [README](../README.md), [FPGA_GATEWARE.md §6.1](FPGA_GATEWARE.md) | Done |
 | `TX_KEY` transmit-enable register (18 Nov) | Dedicated transmit-enable register (`0x38` in `kria_pl_link`, `pl_clk_100m`, requires `"KEY"` in `[31:8]`), owned by R5F core 0, with `DSP_CTRL[1]` read-only | [FPGA_GATEWARE.md §5.3, §5.5](FPGA_GATEWARE.md), [HMI.md §5](HMI.md) | Gateware, R5F core 0 firmware and `tb_system` S7 (`-Mutate tx_key_from_dsp_ctrl`) verified; not run on a KV260 |
-| Vehicle CAN 2.0 on R5F core 1 (18 Nov) | PS `CAN1` (`0xFF07_0000`) through EMIO to KV260 `J9` pins 6 and 8 (`G6`, `D6`), `TCAN330DCNT` + dual-`MMBT3904` mirror-safe adapter (`STATUS` sheet, 6-way `J1503`), R5F core 1 snoop-by-default driver (`kria-core::can`, `kria-r5f1`, `kria-vehicled --can`) | [INTEGRATIONS.md §2.2](INTEGRATIONS.md), [FPGA_GATEWARE.md §5.11](FPGA_GATEWARE.md) | Gateware built (`G6`/`D6` placed in Bank 66), 7 host CAN tests passed; board placed and routed (DRC 0 errors, 0 unrouted); not run on a car or on a KV260 |
+| Vehicle CAN 2.0 on R5F core 1 (18 Nov) | PS `CAN1` (`0xFF07_0000`) through EMIO to KV260 `J9` pins 6 and 8 (`G6`, `D6`), `TCAN3403DDFRQ1` (upgraded from `TCAN330DCNT` in audit P1) + dual-`MMBT3904` mirror-safe adapter (`STATUS` sheet, 6-way `J1503`), R5F core 1 snoop-by-default driver (`kria-core::can`, `kria-r5f1`, `kria-vehicled --can`) | [INTEGRATIONS.md §2.2](INTEGRATIONS.md), [FPGA_GATEWARE.md §5.11](FPGA_GATEWARE.md) | Gateware built (`G6`/`D6` placed in Bank 66), 7 host CAN tests passed; board placed and routed (DRC 0 errors, 0 unrouted); not run on a car or on a KV260 |

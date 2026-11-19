@@ -40,7 +40,7 @@ have parallel CMOS buses. Done by `_work/rev03_split_converters.py`; `hier_label
 | Decision | Evidence | Alternative |
 |---|---|---|
 | **Two AD8352s in cascade, 15 + 10 dB = 25 dB** | AERIS-10 does exactly this: U8 with RG 56 Ω (15 dB), then U4 with RG 115 Ω (10 dB) | One stage (fewer parts, 37 mA less) if the IF arriving here is stronger than at AERIS's own ADC. Changing it is a resistor value; removing a stage is a redraw |
-| **The first stage takes the single-ended values** (Table 7: RG 68 Ω, CD 0.6 pF), not AERIS's differential ones (Table 5: RG 56 Ω) | AERIS feeds its first stage differentially from the mixer; this board gets the IF through a single-ended switch | — |
+| **The first stage takes the single-ended values** (Table 7: RG 68 Ω, CD 0.6 pF), not AERIS's differential ones (Table 5: RG 56 Ω) | AERIS feeds its first stage differentially from the mixer; this board gets the IF through a single-ended switch | n/a |
 | **The AD8352s run at 5 V**, not 3.3 V | The datasheet characterises the part at 5 V only (Table 1); 3 V is merely inside the allowed range. AERIS runs its two at 5 V. The power budget moved them from `+3V3_A` to `+5V0` | 3.3 V saves ~0.1 W but runs on uncharacterised distortion |
 | **ENB tied to VCC, PWDN tied to ground** | The AD8352 evaluation board ties ENB to the supply (R10). The AD9484 powers down through SPI (register 0x08) as well as the pin | AERIS drives both from the FPGA (`EN_OPAMP_IF_*`, `ADC_PWRD`). Three more FPGA lines to save ~0.9 W when the radar is idle. Say if you want them |
 

@@ -101,7 +101,7 @@ page prices from the dimensions.
 | Layers, size, quantity | 119 × 120 mm, 5 (140 × 132 on 13 Nov) | Board **9.30** | Board **11.90** | Board **15.30** |
 | Thickness, finish | 1.6 mm (2116C is 1.52 mm actual), ENIG 1 µ" | Surface finish **18.20** | **18.20** | **18.70** |
 | Material | FR4 TG155 | **3.66** | 0.00 | 0.00 |
-| Copper | 1 oz outer, 0.5 oz inner | — | — | — |
+| Copper | 1 oz outer, 0.5 oz inner | n/a | n/a | n/a |
 | **Stack** | JLC06161H-2116A / **JLC08161H-2116C** | Stack-up fee **102.79** | **83.89** | **84.24** |
 | Impedance control | ±10 % | **33.08** | **33.08** | **33.08** |
 | Via covering | Epoxy filled & capped (POFV) | 0.00 | 0.00 | 0.00 |
@@ -367,8 +367,8 @@ attrition, at least its minimum. Links go to JLCPCB's part page (code) and LCSC'
 | [C17168](https://jlcpcb.com/partdetail/17853-0402WGF0000TCE/C17168) | [0402WGF0000TCE](https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0402wgf0000tce_C17168.html) | UNI-ROYAL(Uniroyal Elec) | 0 | basic | 1 | 14598783 | 20 / 0.0012 / 0.02 | 20 / 0.0012 / 0.02 |
 | [C25879](https://jlcpcb.com/partdetail/26622-0402WGF2201TCE/C25879) | [0402WGF2201TCE](https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0402wgf2201tce_C25879.html) | UNI-ROYAL(Uniroyal Elec) | 2.2k | basic | 3 | 2878052 | 20 / 0.0011 / 0.02 | 25 / 0.0011 / 0.03 |
 | [C25871](https://jlcpcb.com/partdetail/26614-0402WGF1801TCE/C25871) | [0402WGF1801TCE](https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0402wgf1801tce_C25871.html) | UNI-ROYAL(Uniroyal Elec) | 1.8k | extended | 1 | 363130 | 20 / 0.001 / 0.02 | 20 / 0.001 / 0.02 |
-| none |  |  | TC1-1-13M+ |  | 1 |  | 2 / — / — | 5 / — / — |
-| none |  |  | Si549 LVPECL 3V3 pinout C |  | 1 |  | 2 / — / — | 5 / — / — |
+| none |  |  | TC1-1-13M+ |  | 1 |  | 2 / none / none | 5 / none / none |
+| none |  |  | Si549 LVPECL 3V3 pinout C |  | 1 |  | 2 / none / none | 5 / none / none |
 | | **Total** | | | | | | **1608.93** | **3825.21** |
 <!-- parts:end -->
 

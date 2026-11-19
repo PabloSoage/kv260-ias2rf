@@ -219,7 +219,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 | ☐ | **XC7A50T-2FTG256I** | Same part as AERIS: its front-end modules (capture, DDC, chirp) run unported | €80 |
 | ☐ | QSPI flash + sequencing PMIC + JTAG | | €40 |
 | ☐ | ADC **AD9484BCPZ-500** (8 b, 400 MSPS) | The one AERIS uses | €120 |
-| ☐ | Vivado licence/installation | Free for these devices | — |
+| ☐ | Vivado licence/installation | Free for these devices | n/a |
 | | | **Subtotal** | **~€1,000 – 1,800** |
 
 > The DSP core for this stage **already exists and is measured on silicon**:

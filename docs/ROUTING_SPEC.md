@@ -13,8 +13,8 @@ their SMAs.
 | SW2 (U902) | `IF_RX_B`, AD9484 | `AERIS_IF` | `SDR_RX_WB`; since Rev08 the VHF/UHF front end (§1.2) | Wideband SDR at 400/500 MSPS, 8 bits |
 | SW3 (U903) | `IF_TX_A`, AD9767 DAC1 | `SDR_TX_A` | `AERIS_TX_A` | Chirp from the 14-bit DAC |
 | SW4 (U904) | `IF_TX_B`, AD9708 | `AERIS_TX` | `SDR_TX_WB` | SDR transmit from the fast 8-bit DAC |
-| — | `IF_RX_C`, AD9253 ch B | `SDR_RX_C` (J951) | — | — |
-| — | `IF_TX_C`, AD9767 DAC2 | `SDR_TX_C` (J952) | — | — |
+| n/a | `IF_RX_C`, AD9253 ch B | `SDR_RX_C` (J951) | n/a | n/a |
+| n/a | `IF_TX_C`, AD9767 DAC2 | `SDR_TX_C` (J952) | n/a | n/a |
 
 ---
 
@@ -24,9 +24,9 @@ their SMAs.
 |---|---|---|
 | **The switching plan above** | ARCHITECTURE §7.4 asked for switches that *"let each converter channel be reassigned between the SDR chain and the radar chain"*, without naming the ports. This is the reading that gives each converter both uses and keeps each one's home chain as the default | A different pairing; it's only labels and SMA names |
 | **Ten edge SMAs** | Every switch throw and every direct channel gets its own connector | U.FL for internal links. Ten SMAs need edge length the board may not have (INTERFACE_SPEC §5.3) |
-| **The interface is single-ended**, `SW_CTRL0..3` one label per line | Single-ended, because that is how the M3SWA2 and the SMAs carry it (ADC_RADAR_SPEC §1.2). The control lines come one per label, as on the other sheets | — |
+| **The interface is single-ended**, `SW_CTRL0..3` one label per line | Single-ended, because that is how the M3SWA2 and the SMAs carry it (ADC_RADAR_SPEC §1.2). The control lines come one per label, as on the other sheets | n/a |
 | **Pull-down on each control** (10 kΩ) | Keeps every switch on its default (RF1) while the FPGA is unconfigured. Control current is below 1 µA low (DC Electrical Specifications) | Pull-up, if the other chain should be the default |
-| **DC block on every SMA** (100 nF) | Electrical Specifications, note 3: *"All RF-ports must be DC blocked or held at 0 V DC"*. The converter side is already at 0 V: the ADC inputs are terminated to ground and the DAC baluns' secondaries are grounded. The SMA side is whatever is plugged in. 100 nF into 50 Ω gives a 32 kHz corner, below the SDR's 100 kHz | — |
+| **DC block on every SMA** (100 nF) | Electrical Specifications, note 3: *"All RF-ports must be DC blocked or held at 0 V DC"*. The converter side is already at 0 V: the ADC inputs are terminated to ground and the DAC baluns' secondaries are grounded. The SMA side is whatever is plugged in. 100 nF into 50 Ω gives a 32 kHz corner, below the SDR's 100 kHz | n/a |
 
 ### 1.1 Rev07: an anti-alias low-pass on `IF_RX_C` (15 November)
 

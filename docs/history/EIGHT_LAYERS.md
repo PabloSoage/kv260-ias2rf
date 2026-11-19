@@ -21,8 +21,8 @@ The method behind each number is in [SIGNAL_INTEGRITY.md](../SIGNAL_INTEGRITY.md
 | L4 | **power**, plus signal tracks between the islands | **power only** |
 | L5 | **GND** | **GND** (new) |
 | L6 | signal: slow nets (the bottom face) | signal: LVDS pairs, between two GND planes |
-| L7 | — | **GND** |
-| L8 | — | signal: terminations under the BGA (the bottom face) |
+| L7 | n/a | **GND** |
+| L8 | n/a | signal: terminations under the BGA (the bottom face) |
 
 The outer prepreg is the same on both stacks, so the 183 µm RF lines stay at 50 Ω (50.4 Ω on
 2116C). A coupled pair of 0.10 mm tracks 0.15 mm apart is 100.2 Ω on L3 or L6. Under the FPGA the

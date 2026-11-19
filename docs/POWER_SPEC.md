@@ -35,10 +35,11 @@ transceiver, the fan and the bias tee ([AUDIT_Rev08.md](AUDIT_Rev08.md) §2.1). 
 | Block | Part | Circuit from | Datasheet |
 |---|---|---|---|
 | +5V0 | **LMR33630ADDA**, 400 kHz | Figure 9-1, Table 9-2, row *400 kHz, 5 V*: L 8 µH, COUT 4 × 22 µF, RFBT 100 k, RFBB 24.9 k, CIN 10 µF + CHF 220 nF, CBOOT 100 nF, CVCC 1 µF. EN tied to VIN (*"Can be connected directly to VIN"*), PG left open (*"Can be left open when not used"*) | SNVSAN3F, from ti.com (`_work/fetch_datasheets.py`) |
-| +3V3_D, +2V5, +1V0 | **TPS562201**, 580 kHz | Figure 7-1 and Table 7-2: R2 10 k; R1 33.2 k / 22.6 k / 3.09 k; L 3.3 / 3.3 / 2.2 µH; COUT 2 × 22 µF; CIN > 10 µF + 0.1 µF; VBST 0.1 µF; EN pulled up by 10 k (Figure 7-1's R3) | SLVSD91D, AERIS-10 folder |
-| +1V8_A, +1V8_D, +3V3_A | **TPS7A8300RGR** | Figure 51, ANY-OUT: SNS to OUT, 10 nF feed-forward OUT→FB, 10 nF on NR/SS, EN to IN, BIAS open (*"VIN ≥ 1.4 V ... BIAS pin can be left floating"*). CIN 10 µF, COUT 22 µF (Pin Functions). Voltage set by grounding pins (Table 2): 1.8 V = 200 mV + 800 mV pins; 3.3 V = 100 mV + 800 mV + 1.6 V pins. **+1V8_A is 1.85 V** (50 mV pin as well, 12 Nov): its LDO is 75 mm from the ADCs and the copper and ferrite drop up to 0.1 V on the way ([SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY.md) §9.1) | SBVS197F, AERIS-10 folder |
+| +3V3_D | **TPS563201**, 580 kHz (3 A; was TPS562201 until the Rev08 audit, P5) | Figure 7-1 and Table 7-2: same pin-out and 0.768 V reference; R2 10 k, R1 33.2 k, L 3.3 µH (SRP7028A), COUT 2 × 22 µF, CIN > 10 µF + 0.1 µF | SLVSCI8 / SLVSD91D |
+| +2V5, +1V0 | **TPS562201**, 580 kHz (2 A) | Figure 7-1 and Table 7-2: R2 10 k; R1 22.6 k (`+2V5`) / **3.24 k** (`+1V0` at `1.017 V`; was `3.09 k` before the Rev08 audit, P7); L 3.3 / 2.2 µH; COUT 2 × 22 µF; CIN > 10 µF + 0.1 µF; VBST 0.1 µF; EN pulled up by 10 k (Figure 7-1's R3) | SLVSD91D, AERIS-10 folder |
+| +1V8_A, +1V8_D, +3V3_A | **TPS7A8300RGR** | Figure 51, ANY-OUT: SNS to OUT, 10 nF feed-forward OUT→FB, 10 nF on NR/SS, EN to IN, BIAS open (*"VIN ≥ 1.4 V ... BIAS pin can be left floating"*). CIN 10 µF, COUT 22 µF (Pin Functions). Voltage set by grounding pins (Table 2): `+1V8_A` = 1.85 V (50 mV + 200 mV + 800 mV pins, 12 Nov: copper/ferrite drop); **`+1V8_D` = 1.85 V** (50 mV pin grounded too since the Rev08 audit, P4: keeps VCCAUX at 1.714–1.873 V at the balls); `+3V3_A` = 100 mV + 800 mV + 1.6 V pins | SBVS197F, AERIS-10 folder |
 | −3V3 | **LM2663M** | Pin Functions: SD to GND for normal operation, LV to GND below 3.5 V in, OSC open. 47 µF flying and output capacitors, as its Electrical Characteristics are measured with | SNVS002E, AERIS-10 folder |
-| +1V2 | Divider, 1.10 k / 1.02 k, 1 µF | 2.5 V × 1.02 / 2.12 = 1.203 V | — |
+| +1V2 | Divider, 1.10 k / 1.02 k, 1 µF | 2.5 V × 1.02 / 2.12 = 1.203 V | none |
 
 The four regulator symbols are new, each transcribed from its datasheet's pin table. KiCad has an
 LMR33630 symbol, but it inherits from another one (`extends`), which the generator doesn't
@@ -73,8 +74,8 @@ D1002's and R1001's place on the top. DRC with zones refilled and schematic pari
 
 **Limits, said plainly.**
 - A sustained input above 36.7 V (an unsuppressed load dump, or a 24 V system's alternator fault) makes D1003
-  conduct; the PTC then trips with more than its 24 V rating across it. A 1812 PTC rated 60 V at 1.5 A does
-  not exist. Fit the vehicle harness with its usual inline fuse (3 A) in any case.
+  conduct; the PTC then trips with more than its 24 V rating across it. An 1812 PTC rated 60 V at 2.0 A does
+  not exist (the 1812 `mSMD200-24V` is 24 V). Fit the vehicle harness with its usual inline fuse (3 A) in any case.
 - The new parts are not in [JLCPCB_QUOTE.md](JLCPCB_QUOTE.md) yet; LCSC stock of the DMT10H015LFG was not
   confirmed (alternative: any 80–100 V N-FET, ≤ 20 mΩ at 10 V, VGS ±20 V, in PowerDI3333-8).
 - The enclosure's tray honeycomb must be pocketed under the new bottom parts (D1003 is 2.3 mm tall) before
@@ -96,13 +97,13 @@ footprint (LAYOUT §1). The fan's ~0.1 A adds about 2 % to +5V0's load (LMR33630
 | Decision | Evidence | Alternative |
 |---|---|---|
 | **These regulator parts** | All TI, all with datasheets on hand, and three of the four already used by AERIS-10's own boards | A multi-rail PMIC |
-| **No pre-regulator for +3V3_A** | Since the AD8352s moved to 5 V, +3V3_A carries 100 mA. Its LDO straight off +5V0 dissipates 0.17 W | — |
+| **No pre-regulator for +3V3_A** | Since the AD8352s moved to 5 V, +3V3_A carries 100 mA. Its LDO straight off +5V0 dissipates 0.17 W | n/a |
 | **+2V5 feeds both the FPGA's LVDS banks and the +1V8_A LDO** | The FPGA's link bank must be at 2.5 V (IAS_LINK_SPEC §3); the rail already existed. The analogue 1.8 V gets there through a low-noise LDO | A separate 2.5 V LDO for the FPGA |
 | **+1V2 is a resistor divider** | Its only load is the bias of two AC-coupled terminations, with no DC current. The planned "+1V2 LDO for the IAS bank" was based on the wrong bank voltage | An LDO |
 | **No power sequencing** | Every regulator comes up as soon as its input does. Xilinx recommends an order for the 7 series (VCCINT, then VCCAUX, then VCCO) to minimise inrush current. **Checked in DS181 since** ([CONTROL_SPEC.md](CONTROL_SPEC.md) §4): the order is a recommendation; the one hard limit, VCCO − VCCAUX > 2.625 V for at most 300 ms per cycle, is met because +1V8_D is an LDO fed from +3V3_D | An EN chain, or an RC delay on each EN |
 | **Switching frequencies 400 and 580 kHz** | The datasheets' own designs. Their harmonics fall in the HF band the SDR receives. The layout has to keep the switchers away from the SDR front-end inputs, and the ADCs have ferrite-filtered rails | 2.1 MHz LMR33630 version: fewer harmonics in HF, a little less efficient |
 | **LM2663 gives about −3.25 V** | ROUT 3.5 Ω typ × 8 mA pulls it about 30 mV below −3.3 V in magnitude. The M3SWA2 quotes VEE −3.3 V typical, −3.6 V minimum, and no maximum | A regulated negative rail |
-| **Bidirectional TVS** (SMBJ15CA, now SMBJ18CA on +12V and SMCJ33CA at the input) | Superseded by §1.1 | — |
+| **Bidirectional TVS** (SMBJ15CA, now SMBJ18CA on +12V and SMCJ33CA at the input) | Superseded by §1.1 | n/a |
 
 **Chosen at layout (25 Sep; [LAYOUT.md](LAYOUT.md) §5), each against its datasheet:**
 - **Inductors:** Bourns SRP7028A. The 8R2M has Isat 7.5 A, above the LMR33630's 5.05 A current

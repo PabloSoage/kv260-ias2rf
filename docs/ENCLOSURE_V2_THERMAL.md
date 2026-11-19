@@ -44,7 +44,7 @@ This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-
 | `U1002..U1004` TPS562201 | 0.41 / 0.20 / 0.10 | 15.0 | 28.0 | 125.0 | POL bucks |
 | `AD8352` drivers | 0.40 | 14.0 | 20.0 | 125.0 | Differential ADC drivers |
 | `AD9708` + `AD9767` | 0.30 | 18.0 | 30.0 | 125.0 | TX DACs |
-| `K26` SOM + `KV260` Carrier | 9.00 + 2.00 | — | 1.4 (`K26_R_JC`) | **100.0** | SOM + OEM heatsink |
+| `K26` SOM + `KV260` Carrier | 9.00 + 2.00 | n/a | 1.4 (`K26_R_JC`) | **100.0** | SOM + OEM heatsink |
 
 ---
 
@@ -52,9 +52,9 @@ This 21-case 3D CHT CFD study evaluates sealed vs. filtered-ventilation vs. lid-
 
 | Case | `T_amb` (°C) | Mesh (`air + solid`) | `T_air,max` (°C) | `U_max` (m/s) | `p_cav` (Pa) | `K26 Tj` (°C) | `XC7A50T Tj` (°C) | `ADCLK948 Tj` (°C) | `Si549 Tj` (°C) | `AD9484 Tj` (°C) | Hottest IC (`Tj`) | `kv / adapt / R / L` Flow (CFM) |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| `v1_open_25C` | 25 | `102,802 + 5,198` | 49.75 | 8.21 | 4.9 | 59.30 | 52.76 | 72.73 | 68.09 | 68.79 | `U401_ADCLK948` (72.73) | `-8.44 / — / +3.56 / +4.88` |
-| `v1_open_45C` | 45 | `102,802 + 5,198` | 70.37 | 8.47 | 4.9 | 79.51 | 73.18 | 93.25 | 88.63 | 89.28 | `U401_ADCLK948` (93.25) | `-8.72 / — / +3.68 / +5.05` |
-| `v1_open_70C` | 70 | `102,802 + 5,198` | 96.29 | 8.79 | 4.9 | **104.76** | 98.73 | 118.85 | **114.27** | 114.84 | `U401_ADCLK948` (118.85) | `-9.06 / — / +3.82 / +5.24` |
+| `v1_open_25C` | 25 | `102,802 + 5,198` | 49.75 | 8.21 | 4.9 | 59.30 | 52.76 | 72.73 | 68.09 | 68.79 | `U401_ADCLK948` (72.73) | `-8.44 / none / +3.56 / +4.88` |
+| `v1_open_45C` | 45 | `102,802 + 5,198` | 70.37 | 8.47 | 4.9 | 79.51 | 73.18 | 93.25 | 88.63 | 89.28 | `U401_ADCLK948` (93.25) | `-8.72 / none / +3.68 / +5.05` |
+| `v1_open_70C` | 70 | `102,802 + 5,198` | 96.29 | 8.79 | 4.9 | **104.76** | 98.73 | 118.85 | **114.27** | 114.84 | `U401_ADCLK948` (118.85) | `-9.06 / none / +3.82 / +5.24` |
 | `sealed_petg_25C` | 25 | `102,802 + 5,198` | 69.00 | 7.81 | 7671.4 | 77.97 | 74.14 | 92.46 | 88.89 | 88.51 | `U401_ADCLK948` (92.46) | Sealed |
 | `sealed_petg_45C` | 45 | `102,802 + 5,198` | 89.85 | 8.08 | 7344.0 | 98.71 | 94.95 | 113.24 | **109.76** | 109.30 | `U401_ADCLK948` (113.24) | Sealed |
 | `sealed_petg_70C` | 70 | `102,802 + 5,198` | 116.42 | 8.35 | 6985.3 | **124.57** | **120.95** | 139.39 | **135.90** | **135.37** | `U401_ADCLK948` (139.39) | Sealed |
@@ -140,7 +140,7 @@ This section audits the **actual fabricated Enclosure v2 + Rev06 adapter hardwar
    - **`U1001` LMR33630:** operating `Tj,max = 125.0 °C` (previously entered as `150.0 °C` abs max).
    - **`U1201` RTL8211FSI (`-18.2, -1.0`):** `10` thermal vias in exposed pad (`θ_JB = 5.0 °C/W`), `125 °C Tj` / `-40..+85 °C TA`.
    - **Commercial `KV260` vs. Industrial `K26I` SOM (`DS987`):** The stock commercial **KV260 Starter Kit** ships **`XCK26-SFVC784-2LV-C` (`Tj,max = 85.0 °C`**, kit ambient `0..35 °C`). Upgrading to the industrial **`K26I` SOM (`-I`)** raises `Tj,max` to **`100.0 °C`**.
-   - **Adapter `TA` vs. `Tj` classification:** Only `U1101` (`XC7A50T-2FTG256I`, `-40..+100 °C Tj`), `U1001` (`-40..+125 °C Tj`), `U1002..U1004` (`TPS562201`, `125 °C Tj`), and `U1005..U1007` (`TPS7A8300`, `125 °C Tj`) carry junction-temperature ratings up to `100–125 °C`; **`U401`, `Y401`, `U501`, `U502`, `U503`, `U601`, `U1201`, and `AD9708`/`AD9767`** are rated by **`TA = -40..+85 °C`** (industrial ambient). Both local cavity air `T_air,local` and PCB surface `T_board` must therefore be audited alongside `Tj`.
+   - **Adapter `TA` vs. `Tj` classification:** Only `U1101` (`XC7A50T-2FTG256I`, `-40..+100 °C Tj`), `U1001` (`-40..+125 °C Tj`), `U1002` (`TPS563201`, `125 °C Tj`; `TPS562201` before Rev08 audit), `U1003`/`U1004` (`TPS562201`, `125 °C Tj`), and `U1005..U1007` (`TPS7A8300`, `125 °C Tj`) carry junction-temperature ratings up to `100–125 °C`; **`U401`, `Y401`, `U501`, `U502`, `U503`, `U601`, `U1201`, and `AD9708`/`AD9767`** are rated by **`TA = -40..+85 °C`** (industrial ambient). Both local cavity air `T_air,local` and PCB surface `T_board` must therefore be audited alongside `Tj`.
    - **`J1002` `FAN 5V` budget:** Protected by `F1002` (`PTC 0.50 A hold`), leaving ample headroom for a `50×50×15 mm` higher-pressure blower/axial fan (`Orion OD5015-05HB`, `14.0 CFM / 49.8 Pa / 0.13 A`) or dual fans (`0.26 A < 0.50 A`).
 
 ![Built Enclosure v2 3D CHT Thermal Cutaway at Ta = 70 C](sim/v2_thermal_3d_cutaway.png)
@@ -318,7 +318,7 @@ The adopted enclosure of section 7, re-run on the same fine mesh with the Rev08 
 |---|---|---|
 | `U1312` RFFC5072 mixer and synthesiser | 0.375 W | −7.4, 61.6 |
 | `U1301` SPF5043Z LNA, `U1310` SPF5043Z IF amplifier | 0.075 W each | −15.4, 87.4 / −13.8, 56.7 |
-| `U1315` LP5907 3.0 V LDO (0.3 V × 180 mA) | 0.054 W | −11.8, 100.1 |
+| `U1315` LP5907 LDO (Rev08: `0.3 V × 180 mA = 0.054 W` at 3.0 V in model; `LP5907MFX-2.8` `+2V8_RF` after audit gives `0.09 W`) | 0.054 W | −11.8, 100.1 |
 | LEDs and I/O expanders (15 mA at 3.3 V) | 0.05 W | at `U1501`, −16.4, 93.8 |
 | Conversion loss: the 3V3_D buck `U1002`, the LMR33630 (9 % more current) | +0.07 W, +0.08 W | at the parts |
 | IAS camera module on `J103` (carrier rails, estimated) | 0.35 W | the tongue under it, 18, 62 |
@@ -381,7 +381,7 @@ Verified on the 3-D CAD assembly (`_work/mech/render_heatsinks.py`, `_work/mech/
 | **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 8.5 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `11.8 mm` (`1.9 mm` below the `50 × 50 × 15 mm` fan at `z = 13.75 mm`) |
 | **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 8 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `11.2 mm` (`y_max = +2.3 mm`) |
 | **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 8 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `12.0 mm`, `1.8 mm` under the fan (`y_min = +6.3 mm` -> **`4.0 mm` thermal gap** to `HS2`) |
-| **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` |
+| **`HS4`** | `U1101` (`XC7A50T` Artix-7, **fit it in a vehicle**) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` (`102.1 -> 93.4 °C` at `70 °C`) |
 | **`HS5`** | `K26 SOM` (`XCK26` OEM cooler) | **`68 × 58 × 18 mm` + `54 mm` fan** | `(+86.1, +47.0) mm` | Fin top `~25.1 mm` (`7.6 mm` to Enclosure v2 roof) |
 
 ![Annotated 4K heatsink placement](img/board_heatsinks.jpg)

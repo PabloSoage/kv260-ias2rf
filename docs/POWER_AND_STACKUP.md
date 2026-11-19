@@ -17,20 +17,19 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ### 1.1 The tree
 
 ```
-As drawn on rev03/POWER (docs/POWER_SPEC.md), 25 September; loads as of 2 October, Rev08's front end, LEDs and
-expanders added 17 November:
+As drawn on POWER (docs/POWER_SPEC.md), updated for the Rev08 RF & power audit (18 November, AUDIT_Rev08.md §2.1):
 
-12 V in  (1117 mA, 13.4 W worst case; 973 mA, 11.7 W typical: the Rev08 audit, AUDIT_Rev08.md §2.1)
-  └── LMR33630 buck → +5V0   1775 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS)
-        ├── TPS562201 → +3V3_D   1388 mA   digital: FPGA VCCO, DAC DVDD, clock (via FB401 → +3V3_CLK), switches, LEDs
+12 V in  (1117 mA, 13.4 W worst case; 973 mA, 11.7 W typical)
+  └── LMR33630 buck → +5V0    2409 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS), fan
+        ├── TPS563201 → +3V3_D  1890 mA  (3 A part, was TPS562201) digital: FPGA VCCO, PHY, CAN, DAC DVDD, clock, switches, LEDs
         │     ├── LP5907-2.8 → +2V8_RF 180 mA  Rev08 VHF/UHF front end: RFFC5072, two SPF5043Z, switches, attenuator
-        │     ├── TPS7A8300 → +1V8_D  333 mA   FPGA VCCAUX and VCCO_35, AD9484 DRVDD, AD9253 DRVDD, housekeeping
-        │     └── LM2663 → −3V3        8 mA   RF switch VEE
-        ├── TPS7A8300 → +3V3_A    100 mA   DAC AVDD (no pre-regulator needed any more)
-        ├── TPS562201 → +2V5      601 mA   FPGA bank 34 (link outputs), and:
-        │     ├── TPS7A8300 → +1V8_A  500 mA   AD9484 AVDD, AD9253 AVDD
-        │     └── divider → +1V2        1 mA   termination bias only (2 link pairs, CLK_FPGA)
-        └── TPS562201 → +1V0      700 mA   FPGA VCCINT
+        │     ├── TPS7A8300 → +1V8_D   629 mA  (1.85 V) FPGA VCCAUX/VCCADC/VCCO_35, AD9484 DRVDD, AD9253 DRVDD, housekeeping
+        │     └── LM2663 → −3V3          8 mA  RF switch VEE
+        ├── TPS7A8300 → +3V3_A   100 mA  DAC AVDD (no pre-regulator needed any more)
+        ├── TPS562201 → +2V5     601 mA  FPGA bank 34 (link outputs), and:
+        │     ├── TPS7A8300 → +1V8_A   500 mA  AD9484 AVDD, AD9253 AVDD (1.85 V)
+        │     └── divider → +1V2         1 mA  termination bias only (2 link pairs, CLK_FPGA, ETH_VCM)
+        └── TPS562201 → +1V0     735 mA  (1.017 V, R1031 3.24 k) FPGA VCCINT + VCCBRAM (Vivado 70 °C max)
 ```
 
 **The −3.3 V rail is there because B-03 was wrong the first time.** The M3SWA2-34DR+ needs
@@ -79,26 +78,23 @@ With 30 % margin:
 
 | Rail | V | I | Type | From | Dissipation | Size for |
 |---|---|---|---|---|---|---|
-| `+5V0` | 5.0 | 1775 mA | buck | +12V | 0.99 W | ≥ 2.31 A |
-| `+3V3_D` | 3.3 | 1388 mA | buck | +5V0 | 0.51 W | ≥ 1.80 A |
-| `+2V8_RF` (Rev08) | 2.8 | 180 mA | LDO (LP5907-2.8, 250 mA) | +3V3_D | 0.09 W | ≥ 0.23 A |
-| `+1V0` | 1.0 | 700 mA | buck | +5V0 | 0.10 W | ≥ 0.91 A |
-| `+2V5` | 2.5 | 601 mA | buck | +5V0 | 0.20 W | ≥ 0.78 A |
-| `+1V8_A` | 1.8 | 500 mA | LDO | +2V5 | 0.35 W | ≥ 0.65 A |
-| `+3V3_A` | 3.3 | 100 mA | LDO | +5V0 | 0.17 W | ≥ 0.13 A |
-| `+1V8_D` | 1.8 | 333 mA | LDO | +3V3_D | **0.50 W** | ≥ 0.43 A, thermal pad |
-| `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | — |
+| `+5V0` | 5.0 | 2409 mA | buck (`LMR33630`, 3 A) | +12V | 1.34 W | ≥ 2.41 A (80 % of 3 A) |
+| `+3V3_D` | 3.3 | 1890 mA | buck (`TPS563201`, 3 A) | +5V0 | 0.69 W | ≥ 1.89 A (63 % of 3 A) |
+| `+2V8_RF` (Rev08) | 2.8 | 180 mA | LDO (`LP5907-2.8`, 250 mA) | +3V3_D | 0.09 W | 72 % of 0.25 A |
+| `+1V0` | 1.017 | 735 mA | buck (`TPS562201`, 2 A) | +5V0 | 0.10 W | 37 % of 2 A |
+| `+2V5` | 2.5 | 601 mA | buck (`TPS562201`, 2 A) | +5V0 | 0.20 W | 30 % of 2 A |
+| `+1V8_A` | 1.85 | 500 mA | LDO (`TPS7A8300`, 2 A) | +2V5 | 0.32 W | 25 % of 2 A |
+| `+3V3_A` | 3.3 | 100 mA | LDO (`TPS7A8300`, 2 A) | +5V0 | 0.17 W | 5 % of 2 A |
+| `+1V8_D` | 1.85 | 629 mA | LDO (`TPS7A8300`, 2 A) | +3V3_D | **0.91 W** | 31 % of 2 A, thermal pad |
+| `+1V2` | 1.2 | 1 mA | divider | +2V5 | 0.00 W | n/a |
 | `−3V3` | −3.3 | 8 mA | charge pump | +3V3_D | 0.01 W | ≥ 0.01 A |
 
-**Superseded by the Rev08 audit (18 November, [AUDIT_Rev08.md](AUDIT_Rev08.md) §2.1):** the FPGA rails now come from
-Vivado's power report (VCCAUX 365 mA, not 100 mA), and the PHY, the CAN transceiver, the fan and the bias tee are
-counted. The worst case is 1.12 A at 12 V, 13.4 W; +3V3_D carries 1.89 A from a TPS563201 (3 A), and +1V8_D 629 mA,
-0.91 W in its LDO. `python _work/power_budget.py` prints the current table. The text below is the budget of 17 November.
-
-**Input: 823 mA at 12 V = 9.9 W.** With margin, 1.07 A and 12.8 W, inside the jack's and the input protection's
-1 A. Rev08 (17 November) added 0.8 W: the front end's 180 mA on `+3V0_FE` (now `+2V8_RF`), the LEDs and the two I/O expanders;
-the bias tee's external load (100 mA at most, off by default) and the USB bridge (powered by the cable) are not
-counted. On 18 November the GPS receiver on `J1503` (60 mA estimated, module and active antenna) and its PPS buffer added 21 mA at 12 V, 0.25 W, most of it spent in the receiver, off the board. Before Rev08: 733 mA, 8.8 W. (2 October: 755 mA before
+**Rev08 audit summary ([AUDIT_Rev08.md](AUDIT_Rev08.md) §2.1):** the FPGA rails come from Vivado's power report
+(VCCAUX 365 mA worst case, not 100 mA), and the PHY, the CAN transceiver, the fan and the bias tee are counted.
+**Input (current): 1.12 A at 12 V = 13.4 W worst case, 0.97 A = 11.7 W typical** (`python _work/power_budget.py` prints
+the current table). Historical pre-audit numbers retained for trace: the 17 November budget gave 823 mA at 12 V = 9.9 W
+(1.07 A, 12.8 W with margin), where Rev08 added 0.8 W from the front end's 180 mA on `+2V8_RF` (was `+3V0_FE`), the LEDs
+and the two I/O expanders, without counting the bias tee (up to 155 mA), PHY, CAN or fan. On 18 November the GPS receiver on `J1503` (60 mA estimated, module and active antenna) and its PPS buffer added 21 mA at 12 V, 0.25 W, most of it spent in the receiver, off the board. Before Rev08: 733 mA, 8.8 W. (2 October: 755 mA before
 the flash, translator and housekeeping estimates were replaced by their datasheets.) The rise since the first
 budget is the clock, as drawn: the ADCLK948 (330 mA max) and the Si549 (153 mA) replaced an
 ADCLK944 (165 mA) and a TCXO (20 mA), see [CLOCK_SPEC.md](CLOCK_SPEC.md). Then, when the radar
@@ -163,7 +159,7 @@ The six that remain estimates:
 
 | Load | What to check |
 |---|---|
-| XC7A50T VCCINT, 700 mA | The strongest of the estimates: AERIS-10's design on the same part reports **0.730 W total** in Vivado `[V, from its implementation log]`. VCCINT dominates that; 700 mA at 1.0 V leaves room for our link SerDes. Confirm with a Vivado power estimate once the design exists: a datasheet cannot give this, it depends on the design |
+| XC7A50T VCCINT, 700 mA (historical pre-build estimate) | **Superseded by Vivado power report (`1.20 W` typical / `1.55 W` 70 °C max in [AUDIT_Rev08.md §2.1](AUDIT_Rev08.md)):** AERIS-10's earlier design on the same part reported **0.730 W total** in Vivado `[V, from its implementation log]`, which stood in before our own design existed |
 | XC7A50T VCCAUX, VCCO ×3 | Same: Vivado's power report, not a datasheet |
 | Si549 LVPECL pull-downs | Whether its IDD figure already includes them is not stated |
 
@@ -275,7 +271,7 @@ constants are as on `jlcpcb.com/impedance`.
 | L3 | SIG | 2116 + core 0.70 + 2116 = 0.933 mm | 4.16 / 4.53 / 4.16 |
 | L4 | PWR (split) | core, 0.130 mm | 4.17 |
 | L5 | GND | 2116 prepreg, 0.1164 mm | 4.16 |
-| L6 | SIG | — | — |
+| L6 | SIG | none | none |
 
 **Why this one and not JLCPCB's default** (JLC06161H-3313, the "no requirement" stack):
 

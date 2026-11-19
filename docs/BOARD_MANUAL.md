@@ -170,7 +170,7 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | 71 | `U1309` | top | PE4259 | RX_VU | Direct or converted path, after the converter |
 | 72 | `U1310` | bottom | SPF5043Z | RX_VU | IF amplifier |
 | 73 | `U1311` | bottom | PE4312 | RX_VU | Digital attenuator, 0-31.5 dB |
-| 74 | `U1312` | top | RFFC5072 | RX_VU | Synthesiser and mixer: converts 170 MHz-3 GHz down to the IF |
+| 74 | `U1312` | top | RFFC5072 | RX_VU | Synthesiser and mixer: converts 300 MHz-3 GHz down to the IF (170-300 MHz not covered) |
 | 75 | `U1313` | bottom | TCA6416ARTWR | RX_VU | I/O expander 0x20: the front end's switches, bias tee and converter control |
 | 76 | `U1314` | top | AP22652W6-7 | RX_VU | Bias-tee current limiter for `J961` (125 mA) |
 | 77 | `U1315` | bottom | LP5907MFX-2.8 | RX_VU | +2V8_RF LDO for the front end (Rev08 audit, P8) |

@@ -77,8 +77,8 @@ route for a fast converter with few pins.
 |---|---|---|---|
 | **J8 / IAS1** | **5** (4 data + 1 clock) | ~4 (I2C, PWDN, GPIO) | HPA bank, direct to the SOM |
 | **J9 / RPi camera** | **3** (2 data + 1 clock) | ~2 | HPA bank, direct |
-| **J2 / Pmod** | — | **8** at 3.3 V, 100 mA | HD bank |
-| ~~J7 / IAS0~~ | ~~4~~ | — | **Ends at the AP1302 ISP** |
+| **J2 / Pmod** | n/a | **8** at 3.3 V, 100 mA | HD bank |
+| ~~J7 / IAS0~~ | ~~4~~ | n/a | **Ends at the AP1302 ISP** |
 | **Usable total** | **8 pairs** | **~14** | |
 
 Eight differential pairs. That is all there is.

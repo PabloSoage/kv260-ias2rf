@@ -70,19 +70,19 @@ the FPGA's constraint file.
 | **The bank allocation of §1** | FTG256 ball names; UG471 on LVDS in other-voltage banks | A larger package (CSG324) with more 1.8 V I/O |
 | **CLK_FPGA through a matched attenuator:** 24.9 Ω series plus 24.9 Ω to +1V2 on each leg | The ADCLK948 swings 610–960 mV (its Table 1, V<sub>O</sub>). LVDS_25 accepts at most 600 mV (DS181 Table 11). The pad halves that to 305–480 mV and still looks like 50 Ω to the line. +1V2 sets V<sub>ICM</sub>, which must be 0.3–1.5 V | Plain 100 Ω, as for the ADCs, which would overdrive the input |
 | **FPGA_PROG_B through a 74LVC1G07** open-drain buffer powered at 1.8 V | A 2N7002 level shifter with its gate at 1.8 V is not guaranteed to turn on: V<sub>GS(th)</sub> is up to 2.5 V. The LVC1G07 has V<sub>IH</sub> = 0.65 × V<sub>CC</sub> at 1.8 V and its output tolerates 5.5 V (SN74LVC1G07 datasheet) | BSS138 shifter |
-| **Configuration exactly as UG470 Figure 2-14** (master SPI x4) | M[2:0] = 001 through 1 kΩ; INIT_B and PROGRAM_B 4.7 kΩ; FCS_B 2.4 kΩ; W and HOLD 4.7 kΩ; CFGBVS to VCCO_0; push button on PROGRAM_B (Table 2-4) | — |
+| **Configuration exactly as UG470 Figure 2-14** (master SPI x4) | M[2:0] = 001 through 1 kΩ; INIT_B and PROGRAM_B 4.7 kΩ; FCS_B 2.4 kΩ; W and HOLD 4.7 kΩ; CFGBVS to VCCO_0; push button on PROGRAM_B (Table 2-4) | n/a |
 | **PUDC_B high through 1 kΩ** (I/O pull-ups off while configuring) | Table 2-4: *"tied either directly, or via a ≤ 1 kΩ"*. **AERIS uses 4.7 kΩ, outside that limit.** High is AERIS's choice; AERIS's own pull resistors hold the ADAR lines meanwhile | PUDC_B low: pull-ups on, which would raise LOAD and TR during configuration |
 | **Flash MT25QL128ABA1ESE** (128 Mb, SO8W) | In Vivado's configuration-memory list (UG908, `mt25ql128`). The Winbond W25Q128 that KiCad ships is not. AERIS uses a 1 Gb BGA; 128 Mb holds a 50T bitstream (about 17 Mb) several times over | AERIS's MT25QL01G |
 | **XADC on its on-chip reference:** VP, VN, VREFP, VREFN to GNDADC; VCCADC and GNDADC through ferrites (UG480 Figure 1-2, right) | UG480 Table 1-1: *"This pin should always be connected to GNDADC if an external reference is not supplied."* **AERIS ties VREFP to +1V0: that is wrong**, confirmed now that UG480 is on disk | An external 1.25 V reference |
-| **VCCBATT to GND** | DS181: *"If battery is not used, connect VCCBATT to either ground or VCCAUX"*; UG470 Figure 2-14 grounds it | — |
+| **VCCBATT to GND** | DS181: *"If battery is not used, connect VCCBATT to either ground or VCCAUX"*; UG470 Figure 2-14 grounds it | n/a |
 | **DXP/DXN to GND** | UG475 Table 1-12: *"When not used, tie to GND."* The XADC's own sensor reads the die temperature | An external thermal-diode monitor |
 | **JTAG on the Xilinx 2 × 7, 2 mm header** | DS593 Figure 14: 2 VREF, 4 TMS, 6 TCK, 8 TDO, 10 TDI; 3–11 GND, 13 PGND; 1, 12, 14 unused. Direct to the FPGA, as UG470 Figure 2-14 | Digilent 1 × 6 |
 | **The AERIS ribbon: an IDC 2 × 20.** Pins 1–32 carry CS, TX_LOAD, RX_LOAD and TR for each of the 8 ADAR1000s. Pins 33/35/37 carry the SPI (SCLK, SDIO, SDO), each next to a ground. 34, 36 and 38–40 are grounds | ARCHITECTURE §7.2, sized for 8 chips. **Only five grounds for 35 lines**: acceptable for static control lines and a few-MHz SPI, with `SLEW = SLOW` in the constraints | A 2 × 25 with a ground beside every signal |
 | **No pull resistors on the ADAR lines here** | AERIS keeps them next to the chips (4.7 kΩ on LOAD, 22.1 kΩ on TR and SPI, 22.1 kΩ up on CS). **The AERIS end of this cable does not exist yet**: its Main Board has no such connector, because its own U42 drives these nets | Duplicate them here |
-| **Pmod pinout** | Pmod pins 1–4 CS, MOSI, MISO, SCLK (INTERFACE_SPEC §4.2); 7 BEAM_STROBE, 8 PPS_SYNC, 9–10 spare (the debug UART since Rev08, section 9). GND 5/11. The KV260's 3.3 V (6/12) is left open: the adapter takes no power from the Pmod. On an odd/even header Pmod pin *k* is pad 2*k*−1 and pin *k*+6 is pad 2*k* | — |
+| **Pmod pinout** | Pmod pins 1–4 CS, MOSI, MISO, SCLK (INTERFACE_SPEC §4.2); 7 BEAM_STROBE, 8 PPS_SYNC, 9–10 spare (the debug UART since Rev08, section 9). GND 5/11. The KV260's 3.3 V (6/12) is left open: the adapter takes no power from the Pmod. On an odd/even header Pmod pin *k* is pad 2*k*−1 and pin *k*+6 is pad 2*k* | n/a |
 | **HK I²C pull-ups 10 kΩ to 1.8 V**, fitted (4.7 kΩ until 2 October) | The carrier already has 2.21 kΩ to `PL_1V8` (XTP682 sheet 8). With both, the bus sees 1.81 kΩ: 1.0 mA at 1.8 V. That is what the EEPROM must sink, and the M24C02 is specified at 0.7 mA for 0.2 V at 1.8 V (DS9398 Table 14); scaling that up gives about 0.3 V, under the 0.54 V (0.3 × V<sub>DD</sub>) a 1.8 V input reads as low. 4.7 kΩ would ask 1.2 mA. Kept so the bus idles high on the bench without a carrier: 10 kΩ alone is fast enough for 100 kHz | 4.7 kΩ; or none, relying on the carrier |
 | **FPGA_IRQ on J8 pin 15, active high, 47 kΩ pull-down (R1133)** | Pin 15 is the only single-ended pin that goes **into** the SOM, through the carrier's SN74AVC4T245 at 1.8 V. The pin first allocated, 32, is the carrier's 48 MHz camera clock (INTERFACE_SPEC §4.3). With PUDC_B high the FPGA's pin floats until configured; the pull-down holds the translator's input at "no interrupt" | Pin 32, which would fight the carrier's clock |
-| **The HK bus's addresses are free** | The carrier's TCA9546A channel 1 reaches only J8: `IAS1_I2C_SCK/SDA` appear on XTP682 sheets 8 (the switch) and 13 (J8) and nowhere else. So 0x48 and 0x50 are this board's | — |
+| **The HK bus's addresses are free** | The carrier's TCA9546A channel 1 reaches only J8: `IAS1_I2C_SCK/SDA` appear on XTP682 sheets 8 (the switch) and 13 (J8) and nowhere else. So 0x48 and 0x50 are this board's | n/a |
 | **Temperature sensor TMP1075DR** (U1104), SOIC-8, I²C **0x48** | 1.7–5.5 V, ±1 °C max from −40 to 110 °C, LM75-compatible registers (TMP1075 datasheet). A2..A0 to GND gives 0x48 (its Table 7-2). The FPGA's XADC already reads the die; this one reads the board | VSSOP-8 (DGK): its 0.65 mm pitch does not fit the Power class's 0.2 mm clearance, with V+ next to A0 (GND) |
 | **`HK_ALERT`: the sensor's ALERT to the FPGA**, ball K2 (a free bank-35 ball; H3 until the pin swap below), 10 kΩ pull-up (R1134) | ALERT is open-drain (Table 5-1). The FPGA can fold it into `FPGA_IRQ`, the one line into the SOM | Leave ALERT unconnected and poll |
 | **Board ID EEPROM M24C02-FMN6TP** (U1105), SOIC-8, I²C **0x50** | The -F grade runs from 1.7 V. Its output low is specified at **1.8 V: 0.2 V at 0.7 mA** (DS9398 Table 14). It holds the board's revision and serial number, written once | **AT24CS02**, which has a factory-programmed 128-bit serial number. Rejected: at 1.7 V its output low is specified for **0.15 mA** only (its Table 4-2), and this bus needs about 1 mA |
@@ -185,7 +185,7 @@ link's pairs, chosen by fitting parts**:
 
 | Mode | Fitted | Removed | What runs |
 |---|---|---|---|
-| IAS1 (as built) | C101, C102, C107, C108 | — | the link as before; C1218–C1221 are DNP |
+| IAS1 (as built) | C101, C102, C107, C108 | n/a | the link as before; C1218–C1221 are DNP |
 | Ethernet | C1218–C1221 (100 nF 0402) | C101, C102, C107, C108 | LINK_RX_D0 → PHY input, PHY output → LINK_TX_D0 |
 
 LINK_RX_D0 is an FPGA `LVDS_25` output: C1220/C1221 take it to HSIP/HSIN, which the PHY terminates
@@ -276,7 +276,7 @@ ball L6 where the L4 plane has a void.
 | ETH_MDC | P1 (IO_L4N_T0_34) | LVCMOS25 | the PHY's I/O run at 2.5 V (CFG_LDO = 01); R1211 holds it low during configuration |
 | ETH_MDIO | M15 (IO_L3N_T0_DQS_EMCCLK_14) | LVCMOS33, **open-drain** | the gateware only pulls it low; R1213 (1.5 k) pulls it up to the PHY's 2.5 V, which bank 14 reads as high (V_IH 2.0 V). The bitstream must not use EMCCLK |
 | ETH_RSTN | K13 (IO_L5P_T0_D06_14) | LVCMOS33 | R1214/C1216 power-on reset stays; the FPGA can hold the PHY in reset |
-| INTB | — | — | open, as before: the gateware polls MDIO |
+| INTB | n/a | n/a | open, as before: the gateware polls MDIO |
 
 Vivado place-and-route of the full Artix top with these pins closes timing (WNS +0.039 ns).
 

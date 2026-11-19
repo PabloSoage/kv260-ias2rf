@@ -357,8 +357,8 @@ All electromagnetic, transient SPICE, thermal, and power integrity checks are ru
 | `LINK_RX_CLK` | `395 mV, 10 ps` | **`392 mV, 10 ps`** |
 | `ADCS_FCO` | `628 mV, 17 ps` | **`617 mV, 17 ps`** |
 | `ADCR_DCO` | `609 mV, 17 ps` | **`610 mV, 18 ps`** |
-| `ETH_SGTX` (`1.25 Gb/s`) | — | **`> 350 mV` open** ([`eye_ETH_SGTX_1P25G.png`](docs/sim/eye_ETH_SGTX_1P25G.png)) |
-| `ETH_SGRX` (`1.25 Gb/s`) | — | **`> 600 mV` open** ([`eye_ETH_SGRX_1P25G.png`](docs/sim/eye_ETH_SGRX_1P25G.png)) |
+| `ETH_SGTX` (`1.25 Gb/s`) | n/a | **`> 350 mV` open** ([`eye_ETH_SGTX_1P25G.png`](docs/sim/eye_ETH_SGTX_1P25G.png)) |
+| `ETH_SGRX` (`1.25 Gb/s`) | n/a | **`> 600 mV` open** ([`eye_ETH_SGRX_1P25G.png`](docs/sim/eye_ETH_SGRX_1P25G.png)) |
 
 ![Folded 8-layer LVDS eyes](docs/sim/eyes_1g.png)
 
@@ -419,7 +419,7 @@ The closed field enclosure (**Enclosure v2**, PETG-CF / ASA / PAHT-CF with optio
 
 ### Enclosure v2: Filtered Active Cooling & 3-D FEA
 
-With `HS1`–`HS3` plus the `50 × 50 × 15 mm` lid fan (`J1002`) pressurising the housing (`7.5 CFM`, `+5.3 Pa`) and exhausting through 17 right-wall and 9 back-wall slots, the fine-mesh 3-D CFD of the enclosure with the Rev08 board rates it for **`56.1 °C` ambient with the stock KV260**, whose commercial K26 reaches its `85 °C` junction limit there (UG1090), and **`71.1 °C` with an industrial K26I SOM** (`98.9 °C` of `100 °C` at `70 °C`, `99.2 °C` with the filter clogged twice over). At `70 °C` the adapter's hottest junctions are the `LMR33630` at `113.4 °C` (of `125 °C`), the `ADCLK948` at `97.2 °C`, the `Si549` at `94.2 °C` (of `125 °C`), the new front end's `RFFC5072` at `89.7 °C` and the `XC7A50T` at `88.2 °C` (of `100 °C`) ([ENCLOSURE §6](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md §8](docs/ENCLOSURE_V2_THERMAL.md)). A 197k-tetrahedra 3-D CalculiX FEA under a `50 g` shock keeps peak case stress at `9.6 MPa` (`1.8×` margin at `70 °C`) and BGA strain `<= 96 µε` (vs. `500 µε` limit; [ENCLOSURE §5.3](docs/ENCLOSURE.md)).
+With `HS1`–`HS4` plus the `50 × 50 × 15 mm` lid fan (`J1002`) pressurising the housing (`7.5 CFM`, `+5.2 Pa`) and exhausting through 17 right-wall and 9 back-wall slots, the fine-mesh 3-D CFD of the enclosure with the Rev08 board, Vivado FPGA power (`1.25 / 1.60 W` upper bound) and audited regulator losses rates it for **`56.1 °C` ambient with the stock KV260** (whose commercial K26 reaches its `85 °C` junction limit there; UG1090), **`63.3 °C` by the adapter's own `TA = 85 °C` parts** (`U401` board temperature), and **`70.9 °C` with an industrial K26I SOM when `HS4` is fitted** (`68.0 °C` without `HS4`, because `XC7A50T` reaches `102.08 °C` of `100 °C` at `70 °C` vs. **`93.38 °C` clean / `94.24 °C` clogged with `HS4`**; `K26I` itself stays `99.21 °C`). At `70 °C` with `HS4` fitted the adapter's hottest junctions are the `LMR33630` at `117.71 °C` (of `125 °C`), `U1006` (`+1V8_D` LDO) at `111.09 °C` (of `125 °C`), the `ADCLK948` at `98.13 °C` (`Tb = 91.87 °C`), the `XC7A50T` at `93.38 °C` (of `100 °C`), and the `RFFC5072` at `91.37 °C` ([ENCLOSURE §6](docs/ENCLOSURE.md), [ENCLOSURE_V2_THERMAL.md §8](docs/ENCLOSURE_V2_THERMAL.md)). A 197k-tetrahedra 3-D CalculiX FEA under a `50 g` shock keeps peak case stress at `9.6 MPa` (`1.8×` margin at `70 °C`) and BGA strain `<= 96 µε` (vs. `500 µε` limit; [ENCLOSURE §5.3](docs/ENCLOSURE.md)).
 
 ![Enclosure v2 closed, with 50 mm filtered intake fan and TPU bumpers](docs/img/case_v2_closed.jpg)
 

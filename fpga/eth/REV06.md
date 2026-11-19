@@ -52,7 +52,7 @@ Synthesized, placed, physically optimized, and routed with `-generic ENABLE_ETH=
 | **WNS / TNS (Setup)** | **`+0.039 ns`** / `0.000 ns` | `0` | `28,902` |
 | **WHS / THS (Hold)** | **`+0.036 ns`** / `0.000 ns` | `0` | `28,836` |
 | **WPWS / TPWS (Pulse Width)** | **`+0.008 ns`** / `0.000 ns` | `0` | `8,515` |
-| **DRC (`reports_rev06/drc.rpt`)** | **`0` Errors** (`50` Warnings/Advisories) | — | — |
+| **DRC (`reports_rev06/drc.rpt`)** | **`0` Errors** (`50` Warnings/Advisories) | n/a | n/a |
 
 Key clock domains closed: `clk_adcr_dco` (`200 MHz`, `WNS=0.076 ns`), `clk_100m_unbuf` (`100 MHz`, `WNS=1.964 ns`), `clk_200m_unbuf` (`200 MHz`, `WNS=0.282 ns`), `clk_400m_unbuf` (`400 MHz`, `WNS=0.210 ns`), `link_clk_unbuf` (`125 MHz`, `WNS=0.444 ns`), `gen_rev06_eth.clk_312p5_u` (`312.5 MHz`, `WNS=0.219 ns`), `gen_rev06_eth.clk_625_0_u` / `clk_625_90_u` (`625 MHz` DDR, `WPWS=0.008 ns`), and `dl_rx_clk` (`125 MHz`, `WNS=2.021 ns`).
 
@@ -60,13 +60,13 @@ Key clock domains closed: `clk_adcr_dco` (`200 MHz`, `WNS=0.076 ns`), `clk_100m_
 
 | Hierarchy | Module | LUTs (Logic / LUTRAM) | FFs | RAMB36 | RAMB18 | DSP48E1 |
 |---|---|---|---|---|---|---|
-| **`artix_top` (Total)** | — | **`6,369`** (`6,223` / `146`) | **`8,088`** | **`8`** | **`1`** | **`87`** |
+| **`artix_top` (Total)** | n/a | **`6,369`** (`6,223` / `146`) | **`8,088`** | **`8`** | **`1`** | **`87`** |
 | `gen_rev06_eth.u_dual_mux` | `dual_path_mux` | `473` (`473` / `0`) | `299` | `8` | `0` | `0` |
 | `gen_rev06_eth.u_eth_mac` | `eth_mac_udp` | `798` (`798` / `0`) | `868` | `0` | `0` | `0` |
 | `gen_rev06_eth.u_eth_mdio` | `eth_mdio` | `131` (`131` / `0`) | `99` | `0` | `0` | `0` |
 | `gen_rev06_eth.u_eth_phy` | `eth_sgmii_phy` | `561` (`515` / `46`) | `349` | `0` | `1` | `0` |
 | `gen_rev06_eth.u_sdr_gen` | `eth_sdr_pkt_gen` | `20` (`20` / `0`) | `132` | `0` | `0` | `0` |
-| **Rev06 Ethernet Subtotal** | — | **`1,983`** (`1,937` / `46`) | **`1,747`** | **`8`** | **`1`** | **`0`** |
+| **Rev06 Ethernet Subtotal** | n/a | **`1,983`** (`1,937` / `46`) | **`1,747`** | **`8`** | **`1`** | **`0`** |
 | `u_adc_cap` + `u_ddc` + `u_ul_pcs_tx` + `u_dl_*` + `u_pmod_spi` | Core + `IAS1` | `4,386` | `6,341` | `0` | `0` | `87` |
 
 ---
@@ -81,6 +81,6 @@ With wideband SDR DDC (`u_sdr_ddc`), AERIS-10 Radar DDC (`u_ddc`), dedicated-pin
 | **Flip-Flops** (`Slice Registers`) | **17,445** | 65,200 | **26.8%** |
 | **Block RAM (`RAMB36` eq.)** (`13 RAMB36` + `6 RAMB18`) | **16.0** | 75 | **21.3%** |
 | **DSP48E1** | **110** | 120 | **91.7%** |
-| **Timing (`report_timing_summary`)** | `WNS = +0.147 ns`, `WHS = +0.036 ns`, `WPWS = +0.008 ns` | — | **0 failing endpoints** (`0` DRC errors) |
+| **Timing (`report_timing_summary`)** | `WNS = +0.147 ns`, `WHS = +0.036 ns`, `WPWS = +0.008 ns` | n/a | **0 failing endpoints** (`0` DRC errors) |
 
 Full dual-FPGA documentation and Vivado 2026.1 silicon floorplans/schematics: [`docs/FPGA_GATEWARE.md`](../../docs/FPGA_GATEWARE.md).

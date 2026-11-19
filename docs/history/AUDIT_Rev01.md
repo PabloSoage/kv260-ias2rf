@@ -75,18 +75,18 @@ real per-type count, measured with `kicad-cli 10.0.1` `[V]`:
 |---|---|---|---|
 | `pin_not_connected` | 442 | 450 | 248 |
 | `endpoint_off_grid` | 209 | 36 | 8 |
-| `lib_symbol_issues` | 119 | 15 | — |
+| `lib_symbol_issues` | 119 | 15 | n/a |
 | `label_dangling` | 97 | 50 | 25 |
-| **`pin_to_pin`** | **63** | **48** | — |
+| **`pin_to_pin`** | **63** | **48** | n/a |
 | `footprint_link_issues` | 39 | 6 | 1 |
-| `hier_label_mismatch` | 36 | — | — |
-| `isolated_pin_label` | 26 | 24 | — |
+| `hier_label_mismatch` | 36 | n/a | n/a |
+| `isolated_pin_label` | 26 | 24 | n/a |
 | `lib_symbol_mismatch` | 25 | 9 | 8 |
-| `no_connect_dangling` | 24 | — | — |
+| `no_connect_dangling` | 24 | n/a | n/a |
 | `same_local_global_label` | 13 | 3 | 6 |
-| `power_pin_not_driven` | 10 | 3 | — |
-| **`missing_power_pin`** | — | **8** | **8** |
-| `missing_unit` | — | 8 | 8 |
+| `power_pin_not_driven` | 10 | 3 | n/a |
+| **`missing_power_pin`** | n/a | **8** | **8** |
+| `missing_unit` | n/a | 8 | 8 |
 | **Total** | **1130** | **660** | **312** |
 
 **The root's 442 unconnected pins were mostly new**, not inherited from the import. Attributing 70 %
@@ -144,7 +144,7 @@ The most serious ones, because redrawing does not fix them:
 | **Clock back to the Kria** | LVPECL 3.3 V over `B7-CSI2-TXD3_P/N` | A pin on a bank configured for MIPI D-PHY. **Real risk of damaging the SOM**. Also unnecessary: the ADC already provides `DCO±` |
 | **ADAR1000 supply** | 5 V *"over ribbon cable"* from the carrier | ~16 W at 5 V is **>3 A through a ribbon cable**, from a 2 A buck |
 | **RF switches** | 3× HMC547 | Control polarity never verified. No negative rail in the power tree |
-| **No reverse-polarity protection** | — | Connecting a reversed supply destroys the board |
+| **No reverse-polarity protection** | n/a | Connecting a reversed supply destroys the board |
 
 ---
 

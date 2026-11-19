@@ -30,7 +30,7 @@ Each 66-bit block on a physical lane is formed as `{payload[63:0], sync[1:0]}`:
 | `2'b10` | **Control** | `8'h78` | `/S/` (`BTYPE_START`) | `{seq_num[31:0], pkt_len[15:0], stream_id[7:0], 8'h78}` | Start of Packet header |
 | `2'b10` | **Control** | `8'hFF` | `/T/` (`BTYPE_TERM`) | `{dropped_cnt[23:0], crc32[31:0], 8'hFF}` | End of Packet trailer (IEEE CRC-32 + drop count) |
 | `2'b10` | **Control** | `8'h55` | `/C/` (`BTYPE_CTRL`) | `{ctrl_arg[39:0], ctrl_op[15:0], 8'h55}` | Low-latency single-block ordered command (optional) |
-| `2'b00`, `2'b11` | **Invalid** | — | — | *(Never transmitted)* | Invalid sync header; triggers Clause 49 error / slip |
+| `2'b00`, `2'b11` | **Invalid** | n/a | n/a | *(Never transmitted)* | Invalid sync header; triggers Clause 49 error / slip |
 
 - **Idle fill during bring-up:** While the link is training (`ST_EYE_SCAN`, `ST_BLOCK_LOCK`, `ST_DESKEW`), TX transmits continuous scrambled `/I/` blocks (with `/A/` every `AM_PERIOD` blocks per lane). Scrambled `/I/` guarantees >200 Mb/s transition density for Kria `IDELAYE3` eye scanning and safe AC-coupled baseline.
 

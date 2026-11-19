@@ -115,7 +115,7 @@ centre lines did not move, so lengths and skew are unchanged.
 | 0.15 mm | 270 mm, 11 % | 53–54 Ω | ≈ 107 Ω |
 | 0.13 mm | 102 mm, 4 % | 57 Ω | ≈ 114 Ω |
 | 0.117 mm (no room: BGA escapes) | 237 mm, 9 % | 58–59 Ω | ≈ 118 Ω |
-| coupled stretches, left as they were | 55 mm, 2 % | — | 100 Ω |
+| coupled stretches, left as they were | 55 mm, 2 % | n/a | 100 Ω |
 
 ### 3.3 Eye, simulated
 
@@ -177,7 +177,7 @@ MAX_DELAY; 35–133 ps across the I/O balls). They are in `_work/layout/xc7a50t_
 
 | | Pad to pad | With the package |
 |---|---|---|
-| Package share of a pair's P−N | — | −4.4 to +9.4 ps |
+| Package share of a pair's P−N | n/a | −4.4 to +9.4 ps |
 | Worst P−N, pairs at 1 Gb/s | ±42 ps | ±40 ps (ADCS_D1 +40, LINK_TX_CLK −36) |
 | LINK_RX data − clock | D0 +51, D1 +177 ps | D0 +41, D1 +190 ps |
 | LINK_TX data − clock | +2 ps | −17 ps |
@@ -312,7 +312,7 @@ To measure on the first board; the XADC reports VCCINT in `XADC_TEMP_VCCINT`.
 | Exposed pads | LMR33630, all three TPS7A8300 (one dissipates 0.5 W), one AD8352 with **no via**; AD9253 3 vias in 31 mm² | Via grids in every pad (POFV): LMR33630 15, each TPS7A8300 4, AD8352s 2–5, AD9253 15, AD9484 16, ADCLK948 6 |
 | Board edge | 256 of 1,122 points on the outline had a ground via within 3 mm | 176-via fence 0.8 mm in, 2.5 mm pitch (22 stations blocked by connectors) |
 | Power plane at the edge | L4 ran to the edge with L2/L5 | Every L4 zone pulled back 1 mm from the edge |
-| Plane splits under fast lines | None (§1) | — |
+| Plane splits under fast lines | None (§1) | n/a |
 | Acute angles | 453 junctions under 90°, mostly overlapping collinear segments and the router's 45° steps | None: JLCPCB's process does not need it; no DFM flag |
 
 ---
@@ -662,7 +662,7 @@ routed:
 | SDR ADC input (U602 → U601 channel A) | 1 MHz | 10 MHz | 30 MHz | 62.5 MHz |
 |---|---|---|---|---|
 | Gain, routed against ideal | +0.00 dB | +0.01 dB | +0.08 dB | +0.31 dB |
-| Common mode below differential, routed | −90 dB | −70 dB | −58 dB | — |
+| Common mode below differential, routed | −90 dB | −70 dB | −58 dB | n/a |
 
 At HF the copper is a few nH and pF: it changes nothing the ADC could see. The nodes' only
 neighbours within 0.3 mm are 2 mm of `+1V8_A` on L3. A re-placement would mean moving parts
@@ -868,8 +868,7 @@ junction is solved, not estimated.
 - **Airflow alone halves every rise.** At 70 °C it brings the FPGA to 91 °C, inside its limit.
   The board under the clock buffer still reaches about 100 °C.
 - **A sink on the four ICs alone leaves the power corner hot.** The 12 V buck stays the hottest
-  part. The sink has to touch the regulators too: the LMR33630, and the two TPS7A8300 and
-  TPS562201 that dissipate most.
+  part. The sink has to touch the regulators too: the LMR33630, the two TPS7A8300s and the buck (`U1002`, now TPS563201; was TPS562201) that dissipate most.
 - **Sink plus fan keeps every junction under 92 °C at 70 °C ambient.** It takes 3.5 of the 8.2 W.
   The board's hottest spot is then 86 °C, at the parts' 85 °C rating, no longer under it with
   margin. The PHY and the front end are outside the sink here. Touching the PHY too, or a pad to
@@ -1062,7 +1061,7 @@ Where C1218 went (all three simulated the same way):
 |---|---|---|
 | Top face beside R101, 6.6 mm branch | 461 mV | the branch |
 | Bottom face on R101's via, only its pad | 489–499 mV | over the carrier, 0.8 mm above it: no part may go on the underside there (LAYOUT §1) |
-| **Top face below the notch, 0.9 mm of L3 + via (kept, 13 Nov)** | **477–484 mV** | — |
+| **Top face below the notch, 0.9 mm of L3 + via (kept, 13 Nov)** | **477–484 mV** | n/a |
 
 Its tap now sits 3.2 mm further down LINK_TX_D0_P than C1219's on N, so in Ethernet mode the P path
 is 21.7 ps shorter. ETH_SGRX_PHY_P makes it up with a 3.2 mm bump on L8 (PHY-side P−N +20.9 ps):
@@ -1174,14 +1173,16 @@ receiver's floor. What is left for the measurement is what the script cannot see
 and the converters' own feedthrough. The measurement is unchanged: S21 TX SMA → RX SMA on the first board,
 converters off, then the radar ADC's spectrum with the chirp running.
 
-**5. Thermal margin (the 15 November upgrade, [ENCLOSURE_V2_THERMAL §7](ENCLOSURE_V2_THERMAL.md)).** The Si549's limit in 9.8
-was wrong: its junction limit is 125 °C and its rating is 85 °C *ambient* (data sheet Tables 2.1 and 2.6), so at
-70 °C its junction had 20 °C to spare. The real limit is the KV260 itself: its SOM is the commercial K26C,
-85 °C junction (UG1090). Enclosure v2 now has a 50 × 50 × 15 mm fan, nine more exhaust slots in the back wall
-and taller heatsinks (ENCLOSURE.md §6). Fine-mesh CFD of what is built: **rated 56 °C ambient with the stock
-KV260, 63 °C by the adapter's own parts, 70.9 °C with an industrial K26I SOM**. "70 °C" in this
-documentation now means with a K26I. With Rev08's front end and camera: 56.1, 64.1 and 71.1 °C
-(ENCLOSURE_V2_THERMAL §8).
+**5. Thermal margin (the 15 November upgrade and Rev08 audit P6, [ENCLOSURE_V2_THERMAL §7–§8](ENCLOSURE_V2_THERMAL.md)).** The Si549's limit
+in 9.8 was wrong: its junction limit is 125 °C and its rating is 85 °C *ambient* (data sheet Tables 2.1 and 2.6), so at
+70 °C its junction had 20 °C to spare. The real limit is the KV260 itself: its SOM is the commercial K26C, 85 °C junction
+(UG1090). Enclosure v2 has a 50 × 50 × 15 mm fan, nine more exhaust slots in the back wall and taller heatsinks
+(ENCLOSURE.md §6). Fine-mesh CFD with the real Vivado `XC7A50T` power (`1.249 / 1.604 W` upper bound) and audited
+regulator losses (`U1006 = 0.91 W`, `U1002` `TPS563201 = 0.69 W`): **55.9 °C ambient with the stock KV260, 62.5 °C
+by the adapter's `TA` parts (`Tb <= 85 °C`), and 68.2 °C with an industrial K26I SOM** without `HS4` (`XC7A50T` hits
+`101.81 °C` at 70 °C). With Rev08's front end, camera and **`HS4` fitted on `U1101`**: **56.1, 63.3 and 70.9 °C**
+(`XC7A50T` drops from `102.08 °C` to `93.38 °C` clean / `94.24 °C` clogged at 70 °C; `68.0 °C` K26I without `HS4`;
+ENCLOSURE_V2_THERMAL §8).
 
 ### 9.10 Rev08: the VHF/UHF front end's copper (phase 6, 17 November)
 

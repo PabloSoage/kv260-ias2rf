@@ -61,8 +61,8 @@ forces a fundamental change: **a front-end FPGA on the adapter board**.
 |---|---|---|---|
 | **J8 (IAS1)** | **5** (4 data + 1 clock) | ~4 (I2C, PWDN, GPIO) | **HPA bank, direct to the SOM** |
 | **J9 (RPi camera)** | **3** (2 data + 1 clock) | ~2 | **HPA bank, direct to the SOM** |
-| **J2 (Pmod)** | — | **8** at 3.3 V, 100 mA | HD bank |
-| ~~J7 (IAS0)~~ | ~~4~~ | — | **Ends at the AP1302 ISP** |
+| **J2 (Pmod)** | n/a | **8** at 3.3 V, 100 mA | HD bank |
+| ~~J7 (IAS0)~~ | ~~4~~ | n/a | **Ends at the AP1302 ISP** |
 | **Total** | **8 pairs** | **~14** | |
 
 Three facts worth keeping in mind:
@@ -240,11 +240,11 @@ but it is a 15-pin FFC located elsewhere on the carrier, which complicates the m
 | Resource | Pairs / signals | Use | Rate `[E]` |
 |---|---|---|---|
 | J8, pairs 1–2 | 2 | **RX**: decimated I/Q, FPGA → Kria | 2 × 1 Gbps |
-| J8, pair 3 | 1 | Source-synchronous clock, FPGA → Kria | — |
+| J8, pair 3 | 1 | Source-synchronous clock, FPGA → Kria | n/a |
 | J8, pair 4 | 1 | **TX**: baseband, Kria → FPGA | 1 Gbps |
-| J8, pair 5 | 1 | Clock, Kria → FPGA | — |
-| J8, single-ended | ~4 | Housekeeping I2C, reset, interrupt | — |
-| Pmod J2 | 8 | Control SPI (3), beam strobe, PPS, 3 spare | — |
+| J8, pair 5 | 1 | Clock, Kria → FPGA | n/a |
+| J8, single-ended | ~4 | Housekeeping I2C, reset, interrupt | n/a |
+| Pmod J2 | 8 | Control SPI (3), beam strobe, PPS, 3 spare | n/a |
 
 Usable rate: **2 Gbps receive and 1 Gbps transmit**, comfortable for decimated I/Q on two channels
 each way.
@@ -345,7 +345,7 @@ Covers LW/MW, shortwave, **CB (26.9–27.4)** and 10 m.
 
 **Path 2: VHF/UHF by conversion**
 
-> Rev08 built a different version of this path on the board itself: direct sampling below 170 MHz on the AD9484 and a single RFFC5072 conversion above, 30 MHz to 3 GHz, on its own SMA `J961` ([RX_VU_SPEC](docs/RX_VU_SPEC.md), [REV08_PLAN §5](docs/REV08_PLAN.md)). The table below is the original plan.
+> Rev08 built a different version of this path on the board itself: direct sampling 30–170 MHz on the AD9484 and a single RFFC5072 conversion 300 MHz to 3 GHz (behind a 300 MHz HPF; 170–300 MHz is not covered), on its own SMA `J961` ([RX_VU_SPEC](docs/RX_VU_SPEC.md), [REV08_PLAN §5](docs/REV08_PLAN.md)). The table below is the original plan.
 
 | Sub-band | LO (IF = 20 MHz) | Bands |
 |---|---|---|
@@ -509,13 +509,13 @@ VCCINT current. A sequencer or an integrated PMIC handles this cleanly.
 | `Q1001` | Reverse-polarity protection | DMP3013SFV + 15 V zener | C | −30 V, 9.5 mΩ, VGSS ±25 V |
 | `D1001` | TVS | SMBJ15CA | C | Bidirectional, as KiCad's TVS symbol |
 | `J1001` | DC jack | PJ-102AH | C | Drawn: rev03/POWER |
-| `J8` ×2 | Hirose BM20B(0.8)-34DP | — | C | IAS1 functional; IAS0 mechanical and power only |
+| `J8` ×2 | Hirose BM20B(0.8)-34DP | n/a | C | IAS1 functional; IAS0 mechanical and power only |
 | `H1..2` | M3 screws through the KV260's corner holes | M3 + standoff | C | `[V]` The original board's holes land on the carrier's within 5 µm (docs/INTERFACE_SPEC.md §5.3) |
 | `H3..H5` | Outer-edge supports | M3 standoff, 8 mm | C | Placed (LAYOUT §2). The board, 119 × 120 mm, overhangs the carrier by 85 mm; 7.9 mm from its underside to the plane of the KV260's feet |
 | `J1102` | Cable to the KV260's Pmod J2 | 2×6, 2.54 mm | C | Drawn: rev03/CONTROL. The Pmod's 3.3 V is not used |
 | `J1101` | JTAG | Xilinx 2×7, 2 mm (Molex 87832-1420) | C | DS593 Figure 14 |
 | `J911..J952` | IF SMAs, 10 | Edge-mount | C | Drawn: rev03/ROUTING, each DC-blocked. `J401`/`J402` are the clock SMAs |
-| `J1103` | IDC 2×20 to AERIS | — | X | 8 × ADAR1000 at 1.8 V; pinout in CONTROL_SPEC §2. **The AERIS end does not exist yet** |
+| `J1103` | IDC 2×20 to AERIS | n/a | X | 8 × ADAR1000 at 1.8 V; pinout in CONTROL_SPEC §2. **The AERIS end does not exist yet** |
 | ~~`U_MIX1`~~ | ~~ADL5801~~ | | **D** | Does not reach 10.5 GHz; AERIS does the mixing |
 | ~~`U_PWR3`~~ | ~~ADP151~~ | | **D** | 200 mA is not enough |
 | ~~`U_DEC1`~~ | ~~74HC138~~ | | **D** | The FPGA does the fan-out |

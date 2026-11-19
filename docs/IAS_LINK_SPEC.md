@@ -35,7 +35,7 @@ and 23/24 are left unconnected: the adapter takes no power from the connector (A
 |---|---|---|
 | **Termination and bias for the FPGA-bound pairs at `+1V2`** | An AC-coupled LVDS input needs its common mode restored. The XC7A50T has only HR banks, and those have no internal bias for AC-coupled inputs, so it's external. 1.2 V is the LVDS common mode, and the rail already exists | A resistor divider from another rail |
 | **No parts for the Kria-bound pairs beyond the capacitors** | Their receiver is inside the SOM, in an HP bank at 1.2 V. UG571 (read 12 Nov, INTERFACE_SPEC §6.3): `LVDS` there would be input-only with no internal termination, but `DIFF_SSTL12` with `ODT = RTT_48` terminates the pair (about 96 Ω) and re-biases it at 0.6 V on the die. The Kria side drives `LINK_TX` as `DIFF_SSTL12` with `RDRV_60_60` | Footprints for an external bias network, fitted only if needed |
-| **The single-ended signals pass straight through** | `HK_SCL`/`HK_SDA` (14/22), `FPGA_PROG_B` (21) and `FPGA_IRQ` (15) are at the carrier's levels, **1.8 V, verified** in XTP682 (INTERFACE_SPEC §4.3). Translating them belongs next to the FPGA, on CONTROL. Pin 32, first given to FPGA_IRQ, is the carrier's 48 MHz camera clock and is left unconnected | — |
+| **The single-ended signals pass straight through** | `HK_SCL`/`HK_SDA` (14/22), `FPGA_PROG_B` (21) and `FPGA_IRQ` (15) are at the carrier's levels, **1.8 V, verified** in XTP682 (INTERFACE_SPEC §4.3). Translating them belongs next to the FPGA, on CONTROL. Pin 32, first given to FPGA_IRQ, is the carrier's 48 MHz camera clock and is left unconnected | n/a |
 
 ---
 
@@ -126,9 +126,9 @@ PRBS7; `lvds_skew.py` for the skew).
 |---|---|---|---|
 | `LINK_RX_D0` | 457 / 509 mV | 31 / 25 ps | +95 ps |
 | `LINK_RX_D1` | 372 / 385 mV | 51 / 41 ps | +39 ps |
-| `LINK_RX_CLK` | 392 / 395 mV | 10 / 10 ps | — |
+| `LINK_RX_CLK` | 392 / 395 mV | 10 / 10 ps | n/a |
 | `LINK_TX_D0` | 665 / 674 mV | 62 / 64 ps | −40 ps |
-| `LINK_TX_CLK` | 643 / 642 mV | 63 / 63 ps | — |
+| `LINK_TX_CLK` | 643 / 642 mV | 63 / 63 ps | n/a |
 
 - **The width.** The simulation's spread is the board's own contribution: lossless lines, an ideal
   driver edge, no crosstalk, no driver or clock jitter. The floor should come out as roughly 1 ns
@@ -151,9 +151,9 @@ one per direction, and carry no data. One data pair runs the other way.
 |---|---|---|---|
 | `LINK_RX_D0` | FPGA → Kria | data | 1 Gb/s |
 | `LINK_RX_D1` | FPGA → Kria | data | 1 Gb/s |
-| `LINK_RX_CLK` | FPGA → Kria | the 500 MHz DDR clock for the two above | — |
+| `LINK_RX_CLK` | FPGA → Kria | the 500 MHz DDR clock for the two above | n/a |
 | `LINK_TX_D0` | Kria → FPGA | data | 1 Gb/s |
-| `LINK_TX_CLK` | Kria → FPGA | its clock | — |
+| `LINK_TX_CLK` | Kria → FPGA | its clock | n/a |
 
 That makes 2 Gb/s towards the Kria and 1 Gb/s back.
 
@@ -163,7 +163,7 @@ either 8b/10b, or a scrambler with 64b/66b framing.
 | Direction | Raw | 8b/10b (80 %) | 64b/66b (97 %) | Needed | Margin, 8b/10b / 64b/66b |
 |---|---|---|---|---|---|
 | FPGA → Kria | 2 Gb/s | 1.6 Gb/s | 1.94 Gb/s | radar DDC ÷16, one channel, 0.8 Gb/s + two SDR channels of 16-bit I/Q at 3.9 MSPS, 0.25 Gb/s = **1.05 Gb/s** | ~35 % / ~45 % |
-| Kria → FPGA | 1 Gb/s | 0.8 Gb/s | 0.97 Gb/s | beam tables, TX baseband, control | — |
+| Kria → FPGA | 1 Gb/s | 0.8 Gb/s | 0.97 Gb/s | beam tables, TX baseband, control | n/a |
 
 Two radar channels at ÷16 (1.6 Gb/s) would leave no margin under 8b/10b, and 18 % under 64b/66b
 (ARCHITECTURE §3.2).

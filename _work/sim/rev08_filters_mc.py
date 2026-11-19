@@ -242,6 +242,106 @@ def report_fmbp(ax=None):
     ax.legend(fontsize=7, loc="lower left")
 
 
+HP300 = "HP300: 300 MHz IF-reject high-pass, 5th order, pass 300-3000 MHz, stop 30-170 MHz"
+HP300_V = [11e-12, 24e-9, 36e-12, 5.6e-12, 22e-9, 91e-12, 8.2e-12]  # C1441, L1441+C1442, C1443, L1442+C1444, C1445
+HP300_PASS, HP300_STOP, HP300_STOP_AUDIT = (300e6, 3000e6), (30e6, 170e6), (30e6, 175e6)
+
+
+def abcd_hpf5(v, f, q=45.0, cpar=0.12e-12, cpad=CPAD, esl=0.35e-9, via_l=0.25e-9):
+    """5th-order elliptic HPF: series C (with 0402 ESL), shunt (L||cpar) + C + via_l (and shunt pad C)."""
+    w = 2 * np.pi * np.atleast_1d(f); one = np.ones_like(w, dtype=complex)
+    se = lambda C: [one, 1 / (1j * w * C) + 1j * w * esl, 0 * one, one]
+
+    def sh(L, C):
+        zl = 1 / (1 / (1j * w * L + w * L / q) + 1j * w * cpar)
+        return [one, 0 * one, 1 / (zl + 1 / (1j * w * C) + 1j * w * via_l) + 1j * w * cpad, one]
+
+    C1, L2, C2, C3, L4, C4, C5 = v
+    M = se(C1)
+    for b in (sh(L2, C2), se(C3), sh(L4, C4), se(C5)):
+        M = fe._mul(M, b)
+    return M
+
+
+def hp300_metrics(v, stop_band=HP300_STOP_AUDIT, **kw):
+    FP = np.linspace(*HP300_PASS, 120)
+    FS = np.linspace(*stop_band, 80)
+    a, r = fe.s21(abcd_hpf5(v, FP, **kw))
+    s = -20 * np.log10(np.abs(fe.s21(abcd_hpf5(v, FS, **kw))[0]))
+    return (-20 * np.log10(np.abs(a))).max(), (-20 * np.log10(np.abs(r) + 1e-12)).min(), s.min()
+
+
+def hp300_mc(tight=True, n=3000, seed=1, stop_band=HP300_STOP_AUDIT):
+    """Independent MC using rev08_filters_mc tolerances + ESL/Q parasitics (L +-2%, C +-0.1pF/+-2% or +-0.25pF/+-5%)."""
+    rng = np.random.default_rng(seed)
+    il, rl, rj = [], [], []
+    for _ in range(n):
+        w = list(HP300_V)
+        for k in (1, 4):
+            w[k] *= 1 + rng.uniform(-0.02, 0.02)
+        for k in (0, 2, 3, 5, 6):
+            if w[k] < 10e-12:
+                w[k] = max(0.05e-12, w[k] + rng.uniform(-1, 1) * (0.1e-12 if tight else 0.25e-12))
+            else:
+                w[k] *= 1 + rng.uniform(-1, 1) * (0.02 if tight else 0.05)
+        a, b, c = hp300_metrics(
+            w, stop_band=stop_band,
+            cpad=rng.uniform(0.05e-12, 0.15e-12),
+            q=rng.uniform(35.0, 55.0),
+            esl=rng.uniform(0.30e-9, 0.45e-9),
+        )
+        il.append(a); rl.append(b); rj.append(c)
+    return np.array(il), np.array(rl), np.array(rj)
+
+
+def report_hp300(ax=None):
+    import rev08_rf_audit as audit
+    nom_170 = hp300_metrics(HP300_V, stop_band=HP300_STOP)
+    nom_175 = hp300_metrics(HP300_V, stop_band=HP300_STOP_AUDIT)
+    nom_ideal = hp300_metrics(HP300_V, stop_band=HP300_STOP_AUDIT, q=45.0, cpar=0.12e-12, cpad=0.0, esl=0.0, via_l=0.0)
+    il_t, rl_t, rj_t175 = hp300_mc(tight=True, n=3000, seed=1, stop_band=HP300_STOP_AUDIT)
+    _, _, rj_t170 = hp300_mc(tight=True, n=3000, seed=1, stop_band=HP300_STOP)
+    il_l, rl_l, rj_l170 = hp300_mc(tight=False, n=3000, seed=1, stop_band=HP300_STOP)
+    aud_p99, aud_rl, aud_rj = audit.hp_monte_carlo(runs=3000, seed=7)
+    print(HP300)
+    print("  parts   11 pF, 24 nH + 36 pF, 5.6 pF, 22 nH + 91 pF, 8.2 pF (C1441-C1445, L1441-L1442)")
+    print("          loss <= %.2f dB, return loss >= %.1f dB, rejection >= %.1f dB (<=170 MHz) / %.1f dB (<=175 MHz)"
+          % (nom_170[0], nom_170[1], nom_170[2], nom_175[2]))
+    print("          (without 0.35 nH ESL / 0.25 nH via / 0.1 pF pad: loss <= %.2f dB, RL >= %.1f dB, rej >= %.1f dB)"
+          % nom_ideal)
+    print("  MC tight (B/G, seed=1, <=170 MHz): loss p99 %.2f dB (mask 1.6), RL p1 %.1f dB, rej p1 %.1f dB (mask 50), "
+          "yield %.1f %%" % (np.percentile(il_t, 99), np.percentile(rl_t, 1), np.percentile(rj_t170, 1),
+                              100 * np.mean((il_t <= 1.6) & (rj_t170 >= 50))))
+    print("  MC loose (C/J, seed=1, <=170 MHz): loss p99 %.2f dB, RL p1 %.1f dB, rej p1 %.1f dB, yield %.1f %%"
+          % (np.percentile(il_l, 99), np.percentile(rl_l, 1), np.percentile(rj_l170, 1),
+             100 * np.mean((il_l <= 1.6) & (rj_l170 >= 50))))
+    print("  Cross-check <=175 MHz (seed=1 vs audit seed=7): loss p99 %.2f vs %.2f dB, RL p1 %.1f vs %.1f dB, "
+          "rej p1 %.1f vs %.1f dB"
+          % (np.percentile(il_t, 99), aud_p99, np.percentile(rl_t, 1), aud_rl, np.percentile(rj_t175, 1), aud_rj))
+    if ax is None:
+        return
+    f = np.linspace(20e6, 1500e6, 1500)
+    rng = np.random.default_rng(7)
+    for _ in range(60):
+        x = list(HP300_V)
+        for k in (1, 4):
+            x[k] *= 1 + rng.uniform(-0.02, 0.02)
+        for k in (0, 2, 3, 5, 6):
+            x[k] = x[k] + rng.uniform(-0.1e-12, 0.1e-12) if x[k] < 10e-12 else x[k] * (1 + rng.uniform(-0.02, 0.02))
+        ax.plot(f / 1e6, 20 * np.log10(np.abs(fe.s21(abcd_hpf5(
+            x, f, q=rng.uniform(35.0, 55.0), cpad=rng.uniform(0.05e-12, 0.15e-12),
+            esl=rng.uniform(0.30e-9, 0.45e-9)))[0])), color="#9fb8d6", lw=0.5, alpha=0.6)
+    ax.plot(f / 1e6, 20 * np.log10(np.abs(fe.s21(abcd_hpf5(HP300_V, f))[0])), color="#1f4e79", lw=1.6,
+            label="catalogue values")
+    ax.axvspan(300, 1500, color="#c6e0b4", alpha=0.4, label="pass band (300-3000 MHz)")
+    ax.fill_between([30, 175], -50, -90, color="#f4b183", alpha=0.35)
+    ax.axhline(-50, color="#c55a11", lw=0.8, ls="--", label="−50 dB mask (<=175 MHz)")
+    ax.set_ylim(-100, 3); ax.set_xlim(f[0] / 1e6, f[-1] / 1e6)
+    ax.set_xlabel("MHz"); ax.set_ylabel("S21 (dB)"); ax.grid(lw=0.3)
+    ax.set_title("HP300: 300 MHz IF-reject high-pass, 5th order", fontsize=9)
+    ax.legend(fontsize=7, loc="lower right")
+
+
 def fmt(v, name=None):
     return ", ".join("%.3g nH" % (x * 1e9) if k in inds(name) else "%.3g pF" % (x * 1e12) for k, x in enumerate(v))
 
@@ -251,8 +351,9 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     names = list(fe.FILTERS)
-    fig, axs = plt.subplots(1, 5, figsize=(26, 4.8))
-    for ax, name in zip(axs, names):
+    fig, axs = plt.subplots(2, 3, figsize=(16.5, 8.5))
+    axs_flat = axs.ravel()
+    for ax, name in zip(axs_flat, names):
         kind, fp, fs, ilmax, rej, q, cpar, _ = fe.FILTERS[name]
         vi = ideal(name)
         vs = snapped(name, vi)
@@ -286,7 +387,8 @@ def main():
         ax.set_xlabel("MHz"); ax.set_ylabel("S21 (dB)"); ax.grid(lw=0.3)
         ax.set_title(name.split(":")[0] + ": " + name.split(":")[1].strip(), fontsize=9)
         ax.legend(fontsize=7, loc="lower left")
-    report_fmbp(axs[4])
+    report_fmbp(axs_flat[4])
+    report_hp300(axs_flat[5])
     fig.suptitle("Rev08 front-end filters with catalogue parts: nominal (dark) and 60 Monte Carlo samples, "
                  "L ±2 %, C ±0.1 pF / ±2 %, pads 0.10 ± 0.05 pF", fontsize=10)
     plt.tight_layout()

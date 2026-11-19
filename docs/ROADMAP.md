@@ -302,7 +302,7 @@ regressions passing in the new clock domain.
 Scope approved, implementation not started: [REV08_PLAN.md](REV08_PLAN.md). The audit corrections to the
 Rev07 gateware constraints and documents; status LEDs; a debug UART with a vertical USB-C inside the box; a
 camera pass-through receptacle on IAS0; a VHF receive front end on its own (thirteenth) SMA, direct-sampled by
-the AD9484, and an RFFC5072 converter for 170 MHz – 3 GHz; the 500 MSPS capture path. Rev08 is finished only
+the AD9484, and an RFFC5072 converter for 300 MHz – 3 GHz (170–300 MHz not covered since the Rev08 audit; originally 170 MHz – 3 GHz); the 500 MSPS capture path. Rev08 is finished only
 when every simulation, thermal and strength run, render and document has been redone and reviewed against the
 final design (REV08_PLAN §11.1).
 

@@ -97,8 +97,8 @@ These two 12-pin Pmod headers are **independent** hardware ports (not wired to e
 | `4` | `PMOD_HDA16_CC` | `B21` | `E12` | `IO_L8P_HDGC_45` (`HDGC`) | `[M]` |
 | `6` | `PMOD_HDA17` | `B22` | `D11` | `IO_L8N_HDGC_45` (`HDGC`) | `[M]` |
 | `8` | `PMOD_HDA18` | `C22` | `B11` | `IO_L10P_AD10P_45` | `[M]` |
-| `9, 10` | `GND` | — | — | — | `[M]` |
-| `11, 12` | `PMOD_3V3` | — | — | — | `[M]` |
+| `9, 10` | `GND` | n/a | n/a | n/a | `[M]` |
+| `11, 12` | `PMOD_3V3` | n/a | n/a | n/a | `[M]` |
 
 ### 3b. Adapter Pmod `J1102` -> Artix-7 `U1101` (`[M]`)
 
@@ -112,5 +112,5 @@ These two 12-pin Pmod headers are **independent** hardware ports (not wired to e
 | `6` | `/CONTROL/PMOD_SPARE1` | `G15` | `IO_L24N_T3_RS0_15` (`dbg_uart` RX / Kria `D11` PS `UART1` TX, `PULLUP`) | `[M]` |
 | `7` | `/CONTROL/PMOD_SCLK` | `D13` | `IO_L12P_T1_MRCC_15` (`MRCC`) | `[M]` |
 | `8` | `/CONTROL/PMOD_SPARE2` | `G11` | `IO_25_15` (`dbg_uart` TX / Kria `B11` PS `UART1` RX) | `[M]` |
-| `9, 10` | `GND` | — | — | `[M]` |
-| `11, 12` | Unconnected (NC) | — | — | `[M]` |
+| `9, 10` | `GND` | n/a | n/a | `[M]` |
+| `11, 12` | Unconnected (NC) | n/a | n/a | `[M]` |

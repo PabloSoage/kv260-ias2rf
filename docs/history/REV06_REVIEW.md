@@ -43,9 +43,9 @@ Compared against Rev05, with the same checks run on both board files. Rev05 had 
 | Reference-plane changes without a ground via within 1 mm (RF) / 3 mm (others) | 0 of 98 | 0 of 96 | OK |
 | LVDS P/N skew, end to end | all pairs within ±9 ps except CLK_ADCS +23, CLK_FPGA −41 (Rev05, documented) | unchanged; ETH_SGTX +2 ps, ETH_SGRX −4 ps, LINK_RX_D0 +0 ps (re-matched) | OK |
 | Stubs on LVDS legs | ≤ 9 ps on the data pairs | ETH legs 6–9 ps (the bias resistors now sit on the legs) | OK |
-| Eyes at 1.25 Gb/s (SGMII) | — | FPGA → PHY 616 mV, PHY → FPGA 521 mV (> 200 mV needed) | OK |
+| Eyes at 1.25 Gb/s (SGMII) | n/a | FPGA → PHY 616 mV, PHY → FPGA 521 mV (> 200 mV needed) | OK |
 | Parallel runs closer than 3 widths for > 2 mm | 56 pairs of nets | 55 pairs. One is new and one is dropped: **ETH_MDIO beside LINK_RX_D1_N**, 16.5 mm at 0.18 mm on L1 | Accepted, below |
-| Analogue and clock neighbours | — | two new short pairings, both negligible (CONTROL_SPEC §8) | OK |
+| Analogue and clock neighbours | n/a | two new short pairings, both negligible (CONTROL_SPEC §8) | OK |
 
 **ETH_MDIO beside LINK_RX_D1_N.**
 

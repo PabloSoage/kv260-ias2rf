@@ -20,7 +20,7 @@ Datasheet: AD9763/AD9765/AD9767 Rev. G, `_work/datasheets/AD9767.pdf`.
 | Decision | Evidence | Alternative |
 |---|---|---|
 | **Interleaved mode** (MODE low) | The interface already carried one 14-bit bus plus `IQWRT`, `IQSEL`, `IQCLK` and `IQRESET`, which is what interleaved mode uses (p.25, *Interleaved Mode Timing*). It needs 18 FPGA lines instead of 32 | Dual-port mode: two 14-bit buses, 14 more FPGA lines |
-| **Port 2's data pins tied to ground** | Unused in interleaved mode; CMOS inputs should not float. The datasheet doesn't say either way | — |
+| **Port 2's data pins tied to ground** | Unused in interleaved mode; CMOS inputs should not float. The datasheet doesn't say either way | n/a |
 | **Independent gain** (GAINCTRL low), one full-scale network per DAC | p.22, *Gain Control Mode*. Each DAC can then be trimmed on its own; identical values here | Master/slave (GAINCTRL to AVDD): one RSET for both |
 | **10 mA full scale**, RSET 3.83 kΩ | p.24: *"optimum distortion performance ... when the maximum full-scale signal at IOUTA and IOUTB does not exceed 0.5 V"*. 10 mA on 49.9 Ω is 0.5 V. Keeps the loads, filter and balun of DAC_RADAR | 20 mA (1.91 kΩ): 6 dB more output, more distortion |
 | **The 256 Ω + 22 nF network on each FSADJ** | p.22: *"To ensure that the AD9763/AD9765/AD9767 performs properly, connect a 22 nF capacitor and 256 Ω resistor network ... from the FSADJ1 terminal to ground and from the FSADJ2 terminal to ground"* (Figure 59). The note under Figure 58 says it isn't needed with RSET = 2 kΩ; the text is the stronger statement, and the network costs two parts | Leave it out |
