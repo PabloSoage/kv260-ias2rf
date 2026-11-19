@@ -431,15 +431,26 @@ The KV260 also cuts off above 13.2 V (its MP5016 eFuse, XTP682 page 3) `[V]`: it
 
 ### 6.3 The result, as built
 
-| Case, single entry, worst currents | Per BM20 ground contact | Against 0.3 A |
-|---|---|---|
-| Any voltage between vehicle ground points (there is one entry) | 132 mA at 3.19 A | Pass |
-| Typical load (KV260 0.92 A) | 38 mA | Pass |
-| One contact at half the others' resistance, at 3.19 A | 254 mA | Pass |
-| The same at a 2 A load, one contact at a third | 219 mA | Pass |
-| Jumper's ground contact open (all the return through the link) | 138 mA | Pass |
-| All contacts at their 100 mΩ maximum | 109 mA | Pass |
-| Home: one earthed supply, an earthed monitor on DisplayPort, 1 V between the earths | 189 mA (rms, with the DC load) | Pass |
+| Case, single entry, worst currents | Per BM20 ground contact (worst one) | Heat in that contact, in all 22 | Result |
+|---|---|---|---|
+| Any voltage between vehicle ground points (there is one entry) | 132 mA at 3.19 A | 0.53 mW, 11.6 mW | Pass |
+| Typical load (KV260 0.92 A) | 38 mA | | Pass |
+| All contacts at their 100 mΩ maximum | 109 mA | 1.19 mW, 26.2 mW | Pass |
+| Jumper's ground contact open (all the return through the link), contacts at maximum | 122 mA (138 mA at typical) | 1.48 mW, 32.5 mW | Pass |
+| One contact at half the others' resistance, at 3.19 A | 254 mA | 0.97 mW, 11.2 mW | Pass |
+| One contact at a third of the others' (15 against 45 mΩ), at 2 A | 219 mA | | Pass |
+| The same at 3.19 A | 352 mA | 1.86 mW, 14.9 mW | Pass on heat, over 0.3 A |
+| One at a third, the other 21 at their 100 mΩ maximum, at 3.19 A | 306 mA | 3.13 mW, 25.0 mW | Pass on heat, over 0.3 A |
+| Home: one earthed supply, an earthed monitor on DisplayPort, 1 V between the earths | 189 mA (rms, with the DC load) | | Pass |
+
+**Uneven sharing and the 0.3 A figure.** The rating is a heating limit: Hirose derives its current ratings from the
+temperature rise measured under current, less a 20 % margin (Hirose, "Connector derating curves"), and the BM20's
+operating range includes that rise `[V]` (catalogue D47513). Current gathers in one contact only because that
+contact's resistance is low, so its heat, I²R, is the quantity to compare, not its current. The references: a typical
+30 mΩ contact at 0.3 A makes 2.7 mW, a contact at its specified 100 mΩ maximum, still rated 0.3 A, makes 9.0 mW, and
+all 22 at 0.3 A make 59 mW. Every case is below the 9.0 mW and the 59 mW. All but one are below 2.7 mW as well. The
+exception (3.13 mW) needs 21 contacts worn to their maximum and one still new, at the KV260's worst current limit.
+`_work/power/ground_offset.py` reports these figures (`single_entry.heat` in `docs/sim/ground_offset.json`).
 
 Input current at `J1001` (5 A rated): 1.12 A for the adapter plus 3.19 A for the KV260, 4.31 A at worst. `L1004`
 (6 A, 2 × 8 mΩ) dissipates 0.30 W there.

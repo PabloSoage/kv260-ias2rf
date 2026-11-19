@@ -129,9 +129,17 @@ link. That is why `U1010` limits the KV260 to its brick's 3 A rating (2.98 A nom
 | Single entry, typical KV260 load (0.92 A) | -0.89 A | 38 mA | Pass |
 | Single entry, at `U1010` limit (3.19 A) | -3.09 A | 132 mA | Pass |
 | Single entry, contacts at 100 mΩ maximum | -2.88 A | 109 mA | Pass |
-| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass (219 mA at 2 A with one at a third; 352 mA at 3.19 A/third) |
+| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass |
+| Single entry, one contact at a third of the others' resistance (2 A) | | 219 mA | Pass |
+| Single entry, one contact at a third (3.19 A; the other 21 typical / at 100 mΩ max) | -3.09 A | 352 mA / 306 mA | Over 0.30 A, pass on heat: 1.86 mW / 3.13 mW in that contact |
 | Single entry, jumper ground contact open (typ / max R) | -3.21 A | 138 mA / 122 mA | Pass |
 | Home, single entry, earthed monitor 50 Hz (1.0 V / 0.1 V) | 3.27 A / 0.33 A loop | 189 mA / 133 mA | Pass (4.05 mV / 405 uV adapter drop) |
+
+The 0.30 A rating is a heating limit: Hirose derives its ratings from the temperature rise under current, and the
+BM20's operating range includes that rise. One contact carries more than its share only because its resistance is
+low, so its heat (I²R) is the figure to check: 3.13 mW at worst, against 9.0 mW for a contact at its 100 mΩ maximum
+at 0.30 A (2.7 mW for a typical one), and 25 mW in all 22 against 59 mW ([AUDIT_Rev08.md](AUDIT_Rev08.md) §6.3,
+`single_entry.heat` in the JSON).
 
 Topology (`KVPWR` sheet). `J1001` passes both +12 V and return through `L1004` (`VIN_JACK` to `VIN_J`, `GND_IN` to `GND`;
 `F1001` keeps carrying only the adapter). From `VIN_J`, the KV260 branch runs through reverse-blocking N-FET `Q1010`
@@ -169,7 +177,9 @@ backward-Euler solver models `J1001 -> L1004 -> VIN_J -> F1001/LM74502 (+12V)` i
 | ISO 16750-2 Cranking Level II (4.5 V, 15 ms) | +4.3..+13.4 V | 5.9 V | 3.85..13.34 V | Survives sag / 0 J | **PASS** |
 
 In every fault, `+12V_KV` peaks at or below 14.55 V (never reaching the KV260 `SMAJ16A` clamp) and `VIN_J` stays inside
-`U1010`'s -60 to +67 V (75 V for 10 ms) limits.
+`U1010`'s -60 to +67 V (75 V for 10 ms) limits. PASS means nothing is damaged, not that the KV260 keeps running: in
+every case but pulses 3a and 3b, `U1010` opens or the input falls away and the KV260 resets (ISO 16750-2 functional
+status C). The 4 V floor of `+12V_KV` in the plots is where the model's loads stop drawing, not a regulated level.
 
 Common-mode noise at home (`_work/power/cm_noise.py`, `docs/sim/cm_noise.png`, `docs/sim/cm_noise.json`). ![Common-mode noise attenuation](sim/cm_noise.png) With an earthed SMPS brick (120 mV peak switching factor across 50 to 150 kHz, 5 mV VHF floor, 1.0 Ω PE bond `[E]`, 1.8 m DC cord) and earthed external cables (1.5 m monitor/PC lead, 5.0 m coax, board ground 0.5 mΩ + 5 nH `[E]`):
 

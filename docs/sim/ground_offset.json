@@ -74,6 +74,46 @@
    "limit_one_at_third": 0.3521566422323929,
    "typical_one_at_half": 0.07292753905672644,
    "load_2A_one_at_third": 0.21941223815102362
+  },
+  "heat": {
+   "reference_contact_W": 0.0026999999999999997,
+   "reference_all_W": 0.059399999999999994,
+   "limit": {
+    "per_contact_A": 0.13247753306456314,
+    "contact_ohm": 0.03,
+    "worst_contact_W": 0.0005265089030061726,
+    "all_contacts_W": 0.011583195866135796
+   },
+   "contacts_at_max": {
+    "per_contact_A": 0.10905355520627741,
+    "contact_ohm": 0.1,
+    "worst_contact_W": 0.0011892677903128596,
+    "all_contacts_W": 0.02616389138688291
+   },
+   "jumper_ground_open_contacts_at_max": {
+    "per_contact_A": 0.12151210048465727,
+    "contact_ohm": 0.1,
+    "worst_contact_W": 0.0014765190564193448,
+    "all_contacts_W": 0.03248341924122558
+   },
+   "limit_one_at_half": {
+    "per_contact_A": 0.2544536960566216,
+    "contact_ohm": 0.015,
+    "worst_contact_W": 0.0009712002515531334,
+    "all_contacts_W": 0.011168802892861034
+   },
+   "limit_one_at_third": {
+    "per_contact_A": 0.3521566422323929,
+    "contact_ohm": 0.015,
+    "worst_contact_W": 0.0018602145100259035,
+    "all_contacts_W": 0.014881716080207231
+   },
+   "limit_one_at_third_others_at_max": {
+    "per_contact_A": 0.3063456603927606,
+    "contact_ohm": 0.03333333333333333,
+    "worst_contact_W": 0.0031282554547158873,
+    "all_contacts_W": 0.0250260436377271
+   }
   }
  },
  "offset_at_rating_V": {

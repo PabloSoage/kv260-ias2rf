@@ -22,6 +22,13 @@ This script solves that network as resistors (DC, and 50 Hz, where the cords are
 It reports the current in each BM20 ground contact against its 0.3 A rating, and the voltage the loop
 current leaves across the adapter's ground.
 
+When the contacts share unevenly, the current also exceeds the rating's number in one case (one contact at a third
+of the others' resistance at U1010's worst limit). The rating is a heating limit: Hirose derives its current
+ratings from the temperature rise under current, with a 20 % margin (Hirose, "Connector derating curves"), and the
+BM20's operating range includes the rise from current [V] (D47513). Current gathers in a contact only because its
+resistance is low, so its heat, I^2 R, is what to compare: the script reports the heat in the worst contact and in
+all 22, against a typical contact at 0.3 A (0.3^2 x 30 mOhm = 2.7 mW; 59 mW for all 22).
+
 [V] verified against a data sheet or standard, [E] estimated. Values:
   BM20 contact: 0.3 A rated, 100 mOhm maximum [V] (Hirose BM20 catalogue D47513); 30 mOhm typical [E].
   Harness wire FLRY 0.5 mm^2: 37.1 mOhm/m at 20 C [V] (ISO 6722-1 maximum for 0.5 mm^2).
@@ -156,16 +163,37 @@ def main():
                            "jumper_ground_open": single(1e6, R_BM20_TYP, I_KV_LIMIT),
                            "jumper_ground_open_contacts_at_max": single(1e6, R_BM20_MAX, I_KV_LIMIT)}
 
-    def one_low(i_k, r_others, r_low):
-        """One BM20 contact at r_low, the other 21 at r_others: the current in that one contact."""
+    def one_low(i_k, r_others, r_low, heat=False):
+        """One BM20 contact at r_low, the other 21 at r_others: the current in that one contact; with heat, the
+        heat in it and in all 22 (W)."""
         r = 1.0 / ((N_BM20 - 1) / r_others + 1.0 / r_low + 2 / R_FFC + 2 / R_PMOD)
         i_link = i_k * R_JUMPER / (r + R_JUMPER)
-        return i_link * r / r_low
+        i_low = i_link * r / r_low
+        if not heat:
+            return i_low
+        i_o = i_link * r / r_others
+        return {"per_contact_A": i_low, "contact_ohm": r_low, "worst_contact_W": i_low ** 2 * r_low,
+                "all_contacts_W": i_low ** 2 * r_low + (N_BM20 - 1) * i_o ** 2 * r_others}
     res["single_entry"]["uneven"] = {
         "limit_one_at_half": one_low(I_KV_LIMIT, R_BM20_TYP, R_BM20_TYP / 2),
         "limit_one_at_third": one_low(I_KV_LIMIT, 1.5 * R_BM20_TYP, R_BM20_TYP / 2),
         "typical_one_at_half": one_low(I_KV_TYP, R_BM20_TYP, R_BM20_TYP / 2),
         "load_2A_one_at_third": one_low(2.0, 1.5 * R_BM20_TYP, R_BM20_TYP / 2)}
+
+    # the heating check: the worst contact and all 22, against a typical contact at its rating
+    def even(i_pc, r_c):
+        return {"per_contact_A": i_pc, "contact_ohm": r_c, "worst_contact_W": i_pc ** 2 * r_c,
+                "all_contacts_W": N_BM20 * i_pc ** 2 * r_c}
+    se_ = res["single_entry"]
+    res["single_entry"]["heat"] = {
+        "reference_contact_W": BM20_RATED ** 2 * R_BM20_TYP, "reference_all_W": N_BM20 * BM20_RATED ** 2 * R_BM20_TYP,
+        "limit": even(se_["per_contact_A"], R_BM20_TYP),
+        "contacts_at_max": even(se_["contacts_at_max"]["per_contact_A"], R_BM20_MAX),
+        "jumper_ground_open_contacts_at_max": even(se_["jumper_ground_open_contacts_at_max"]["per_contact_A"],
+                                                   R_BM20_MAX),
+        "limit_one_at_half": one_low(I_KV_LIMIT, R_BM20_TYP, R_BM20_TYP / 2, heat=True),
+        "limit_one_at_third": one_low(I_KV_LIMIT, 1.5 * R_BM20_TYP, R_BM20_TYP / 2, heat=True),
+        "limit_one_at_third_others_at_max": one_low(I_KV_LIMIT, R_BM20_MAX, R_BM20_MAX / 3, heat=True)}
     # offsets at which the contacts reach their rating, today
     lim = {}
     for name in ("separate_0p3m_typ", "separate_1m_typ", "separate_3m_typ", "separate_1m_max"):
@@ -260,6 +288,10 @@ def main():
           f"({se['jumper_ground_open_contacts_at_max']['per_contact_A']*1000:.0f} mA at max); typical load "
           f"{se['typical_load']['per_contact_A']*1000:.0f} mA")
     print("single entry, uneven contacts (mA in the low one):", {k: round(v * 1000) for k, v in se["uneven"].items()})
+    h = se["heat"]
+    print(f"heat (reference {h['reference_contact_W']*1000:.1f} mW a contact, {h['reference_all_W']*1000:.0f} mW all 22):",
+          {k: (round(v['per_contact_A'] * 1000), round(v['worst_contact_W'] * 1000, 2), round(v['all_contacts_W'] * 1000, 1))
+           for k, v in h.items() if isinstance(v, dict)}, "(mA, mW worst contact, mW all)")
     print("home single entry 50 Hz:", {k: (round(v['loop_A'], 2), round(v['per_contact_A'] * 1000), round(v['adapter_ground_drop_uV']))
                                        for k, v in home1.items()}, "(A loop, mA a contact, uV)")
     print("home 50 Hz:", {k: (round(v['loop_A'], 2), round(v['per_contact_A'] * 1000), round(v['adapter_ground_drop_uV'])) for k, v in home.items()}, "(A loop, mA a contact, uV)")

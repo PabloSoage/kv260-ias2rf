@@ -241,8 +241,12 @@ Inter-board BM20 ground currents (`_work/power/ground_offset.py`, `docs/sim/grou
 | Single entry, typical KV260 load (0.92 A) | -0.89 A | 38 mA | Pass |
 | Single entry, at `U1010` limit (3.19 A) | -3.09 A | 132 mA | Pass (independent of chassis offset) |
 | Single entry, contacts at 100 mOhm max | -2.88 A | 109 mA | Pass |
-| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass (219 mA at 2 A with one at a third; 352 mA at 3.19 A/third) |
+| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass |
+| Single entry, one contact at a third of the others' resistance (2 A) | | 219 mA | Pass |
+| Single entry, one contact at a third (3.19 A; the other 21 typical / at 100 mOhm max) | -3.09 A | 352 mA / 306 mA | Over 0.30 A, pass on heat: 1.86 mW / 3.13 mW in that contact |
 | Single entry, jumper ground contact open (typ / max R) | -3.21 A | 138 mA / 122 mA | Pass |
 | Home, single entry, earthed monitor 50 Hz (1.0 V / 0.1 V) | 3.27 A / 0.33 A loop | 189 mA / 133 mA | Pass (4.05 mV / 405 uV adapter drop) |
+
+The 0.30 A rating is a heating limit (Hirose derives it from the temperature rise under current). When one contact takes more than its share it is because its resistance is low, so its heat stays small: 3.13 mW at worst, against 9.0 mW for a contact at its 100 mOhm maximum at 0.30 A, and 25 mW in all 22 against 59 mW (docs/AUDIT_Rev08.md section 6.3).
 
 Levels, bands and the register map: [ROUTING_SPEC](ROUTING_SPEC.md), [RX_VU_SPEC](RX_VU_SPEC.md), [SIGNAL_INTEGRITY](SIGNAL_INTEGRITY.md), [FPGA_GATEWARE](FPGA_GATEWARE.md), [LINK_PROTOCOL](../fpga/link/LINK_PROTOCOL.md).
