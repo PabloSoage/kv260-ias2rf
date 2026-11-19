@@ -13,6 +13,7 @@ from mathutils import Vector
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 D = os.path.join(ROOT, "_work", "mech", "cache")
+os.makedirs(D, exist_ok=True)
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 V2 = "--v2" in argv        # enclosure v2: adapter fan + filtered grille, SMA vents closed (docs/ENCLOSURE.md section 7)
 MM = 0.001
@@ -331,6 +332,11 @@ pockets.append(box("pk_rj45", -28.0, -11.0, -27.2, -11.2, ADAPTER_BOT - 4.5, 6))
 # Rev05 input protection on the adapter's underside (U1009, Q1003, D1003 SMC 2.3 mm, C1090, C1091), not in the
 # assembly's glTF yet: board x 95.6-111.4, y 137.6-151.2 (courtyards) through k2m, 0.6 mm margin, 3.1 mm deep
 pockets.append(box("pk_prot", -44.6, -29.8, 86.0, 103.0, ADAPTER_BOT - 3.1, 6))
+# Single power entry (Rev08, 19 Nov) bottom parts: L1004 choke (4.8 mm + 0.5 mm), KV260 eFuse branch
+# (U1010, Q1010, Q1011, D1004 2.3 mm max, C1094, C1095, R1040-R1043, C1093: 2.3 mm + 0.5 mm), and J1004 pins
+pockets.append(box("pk_l1004", -60.5, -48.5, 92.8, 102.8, ADAPTER_BOT - 5.3, 6))
+pockets.append(box("pk_kvpwr", -83.4, -67.5, 83.4, 108.2, ADAPTER_BOT - 2.8, 6))
+pockets.append(box("pk_j1004_pins", -88.1, -79.4, 91.8, 96.5, ADAPTER_BOT - 2.8, 6))
 print("pockets", len(pockets))
 cut(hc, join(pockets, "pockets"), self_ix=True)
 
@@ -350,10 +356,9 @@ cut(hc, join(inserts, "inserts"), self_ix=True)
 union(bottom, hc)
 
 # ---- lugs: lid and tray close on them; vehicle ears ------------------------------------------------------
-# Rev08: the back-wall lug moved from X -20 to -27, west of J961's notch (X -17.4 to -10.7) and east of the 12 V
-# jack's opening (to -36.8): 2.6 mm of wall each side. East of the notch the gap to the KV260's J12 opening is 11.5 mm,
-# too narrow for a 14 mm lug.
-LUG_X = {"front": [-95.0, 70.0, 127.0], "back": [-95.0, -27.0, 127.0]}   # clear of the I/O openings and J1001
+# Rev08: the middle back-wall lug moved from X -20 to -27 (west of J961's notch and east of J1001), and the
+# west lug moved from X -95 to -100 to clear J1004's back-wall opening (span -107..-93, 4.9 mm clear of J1004).
+LUG_X = {"front": [-95.0, 70.0, 127.0], "back": [-100.0, -27.0, 127.0]}   # clear of I/O, J1001 and J1004
 Y_OUT = {"front": OUTER[0][1], "back": OUTER[6][1]}
 LUG_W, LUG_D = 14.0, 10.0
 LUG_HOLE = 4.4                        # M4 clearance; the snap pins are 4.1
@@ -474,10 +479,11 @@ for k in range(NR):                                            # right wall, bes
     vents.append(box("vr", INNER[5][0] - 1, OUTER[5][0] + 1, y, y + (3.5 if V2 else 3.0),
                      7.5 if V2 else 12.0, 28.5 if V2 else 26.0))
 if V2:
-    # 15 Nov: nine slots in the back wall, over the adapter's regulators, 3.5 x 18 mm, z 10-28, none
-    # between x -51.5 and -31 where the J1001 jack's opening is. The box runs at overpressure: they are exhausts.
+    # 15 Nov: nine slots in the back wall, over the adapter's regulators, 3.5 x 18 mm, z 10-28 (the two above J1004
+    # start at z 16 to keep a 2.6 mm lintel above its opening), none between x -51.5 and -31 around J1001.
     for x0 in (-85.0, -79.0, -73.0, -67.0, -61.0, -55.0, -31.0, -25.0, -19.5):
-        vents.append(box("vb", x0, x0 + 3.5, INNER[6][1] - 1, OUTER[6][1] + 1, 10.0, 28.0))
+        z0 = 16.0 if x0 in (-85.0, -79.0) else 10.0
+        vents.append(box("vb", x0, x0 + 3.5, INNER[6][1] - 1, OUTER[6][1] + 1, z0, 28.0))
 if not V2:                                                     # v2 closes the SMA wall: dust stays out
     for k in range(14):                                        # SMA wall, above the SMAs: air across the adapter
         y = 4.0 + k * 7.0
@@ -668,6 +674,13 @@ for name, lo, hi in PARTS:
         dco = bpy.data.objects.new("dc_u", me)
         sc.collection.objects.link(dco)
         openings.append(dco)
+# J1004 (JST B2PS-VH right angle -> VHR-2N jumper to KV260 J12): mating face on the back edge, housing 7.8 x 9.0 mm
+# with top latch, 0.5 mm clearance per side (provisional KiCad 103.9, 189.0 rot 270 -> centre at pin mid 103.9, 190.98)
+j1004_xc, _ = k2m(103.9, 190.98)
+openings.append(box("op_j1004", j1004_xc - 4.4, j1004_xc + 4.4,
+                    INNER[6][1] - 1, OUTER[6][1] + 1, Z_SPLIT - 0.6, ADAPTER_TOP + 11.0))
+print("J1004 opening at x", round(j1004_xc - 4.4, 2), "..", round(j1004_xc + 4.4, 2),
+      "z", round(Z_SPLIT - 0.6, 2), "..", round(ADAPTER_TOP + 11.0, 2))
 # J1103, the 2 x 20 IDC header for the ribbon to AERIS-10's ADAR1000 boards, outside the case: the ribbon
 # (50.8 mm wide, about 1 mm thick) leaves through a 54 x 2.6 mm slot in the lid right above the header,
 # its plug fitted before the lid goes on

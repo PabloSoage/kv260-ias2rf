@@ -67,6 +67,7 @@ def build():
              (3, B(37.6, -20, -1.5, 51.2, -10, 5.4)),               # micro-USB
              (3, B(92.4, -20, -1.0, 108.2, -10, 2.9)),              # microSD
              (3, B(-120, -1.4, -0.5, -105, 101.9, 6.2)),            # the SMA row
+             (3, B(-88.13, 110.0, 2.24, -79.33, 120.0, 13.40)),     # J1004 back-wall opening
              (3, C(86.1, 47.0, 30, 40, 40.0))]                      # the grille, as a hole
     for k in range(9):
         holes.append((3, B(128, 22.0 + 6 * k, 12, 140, 25.0 + 6 * k, 26)))
@@ -76,15 +77,20 @@ def build():
     lugs = []
     for x in (-95.0, 70.0, 127.0):
         lugs.append((3, B(x - 7, -25.7, -5.16, x + 7, -15.2, 9.84)))
-    for x in (-95.0, -40.0, 127.0):
+    for x in (-100.0, -27.0, 127.0):
         lugs.append((3, B(x - 7, 115.0, -5.16, x + 7, 125.5, 9.84)))
     ears = []
     for x in (-65.0, 100.0):
         ears.append((3, B(x - 11, -30.7, Z_BOT, x + 11, -15.2, Z_BOT + 5)))
         ears.append((3, B(x - 11, 115.0, Z_BOT, x + 11, 130.5, Z_BOT + 5)))
     shell = occ.fuse(shell, lugs + ears)[0]
-    honey = [(3, B(-9.7, -9.7, Z_FLOOR, 129.7, 108.7, CARRIER_BOT)),
-             (3, B(-107.2, -9.7, Z_FLOOR, -10.0, 108.7, ADAPTER_BOT)),
+    adapter_honey = occ.cut(
+        [(3, B(-107.2, -9.7, Z_FLOOR, -10.0, 108.7, ADAPTER_BOT))],
+        [(3, B(-60.5, 92.8, ADAPTER_BOT - 5.3, -48.5, 102.8, ADAPTER_BOT + 1.0)),
+         (3, B(-83.4, 83.4, ADAPTER_BOT - 2.8, -67.5, 108.2, ADAPTER_BOT + 1.0)),
+         (3, B(-88.1, 91.8, ADAPTER_BOT - 2.8, -79.4, 96.5, ADAPTER_BOT + 1.0))],
+    )[0]
+    honey = [(3, B(-9.7, -9.7, Z_FLOOR, 129.7, 108.7, CARRIER_BOT))] + adapter_honey + [
              (3, B(-28.5, -30.7, Z_FLOOR, -10.6, -10.0, ADAPTER_BOT))]
     lidhc = occ.cut([(3, B(-109.1, -11.7, Z_TOP_IN - 4.5, 130.5, 111.5, Z_TOP_IN))],
                     [(3, B(49.0, 17.0, Z_TOP_IN - 5, 123.0, 77.0, Z_TOP_IN + 1))])[0]

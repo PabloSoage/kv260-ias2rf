@@ -79,6 +79,19 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     outside, 10 mm lip inside, 3.2 mm bore for the six 28 AWG wires, a 0.8 mm slit to slip the crimped cable in
     from the side). The lip sits in a 10.6 mm seat, 1.4 mm deep, under the lid. The hole clears the corner clamp at (−5, −5) and v2's filter recess (X −69 to −11). The clamp
     gives way above the receptacle, where the plug stands. Fit the plug before the lid goes on, as the ribbon.
+  - **Single power entry (`J1004`, `L1004` and KV260 eFuse branch, 19 Nov, provisional placement within 0.5 mm).**
+    - **`J1004` opening** (`JST B2PS-VH` + `VHR-2N` plug, `7.8 × 9.0 mm` housing with top latch, `0.5 mm` clearance per
+      side): cut at `X −88.1` to `−79.3 mm`, `Z 2.24` to `13.40 mm` in the back wall beside `J1001`.
+    - **Back-wall west lug** moved from `X −95` to **`X −100`** (span `−107` to `−93 mm`, full `14 mm` width kept):
+      `4.9 mm` of solid wall clear of `J1004`'s opening, inside the flat outer wall (`X −107.6`) and fully inside
+      `bumper_lback`. On v2, the two back-wall exhaust slots above `J1004` (`X −85` and `−79`) start at `z = 16 mm`
+      instead of `10 mm` (`2.6 mm` lintel above `J1004`).
+    - **Tray pockets** under the adapter honeycomb (`Z_FLOOR −8.0 mm`, `Z_BOT −11.0 mm`, `3.0 mm` solid outer floor):
+      `pk_l1004` (`5.3 mm` deep under `L1004`'s `4.8 mm` body -> floor `Z −4.5 mm`, leaving **`3.5 mm` honeycomb web /
+      `6.5 mm` total remaining tray thickness**); `pk_kvpwr` (`2.8 mm` deep under `U1010`, `Q1010`, `Q1011`, `D1004`
+      `2.3 mm` max, `C1094`, `C1095`, `R1040`–`R1043`, `C1093`) and `pk_j1004_pins` (`2.8 mm` deep under `J1004`'s
+      through-hole leads) -> floor `Z −2.0 mm`, leaving **`6.0 mm` honeycomb web / `9.0 mm` total thickness**.
+    - All STLs rebuild with `0` non-manifold edges; `check_case.py` reports `15` intended contacts (v1) and `16` (v2).
 
 | | |
 |---|---|
@@ -185,15 +198,15 @@ pull layers apart are checked against the across-layer strength.
 
 | Material | T | Mass | f₁ | 50 g shock | Drop, bare | Drop, bumpers | Vibration |
 |---|---|---|---|---|---|---|---|
-| PETG-CF | 23 °C | 0.85 kg | 261 Hz | 2.8 | 0.2 | 1.5 | 1.5 |
+| PETG-CF | 23 °C | 0.85 kg | 260 Hz | 2.8 | 0.2 | 1.4 | 1.5 |
 | PETG-CF | 70 °C | | 177 Hz | 1.7 | 0.2 | 0.9 | 1.1 |
-| ASA | 23 °C | 0.76 kg | 281 Hz | 2.7 | 0.2 | 1.3 | 1.4 |
-| ASA | 70 °C | | 252 Hz | 2.2 | 0.2 | 1.1 | 1.1 |
+| ASA | 23 °C | 0.76 kg | 280 Hz | 2.7 | 0.2 | 1.3 | 1.4 |
+| ASA | 70 °C | | 251 Hz | 2.2 | 0.2 | 1.1 | 1.2 |
 | PAHT-CF | 23 °C | 0.77 kg | 345 Hz | 4.8 | 0.3 | 2.4 | 2.2 |
-| PAHT-CF | 70 °C | | 291 Hz | 3.4 | 0.2 | 1.7 | 1.7 |
+| PAHT-CF | 70 °C | | 290 Hz | 3.4 | 0.2 | 1.7 | 1.7 |
 | PETG | 70 °C | 0.86 kg | 149 Hz | 1.2 | 0.1 | 0.5 | 0.9 |
 | PLA | 70 °C | 0.84 kg | 67 Hz | 0.2 | 0.03 | 0.05 | 0.2 |
-| Resin ABS-like | 70 °C | 0.81 kg | 78 Hz | 0.8 | 0.1 | 0.2 | 0.7 |
+| Resin ABS-like | 70 °C | 0.80 kg | 78 Hz | 0.8 | 0.1 | 0.2 | 0.7 |
 
 What this says:
 - **Shock and vibration.** PETG-CF, ASA and PAHT-CF pass at both temperatures. PETG passes cold only. PLA and
@@ -327,7 +340,7 @@ the fan 5 V.
 - **The SMA wall has no slots**: with the fan blowing in, the box runs at a slight overpressure (CFD: about
   +11 Pa), so air leaves through the vents and dust does not come in at the seams.
 - **Right-wall exhaust along the whole wall**: 17 slots of 3.5 × 21 mm (y 4 to 103.5 mm, z 7.5 to 28.5 mm, 1.5 mm
-  above the tongue's groove) instead of v1's 9 of 3 × 14 mm, and **9 back-wall slots** of 3.5 × 18 mm (z 10 to 28 mm)
+  above the tongue's groove) instead of v1's 9 of 3 × 14 mm, and **9 back-wall slots** of 3.5 × 18 mm (z 10 to 28 mm; the two above `J1004` at x −85 and −79 start at z 16 mm)
   over the adapter's regulators, none between x −51.5 and −31 mm where the J1001 jack's opening is (15 Nov). In the
   CFD they carry 5.2 of the 7.5 CFM the fan blows in.
 - **The "KV260 · IAS2RF" label** is kept, at its new place behind the ribbon slot (as v1).
