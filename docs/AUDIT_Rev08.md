@@ -382,3 +382,12 @@ onwards. Anything it found was fixed before going on.
 - **Gateware.** All the benches pass, among them `tb_system` at 500 and 400 MHz. The four gate mutations fail as they
   should. `cargo test`: 61 of 61.
 
+- **The K26 build** (`fpga/kria/bd.tcl`) re-run on the gateware of section 5.1: `WNS +1.043 ns`, `WHS +0.010 ns`,
+  0 failing endpoints of 188,554, 53,336 LUT. The CDC report gains one synchroniser, `PMOD_SPARE2`'s. The other
+  crossings are the ones of 18 November ([FPGA_GATEWARE.md §3.3](FPGA_GATEWARE.md)).
+- **The front end with the 300 MHz high-pass** (`rev08_filters_mc.py`, `rev08_frontend.py`). The filter passes all
+  3,000 Monte Carlo runs: loss 1.52 dB at p99, rejection 51.7 dB at p1 against the 50 dB mask. It costs the
+  converted modes 1.1 dB: ADS-B noise figure 7.1 to 7.9 dB, UHF 3.7 to 4.2 dB. The direct modes do not change
+  ([RX_VU_SPEC.md](RX_VU_SPEC.md)).
+- **The documents.** Stale figures swept and every em-dash removed from the public `.md` files. The book is rebuilt:
+  278 pages, `pdf_table_check` 0 defects.

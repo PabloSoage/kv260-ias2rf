@@ -610,13 +610,13 @@ Both blocks and their DMAs are in the K26 block design (`fpga/kria/bd.tcl`), bui
 
 | Instance | LUT | FF | BRAM36 / 18 | DSP |
 |---|---|---|---|---|
-| `kria_doa_0` | 10,116 (3,200 of them LUTRAM) | 2,098 | 0 / 1 | 115 |
-| `axi_dma_2` | 560 | 841 | 1 / 1 | 0 |
-| `kria_sweep_0` | 1,585 | 638 | 2 / 1 | 8 |
-| `axi_dma_3` | 1,665 | 2,415 | 2 / 2 | 0 |
-| **Whole K26 design** | **53,294 of 117,120 (45.5 %)** | 46,879 (20.0 %) | 44.0 eq. (30.6 %), 1 URAM | 229 (18.3 %) |
+| `kria_doa_0` | 10,117 (3,200 of them LUTRAM) | 2,089 | 0 / 1 | 115 |
+| `axi_dma_2` | 563 | 841 | 1 / 1 | 0 |
+| `kria_sweep_0` | 1,586 | 638 | 2 / 1 | 8 |
+| `axi_dma_3` | 1,667 | 2,415 | 2 / 2 | 0 |
+| **Whole K26 design** | **53,336 of 117,120 (45.5 %)** | 46,896 (20.0 %) | 44.0 eq. (30.6 %), 1 URAM | 229 (18.3 %) |
 
-- **Timing:** `WNS = +0.991 ns`, `WHS = +0.010 ns`; `clk_pl_0` `+1.475 ns`, its worst intra-clock path in the ADS-B receiver, not in the new blocks.
+- **Timing:** `WNS = +1.043 ns`, `WHS = +0.010 ns` (build of 19 November); the worst path is in the ADS-B receiver, not in the new blocks.
 - **Clock-domain crossings:** none added by `kria_doa_0`, `kria_sweep_0`, `axi_dma_2`, `axi_dma_3` or PS `CAN1` EMIO. The four streaming instances run on `clk_pl_0`, the clock of the HP0 and HPM0_LPD ports ([FPGA_GATEWARE.md §3.3](FPGA_GATEWARE.md)).
 - **Addresses**, as Vivado assigned them (the XSA's hardware handoff): `kria_doa_0` `0x8005_0000`, `axi_dma_2` `0x8006_0000`, `kria_sweep_0` `0x8007_0000`, `axi_dma_3` `0x8008_0000`, each 64 KiB, after the existing five slaves at `0x8000_0000` to `0x8004_FFFF`. The overlay (`sw/ias2rf_pl.dtsi`) adds the four nodes and the DMA buffers `kraken_buf` (`0x3EE4_0000`, 512 KiB) and `sweep_buf` (`0x3EF0_0000`, 832 KiB).
 - **The first build** put `kria_sweep`'s FFT memory, read at four places at once, in flip-flops and multiplexers: 43,305 LUT for that block alone. The memory is now one block RAM with a write and a read port, six clocks per butterfly; the block fell to 1,586 LUT, and the benches above were re-run on it.
