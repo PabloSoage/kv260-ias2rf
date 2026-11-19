@@ -154208,7 +154208,7 @@
 			(uuid "15af67fc-0e99-4e35-9e9b-3bec165ae53e")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Connector_JST.3dshapes/JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step"
+		(model "${KIPRJMOD}/mech/models3d/JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -154812,7 +154812,7 @@
 			(uuid "a5bd7323-5551-4d9d-9e7d-d2ace1f674f4")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm.step"
+		(model "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm.step"
 			(offset
 				(xyz 0 0 0)
 			)

@@ -97,7 +97,10 @@ def main(src, dst):
     blocks = []
     for ref, (x, y, a, side) in PLACE.items():
         lib = comps[ref]["footprint"]
-        blocks.append(P.place(P.lib_text(lib), lib, ref, comps[ref], pins[ref], x, y, a, side == "B"))
+        b = P.place(P.lib_text(lib), lib, ref, comps[ref], pins[ref], x, y, a, side == "B")
+        for old, new in MODELS.items():
+            b = b.replace(f'(model "{old}"', f'(model "{new}"')
+        blocks.append(b)
     s = max(e for _, e, _ in P.footprints(t))
     t = t[:s] + "\n" + "".join(blocks).rstrip("\n") + t[s:]
     # 6. C1072's reference
@@ -121,6 +124,15 @@ def main(src, dst):
 
 # ---------------------------------------------------------------- the layout
 # x, y, rotation, side (a bottom part is mirrored about its x axis, then turned)
+# 3-D models the stock footprints name but KiCad 10 does not ship: the plain HTSSOP-20 body, and a JST VH model
+# drawn from the catalogue (mech/models3d)
+MODELS = {
+    "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm.step":
+        "${KICAD10_3DMODEL_DIR}/Package_SO.3dshapes/HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm.step",
+    "${KICAD10_3DMODEL_DIR}/Connector_JST.3dshapes/JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step":
+        "${KIPRJMOD}/mech/models3d/JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step",
+}
+
 PLACE = {
     "L1004": (100.25, 161.75, 270, "B"),
     "J1004": (103.9, 189, 270, "F"),
