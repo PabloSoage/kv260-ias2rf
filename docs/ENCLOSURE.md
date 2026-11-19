@@ -79,7 +79,7 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     outside, 10 mm lip inside, 3.2 mm bore for the six 28 AWG wires, a 0.8 mm slit to slip the crimped cable in
     from the side). The lip sits in a 10.6 mm seat, 1.4 mm deep, under the lid. The hole clears the corner clamp at (−5, −5) and v2's filter recess (X −69 to −11). The clamp
     gives way above the receptacle, where the plug stands. Fit the plug before the lid goes on, as the ribbon.
-  - **Single power entry (`J1004`, `L1004` and KV260 eFuse branch, 19 Nov, provisional placement within 0.5 mm).**
+  - **Single power entry (`J1004`, `L1004` and KV260 eFuse branch, 19 Nov, Rev08 final placement).**
     - **`J1004` opening** (`JST B2PS-VH` + `VHR-2N` plug, `7.8 × 9.0 mm` housing with top latch, `0.5 mm` clearance per
       side): cut at `X −88.1` to `−79.3 mm`, `Z 2.24` to `13.40 mm` in the back wall beside `J1001`.
     - **Back-wall west lug** moved from `X −95` to **`X −100`** (span `−107` to `−93 mm`, full `14 mm` width kept):
@@ -90,8 +90,13 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
       `pk_l1004` (`5.3 mm` deep under `L1004`'s `4.8 mm` body -> floor `Z −4.5 mm`, leaving **`3.5 mm` honeycomb web /
       `6.5 mm` total remaining tray thickness**); `pk_kvpwr` (`2.8 mm` deep under `U1010`, `Q1010`, `Q1011`, `D1004`
       `2.3 mm` max, `C1094`, `C1095`, `R1040`–`R1043`, `C1093`) and `pk_j1004_pins` (`2.8 mm` deep under `J1004`'s
-      through-hole leads) -> floor `Z −2.0 mm`, leaving **`6.0 mm` honeycomb web / `9.0 mm` total thickness**.
-    - All STLs rebuild with `0` non-manifold edges; `check_case.py` reports `15` intended contacts (v1) and `16` (v2).
+      through-hole leads) -> floor `Z −2.0 mm`, leaving **`6.0 mm` honeycomb web / `9.0 mm` total thickness**. Under
+      the RJ45 `J1201` tab, the bottom-side shield RC parts `C1223` (`1 nF 2 kV` `1206`, up to `1.8 mm` tall) and
+      `R1218` (`1 MOhm` `0603`) sit completely inside the existing `4.5 mm`-deep `pk_rj45` pocket and below
+      `case_pad_rj45`.
+    - All STLs rebuild with `0` non-manifold edges; `check_case.py` re-verified with the real `J1004` and `U1010` 3-D
+      models reports `15` intended contacts (v1) and `16` (v2), and zero interference with `J1004`, `L1004`, `U1010`,
+      `Q1010`, `Q1011`, `D1004`, `C1223`, or `R1218`.
 
 | | |
 |---|---|

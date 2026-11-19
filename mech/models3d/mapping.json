@@ -665,6 +665,30 @@
         1
       ],
       "notes": "Common-mode power choke (Coilmaster SMM9070-501 / ZEGMCM9070-501T, 9.0 x 7.0 x 4.58 mm)"
+    },
+    {
+      "ref": "J1004",
+      "value": "B2PS-VH",
+      "footprint": "Connector_JST:JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal",
+      "bucket": "repo",
+      "model_path": "mech/models3d/JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step",
+      "source": "Project parametric CAD (_work/mech/jst_vh_model.py, Apache-2.0)",
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "rotate_deg": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "notes": "JST B2PS-VH 2-pin 3.96 mm horizontal power feed header (warm PA66 shroud + 1.14 mm square brass/tin posts); KiCad 10 omits this 3D file from Connector_JST.3dshapes"
     }
   ]
 }

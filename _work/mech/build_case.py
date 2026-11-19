@@ -327,7 +327,7 @@ for name, lo, hi in leaves():
         if not any(p[0] <= r[0] and r[1] <= p[1] and p[2] <= r[2] and r[3] <= p[3] and p[4] <= r[4] for p in pk_rects):
             pk_rects.append(r)
 pockets = [box("pk", *r, 6) for r in pk_rects]
-# the RJ45's through-hole pins (its footprint has no 3D model): as the mount's pin pocket
+# the RJ45's through-hole pins and bottom-side shield RC network (C1223 1206, R1218 0603; <= 1.8 mm tall): inside the 4.5 mm pin pocket
 pockets.append(box("pk_rj45", -28.0, -11.0, -27.2, -11.2, ADAPTER_BOT - 4.5, 6))
 # Rev05 input protection on the adapter's underside (U1009, Q1003, D1003 SMC 2.3 mm, C1090, C1091), not in the
 # assembly's glTF yet: board x 95.6-111.4, y 137.6-151.2 (courtyards) through k2m, 0.6 mm margin, 3.1 mm deep
@@ -675,7 +675,7 @@ for name, lo, hi in PARTS:
         sc.collection.objects.link(dco)
         openings.append(dco)
 # J1004 (JST B2PS-VH right angle -> VHR-2N jumper to KV260 J12): mating face on the back edge, housing 7.8 x 9.0 mm
-# with top latch, 0.5 mm clearance per side (provisional KiCad 103.9, 189.0 rot 270 -> centre at pin mid 103.9, 190.98)
+# with top latch, 0.5 mm clearance per side (Rev08 final KiCad 103.9, 189.0 rot 270 -> centre at pin mid 103.9, 190.98)
 j1004_xc, _ = k2m(103.9, 190.98)
 openings.append(box("op_j1004", j1004_xc - 4.4, j1004_xc + 4.4,
                     INNER[6][1] - 1, OUTER[6][1] + 1, Z_SPLIT - 0.6, ADAPTER_TOP + 11.0))
