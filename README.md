@@ -157,8 +157,8 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | [CONTROL](docs/img/sch/CONTROL.png) | The front-end FPGA: banks, configuration, Pmod, AERIS ribbon, housekeeping | [CONTROL_SPEC](docs/CONTROL_SPEC.md) |
 | [POWER](docs/img/sch/POWER.png) | The power tree | [POWER_SPEC](docs/POWER_SPEC.md) |
 | [RX_VU](docs/img/sch/RX_VU.png) | VHF/UHF front end (`J961`), LNA, preselectors, RFFC5072 and IF chain | [RX_VU_SPEC](docs/RX_VU_SPEC.md) |
-| [STATUS](docs/img/sch/STATUS.png) | Status LEDs, TCA6416A expanders, debug USB-C UART, GPS PPS and vehicle CAN | [LAYOUT](docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can) |
-| [KVPWR](docs/img/sch/KVPWR.png) | KV260 single-entry power feed: `J1004`, `L1004` CMC, `U1010` 3.0 A eFuse | [POWER_SPEC](docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter) |
+| [STATUS](docs/img/sch/STATUS.png) | Status LEDs, TCA6416A expanders, debug USB-C UART, GPS PPS and vehicle CAN | [BOARD_MANUAL](docs/BOARD_MANUAL.md#3-leds) |
+| [KVPWR](docs/img/sch/KVPWR.png) | KV260 single-entry power feed: `J1004`, `L1004` CMC, `U1010` 3.0 A eFuse | [POWER_SPEC](docs/POWER_SPEC.md#14-single-power-entry-and-the-kv260-output-rev08-19-nov) |
 
 ![Full wired circuit overview (all sheets connected)](docs/img/sch/ROOT.png)
 
