@@ -6,7 +6,7 @@ This directory provides **4K raster renders (`3840 × 2160` PNG)** and **lossles
 
 ## 1. Schematics (`sch/`)
 
-- Combined single-page full wired circuit (all 11 sheets stitched onto one vector canvas):
+- Combined single-page full wired circuit (all 12 sheets stitched onto one vector canvas):
   - [`FULL_CIRCUIT.pdf`](sch/FULL_CIRCUIT.pdf) · [`FULL_CIRCUIT.svg`](sch/FULL_CIRCUIT.svg) · [`FULL_CIRCUIT_4k.png`](sch/FULL_CIRCUIT_4k.png)
 - Root hierarchy sheet:
   - [`CSI2-KRIA-KV260_Rev01.svg`](sch/CSI2-KRIA-KV260_Rev01.svg) · [`ROOT_4k.png`](sch/ROOT_4k.png)
@@ -18,12 +18,13 @@ This directory provides **4K raster renders (`3840 × 2160` PNG)** and **lossles
   - `DAC_RADAR`: [`CSI2-KRIA-KV260_Rev01-DAC_RADAR.svg`](sch/CSI2-KRIA-KV260_Rev01-DAC_RADAR.svg) · [`DAC_RADAR_4k.png`](sch/DAC_RADAR_4k.png)
   - `DAC_SDR`: [`CSI2-KRIA-KV260_Rev01-DAC_SDR.svg`](sch/CSI2-KRIA-KV260_Rev01-DAC_SDR.svg) · [`DAC_SDR_4k.png`](sch/DAC_SDR_4k.png)
   - `IAS_LINK`: [`CSI2-KRIA-KV260_Rev01-IAS_LINK.svg`](sch/CSI2-KRIA-KV260_Rev01-IAS_LINK.svg) · [`IAS_LINK_4k.png`](sch/IAS_LINK_4k.png)
+  - `KVPWR`: [`CSI2-KRIA-KV260_Rev01-KVPWR.svg`](sch/CSI2-KRIA-KV260_Rev01-KVPWR.svg) · [`KVPWR_4k.png`](sch/KVPWR_4k.png)
   - `POWER`: [`CSI2-KRIA-KV260_Rev01-POWER.svg`](sch/CSI2-KRIA-KV260_Rev01-POWER.svg) · [`POWER_4k.png`](sch/POWER_4k.png)
   - `ROUTING`: [`CSI2-KRIA-KV260_Rev01-ROUTING.svg`](sch/CSI2-KRIA-KV260_Rev01-ROUTING.svg) · [`ROUTING_4k.png`](sch/ROUTING_4k.png)
   - `RX_VU`: [`CSI2-KRIA-KV260_Rev01-RX_VU.svg`](sch/CSI2-KRIA-KV260_Rev01-RX_VU.svg) · [`RX_VU_4k.png`](sch/RX_VU_4k.png)
   - `STATUS`: [`CSI2-KRIA-KV260_Rev01-STATUS.svg`](sch/CSI2-KRIA-KV260_Rev01-STATUS.svg) · [`STATUS_4k.png`](sch/STATUS_4k.png)
 
-*(Full 13-page multi-sheet vector PDF: the root, the composite and the 11 sheets: [`docs/KV260-IAS2RF_schematic.pdf`](../../KV260-IAS2RF_schematic.pdf).)*
+*(Full 14-page multi-sheet vector PDF: the root, the composite and the 12 sheets: [`docs/KV260-IAS2RF_schematic.pdf`](../../KV260-IAS2RF_schematic.pdf).)*
 
 ---
 

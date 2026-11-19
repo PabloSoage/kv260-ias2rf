@@ -427,6 +427,7 @@ function sheetLink(sheet, ref) {
     IAS_LINK: "docs/INTERFACE_SPEC.md",
     RX_VU: "docs/RX_VU_SPEC.md",
     STATUS: "docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can",
+    KVPWR: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
   };
   return map[sheet] || "docs/BOARD_MANUAL.md";
 }
@@ -435,6 +436,7 @@ function estimateHeightMm(ref, fp, hasStep) {
   if (/^(FID|TP|MH|JP|NT)/.test(ref)) return 0.1;
   if (/^J1201/.test(ref)) return 13.5;
   if (/^J1001/.test(ref)) return 11.0;
+  if (/^J1004/.test(ref)) return 9.0;
   if (/^J1103/.test(ref)) return 8.8;
   if (/^J1102/.test(ref)) return 8.5;
   if (/^J1501/.test(ref)) return 9.3;
@@ -442,6 +444,7 @@ function estimateHeightMm(ref, fp, hasStep) {
   if (/^J1503/.test(ref)) return 2.95;
   if (/^J1502/.test(ref)) return 2.55;
   if (/^J10[123]/.test(ref)) return 0.8;
+  if (/^L1004/.test(ref)) return 4.8;
   if (/^L10/.test(ref)) return 2.8;
   if (/^T7|^T8/.test(ref)) return 2.84;
   if (/^Y401/.test(ref)) return 1.65;
@@ -691,9 +694,9 @@ const KV260_PARTS = [
     assembly: "kv260",
     subassembly: "carrier",
     bbox_mm: [1.78, 92.96, 11.18, 107.36, -3.0, 11.5],
-    role: "12 V 3 A power input for the KV260 carrier and K26 SOM (separate from adapter J1001 12 V jack per INTERFACE_SPEC.md).",
-    citation: "AMD UG1089",
-    manual_link: "docs/ENCLOSURE.md#2-geometry",
+    role: "12 V 3 A power input for the KV260 carrier and K26 SOM, fed from adapter J1004 via a VHR-2N jumper through the U1010 3.0 A eFuse (POWER_SPEC.md §1.4, BOARD_MANUAL.md §6; never power J1001 and J12 from separate supplies).",
+    citation: "AMD UG1089; POWER_SPEC.md §1.4",
+    manual_link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
   },
   {
     id: "KV260_J4_UART",
@@ -1025,6 +1028,42 @@ function build() {
       },
       J1102: {
         desc: "12-pin 2x6 Pmod header (Artix bank 15 <-> K26 HDA); Pmod back-powering gated in gateware on both FPGAs (kria_present / adapter_alive, PMOD_SPARE2 open-drain; Rev08 audit P2)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      J1004: {
+        desc: "JST B2PS-VH 2-pin 3.96 mm horizontal 12 V output header feeding KV260 J12 over a short VHR-2N jumper (single-entry return via BM20 link by design, 132 mA/contact at 3.19 A worst)",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      L1004: {
+        desc: "ZEGMCM9070-501T 6 A common-mode choke (600 Ohm @ 100 MHz, 450 Ohm min, 2 x 8 mOhm) on both J1001 entry lines (attenuates common-mode noise by 2.9 dB at 65 kHz to 9.5 dB at 100 MHz; 0.30 W at 4.31 A worst)",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      U1010: {
+        desc: "TPS26631PWPR eFuse for KV260 12 V feed: 3.0 A limit set by R1043 (2.77-3.19 A across tolerance, capping BM20 contact current), OVP 14.4 V, UVLO 8.0 V",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      Q1010: {
+        desc: "DMT10H015LFG 100 V 13.5 mOhm reverse-blocking N-FET (source on VIN_J) providing -60 V reverse polarity protection with Q1011 (57.3 V peak VDS in ISO 7637-2 pulse 1; 0.137 W at 3.19 A)",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      Q1011: {
+        desc: "2N7002 N-FET (VDS >= 15 V, Ciss <= 50 pF) coupling U1010 DRV to Q1010 B_GATE for -60 V reverse polarity protection (SLVSE94G §8.3.5)",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      D1004: {
+        desc: "SS34 40 V 3 A SMA Schottky diode on +12V_KV to GND clamping inductive negative kick on the KV260 jumper when U1010 opens on fault (SLVSE94G §9.5.1)",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      R1043: {
+        desc: "6.04 kOhm 0603 1% ILIM resistor setting U1010 TPS26631 current limit to 3.0 A nominal (3.19 A worst case)",
+        link: "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      },
+      C1223: {
+        desc: "1 nF 2 kV X7R 1206 capacitor across the J1201 Ethernet shield-to-ground RC network (breaks DC/50 Hz earth loops to earthed switches)",
+        link: "docs/AUDIT_Rev08.md",
+      },
+      R1218: {
+        desc: "1 MOhm 0603 bleed resistor in parallel with C1223 on the J1201 Ethernet RJ45 shield",
         link: "docs/AUDIT_Rev08.md",
       },
     };

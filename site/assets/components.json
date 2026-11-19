@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-19T09:17:42.328Z",
+  "generated_at": "2026-11-19T14:44:32.114Z",
   "pcb_file": "CSI2-KRIA-KV260_Rev01.kicad_pcb",
   "registration": {
     "note": "k2m(x, y) = (107.247 - y, 198.004 - x); board underside at Z = 0.8 mm, top at Z = 2.4 mm",
@@ -96,12 +96,12 @@
     ]
   },
   "counts": {
-    "total_components": 802,
-    "described": 774,
+    "total_components": 817,
+    "described": 789,
     "undescribed": 28,
-    "kicad_step_models": 762,
+    "kicad_step_models": 777,
     "procedural_replacements": 9,
-    "unique_nets": 592,
+    "unique_nets": 603,
     "kv260_parts": 23
   },
   "layer_stack": [
@@ -1536,7 +1536,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 15.7dBm 250dB 2GHz 37mA 3V~5.5V 41dBm Low-power mode、Linearization design、Variable gain control LFCSP-16(3x3) Differential Amplifiers ROHS",
       "description": "Driver for the AD9253 channel A. Spec: Channel A driver",
-      "callout": 58,
+      "callout": 59,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+5V_IFS",
@@ -1768,7 +1768,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃@(TJ) 1 1V~24V 24uA 3.8V~36V 3A 400kHz Adjustable Buck Buck Built-in Yes ESOP-8 DC-DC Converters ROHS",
       "description": "+12V to +5V0 buck, 3 A. Spec: 12 V -> 5 V, 3 A, 400 kHz (A version)",
-      "callout": 66,
+      "callout": 67,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+12V",
@@ -1987,7 +1987,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-3.6V~-3.3V、3.3V~3.6V -55℃~+105℃ 0GHz~30GHz 2.2dB 27.8dBm 44dB Hot-switch capability SPDT QFN-16(3x3) RF Switches ROHS",
       "description": "SW1: SDR_RX_A or AERIS_IF_A to the AD9253 channel A",
-      "callout": 62,
+      "callout": 63,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_RX_A",
@@ -2267,7 +2267,7 @@
       "manufacturer": "TECH PUBLIC",
       "bom_desc": "-55℃~+125℃ 0.35pF 12V 150W 2 5V 6A 6V 80nA ESD IEC 61000-4-2、IEC 61000-4-5、IEC 61000-4-4 Unidirectional SOT-23-6 ESD and Surge Protection (TVS/ESD) ROHS",
       "description": "ESD on the USB data lines",
-      "callout": 92,
+      "callout": 94,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/STATUS/USB_DN",
@@ -2431,7 +2431,7 @@
       "manufacturer": "",
       "bom_desc": "",
       "description": "Mixer input balun. Spec: Mixer input balun 1:1, 4.5-3000 MHz",
-      "callout": 105,
+      "callout": 107,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_MIX_IN",
@@ -4838,7 +4838,7 @@
       "manufacturer": "Skyworks Solutions",
       "bom_desc": "-40℃~+90℃ 0.7dB 100MHz~3.8GHz 2.5V~5V 20dB Integrated control logic QFN-14-EP(2x2) RF Switches ROHS",
       "description": "Preselector B, input side (straight, UHF low-pass, ADS-B). Spec: Preselector B in: RF1 UHF low-pass, RF2 SAW 1090, RF3 HPF 1 GHz, RF4 LPF 1 GHz, RF5-8 spare",
-      "callout": 80,
+      "callout": 82,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -5015,7 +5015,7 @@
       "manufacturer": "TST",
       "bom_desc": "-30℃~+85℃ 1.09GHz 30MHz 30dB、33.5dB 3dB 50Ω SMD3838-6P SAW Filters ROHS",
       "description": "1090 MHz SAW filter (ADS-B path). Spec: SAW band-pass 1090 MHz (ADS-B)",
-      "callout": 99,
+      "callout": 101,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_SAW_IN",
@@ -5228,7 +5228,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 15.7dBm 250dB 2GHz 37mA 3V~5.5V 41dBm Low-power mode、Linearization design、Variable gain control LFCSP-16(3x3) Differential Amplifiers ROHS",
       "description": "Driver for the AD9253 channel B (HF). Spec: Channel B driver",
-      "callout": 59,
+      "callout": 60,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+5V_IFS",
@@ -5356,7 +5356,7 @@
       "manufacturer": "DOWO",
       "bom_desc": "-55℃~+125℃ 0.2pF 10V、15V 1uA 5V 60W@8/20us 9V Four channels IEC 61000-4-2、IEC 61000-4-5 TVS Unidirectional DFN2510-10L ESD and Surge Protection (TVS/ESD) ROHS",
       "description": "ESD array on the Pmod lines",
-      "callout": 49,
+      "callout": 50,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/CONTROL/PMOD_CS",
@@ -5783,7 +5783,7 @@
       "manufacturer": "Diodes Incorporated",
       "bom_desc": "-40℃~+85℃ 1 2.1A 3V~5.5V 65mΩ Active Low High Side Switch Short-Circuit Protection(SCP)、Overcurrent Protection(OCP)、Overtemperature protection (OTP) SOT-26 Power Distribution Switches ROHS",
       "description": "Bias-tee current limiter for `J961` (125 mA). Spec: Bias-tee switch, 125 mA limit (RLIM 210 k), active-low enable, fault flag",
-      "callout": 88,
+      "callout": 90,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_BIAS_EN_N",
@@ -7611,7 +7611,7 @@
       "manufacturer": "Ckmtw(Shenzhen Cankemeng)",
       "bom_desc": "2 2.54mm 2.54mm 20 2x20P Brass Gold IDC Header Through Hole ,P=2.54mm IDC Connectors ROHS",
       "description": "AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines. Spec: Ribbon to AERIS-10: 8 x ADAR1000 control (ARCHITECTURE §7.2)",
-      "callout": 21,
+      "callout": 22,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
         "/CONTROL/ADAR1_CS",
@@ -7891,7 +7891,7 @@
       "manufacturer": "Qorvo",
       "bom_desc": "-40℃~+85℃ 0.8dB 16dB 17.5dB 18.2dB 22.7dBm 35dBm 4.75V~5.25V 46mA 50MHz~4GHz Linearization design、Bias control circuit SOT-343 RF Amplifiers ROHS",
       "description": "VHF/UHF low-noise amplifier. Spec: LNA, 22.6 dB / NF 0.6 dB at 100 MHz, 25 mA at 3.0 V",
-      "callout": 75,
+      "callout": 77,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_LNA_IN",
@@ -8050,7 +8050,7 @@
       "manufacturer": "JST",
       "bom_desc": "-25℃~+85℃ 1 1A 1mm 1x6P 3.6mm 4.25mm 50V 6 6P 8mm Auxiliary Solder Pin Copper alloy PA SH Surface Mount,Vertical Tin UL94V-0 White SMD,P=1mm Wire To Board Connector ROHS",
       "description": "GPS receiver and vehicle CAN, JST-SH 6-pin, vertical, the plug from above: 1 GND, 2 CANL, 3 CANH, 4 GND, 5 PPS in (3.3 V), 6 +3.3 V out (0.2 A PTC) (no termination: it taps the car's bus)",
-      "callout": 25,
+      "callout": 26,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
         "/STATUS/CAN_H",
@@ -8682,7 +8682,7 @@
       "manufacturer": "Korean Hroparts Elec",
       "bom_desc": "-25℃~+85℃ 1 10000 times 16P 5A 5V 6mm Female Surface Mount,Vertical Type-C SMD USB Connectors ROHS",
       "description": "Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off. Spec: Debug USB, vertical, surface mount only, on the IAS0 tongue (inside the box)",
-      "callout": 23,
+      "callout": 24,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
         "/STATUS/USB_CC1",
@@ -8857,7 +8857,7 @@
       "manufacturer": "AMD/XILINX",
       "bom_desc": "-40℃~+100℃ 52160 Integrated temperature sensor、Supports SEU error detection and correction、Supports AES encryption FTBGA-256(17x17) Programmable Logic Device (CPLDs/FPGAs) ROHS",
       "description": "The front-end FPGA: converters, RF switches, link to the Kria, Ethernet, housekeeping. Spec: Front-end FPGA, AERIS-10's part (ARCHITECTURE §2.2)",
-      "callout": 44,
+      "callout": 45,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V0",
@@ -9627,7 +9627,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 0.25LSB 1 2.7V~5.5V 35ns 8 Current-Non-buffered Parallel SOIC-28-300mil Digital to Analog Converters (DAC) ROHS",
       "description": "8-bit 125 MSPS DAC: the radar chirp. Spec: Radar DAC, AERIS-10's part. R-28: body 17.70-18.10 x 7.40-7.60 mm (outline)",
-      "callout": 60,
+      "callout": 61,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_A",
@@ -9825,7 +9825,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 200mV@(2A) 2A 40dB@(1MHz) 6.5V 6uVrms 800mV~5V Adjustable PG Pin、Over Current Protection、Over Temperature Protection、Soft Start、Thermal Shutdown VQFN-20-EP(3.5x3.5) Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
       "description": "+2V5 to +1V8_A LDO (the ADCs' analogue supply)",
-      "callout": 70,
+      "callout": 71,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V8_A",
@@ -9951,7 +9951,7 @@
       "manufacturer": "HANRUN(Zhongshan HanRun Elec)",
       "bom_desc": "0℃~+70℃ 1 Gold Non-PoE Phosphor bronze RJ45 Jack Right Angle Shielded With LED Ethernet Connectors / Modular Connectors (RJ45 RJ11) ROHS",
       "description": "Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone",
-      "callout": 22,
+      "callout": 23,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
         "/CONTROL/ETH_CT",
@@ -9966,6 +9966,7 @@
         "/CONTROL/ETH_MDI2_P",
         "/CONTROL/ETH_MDI3_N",
         "/CONTROL/ETH_MDI3_P",
+        "/CONTROL/ETH_SHIELD",
         "GND"
       ],
       "pads": {
@@ -9983,7 +9984,7 @@
         "13": "GND",
         "14": "/CONTROL/ETH_LEDY_A",
         "?": "/CONTROL/ETH_CT",
-        "SH": "GND"
+        "SH": "/CONTROL/ETH_SHIELD"
       }
     },
     {
@@ -10183,7 +10184,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-40℃~+105℃ 2.35dB 3.3V 30MHz~6GHz 61dB QFN-24-EP(4x4) RF Switches ROHS",
       "description": "Preselector A: band selection, input side. Spec: Preselector A in: RF1 straight, RF2 FM band-pass, RF3 FM reject, RF4 preselector B",
-      "callout": 78,
+      "callout": 80,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -10419,7 +10420,7 @@
       "manufacturer": "KDS Daishinku",
       "bom_desc": "-40℃~+85℃ 1.5mA 1.7V~3.6V 26MHz ±1.5ppm SMD2016-4P Temperature Compensated Crystal Oscillators (TCXO) ROHS",
       "description": "TCXO, the RFFC5072's reference. Spec: RFFC5072 reference, 26 MHz +-1.5 ppm, clipped sine",
-      "callout": 98,
+      "callout": 100,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_TCXO_OUT",
@@ -10735,7 +10736,7 @@
       "manufacturer": "E-Switch",
       "bom_desc": "-20℃~+70℃ 1.54mm 100,000 cycles 12V 4.5N 5.2mm 50mA Gull Wing Round Button SPST-NO Surface Mount,Vertical SMD-4P,5.2x5.2mm Tactile Switches ROHS",
       "description": "Pulls the FPGA's PROG_B: reloads the bitstream from the flash. Spec: UG470 Table 2-4: 'recommend push-button to GND' on PROGRAM_B",
-      "callout": 26,
+      "callout": 27,
       "manual_link": "docs/BOARD_MANUAL.md#2-switches-and-jumpers",
       "nets": [
         "/CONTROL/PROGRAM_B",
@@ -10888,8 +10889,8 @@
       "mpn": "RFFC5072TR13",
       "manufacturer": "Qorvo",
       "bom_desc": "QFN-32 RF Misc ICs and Modules ROHS",
-      "description": "Synthesiser and mixer: converts 170 MHz-3 GHz down to the IF. Spec: Synthesiser and mixer, LO 85-4200 MHz; down-converts to the 135 MHz IF",
-      "callout": 86,
+      "description": "Synthesiser and mixer: converts 300 MHz-3 GHz down to the IF (170-300 MHz not covered). Spec: Synthesiser and mixer, LO 85-4200 MHz; down-converts to the 135 MHz IF",
+      "callout": 88,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -10988,7 +10989,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 15.7dBm 250dB 2GHz 37mA 3V~5.5V 41dBm Low-power mode、Linearization design、Variable gain control LFCSP-16(3x3) Differential Amplifiers ROHS",
       "description": "Differential driver for the AD9484, first stage. Spec: First stage, single-ended in. CP-16-22: exposed pad 1.60 mm (datasheet outline)",
-      "callout": 55,
+      "callout": 56,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+5V_IFR",
@@ -11584,7 +11585,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-20℃~+85℃ 0.2dB 18dB 1:2 1° 400kHz~450MHz SMD-6P Balun ROHS",
       "description": "AD9767 DAC1 output balun",
-      "callout": 103,
+      "callout": 105,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_A",
@@ -12212,7 +12213,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 15.7dBm 250dB 2GHz 37mA 3V~5.5V 41dBm Low-power mode、Linearization design、Variable gain control LFCSP-16(3x3) Differential Amplifiers ROHS",
       "description": "Differential driver for the AD9484, second stage. Spec: Second stage, differential",
-      "callout": 56,
+      "callout": 57,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+5V_IFR",
@@ -12340,7 +12341,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-40℃~+85℃ 0.35dB 1.8V~3.3V 10MHz~3GHz 30dB 33.5dBm Integrated control logic SPDT SC-70-6 RF Switches ROHS",
       "description": "LNA bypass switch, input side. Spec: LNA bypass, input side; CTRL high = LNA in",
-      "callout": 76,
+      "callout": 78,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -12972,7 +12973,7 @@
       "manufacturer": "DOWO",
       "bom_desc": "-55℃~+125℃ 0.2pF 10V、15V 1uA 5V 60W@8/20us 9V Four channels IEC 61000-4-2、IEC 61000-4-5 TVS Unidirectional DFN2510-10L ESD and Surge Protection (TVS/ESD) ROHS",
       "description": "ESD array on the JTAG lines",
-      "callout": 51,
+      "callout": 52,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/CONTROL/JTAG_TCK",
@@ -13993,7 +13994,7 @@
       "manufacturer": "STMicroelectronics",
       "bom_desc": "-40℃~+85℃ 1.7V~5.5V 200 Years 2Kbit 4,000,000 Cycles 400kHz 5ms Hardware write protection function、Noise suppression function、Built-in power-on reset (POR) I2C SOIC-8 EEPROM ROHS",
       "description": "Board-ID EEPROM (revision, serial), I2C 0x50, write-protected unless `JP1101` is closed. Spec: Board ID EEPROM, 2 kbit, I2C 0x50 (E2..E0 = GND, DS9398 Table 2). -F grade: 1.7-5.5 V",
-      "callout": 48,
+      "callout": 49,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V8_D",
@@ -14324,7 +14325,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-40℃~+105℃ 2.35dB 3.3V 30MHz~6GHz 61dB QFN-24-EP(4x4) RF Switches ROHS",
       "description": "Preselector A: band selection, output side. Spec: Preselector A out",
-      "callout": 79,
+      "callout": 81,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -16379,11 +16380,11 @@
       "callout": null,
       "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
-        "/POWER/VIN_F",
-        "Net-(F1001-Pad1)"
+        "/KVPWR/VIN_J",
+        "/POWER/VIN_F"
       ],
       "pads": {
-        "1": "Net-(F1001-Pad1)",
+        "1": "/KVPWR/VIN_J",
         "2": "/POWER/VIN_F"
       }
     },
@@ -16428,7 +16429,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 1.5LSB 125MHz 14 2 3.3V~5V 35ns 8mA Parallel LQFP-48(7x7) Digital to Analog Converters (DAC) ROHS",
       "description": "Dual 14-bit 125 MSPS DAC: SDR transmit A and HF. Spec: Dual 14-bit DAC, 48-lead LQFP (ST-48)",
-      "callout": 61,
+      "callout": 62,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_A",
@@ -18110,7 +18111,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 1.7V~1.9V 125MHz 125MHz 14 2LSB 4 74.2dB Built-in Multi-chip synchronization、Soft reset、Programmable output clock and data alignment Serial port Yes LFCSP-48(7x7) Analog to Digital Converters (ADC) ROHS",
       "description": "14-bit quad ADC, two channels used: SDR receive A and HF (C). Spec: SDR ADC, 14 bits. CP-48-13: 7x7 mm, exposed pad 5.60 mm (Figure 77), matching the stock footprint",
-      "callout": 57,
+      "callout": 58,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V8_ADCS_A",
@@ -18230,7 +18231,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+85℃ 2.5V~5.5V 200mA 3.5Ω 75kHz 800uA 96% Inverted、boost converter Not supported SOIC-8 Charge Pumps ROHS",
       "description": "-3V3 charge pump (the RF switches' negative supply). Spec: Inverter, +3V3_D -> about -3.25 V at 8 mA (ROUT 3.5 ohm typ)",
-      "callout": 73,
+      "callout": 74,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_D",
@@ -18871,7 +18872,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-55℃~+100℃ 1.3GHz 1dB 50Ω Low Pass SMD-4P,3.2x1.6mm RF Filters ROHS",
       "description": "Low-pass, UHF preselector",
-      "callout": 101,
+      "callout": 103,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_LP1G_IN",
@@ -19496,7 +19497,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 200mV@(2A) 2A 40dB@(1MHz) 6.5V 6uVrms 800mV~5V Adjustable PG Pin、Over Current Protection、Over Temperature Protection、Soft Start、Thermal Shutdown VQFN-20-EP(3.5x3.5) Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
       "description": "TPS7A8300RGR low-noise LDO for +1V8_D set to 1.85 V (pin 5 ANY-OUT grounded; VCCAUX 1.714-1.873 V at balls, 0.91 W worst; Rev08 audit P4)",
-      "callout": 71,
+      "callout": 72,
       "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+1V8_D",
@@ -19776,7 +19777,7 @@
       "manufacturer": "Realtek Semicon",
       "bom_desc": "QFN-48 Ethernet Transceivers ROHS",
       "description": "Gigabit Ethernet PHY, SGMII to the FPGA",
-      "callout": 52,
+      "callout": 53,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_D",
@@ -20994,7 +20995,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃@(TJ) 1 3A 4.5V~17V 580kHz 768mV~7V Adjustable Buck Buck Built-in Yes SOT-23-THIN-6 DC-DC Converters ROHS",
       "description": "TPS563201 (3 A) synchronous buck converter for +3V3_D (upgraded from 2 A TPS562201, 63% worst-case use; Rev08 audit P5)",
-      "callout": 67,
+      "callout": 68,
       "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+5V0",
@@ -21936,7 +21937,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 200mV@(2A) 2A 40dB@(1MHz) 6.5V 6uVrms 800mV~5V Adjustable PG Pin、Over Current Protection、Over Temperature Protection、Soft Start、Thermal Shutdown VQFN-20-EP(3.5x3.5) Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
       "description": "+5V0 to +3V3_A LDO (the DACs' analogue supply)",
-      "callout": 72,
+      "callout": 73,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_A",
@@ -22840,7 +22841,7 @@
       "manufacturer": "Micron Tech",
       "bom_desc": "-40℃~+85℃ 100,000 cycles 128Mbit 133MHz 2.7V~3.6V 20 Years Power-on reset、Hardware write protection、Software write protection、Write enable latch、Absolute write protection SPI SOP-8-208mil NOR FLASH ROHS",
       "description": "128 Mbit SPI flash: the FPGA's bitstream. Spec: Configuration flash, 128 Mb: in Vivado's list (UG908) as mt25ql128",
-      "callout": 45,
+      "callout": 46,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_D",
@@ -23164,7 +23165,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-20℃~+85℃ 0.2dB 18dB 1:2 1° 400kHz~450MHz SMD-6P Balun ROHS",
       "description": "AD9767 DAC2 output balun",
-      "callout": 104,
+      "callout": 106,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_C",
@@ -23897,16 +23898,16 @@
       "mpn": "PJ-102AH",
       "manufacturer": "CUI",
       "bom_desc": "-25℃~+85℃ 11mm 14.4mm 24V 2mm 5A 6.5mm 9mm DC Power Jack Right Angle Plugin DC Power Connectors ROHS",
-      "description": "12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.9 W, 12.8 W with margin (the GPS receiver included). Spec: PJ-102AH (ARCHITECTURE BOM, C). Pin 1 centre = +12 V, pin 2 sleeve = GND",
+      "description": "12 V input, barrel jack (CUI PJ-102AH, 5 A). Single power entry for both boards (`L1004` on both lines): feeds the adapter (11.7 W typical, 13.4 W / 1.12 A worst; `F1001` 2 A PTC, 18.3 V OVP) and the KV260 via `U1010`/`J1004` (3.0 A / 3.19 A max limit; 1.89 A typical, 4.12 A rated, 4.31 A worst combined). See POWER_SPEC section 1.4 and section 6. Spec: PJ-102AH (ARCHITECTURE BOM, C). Pin 1 centre = +12 V, pin 2 sleeve = GND",
       "callout": 17,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
-        "GND",
-        "Net-(F1001-Pad1)"
+        "/KVPWR/GND_IN",
+        "/KVPWR/VIN_JACK"
       ],
       "pads": {
-        "1": "Net-(F1001-Pad1)",
-        "2": "GND"
+        "1": "/KVPWR/VIN_JACK",
+        "2": "/KVPWR/GND_IN"
       }
     },
     {
@@ -23950,7 +23951,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-40℃~+85℃ 3MHz~800MHz Transformer SMD,3.8x3.8mm RF Misc ICs and Modules ROHS",
       "description": "Mixer output balun. Spec: Mixer output balun 4:1 with centre tap: the data sheet's -2 dB arrangement; the mixer's bias current flows through it: MIX2_IDD <= 3 (TC4-1W+ is rated 30 mA)",
-      "callout": 106,
+      "callout": 108,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -24318,7 +24319,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 1 1 1.65V~5.5V 10uA 32mA 4.2ns@3.3V,50pF 74LVC Open-drain Power-off isolation、Level shifting Unidirectional SOT-23-5 Buffers, Drivers, Receivers, Transceivers ROHS",
       "description": "Open-drain buffer on the FPGA's PROG_B. Spec: FPGA_PROG_B (1.8 V, from the Kria) to PROGRAM_B (3.3 V): open-drain buffer",
-      "callout": 46,
+      "callout": 47,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V8_D",
@@ -24532,7 +24533,7 @@
       "manufacturer": "MOLEX",
       "bom_desc": "-55℃~+105℃ 125V 14P 2 2A 2mm 2mm 2x7P 7 Black Gold PA Phosphor bronze Surface Mount,Vertical UL94V-0 SMD,P=2mm Wire To Board Connector ROHS",
       "description": "Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter). Spec: Xilinx cable header, DS593 Figure 14 (shrouded Molex 87832-1420 to fit)",
-      "callout": 19,
+      "callout": 20,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
         "+3V3_D",
@@ -25014,7 +25015,7 @@
       "manufacturer": "Skyworks Solutions",
       "bom_desc": "-40℃~+90℃ 0.7dB 100MHz~3.8GHz 2.5V~5V 20dB Integrated control logic QFN-14-EP(2x2) RF Switches ROHS",
       "description": "Preselector B, output side. Spec: Preselector B out",
-      "callout": 81,
+      "callout": 83,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -25341,7 +25342,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-3.6V~-3.3V、3.3V~3.6V -55℃~+105℃ 0GHz~30GHz 2.2dB 27.8dBm 44dB Hot-switch capability SPDT QFN-16(3x3) RF Switches ROHS",
       "description": "SW2: AERIS_IF or the VHF/UHF front end to the AD9484",
-      "callout": 63,
+      "callout": 64,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_RX_B",
@@ -25469,7 +25470,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 2 2.97V~3.63V 4.8GHz 8 LFCSP-32(5x5) Clock Buffers, Drivers, Distributors ROHS",
       "description": "Clock fan-out: the converters' and the FPGA's clocks from the Si549 or `J401`. Spec: 2 selectable inputs, 8 LVPECL outputs. Footprint: CP-32-21 has a 2.70 mm exposed pad; KiCad's stock LFCSP-32 5x5 all have >= 3.1 mm. Custom footprint needed at layout",
-      "callout": 53,
+      "callout": 54,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_CLK",
@@ -25734,7 +25735,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-55℃~+125℃ 1.7V~5.5V 12bit 3.5uA 7ms Factory temperature calibration、Temperature threshold monitoring I2C、SMBus ±1℃ SOIC-8 Temperature Sensors ROHS",
       "description": "Board temperature sensor, I2C 0x48. Spec: Board temperature on the HK bus, I2C 0x48 (A2..A0 = GND, TMP1075 Table 7-2). 1.7-5.5 V, +-1 C max -40..110 C",
-      "callout": 47,
+      "callout": 48,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V8_D",
@@ -25859,7 +25860,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-3.6V~-3.3V、3.3V~3.6V -55℃~+105℃ 0GHz~30GHz 2.2dB 27.8dBm 44dB Hot-switch capability SPDT QFN-16(3x3) RF Switches ROHS",
       "description": "SW4: the AD9708 to AERIS_TX or SDR_TX_WB",
-      "callout": 65,
+      "callout": 66,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_B",
@@ -26139,7 +26140,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-40℃~+85℃ 0.35dB 1.8V~3.3V 10MHz~3GHz 30dB 33.5dBm Integrated control logic SPDT SC-70-6 RF Switches ROHS",
       "description": "Direct or converted path. Spec: Converter bypass, input side; CTRL high = through the RFFC5072",
-      "callout": 82,
+      "callout": 84,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -27343,7 +27344,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "2.54GHz 50Ω SMD3216-4P Ceramic Filters ROHS",
       "description": "High-pass after the mixer",
-      "callout": 100,
+      "callout": 102,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_HP1G_IN",
@@ -28588,7 +28589,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-3.6V~-3.3V、3.3V~3.6V -55℃~+105℃ 0GHz~30GHz 2.2dB 27.8dBm 44dB Hot-switch capability SPDT QFN-16(3x3) RF Switches ROHS",
       "description": "SW3: the AD9767 DAC1 to SDR_TX_A or AERIS_TX_A",
-      "callout": 64,
+      "callout": 65,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_A",
@@ -28660,7 +28661,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-40℃~+85℃ 0.35dB 1.8V~3.3V 10MHz~3GHz 30dB 33.5dBm Integrated control logic SPDT SC-70-6 RF Switches ROHS",
       "description": "Direct or converted path, after the converter. Spec: Converter bypass, output side",
-      "callout": 83,
+      "callout": 85,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -29448,7 +29449,7 @@
       "manufacturer": "hanxia",
       "bom_desc": "-40℃~+105℃ 12P 1kV 2 2.54mm 2.54mm 2.5mm 2x6P 3A 3mm 6mm Black Copper Alloy Gold Square pin Through Hole Plugin,P=2.54mm Pin Headers ROHS",
       "description": "12-pin 2x6 Pmod header (Artix bank 15 <-> K26 HDA); Pmod back-powering gated in gateware on both FPGAs (kria_present / adapter_alive, PMOD_SPARE2 open-drain; Rev08 audit P2)",
-      "callout": 20,
+      "callout": 21,
       "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "/CONTROL/BEAM_STROBE",
@@ -29517,7 +29518,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃@(TJ) 1 2A 380uA 4.5V~17V 580kHz 768mV~7V Adjustable Buck Built-in Overcurrent Protection、Light load efficient mode、Cycle-by-cycle current limiting、Hiccup current limiting Step-down type Yes TSOT-23-6 DC-DC Converters ROHS",
       "description": "+5V0 to +2V5 buck (FPGA LVDS banks, feeds +1V8_A)",
-      "callout": 68,
+      "callout": 69,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+5V0",
@@ -29681,7 +29682,7 @@
       "manufacturer": "",
       "bom_desc": "",
       "description": "Solder jumper, open as built: close it to allow writing the board-ID EEPROM `U1105`. Spec: Close to write the ID EEPROM: pulls WC to GND (open: write-protected)",
-      "callout": 27,
+      "callout": 28,
       "manual_link": "docs/BOARD_MANUAL.md#2-switches-and-jumpers",
       "nets": [
         "/CONTROL/EE_WC",
@@ -30147,7 +30148,7 @@
       "manufacturer": "YXC Crystal Oscillators",
       "bom_desc": "-40℃~+85℃ 12pF 25MHz 50Ω Crystal Oscillator ±10ppm ±20ppm SMD3225-4P Crystals ROHS",
       "description": "Crystal for the Ethernet PHY",
-      "callout": 97,
+      "callout": 99,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/CONTROL/ETH_XI",
@@ -30408,7 +30409,7 @@
       "manufacturer": "",
       "bom_desc": "",
       "description": "Programmable master oscillator, 400 or 500 MHz. Spec: 5x7 mm package, pin-compatible with Si570 (datasheet: 'if replacing Si570A-K, use Code C')",
-      "callout": 96,
+      "callout": 98,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_CLK",
@@ -30992,7 +30993,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-40℃~+85℃ 0.35dB 1.8V~3.3V 10MHz~3GHz 30dB 33.5dBm Integrated control logic SPDT SC-70-6 RF Switches ROHS",
       "description": "LNA bypass switch, output side. Spec: LNA bypass, output side",
-      "callout": 77,
+      "callout": 79,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -31624,7 +31625,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃@(TJ) 1 2A 380uA 4.5V~17V 580kHz 768mV~7V Adjustable Buck Built-in Overcurrent Protection、Light load efficient mode、Cycle-by-cycle current limiting、Hiccup current limiting Step-down type Yes TSOT-23-6 DC-DC Converters ROHS",
       "description": "+5V0 to +1V0 buck (FPGA core)",
-      "callout": 69,
+      "callout": 70,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+5V0",
@@ -32830,7 +32831,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃@(Tj) 1 10uVrms 12uA 250mA 250mV@(250mA) 3.3V 5.5V 82dB@(1kHz) Fixed Positive Short Circuit Protection、Thermal shutdown、Enable control、Input under-voltage protection、Output discharge SOT-23-5 Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
       "description": "3.3 V LDO for the USB bridge, from the cable. Spec: 3.3 V for the bridge from the USB cable",
-      "callout": 93,
+      "callout": 95,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_USB",
@@ -32990,7 +32991,7 @@
       "manufacturer": "WCH(Jiangsu Qin Heng)",
       "bom_desc": "-20℃~+70℃ 2Mbps 3.3V、5V USB 2.0 USB to serial、USB to Parallel MSOP-10 USB Converters ROHS",
       "description": "USB to UART bridge for the debug console",
-      "callout": 91,
+      "callout": 93,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_USB",
@@ -33367,7 +33368,7 @@
       "manufacturer": "Mini-Circuits",
       "bom_desc": "-20℃~+85℃ 0.2dB 18dB 1:2 1° 400kHz~450MHz SMD-6P Balun ROHS",
       "description": "AD9708 output balun. Spec: 100 ohm differential (two 50 ohm loads) to 50 ohm single-ended. Mini-Circuits ADT2-1T+: impedance ratio 2, 0.4-450 MHz. 100 ohm secondary to the DAC; centre tap unused",
-      "callout": 102,
+      "callout": 104,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/IF_TX_B",
@@ -33939,7 +33940,7 @@
       "manufacturer": "Analog Devices",
       "bom_desc": "-40℃~+85℃ 0.1LSB 1 1.5V 1.8V 47dB 500MHz 500MHz 8 Built-in LVDS Support Yes LFCSP-56(8x8) Analog to Digital Converters (ADC) ROHS",
       "description": "8-bit 500 MSPS ADC: the radar IF, the wideband SDR and the VHF/UHF front end. Spec: Radar ADC, AERIS-10's part. Footprint: CP-56-5 has a 5.10 mm exposed pad (datasheet Figure 40); KiCad's 8x8 mm 56-pin parts have 6.6 or 5.1x4.96 mm. Custom footprint needed at layout",
-      "callout": 54,
+      "callout": 55,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+1V8_ADCR_A",
@@ -34284,7 +34285,7 @@
       "manufacturer": "DOWO",
       "bom_desc": "-55℃~+125℃ 0.2pF 10V、15V 1uA 5V 60W@8/20us 9V Four channels IEC 61000-4-2、IEC 61000-4-5 TVS Unidirectional DFN2510-10L ESD and Surge Protection (TVS/ESD) ROHS",
       "description": "ESD array on the Pmod lines",
-      "callout": 50,
+      "callout": 51,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/CONTROL/BEAM_STROBE",
@@ -35439,7 +35440,7 @@
       "manufacturer": "XUNPU",
       "bom_desc": "-25℃~+85℃ 0.3mm 15P 1mm 2mm 500mA 50V Bottom Contact Copper alloy Hinged Lid Surface Mount, Right Angle Tin SMD,P=1mm, FFC, FPC (Flat Flexible) Connector Assemblies ROHS",
       "description": "GPS PPS and the vehicle CAN to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`); CAN TX leaves on `J9` pin 6 and RX comes back on pin 8 (PS `CAN1`, R5F core 1). Spec: To KV260 J9 (Raspberry Pi camera connector) by a 15-way 1 mm FFC, 100 mm; J9 pin 12 = HDA10 (PL)",
-      "callout": 24,
+      "callout": 25,
       "manual_link": "docs/BOARD_MANUAL.md#1-connectors",
       "nets": [
         "/STATUS/J9_CAN_RX",
@@ -36790,7 +36791,7 @@
       "manufacturer": "Qorvo",
       "bom_desc": "-40℃~+85℃ 0.8dB 16dB 17.5dB 18.2dB 22.7dBm 35dBm 4.75V~5.25V 46mA 50MHz~4GHz Linearization design、Bias control circuit SOT-343 RF Amplifiers ROHS",
       "description": "IF amplifier. Spec: IF amplifier, 30-170 MHz",
-      "callout": 84,
+      "callout": 86,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/RX_VU/VU_IFA_IN",
@@ -37261,7 +37262,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+85℃ 1.65V~5.5V 10mA 16 2 200mV 25mA 3uA 4.1V 400kHz I2C、SMBus Interrupt Output Push-Pull Reset function、Cascading and address extension、Built-in LED driver、IO level configurable WQFN-24-EP(4x4) I/O Expanders ROHS",
       "description": "I/O expander 0x20: the front end's switches, bias tee and converter control. Spec: I2C expander 0x20 (ADDR low) on XO_SCL/XO_SDA; ports at 3.0 V",
-      "callout": 87,
+      "callout": 89,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -37772,7 +37773,7 @@
       "manufacturer": "",
       "bom_desc": "",
       "description": "Solder jumper, bias-tee voltage for `J961`: 1-2 (as built) +5 V, 2-3 +3.3 V. The bias itself is off until the gateware turns it on. Spec: Bias-tee supply: 1-2 (as built) +5V0, cut and bridge 2-3 for +3V3_D",
-      "callout": 28,
+      "callout": 29,
       "manual_link": "docs/BOARD_MANUAL.md#2-switches-and-jumpers",
       "nets": [
         "+3V3_D",
@@ -38398,7 +38399,7 @@
       "manufacturer": "TECH PUBLIC",
       "bom_desc": "-40℃~+125℃ 1 1 1.2V、1.9V、2.3V、2.4V 1.65V~5.5V 100mV、300mV、400mV、550mV 10uA 32mA 32mA 74LVC 8.3ns@5V,50pF SOT-353 Logic Gates ROHS",
       "description": "GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4. Spec: PPS Schmitt buffer: drives J9 pin 12 through either cable type",
-      "callout": 94,
+      "callout": 96,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_D",
@@ -38455,7 +38456,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃ 1 3.2V~65V Active High Load Switch Over Voltage Protection SOT-23-8-THIN Power Distribution Switches ROHS",
       "description": "Input protection controller: reverse battery and over-voltage cut-off, with `Q1001`/`Q1003`",
-      "callout": 74,
+      "callout": 75,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "/POWER/PROT_COM",
@@ -40545,7 +40546,7 @@
       "manufacturer": "pSemi",
       "bom_desc": "-55℃~+105℃ 1MHz~4GHz 31.5dB 50Ω Digitally programmable attenuation、Multi-step attenuation、Digital control interface、Parallel control interface QFN-20-EP(4x4) RF Attenuators ROHS",
       "description": "Digital attenuator, 0-31.5 dB. Spec: Step attenuator 0-31.5 dB, serial; powers up at 31.5 dB (C bits high)",
-      "callout": 85,
+      "callout": 87,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+2V8_RF",
@@ -41505,7 +41506,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+125℃@(Tj) 1 120mV@(250mA) 12uA 2.8V 250mA 5.5V 6.5uVrms 82dB@(1kHz) Fixed Positive Short Circuit Protection、Thermal shutdown、Enable control、Input under-voltage protection、Output discharge SOT-23-5 Voltage Regulators - Linear, Low Drop Out (LDO) Regulators ROHS",
       "description": "LP5907MFX-2.8 ultra-low-noise LDO for +2V8_RF front-end rail (232 mV worst-case headroom vs 180 mV dropout; Rev08 audit P8)",
-      "callout": 89,
+      "callout": 91,
       "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+2V8_RF",
@@ -41613,7 +41614,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+85℃ 1.65V~5.5V 10mA 16 2 200mV 25mA 3uA 4.1V 400kHz I2C、SMBus Interrupt Output Push-Pull Reset function、Cascading and address extension、Built-in LED driver、IO level configurable WQFN-24-EP(4x4) I/O Expanders ROHS",
       "description": "I/O expander 0x21: the status LEDs. Spec: LED expander at 0x21 on XO_SCL/XO_SDA; P00-P07 sink the status LEDs",
-      "callout": 90,
+      "callout": 92,
       "manual_link": "docs/BOARD_MANUAL.md#4-chips",
       "nets": [
         "+3V3_D",
@@ -43205,7 +43206,7 @@
       "manufacturer": "Texas Instruments",
       "bom_desc": "-40℃~+150℃ 1 15uA 3.3V 60mA 8Mbps CAN FD Transceiver TSOT-23-8 CAN Transceivers ROHS",
       "description": "TCAN3403DDFRQ1 3.3 V CAN transceiver (+-58 V bus fault protection, pin 5 VIO on +3V3_D, STB low; Rev08 audit P1)",
-      "callout": 95,
+      "callout": 97,
       "manual_link": "docs/AUDIT_Rev08.md",
       "nets": [
         "+3V3_D",
@@ -43803,6 +43804,823 @@
         "1": "/STATUS/CAN_TXB10",
         "2": "GND"
       }
+    },
+    {
+      "id": "L1004",
+      "ref": "L1004",
+      "value": "ZEGMCM9070-501T",
+      "footprint": "CMC_9070_SMD-4P_9.0x7.0mm",
+      "side": "bottom",
+      "x_mm": 100.25,
+      "y_mm": 161.75,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        96.5,
+        156,
+        104,
+        167.5
+      ],
+      "model_pos_mm": [
+        -54.503,
+        97.754,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -60.253,
+        94.004,
+        -48.753,
+        101.504,
+        -4,
+        0.8
+      ],
+      "local_size_mm": [
+        11.5,
+        7.5,
+        4.8
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C53154905",
+      "mpn": "ZEGMCM9070-501T",
+      "manufacturer": "ZE",
+      "bom_desc": "SMD-4P,9x7mm Common Mode Filters ROHS",
+      "description": "ZEGMCM9070-501T 6 A common-mode choke (600 Ohm @ 100 MHz, 450 Ohm min, 2 x 8 mOhm) on both J1001 entry lines (attenuates common-mode noise by 2.9 dB at 65 kHz to 9.5 dB at 100 MHz; 0.30 W at 4.31 A worst)",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/GND_IN",
+        "/KVPWR/VIN_J",
+        "/KVPWR/VIN_JACK",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/GND_IN",
+        "2": "GND",
+        "3": "/KVPWR/VIN_JACK",
+        "4": "/KVPWR/VIN_J"
+      }
+    },
+    {
+      "id": "J1004",
+      "ref": "J1004",
+      "value": "B2PS-VH",
+      "footprint": "JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal",
+      "side": "top",
+      "x_mm": 103.9,
+      "y_mm": 189,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        88.5,
+        186.55,
+        105.75,
+        195.41
+      ],
+      "model_pos_mm": [
+        -81.753,
+        94.104,
+        2.4
+      ],
+      "bbox_world_mm": [
+        -88.163,
+        92.254,
+        -79.303,
+        109.504,
+        2.4,
+        11.4
+      ],
+      "local_size_mm": [
+        8.86,
+        17.25,
+        9
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C158007",
+      "mpn": "B2PS-VH(LF)(SN)",
+      "manufacturer": "JST",
+      "bom_desc": "-25℃~+85℃ 1 10A 14.9mm 1x2P 2 250V 2P 3.96mm 7.86mm 8.5mm Brass PA66 Right Angle Tin UL94V-0 VH White ,P=3.96mm Wire To Board Connector ROHS",
+      "description": "JST B2PS-VH 2-pin 3.96 mm horizontal 12 V output header feeding KV260 J12 over a short VHR-2N jumper (single-entry return via BM20 link by design, 132 mA/contact at 3.19 A worst)",
+      "callout": 19,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/+12V_KV",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/+12V_KV",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "U1010",
+      "ref": "U1010",
+      "value": "TPS26631PWPR",
+      "footprint": "HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm_ThermalVias",
+      "side": "bottom",
+      "x_mm": 102.25,
+      "y_mm": 183.75,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        98.35,
+        180.25,
+        106.15,
+        187.25
+      ],
+      "model_pos_mm": [
+        -76.503,
+        95.754,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -80.003,
+        91.854,
+        -73.003,
+        99.654,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        7.8,
+        7,
+        1.2
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C2866319",
+      "mpn": "TPS26631PWPR",
+      "manufacturer": "Texas Instruments",
+      "bom_desc": "-40℃~+125℃ 1 1.2mm 31mΩ 4.4mm 4.5V~60V 6.5mm 600mA~6A Integrated FET Overcurrent Protection、Short-Circuit Protection、Under-voltage lockout、Thermal Protection、Overvoltage clamping protection、Overload protection Surface Mount HTSSOP-20 Surge Protection Devices (SPDs) ROHS",
+      "description": "TPS26631PWPR eFuse for KV260 12 V feed: 3.0 A limit set by R1043 (2.77-3.19 A across tolerance, capping BM20 contact current), OVP 14.4 V, UVLO 8.0 V",
+      "callout": 76,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/+12V_KV",
+        "/KVPWR/KV_BGATE",
+        "/KVPWR/KV_DRV",
+        "/KVPWR/KV_DVDT",
+        "/KVPWR/KV_ILIM",
+        "/KVPWR/KV_IN",
+        "/KVPWR/KV_OVP",
+        "/KVPWR/KV_UVLO",
+        "/KVPWR/VIN_J",
+        "GND"
+      ],
+      "pads": {
+        "2": "/KVPWR/KV_IN",
+        "3": "/KVPWR/KV_IN",
+        "4": "/KVPWR/KV_BGATE",
+        "5": "/KVPWR/KV_DRV",
+        "6": "/KVPWR/VIN_J",
+        "7": "/KVPWR/KV_UVLO",
+        "8": "/KVPWR/KV_OVP",
+        "9": "GND",
+        "10": "/KVPWR/KV_DVDT",
+        "11": "/KVPWR/KV_ILIM",
+        "12": "GND",
+        "13": "(nc)",
+        "14": "(nc)",
+        "15": "(nc)",
+        "16": "GND",
+        "17": "(nc)",
+        "18": "/KVPWR/+12V_KV",
+        "19": "/KVPWR/+12V_KV",
+        "20": "/KVPWR/+12V_KV",
+        "21": "GND",
+        "?": "/KVPWR/KV_IN"
+      }
+    },
+    {
+      "id": "Q1010",
+      "ref": "Q1010",
+      "value": "DMT10H015LFG",
+      "footprint": "Diodes_PowerDI3333-8",
+      "side": "bottom",
+      "x_mm": 95.75,
+      "y_mm": 186,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        93.65,
+        184.1,
+        97.85,
+        187.9
+      ],
+      "model_pos_mm": [
+        -78.753,
+        102.254,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -80.653,
+        100.154,
+        -76.853,
+        104.354,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        4.2,
+        3.8,
+        1.2
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C5245407",
+      "mpn": "DMT10H015LFG-7",
+      "manufacturer": "Diodes Incorporated",
+      "bom_desc": "-55℃~+150℃ 1 N-channel 1.871nF 100V 13.5mΩ@10V 3.5V 33.3nC@10V 35W 42A PowerDI3333-8 MOSFETs ROHS",
+      "description": "DMT10H015LFG 100 V 13.5 mOhm reverse-blocking N-FET (source on VIN_J) providing -60 V reverse polarity protection with Q1011 (57.3 V peak VDS in ISO 7637-2 pulse 1; 0.137 W at 3.19 A)",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_BGATE",
+        "/KVPWR/KV_IN",
+        "/KVPWR/VIN_J"
+      ],
+      "pads": {
+        "2": "/KVPWR/VIN_J",
+        "3": "/KVPWR/VIN_J",
+        "4": "/KVPWR/KV_BGATE",
+        "5": "/KVPWR/KV_IN",
+        "?": "/KVPWR/VIN_J"
+      }
+    },
+    {
+      "id": "Q1011",
+      "ref": "Q1011",
+      "value": "2N7002",
+      "footprint": "SOT-23",
+      "side": "bottom",
+      "x_mm": 92.25,
+      "y_mm": 182,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        90.55,
+        180.07,
+        93.95,
+        183.93
+      ],
+      "model_pos_mm": [
+        -74.753,
+        105.754,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -76.683,
+        104.054,
+        -72.823,
+        107.454,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        3.86,
+        3.4,
+        1.2
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C8545",
+      "mpn": "2N7002",
+      "manufacturer": "Jiangsu Changjing Electronics Technology Co., Ltd.",
+      "bom_desc": "1 N-channel 115mA 2.5V 225mW 25pF 50pF 5pF 5Ω@10V 60V N-Channel ±20V SOT-23 MOSFETs ROHS",
+      "description": "2N7002 N-FET (VDS >= 15 V, Ciss <= 50 pF) coupling U1010 DRV to Q1010 B_GATE for -60 V reverse polarity protection (SLVSE94G §8.3.5)",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_BGATE",
+        "/KVPWR/KV_DRV",
+        "/KVPWR/VIN_J"
+      ],
+      "pads": {
+        "1": "/KVPWR/KV_DRV",
+        "2": "/KVPWR/VIN_J",
+        "3": "/KVPWR/KV_BGATE"
+      }
+    },
+    {
+      "id": "C1093",
+      "ref": "C1093",
+      "value": "22n",
+      "footprint": "C_0603_1608Metric",
+      "side": "bottom",
+      "x_mm": 97.25,
+      "y_mm": 179.25,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        95.77,
+        178.52,
+        98.73,
+        179.98
+      ],
+      "model_pos_mm": [
+        -72.003,
+        100.754,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -72.733,
+        99.274,
+        -71.273,
+        102.234,
+        0,
+        0.8
+      ],
+      "local_size_mm": [
+        2.96,
+        1.46,
+        0.8
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C21122",
+      "mpn": "CL10B223KB8NNNC",
+      "manufacturer": "Samsung Electro-Mechanics",
+      "bom_desc": "22nF 50V X7R ±10% 0603 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "dVdT: 5.5 ms output ramp at 12 V",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_DVDT",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/KV_DVDT",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "R1041",
+      "ref": "R1041",
+      "value": "24.9k",
+      "footprint": "R_0603_1608Metric",
+      "side": "bottom",
+      "x_mm": 94.75,
+      "y_mm": 178.5,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        94.02,
+        177.02,
+        95.48,
+        179.98
+      ],
+      "model_pos_mm": [
+        -71.253,
+        103.254,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -72.733,
+        102.524,
+        -69.773,
+        103.984,
+        0,
+        0.8
+      ],
+      "local_size_mm": [
+        2.96,
+        1.46,
+        0.8
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C137761",
+      "mpn": "RC0603FR-0724K9L",
+      "manufacturer": "YAGEO",
+      "bom_desc": "-55℃~+155℃ 100mW 24.9kΩ 75V Thick Film Resistor ±1% ±100ppm/℃ 0603 Chip Resistor - Surface Mount",
+      "description": "UVLO/OVP divider, middle",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_OVP",
+        "/KVPWR/KV_UVLO"
+      ],
+      "pads": {
+        "1": "/KVPWR/KV_UVLO",
+        "2": "/KVPWR/KV_OVP"
+      }
+    },
+    {
+      "id": "R1040",
+      "ref": "R1040",
+      "value": "316k",
+      "footprint": "R_0603_1608Metric",
+      "side": "bottom",
+      "x_mm": 93.25,
+      "y_mm": 178.5,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        92.52,
+        177.02,
+        93.98,
+        179.98
+      ],
+      "model_pos_mm": [
+        -71.253,
+        104.754,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -72.733,
+        104.024,
+        -69.773,
+        105.484,
+        0,
+        0.8
+      ],
+      "local_size_mm": [
+        2.96,
+        1.46,
+        0.8
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25814",
+      "mpn": "0603WAF3163T5E",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 100mW 316kΩ 75V Thick Film Resistor ±1% ±100ppm/℃ 0603 Chip Resistor - Surface Mount ROHS",
+      "description": "UVLO/OVP divider, top: 8.0 V UVLO, 14.4 V OVP; >= 300 k for reverse polarity",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_UVLO",
+        "/KVPWR/VIN_J"
+      ],
+      "pads": {
+        "1": "/KVPWR/VIN_J",
+        "2": "/KVPWR/KV_UVLO"
+      }
+    },
+    {
+      "id": "R1042",
+      "ref": "R1042",
+      "value": "30.9k",
+      "footprint": "R_0603_1608Metric",
+      "side": "bottom",
+      "x_mm": 97.25,
+      "y_mm": 177.5,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        95.77,
+        176.77,
+        98.73,
+        178.23
+      ],
+      "model_pos_mm": [
+        -70.253,
+        100.754,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -70.983,
+        99.274,
+        -69.523,
+        102.234,
+        0,
+        0.8
+      ],
+      "local_size_mm": [
+        2.96,
+        1.46,
+        0.8
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C2930090",
+      "mpn": "FRC0603F3092TS",
+      "manufacturer": "FOJAN",
+      "bom_desc": "-55℃~+155℃ 100mW 30.9kΩ 75V Thick Film Resistor ±1% ±100ppm/℃ 0603 Chip Resistor - Surface Mount ROHS",
+      "description": "UVLO/OVP divider, bottom",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_OVP",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/KV_OVP",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "R1043",
+      "ref": "R1043",
+      "value": "6.04k",
+      "footprint": "R_0603_1608Metric",
+      "side": "bottom",
+      "x_mm": 107.75,
+      "y_mm": 180.5,
+      "rot_deg": 0,
+      "bbox_board_mm": [
+        106.27,
+        179.77,
+        109.23,
+        181.23
+      ],
+      "model_pos_mm": [
+        -73.253,
+        90.254,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -73.983,
+        88.774,
+        -72.523,
+        91.734,
+        0,
+        0.8
+      ],
+      "local_size_mm": [
+        2.96,
+        1.46,
+        0.8
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C25977",
+      "mpn": "0603WAF6041T5E",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 100mW 6.04kΩ 75V Thick Film Resistor ±1% ±100ppm/℃ 0603 Chip Resistor - Surface Mount ROHS",
+      "description": "6.04 kOhm 0603 1% ILIM resistor setting U1010 TPS26631 current limit to 3.0 A nominal (3.19 A worst case)",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/KV_ILIM",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/KV_ILIM",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "C1094",
+      "ref": "C1094",
+      "value": "1u 100V",
+      "footprint": "C_1206_3216Metric",
+      "side": "bottom",
+      "x_mm": 92.05,
+      "y_mm": 186.5,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        90.9,
+        184.2,
+        93.2,
+        188.8
+      ],
+      "model_pos_mm": [
+        -79.253,
+        105.954,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -81.553,
+        104.804,
+        -76.953,
+        107.104,
+        -0.8,
+        0.8
+      ],
+      "local_size_mm": [
+        4.6,
+        2.3,
+        1.6
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C13832",
+      "mpn": "CL31B105KCHNNNE",
+      "manufacturer": "Samsung Electro-Mechanics",
+      "bom_desc": "100V 1uF X7R ±10% 1206 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "U1010 input, at IN_SYS",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/VIN_J",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/VIN_J",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "C1095",
+      "ref": "C1095",
+      "value": "10u 25V",
+      "footprint": "C_1206_3216Metric",
+      "side": "bottom",
+      "x_mm": 108,
+      "y_mm": 186.5,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        106.85,
+        184.2,
+        109.15,
+        188.8
+      ],
+      "model_pos_mm": [
+        -79.253,
+        90.004,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -81.553,
+        88.854,
+        -76.953,
+        91.154,
+        -0.8,
+        0.8
+      ],
+      "local_size_mm": [
+        4.6,
+        2.3,
+        1.6
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C13585",
+      "mpn": "CL31A106KBHNNNE",
+      "manufacturer": "Samsung Electro-Mechanics",
+      "bom_desc": "10uF 50V X5R ±10% 1206 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "+12V_KV at J1004",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/+12V_KV",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/+12V_KV",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "D1004",
+      "ref": "D1004",
+      "value": "SS34",
+      "footprint": "D_SMA",
+      "side": "bottom",
+      "x_mm": 111,
+      "y_mm": 186.5,
+      "rot_deg": 90,
+      "bbox_board_mm": [
+        109.25,
+        183,
+        112.75,
+        190
+      ],
+      "model_pos_mm": [
+        -79.253,
+        87.004,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -82.753,
+        85.254,
+        -75.753,
+        88.754,
+        -0.4,
+        0.8
+      ],
+      "local_size_mm": [
+        7,
+        3.5,
+        1.2
+      ],
+      "sheet": "KVPWR",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C8678",
+      "mpn": "SS34",
+      "manufacturer": "MDD(Microdiode Semiconductor)",
+      "bom_desc": "-55℃~+125℃ 3A 40V 500uA@40V 550mV@3A Independent SMA(DO-214AC) Schottky Diodes ROHS",
+      "description": "SS34 40 V 3 A SMA Schottky diode on +12V_KV to GND clamping inductive negative kick on the KV260 jumper when U1010 opens on fault (SLVSE94G §9.5.1)",
+      "callout": null,
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter",
+      "nets": [
+        "/KVPWR/+12V_KV",
+        "GND"
+      ],
+      "pads": {
+        "1": "/KVPWR/+12V_KV",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "C1223",
+      "ref": "C1223",
+      "value": "1n 2kV",
+      "footprint": "C_1206_3216Metric",
+      "side": "bottom",
+      "x_mm": 216.15,
+      "y_mm": 122.65,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        215,
+        120.35,
+        217.3,
+        124.95
+      ],
+      "model_pos_mm": [
+        -15.403,
+        -18.146,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -17.703,
+        -19.296,
+        -13.103,
+        -16.996,
+        -0.8,
+        0.8
+      ],
+      "local_size_mm": [
+        4.6,
+        2.3,
+        1.6
+      ],
+      "sheet": "CONTROL",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C23631",
+      "mpn": "CC1206KKX7RDBB102",
+      "manufacturer": "YAGEO",
+      "bom_desc": "1nF 2kV X7R ±10% 1206 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+      "description": "1 nF 2 kV X7R 1206 capacitor across the J1201 Ethernet shield-to-ground RC network (breaks DC/50 Hz earth loops to earthed switches)",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "/CONTROL/ETH_SHIELD",
+        "GND"
+      ],
+      "pads": {
+        "1": "/CONTROL/ETH_SHIELD",
+        "2": "GND"
+      }
+    },
+    {
+      "id": "R1218",
+      "ref": "R1218",
+      "value": "1M",
+      "footprint": "R_0603_1608Metric",
+      "side": "bottom",
+      "x_mm": 214.25,
+      "y_mm": 122.05,
+      "rot_deg": 270,
+      "bbox_board_mm": [
+        213.52,
+        120.57,
+        214.98,
+        123.53
+      ],
+      "model_pos_mm": [
+        -14.803,
+        -16.246,
+        0.8
+      ],
+      "bbox_world_mm": [
+        -16.283,
+        -16.976,
+        -13.323,
+        -15.516,
+        0,
+        0.8
+      ],
+      "local_size_mm": [
+        2.96,
+        1.46,
+        0.8
+      ],
+      "sheet": "CONTROL",
+      "dnp": false,
+      "model_source": "kicad-step",
+      "lcsc": "C22935",
+      "mpn": "0603WAF1004T5E",
+      "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+      "bom_desc": "-55℃~+155℃ 100mW 1MΩ 75V Thick Film Resistor ±1% ±100ppm/℃ 0603 Chip Resistor - Surface Mount ROHS",
+      "description": "1 MOhm 0603 bleed resistor in parallel with C1223 on the J1201 Ethernet RJ45 shield",
+      "callout": null,
+      "manual_link": "docs/AUDIT_Rev08.md",
+      "nets": [
+        "/CONTROL/ETH_SHIELD",
+        "GND"
+      ],
+      "pads": {
+        "1": "/CONTROL/ETH_SHIELD",
+        "2": "GND"
+      }
     }
   ],
   "kv260_parts": [
@@ -44182,9 +45000,9 @@
         -3,
         11.5
       ],
-      "role": "12 V 3 A power input for the KV260 carrier and K26 SOM (separate from adapter J1001 12 V jack per INTERFACE_SPEC.md).",
-      "citation": "AMD UG1089",
-      "manual_link": "docs/ENCLOSURE.md#2-geometry"
+      "role": "12 V 3 A power input for the KV260 carrier and K26 SOM, fed from adapter J1004 via a VHR-2N jumper through the U1010 3.0 A eFuse (POWER_SPEC.md §1.4, BOARD_MANUAL.md §6; never power J1001 and J12 from separate supplies).",
+      "citation": "AMD UG1089; POWER_SPEC.md §1.4",
+      "manual_link": "docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter"
     },
     {
       "id": "KV260_J4_UART",

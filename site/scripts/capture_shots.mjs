@@ -478,7 +478,7 @@ async function run() {
     await waitFor(async () => {
       return await client.evalJs(`(() => {
         const imgs = Array.from(document.querySelectorAll("#sim-inspector-card img"));
-        return imgs.length === 5 && imgs.every((im) => im.complete && im.naturalWidth > 0);
+        return imgs.length === 7 && imgs.every((im) => im.complete && im.naturalWidth > 0);
       })()`);
     }, 10000, 150);
     const auditDomStats = await client.evalJs(`(() => {

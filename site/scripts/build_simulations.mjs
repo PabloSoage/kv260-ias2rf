@@ -77,6 +77,8 @@ function copySimImages() {
     "power_budget_ptc.png",
     "power_startup.png",
     "power_transients.png",
+    "ground_offset.png",
+    "cm_noise.png",
     "case_materials.png",
   ];
   const fromDocsImg = ["case3d_v2_stress.jpg", "case3d_v2_boards.jpg"];
@@ -968,6 +970,20 @@ function build() {
       src: "assets/img/sim_results/board_thermal.png",
       cap: "Updated Vivado 1.25/1.60 W FPGA + 0.91 W U1006; HS4 brings U1101 from 102.1 C to 93.4 C at 70 C ambient.",
       source_file: "docs/sim/board_thermal.png",
+    },
+    {
+      id: "ground_offset",
+      title: "Single-Entry Power & BM20 Ground Contact Current (AUDIT §6)",
+      src: "assets/img/sim_results/ground_offset.png",
+      cap: "Single entry via J1001 + U1010 (3.0 A limit) keeps BM20 at 132 mA/contact (3.19 A worst, 38 mA typ, <= 3.13 mW vs 9.0 mW rating) vs 411-714 mA separate-supply loops.",
+      source_file: "docs/sim/ground_offset.png",
+    },
+    {
+      id: "cm_noise",
+      title: "L1004 Common-Mode Choke Attenuation & J1201 Shield RC",
+      src: "assets/img/sim_results/cm_noise.png",
+      cap: "ZEGMCM9070-501T (L1004) attenuates common-mode supply noise by 2.9 dB at 65 kHz to 9.5 dB at 100 MHz; R1218/C1223 isolates J1201 Ethernet shield at DC/50 Hz.",
+      source_file: "docs/sim/cm_noise.png",
     },
   ];
 

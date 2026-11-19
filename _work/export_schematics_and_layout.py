@@ -77,7 +77,7 @@ def identify_sch_pages(doc):
 
 def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
     """
-    Create an A0-landscape 100% vector composite containing all 11 sub-circuits
+    Create an A0-landscape 100% vector composite containing all 12 sub-circuits
     arranged in signal-flow order and linked by color-coded inter-sheet bus trunks.
     """
     W, H = 3370.39, 2383.94  # A0 Landscape in pt (1189 x 841 mm)
@@ -90,7 +90,7 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
 
     p.insert_text(
         (36, 40),
-        "KV260-IAS2RF — COMPLETE CONNECTED SYSTEM SCHEMATIC (ALL 11 HIERARCHICAL CIRCUITS + INTER-SHEET BUSES)",
+        "KV260-IAS2RF - COMPLETE CONNECTED SYSTEM SCHEMATIC (ALL 12 HIERARCHICAL CIRCUITS + INTER-SHEET BUSES)",
         fontsize=24, fontname="helv", color=(1, 1, 1),
     )
     p.insert_text(
@@ -120,11 +120,11 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
         p.insert_text((lx + 46, 117), label, fontsize=10.5, fontname="helv", color=(0.12, 0.16, 0.22))
         lx += 48 + len(label) * 6.0 + 30
 
-    # 3x4 grid layout of all 11 sheets with gutters for trunk buses (Rev08: STATUS and RX_VU in a fourth column)
+    # 3x4 grid layout of all 12 sheets with gutters for trunk buses (KVPWR fills the fourth column of row 3)
     grid = [
         ["IAS_LINK", "CONTROL", "CLOCK", "STATUS"],
         ["ADC_RADAR", "DAC_RADAR", "ROUTING", "RX_VU"],
-        ["ADC_SDR", "DAC_SDR", "POWER", None],
+        ["ADC_SDR", "DAC_SDR", "POWER", "KVPWR"],
     ]
     titles = {
         "IAS_LINK": "1. IAS1 KV260 CONNECTOR + RJ45 1000BASE-T",
@@ -138,6 +138,7 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
         "POWER": "9. POWER: 12V LM74502 ORing + LMR33630/TPS562201 BUCKS + TPS7A8300 LDOs",
         "RX_VU": "10. VHF/UHF FRONT END (J961): LNA + PRESELECTOR + RFFC5072 + IF CHAIN",
         "STATUS": "11. STATUS: TCA6416A + LEDs + CH340X USB-C DEBUG UART",
+        "KVPWR": "12. KV260 POWER FEED: J1004 + TPS26631 eFUSE (U1010, 3.0 A) + L1004 CMC",
     }
 
     margin_x, margin_top, margin_bot = 34, 152, 26
@@ -250,17 +251,17 @@ def build_full_circuit_pdf(raw_doc, page_map, out_pdf, out_svg):
     draw_bus([mid_r("DAC_SDR", 0.55), (gx12 - 22, mid_r("DAC_SDR", 0.55)[1]), (gx12 - 22, mid_b("ROUTING", 0.25)[1] + 22), mid_b("ROUTING", 0.25)], "#00838F", 3.5, "SDR TX/RX SMA", (gx12 - 32, gy12 + 28))
     draw_bus([mid_b("ADC_SDR", 0.50), (mid_b("ADC_SDR", 0.50)[0], H - 14), (boxes["ROUTING"].x0 - 12, H - 14), (boxes["ROUTING"].x0 - 12, mid_b("ROUTING", 0.12)[1] + 28), mid_b("ROUTING", 0.12)], "#00838F", 3.0)
 
-    # 5. POWER -> All sheets
+    # 5. POWER -> All sheets & KVPWR single-entry feed
+    gx23 = (boxes["ROUTING"].x1 + boxes["RX_VU"].x0) / 2.0
     draw_bus([mid_t("POWER", 0.50), (mid_t("POWER", 0.50)[0], gy12), (boxes["ADC_SDR"].x0 + 60, gy12)], "#B7791F", 3.8, "12V -> 5V / 3V3 / 2V5 / 1V8 / 1V0 / -3V3 POWER", (boxes["DAC_SDR"].x0 + 20, gy12 - 6))
     draw_bus([mid_l("POWER", 0.50), mid_r("DAC_SDR", 0.50)], "#B7791F", 3.2)
+    draw_bus([mid_r("POWER", 0.65), mid_l("KVPWR", 0.65)], "#B7791F", 3.2, "12V_IN / +12V_KV", (boxes["POWER"].x1 + 2, mid_r("POWER", 0.65)[1] + 15))
 
-    # 6. Rev08: the VHF/UHF front end's IF into ROUTING's SW2, its +3V0_FE from +3V3_D, and the STATUS sheet on
-    #    the FPGA's I2C bus and debug UART
+    # 6. VHF/UHF front end IF into ROUTING's SW2, its +3V0_FE from POWER +3V3_D via gutter, and STATUS control bus
     draw_bus([mid_l("RX_VU", 0.40), mid_r("ROUTING", 0.40)], "#00838F", 4.0, "IF_VU -> SW2",
              (boxes["ROUTING"].x1 + 8, mid_r("ROUTING", 0.40)[1] - 10))
-    rv_b = mid_b("RX_VU", 0.50)
-    draw_bus([rv_b, (rv_b[0], mid_r("POWER", 0.30)[1]), mid_r("POWER", 0.30)], "#B7791F", 3.2, "+3V3_D -> +3V0_FE",
-             (rv_b[0] + 8, mid_r("POWER", 0.30)[1] - 10))
+    draw_bus([mid_r("POWER", 0.25), (gx23, mid_r("POWER", 0.25)[1]), (gx23, mid_l("RX_VU", 0.72)[1]), mid_l("RX_VU", 0.72)], "#B7791F", 3.2, "+3V3_D -> +3V0_FE",
+             (gx23 - 26, (mid_r("POWER", 0.25)[1] + mid_l("RX_VU", 0.72)[1]) / 2))
     top_y = boxes["CONTROL"].y0 - 14
     draw_bus([mid_t("CONTROL", 0.80), (mid_t("CONTROL", 0.80)[0], top_y), (mid_t("STATUS", 0.30)[0], top_y), mid_t("STATUS", 0.30)],
              "#1565C0", 3.2, "XO I2C (TCA6416A x2) + DEBUG UART", (mid_t("CLOCK", 0.30)[0], top_y - 6))
@@ -293,11 +294,11 @@ def export_schematics():
     # Build ordered KV260-IAS2RF_schematic.pdf:
     # Page 1: Root Connected Hierarchy
     # Page 2: Full Connected All-Sheets Circuit Composite (A0 Vector)
-    # Pages 3..13: 11 individual sub-sheets
+    # Pages 3..14: 12 individual sub-sheets
     out_doc = pymupdf.open()
     ordered_sheets = [
         "IAS_LINK", "CONTROL", "CLOCK", "ADC_RADAR", "ADC_SDR",
-        "DAC_RADAR", "DAC_SDR", "ROUTING", "POWER", "RX_VU", "STATUS",
+        "DAC_RADAR", "DAC_SDR", "ROUTING", "POWER", "RX_VU", "STATUS", "KVPWR",
     ]
     out_doc.insert_pdf(raw_doc, from_page=page_map["ROOT"], to_page=page_map["ROOT"])
     out_doc.insert_pdf(full_doc, from_page=0, to_page=0)
@@ -306,8 +307,8 @@ def export_schematics():
         out_doc.insert_pdf(raw_doc, from_page=idx, to_page=idx)
 
     toc = [
-        [1, "1. Root — Connected System Architecture", 1],
-        [1, "2. Complete Connected Circuit Composite (All 11 Sheets)", 2],
+        [1, "1. Root - Connected System Architecture", 1],
+        [1, "2. Complete Connected Circuit Composite (All 12 Sheets)", 2],
     ]
     for pno, s in enumerate(ordered_sheets, start=3):
         toc.append([1, f"{pno}. {s}", pno])
@@ -336,7 +337,7 @@ def export_schematics():
     out_doc.close()
     os.remove(raw_pdf)
     sz_mb = os.path.getsize(SCH_PDF) / (1024 * 1024)
-    print(f"   Saved {SCH_PDF} ({sz_mb:.2f} MB, 13 vector pages)")
+    print(f"   Saved {SCH_PDF} ({sz_mb:.2f} MB, 14 vector pages)")
 
 
 # ---------------------------------------------------------------------------

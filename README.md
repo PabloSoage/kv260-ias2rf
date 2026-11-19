@@ -136,11 +136,11 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 
 ## Schematics and layout
 
-- **[Schematic, all 11 sheets including full wired overview (PDF)](docs/KV260-IAS2RF_schematic.pdf)** · [High-res SVGs & 4K PNGs](docs/img/highres/README.md#1-schematics-sch)
+- **[Schematic, all 12 sheets including full wired overview (PDF)](docs/KV260-IAS2RF_schematic.pdf)** · [High-res SVGs & 4K PNGs](docs/img/highres/README.md#1-schematics-sch)
 - **[Layout, all 8 copper layers + combined + transparent tracks (PDF)](docs/KV260-IAS2RF_layout.pdf)** · [Per-layer SVGs & 4K PNGs](docs/img/highres/README.md#2-8-layer-pcb-layout-layout)
 - **[Complete Project Documentation Book (PDF)](docs/KV260-IAS2RF_Documentation.pdf)** (reproducible locally via [`export_documentation.py`](export_documentation.py))
 - KiCad 10 sources: [`CSI2-KRIA-KV260_Rev01.kicad_pro`](CSI2-KRIA-KV260_Rev01.kicad_pro), the root
-  schematic and [`rev03/`](rev03/) (nine hierarchical sheets), the 8-layer board
+  schematic and [`rev03/`](rev03/) (twelve hierarchical sheets), the 8-layer board
   [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and custom libraries in
   [`symbols/`](symbols/) and [`footprints/`](footprints/). *(Root KiCad project filenames and `rev03/` directory names are preserved for tool/netlist continuity; see [docs/history/README.md](docs/history/README.md) for revision history.)*
 
@@ -156,6 +156,9 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | [ROUTING](docs/img/sch/ROUTING.png) | Four RF switches and the SMAs | [ROUTING_SPEC](docs/ROUTING_SPEC.md) |
 | [CONTROL](docs/img/sch/CONTROL.png) | The front-end FPGA: banks, configuration, Pmod, AERIS ribbon, housekeeping | [CONTROL_SPEC](docs/CONTROL_SPEC.md) |
 | [POWER](docs/img/sch/POWER.png) | The power tree | [POWER_SPEC](docs/POWER_SPEC.md) |
+| [RX_VU](docs/img/sch/RX_VU.png) | VHF/UHF front end (`J961`), LNA, preselectors, RFFC5072 and IF chain | [RX_VU_SPEC](docs/RX_VU_SPEC.md) |
+| [STATUS](docs/img/sch/STATUS.png) | Status LEDs, TCA6416A expanders, debug USB-C UART, GPS PPS and vehicle CAN | [LAYOUT](docs/LAYOUT.md#68-debug-usb-c-gps-pps-and-vehicle-can) |
+| [KVPWR](docs/img/sch/KVPWR.png) | KV260 single-entry power feed: `J1004`, `L1004` CMC, `U1010` 3.0 A eFuse | [POWER_SPEC](docs/POWER_SPEC.md#14-single-power-entry-for-the-kv260-and-adapter) |
 
 ![Full wired circuit overview (all sheets connected)](docs/img/sch/ROOT.png)
 
