@@ -1,6 +1,6 @@
 # Rev08 audit: RF and power, before the tag
 
-*18 November 2026 · audited on `main` at `6df5766`, fixed the same day · scripts `_work/sim/rev08_rf_audit.py`,
+*18 November 2026 · audited on `main` at `6df5766`, fixed the same day; re-audited on 19 November (section 5) · scripts `_work/sim/rev08_rf_audit.py`,
 `_work/power/power_audit.py`, `_work/power_budget.py`, `_work/rev08_audit_sch.py`, `_work/rev08_audit_pcb.py` · figures
 and data in [`docs/sim/`](sim/)*
 
@@ -49,7 +49,7 @@ stated bench check. On the board as committed:
 | P4 | `U1006` (+1V8_D LDO) dissipates 0.91-0.94 W, not 0.50 W: VCCAUX is 0.31-0.37 A (Vivado), not 0.1 A. Through its single path to the balls (184-263 mΩ, SI 4.4), VCCAUX could sag to 1.665 V against 1.71 V | Margin | **+1V8_D at 1.85 V** (the 50 mV ANY-OUT pin grounded, as on `U1005`): VCCAUX 1.714-1.873 V at the balls. The LDO keeps its 0.91 W, checked in the CFD (P6) | Schematic, a 0.2 mm stub |
 | P5 | +3V3_D carries 1.78-1.89 A from a 2 A TPS562201 (89-95 %) | Margin | **`U1002` TPS563201**: 3 A, pin for pin, with the same divider and inductor (63 %) | BOM |
 | R1 | **The converter has no IF rejection.** The UHF image filter is a low-pass, so 30-480 MHz reached the mixer, the 100-170 MHz IF window included (≤ 0.4 dB). FM broadcast, airband, 2 m, marine VHF and PMR leaked through the mixer onto the UHF tuning; the 1 GHz low-pass path did the same for 480-1000 MHz | **Design gap** | **A 300 MHz high-pass ahead of preselector B** (5th-order elliptic, seven 0402 parts in frame A). IF rejection goes from 31-46 dB to 84-99 dB. Converted coverage now starts at 300 MHz | Schematic, board (LAYOUT 6.9) |
-| P6 | The thermal model and the CFD took the FPGA at 0.73 W; Vivado gives 1.20 W at 25 °C and 1.55 W at 70 °C, maximum process | Margin | CFD re-run with the Vivado figures and the new regulator losses: see [ENCLOSURE_V2_THERMAL](ENCLOSURE_V2_THERMAL.md) | Simulation |
+| P6 | The thermal model and the CFD took the FPGA at 0.73 W; Vivado gives 1.20 W at 25 °C and 1.55 W at 70 °C, maximum process | Margin | **CFD re-run** with 1.25 / 1.60 W (an upper bound: the industrial grade gives 1.22 / 1.45 W) and the new regulator losses. At 70 °C the XC7A50T reaches 102.1 °C without `HS4` (limit 100 °C) and **93.4 °C with it**. The enclosure's rating stays **63.3 °C**, set by `U401`'s board temperature, and there the XC7A50T is about 95 °C without `HS4`. **Fit `HS4` in a vehicle**: it is required above 68 °C with a K26I ([ENCLOSURE_V2_THERMAL](ENCLOSURE_V2_THERMAL.md) section 8) | Simulation; `HS4` in the assembly notes |
 | P7 | VCCINT, VCCO and the 3.3 V parts' ±5 % windows were met nominally but not in the worst-case linear stack (the TPS562201's reference is ±2.5 % over temperature) | Note | `R1031` 3.24 k: +1V0 at 1.017 V, so the balls sit at 0.983 V at full load. Root-sum-square inside every window; measure each rail on the first board (the XADC reads VCCINT) | BOM |
 | P8 | `U1315` (+3V0_RF) could reach dropout at the worst corner (26 mV of headroom against 180 mV), letting the 580 kHz ripple of +3V3_D onto the RFFC5072's supply | Note | **LP5907MFX-2.8**: the rail is `+2V8_RF`, with 232 mV of headroom at the worst corner | BOM, net rename |
 | R2-R8 | Half-IF response, LO leakage, the TCXO's pin 1, the bias tee against the antenna TVS, no limiter on `J961`, floating switch controls at power-up | Notes | Section 1.3; R3 by gateware | Mostly none |
@@ -335,5 +335,50 @@ python _work/rev08_audit_pcb.py <audited board> <out>   # the board edits, from 
 
 To repeat the Vivado power report:
 - open `fpga/artix/.build_rev06/artix_top_routed.dcp`;
-- run `set_operating_conditions -ambient_temp 70 -process maximum -board_layers 8to11`;
+- run `set_operating_conditions -grade industrial -ambient_temp 70 -process maximum -board_layers 8to11`;
 - run `report_power`.
+
+## 5. The final re-audit (19 November 2026)
+
+The owner asked for one more full pass once everything above was in, before the tag. It covered RF, power, thermal,
+the board's DRC, ERC and parity, the BOM and the gateware. It ran on `main` from `c1e6b1c`, the audit's fixes,
+onwards. Anything it found was fixed before going on.
+
+### 5.1 What it found and fixed
+
+| # | Found | Fix | Where |
+|---|---|---|---|
+| F1 | **Two vias of `Net-(C1414-Pad2)` 0.10 mm apart, drill to drill** (the rule is 0.25 mm), beside `C1415`. DRC had carried it as an accepted warning since Rev04. One net, so no short, but a drill that can break through | One via goes; `C1415` joins the other on L8 | Board, `_work/rev08_final_cleanup.py`, LAYOUT 6.10 |
+| F2 | 15 more copper warnings carried as accepted: four vias in pads that reached no other layer (on `XO_SDA`, `U902` RFOUT2, `VU_LP1G_IN`, `VU_ATT_IN`), three through vias used only to join two tracks on one layer, eight dead stubs | Removed, or replaced by short tracks. No copper warning is left | Board, LAYOUT 6.10 |
+| F3 | `PMOD_CS_N` had no pull on the Artix. The Artix sets `kria_present`, and so drives `PMOD_MISO`, after 1 ms of CS high. A line left floating by an unpowered K26, or by one that still holds its outputs high-Z, could read high and defeat the P2 gate | `PULLDOWN` on `pmod_cs_n` in `xc7a50t.xdc`. It sinks, so it never sources current into the other board | Gateware |
+| F4 | The Ethernet build (`build_rev06.tcl`) missed timing after the audit's gateware gates. It failed by 0.186 ns at first, then by 0.013 and 0.055 ns on paths that moved from one build to the next | The eye finder rotates its mask instead of indexing it (no 32:1 mux). The IDDR pipe flops take the IDDR's own edge, so ILOGIC to fabric gets a full cycle. The AERIS NCO reset's fanout is capped at 8. **WNS +0.007 ns**, 0 failing; `build.tcl` **+0.035 ns** | Gateware, FPGA_GATEWARE 4 |
+| F5 | Vivado's power reports used the commercial grade: "junction temperature exceeded" at 70 °C and a pessimistic static power | Reported for the fitted industrial grade: 1.223 / 1.446 W. The budget and the CFD keep 1.25 / 1.60 W as an upper bound | `build_rev06.tcl` |
+| F6 | P6 left open: the XC7A50T at 102 °C at 70 °C ambient without `HS4` | CFD cases with `HS4`: 93.4 °C (94.2 °C clogged). See P6 | `mech/v2_cfd`, ENCLOSURE_V2_THERMAL 8 |
+| F7 | **The book's build ran away**, to 47 GB. MuPDF's Story never finishes a table chunk whose last row ends flush with the foot of a page; the BOM table of JLCPCB_QUOTE hit it after the audit's new rows | `export_documentation.py` stops a layout that makes no progress and moves that cut one row up. All 32 documents settle; `pdf_table_check` 0 defects | Tooling |
+| F8 | FABRICATION still gave the BOM of 17 November (214 lines, 739 parts) | 224 lines, 770 parts; CPL 770, the same references as the BOM | Docs |
+
+### 5.2 What it checked and left as it was
+
+- **The board.** DRC with zones refilled and schematic parity: 0 errors, 0 unconnected, 0 parity problems, and no
+  copper warnings. What is left is silkscreen and library notices (LAYOUT 6.10). ERC gives the same 7 `pin_to_pin`
+  warnings. `make_fab.py`: 0 errors, 0 unrouted. 222 of 224 BOM lines have an LCSC code with stock; the other two,
+  `Y401` and `T1301`, are consigned.
+- **The parts the audit changed, pin by pin against their data sheets:**
+  - `U1506` TCAN3403: VCC and VIO on +3V3_D, STB to ground;
+  - `U1002` TPS563201: the TPS562201's pin-out and its 0.768 V reference, so the same divider. Its SRP7028A
+    3.3 µH carries the 3 A part's current with room to spare;
+  - `U1315` LP5907MFX-2.8: EN tied to IN.
+- **Capacitor voltage ratings against their rails**, with every capacitor's LCSC part. No rail capacitor runs above 50 %
+  of its rating at the nominal voltage. The worst transient puts +12V at 18.6 V (pulse 2a and the suppressed load
+  dump), 74 % of the 25 V parts there. VIN_F's are 100 V.
+- **RF.** `rev08_rf_audit.py` and `txrx_isolation.py` re-run on the cleaned board: unchanged. R2 to R8 stand as notes
+  (section 1.3).
+- **Thermal margins at 70 °C**, from the CFD:
+  - the LMR33630 at 117.7 °C (limit 125 °C);
+  - `U1006` at 111 °C (limit 125 °C);
+  - the K26I at 99.2 °C (limit 100 °C).
+
+  The enclosure's rated ambient is 63.3 °C, not 70 °C; all three have more room there.
+- **Gateware.** All the benches pass, among them `tb_system` at 500 and 400 MHz. The four gate mutations fail as they
+  should. `cargo test`: 61 of 61.
+
