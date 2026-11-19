@@ -529,3 +529,33 @@ The board now has 802 footprints, 13,709 track segments and 2,612 vias. DRC with
 parity gives **the same report as before the edits**: 0 errors, 0 unconnected, 0 parity problems, and the same
 warnings category by category. `make_fab.py`: DRC 0 errors, 0 unrouted; BOM 224 lines and 770 parts. ERC: the same
 7 warnings.
+
+### 6.10 The final re-audit's copper clean-up (19 November 2026)
+
+The re-audit before the tag ([AUDIT_Rev08.md](AUDIT_Rev08.md) section 5) took the 16 copper warnings that the
+earlier passes had carried as accepted: `hole_to_hole`, `via_dangling` and `track_dangling`. None of them broke a
+connection, but one was a drilling risk and the rest were dead copper. `_work/rev08_final_cleanup.py` clears them as
+text edits:
+
+- **Two vias of `Net-(C1414-Pad2)` 0.10 mm apart, drill to drill** (the rule is 0.25 mm), beside `C1415` in
+  preselector A. The second via and its dead L1 stub went; `C1415` pad 1 now joins the first via on L8.
+- **Four vias in a pad that reached no other layer:** `Y401` pad 7 (`XO_SDA`), `C927` pad 1 (`U902` RFOUT2),
+  `FL1303` pad 1 (`VU_LP1G_IN`) and `C1332` pad 2 (`VU_ATT_IN`). Each was a dead drill and a 1.6 mm stub on its
+  line. The board's vias in pads are filled and capped, so solder wicking was never the issue.
+- **Three through vias used only as a junction between two tracks on one layer:**
+  - `VU_SCLK` on L8;
+  - `VU_TCXO_OUT` on L3;
+  - `VU_RESETX` on L8, with a 0.58 mm dead end past it.
+
+  Each became a short track on its layer.
+- **Dead stubs of 0.01-0.7 mm on GND, +3V3_D, +2V8_RF and +1V8_D.** On +1V8_D this was a chain of short pieces
+  lying on top of the 1 mm diagonal they duplicated.
+
+The board now has 13,698 track segments and 2,604 vias. DRC with zones refilled and schematic parity: 0 errors,
+0 unconnected, 0 parity problems, and no copper warnings at all. What is left is silkscreen and library notices:
+- 9 silkscreen segments clipped by the mask (the fab clips them anyway);
+- 5 silkscreen overlaps;
+- 3 footprints that differ from their library copies;
+- 2 footprints (the shield frames) that live only in the board.
+
+`make_fab.py`: DRC 0 errors, 0 unrouted; BOM 224 lines and 770 parts, unchanged.
