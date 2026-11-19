@@ -410,7 +410,7 @@ The closed field enclosure (**Enclosure v2**, PETG-CF / ASA / PAHT-CF with optio
 | **`HS1`** | `U501` (`AD9484` 400 MSPS ADC) | **`14 × 14 × 8.5 mm`** (black anodized Al, `0.18 mm` TIM) | `(-51.8, +10.55) mm` | Fin top `11.8 mm` (`1.9 mm` below the fan at `z = 13.75 mm`) |
 | **`HS2`** | `U401` (`ADCLK948` LVPECL fan-out) | **`9 × 7 × 8 mm`** (blue anodized Al, `-1.0 mm` Y shift) | `(-34.9, -1.20) mm` | Fin top `11.2 mm` (`y_max = +2.3 mm`) |
 | **`HS3`** | `Y401` (`Si549` Programmable XO) | **`9 × 7 × 8 mm`** (blue anodized Al, `+1.0 mm` Y shift) | `(-35.0, +9.80) mm` | Fin top `12.0 mm`, `1.8 mm` under the fan (`y_min = +6.3 mm` -> **`4.0 mm` thermal air gap** to `HS2`) |
-| **`HS4`** | `U1101` (`XC7A50T` Artix-7, optional) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` (not needed: `87.8 °C` at `70 °C` ambient without it in the CFD) |
+| **`HS4`** | `U1101` (`XC7A50T` Artix-7, **fit it in a vehicle**) | **`14 × 14 × 5 mm`** (low-profile Cu/Al) | `(-42.75, +40.0) mm` | Fin top `~9.0 mm` (with Vivado's FPGA power the CFD gives `102.1 °C` at `70 °C` ambient without it, `93.4 °C` with it; limit `100 °C`: AUDIT_Rev08 P6) |
 | **`HS5`** | `K26 SOM` (`XCK26` OEM cooler) | **`68 × 58 × 18 mm` + `54 mm` fan** | `(+86.1, +47.0) mm` | Fin top `~25.1 mm` (`7.6 mm` to Enclosure v2 roof honeycomb vent) |
 
 ![Annotated 4K heatsink placement over KV260 + IAS2RF assembly](docs/img/board_heatsinks.jpg)
