@@ -327,6 +327,17 @@ Limits, said plainly.
   trip KV260 `MP5016H` OVP. With that converter, only disconnecting the supply (`ISO 7637-2` pulse 1, 200 ms off),
   prolonged -14 V reverse polarity, or aged-battery 3.0 V Level III cranking still resets the module.
 
+### 1.5 The PSU board: the converter section 1.4 asks for, feeding both boards (19 Nov)
+
+No off-the-shelf module met the specification above (none starts below 6 V), so the project has its own:
+[PSU_SPEC](PSU_SPEC.md), KiCad project `psu/`. An LTC4364 surge stopper (Load Dump A clamped at 48 V, reverse input
+to -40 V) ahead of an LM5177 four-switch buck-boost (12.0 V from 2.9 to 60 V), and one TPS26631 eFuse per output. It
+feeds the adapter's `J1001` and the KV260's `J12` by two cables from one ground, so each board's return stays in its
+own cable: 38 mA a BM20 contact at the worst load against 132 mA through `J1004` (`ground_offset.py`,
+`vfe_two_cables`). With it the adapter's KV260 branch (`Q1010` to `J1004`) is not needed and can stay unfitted; that
+also removes `U1010`, whose two versions (TPS26631PWPR `C2866319`, and the same part on a 250-piece reel,
+TPS26631PWPT `C2832195`, a drop-in alternative) both showed no LCSC stock on 19 November.
+
 ## 2. Decisions this sheet makes, for your approval
 
 | Decision | Evidence | Alternative |

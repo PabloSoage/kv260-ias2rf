@@ -53,7 +53,7 @@ signal chains:
 | Link to the Kria | IAS1 (Hirose BM20B), five LVDS pairs at up to 1 Gb/s each, AC-coupled; the Pmod J2 for control |
 | Ethernet | Gigabit RJ45 through an RTL8211FSI SGMII PHY on its own FPGA pins, so it runs alongside IAS1 ([CONTROL_SPEC §8](docs/CONTROL_SPEC.md)) |
 | To AERIS-10 | 2×20 IDC ribbon for eight ADAR1000s |
-| Power | 12 V single power entry (`J1001` via `L1004` to adapter + `U1010`/`J1004` 3.0 A output to KV260 `J12`); buck and LDO tree for 5 V, 3.3 V, 2.5 V, 1.8 V and 1.0 V, plus -3.3 V for the switches ([POWER_SPEC §1.4](docs/POWER_SPEC.md), [BOARD_MANUAL §6](docs/BOARD_MANUAL.md#6-powering-the-kv260-together-with-the-board)) |
+| Power | 12 V single power entry (`J1001` via `L1004` to adapter + `U1010`/`J1004` 3.0 A output to KV260 `J12`); buck and LDO tree for 5 V, 3.3 V, 2.5 V, 1.8 V and 1.0 V, plus -3.3 V for the switches ([POWER_SPEC §1.4](docs/POWER_SPEC.md), [BOARD_MANUAL §6](docs/BOARD_MANUAL.md#6-powering-the-kv260-together-with-the-board)). In a vehicle, the [PSU board](docs/PSU_SPEC.md) feeds both boards from the battery |
 
 ```mermaid
 flowchart LR
@@ -198,6 +198,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | Document | Contents |
 |---|---|
 | **[docs/BOARD_MANUAL.md](docs/BOARD_MANUAL.md)** | **Board manual.** Every connector, LED, switch, jumper, test point and chip, with drawings of both sides, the Pmod pin-out, troubleshooting by LED and typical uses |
+| **[docs/PSU_SPEC.md](docs/PSU_SPEC.md)** | **PSU board.** The battery-to-both-boards supply (`psu/`): LTC4364 surge stopper and LM5177 buck-boost, its simulations (steady state, loop, ISO 7637-2 and 16750-2 events, thermal, conducted noise) and installation |
 | **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** Complete vehicle platform: LiDAR, SDR, radar, OBD2 |
 | [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | **Dual-FPGA Gateware.** Artix-7 + Kria K26 RTL, Vivado 2026.1 utilization/timing/floorplans/schematics, CSR map, wideband SDR & AERIS-10 radar DSP, and XSim e2e simulation |
 | [docs/HMI.md](docs/HMI.md) | **In-car HMI.** The ten touchscreen screens, a Slint application in Rust that runs on the KV260 (Linux KMS), a PC or a phone's browser, its data service and the PL's result streams behind it, and which job runs on the PL, the A53s, the R5F cores, the GPU and the VCU |
