@@ -97,6 +97,11 @@ and the resins it prints lose most of their stiffness at 70 °C (§4).
     - All STLs rebuild with `0` non-manifold edges; `check_case.py` re-verified with the real `J1004` and `U1010` 3-D
       models reports `15` intended contacts (v1) and `16` (v2), and zero interference with `J1004`, `L1004`, `U1010`,
       `Q1010`, `Q1011`, `D1004`, `C1223`, or `R1218`.
+    - Mated `VHR-2N` plug (`7.8 × 9.0 × 13.3 mm`, straight insertion with `bumper_Lback` fitted) and dual 18 AWG
+      jumper leads (`R = 10 mm` bend radius to KV260 `J12` at `90.2 mm` X span, `111.9 mm` routed path vs `150 mm`
+      jumper): `0` overlaps in `check_case.py` (`VHR-2N` plug `3.97 mm` clear of `bumper_Lback`, `0.50 mm` to lid
+      opening side walls, `0.10 mm` to tray lip; straight plug-in corridor `3.97 mm` clear of `bumper_Lback`; 18 AWG
+      wire bend `4.79 mm` clear of `bumper_Lback`, `3.92 mm` to tray, `2.57 mm` to lid).
 
 | | |
 |---|---|

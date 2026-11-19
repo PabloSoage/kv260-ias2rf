@@ -7,7 +7,7 @@ Aligned to KiCad footprint Connector_JST:JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal:
   - Right-angle 1.14 x 1.14 mm square tin-plated brass posts extend to STEP Y = -14.9 mm
   - Housing width 7.86 mm (X = -1.95..+5.91) at rear flange, height Z = 0.0..8.5 mm above PCB top face
 
-Colours follow the project render rules (warm dark ivory PA66 insulator, satin tin-brass posts;
+Colours follow the project render rules (matte dark natural-nylon PA66 insulator, satin tin-brass posts;
 never pure white).
 
 Usage (WSL CadQuery/OCP environment):
@@ -20,8 +20,8 @@ import cadquery as cq
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(ROOT, "mech", "models3d", "JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step")
 
-PA66_COLOR = cq.Color(0.58, 0.54, 0.47)
-PIN_COLOR = cq.Color(0.68, 0.69, 0.70)
+PA66_COLOR = cq.Color(0.46, 0.40, 0.30)
+PIN_COLOR = cq.Color(0.54, 0.55, 0.57)
 
 
 def make_housing():

@@ -183,6 +183,12 @@ def apply(materials, objects):
             _set(b, "Roughness", 0.55)
             _set(b, "Specular IOR Level", 0.3)
             count("beige")
+        elif "ad" in who and r > g > bl and sat < 0.2 and 0.08 <= L <= 0.30:
+            # Dark natural-nylon housings: keep matte so highlights never blow toward white.
+            _set(b, "Metallic", 0.0)
+            _set(b, "Roughness", 0.68)
+            _set(b, "Specular IOR Level", 0.22)
+            count("nylon")
         else:
             k = min(1.0, 0.8 / max(max(c), 1e-6))
             b.inputs["Base Color"].default_value = (r * k, g * k, bl * k, 1)
