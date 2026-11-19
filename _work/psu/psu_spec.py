@@ -125,7 +125,8 @@ def two(ref, part, n1, n2):
 
 
 # ---- U1 LTC4364
-two("R4", R("1k", "U1 VCC: limits D5's current in a load dump", R1206), "VCC_OR", "VCC_LTC")
+two("R4", R("1k 0.66W", "U1 VCC: limits D5's current in a load dump; anti-surge (ERJ-P08F1001V): 0.88 W peak, "
+                   "23.5 mJ over 92 ms in Load Dump A (psu_audit.py)", R1206), "VCC_OR", "VCC_LTC")
 two("C1", C("100n 100V", "U1 VCC", C0805), "VCC_LTC", GND)
 two("R5", R("140k", "U1 UV divider, top: 3.0 V", R0603), "VBAT", "UV")
 two("R6", R("100k", "U1 UV divider, bottom", R0603), "UV", GND)

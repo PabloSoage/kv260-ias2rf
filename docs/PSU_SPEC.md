@@ -220,3 +220,38 @@ copies of KiCad's models with their near-white metal toned to grey (`psu_pcb.py`
 - Off-the-shelf modules checked before this board: Bicker DC160WS (6 to 36 V), Mini-Box DCDC-USB-200 (6 to 34 V),
   DFRobot 5 A buck-boost (6 to 35 V), Analog Devices DC1198B-B (6 to 36 V as built); none starts below 6 V, so none
   holds the module through cranking Level II.
+
+## 10. Audit (`psu_audit.py`, `docs/sim/psu_audit.json`)
+
+Checked on 19 November 2026, against the data sheets and the simulated extremes:
+
+- **Every IC pin against its data sheet's pin table** (93 pins: LTC4364-2 MS16, LM5177 HTSSOP-38, two TPS26631
+  VQFN-24). Each pin left open is one its data sheet allows open: the LM5177's `HO1_LL`/`HO2_LL` ("make no external
+  connection"), the TPS26631s' `B_GATE`, `DRV`, `IMON`, `FLT` and `PGOOD`, their `SHDN` (open-circuit 2.48 to 3.3 V,
+  above its 2 V threshold), the LTC4364's `ENOUT` and `SHDN` (an internal current source to a 4 V clamp; the board's
+  leakage there must stay under 1 uA, so keep it clean of flux). The pins that must not float are tied as their data
+  sheets say: `DTRK` to ground, `SYNC` and `MODE` (forced PWM) to `VCC`, `OV` to ground (the OV comparator unused),
+  `IN_SYS` to `IN`.
+- **Every pin's absolute maximum against its net's worst voltage**: the LTC4364's `VCC` (100 V) sees at most D5's
+  62.7 V breakdown; its `SOURCE` and `OUT` the 48 V clamp (52 V with tolerances); the LM5177's `VIN`, `SW1`, `CSA`/`CSB`
+  (85 V) the same 52 V, its `BIAS` (50 V) 14.4 V; the TPS26631s' `IN` and `OUT` (67 V) 14.4 V.
+- **Every part's voltage against its rating** (ceramics at 80 %, electrolytics at 85 %): the highest are `C6`, `C17`,
+  `C18` (63 V electrolytics, 52 V for the 400 ms of a load dump: 83 %), `C1` and `C3` (100 V, 63 %), `Q1` (150 V,
+  77 V across it in the clamp: 51 %), `Q2` (100 V, 54 V in a negative pulse: 54 %).
+- **Every resistor's dissipation**: the shunts `R1` (2 W part) 0.43 W and `R2` (3 W) 0.89 W at their worst currents;
+  the dividers under 40 mW.
+- **The simulation** (section 4.4): after `U1` the bus never passes 48.2 V; `Q1` takes at most 18.9 J (cranking
+  Level II, within its SOA averaged over 1 ms); the TVS pair at most 0.19 J (rated 1500 W for 1 ms); no part is
+  overstressed in any event.
+
+Changed by this audit:
+
+- **`R4`** (`U1`'s `VCC` feed): in Load Dump A, `D5` clamps `VCC` and `R4` takes 0.88 W at the peak, 23.5 mJ over
+  92 ms, over a plain 1206's 0.25 W. It is now an anti-surge 1206, Panasonic ERJ-P08F1001V (0.66 W, LCSC C4261071).
+  It stays 1 kohm: more would stop `U1` starting from 6 V (its `VCC` needs 4 V at 750 uA).
+- **`J2`, `J3`**: turned so that their openings face the board edge, with the plugs leaving edge-on (they first faced
+  inwards; the 3-D render showed it).
+
+Left for the bench: the loop with the real layout, the `IMONOUT` compensation (`R25`, `C29`), conducted emissions
+above 30 MHz and the CISPR 25 average limits, and the switching nodes' ringing (`R13` to `R16` are there to slow
+them).

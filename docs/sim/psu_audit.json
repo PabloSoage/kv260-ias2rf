@@ -1,0 +1,1272 @@
+{
+ "parts": [
+  {
+   "ref": "R4",
+   "what": "1k 0.66W R_1206_3216Metric VCC_OR/VCC_LTC",
+   "stress_V": 29.6,
+   "worst_W": 0.8762,
+   "rating_W": 0.66,
+   "ok": true
+  },
+  {
+   "ref": "C1",
+   "what": "100n 100V on VCC_LTC/GND",
+   "stress_V": 62.7,
+   "rating_V": 100.0,
+   "use": 0.63,
+   "ok": true
+  },
+  {
+   "ref": "R5",
+   "what": "140k R_0603_1608Metric VBAT/UV",
+   "stress_V": 72.9,
+   "worst_W": 0.038,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R6",
+   "what": "100k R_0603_1608Metric UV/GND",
+   "stress_V": 52.1,
+   "worst_W": 0.0271,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R7",
+   "what": "374k R_0603_1608Metric B0/FB_LTC",
+   "stress_V": 46.2,
+   "worst_W": 0.0057,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R8",
+   "what": "10k R_0603_1608Metric FB_LTC/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0034,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C2",
+   "what": "4.7u 25V on TMR/GND",
+   "stress_V": 5.8,
+   "rating_V": 25.0,
+   "use": 0.23,
+   "ok": true
+  },
+  {
+   "ref": "C3",
+   "what": "10n 100V on HG/GND",
+   "stress_V": 62.0,
+   "rating_V": 100.0,
+   "use": 0.62,
+   "ok": true
+  },
+  {
+   "ref": "R9",
+   "what": "2.2k R_0603_1608Metric +12V/LED_FLT",
+   "stress_V": 12.6,
+   "worst_W": 0.0722,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C4",
+   "what": "100n 250V on VBAT/GND",
+   "stress_V": 125.0,
+   "rating_V": 250.0,
+   "use": 0.5,
+   "ok": true
+  },
+  {
+   "ref": "C5",
+   "what": "100n 250V on VBAT/GND",
+   "stress_V": 125.0,
+   "rating_V": 250.0,
+   "use": 0.5,
+   "ok": true
+  },
+  {
+   "ref": "C6",
+   "what": "47u 63V on B0/GND",
+   "stress_V": 52.0,
+   "rating_V": 63.0,
+   "use": 0.83,
+   "ok": true
+  },
+  {
+   "ref": "C7",
+   "what": "4.7u 100V on B0/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C8",
+   "what": "4.7u 100V on B0/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C9",
+   "what": "100n 100V on B0/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C10",
+   "what": "100n 100V on B0/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C11",
+   "what": "4.7u 100V on B/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C12",
+   "what": "4.7u 100V on B/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C13",
+   "what": "4.7u 100V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C14",
+   "what": "4.7u 100V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C15",
+   "what": "4.7u 100V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C16",
+   "what": "4.7u 100V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "C17",
+   "what": "100u 63V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 63.0,
+   "use": 0.83,
+   "ok": true
+  },
+  {
+   "ref": "C18",
+   "what": "100u 63V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 63.0,
+   "use": 0.83,
+   "ok": true
+  },
+  {
+   "ref": "C19",
+   "what": "100n 100V on VIN/GND",
+   "stress_V": 52.0,
+   "rating_V": 100.0,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "R10",
+   "what": "576k R_0603_1608Metric VIN/EN_UVLO",
+   "stress_V": 31.2,
+   "worst_W": 0.0017,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R11",
+   "what": "383k R_0603_1608Metric EN_UVLO/GND",
+   "stress_V": 20.8,
+   "worst_W": 0.0011,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R12",
+   "what": "10 R_0603_1608Metric +12V/BIAS",
+   "stress_V": 0.5,
+   "worst_W": 0.025,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C20",
+   "what": "1u 25V on BIAS/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C21",
+   "what": "10u 10V on VCC/GND",
+   "stress_V": 5.5,
+   "rating_V": 10.0,
+   "use": 0.55,
+   "ok": true
+  },
+  {
+   "ref": "C22",
+   "what": "10u 10V on VCC/GND",
+   "stress_V": 5.5,
+   "rating_V": 10.0,
+   "use": 0.55,
+   "ok": true
+  },
+  {
+   "ref": "C23",
+   "what": "100n 25V on HB1/SW1",
+   "stress_V": 5.5,
+   "rating_V": 25.0,
+   "use": 0.22,
+   "ok": true
+  },
+  {
+   "ref": "C24",
+   "what": "100n 25V on HB2/SW2",
+   "stress_V": 5.5,
+   "rating_V": 25.0,
+   "use": 0.22,
+   "ok": true
+  },
+  {
+   "ref": "R17",
+   "what": "10 R_0603_1608Metric SW1/CSA",
+   "stress_V": 0.3,
+   "worst_W": 0.009,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R18",
+   "what": "10 R_0603_1608Metric LX/CSB",
+   "stress_V": 0.3,
+   "worst_W": 0.009,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C25",
+   "what": "150p 50V on CSA/CSB",
+   "stress_V": 0.3,
+   "rating_V": 50.0,
+   "use": 0.01,
+   "ok": true
+  },
+  {
+   "ref": "R19",
+   "what": "71.5k R_0603_1608Metric +12V/FB",
+   "stress_V": 8.6,
+   "worst_W": 0.001,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R20",
+   "what": "6.49k R_0603_1608Metric FB/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0052,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R21",
+   "what": "15.8k R_0603_1608Metric COMP/COMP_RC",
+   "stress_V": 0.0,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C26",
+   "what": "15n 50V on COMP_RC/GND",
+   "stress_V": 5.8,
+   "rating_V": 50.0,
+   "use": 0.12,
+   "ok": true
+  },
+  {
+   "ref": "C27",
+   "what": "120p 50V on COMP/GND",
+   "stress_V": 5.8,
+   "rating_V": 50.0,
+   "use": 0.12,
+   "ok": true
+  },
+  {
+   "ref": "C28",
+   "what": "47n 25V on SS/GND",
+   "stress_V": 5.8,
+   "rating_V": 25.0,
+   "use": 0.23,
+   "ok": true
+  },
+  {
+   "ref": "R22",
+   "what": "75k R_0603_1608Metric RT/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0004,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R23",
+   "what": "54.9k R_0603_1608Metric SLOPE/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0006,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R24",
+   "what": "3.83k R_0603_1608Metric CFG/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0088,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R25",
+   "what": "20k R_0603_1608Metric IMON/IMON_RC",
+   "stress_V": 0.0,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C29",
+   "what": "10n 25V on IMON_RC/GND",
+   "stress_V": 5.8,
+   "rating_V": 25.0,
+   "use": 0.23,
+   "ok": true
+  },
+  {
+   "ref": "R26",
+   "what": "100k R_0603_1608Metric VCC/NFLT",
+   "stress_V": 0.0,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C32",
+   "what": "22u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C33",
+   "what": "22u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C34",
+   "what": "22u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C35",
+   "what": "22u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C36",
+   "what": "22u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C37",
+   "what": "22u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C38",
+   "what": "100u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "C39",
+   "what": "100u 25V on +12V/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "R29",
+   "what": "4.7k R_0603_1608Metric +12V/LED_PWR",
+   "stress_V": 12.6,
+   "worst_W": 0.0338,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R40",
+   "what": "316k R_0603_1608Metric +12V/A_UVLO",
+   "stress_V": 12.2,
+   "worst_W": 0.0005,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R41",
+   "what": "24.9k R_0603_1608Metric A_UVLO/A_OVP",
+   "stress_V": 1.0,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R42",
+   "what": "30.9k R_0603_1608Metric A_OVP/GND",
+   "stress_V": 1.2,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R43",
+   "what": "9.09k R_0603_1608Metric A_ILIM/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0037,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C40",
+   "what": "22n 50V on A_DVDT/GND",
+   "stress_V": 5.8,
+   "rating_V": 50.0,
+   "use": 0.12,
+   "ok": true
+  },
+  {
+   "ref": "C41",
+   "what": "10u 25V on OUT_A/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "R50",
+   "what": "316k R_0603_1608Metric +12V/K_UVLO",
+   "stress_V": 12.2,
+   "worst_W": 0.0005,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R51",
+   "what": "24.9k R_0603_1608Metric K_UVLO/K_OVP",
+   "stress_V": 1.0,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R52",
+   "what": "30.9k R_0603_1608Metric K_OVP/GND",
+   "stress_V": 1.2,
+   "worst_W": 0.0,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "R53",
+   "what": "6.04k R_0603_1608Metric K_ILIM/GND",
+   "stress_V": 5.8,
+   "worst_W": 0.0056,
+   "rating_W": 0.1,
+   "ok": true
+  },
+  {
+   "ref": "C50",
+   "what": "22n 50V on K_DVDT/GND",
+   "stress_V": 5.8,
+   "rating_V": 50.0,
+   "use": 0.12,
+   "ok": true
+  },
+  {
+   "ref": "C51",
+   "what": "10u 25V on OUT_K/GND",
+   "stress_V": 14.4,
+   "rating_V": 25.0,
+   "use": 0.58,
+   "ok": true
+  },
+  {
+   "ref": "R1",
+   "what": "2m shunt at 14.6 A",
+   "worst_W": 0.426,
+   "rating_W": 2.0,
+   "ok": true
+  },
+  {
+   "ref": "R2",
+   "what": "3m shunt at 17.2 A",
+   "worst_W": 0.888,
+   "rating_W": 3.0,
+   "ok": true
+  },
+  {
+   "ref": "Q1",
+   "what": "IPB048N15N5 V(DS)",
+   "stress_V": 76.8,
+   "rating_V": 150,
+   "use": 0.51,
+   "ok": true
+  },
+  {
+   "ref": "Q2",
+   "what": "BSC040N10NS5 V(DS)",
+   "stress_V": 54.4,
+   "rating_V": 100,
+   "use": 0.54,
+   "ok": true
+  },
+  {
+   "ref": "Q3",
+   "what": "BSC0805LS V(DS)",
+   "stress_V": 52.0,
+   "rating_V": 100,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "Q4",
+   "what": "BSC0805LS V(DS)",
+   "stress_V": 52.0,
+   "rating_V": 100,
+   "use": 0.52,
+   "ok": true
+  },
+  {
+   "ref": "Q5",
+   "what": "BSC026N04LS V(DS)",
+   "stress_V": 14.4,
+   "rating_V": 40,
+   "use": 0.36,
+   "ok": true
+  },
+  {
+   "ref": "Q6",
+   "what": "BSC026N04LS V(DS)",
+   "stress_V": 14.4,
+   "rating_V": 40,
+   "use": 0.36,
+   "ok": true
+  }
+ ],
+ "ic_pins": [
+  {
+   "ic": "U1",
+   "pin": "1",
+   "name": "OUT",
+   "net": "B0",
+   "absmax_V": 100,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U1",
+   "pin": "2",
+   "name": "SENSE",
+   "net": "B0",
+   "note": "tied to OUT: no current limit (the LM5177 limits the input current)",
+   "absmax_V": 100,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U1",
+   "pin": "3",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U1",
+   "pin": "4",
+   "name": "DGATE",
+   "net": "DG"
+  },
+  {
+   "ic": "U1",
+   "pin": "5",
+   "name": "SOURCE",
+   "net": "VS",
+   "absmax_V": 100,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U1",
+   "pin": "6",
+   "name": "HGATE",
+   "net": "HG"
+  },
+  {
+   "ic": "U1",
+   "pin": "7",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U1",
+   "pin": "8",
+   "name": "VCC",
+   "net": "VCC_LTC",
+   "absmax_V": 100,
+   "net_max_V": 62.7
+  },
+  {
+   "ic": "U1",
+   "pin": "9",
+   "name": "SHDN",
+   "net": "NC",
+   "note": "open: an internal current source pulls it to its 4 V clamp; leakage to ground must stay below 1 uA"
+  },
+  {
+   "ic": "U1",
+   "pin": "10",
+   "name": "UV",
+   "net": "UV",
+   "absmax_V": 100,
+   "net_max_V": 52.1
+  },
+  {
+   "ic": "U1",
+   "pin": "11",
+   "name": "OV",
+   "net": "GND",
+   "note": "to GND: the OV comparator is not used (the fault retry is never inhibited)"
+  },
+  {
+   "ic": "U1",
+   "pin": "12",
+   "name": "GND",
+   "net": "GND"
+  },
+  {
+   "ic": "U1",
+   "pin": "13",
+   "name": "FLT",
+   "net": "FLT_LTC",
+   "absmax_V": 100,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U1",
+   "pin": "14",
+   "name": "ENOUT",
+   "net": "NC",
+   "note": "open: ENOUT unused"
+  },
+  {
+   "ic": "U1",
+   "pin": "15",
+   "name": "TMR",
+   "net": "TMR"
+  },
+  {
+   "ic": "U1",
+   "pin": "16",
+   "name": "FB",
+   "net": "FB_LTC"
+  },
+  {
+   "ic": "U2",
+   "pin": "1",
+   "name": "BIAS",
+   "net": "BIAS",
+   "absmax_V": 50,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U2",
+   "pin": "2",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U2",
+   "pin": "3",
+   "name": "VIN",
+   "net": "VIN",
+   "absmax_V": 85,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U2",
+   "pin": "4",
+   "name": "EN/UVLO",
+   "net": "EN_UVLO"
+  },
+  {
+   "ic": "U2",
+   "pin": "5",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U2",
+   "pin": "6",
+   "name": "IMONOUT",
+   "net": "IMON"
+  },
+  {
+   "ic": "U2",
+   "pin": "7",
+   "name": "nFLT",
+   "net": "NFLT"
+  },
+  {
+   "ic": "U2",
+   "pin": "8",
+   "name": "HO1_LL",
+   "net": "NC",
+   "note": "open: 'make no external connection' when unused"
+  },
+  {
+   "ic": "U2",
+   "pin": "9",
+   "name": "HO2_LL",
+   "net": "NC",
+   "note": "open: likewise"
+  },
+  {
+   "ic": "U2",
+   "pin": "10",
+   "name": "DTRK",
+   "net": "GND",
+   "note": "to GND: 'connect to VCC or GND' when unused"
+  },
+  {
+   "ic": "U2",
+   "pin": "11",
+   "name": "SYNC",
+   "net": "VCC",
+   "note": "to VCC: 'connect to VCC' when unused"
+  },
+  {
+   "ic": "U2",
+   "pin": "12",
+   "name": "MODE",
+   "net": "VCC",
+   "note": "to VCC: forced PWM (spread spectrum, no pulse skipping in the AM band)"
+  },
+  {
+   "ic": "U2",
+   "pin": "13",
+   "name": "CFG",
+   "net": "CFG"
+  },
+  {
+   "ic": "U2",
+   "pin": "14",
+   "name": "SLOPE",
+   "net": "SLOPE"
+  },
+  {
+   "ic": "U2",
+   "pin": "15",
+   "name": "RT",
+   "net": "RT"
+  },
+  {
+   "ic": "U2",
+   "pin": "16",
+   "name": "SS/ATRK",
+   "net": "SS"
+  },
+  {
+   "ic": "U2",
+   "pin": "17",
+   "name": "AGND",
+   "net": "GND"
+  },
+  {
+   "ic": "U2",
+   "pin": "18",
+   "name": "COMP",
+   "net": "COMP"
+  },
+  {
+   "ic": "U2",
+   "pin": "19",
+   "name": "FB",
+   "net": "FB"
+  },
+  {
+   "ic": "U2",
+   "pin": "20",
+   "name": "VOUT",
+   "net": "+12V",
+   "absmax_V": 85,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U2",
+   "pin": "21",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U2",
+   "pin": "22",
+   "name": "ISNSN",
+   "net": "VIN",
+   "absmax_V": 85,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U2",
+   "pin": "23",
+   "name": "ISNSP",
+   "net": "B2",
+   "absmax_V": 85,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U2",
+   "pin": "24",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U2",
+   "pin": "25",
+   "name": "SW2",
+   "net": "SW2",
+   "absmax_V": 85,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U2",
+   "pin": "26",
+   "name": "HB2",
+   "net": "HB2"
+  },
+  {
+   "ic": "U2",
+   "pin": "27",
+   "name": "HO2",
+   "net": "HO2"
+  },
+  {
+   "ic": "U2",
+   "pin": "28",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U2",
+   "pin": "29",
+   "name": "LO2",
+   "net": "LO2"
+  },
+  {
+   "ic": "U2",
+   "pin": "30",
+   "name": "PGND",
+   "net": "GND"
+  },
+  {
+   "ic": "U2",
+   "pin": "31",
+   "name": "VCC",
+   "net": "VCC"
+  },
+  {
+   "ic": "U2",
+   "pin": "32",
+   "name": "LO1",
+   "net": "LO1"
+  },
+  {
+   "ic": "U2",
+   "pin": "33",
+   "name": "NC",
+   "net": "NC"
+  },
+  {
+   "ic": "U2",
+   "pin": "34",
+   "name": "HO1",
+   "net": "HO1"
+  },
+  {
+   "ic": "U2",
+   "pin": "35",
+   "name": "HB1",
+   "net": "HB1"
+  },
+  {
+   "ic": "U2",
+   "pin": "36",
+   "name": "SW1",
+   "net": "SW1",
+   "absmax_V": 85,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U2",
+   "pin": "37",
+   "name": "CSA",
+   "net": "CSA",
+   "absmax_V": 85,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U2",
+   "pin": "38",
+   "name": "CSB",
+   "net": "CSB",
+   "absmax_V": 85,
+   "net_max_V": 52.0
+  },
+  {
+   "ic": "U2",
+   "pin": "39",
+   "name": "PowerPAD",
+   "net": "GND"
+  },
+  {
+   "ic": "U3",
+   "pin": "1",
+   "name": "IN",
+   "net": "+12V",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U3",
+   "pin": "2",
+   "name": "IN",
+   "net": "+12V",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U3",
+   "pin": "3",
+   "name": "B_GATE",
+   "net": "NC",
+   "note": "open: 'leave floating' without a blocking FET"
+  },
+  {
+   "ic": "U3",
+   "pin": "4",
+   "name": "DRV",
+   "net": "NC",
+   "note": "open: likewise"
+  },
+  {
+   "ic": "U3",
+   "pin": "5",
+   "name": "IN_SYS",
+   "net": "+12V",
+   "note": "to IN: 'short IN_SYS to IN' without a blocking FET",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U3",
+   "pin": "6",
+   "name": "UVLO",
+   "net": "A_UVLO",
+   "absmax_V": 67,
+   "net_max_V": 2.2
+  },
+  {
+   "ic": "U3",
+   "pin": "7",
+   "name": "OVP",
+   "net": "A_OVP",
+   "absmax_V": 67,
+   "net_max_V": 1.2
+  },
+  {
+   "ic": "U3",
+   "pin": "8",
+   "name": "GND",
+   "net": "GND"
+  },
+  {
+   "ic": "U3",
+   "pin": "9",
+   "name": "dVdT",
+   "net": "A_DVDT"
+  },
+  {
+   "ic": "U3",
+   "pin": "10",
+   "name": "ILIM",
+   "net": "A_ILIM"
+  },
+  {
+   "ic": "U3",
+   "pin": "11",
+   "name": "MODE",
+   "net": "GND",
+   "note": "to GND: 2x for t(CB), then 1x, then auto-retry (Table 8-1)"
+  },
+  {
+   "ic": "U3",
+   "pin": "12",
+   "name": "SHDN",
+   "net": "NC",
+   "note": "open: its open-circuit voltage is 2.48 to 3.3 V, above the 2 V rising threshold"
+  },
+  {
+   "ic": "U3",
+   "pin": "13",
+   "name": "IMON",
+   "net": "NC",
+   "note": "open: 'if unused, leave floating'"
+  },
+  {
+   "ic": "U3",
+   "pin": "14",
+   "name": "FLT",
+   "net": "NC",
+   "note": "open: 'leave floating or connect to GND'"
+  },
+  {
+   "ic": "U3",
+   "pin": "15",
+   "name": "PGTH",
+   "net": "GND",
+   "note": "to GND: PGOOD unused"
+  },
+  {
+   "ic": "U3",
+   "pin": "16",
+   "name": "PGOOD",
+   "net": "NC",
+   "note": "open: 'connect to GND or leave floating'"
+  },
+  {
+   "ic": "U3",
+   "pin": "17",
+   "name": "OUT",
+   "net": "OUT_A",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U3",
+   "pin": "18",
+   "name": "OUT",
+   "net": "OUT_A",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U3",
+   "pin": "25",
+   "name": "EP",
+   "net": "GND"
+  },
+  {
+   "ic": "U4",
+   "pin": "1",
+   "name": "IN",
+   "net": "+12V",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U4",
+   "pin": "2",
+   "name": "IN",
+   "net": "+12V",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U4",
+   "pin": "3",
+   "name": "B_GATE",
+   "net": "NC",
+   "note": "open: 'leave floating' without a blocking FET"
+  },
+  {
+   "ic": "U4",
+   "pin": "4",
+   "name": "DRV",
+   "net": "NC",
+   "note": "open: likewise"
+  },
+  {
+   "ic": "U4",
+   "pin": "5",
+   "name": "IN_SYS",
+   "net": "+12V",
+   "note": "to IN: 'short IN_SYS to IN' without a blocking FET",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U4",
+   "pin": "6",
+   "name": "UVLO",
+   "net": "K_UVLO",
+   "absmax_V": 67,
+   "net_max_V": 2.2
+  },
+  {
+   "ic": "U4",
+   "pin": "7",
+   "name": "OVP",
+   "net": "K_OVP",
+   "absmax_V": 67,
+   "net_max_V": 1.2
+  },
+  {
+   "ic": "U4",
+   "pin": "8",
+   "name": "GND",
+   "net": "GND"
+  },
+  {
+   "ic": "U4",
+   "pin": "9",
+   "name": "dVdT",
+   "net": "K_DVDT"
+  },
+  {
+   "ic": "U4",
+   "pin": "10",
+   "name": "ILIM",
+   "net": "K_ILIM"
+  },
+  {
+   "ic": "U4",
+   "pin": "11",
+   "name": "MODE",
+   "net": "GND",
+   "note": "to GND: 2x for t(CB), then 1x, then auto-retry (Table 8-1)"
+  },
+  {
+   "ic": "U4",
+   "pin": "12",
+   "name": "SHDN",
+   "net": "NC",
+   "note": "open: its open-circuit voltage is 2.48 to 3.3 V, above the 2 V rising threshold"
+  },
+  {
+   "ic": "U4",
+   "pin": "13",
+   "name": "IMON",
+   "net": "NC",
+   "note": "open: 'if unused, leave floating'"
+  },
+  {
+   "ic": "U4",
+   "pin": "14",
+   "name": "FLT",
+   "net": "NC",
+   "note": "open: 'leave floating or connect to GND'"
+  },
+  {
+   "ic": "U4",
+   "pin": "15",
+   "name": "PGTH",
+   "net": "GND",
+   "note": "to GND: PGOOD unused"
+  },
+  {
+   "ic": "U4",
+   "pin": "16",
+   "name": "PGOOD",
+   "net": "NC",
+   "note": "open: 'connect to GND or leave floating'"
+  },
+  {
+   "ic": "U4",
+   "pin": "17",
+   "name": "OUT",
+   "net": "OUT_K",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U4",
+   "pin": "18",
+   "name": "OUT",
+   "net": "OUT_K",
+   "absmax_V": 67,
+   "net_max_V": 14.4
+  },
+  {
+   "ic": "U4",
+   "pin": "25",
+   "name": "EP",
+   "net": "GND"
+  }
+ ],
+ "simulated_extremes": {
+  "vb_max_V": 48.197450996023626,
+  "va_max_V": 86.47466875529447,
+  "va_min_V": -30.635695843158793,
+  "q1_energy_max_J": 18.882125420183023,
+  "tvs_energy_max_J": 0.1868394512480979,
+  "damage": []
+ },
+ "issues": []
+}
