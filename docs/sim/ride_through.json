@@ -530,7 +530,7 @@
   }
  ],
  "converter_spec": {
-  "topology": "4-switch synchronous buck-boost (plus upstream active 36 V Load Dump A limiter such as LM5060-Q1 / TIDA-01167)",
+  "topology": "4-switch synchronous buck-boost (plus an upstream 36 V Load Dump A surge stopper that clamps, such as LT4363)",
   "output_v": "12.0 V +-2 % (11.76-12.24 V < 13.2 V KV260 MP5016H OVP)",
   "current_min_a": 5.0,
   "power_min_w": 60.0,

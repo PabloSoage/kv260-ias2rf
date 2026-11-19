@@ -191,7 +191,7 @@ adapter cut-off limits:
 ![Vehicle ride-through with upstream converter](sim/ride_through.png)
 
 1. Standards and fault waveforms evaluated `[V]`:
-   - `ISO 16750-2:2012` Clause 4.6.3 Table 5 starting profiles (retained unchanged in `ISO 16750-2:2023` Table 11):
+   - `ISO 16750-2:2012` Clause 4.6.3 Table 5 starting profiles (as reproduced in TI `TIDUC53` Table 8):
      Level I (Us = 8.0 V, Ua = 9.5 to 11.5 V, tf = 5 ms, t6 = 15 ms, t7 = 50 ms, t8 = 1.0 s, tr = 40 ms), Level II
      (Us = 4.5 V, Ua = 6.5 to 8.5 V, t8 = 10 s, tr = 100 ms), Level III (Us = 3.0 V, Ua = 5.0 to 7.0 V, t8 = 1.0 s,
      tr = 100 ms), and Level IV (Us = 6.0 V, Ua = 6.5 to 8.5 V, t8 = 10 s, tr = 100 ms).
@@ -260,9 +260,13 @@ adapter cut-off limits:
    - Required parameters: 11.76 to 12.24 V output (<= 12.4 V max transient overshoot), -14 V for 60 s reverse-polarity
      protection, and a monotonic 2 to 20 ms rise into `U1010`'s 5.49 ms `dVdT` ramp with no dwell inside the 7.48 to 8.00 V
      hysteresis window. A passive `SM8S33A` TVS alone reaches 43.8 V and absorbs 141.7 J during 87 V Load Dump A, exceeding its
-     130.7 J Wunsch-Bell limit, so unsuppressed 87 V transients require an active surge stopper such as `LM5060-Q1`
-     (`TIDA-01167`). Reference buck-boost controllers meeting 4.3 to 36 V directly are `LM5118-Q1` (`TIDA-01179`) or
-     `LTM4607`.
+     130.7 J Wunsch-Bell limit, so unsuppressed 87 V transients require an active surge stopper that clamps rather
+     than cuts off, such as Analog Devices `LT4363` (4 to 80 V, adjustable output clamp; its DC2062A demo limits a
+     100 V, 500 ms load dump to 25 V). Its fault timer and MOSFET must be sized to clamp for the whole 400 ms of Load
+     Dump A; if the timer cuts off first, the module resets (Class C) but nothing is damaged. An over-voltage cut-off
+     controller (`LM5060-Q1` and similar) disconnects instead and gives Class C as well. Reference buck-boost designs:
+     `LM5118-Q1` (3 to 75 V; TI `TIDA-01179` keeps a regulated output through ISO 16750-2 Level III cold crank) and
+     the `LTM4607` module (4.5 to 36 V, so it meets Level II at 4.5 V with no margin for the harness drop).
    - Never fit a 13.6 V or 13.8 V automotive battery stabiliser: KV260 `MP5016H` OVP opens permanently above 13.2 V.
    - Comparison with real COTS DC-DC modules (every gap stated honestly):
      - `Bicker Elektronik DC160WS` (`https://www.bicker.de/en/dc160ws`): 6.0 to 36.0 V in, 12.0 V +-3 % out (11.64 to 12.36 V,

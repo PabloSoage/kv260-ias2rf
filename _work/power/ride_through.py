@@ -36,7 +36,6 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 # ---------------------------------------------------------------------------- 1. Standards [V]
 # ISO 16750-2:2012 (4th ed.), Clause 4.6.3 Figure 7 / Table 5 (reproduced in TI TIDUC53 Table 8)
-# Note: ISO 16750-2:2023 (5th ed.) keeps the same 4 levels in Table 11 / Figure 13.
 # Waveform: UB=12.0 V -> drop over tf to US for t6 -> rise over t7 to UA -> 2 Hz 2 Vpp sine above UA
 # trough (UA .. UA+2V) for t8 -> rise over tr to UB (12.0 V).
 CRANK_LEVELS = {
@@ -712,7 +711,7 @@ def main():
         holdup_events=holdup_rows,
         holdup_solver_verification=solver_holdup,
         converter_spec=dict(
-            topology="4-switch synchronous buck-boost (plus upstream active 36 V Load Dump A limiter such as LM5060-Q1 / TIDA-01167)",
+            topology="4-switch synchronous buck-boost (plus an upstream 36 V Load Dump A surge stopper that clamps, such as LT4363)",
             output_v="12.0 V +-2 % (11.76-12.24 V < 13.2 V KV260 MP5016H OVP)",
             current_min_a=5.0,
             power_min_w=60.0,
