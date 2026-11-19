@@ -336,6 +336,18 @@ def pulse(kind):
     if kind == "Reverse battery, -14 V (ISO 16750-2 4.7), first 50 ms":
         f = lambda t: -14.0 * min(1, t / 1e-3) if t >= 0 else UA
         return f, 0.05, 0.05, 1e-6, True
+    if kind == "ISO 16750-2 cranking, starting profile level II (4.5 V for 15 ms, 6 V ripple, 0.05 ohm)":
+        def f(t):
+            if t < 0:
+                return UA
+            if t < 1e-3:
+                return UA + (4.5 - UA) * (t / 1e-3)
+            if t < 16e-3:
+                return 4.5
+            if t < 66e-3:
+                return 6.0 + 0.5 * math.sin(2.0 * math.pi * 2.0 * (t - 16e-3))
+            return min(12.5, 6.0 + (12.5 - 6.0) * (t - 66e-3) / 5e-3)
+        return f, 0.05, 0.08, 5e-6, False
     raise KeyError(kind)
 
 
@@ -346,36 +358,84 @@ PULSES = ["ISO 7637-2 pulse 1 (-150 V, 10 ohm, 2 ms; supply disconnected)",
           "ISO 16750-2 load dump, test B (suppressed to 35 V, 0.5 ohm, 400 ms)",
           "ISO 16750-2 load dump, test A (87 V unsuppressed, 1 ohm, 400 ms)",
           "Jump start, 24 V for 60 s (ISO 16750-2 4.3.1.2), first 50 ms",
-          "Reverse battery, -14 V (ISO 16750-2 4.7), first 50 ms"]
+          "Reverse battery, -14 V (ISO 16750-2 4.7), first 50 ms",
+          "ISO 16750-2 cranking, starting profile level II (4.5 V for 15 ms, 6 V ripple, 0.05 ohm)"]
 
 
-def input_stage(kind, p_load=13.4):
-    """Source -> Ri -> harness 1 uH -> PTC 0.06 ohm -> VIN_F (C1090 100 nF, D1003) -> FETs -> +12V (C1001 47 uF +
-    C1002 10 uF + C1003 0.22 uF, derated 50 % for DC bias, D1001) -> constant-power load (LMR33630, off below 4 V)."""
+def _solve4(A, b):
+    """Fast 4x4 linear solver A*x = b (partial pivoting, scalar Python)."""
+    for col in range(4):
+        piv = max(range(col, 4), key=lambda r: abs(A[r][col]))
+        if piv != col:
+            A[col], A[piv] = A[piv], A[col]
+            b[col], b[piv] = b[piv], b[col]
+        diag = A[col][col]
+        if abs(diag) < 1e-18:
+            diag = 1e-18
+        for r in range(col + 1, 4):
+            fac = A[r][col] / diag
+            if fac:
+                for c in range(col + 1, 4):
+                    A[r][c] -= fac * A[col][c]
+                b[r] -= fac * b[col]
+    x = [0.0, 0.0, 0.0, 0.0]
+    for r in range(3, -1, -1):
+        s = b[r]
+        for c in range(r + 1, 4):
+            s -= A[r][c] * x[c]
+        x[r] = s / (A[r][r] if abs(A[r][r]) > 1e-18 else 1e-18)
+    return x
+
+
+def input_stage(kind, p_load=13.4, p_kv=11.0):
+    """Single-entry topology:
+    Source -> Ri -> harness 1 uH + L1004 (50 nH leak, 2x8 mOhm [V/E]) -> VIN_J (C_j 10 nF [E])
+      |- Adapter: F1001 (40 mOhm) -> VIN_F (C1090 100 nF, D1003 SMCJ33CA) -> LM74502 FETs (27 mOhm) -> +12V (C12, D1001)
+      |- KV260:   Q1010 (13.5 mOhm) + U1010 TPS26631 (31 mOhm, OVP 14.4/13.5 V 11 us, UVLO 8.0/8.4 V, ILIM 3.6 A, RCB 0.17 us)
+                  -> +12V_KV (C_kv 47 uF [E], SMAJ16A on KV260) -> constant-power load (off < 4 V).
+    """
     src, ri, t_end, dt, disconnect = pulse(kind)
     d1003 = TVS(38.65, 53.3, 28.2, 1500.0)    # SMCJ33CA: VBR 36.7-40.6, VC 53.3 V at 28.2 A, 1500 W 10/1000 us [V]
     d1001 = TVS(21.05, 29.2, 20.5, 600.0)     # SMBJ18CA: VBR 20.0-22.1, VC 29.2 V at 20.5 A, 600 W [V]
-    L, rptc, cin, c12 = 1e-6, 0.06, 100e-9, 0.5 * (47e-6 + 10e-6 + 0.22e-6)
-    ron = 2 * 0.0135
-    ov_on, ov_off = 18.33, 18.0                # R1004/R1005 with the 1.25 V typical threshold [V]
-    vin, v12 = 13.5, 13.5 - p_load / 13.5 * ron
-    il = p_load / v12
+    d_smaj16 = TVS(18.75, 26.0, 15.4, 400.0)  # SMAJ16A on KV260 input: VBR 17.8-19.7 V [V]
+    L, r_l1004, rptc = 1.0e-6 + 50e-9, 0.016, 0.040
+    cvinj, cin, c12, ckv = 10e-9, 100e-9, 0.5 * (47e-6 + 10e-6 + 0.22e-6), 47e-6
+    ron_adp = 2 * 0.0135
+    ron_kv = 0.0135 + 0.031                   # Q1010 DMT10H015LFG (13.5 mOhm) + U1010 TPS26631 (31 mOhm) [V]
+    ov_on, ov_off = 18.33, 18.0               # LM74502 R1004/R1005 [V]
+    kv_ov_on, kv_ov_off = 14.4, 13.5          # TPS26631 R1040/R1041/R1042 OVP [V]
+    kv_uv_off, kv_uv_on = 8.0, 8.4            # TPS26631 UVLO [V]
+    kv_ilim = 3.6                             # R1043 = 4.99 kOhm [V]
+
+    il = (p_load + p_kv) / 13.5
+    vinj = 13.5 - il * r_l1004
+    vin = vinj - (p_load / 13.5) * rptc
+    v12 = vin - (p_load / 13.5) * ron_adp
+    vkv = vinj - (p_kv / 13.5) * ron_kv
+
     fet_on, ov_timer, on_timer = True, 0.0, 0.0
+    kv_on, kv_ov_t, kv_uv_t, kv_rcb_t, kv_rec_t = True, 0.0, 0.0, 0.0, 0.0
+    ovp_tripped, ovp_trip_us = False, None
+
     n = int(t_end / dt)
-    rec = dict(t=[], vsrc=[], vin=[], v12=[], fet=[])
-    e1003 = e1001 = p1003 = p1001 = vds_max = 0.0
-    pk = dict(vin_max=-1e9, vin_min=1e9, v12_max=-1e9, v12_min=1e9)
+    rec = dict(t=[], vsrc=[], vinj=[], vin=[], v12=[], vkv=[], fet=[], kv_on=[])
+    e1003 = e1001 = e_smaj16 = p1003 = p1001 = vds_max = q1010_vds_max = 0.0
+    pk = dict(vinj_max=-1e9, vinj_min=1e9, vin_max=-1e9, vin_min=1e9,
+              v12_max=-1e9, v12_min=1e9, vkv_max=-1e9, vkv_min=1e9)
     keep = max(1, n // 4000)
-    t0 = -20e-6                      # settle before the pulse
+    t0 = -20e-6
     k0 = int(-t0 / dt)
+    g_ptc = 1.0 / rptc
+    g_kv_nom = 1.0 / ron_kv
+
     for k in range(-k0, n):
         t = k * dt
         vs = src(t) if (t >= 0 or not disconnect) else 13.5
         rs = ri if t >= 0 else 0.05
         if t < 0:
             vs = 13.5
-        # LM74502: OV comparator, 0.6-1 us to turn the gate off, 5-10 us to turn it back on [V];
-        # reverse polarity (VS below about 0.5 V) also pulls the gate to the source
+
+        # LM74502 OV / reverse comparator (adapter branch)
         want_off = vin > ov_on or vin < 0.5
         if fet_on and want_off:
             ov_timer += dt
@@ -389,40 +449,96 @@ def input_stage(kind, p_load=13.4):
                 fet_on, ov_timer = True, 0.0
         else:
             on_timer = 0.0
-        gf = 1.0 / ron if fet_on else 0.0
+
+        # TPS26631 + Q1010 state machine (KV260 branch)
+        kv_want_ov = vinj > kv_ov_on
+        kv_want_uv = vinj < kv_uv_off
+        kv_want_rcb = vinj < vkv - 0.05 or vinj < 0.5
+        if kv_on:
+            kv_ov_t = (kv_ov_t + dt) if kv_want_ov else 0.0
+            kv_uv_t = (kv_uv_t + dt) if kv_want_uv else 0.0
+            kv_rcb_t = (kv_rcb_t + dt) if kv_want_rcb else 0.0
+            if kv_ov_t >= 11e-6:       # TPS26631 OVP_tOFF(dly) = 11 us typ [V]
+                kv_on, kv_rec_t = False, 0.0
+                if t >= 0 and not ovp_tripped:
+                    ovp_tripped, ovp_trip_us = True, t * 1e6
+            elif kv_rcb_t >= 0.17e-6:  # fast reverse current blocking 0.17 us [V]
+                kv_on, kv_rec_t = False, 0.0
+            elif kv_uv_t >= 2e-6:
+                kv_on, kv_rec_t = False, 0.0
+        else:
+            ok_rec = (kv_uv_on <= vinj <= kv_ov_off) and (vinj >= vkv)
+            kv_rec_t = (kv_rec_t + dt) if ok_rec else 0.0
+            if kv_rec_t >= 1e-3:       # auto-retry recovery debounce [E]
+                kv_on = True
+                kv_ov_t = kv_uv_t = kv_rcb_t = 0.0
+
+        gf = 1.0 / ron_adp if fet_on else 0.0
         iload = p_load / v12 if v12 > 4.0 else 0.0
-        # backward Euler: harness current eliminated, Newton on (vin, v12) with the TVSs piecewise linear
-        a_l = dt / L; den = 1 + a_l * (rs + rptc)
-        x1, x2 = vin, v12
+        ikv_load = p_kv / vkv if vkv > 4.0 else 0.0
+        # TPS26631 / Q1010 turn-off isolates +12V_KV (reverse Q1010 body diode blocks negative VIN_J)
+        rcb_fwd_leak = (not kv_on) and (vinj > vkv)
+
+        a_l = dt / L
+        den = 1.0 + a_l * (rs + r_l1004)
+        g_l = a_l / den
+        x0, x1, x2, x3 = vinj, vin, v12, vkv
+
         for _ in range(8):
-            il_n = (il + a_l * (vs - x1)) / den
-            f1 = cin * (x1 - vin) / dt - il_n + d1003.i(x1) + gf * (x1 - x2)
+            il_n = (il + a_l * (vs - x0)) / den
+            # TPS26631 + Q1010 current-limited conduction
+            if kv_on and (x0 - x3) * g_kv_nom > kv_ilim:
+                ikv = kv_ilim + 1e-3 * (x0 - x3)
+                gkv = 1e-3
+            elif kv_on:
+                ikv = (x0 - x3) * g_kv_nom
+                gkv = g_kv_nom
+            else:
+                ikv = 0.0
+                gkv = 0.0
+
+            f0 = cvinj * (x0 - vinj) / dt - il_n + g_ptc * (x0 - x1) + ikv
+            f1 = cin * (x1 - vin) / dt - g_ptc * (x0 - x1) + d1003.i(x1) + gf * (x1 - x2)
             f2 = c12 * (x2 - v12) / dt - gf * (x1 - x2) + d1001.i(x2) + iload
-            j11 = cin / dt + a_l / den + d1003.g(x1) + gf
-            j12 = -gf
-            j21 = -gf
-            j22 = c12 / dt + gf + d1001.g(x2)
-            det = j11 * j22 - j12 * j21
-            d1 = (f1 * j22 - f2 * j12) / det
-            d2 = (j11 * f2 - j21 * f1) / det
-            x1 -= d1; x2 -= d2
-            if abs(d1) < 1e-6 and abs(d2) < 1e-6:
+            f3 = ckv * (x3 - vkv) / dt - ikv + d_smaj16.i(x3) + ikv_load
+
+            A = [
+                [cvinj / dt + g_l + g_ptc + gkv, -g_ptc, 0.0, -gkv],
+                [-g_ptc, cin / dt + g_ptc + d1003.g(x1) + gf, -gf, 0.0],
+                [0.0, -gf, c12 / dt + gf + d1001.g(x2), 0.0],
+                [-gkv, 0.0, 0.0, ckv / dt + gkv + d_smaj16.g(x3)],
+            ]
+            dx0, dx1, dx2, dx3 = _solve4(A, [-f0, -f1, -f2, -f3])
+            x0 += dx0; x1 += dx1; x2 += dx2; x3 += dx3
+            if abs(dx0) < 1e-6 and abs(dx1) < 1e-6 and abs(dx2) < 1e-6 and abs(dx3) < 1e-6:
                 break
-        il = (il + a_l * (vs - x1)) / den
-        vin, v12 = x1, x2
+
+        il = (il + a_l * (vs - x0)) / den
+        vinj, vin, v12, vkv = x0, x1, x2, x3
         if t < 0:
             continue
-        i3, i1 = d1003.i(vin), d1001.i(v12)
-        e1003 += abs(vin * i3) * dt; e1001 += abs(v12 * i1) * dt
+        i3, i1, ismj = d1003.i(vin), d1001.i(v12), d_smaj16.i(vkv)
+        e1003 += abs(vin * i3) * dt; e1001 += abs(v12 * i1) * dt; e_smaj16 += abs(vkv * ismj) * dt
         p1003 = max(p1003, abs(vin * i3)); p1001 = max(p1001, abs(v12 * i1))
         if not fet_on:
             vds_max = max(vds_max, abs(vin - v12))
+        if not kv_on:
+            q1010_vds_max = max(q1010_vds_max, abs(vinj - vkv))
+        pk["vinj_max"] = max(pk["vinj_max"], vinj); pk["vinj_min"] = min(pk["vinj_min"], vinj)
         pk["vin_max"] = max(pk["vin_max"], vin); pk["vin_min"] = min(pk["vin_min"], vin)
         pk["v12_max"] = max(pk["v12_max"], v12); pk["v12_min"] = min(pk["v12_min"], v12)
+        pk["vkv_max"] = max(pk["vkv_max"], vkv); pk["vkv_min"] = min(pk["vkv_min"], vkv)
         if k % keep == 0:
-            rec["t"].append(t); rec["vsrc"].append(vs); rec["vin"].append(vin); rec["v12"].append(v12); rec["fet"].append(fet_on)
+            rec["t"].append(t); rec["vsrc"].append(vs); rec["vinj"].append(vinj)
+            rec["vin"].append(vin); rec["v12"].append(v12); rec["vkv"].append(vkv)
+            rec["fet"].append(fet_on); rec["kv_on"].append(kv_on)
     arr = {k: np.array(x) for k, x in rec.items()}
-    return arr, dict(vds_max=vds_max, e1003=e1003, e1001=e1001, p1003=p1003, p1001=p1001, **pk)
+    return arr, dict(vds_max=vds_max, q1010_vds_max=q1010_vds_max,
+                     e1003=e1003, e1001=e1001, e_smaj16=e_smaj16,
+                     p1003=p1003, p1001=p1001,
+                     u1010_ovp_tripped=ovp_tripped,
+                     u1010_ovp_time_us=(round(ovp_trip_us, 2) if ovp_trip_us is not None else None),
+                     **pk)
 
 
 def tvs_energy_limit(ppk, t_eff):
@@ -432,24 +548,50 @@ def tvs_energy_limit(ppk, t_eff):
 
 
 def check_transients():
-    hdr("6. VEHICLE TRANSIENTS through the input stage as drawn")
+    hdr("6. VEHICLE TRANSIENTS through the single-entry input stage (L1004 + adapter + KV260 branch)")
     rows, traces = [], {}
-    durations = {PULSES[0]: 2e-3, PULSES[1]: 50e-6, PULSES[2]: 0.1e-6, PULSES[3]: 0.1e-6, PULSES[4]: 0.4, PULSES[5]: 0.4,
-                 PULSES[6]: 60, PULSES[7]: 60}
+    durations = {PULSES[0]: 2e-3, PULSES[1]: 50e-6, PULSES[2]: 0.1e-6, PULSES[3]: 0.1e-6, PULSES[4]: 0.4,
+                 PULSES[5]: 0.4, PULSES[6]: 60, PULSES[7]: 60, PULSES[8]: 0.08}
     for kind in PULSES:
         arr, r = input_stage(kind)
         traces[kind] = arr
         lim3 = tvs_energy_limit(1500, durations[kind] * 0.7)
         lim1 = tvs_energy_limit(600, durations[kind] * 0.7)
+        # U1010 IN_SYS rating: -60 V to +67 V (+75 V <= 10 ms) [V]; KV260 SMAJ16A must not conduct (< 16 V) [V]
+        in_sys_limit = 75.0 if durations[kind] <= 10e-3 else 67.0
+        u1010_ok = (r["vinj_max"] < in_sys_limit and r["vinj_min"] > -60.0 and r["q1010_vds_max"] < 100.0)
+        smaj16_ok = (r["vkv_max"] < 16.0 and r["e_smaj16"] < 1e-6)
         ok = (r["v12_max"] < 36 and r["vds_max"] < 100 and r["vin_max"] < 65 and r["vin_min"] > -65
-              and r["e1003"] < lim3 and r["e1001"] < lim1)
-        print("  %-70s\n      VIN_F %+7.1f/%+7.1f V, +12V %5.1f..%5.1f V, FET VDS %5.1f V, D1003 %.3g J (limit %.3g), D1001 %.3g J (limit %.3g)  %s"
-              % (kind, r["vin_max"], r["vin_min"], r["v12_min"], r["v12_max"], r["vds_max"], r["e1003"], lim3, r["e1001"], lim1,
-                 "PASS" if ok else "FAIL"))
-        r.update(kind=kind, ok=bool(ok), d1003_limit_j=lim3, d1001_limit_j=lim1)
+              and r["e1003"] < lim3 and r["e1001"] < lim1 and u1010_ok and smaj16_ok)
+        ovp_s = (f"tripped@{r['u1010_ovp_time_us']:.1f}us" if r["u1010_ovp_tripped"] else "no")
+        print("  %-76s\n      VIN_J %+6.1f/%+6.1f V, VIN_F %+6.1f/%+6.1f V, +12V %5.1f..%5.1f V, +12V_KV %5.1f..%5.2f V (OVP %s), Q1010 VDS %5.1f V, D1003 %.3g/%.3g J  %s"
+              % (kind, r["vinj_max"], r["vinj_min"], r["vin_max"], r["vin_min"],
+                 r["v12_min"], r["v12_max"], r["vkv_min"], r["vkv_max"], ovp_s, r["q1010_vds_max"],
+                 r["e1003"], lim3, "PASS" if ok else "FAIL"))
+        r.update(kind=kind, ok=bool(ok), u1010_ok=bool(u1010_ok), smaj16_ok=bool(smaj16_ok),
+                 d1003_limit_j=lim3, d1001_limit_j=lim1)
         rows.append({k: (round(v, 4) if isinstance(v, float) else v) for k, v in r.items()})
-    print("  limits: LMR33630 VIN 36 V abs (+12V), LM74502 VS +-65 V (VIN_F), DMT10H015LFG 100 V; TVS energy by Wunsch-Bell scaling [E]")
+    print("  limits: LMR33630 +12V<36V; LM74502 +-65V; DMT10H015LFG 100V; U1010 IN_SYS -60..+67V (75V 10ms); KV260 SMAJ16A <16V steady [V]")
+
+    # Steady-state dissipation in the single-entry series path
+    p_u1010_092 = 0.92 ** 2 * 0.031
+    p_u1010_360 = 3.60 ** 2 * 0.031
+    p_q1010_092 = 0.92 ** 2 * 0.0135
+    p_q1010_360 = 3.60 ** 2 * 0.0135
+    p_l1004_189 = 1.89 ** 2 * 0.016
+    p_l1004_498 = 4.98 ** 2 * 0.016
+    steady = dict(
+        u1010_tps26631=dict(ron_mohm=31.0, p_at_0p92a_w=round(p_u1010_092, 4), p_at_3p6a_w=round(p_u1010_360, 4)),
+        q1010_dmt10h015lfg=dict(ron_mohm=13.5, p_at_0p92a_w=round(p_q1010_092, 4), p_at_3p6a_w=round(p_q1010_360, 4)),
+        l1004_cm_choke=dict(r_both_mohm=16.0, p_at_1p89a_w=round(p_l1004_189, 4), p_at_4p98a_w=round(p_l1004_498, 4)),
+    )
+    print("\n  steady-state dissipation (single-entry path):")
+    print("    U1010 TPS26631 (31 mOhm):   %.3f W @ 0.92 A,  %.3f W @ 3.60 A" % (p_u1010_092, p_u1010_360))
+    print("    Q1010 DMT10H015 (13.5 mOhm): %.3f W @ 0.92 A,  %.3f W @ 3.60 A" % (p_q1010_092, p_q1010_360))
+    print("    L1004 (2 x 8 mOhm = 16 mOhm): %.3f W @ 1.89 A typ, %.3f W @ 4.98 A max" % (p_l1004_189, p_l1004_498))
+
     RESULT["transients"] = rows
+    RESULT["single_entry_steady"] = steady
     return traces
 
 
@@ -537,21 +679,24 @@ def figures(lt, lw, vin, it, iw, runs, traces):
     ax.set_title("Power-up, behavioural model (nominal soft-starts)"); ax.legend(ncol=4, fontsize=7, loc="center right", bbox_to_anchor=(1.0, 0.68))
     fig.tight_layout(); fig.savefig(os.path.join(OUT, "power_startup.png"), dpi=130); plt.close(fig)
 
-    # transients
-    fig, axs = plt.subplots(2, 4, figsize=(13, 6))
+    # transients (3 x 3 covering all 9 pulses including cranking and single-entry +12V_KV)
+    fig, axs = plt.subplots(3, 3, figsize=(13, 8.2))
     for ax, kind in zip(axs.flat, PULSES):
         a = traces[kind]
         sc = 1e3 if a["t"][-1] > 1e-3 else 1e6
         un = "ms" if sc == 1e3 else "us"
         ax.plot(a["t"] * sc, a["vsrc"], c="#bdc3c7", lw=0.9, label="source (open circuit)")
+        ax.plot(a["t"] * sc, a["vinj"], c="#8e44ad", lw=1.0, ls="--", label="VIN_J (U1010 IN_SYS)")
         ax.plot(a["t"] * sc, a["vin"], c="#c0392b", lw=1.1, label="VIN_F (D1003)")
-        ax.plot(a["t"] * sc, a["v12"], c="#2980b9", lw=1.3, label="+12V (to LMR33630)")
+        ax.plot(a["t"] * sc, a["v12"], c="#2980b9", lw=1.2, label="+12V (LMR33630)")
+        ax.plot(a["t"] * sc, a["vkv"], c="#27ae60", lw=1.3, label="+12V_KV (KV260)")
         ax.axhline(36, c="k", ls=":", lw=0.7)
+        ax.axhline(16, c="#27ae60", ls=":", lw=0.7)
         ax.set_title(kind.split("(")[0].replace("ISO ", ""), fontsize=8); ax.set_xlabel(un, fontsize=7); ax.grid(alpha=0.3)
-        lo = min(-20, a["vin"].min() * 1.1); hi = max(40, min(a["vsrc"].max(), 120) * 1.05)
+        lo = min(-20, a["vinj"].min() * 1.1); hi = max(40, min(max(a["vsrc"].max(), a["vinj"].max()), 120) * 1.05)
         ax.set_ylim(lo, hi)
     axs[0, 0].legend(fontsize=6)
-    fig.suptitle("Input stage under vehicle transients (dotted: LMR33630's 36 V)", fontsize=10)
+    fig.suptitle("Single-entry input stage under vehicle transients (dotted: 16 V SMAJ16A, 36 V LMR33630)", fontsize=10)
     fig.tight_layout(); fig.savefig(os.path.join(OUT, "power_transients.png"), dpi=130); plt.close(fig)
 
 
