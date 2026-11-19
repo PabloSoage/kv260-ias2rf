@@ -1,6 +1,6 @@
 # Rev08 audit: RF and power, before the tag
 
-*18 November 2026 · audited on `main` at `6df5766`, fixed the same day; re-audited on 19 November (section 5) · scripts `_work/sim/rev08_rf_audit.py`,
+*18 November 2026 · audited on `main` at `6df5766`, fixed the same day; re-audited on 19 November (section 5); ground offset addendum the same day (section 6) · scripts `_work/sim/rev08_rf_audit.py`,
 `_work/power/power_audit.py`, `_work/power_budget.py`, `_work/rev08_audit_sch.py`, `_work/rev08_audit_pcb.py` · figures
 and data in [`docs/sim/`](sim/)*
 
@@ -391,3 +391,70 @@ onwards. Anything it found was fixed before going on.
   ([RX_VU_SPEC.md](RX_VU_SPEC.md)).
 - **The documents.** Stale figures swept and every em-dash removed from the public `.md` files. The book is rebuilt:
   278 pages, `pdf_table_check` 0 defects.
+
+## 6. Addendum: ground offset and earth loops between the two boards (19 November 2026)
+
+The owner asked whether two supplies, one for each board, could hurt the module: in a car, each board grounded at a
+different point; at home, two earthed wall adapters. The answer had to come with numbers, so it was modelled
+(`_work/power/ground_offset.py`, `docs/sim/ground_offset.png` and `.json`), and the design was changed to remove
+the problem.
+
+### 6.1 What was wrong
+
+The two boards share their ground through the 22 ground contacts of the BM20 connectors `J101`/`J102`, the FFC and
+the Pmod cable: 1.3 mΩ in all `[V/E]`, 94 % of it in the BM20s, each rated 0.3 A `[V]` (Hirose D47513). With each
+board on its own supply, any voltage between the two return points drives current through that link:
+
+| Wiring before the change | Per BM20 ground contact | Against 0.3 A |
+|---|---|---|
+| Both grounds to the same point, 1 m wires | 40 mA | Pass |
+| Two points, 1 V apart (ISO 16750-2 section 4.8), 1 m wires | 411 mA | **Fail from 0.75 V** |
+| Two points, 1 V apart, 0.3 m wires | 714 mA | **Fail from 0.40 V** |
+| Home, two earthed supplies, 1 V between the earths (50 Hz) | 148 mA | Pass, but 3.5 A of loop current |
+
+The KV260 also cuts off above 13.2 V (its MP5016 eFuse, XTP682 page 3) `[V]`: it cannot share the adapter's
+18.3 V input window.
+
+### 6.2 What changed
+
+- **Single power entry** (sheet KVPWR, [POWER_SPEC section 1.4](POWER_SPEC.md)). `J1001` feeds the whole module.
+  `L1004`, a 6 A common-mode choke, sits on both lines. The KV260 is fed from the adapter's `J1004` through
+  `U1010` TPS26631 (OVP 14.4 V, UVLO 8.0 V, current limit 3.0 A, −60 V reverse with `Q1010`) by a short jumper to
+  its `J12`. There is no second supply and no second ground wire.
+- **The current limit is the BM20 limit too.** With a single entry, nearly all the KV260's own return (96 %) crosses
+  to the adapter through the BM20 link, because the link is 1.3 mΩ against the jumper's 33 mΩ. So `R1043` sets
+  3.0 A, the KV260's own brick rating (2.77 to 3.19 A at ±7 %), not the 3.6 A first drawn: at 3.6 A, a contact with
+  half the others' resistance would have carried 305 mA.
+- **The RJ45's shield** goes to ground through `R1218` 1 MΩ in parallel with `C1223` 1 nF 2 kV. It was the only DC
+  path to an earthed switch or PC at the far end of an Ethernet cable. USB is not treated the same way: its ground
+  is a conductor of the cable, so a shield RC would not open the loop.
+
+### 6.3 The result, as built
+
+| Case, single entry, worst currents | Per BM20 ground contact | Against 0.3 A |
+|---|---|---|
+| Any voltage between vehicle ground points (there is one entry) | 132 mA at 3.19 A | Pass |
+| Typical load (KV260 0.92 A) | 38 mA | Pass |
+| One contact at half the others' resistance, at 3.19 A | 254 mA | Pass |
+| The same at a 2 A load, one contact at a third | 219 mA | Pass |
+| Jumper's ground contact open (all the return through the link) | 138 mA | Pass |
+| All contacts at their 100 mΩ maximum | 109 mA | Pass |
+| Home: one earthed supply, an earthed monitor on DisplayPort, 1 V between the earths | 189 mA (rms, with the DC load) | Pass |
+
+Input current at `J1001` (5 A rated): 1.12 A for the adapter plus 3.19 A for the KV260, 4.31 A at worst. `L1004`
+(6 A, 2 × 8 mΩ) dissipates 0.30 W there.
+
+Board: DRC 0 errors and 0 unconnected with schematic parity, on the refilled copy as `make_fab.py` checks it;
+ERC the 7 known `pin_to_pin` warnings. `_work/kvpwr_pcb.py` and `_work/ethshield_pcb.py` rebuild the edits from
+the board before them.
+
+### 6.4 What it does not do
+
+- `L1004` attenuates the supply's common-mode noise by 3 to 10 dB (2.9 dB at 65 kHz, 9.5 dB at 100 MHz,
+  `docs/sim/cm_noise.json`). It does not open an earth loop closed through another cable.
+- Such loops remain where a cable carries ground as a conductor: DisplayPort to an earthed monitor (in rating, the
+  table above), USB to an earthed PC (use a USB isolator or a laptop on battery for the debug port). They are
+  installation matters, in [BOARD_MANUAL section 6](BOARD_MANUAL.md).
+- In a car, the module needs a regulated 12 V converter upstream (12.0 V, at least 5 A, output under 13.2 V) behind
+  a 5 A fuse. That converter is also what covers the unsuppressed load dump (test A), which exceeds `D1003`'s
+  energy rating, as it did before this change.
