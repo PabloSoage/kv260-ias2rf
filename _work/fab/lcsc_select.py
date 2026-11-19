@@ -227,6 +227,7 @@ RULES = {
     ("B2PS-VH", "JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal"): ("P", "B2PS-VH", r"^B2PS-VH"),
     ("22n", "C_0603_1608Metric"): ("C", "22n", "0603", 16, XR),
     ("1u 100V", "C_1206_3216Metric"): ("C", "1u", "1206", 100, ("X7R",)),
+    ("1n 2kV", "C_1206_3216Metric"): ("C", "1n", "1206", 2000, ("X7R",)),
 }
 # Where the part is not the drawn value, and why. Copied into the CSV's Note.
 NOTES = {

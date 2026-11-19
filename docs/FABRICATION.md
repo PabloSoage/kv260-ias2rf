@@ -30,8 +30,8 @@ lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 | **Gerbers** | L1–L8, paste, silkscreen, mask, outline. Protel extensions, soldermask subtracted from silkscreen, zones checked | JLCPCB's KiCad guide, point by point |
 | **Drill** | Excellon, mm, decimal, absolute origin, alternate mode for oval holes, plus a PDF drill map | Same guide |
 | **Zip** | Gerbers + drill in one zip, spaces in the layer names replaced by `_` | The zip is what is uploaded |
-| **BOM** | `Comment, Designator, Footprint, LCSC Part #, Quantity`, one line per value and footprint: 234 lines, 783 parts (19 Nov single power entry; 224 / 770 pre-KVPWR, 214 / 739 on 17 Nov) | JLCPCB's BOM columns |
-| **CPL** | `Designator, Mid X, Mid Y, Layer, Rotation`, from KiCad's position file: 783 placements (fiducials, holes and the solder jumper JP1101 left out: they are copper only) | JLCPCB's CPL columns |
+| **BOM** | `Comment, Designator, Footprint, LCSC Part #, Quantity`, one line per value and footprint: 236 lines, 785 parts (19 Nov single power entry + RJ45 shield RC; 224 / 770 pre-KVPWR, 214 / 739 on 17 Nov) | JLCPCB's BOM columns |
+| **CPL** | `Designator, Mid X, Mid Y, Layer, Rotation`, from KiCad's position file: 785 placements (fiducials, holes and the solder jumper JP1101 left out: they are copper only) | JLCPCB's CPL columns |
 | **ORDER.txt** | The order form's values, and the DRC result | So the order is entered the same way every time |
 
 ---
@@ -68,7 +68,7 @@ chosen on 2 October 2026 by `_work/fab/lcsc_select.py` from JLCPCB's own parts s
 Stock changes daily: run `py _work/fab/lcsc_select.py` again before ordering and read the diff of the
 CSV, then `python _work/fab/quote.py` for today's prices ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)). On 10 Nov
 two lines were re-selected because their part ran out: the 22.6 kΩ (now C100316) and the PROG switch
-(now TL3342F450QG). **Re-run on 17 November for Rev08: 212 of 214 lines have a code** (187 distinct); after the RF and power audit (18 November), **222 of 224**; and after the single power entry (19 November), **232 of 234 lines (`207` distinct codes)**. Note that `TPS26631PWPR` (`C2866319`) showed `0` LCSC stock on 19 November and requires global sourcing or consignment alongside the other zero-stock ICs below. The rules gained the front end's parts by name (the Murata LQW15/LQW18 wirewounds the filter Monte Carlo assumed, Q 40–45, ±2 %), any small capacitor as C0G, and the LEDs by colour; green is AlGaInP (≥ 560 nm, about 2 V), because the rail and status LEDs run from 3.3 V through a resistor. The `74LVC1G07` rule now takes only TI's part, not a second source of the same name. Four are not the drawn value, because that value is not made
+(now TL3342F450QG). **Re-run on 17 November for Rev08: 212 of 214 lines have a code** (187 distinct); after the RF and power audit (18 November), **222 of 224**; and after the single power entry (`KVPWR`, `R1043 = 6.04k`) and RJ45 shield RC (`C1223`, `R1218`) (19 November), **234 of 236 lines (`209` distinct codes)**. Note that `TPS26631PWPR` (`C2866319`) showed `0` LCSC stock on 19 November and requires global sourcing or consignment alongside the other zero-stock ICs below. The rules gained the front end's parts by name (the Murata LQW15/LQW18 wirewounds the filter Monte Carlo assumed, Q 40–45, ±2 %), any small capacitor as C0G, and the LEDs by colour; green is AlGaInP (≥ 560 nm, about 2 V), because the rail and status LEDs run from 3.3 V through a resistor. The `74LVC1G07` rule now takes only TI's part, not a second source of the same name. Four are not the drawn value, because that value is not made
 (the CSV's Note column says so):
 
 | Line | Drawn | Fitted | Effect |
@@ -113,6 +113,6 @@ RF lines off 50 Ω.
 
 | Check | Result |
 |---|---|
-| Script run on the placed board | 17 files in the zip (8 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 224 lines / 770 parts, CPL 770 placements, DRC 0 violations, 0 unconnected pads, 0 footprint errors (19 November, the Rev08 board after the final re-audit; 214 / 739 on 17 November, 15 files and 110 / 478 on 2 October) |
-| CPL against BOM | The same 770 references in both (19 Nov) |
+| Script run on the placed board | 17 files in the zip (8 copper layers, 2 mask, 2 paste, 2 silkscreen, outline, drill, job file), BOM 236 lines / 785 parts, CPL 785 placements, DRC 0 violations, 0 unconnected pads, 0 footprint errors (19 November, single power entry and RJ45 shield RC on the Rev08 board; 224 / 770 pre-KVPWR, 214 / 739 on 17 Nov) |
+| CPL against BOM | The same 785 references in both (19 Nov) |
 | Settings against JLCPCB's KiCad guide | Protel extensions, subtract soldermask, zone check; Excellon mm, decimal, absolute, alternate oval mode, all as the guide lists |

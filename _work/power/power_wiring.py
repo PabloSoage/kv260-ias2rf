@@ -159,7 +159,7 @@ def draw_car_panel(ax):
 
     rbox(ax, 8.05, 5.40, 1.43, 1.10, "#DCE5EE", AD_EDGE, lw=1.1, r=0.08, zorder=3)
     ax.text(8.765, 6.22, "Q1010 + U1010", ha="center", va="center", fontsize=7.6, fontweight="bold", color=INK, zorder=4)
-    ax.text(8.765, 5.74, "OVP 14.4 V, 3.6 A\n-> J1004 out", ha="center", va="center", fontsize=6.8, color=MUTED, zorder=4)
+    ax.text(8.765, 5.74, "OVP 14.4 V, 3.0 A\n-> J1004 out", ha="center", va="center", fontsize=6.8, color=MUTED, zorder=4)
 
     # Adapter internal and external GND connections
     wire(ax, [(6.02, 1.85), (6.02, 7.05), (6.56, 7.05)], color=CHARCOAL, lw=1.9)
@@ -170,18 +170,18 @@ def draw_car_panel(ax):
     # KV260 box (KV260 GREEN!)
     rbox(ax, 6.42, 2.55, 3.20, 1.50, KV_FILL, KV_EDGE, lw=1.8, r=0.16)
     ax.text(8.02, 3.84, "AMD Kria KV260", ha="center", va="top", fontsize=9.6, fontweight="bold", color=INK)
-    ax.text(8.02, 3.36, "J12 input (+12V_KV)\nMP5016 OVP 13.2 V, 3 A typ / 3.6 A lim",
+    ax.text(8.02, 3.36, "J12 input (+12V_KV)\nMP5016 OVP 13.2 V, 3.0 A limit",
             ha="center", va="center", fontsize=7.1, color="#16381D", linespacing=1.16)
     ax.text(8.02, 2.76, "Do NOT plug any other supply into J12",
             ha="center", va="center", fontsize=7.3, fontweight="bold", color="#5F1212")
 
     # Between Adapter (y=5.25) and KV260 (y=4.05): both labels right of their wires, clear of x=6.02
     wire(ax, [(6.65, 5.25), (6.65, 4.05)], color=CHARCOAL, lw=2.3)
-    ax.text(6.74, 4.66, "BM20 + FFC/Pmod\n125 mA/contact\n(limit 300 mA)",
+    ax.text(6.74, 4.66, "BM20 + FFC/Pmod\n132 mA/contact\n(limit 300 mA)",
             ha="left", va="center", fontsize=6.85, color=INK, linespacing=1.12)
 
     arrow(ax, (8.28, 5.25), (8.28, 4.05), color=RED, lw=2.2)
-    ax.text(8.38, 4.66, "J1004 -> J12\nVHR-2N jumper\n18 AWG (~15 cm)",
+    ax.text(8.38, 4.66, "J1004 -> J12\nVHR-2N jumper\n18 AWG (15 cm)",
             ha="left", va="center", fontsize=6.85, fontweight="bold", color=RED, linespacing=1.12)
 
     # CROSSED-OUT second chassis ground wire from KV260
@@ -210,25 +210,25 @@ def draw_home_panel(ax):
             fontsize=8.3, color=MUTED, va="top")
 
     # Wall Adapter
-    rbox(ax, 0.38, 5.75, 2.25, 2.45, PSU_FILL, PSU_EDGE, lw=1.5, r=0.14)
-    ax.text(1.505, 7.92, "Wall Adapter", ha="center", va="top", fontsize=9.4, fontweight="bold", color=INK)
-    ax.text(1.505, 7.22, "ONE 12 V, >= 5 A supply\n11.7 W + KV260 (~23-55 W)\n1.8 m DC output lead",
-            ha="center", va="center", fontsize=7.4, color=MUTED, linespacing=1.18)
-    rbox(ax, 0.54, 5.92, 1.93, 0.62, "#C9D8C7", EARTH, lw=1.1, r=0.08, zorder=3)
-    ax.text(1.505, 6.23, "Prefer 2-prong (Class II)\nno mains earth loop",
-            ha="center", va="center", fontsize=7.2, fontweight="bold", color="#1A421D", linespacing=1.12, zorder=4)
+    rbox(ax, 0.36, 5.75, 2.26, 2.45, PSU_FILL, PSU_EDGE, lw=1.5, r=0.14)
+    ax.text(1.49, 7.92, "Wall Adapter", ha="center", va="top", fontsize=9.4, fontweight="bold", color=INK)
+    ax.text(1.49, 7.22, "ONE 12 V, >= 5 A supply\nadapter 13.4 W + KV260 up to 36 W\n1.8 m DC output lead",
+            ha="center", va="center", fontsize=7.0, color=MUTED, linespacing=1.18)
+    rbox(ax, 0.50, 5.92, 1.98, 0.62, "#C9D8C7", EARTH, lw=1.1, r=0.08, zorder=3)
+    ax.text(1.49, 6.23, "Prefer 2-prong (Class II)\nno mains earth loop",
+            ha="center", va="center", fontsize=7.1, fontweight="bold", color="#1A421D", linespacing=1.12, zorder=4)
 
-    wire(ax, [(1.505, 5.75), (1.505, 5.05)], color=EARTH, lw=1.5, ls="--")
-    gnd_symbol(ax, 1.505, 5.05, color=EARTH, scale=0.85)
-    ax.text(1.505, 4.60, "If 3-prong brick:\nPE earth + Y-cap", ha="center", va="top", fontsize=7.1, color=EARTH)
+    wire(ax, [(1.49, 5.75), (1.49, 5.05)], color=EARTH, lw=1.5, ls="--")
+    gnd_symbol(ax, 1.49, 5.05, color=EARTH, scale=0.85)
+    ax.text(1.49, 4.60, "If 3-prong brick:\nPE earth + Y-cap", ha="center", va="top", fontsize=7.1, color=EARTH)
 
     # Module block (Adapter top + KV260 bottom green)
     rbox(ax, 3.55, 5.65, 2.75, 2.55, AD_FILL, AD_EDGE, lw=1.6, r=0.15)
     ax.text(4.925, 7.98, "IAS2RF Adapter", ha="center", va="top", fontsize=9.3, fontweight="bold", color=INK)
     rbox(ax, 3.74, 6.55, 2.37, 0.98, "#DCE5EE", AD_EDGE, lw=1.2, r=0.08, zorder=3)
-    ax.text(4.925, 7.04, "J1001 -> L1004 (600R@100M)\nQ1010/U1010 -> J1004",
-            ha="center", va="center", fontsize=7.3, fontweight="bold", color=INK, linespacing=1.20, zorder=4)
-    ax.text(4.925, 6.10, "Board GND plane\n(0.5 mOhm + 5 nH [E] to SMAs)",
+    ax.text(4.925, 7.04, "J1001 -> L1004 (600R@100M)\nQ1010/U1010 -> J1004 (3.0 A)",
+            ha="center", va="center", fontsize=7.2, fontweight="bold", color=INK, linespacing=1.20, zorder=4)
+    ax.text(4.925, 6.10, "J1201 RJ45 shield on RC\n(1 M || 1 nF 2 kV to GND)",
             ha="center", va="center", fontsize=7.0, color=MUTED, linespacing=1.15)
 
     rbox(ax, 3.55, 2.95, 2.75, 1.85, KV_FILL, KV_EDGE, lw=1.8, r=0.15)
@@ -236,39 +236,39 @@ def draw_home_panel(ax):
     ax.text(4.925, 3.86, "J12 (+12V_KV)\nsole power entry\nNothing else on J12",
             ha="center", va="center", fontsize=7.5, color="#16381D", linespacing=1.18)
 
-    arrow(ax, (2.63, 7.12), (3.55, 7.12), color=RED, lw=2.2)
-    ax.text(3.09, 7.30, "+12V / GND", ha="center", va="bottom", fontsize=7.3, fontweight="bold", color=INK)
+    arrow(ax, (2.62, 7.12), (3.55, 7.12), color=RED, lw=2.2)
+    ax.text(3.085, 7.30, "+12V / GND", ha="center", va="bottom", fontsize=6.9, fontweight="bold", color=INK)
 
     arrow(ax, (5.40, 5.65), (5.40, 4.80), color=RED, lw=2.1)
     ax.text(5.50, 5.23, "J1004 -> J12", ha="left", va="center", fontsize=7.3, fontweight="bold", color=RED)
     wire(ax, [(4.40, 5.65), (4.40, 4.80)], color=CHARCOAL, lw=2.2)
     ax.text(4.30, 5.23, "BM20\nGND", ha="right", va="center", fontsize=7.1, fontweight="bold", color=CHARCOAL)
 
-    # Earthed external peripherals on right
+    # External peripherals on right
     periphs = [
-        (7.55, "PC / Laptop", "USB (KV260) or\nEthernet (J1201)", 7.95),
+        (7.55, "PC via USB", "Use USB isolator or\nlaptop on battery", 7.95),
         (5.25, "Antenna Mast", "RF coax to J961\n(49.7% VHF CM share)", 5.95),
-        (2.95, "DisplayPort Monitor", "DP cable to KV260", 3.60),
+        (2.95, "DisplayPort Monitor", "Stays a loop: 189 mA/c\nat 1 V (within 300 mA)", 3.60),
     ]
     for y0, title, sub, wire_y in periphs:
         rbox(ax, 7.72, y0, 1.92, 1.25, PSU_FILL, PSU_EDGE, lw=1.4, r=0.12)
-        ax.text(8.68, y0 + 0.92, title, ha="center", va="center", fontsize=8.7, fontweight="bold", color=INK)
-        ax.text(8.68, y0 + 0.42, sub, ha="center", va="center", fontsize=6.95, color=MUTED, linespacing=1.12)
+        ax.text(8.68, y0 + 0.92, title, ha="center", va="center", fontsize=8.5, fontweight="bold", color=INK)
+        ax.text(8.68, y0 + 0.42, sub, ha="center", va="center", fontsize=6.85, color=MUTED, linespacing=1.12)
         gnd_symbol(ax, 9.25, y0, color=EARTH, scale=0.75)
         ax.text(8.98, y0 - 0.16, "PE earth", ha="right", va="top", fontsize=6.8, fontweight="bold", color=EARTH)
         wire(ax, [(6.30, wire_y), (7.72, wire_y)], color=CHARCOAL, lw=1.8)
-        ferrite_clamp(ax, 7.01, wire_y, label="Ferrite clamp")
+        ferrite_clamp(ax, 7.01, wire_y, label="Isolator / ferrite" if y0 > 7.0 else "Ferrite clamp")
 
     # Honest limit & numbers box (padded text stays strictly inside borders)
     rbox(ax, 0.38, 0.36, 9.26, 1.95, NOTE_FILL, NOTE_EDGE, lw=1.3, r=0.12)
     ax.text(0.58, 2.12, "Honest performance and earth-loop limits (docs/sim/cm_noise.json & ground_offset.json):",
             fontsize=8.2, fontweight="bold", color=INK, va="top")
     ax.text(0.58, 1.78,
-            "- L1004 insertion loss on the combined CM loop: 2.9 dB at 65 kHz, 3.7 dB at 100 kHz, 4.8 dB at 1 MHz, 9.5 dB at 100 MHz.\n"
-            "- 50 Hz Y-cap leakage (230 V / 2.2 nF [E], 159 uA rms): |Z_L1004| = 4.05 mOhm -> 0.08 uV across the board ground plane.\n"
-            "- L1004 does NOT interrupt earth loops between a 3-prong brick and earthed PC, monitor or coax shields;\n"
-            "  fit clip-on ferrites on those cables or use a 2-prong (Class II) wall adapter.",
-            fontsize=7.25, color=MUTED, va="top", linespacing=1.26)
+            "- Ethernet on J1201 has an RC shield bond (R1218 1 M || C1223 1 nF 2 kV), so an earthed switch closes no loop.\n"
+            "- USB ground is a conductor: use a USB isolator or battery laptop on J1501 / KV260 USB when using a 3-prong brick.\n"
+            "- DisplayPort to an earthed monitor stays a loop (189 mA/contact at 1 V rms 50 Hz, 4.05 mV board drop, passes).\n"
+            "- L1004 adds 2.9-9.5 dB CM attenuation (65 kHz-100 MHz); fit ferrites or use a Class II brick.",
+            fontsize=7.05, color=MUTED, va="top", linespacing=1.22)
 
 
 def main():

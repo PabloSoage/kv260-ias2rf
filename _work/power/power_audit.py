@@ -391,7 +391,7 @@ def input_stage(kind, p_load=13.4, p_kv=11.0):
     """Single-entry topology:
     Source -> Ri -> harness 1 uH + L1004 (50 nH leak, 2x8 mOhm [V/E]) -> VIN_J (C_j 10 nF [E])
       |- Adapter: F1001 (40 mOhm) -> VIN_F (C1090 100 nF, D1003 SMCJ33CA) -> LM74502 FETs (27 mOhm) -> +12V (C12, D1001)
-      |- KV260:   Q1010 (13.5 mOhm) + U1010 TPS26631 (31 mOhm, OVP 14.4/13.5 V 11 us, UVLO 8.0/8.4 V, ILIM 3.6 A, RCB 0.17 us)
+      |- KV260:   Q1010 (13.5 mOhm) + U1010 TPS26631 (31 mOhm, OVP 14.4/13.5 V 11 us, UVLO 8.0/8.4 V, ILIM 3.0 A, RCB 0.17 us)
                   -> +12V_KV (C_kv 47 uF [E], SMAJ16A on KV260) -> constant-power load (off < 4 V).
     """
     src, ri, t_end, dt, disconnect = pulse(kind)
@@ -405,7 +405,7 @@ def input_stage(kind, p_load=13.4, p_kv=11.0):
     ov_on, ov_off = 18.33, 18.0               # LM74502 R1004/R1005 [V]
     kv_ov_on, kv_ov_off = 14.4, 13.5          # TPS26631 R1040/R1041/R1042 OVP [V]
     kv_uv_off, kv_uv_on = 8.0, 8.4            # TPS26631 UVLO [V]
-    kv_ilim = 3.6                             # R1043 = 4.99 kOhm [V]
+    kv_ilim = 3.0                             # R1043 = 6.04 kOhm (2.98 A nom, 2.77..3.19 A at +-7 %) [V]
 
     il = (p_load + p_kv) / 13.5
     vinj = 13.5 - il * r_l1004
@@ -575,20 +575,23 @@ def check_transients():
 
     # Steady-state dissipation in the single-entry series path
     p_u1010_092 = 0.92 ** 2 * 0.031
-    p_u1010_360 = 3.60 ** 2 * 0.031
+    p_u1010_300 = 3.00 ** 2 * 0.031
+    p_u1010_319 = 3.19 ** 2 * 0.031
     p_q1010_092 = 0.92 ** 2 * 0.0135
-    p_q1010_360 = 3.60 ** 2 * 0.0135
+    p_q1010_300 = 3.00 ** 2 * 0.0135
+    p_q1010_319 = 3.19 ** 2 * 0.0135
     p_l1004_189 = 1.89 ** 2 * 0.016
-    p_l1004_498 = 4.98 ** 2 * 0.016
+    p_l1004_412 = 4.12 ** 2 * 0.016
+    p_l1004_431 = 4.31 ** 2 * 0.016
     steady = dict(
-        u1010_tps26631=dict(ron_mohm=31.0, p_at_0p92a_w=round(p_u1010_092, 4), p_at_3p6a_w=round(p_u1010_360, 4)),
-        q1010_dmt10h015lfg=dict(ron_mohm=13.5, p_at_0p92a_w=round(p_q1010_092, 4), p_at_3p6a_w=round(p_q1010_360, 4)),
-        l1004_cm_choke=dict(r_both_mohm=16.0, p_at_1p89a_w=round(p_l1004_189, 4), p_at_4p98a_w=round(p_l1004_498, 4)),
+        u1010_tps26631=dict(ron_mohm=31.0, p_at_0p92a_w=round(p_u1010_092, 4), p_at_3p0a_w=round(p_u1010_300, 4), p_at_3p19a_w=round(p_u1010_319, 4)),
+        q1010_dmt10h015lfg=dict(ron_mohm=13.5, p_at_0p92a_w=round(p_q1010_092, 4), p_at_3p0a_w=round(p_q1010_300, 4), p_at_3p19a_w=round(p_q1010_319, 4)),
+        l1004_cm_choke=dict(r_both_mohm=16.0, p_at_1p89a_w=round(p_l1004_189, 4), p_at_4p12a_w=round(p_l1004_412, 4), p_at_4p31a_w=round(p_l1004_431, 4)),
     )
     print("\n  steady-state dissipation (single-entry path):")
-    print("    U1010 TPS26631 (31 mOhm):   %.3f W @ 0.92 A,  %.3f W @ 3.60 A" % (p_u1010_092, p_u1010_360))
-    print("    Q1010 DMT10H015 (13.5 mOhm): %.3f W @ 0.92 A,  %.3f W @ 3.60 A" % (p_q1010_092, p_q1010_360))
-    print("    L1004 (2 x 8 mOhm = 16 mOhm): %.3f W @ 1.89 A typ, %.3f W @ 4.98 A max" % (p_l1004_189, p_l1004_498))
+    print("    U1010 TPS26631 (31 mOhm):     %.3f W @ 0.92 A,  %.3f W @ 3.00 A,  %.3f W @ 3.19 A" % (p_u1010_092, p_u1010_300, p_u1010_319))
+    print("    Q1010 DMT10H015 (13.5 mOhm):   %.3f W @ 0.92 A,  %.3f W @ 3.00 A,  %.3f W @ 3.19 A" % (p_q1010_092, p_q1010_300, p_q1010_319))
+    print("    L1004 (2 x 8 mOhm = 16 mOhm):  %.3f W @ 1.89 A typ, %.3f W @ 4.12 A rated, %.3f W @ 4.31 A max" % (p_l1004_189, p_l1004_412, p_l1004_431))
 
     RESULT["transients"] = rows
     RESULT["single_entry_steady"] = steady
