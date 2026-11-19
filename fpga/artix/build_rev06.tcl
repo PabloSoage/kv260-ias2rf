@@ -52,9 +52,9 @@ report_drc               -file [file join $rpt_dir "drc.rpt"]
 report_methodology       -file [file join $rpt_dir "methodology.rpt"]
 report_cdc               -details -file [file join $rpt_dir "cdc.rpt"]
 
-set_operating_conditions -process typical -ambient_temp 25.0 -board_layers 8to11 -airflow 0
+set_operating_conditions -grade industrial -process typical -ambient_temp 25.0 -board_layers 8to11 -airflow 0
 report_power -file [file join $rpt_dir "power_25c_typ.rpt"]
-set_operating_conditions -process maximum -ambient_temp 70.0 -board_layers 8to11 -airflow 0
+set_operating_conditions -grade industrial -process maximum -ambient_temp 70.0 -board_layers 8to11 -airflow 0
 report_power -file [file join $rpt_dir "power_70c_max.rpt"]
 
 set wns [get_property SLACK [get_timing_paths -max_paths 1 -nworst 1 -setup]]

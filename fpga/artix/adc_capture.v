@@ -325,10 +325,23 @@ module adc_capture #(
         b2g3 = b ^ (b >> 1);
     endfunction
 
-    always @(posedge dco_bufr) begin
-        q_rise_pipe <= q_rise;
-        q_fall_pipe <= q_fall;
-    end
+    // The pipe flops take the IDDR's own edge. With the DCO inverted the IDDR updates on dco_bufr's falling edge,
+    // so a rising-edge pipe gave ILOGIC -> fabric only half a cycle (2 ns at 500 MSPS): the Ethernet build missed it
+    // by 0.055 ns in the Rev08 final re-audit. On the falling edge that route gets the full cycle; the rising-edge
+    // users below still see the data in the same cycle as before, and the half cycle is now fabric to fabric.
+    generate
+        if (EFF_DCO_INVERT) begin : g_pipe_neg
+            always @(negedge dco_bufr) begin
+                q_rise_pipe <= q_rise;
+                q_fall_pipe <= q_fall;
+            end
+        end else begin : g_pipe_pos
+            always @(posedge dco_bufr) begin
+                q_rise_pipe <= q_rise;
+                q_fall_pipe <= q_fall;
+            end
+        end
+    endgenerate
 
     always @(posedge dco_bufr) begin
         if (rst_bufr) begin
@@ -608,8 +621,12 @@ module adc_capture #(
                 end
 
                 ST_FIND_EYE: begin
+                    // The mask rotates right one place per step, so the tap under test (find_k) is always bit 0:
+                    // no 32:1 mux on find_k in front of best_len's enable (that path missed 400 MHz timing in
+                    // the Ethernet build by 0.19 ns). After the 32 steps the mask is back as it was scanned.
                     for (i = 0; i < 8; i = i + 1) begin
-                        if (pass_mask[i][find_k[4:0]] && cur_len[i] < 6'd32) begin
+                        pass_mask[i] <= {pass_mask[i][0], pass_mask[i][31:1]};
+                        if (pass_mask[i][0] && cur_len[i] < 6'd32) begin
                             if (cur_len[i] == 6'd0)
                                 cur_start[i] <= find_k;
                             if (cur_len[i] >= best_len[i]) begin

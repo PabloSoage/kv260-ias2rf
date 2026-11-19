@@ -269,6 +269,10 @@ set_clock_groups -asynchronous \
 
 # Debug UART (PMOD_SPARE1 RX / PMOD_SPARE2 TX) + asynchronous board I/Os
 set_property PULLUP TRUE [get_ports pmod_spare1]
+# Audit P2: PMOD_CS_N reads low while the K26 is unpowered or still holds its Pmod outputs high-Z, so pmod_spi's
+# kria_present (CS_N high for 1 ms) cannot be set by a floating line. A pull-down sinks; it never sources current
+# into the other board.
+set_property PULLDOWN TRUE [get_ports pmod_cs_n]
 set_false_path -from [get_ports {pmod_* beam_strobe pps_sync hk_alert_n}]
 set_false_path -to   [get_ports {pmod_miso pmod_spare2 fpga_irq}]
 
@@ -321,3 +325,8 @@ set_max_delay -quiet -datapath_only 3.000 -from [get_clocks -of_objects [get_pin
 # transition into S_PREP, and S_ISSUE comes two cycles later (S_PREP, S_PREP2), so the decode has two cycles.
 set_multicycle_path -setup 2 -from [get_cells -hier -filter {NAME =~ *u_fe_ctrl/k_reg* || NAME =~ *u_fe_ctrl/op_reg* || NAME =~ *u_fe_ctrl/pre_init_reg* || NAME =~ *u_fe_ctrl/arg_reg* || NAME =~ *u_fe_ctrl/p0_sh_reg* || NAME =~ *u_fe_ctrl/p1_user_reg* || NAME =~ *u_fe_ctrl/led_sh_reg*}] -to [get_cells -hier -filter {NAME =~ *u_fe_ctrl/kind_reg* || NAME =~ *u_fe_ctrl/val_reg* || NAME =~ *u_fe_ctrl/dev_reg* || NAME =~ *u_fe_ctrl/wr3_reg*}]
 set_multicycle_path -hold 1 -from [get_cells -hier -filter {NAME =~ *u_fe_ctrl/k_reg* || NAME =~ *u_fe_ctrl/op_reg* || NAME =~ *u_fe_ctrl/pre_init_reg* || NAME =~ *u_fe_ctrl/arg_reg* || NAME =~ *u_fe_ctrl/p0_sh_reg* || NAME =~ *u_fe_ctrl/p1_user_reg* || NAME =~ *u_fe_ctrl/led_sh_reg*}] -to [get_cells -hier -filter {NAME =~ *u_fe_ctrl/kind_reg* || NAME =~ *u_fe_ctrl/val_reg* || NAME =~ *u_fe_ctrl/dev_reg* || NAME =~ *u_fe_ctrl/wr3_reg*}]
+
+# AERIS DDC (third_party, unchanged): rst_n_400_nco drives the NCO's asynchronous clears through an inverter at
+# 400 MHz. At its source's max_fanout of 24 the recovery check missed by 13 ps in the Ethernet build (Rev08 final
+# re-audit); 8 per copy keeps each copy next to its flops.
+set_property MAX_FANOUT 8 [get_cells -hierarchical -filter {NAME =~ *u_ddc/rst_n_400_nco_reg}]

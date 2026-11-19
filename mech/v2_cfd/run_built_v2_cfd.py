@@ -161,6 +161,11 @@ def set_components(cfg: "BuiltCaseConfig") -> None:
     comps = [replace(c, power_w=fpga_w) if c.name == "U1101_XC7A50T" else c for c in BASE_COMPONENTS]
     if cfg.rev08:
         comps = [replace(c, power_w=REV08_POWER_W.get(c.name, c.power_w)) for c in comps] + REV08_COMPONENTS
+    if cfg.hs4:
+        # HS4 (docs/img/board_heatsinks.jpg): a 14 x 14 x 5 mm stick-on aluminium sink on the XC7A50T, the same
+        # sink and epoxy as U501's (r_tim 1.95 K/W), height kept at 5 mm under the fan whatever tall_hs says
+        comps = [replace(c, hs_size_mm=(14.0, 14.0, 5.0), r_tim=1.95) if c.name == "U1101_XC7A50T" else c
+                 for c in comps]
     COMPONENTS[:] = comps
 
 KV260_CARRIER_W = 2.0
@@ -234,6 +239,7 @@ class BuiltCaseConfig:
     tall_hs: bool = False            # 15 Nov study: taller decoupled sinks (U401/Y401 9x7x8 mm, U501 14x14x8.5 mm)
     pad_to_lid: bool = False         # 15 Nov study: 5 W/mK thermal pad from U1001 & K26 perimeter rails to Al lid plate
     rev08: bool = False              # Rev08: front-end sources, camera, adapter outline, lens window and LED slots
+    hs4: bool = False                # Rev08 final re-audit: HS4 fitted on U1101 (XC7A50T), 14 x 14 x 5 mm
     keep_vtk: bool = False
 
 
@@ -360,7 +366,7 @@ def generate_case(cfg: BuiltCaseConfig, case_dir: Path, nprocs: int = 16) -> dic
             pkg_boxes[c.name] = pb
             # Heatsink body directly on top of pb[5]
             wx, wy, hz = c.hs_size_mm
-            if cfg.tall_hs:
+            if cfg.tall_hs and c.name != "U1101_XC7A50T":
                 hz = 8.5 if c.name == "U501_AD9484" else 8.0
             sep_hs = cfg.decouple_hs or cfg.tall_hs
             if sep_hs and c.name == "U401_ADCLK948":
@@ -1439,6 +1445,7 @@ p_{op}
         "extra_exhaust_slots": cfg.extra_exhaust_slots,
         "adopted_back_slots": cfg.adopted_back_slots,
         "tall_hs": cfg.tall_hs,
+        "hs4": cfg.hs4,
         "pad_to_lid": cfg.pad_to_lid,
         "rev08": cfg.rev08,
         "cells_air": int(len(T_air)),
@@ -1496,6 +1503,9 @@ def build_suite() -> List[BuiltCaseConfig]:
         BuiltCaseConfig("rev08_clean_fine_55C", ambient_c=55.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
         BuiltCaseConfig("rev08_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True, keep_vtk=True),
         BuiltCaseConfig("rev08_clogged_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=2.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True),
+        # Rev08 final re-audit: the same with HS4 on the XC7A50T (it passes its 100 C Tj at 70 C ambient without)
+        BuiltCaseConfig("rev08_hs4_clean_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=1.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True, hs4=True),
+        BuiltCaseConfig("rev08_hs4_clogged_fine_70C", ambient_c=70.0, mesh_level="fine", with_heatsinks=True, filter_clog_factor=2.0, wide_grille=True, fan_5015=True, expand_exhaust=True, adopted_back_slots=True, tall_hs=True, rev08=True, hs4=True),
     ]
 
 

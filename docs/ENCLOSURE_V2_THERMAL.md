@@ -336,7 +336,9 @@ The adopted enclosure of section 7, re-run on the same fine mesh with the Rev08 
 | 55 °C clean | 7.53 CFM | 83.88 | 102.76 | 76.51 / 82.78 | 86.81 | 72.19 / 76.69 | 73.31 |
 | 70 °C clean | 7.55 CFM | 99.08 | 117.43 | 91.82 / 98.08 | **102.08** | 87.10 / 91.60 | 88.60 |
 | 70 °C, filter clogged twice | 6.77 CFM | 99.29 | 117.94 | 92.24 / 98.48 | **102.39** | 87.00 / 91.50 | 88.50 |
-| Section 7, 70 °C clean, for comparison | 7.52 CFM | 99.20 | 114.55 | 92.60 / 98.77 | **101.81** | — | — |
+| 70 °C clean, `HS4` fitted (Rev08 final re-audit) | 7.47 CFM | 99.21 | 117.71 | 91.87 / 98.13 | **93.38** | 86.87 / 91.37 | 88.42 |
+| 70 °C, filter clogged twice, `HS4` fitted | 6.72 CFM | 99.35 | 118.11 | 92.36 / 98.60 | **94.24** | 87.01 / 91.51 | 88.30 |
+| Section 7, 70 °C clean, for comparison | 7.52 CFM | 99.20 | 114.55 | 92.60 / 98.77 | **101.81** | n/a | n/a |
 
 ![Rev08 adapter board at 70 °C and its change against Rev06/07](sim/rev08_thermal_70c.png)
 
@@ -352,6 +354,17 @@ The adopted enclosure of section 7, re-run on the same fine mesh with the Rev08 
 
 **What it shows.**
 - **The `K26I` assembly rating drops below 70 °C.** With the real Vivado `XC7A50T` power (`1.604 W` at `70 °C` max process) plus `U1006 = 0.91 W` and `U1002 = 0.69 W`, `U1101` reaches `102.08 °C` clean (`102.39 °C` clogged) without `HS4`, dropping the `K26I`-paired ambient rating from `71.1 °C` to **`68.0 °C`** (`K26I` itself still passes at `99.08 °C`, `70.9 °C` limit). Stock commercial `KV260` stays at **`56.1 °C`**, and adapter-limited `Tb <= 85 °C` drops from `64.1 °C` to **`63.3 °C`**.
+- **`HS4` on the `XC7A50T` (Rev08 final re-audit, 19 November; `run_built_v2_cfd.py` option `hs4`, cases
+  `rev08_hs4_*`).**
+  - **What it is:** the 14 x 14 x 5 mm stick-on aluminium sink of the heatsink map, on the same epoxy as `U501`'s.
+  - **Effect at 70 °C:** it takes `U1101` from 102.08 to **93.38 °C** (clogged: 102.39 to **94.24 °C**), 6-7 °C under
+    its 100 °C limit. Nothing else moves by more than 0.3 °C.
+  - **Effect on the ratings:** with it, the `K26I` assembly is limited by the `K26` itself (70.9 °C), no longer by
+    the adapter's FPGA. The enclosure's overall rating stays **63.3 °C**, set by `U401`'s board temperature, which
+    `HS4` does not change.
+  - **Decision:** at that rating `U1101` is at about 95 °C without the sink, so `HS4` is not needed to meet it.
+  - **Recommendation:** fit `HS4` all the same in a vehicle (5 °C more margin at 63 °C, and the only way to run past
+    68 °C with a `K26I`).
 - **The front end warms its own corner.** The board around the RFFC5072 rises by up to 5.16 K. The RFFC5072 is at 91.60 °C junction at 70 °C, far from its limit; its board temperature reaches its 85 °C rating at 67.9 °C ambient.
 - **The front edge cools.** With the board now running east of X = −10, the Ethernet PHY's and the clock's corner spreads into it: the board there falls by up to 4.97 K.
 - **The LMR33630** rises from `114.55 °C` (Section 7) to `117.43 °C` at `70 °C` (`117.94 °C` clogged), `7.6 °C` under its `125 °C` limit (`U1006` sits at `111.09 °C`, `13.9 °C` under its `125 °C` limit).
