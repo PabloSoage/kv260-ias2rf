@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "psu")(type "KiCad")(uri "${KIPRJMOD}/psu.pretty")(options "")(descr "PSU board footprints"))
+)

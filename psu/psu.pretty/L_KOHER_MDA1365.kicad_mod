@@ -1,0 +1,121 @@
+(footprint "L_KOHER_MDA1365"
+	(version 20241229)
+	(generator "kv260-ias2rf/_work/psu/psu_parts.py")
+	(layer "F.Cu")
+	(descr "KOHERelec MDA1365 molded power inductor 13.5 x 12.6 x 6.2 mm; land pattern from the MDA series 1365 data sheet; 3-D body: KiCad's Changjiang FXL1350, about the same size")
+	(property "Reference" "REF**"
+		(at 0 -7.5 0)
+		(layer "F.SilkS")
+		(uuid "f85b991b-c0ae-5ff5-abb9-1aba9745d5e7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "L_KOHER_MDA1365"
+		(at 0 7.5 0)
+		(layer "F.Fab")
+		(uuid "97880ce3-6ac7-5e24-a054-6fd7787f30a0")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "299aeeeb-bf8f-5d01-a182-cad5b0ce927a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "db8694f9-82fd-5231-a390-58afe4af5a5c")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "11252095-475b-505a-93cc-4a380f1afc57")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(pad "1" smd rect
+		(at -5.625 0)
+		(size 3.25 5)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "10e88f9c-88a4-5042-9748-984074086c2d")
+	)
+	(pad "2" smd rect
+		(at 5.625 0)
+		(size 3.25 5)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "98ef00e7-545b-586e-8a2d-8effefd65a7d")
+	)
+	(fp_rect
+		(start -6.75 -6.3)
+		(end 6.75 6.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "4ce85808-94bd-5a9e-9d82-25ee125ee97d")
+	)
+	(fp_rect
+		(start -7 -6.55)
+		(end 7 6.55)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "f7d44710-7ed8-5f62-bf02-65c77600a33a")
+	)
+	(fp_rect
+		(start -6.87 -6.42)
+		(end 6.87 6.42)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "b29616b7-e067-596a-8124-9f784025aa65")
+	)
+	(model "${KICAD10_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_Changjiang_FXL1350.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

@@ -1,0 +1,121 @@
+(footprint "L_KOHER_MDA1870"
+	(version 20241229)
+	(generator "kv260-ias2rf/_work/psu/psu_parts.py")
+	(layer "F.Cu")
+	(descr "KOHERelec MDA1870 molded power inductor 17.8 x 16.9 x 6.7 mm; land pattern from the MDA series 1870 data sheet; 3-D body: KiCad's Changjiang FXL1770, about the same size")
+	(property "Reference" "REF**"
+		(at 0 -9.65 0)
+		(layer "F.SilkS")
+		(uuid "70263e45-9dcd-5b69-93fb-c72e5987f50c")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "L_KOHER_MDA1870"
+		(at 0 9.65 0)
+		(layer "F.Fab")
+		(uuid "cd8b8bc6-e68f-5045-b602-3a2fded93a44")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "70439e22-53fa-5612-ba1a-09f92cd076b0")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "5e64670e-a00b-5460-a951-13db0052da64")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d02302e9-0a0b-5da7-a8b3-38b3bea37542")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(pad "1" smd rect
+		(at -7.625 0)
+		(size 3.25 12.5)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "fd311921-0cbb-5806-9dd8-d9caf1f2841c")
+	)
+	(pad "2" smd rect
+		(at 7.625 0)
+		(size 3.25 12.5)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(uuid "ba339aa8-06b8-56f8-b31f-707aaa728e44")
+	)
+	(fp_rect
+		(start -8.9 -8.45)
+		(end 8.9 8.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "67d030ff-c8aa-59d2-a12f-251385d8f114")
+	)
+	(fp_rect
+		(start -9.15 -8.7)
+		(end 9.15 8.7)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "59467166-dbc4-5cd5-b1e4-b51f92fc08aa")
+	)
+	(fp_rect
+		(start -9.02 -8.57)
+		(end 9.02 8.57)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "2d1c8441-d26f-56c1-a5e6-3fb39861ba9e")
+	)
+	(model "${KICAD10_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_Changjiang_FXL1770.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
