@@ -46,9 +46,10 @@ CONNECTORS = [
     ("J942", "SDR_TX_WB", "Wideband SDR transmit from the AD9708 (SMA), SW4's second throw"),
     ("J951", "SDR_RX_C", "HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input"),
     ("J952", "SDR_TX_C", "HF transmit (SMA), no switch: AD9767 DAC2. The default HF output"),
-    ("J961", "VU_ANT", "VHF/UHF antenna (SMA, back wall): the Rev08 front end, 30 MHz-3 GHz (direct below 170 MHz, converted above), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed"),
-    ("J1001", "12V IN", "12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 9.9 W, 12.8 W with margin (the GPS receiver included)"),
+    ("J961", "VU_ANT", "VHF/UHF antenna (SMA, back wall): the Rev08 front end, direct 30-170 MHz and converted from 300 MHz to 3 GHz (170-300 MHz not covered: the converter's 300 MHz high-pass, AUDIT_Rev08 R1), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit; prefer 3.3 V where the antenna accepts it). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed. No limiter: keep it away from a transmitter on the same vehicle (+25 dBm destroys the LNA)"),
+    ("J1001", "12V IN", "12 V input, barrel jack (CUI PJ-102AH, 5 A). Single power entry for both boards (`L1004` on both lines): feeds the adapter (11.7 W typical, 13.4 W / 1.12 A worst; `F1001` 2 A PTC, 18.3 V OVP) and the KV260 via `U1010`/`J1004` (3.0 A / 3.19 A max limit; 1.89 A typical, 4.12 A rated, 4.31 A worst combined). See POWER_SPEC section 1.4 and section 6"),
     ("J1002", "FAN 5V", "Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND"),
+    ("J1004", "B2PS-VH", "12 V output to the KV260's `J12` (JST VH 2-pin right-angle, 10 A: pin 1 `+12V_KV`, pin 2 `GND`): protected by `U1010` (8.0 V UVLO, 14.4 V OVP, 3.0 A limit via `R1043` 6.04 kohm, -60 V reverse); see section 6"),
     ("J1101", "JTAG 2x7 2mm", "Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter)"),
     ("J1102", "Pmod", "Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below"),
     ("J1103", "AERIS ADAR", "AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines"),
@@ -105,7 +106,7 @@ ICS = [
     ("U903", "M3SWA2-34DR+", "ROUTING", "SW3: the AD9767 DAC1 to SDR_TX_A or AERIS_TX_A"),
     ("U904", "M3SWA2-34DR+", "ROUTING", "SW4: the AD9708 to AERIS_TX or SDR_TX_WB"),
     ("U1001", "LMR33630ADDA", "POWER", "+12V to +5V0 buck, 3 A"),
-    ("U1002", "TPS562201", "POWER", "+5V0 to +3V3_D buck"),
+    ("U1002", "TPS563201", "POWER", "+5V0 to +3V3_D buck, 3 A (Rev08 audit, P5)"),
     ("U1003", "TPS562201", "POWER", "+5V0 to +2V5 buck (FPGA LVDS banks, feeds +1V8_A)"),
     ("U1004", "TPS562201", "POWER", "+5V0 to +1V0 buck (FPGA core)"),
     ("U1005", "TPS7A8300RGR", "POWER", "+2V5 to +1V8_A LDO (the ADCs' analogue supply)"),
@@ -113,6 +114,7 @@ ICS = [
     ("U1007", "TPS7A8300RGR", "POWER", "+5V0 to +3V3_A LDO (the DACs' analogue supply)"),
     ("U1008", "LM2663M", "POWER", "-3V3 charge pump (the RF switches' negative supply)"),
     ("U1009", "LM74502-Q1", "POWER", "Input protection controller: reverse battery and over-voltage cut-off, with `Q1001`/`Q1003`"),
+    ("U1010", "TPS26631PWPR", "KVPWR", "KV260 12 V output eFuse: 8.0 V UVLO, 14.4 V OVP, 3.0 A limit (`R1043` 6.04 kohm, 2.77 to 3.19 A), auto-retry, with `Q1010`/`Q1011` reverse protection"),
     ("U1301", "SPF5043Z", "RX_VU", "VHF/UHF low-noise amplifier"),
     ("U1302", "PE4259", "RX_VU", "LNA bypass switch, input side"),
     ("U1303", "PE4259", "RX_VU", "LNA bypass switch, output side"),
@@ -124,16 +126,16 @@ ICS = [
     ("U1309", "PE4259", "RX_VU", "Direct or converted path, after the converter"),
     ("U1310", "SPF5043Z", "RX_VU", "IF amplifier"),
     ("U1311", "PE4312", "RX_VU", "Digital attenuator, 0-31.5 dB"),
-    ("U1312", "RFFC5072", "RX_VU", "Synthesiser and mixer: converts 170 MHz-3 GHz down to the IF"),
+    ("U1312", "RFFC5072", "RX_VU", "Synthesiser and mixer: converts 300 MHz-3 GHz down to the IF (170-300 MHz not covered)"),
     ("U1313", "TCA6416ARTWR", "RX_VU", "I/O expander 0x20: the front end's switches, bias tee and converter control"),
     ("U1314", "AP22652W6-7", "RX_VU", "Bias-tee current limiter for `J961` (125 mA)"),
-    ("U1315", "LP5907MFX-3.0", "RX_VU", "+3V0 LDO for the front end"),
+    ("U1315", "LP5907MFX-2.8", "RX_VU", "+2V8_RF LDO for the front end (Rev08 audit, P8)"),
     ("U1501", "TCA6416ARTWR", "STATUS", "I/O expander 0x21: the status LEDs"),
     ("U1502", "CH340X", "STATUS", "USB to UART bridge for the debug console"),
     ("U1503", "USBLC6-2SC6", "STATUS", "ESD on the USB data lines"),
     ("U1504", "LP5907MFX-3.3", "STATUS", "3.3 V LDO for the USB bridge, from the cable"),
     ("U1505", "SN74LVC1G17DCKR", "STATUS", "GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4"),
-    ("U1506", "TCAN330DCNT", "STATUS", "Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8"),
+    ("U1506", "TCAN3403DDFRQ1", "STATUS", "Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8"),
 ]
 OTHER = [   # oscillators, filters, transformers: in the chip table, one line each
     ("Y401", "Si549 LVPECL 3V3 pinout C", "CLOCK", "Programmable master oscillator, 400 or 500 MHz"),
@@ -402,6 +404,57 @@ def md(parts, nums):
     w("|---|---|---|")
     for a, b, c in USES:
         w(f"| {a} | {b} | {c} |")
+    w("")
+    w("## 6. Powering the KV260 together with the board")
+    w("")
+    w("![Power and grounding wiring](img/power_wiring.png)")
+    w("")
+    w("![Ground offset and earth loops](sim/ground_offset.png)")
+    w("")
+    w("Feed the entire two-board module through `J1001` alone. Connect `J1004` (right-angle JST VH at the back edge; "
+      "pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack `J12` with the short 18 AWG jumper (VHR-2N, 15 cm to a "
+      "5.5 x 2.5 mm centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (5 A rating) and "
+      "`L1004` (6 A rating) is 1.89 A typical, 4.12 A at the KV260's 3.0 A brick rating (1.12 A adapter plus 3.0 A KV260), "
+      "and 4.31 A worst case at `U1010`'s +7 % limit (3.19 A from `R1043` 6.04 kohm).")
+    w("")
+    w("With this single entry, **the KV260's own DC return runs through the BM20 ground contacts (`J101`/`J102`) by design**: "
+      "the 22 parallel BM20 ground contacts plus the FFC and Pmod conductors present 1.3 mOhm (1.29 mOhm) against the jumper's "
+      "33 mOhm (33.1 mOhm), so 96 % of the KV260's return crosses the BM20 link. That is why `U1010` limits the KV260 to its "
+      "brick's 3 A rating (2.98 A nominal, 2.77 to 3.19 A).")
+    w("")
+    w("- In a vehicle:")
+    w("  - **Feed `J1001` from an upstream regulated 12.0 V DC-DC converter (>= 5 A, output strictly below 13.2 V)** so the "
+      "KV260's `MP5016` eFuse stays enabled and Load Dump A (87 V) cannot overload `D1003`, behind a 5 A inline harness fuse.")
+    w("  - **Never run a second chassis ground wire to the KV260** (by wire, mounting strap or shield); both boards return "
+      "through `J1001` alone. Return the CAN/GPS cable ground (`J1503` pins 1 and 4) from the same chassis ground point as the "
+      "DC-DC converter's negative lead.")
+    w("- At home / on a bench:")
+    w("  - Use one 12 V / 5 A wall adapter on `J1001`, preferably a two-prong (Class II, double-insulated) brick with no mains "
+      "earth pin.")
+    w("  - Ethernet on `J1201` to an earthed PC or switch no longer closes a DC or 50 Hz earth loop (`J1201`'s shield goes to "
+      "ground through `R1218` 1 Mohm in parallel with `C1223` 1 nF 2 kV).")
+    w("  - **USB does close a ground loop** (its ground is a cable conductor): when connecting the debug USB-C `J1501` or the "
+      "KV260's USB to an earthed PC while running an earthed supply, use a USB isolator or a laptop on battery.")
+    w("  - DisplayPort to an earthed monitor stays a loop (189 mA per BM20 contact with 1 V rms 50 Hz between earths, inside "
+      "the 300 mA rating); fit clip-on ferrites on earthed cables.")
+    w("")
+    w("Inter-board BM20 ground currents (`_work/power/ground_offset.py`, `docs/sim/ground_offset.json`, 0.30 A per-contact rating):")
+    w("")
+    w("| Installation / Fault case | Inter-board link current | Per BM20 contact | Against 0.30 A rating |")
+    w("|---|---|---|---|")
+    w("| Separate grounds, same point (1.0 m / 1.0 m) | -0.93 A | 40 mA | Pass |")
+    w("| Separate grounds, same point (0.3 m / 2.0 m) | -1.96 A | 84 mA | Pass |")
+    w("| Separate grounds, 1.0 V chassis offset (1 m typ) | 10.2 A | 411 mA | Fail (exceeds 0.30 A from 0.75 V) |")
+    w("| Separate grounds, 1.0 V offset (1 m, max contact R) | 9.9 A | 355 mA | Fail (exceeds 0.30 A from 0.85 V) |")
+    w("| Separate grounds, 1.0 V offset (0.3 m leads, typ) | 17.7 A | 714 mA | Fail (exceeds 0.30 A from 0.40 V) |")
+    w("| Separate grounds, 1.0 V offset (3.0 m leads, typ) | 5.0 A | 203 mA | Pass (0.30 A at 1.60 V) |")
+    w("| Separate grounds, KV260 ground wire lost | 3.00 A | 129 mA | Pass (surviving jack 4.12 A) |")
+    w("| Single entry, typical KV260 load (0.92 A) | -0.89 A | 38 mA | Pass |")
+    w("| Single entry, at `U1010` limit (3.19 A) | -3.09 A | 132 mA | Pass (independent of chassis offset) |")
+    w("| Single entry, contacts at 100 mOhm max | -2.88 A | 109 mA | Pass |")
+    w("| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass (219 mA at 2 A with one at a third; 352 mA at 3.19 A/third) |")
+    w("| Single entry, jumper ground contact open (typ / max R) | -3.21 A | 138 mA / 122 mA | Pass |")
+    w("| Home, single entry, earthed monitor 50 Hz (1.0 V / 0.1 V) | 3.27 A / 0.33 A loop | 189 mA / 133 mA | Pass (4.05 mV / 405 uV adapter drop) |")
     w("")
     w("Levels, bands and the register map: [ROUTING_SPEC](ROUTING_SPEC.md), [RX_VU_SPEC](RX_VU_SPEC.md), "
       "[SIGNAL_INTEGRITY](SIGNAL_INTEGRITY.md), [FPGA_GATEWARE](FPGA_GATEWARE.md), "

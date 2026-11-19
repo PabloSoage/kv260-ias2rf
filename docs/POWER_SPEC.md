@@ -9,9 +9,9 @@ sizing are in [POWER_AND_STACKUP.md](POWER_AND_STACKUP.md) §1, recomputed by `_
 for the tree as drawn.
 
 ```
-J1001 (12 V, 5 A) ─ L1004 (6 A CMC, both lines) ─► VIN_J
-  ├── F1001 PTC ─ SMCJ33CA ─ Q1001/Q1003 (LM74502-Q1 U1009, OVP 18.3 V) ─ SMBJ18CA ─► +12V  (adapter, 1.12 A worst)
-  └── Q1010 (DMT10H015LFG) ─ U1010 (TPS26631, OVP 14.4 V, ILIM 3.6 A) ─ SS34 ─► +12V_KV ─► J1004 (§1.4)
+J1001 (12 V, 5 A) -> L1004 (6 A CMC, both lines) -> VIN_J
+  |-- F1001 PTC -> SMCJ33CA -> Q1001/Q1003 (LM74502-Q1 U1009, OVP 18.3 V) -> SMBJ18CA -> +12V  (adapter, 1.12 A worst)
+  +-- Q1010 (DMT10H015LFG) -> U1010 (TPS26631, OVP 14.4 V, ILIM 3.0 A) -> SS34 -> +12V_KV -> J1004 (§1.4)
 +12V   ─ U1001 LMR33630  buck ─► +5V0    2410 mA   (3 A part)
 +5V0   ─ U1002 TPS563201 buck ─► +3V3_D  1891 mA   (3 A part; a 2 A TPS562201 until the Rev08 audit)
        ─ U1003 TPS562201 buck ─► +2V5     601 mA   FPGA LVDS banks, and feeds +1V8_A
@@ -24,13 +24,12 @@ J1001 (12 V, 5 A) ─ L1004 (6 A CMC, both lines) ─► VIN_J
        ─ U1315 LP5907-2.8 LDO ─► +2V8_RF  180 mA   Rev08 VHF/UHF front end (RX_VU sheet)
 ```
 
-Input at `+12V` (adapter only, 70 °C, maximum process, bias tee at its limit, CAN dominant, fan on): **1.12 A at 12 V, 13.4 W**;
+Input at `+12V` (adapter only, 70 °C, maximum process, bias tee at its limit, CAN dominant, fan on): 1.12 A at 12 V, 13.4 W;
 typical 0.97 A, 11.7 W. The FPGA rails come from Vivado's power report, which the budget lacked until the Rev08 audit
 of 18 November; four loads were also added then (Ethernet PHY, CAN transceiver, fan and bias tee,
 [AUDIT_Rev08.md](AUDIT_Rev08.md) §2.1). With the single power entry feeding the KV260 through `J1004` (§1.4; KV260
-0.92 A idle, 3.0 A brick rating, `U1010` 3.6 A nominal / 3.86 A max `+7 %` limit), **`J1001` and `L1004` carry 1.89 A
-typical, 4.12 A at the KV260 rating, 4.72 A at the nominal eFuse limit, and 4.98 A worst case** within `J1001`'s 5 A
-rating.
+0.92 A idle, 3.0 A brick rating, `U1010` 2.98 A nominal / 2.77 to 3.19 A at ±7 % with `R1043` 6.04 kΩ), **`J1001` and
+`L1004` carry 1.89 A typical, 4.12 A at the KV260 rating, and 4.31 A worst case** within `J1001`'s 5 A rating.
 
 ---
 
@@ -101,76 +100,98 @@ footprint (LAYOUT §1). The fan's ~0.1 A adds about 2 % to +5V0's load (LMR33630
 
 ### 1.4 Single power entry and the KV260 output (Rev08, 19 Nov)
 
-**Why (`_work/power/ground_offset.py`, `docs/sim/ground_offset.json`).** With the KV260 and the adapter on separate
-vehicle grounds, their boards are bridged by the two 34-pin BM20 connectors (`J101`/`J102`), the FFC and the Pmod.
-The link's total resistance is only `1.29 mΩ` typical (`3.79 mΩ` worst contact resistance), and the BM20 contacts carry
-`94.3 %` of any loop current (`83.3 %` max contact R) against a `0.30 A` per-contact rating. At the ISO 16750-2
-section 4.8 chassis ground offset of `1.0 V`, the inter-board loop drives **`411 mA` per BM20 contact** on 1 m leads
-(`355 mA` at worst contact R, `714 mA` on 0.3 m leads), exceeding the `0.30 A` limit from `0.75 V` (`0.40 V` on 0.3 m
-leads). Meanwhile the KV260's own input eFuse (`MP5016`, XTP682 p. 3) cuts off above `13.2 V`, below the adapter's
-`18.3 V` OVP. Feeding the KV260 strictly from the adapter gives the two-board module one supply entry (`J1001`) and one
-ground return (`GND_IN`), capping steady-state BM20 ground return at **`125 mA/contact`** (at `3.0 A` KV260 load),
-independent of vehicle chassis offset.
+![Power and grounding wiring](img/power_wiring.png)
 
-**Topology (`KVPWR` sheet).** `J1001` passes both `+12V` and return through `L1004` (`VIN_JACK -> VIN_J`, `GND_IN -> GND`;
-the adapter's `F1001` keeps carrying only the adapter). From `VIN_J`, the KV260 branch runs through reverse-blocking
-N-FET `Q1010` (source on `VIN_J`) and `U1010` (`TPS26631PWPR` eFuse, `4.5-60 V`, `-60/+67 V` abs max on `IN_SYS`,
-`75 V` for `10 ms`, `31 mΩ` typical integrated FET) to `+12V_KV` and right-angle output header `J1004`. Reference: TI
-TPS2663x datasheet **SLVSE94G** (revised June 2024).
+![Ground offset and earth loops](sim/ground_offset.png)
 
-| Part / Setting | Value & Formula | Margin & Datasheet Reference |
+Why (`_work/power/ground_offset.py`, `docs/sim/ground_offset.json`). With the KV260 and the adapter on separate
+vehicle grounds, their boards are bridged by the 22 ground contacts of the two BM20 connectors (`J101`/`J102`), the FFC
+and the Pmod cable: 1.29 mΩ typical total (3.79 mΩ with contacts at 100 mΩ maximum), with the BM20 contacts carrying
+94.3 % of any link current (83.3 % at max contact resistance) against a 0.30 A per-contact rating. At the ISO 16750-2
+section 4.8 ground offset of 1.0 V, the inter-board loop drives 411 mA per BM20 contact on 1 m leads (exceeding 0.30 A
+from 0.75 V), 355 mA at max contact resistance (from 0.85 V), 714 mA on 0.3 m leads (from 0.40 V) and 203 mA on 3 m leads
+(from 1.60 V). Even grounded to the same point, unequal wire lengths (0.3 m / 2.0 m) drive 84 mA per contact (40 mA on
+1 m / 1 m), and losing the KV260 ground wire puts 129 mA per contact (3.00 A on the link) across the BM20s. The KV260's
+own input eFuse (`MP5016`, XTP682 p. 3) also cuts off above 13.2 V, below the adapter's 18.3 V OVP.
+
+With single-entry power, **the KV260's own DC return runs through the BM20 ground contacts by design**: the BM20 link is
+1.3 mΩ (1.29 mΩ) against the 150 mm 18 AWG jumper's 33 mΩ (33.1 mΩ), so 96 % of the KV260's return crosses the BM20
+link. That is why `U1010` limits the KV260 to its brick's 3 A rating (2.98 A nominal, 2.77 to 3.19 A at ±7 % with
+`R1043` 6.04 kΩ; at 3.6 A, one contact at half resistance carried 305 mA, over the 300 mA rating):
+
+| Case (`docs/sim/ground_offset.json`) | Inter-board link | Per BM20 contact | Against 0.30 A rating |
+|---|---|---|---|
+| Separate grounds, same point (1.0 m / 1.0 m) | -0.93 A | 40 mA | Pass |
+| Separate grounds, same point (0.3 m / 2.0 m) | -1.96 A | 84 mA | Pass |
+| Separate grounds, 1.0 V offset (1 m typ / max R) | 10.2 / 9.9 A | 411 mA / 355 mA | **Fail** (from 0.75 V / 0.85 V) |
+| Separate grounds, 1.0 V offset (0.3 m / 3.0 m typ) | 17.7 / 5.0 A | 714 mA / 203 mA | **Fail** on 0.3 m (from 0.40 V) / Pass on 3 m (1.60 V) |
+| Separate grounds, KV260 ground wire lost | 3.00 A | 129 mA | Pass (surviving jack 4.12 A) |
+| Single entry, typical KV260 load (0.92 A) | -0.89 A | 38 mA | Pass |
+| Single entry, at `U1010` limit (3.19 A) | -3.09 A | 132 mA | Pass |
+| Single entry, contacts at 100 mΩ maximum | -2.88 A | 109 mA | Pass |
+| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass (219 mA at 2 A with one at a third; 352 mA at 3.19 A/third) |
+| Single entry, jumper ground contact open (typ / max R) | -3.21 A | 138 mA / 122 mA | Pass |
+| Home, single entry, earthed monitor 50 Hz (1.0 V / 0.1 V) | 3.27 A / 0.33 A loop | 189 mA / 133 mA | Pass (4.05 mV / 405 uV adapter drop) |
+
+Topology (`KVPWR` sheet). `J1001` passes both +12 V and return through `L1004` (`VIN_JACK` to `VIN_J`, `GND_IN` to `GND`;
+`F1001` keeps carrying only the adapter). From `VIN_J`, the KV260 branch runs through reverse-blocking N-FET `Q1010`
+(source on `VIN_J`) and `U1010` (`TPS26631PWPR` eFuse, 4.5 to 60 V, -60 to +67 V abs max on `IN_SYS`, 75 V for 10 ms,
+31 mΩ typical integrated FET) to `+12V_KV` and right-angle header `J1004`. Reference: TI TPS2663x datasheet SLVSE94G
+(revised June 2024).
+
+| Part / Setting | Value and formula | Margin and datasheet reference |
 |---|---|---|
-| `L1004` | **ZEGMCM9070-501T** (`C53154905`, Coilmaster SMM9070-501 equiv.): `600 Ω @ 100 MHz` (`450 Ω` min), `6 A`, `2 × 8 mΩ` max (`16 mΩ` total), `80 V` | Carries `1.89 A` typ / `4.98 A` worst case vs `6 A` (`0.057 W` / `0.397 W` both windings). Pads 1-2 `GND`, 3-4 `+12V`, dotted ends on jack side |
-| `Q1010`, `Q1011` | **DMT10H015LFG** (`100 V`, `13.5 mΩ`, source on `VIN_J`) + **2N7002** (`>= 15 V V_DS`, `C_iss <= 50 pF`, `V_GS 20 V`) | Reverse polarity to `-60 V` (SLVSE94G §8.3.5, §9.2.2.6). `Q1010` sees `57.3 V` peak `V_DS` in pulse 1 (`0.011 W @ 0.92 A`, `0.175 W @ 3.6 A`) |
-| `U1010` | **TPS26631PWPR** (`C2866319`): `MODE = GND` (auto-retry), `SHDN` open (`2.7 V` internal enable), `PGTH = GND`, `IMON`/`FLT` open | Active current limit with `2× I_OL` pulse support (SLVSE94G §8.3.7.1.2). `0.026 W @ 0.92 A`, `0.402 W @ 3.60 A` |
-| `R1040`, `R1041`, `R1042` | `316 kΩ` / `24.9 kΩ` / `30.9 kΩ` (`R_sum = 371.8 kΩ`) -> **`OVP 14.44 V` rising / `13.48 V` falling** (`±2 %`), **`UVLO 8.00 V` rising / `7.46 V` falling** | SLVSE94G §8.3.3 requires `R1 >= 300 kΩ` (`316 kΩ`) between `IN_SYS` and `UVLO` with reverse polarity. Equations 9-10 (§9.2.2.2) with `V_OVPR = V_UVLOR = 1.20 V`, `V_OVPF/UVLOF = 1.12 V` keep `+12V_KV` under KV260's `16 V` `SMAJ16A` |
-| `R1043` | `4.99 kΩ` (0603, `1 %`) -> `I_OL = 18 kΩ·A / 4.99 kΩ =` **`3.61 A`** (`±7 %`: `3.35-3.86 A`) | SLVSE94G §8.3.7.1 Equation 5. Covers KV260 `3 A` rating while `1.12 + 3.86 = 4.98 A` stays under `J1001`'s `5 A` rating |
-| `C1093` | `22 nF` (0603) on `dVdT` -> `t_dVdT = 20.8 × 10^3 × 12 V × 22 nF =` **`5.49 ms`** | SLVSE94G §8.3.1 Equation 2: controlled soft-start slew into KV260 bulk capacitance |
-| `C1094`, `C1095` | `1 µF 100 V` 1206 X7R (`IN_SYS`), `10 µF 25 V` 1206 X7R (`+12V_KV` at `J1004`) | High-voltage ceramic buffer (`>= 67 V` abs max on `IN_SYS`) + output decoupling at jumper |
-| `D1004` | **SS34** (`C8678`, `40 V`, `3 A` SMA Schottky) on `+12V_KV` to `GND` | Clamps inductive negative kick on the KV260 jumper when `U1010` opens on fault (SLVSE94G §9.5.1) |
-| `J1004` | **JST B2PS-VH** (`C158007`, right-angle, `10 A`): pin 1 `+12V_KV`, pin 2 `GND` | Mates with `VHR-2N` / `18 AWG` (~15 cm) -> `5.5 × 2.5 mm` centre-positive barrel plug to KV260 `J12` |
+| `L1004` | `ZEGMCM9070-501T` (C53154905, Coilmaster SMM9070-501 equiv.): 600 Ω at 100 MHz (450 Ω min), 6 A, 2 x 8 mΩ max (16 mΩ total), 80 V | Carries 1.89 A typ / 4.12 A rated / 4.31 A worst vs 6 A (0.057 W / 0.272 W / 0.297 W both windings). Pads 1-2 `GND`, 3-4 `+12V`, dotted ends on jack side |
+| `Q1010`, `Q1011` | `DMT10H015LFG` (100 V, 13.5 mΩ, source on `VIN_J`) + `2N7002` (>= 15 V VDS, Ciss <= 50 pF, VGS 20 V) | Reverse polarity to -60 V (SLVSE94G §8.3.5, §9.2.2.6). `Q1010` sees 57.3 V peak VDS in pulse 1 (0.011 W at 0.92 A, 0.122 W at 3.00 A, 0.137 W at 3.19 A) |
+| `U1010` | `TPS26631PWPR` (C2866319): `MODE` = `GND` (auto-retry), `SHDN` open (2.7 V internal enable), `PGTH` = `GND`, `IMON`/`FLT` open | Active current limit with 2x IOL pulse support (SLVSE94G §8.3.7.1.2). 0.026 W at 0.92 A, 0.279 W at 3.00 A, 0.315 W at 3.19 A |
+| `R1040`, `R1041`, `R1042` | 316 kΩ / 24.9 kΩ / 30.9 kΩ (Rsum = 371.8 kΩ): OVP 14.44 V rising / 13.48 V falling (±2 %), UVLO 8.00 V rising / 7.46 V falling | SLVSE94G §8.3.3 requires R1 >= 300 kΩ (316 kΩ) between `IN_SYS` and `UVLO` with reverse polarity. Equations 9-10 (§9.2.2.2) keep `+12V_KV` under KV260's 16 V `SMAJ16A` |
+| `R1043` | 6.04 kΩ (0603, 1 %): IOL = 18 kΩ·A / 6.04 kΩ = 2.98 A (2.77 to 3.19 A at ±7 %) | SLVSE94G §8.3.7.1 Equation 5. Caps KV260 at its 3.0 A brick rating while 1.12 + 3.19 = 4.31 A stays within `J1001`'s 5 A rating |
+| `C1093` | 22 nF (0603) on `dVdT`: t_dVdT = 20.8e3 x 12 V x 22 nF = 5.49 ms | SLVSE94G §8.3.1 Equation 2: controlled soft-start slew into KV260 bulk capacitance |
+| `C1094`, `C1095` | 1 uF 100 V 1206 X7R (`IN_SYS`), 10 uF 25 V 1206 X7R (`+12V_KV` at `J1004`) | High-voltage ceramic buffer (>= 67 V abs max on `IN_SYS`) + output decoupling at jumper |
+| `D1004` | `SS34` (C8678, 40 V, 3 A SMA Schottky) on `+12V_KV` to `GND` | Clamps inductive negative kick on the KV260 jumper when `U1010` opens on fault (SLVSE94G §9.5.1) |
+| `J1004` | `JST B2PS-VH` (C158007, right-angle, 10 A): pin 1 `+12V_KV`, pin 2 `GND` | Mates with `VHR-2N` / 18 AWG (15 cm) to 5.5 x 2.5 mm centre-positive barrel plug for KV260 `J12` |
+| `R1218`, `C1223` | 1 MΩ 0603 in parallel with 1 nF 2 kV X7R 1206 on `J1201` RJ45 shield to `GND` | Breaks the DC / 50 Hz earth loop to an earthed PC or switch while keeping the RF / ESD bond (`CONTROL` sheet) |
 
-**Transients (`_work/power/power_audit.py`, `docs/sim/power_transients.png`, `docs/sim/power_audit.json`).** The 4-node
+Transients (`_work/power/power_audit.py`, `docs/sim/power_transients.png`, `docs/sim/power_audit.json`). The 4-node
 backward-Euler solver models `J1001 -> L1004 -> VIN_J -> F1001/LM74502 (+12V)` in parallel with `Q1010/U1010 (+12V_KV)`
-(`D1003 SMCJ33CA` clamping through `F1001`'s `40 mΩ` and `L1004`'s `16 mΩ`):
+(`D1003` SMCJ33CA clamping through `F1001`'s 40 mΩ and `L1004`'s 16 mΩ):
 
-| Pulse / Fault | `VIN_J` min..max | `Q1010 V_DS` max | `+12V_KV` min..max | `U1010` OVP / `SMAJ16A` | Result |
+| Pulse / Fault | `VIN_J` min..max | `Q1010` VDS max | `+12V_KV` min..max | `U1010` OVP / `SMAJ16A` | Result |
 |---|---|---|---|---|---|
-| ISO 7637-2 Pulse 1 (`-150 V, 10 Ω, 2 ms`) | `-44.4..+13.4 V` | `57.3 V` (`< 100 V`) | `4.00..13.34 V` | No trip / `0 J` | **PASS** |
-| ISO 7637-2 Pulse 2a (`+112 V, 2 Ω, 50 µs`) | `+11.4..+58.5 V` | `34.5 V` | `7.86..14.03 V` | OVP @ `11.72 µs` / `0 J` | **PASS** |
-| ISO 7637-2 Pulse 3a (`-220 V, 50 Ω, 0.1 µs`) | `+13.3..+13.4 V` | `0 V` | `13.29..13.34 V` | No trip / `0 J` | **PASS** |
-| ISO 7637-2 Pulse 3b (`+150 V, 50 Ω, 0.1 µs`) | `+13.3..+13.4 V` | `0 V` | `13.29..13.34 V` | No trip / `0 J` | **PASS** |
-| ISO 16750-2 Load Dump B (suppressed `35 V`) | `+6.4..+35.0 V` | `31.1 V` | `3.91..14.42 V` | OVP @ `475 µs` / `0 J` | **PASS** |
-| ISO 16750-2 Load Dump A (`87 V` unsuppressed) | `+12.6..+55.8 V` | `52.0 V` | `3.78..14.55 V` | OVP @ `275 µs` / `D1003 116.5 J` (`> 29.7 J`) | **FAIL** (`D1003` energy) |
-| Jump start (`24 V, 60 s`, first `50 ms`) | `+13.4..+24.0 V` | `20.0 V` | `4.00..14.46 V` | OVP @ `113 µs` / `0 J` | **PASS** |
-| Reverse battery (`-14 V`, first `50 ms`) | `-30.3..+12.9 V` | `43.3 V` | `4.00..13.19 V` | Reverse blocked / `0 J` | **PASS** |
-| ISO 16750-2 Cranking Level II (`4.5 V, 15 ms`) | `+4.3..+13.4 V` | `5.9 V` | `3.85..13.34 V` | Survives sag / `0 J` | **PASS** |
+| ISO 7637-2 Pulse 1 (-150 V, 10 Ω, 2 ms) | -44.4..+13.4 V | 57.3 V (< 100 V) | 4.00..13.34 V | No trip / 0 J | **PASS** |
+| ISO 7637-2 Pulse 2a (+112 V, 2 Ω, 50 us) | +11.4..+58.5 V | 34.5 V | 7.86..14.03 V | OVP at 11.7 us / 0 J | **PASS** |
+| ISO 7637-2 Pulse 3a (-220 V, 50 Ω, 0.1 us) | +13.3..+13.4 V | 0 V | 13.29..13.34 V | No trip / 0 J | **PASS** |
+| ISO 7637-2 Pulse 3b (+150 V, 50 Ω, 0.1 us) | +13.3..+13.4 V | 0 V | 13.29..13.34 V | No trip / 0 J | **PASS** |
+| ISO 16750-2 Load Dump B (suppressed 35 V) | +6.4..+35.0 V | 31.1 V | 3.91..14.42 V | OVP at 475 us / 0 J | **PASS** |
+| ISO 16750-2 Load Dump A (87 V unsuppressed) | +12.6..+55.8 V | 52.0 V | 3.78..14.55 V | OVP at 275 us / `D1003` 116.5 J (> 29.7 J) | **FAIL** (`D1003` energy) |
+| Jump start (24 V, 60 s, first 50 ms) | +13.4..+24.0 V | 20.0 V | 4.00..14.46 V | OVP at 113 us / 0 J | **PASS** |
+| Reverse battery (-14 V, first 50 ms) | -30.3..+12.9 V | 43.3 V | 4.00..13.19 V | Reverse blocked / 0 J | **PASS** |
+| ISO 16750-2 Cranking Level II (4.5 V, 15 ms) | +4.3..+13.4 V | 5.9 V | 3.85..13.34 V | Survives sag / 0 J | **PASS** |
 
-In every fault, `+12V_KV` peaks at or below `14.55 V` (never reaching the KV260 `SMAJ16A` clamp) and `VIN_J` stays inside
-`U1010`'s `-60..+67 V` (`75 V / 10 ms`) limits.
+In every fault, `+12V_KV` peaks at or below 14.55 V (never reaching the KV260 `SMAJ16A` clamp) and `VIN_J` stays inside
+`U1010`'s -60 to +67 V (75 V for 10 ms) limits.
 
-**Common-mode noise at home (`_work/power/cm_noise.py`, `docs/sim/cm_noise.png`, `docs/sim/cm_noise.json`).** With an
-earthed SMPS brick (`120 mV` peak switching factor across `50-150 kHz`, `5 mV` VHF floor, `1.0 Ω` PE bond `[E]`,
-`1.8 m` DC cord) and earthed external cables (`1.5 m` monitor/PC lead, `5.0 m` coax, board ground `0.5 mΩ + 5 nH [E]`):
+Common-mode noise at home (`_work/power/cm_noise.py`, `docs/sim/cm_noise.png`, `docs/sim/cm_noise.json`). ![Common-mode noise attenuation](sim/cm_noise.png) With an earthed SMPS brick (120 mV peak switching factor across 50 to 150 kHz, 5 mV VHF floor, 1.0 Ω PE bond `[E]`, 1.8 m DC cord) and earthed external cables (1.5 m monitor/PC lead, 5.0 m coax, board ground 0.5 mΩ + 5 nH `[E]`):
 
-| Frequency | `|Z_L1004|` (typ) | `I_cm` combined (no -> with `L1004`) | Combined IL (min `450 Ω` corner) | Coax shield share | `V_gnd` (no -> with `L1004`) |
+| Frequency | `|Z_L1004|` (typ) | Icm combined (no -> with `L1004`) | Combined IL (min 450 Ω corner) | Coax shield share | Vgnd (no -> with `L1004`) |
 |---|---|---|---|---|---|
-| `65 kHz` | `0.82 Ω` | `39.44 -> 28.30 mA` | **`2.9 dB`** (`2.2 dB`) | `27.6 %` | `82.9 -> 59.5 µV` |
-| `100 kHz` | `1.26 Ω` | `36.58 -> 23.93 mA` | **`3.7 dB`** (`2.9 dB`) | `26.7 %` | `116.4 -> 76.1 µV` |
-| `1 MHz` | `12.57 Ω` | `1.06 -> 0.61 mA` | **`4.8 dB`** (`3.8 dB`) | `25.7 %` | `33.3 -> 19.2 µV` |
-| `10 MHz` | `124.2 Ω` | `36.2 -> 20.0 µA` | **`5.2 dB`** (`4.1 dB`) | `33.1 %` | `11.4 -> 6.3 µV` |
-| `30 MHz` | `340.9 Ω` | `19.6 -> 8.7 µA` | **`7.0 dB`** (`5.7 dB`) | `45.0 %` | `18.5 -> 8.2 µV` |
-| `100 MHz` | `600.0 Ω` | `16.9 -> 5.7 µA` | **`9.5 dB`** (`7.9 dB`) | `49.7 %` | `53.2 -> 17.9 µV` |
+| 65 kHz | 0.82 Ω | 39.44 -> 28.30 mA | 2.9 dB (2.2 dB) | 27.6 % | 82.9 -> 59.5 uV |
+| 100 kHz | 1.26 Ω | 36.58 -> 23.93 mA | 3.7 dB (2.9 dB) | 26.7 % | 116.4 -> 76.1 uV |
+| 1 MHz | 12.57 Ω | 1.06 -> 0.61 mA | 4.8 dB (3.8 dB) | 25.7 % | 33.3 -> 19.2 uV |
+| 10 MHz | 124.2 Ω | 36.2 -> 20.0 uA | 5.2 dB (4.1 dB) | 33.1 % | 11.4 -> 6.3 uV |
+| 30 MHz | 340.9 Ω | 19.6 -> 8.7 uA | 7.0 dB (5.7 dB) | 45.0 % | 18.5 -> 8.2 uV |
+| 100 MHz | 600.0 Ω | 16.9 -> 5.7 uA | 9.5 dB (7.9 dB) | 49.7 % | 53.2 -> 17.9 uV |
 
-Mains `50 Hz` Y-capacitor leakage (`230 V` across `2.2 nF [E]` = `159.0 µA rms`) meets `|Z_L1004(50 Hz)| = 4.05 mΩ`
-and leaves `0.0795 µV` across the board's ground.
+Mains 50 Hz Y-capacitor leakage (230 V across 2.2 nF `[E]` = 159.0 uA rms) meets `|Z_L1004(50 Hz)|` = 4.05 mΩ and leaves
+0.0795 uV across the board's ground.
 
-**Limits, said plainly.**
-- `L1004` adds `3-10 dB` across `65 kHz-100 MHz` (`2.9 dB` at `65 kHz`, `9.51 dB` peak at `92 MHz`), useful for cleaning
-  switching CM current on the DC cord, but it does **not** interrupt earth loops closed among an earthed PSU, monitor,
-  PC and antenna coax: fit ferrite clamps on external cables or prefer a two-prong (Class II) bench supply.
-- Unsuppressed Load Dump A (`87 V`) still overloads `D1003` (`116.5 J > 29.7 J`): vehicle installations must feed
-  `J1001` from a regulated `12 V` DC-DC converter (`>= 5 A`, `< 13.2 V`) behind a `5 A` inline fuse.
+Limits, said plainly.
+- `L1004` adds 3 to 10 dB across 65 kHz to 100 MHz (2.9 dB at 65 kHz, 9.51 dB peak at 92 MHz), useful for cleaning
+  switching CM current on the DC cord, and `R1218`/`C1223` isolate Ethernet `J1201`'s shield at DC/50 Hz, **but USB (`J1501`
+  or KV260 USB to an earthed PC) and DisplayPort (to an earthed monitor) still close ground loops**: prefer a two-prong
+  (Class II) bench brick, use a USB isolator or battery laptop on USB, and fit clip-on ferrites on earthed leads.
+- **In a vehicle, feed `J1001` from a regulated 12.0 V DC-DC converter (>= 5 A, < 13.2 V) behind a 5 A inline fuse**:
+  unsuppressed Load Dump A (87 V) exceeds `D1003`'s 29.7 J rating (116.5 J).
 
 ## 2. Decisions this sheet makes, for your approval
 

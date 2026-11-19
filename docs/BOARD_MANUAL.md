@@ -30,15 +30,16 @@ The thirteen SMAs are on the front edge (`J401`-`J952`) and the back wall (`J961
 | 14 | `J951` | top | SDR_RX_C | HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input |
 | 15 | `J952` | top | SDR_TX_C | HF transmit (SMA), no switch: AD9767 DAC2. The default HF output |
 | 16 | `J961` | top | VU_ANT | VHF/UHF antenna (SMA, back wall): the Rev08 front end, direct 30-170 MHz and converted from 300 MHz to 3 GHz (170-300 MHz not covered: the converter's 300 MHz high-pass, AUDIT_Rev08 R1), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit; prefer 3.3 V where the antenna accepts it). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed. No limiter: keep it away from a transmitter on the same vehicle (+25 dBm destroys the LNA) |
-| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH, 5 A). Single power entry for the whole module (`L1004` on both lines): feeds the adapter (11.7 W typ, 13.4 W / 1.12 A worst case; F1001 2 A PTC, 18.3 V OVP) and the KV260 through `U1010`/`J1004` (OVP 14.4 V, 3.6 A limit; up to 4.12 A rated / 4.98 A worst case combined). See POWER_SPEC section 1.4 and §6 |
+| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH, 5 A). Single power entry for both boards (`L1004` on both lines): feeds the adapter (11.7 W typical, 13.4 W / 1.12 A worst; `F1001` 2 A PTC, 18.3 V OVP) and the KV260 via `U1010`/`J1004` (3.0 A / 3.19 A max limit; 1.89 A typical, 4.12 A rated, 4.31 A worst combined). See POWER_SPEC section 1.4 and section 6 |
 | 18 | `J1002` | top | FAN 5V | Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND |
-| 19 | `J1101` | top | JTAG 2x7 2mm | Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter) |
-| 20 | `J1102` | top | Pmod | Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below |
-| 21 | `J1103` | top | AERIS ADAR | AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines |
-| 22 | `J1201` | top | HR911130C | Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone |
-| 23 | `J1501` | top | TYPE-C-31-E-17 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
-| 24 | `J1502` | top | FPC-1.0FX-15PWCR-H20 | GPS PPS and the vehicle CAN to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`); CAN TX leaves on `J9` pin 6 and RX comes back on pin 8 (PS `CAN1`, R5F core 1) |
-| 25 | `J1503` | top | BM06B-SRSS-TB | GPS receiver and vehicle CAN, JST-SH 6-pin, vertical, the plug from above: 1 GND, 2 CANL, 3 CANH, 4 GND, 5 PPS in (3.3 V), 6 +3.3 V out (0.2 A PTC) (no termination: it taps the car's bus) |
+| 19 | `J1004` | top | B2PS-VH | 12 V output to the KV260's `J12` (JST VH 2-pin right-angle, 10 A: pin 1 `+12V_KV`, pin 2 `GND`): protected by `U1010` (8.0 V UVLO, 14.4 V OVP, 3.0 A limit via `R1043` 6.04 kohm, -60 V reverse); see section 6 |
+| 20 | `J1101` | top | JTAG 2x7 2mm | Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter) |
+| 21 | `J1102` | top | Pmod | Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below |
+| 22 | `J1103` | top | AERIS ADAR | AERIS-10 beam-steering ribbon (2x20 IDC): the ADAR1000 SPI and its control lines |
+| 23 | `J1201` | top | HR911130C | Gigabit Ethernet (RJ45, magnetics and LEDs inside), from the RTL8211FS over SGMII to the FPGA: the board standalone |
+| 24 | `J1501` | top | TYPE-C-31-E-17 | Debug USB-C (vertical, on the tongue): the FPGA's console through a CH340X, 115,200 baud 8N1, powered from the cable. Lid off |
+| 25 | `J1502` | top | FPC-1.0FX-15PWCR-H20 | GPS PPS and the vehicle CAN to the KV260's `J9` (Raspberry Pi camera connector) by a 100 mm 15-way 1 mm FFC, either cable type: the pulse reaches `J9` pin 12, a PL pin (`kria_pps`); CAN TX leaves on `J9` pin 6 and RX comes back on pin 8 (PS `CAN1`, R5F core 1) |
+| 26 | `J1503` | top | BM06B-SRSS-TB | GPS receiver and vehicle CAN, JST-SH 6-pin, vertical, the plug from above: 1 GND, 2 CANL, 3 CANH, 4 GND, 5 PPS in (3.3 V), 6 +3.3 V out (0.2 A PTC) (no termination: it taps the car's bus) |
 
 ### 1.1 Pmod `J1102`
 
@@ -71,9 +72,9 @@ A Pmod cable from the KV260's `J2`. 3.3 V signals into the FPGA's bank 15, ESD-p
 
 | No. | Ref | Side | Name | What it does |
 |---|---|---|---|---|
-| 26 | `SW1101` | top | PROG | Pulls the FPGA's PROG_B: reloads the bitstream from the flash |
-| 27 | `JP1101` | top | WC | Solder jumper, open as built: close it to allow writing the board-ID EEPROM `U1105` |
-| 28 | `JP1301` | bottom | BIAS 5V0 | 3V3 | Solder jumper, bias-tee voltage for `J961`: 1-2 (as built) +5 V, 2-3 +3.3 V. The bias itself is off until the gateware turns it on |
+| 27 | `SW1101` | top | PROG | Pulls the FPGA's PROG_B: reloads the bitstream from the flash |
+| 28 | `JP1101` | top | WC | Solder jumper, open as built: close it to allow writing the board-ID EEPROM `U1105` |
+| 29 | `JP1301` | bottom | BIAS 5V0 | 3V3 | Solder jumper, bias-tee voltage for `J961`: 1-2 (as built) +5 V, 2-3 +3.3 V. The bias itself is off until the gateware turns it on |
 
 **Assembly options.** `C926`/`C927` choose what SW2's second throw reaches: as built `C927` is fitted (the VHF/UHF front end) and `C926` is not (`J922`). The Ethernet parts (`U1201`, `J1201`, `Y1201`) can be left off the BOM for a board that only runs with the Kria. The master clock mode (400 or 500 MHz) has no jumper: the FPGA programs the Si549 over I2C.
 
@@ -92,21 +93,21 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 
 | No. | Ref | Side | Colour | Meaning when lit |
 |---|---|---|---|---|
-| 29 | `D1501` | top | CFG green | FPGA configured and the clock sequencer finished |
-| 29 | `D1502` | top | CLK yellow | Master clock mode: on 500 MHz, off 400 MHz |
-| 29 | `D1503` | top | LINK green | IAS1 link to the Kria trained |
-| 29 | `D1504` | top | ADCR red | The radar ADC (AD9484) clipped since the last read (sticky) |
-| 29 | `D1505` | top | ADCS red | The SDR ADC (AD9253) clipped since the last read (sticky) |
-| 29 | `D1506` | top | LO green | The RFFC5072 synthesiser is locked |
-| 29 | `D1507` | top | TX red | A DAC is driving an SMA |
-| 29 | `D1508` | top | ERR red | Any sticky error: CRC, FIFO overflow, I2C no-acknowledge, over-temperature |
-| 29 | `D1509` | top | HB blue | Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second |
-| 30 | `D1520` | top | +12V green | +12V present (after the input protection) |
-| 30 | `D1521` | top | +5V0 green | +5V0 present |
-| 30 | `D1522` | top | +3V3_D green | +3V3_D present |
-| 30 | `D1523` | top | +1V8_D green | +1V8_D present (switched from +3V3_D by `Q1520`) |
-| 30 | `D1524` | top | +1V0 green | +1V0 (FPGA core) present (switched from +3V3_D by `Q1521`) |
-| 31 | `D1101` | top | green | DONE: the FPGA has loaded a bitstream |
+| 30 | `D1501` | top | CFG green | FPGA configured and the clock sequencer finished |
+| 30 | `D1502` | top | CLK yellow | Master clock mode: on 500 MHz, off 400 MHz |
+| 30 | `D1503` | top | LINK green | IAS1 link to the Kria trained |
+| 30 | `D1504` | top | ADCR red | The radar ADC (AD9484) clipped since the last read (sticky) |
+| 30 | `D1505` | top | ADCS red | The SDR ADC (AD9253) clipped since the last read (sticky) |
+| 30 | `D1506` | top | LO green | The RFFC5072 synthesiser is locked |
+| 30 | `D1507` | top | TX red | A DAC is driving an SMA |
+| 30 | `D1508` | top | ERR red | Any sticky error: CRC, FIFO overflow, I2C no-acknowledge, over-temperature |
+| 30 | `D1509` | top | HB blue | Heartbeat: flickers with every line the FPGA prints on the debug UART, once a second |
+| 31 | `D1520` | top | +12V green | +12V present (after the input protection) |
+| 31 | `D1521` | top | +5V0 green | +5V0 present |
+| 31 | `D1522` | top | +3V3_D green | +3V3_D present |
+| 31 | `D1523` | top | +1V8_D green | +1V8_D present (switched from +3V3_D by `Q1520`) |
+| 31 | `D1524` | top | +1V0 green | +1V0 (FPGA core) present (switched from +3V3_D by `Q1521`) |
+| 32 | `D1101` | top | green | DONE: the FPGA has loaded a bitstream |
 
 **At power-up**, in order: the five rail LEDs; DONE when the FPGA has loaded its bitstream; CFG when the clocks are running; HB flickering once a second; LINK when the Kria has trained IAS1. The RJ45's own two LEDs show the Ethernet link and activity.
 
@@ -128,69 +129,70 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 
 | No. | Ref | Side | Part | Sheet | Function |
 |---|---|---|---|---|---|
-| 32 | `U1101` | top | XC7A50T-2FTG256I | CONTROL | The front-end FPGA: converters, RF switches, link to the Kria, Ethernet, housekeeping |
-| 33 | `U1102` | top | MT25QL128ABA1ESE | CONTROL | 128 Mbit SPI flash: the FPGA's bitstream |
-| 34 | `U1103` | top | 74LVC1G07 | CONTROL | Open-drain buffer on the FPGA's PROG_B |
-| 35 | `U1104` | top | TMP1075DR | CONTROL | Board temperature sensor, I2C 0x48 |
-| 36 | `U1105` | top | M24C02-FMN6TP | CONTROL | Board-ID EEPROM (revision, serial), I2C 0x50, write-protected unless `JP1101` is closed |
-| 37 | `U1108` | top | TPD4E05U06DQAR | CONTROL | ESD array on the Pmod lines |
-| 38 | `U1109` | top | TPD4E05U06DQAR | CONTROL | ESD array on the Pmod lines |
-| 39 | `U1110` | top | TPD4E05U06DQAR | CONTROL | ESD array on the JTAG lines |
-| 40 | `U1201` | top | RTL8211FSI-CG | CONTROL | Gigabit Ethernet PHY, SGMII to the FPGA |
-| 41 | `U401` | top | ADCLK948BCPZ | CLOCK | Clock fan-out: the converters' and the FPGA's clocks from the Si549 or `J401` |
-| 42 | `U501` | top | AD9484BCPZ-500 | ADC_RADAR | 8-bit 500 MSPS ADC: the radar IF, the wideband SDR and the VHF/UHF front end |
-| 43 | `U502` | top | AD8352ACPZ | ADC_RADAR | Differential driver for the AD9484, first stage |
-| 44 | `U503` | top | AD8352ACPZ | ADC_RADAR | Differential driver for the AD9484, second stage |
-| 45 | `U601` | top | AD9253BCPZ-125 | ADC_SDR | 14-bit quad ADC, two channels used: SDR receive A and HF (C) |
-| 46 | `U602` | top | AD8352ACPZ | ADC_SDR | Driver for the AD9253 channel A |
-| 47 | `U603` | top | AD8352ACPZ | ADC_SDR | Driver for the AD9253 channel B (HF) |
-| 48 | `U701` | top | AD9708AR | DAC_RADAR | 8-bit 125 MSPS DAC: the radar chirp |
-| 49 | `U801` | top | AD9767ASTZ | DAC_SDR | Dual 14-bit 125 MSPS DAC: SDR transmit A and HF |
-| 50 | `U901` | top | M3SWA2-34DR+ | ROUTING | SW1: SDR_RX_A or AERIS_IF_A to the AD9253 channel A |
-| 51 | `U902` | top | M3SWA2-34DR+ | ROUTING | SW2: AERIS_IF or the VHF/UHF front end to the AD9484 |
-| 52 | `U903` | top | M3SWA2-34DR+ | ROUTING | SW3: the AD9767 DAC1 to SDR_TX_A or AERIS_TX_A |
-| 53 | `U904` | top | M3SWA2-34DR+ | ROUTING | SW4: the AD9708 to AERIS_TX or SDR_TX_WB |
-| 54 | `U1001` | top | LMR33630ADDA | POWER | +12V to +5V0 buck, 3 A |
-| 55 | `U1002` | top | TPS563201 | POWER | +5V0 to +3V3_D buck, 3 A (Rev08 audit, P5) |
-| 56 | `U1003` | top | TPS562201 | POWER | +5V0 to +2V5 buck (FPGA LVDS banks, feeds +1V8_A) |
-| 57 | `U1004` | top | TPS562201 | POWER | +5V0 to +1V0 buck (FPGA core) |
-| 58 | `U1005` | top | TPS7A8300RGR | POWER | +2V5 to +1V8_A LDO (the ADCs' analogue supply) |
-| 59 | `U1006` | top | TPS7A8300RGR | POWER | +3V3_D to +1V8_D LDO (FPGA VCCAUX, the ADCs' outputs) |
-| 60 | `U1007` | top | TPS7A8300RGR | POWER | +5V0 to +3V3_A LDO (the DACs' analogue supply) |
-| 61 | `U1008` | top | LM2663M | POWER | -3V3 charge pump (the RF switches' negative supply) |
-| 62 | `U1009` | bottom | LM74502-Q1 | POWER | Input protection controller: reverse battery and over-voltage cut-off, with `Q1001`/`Q1003` |
-| 63 | `U1301` | top | SPF5043Z | RX_VU | VHF/UHF low-noise amplifier |
-| 64 | `U1302` | top | PE4259 | RX_VU | LNA bypass switch, input side |
-| 65 | `U1303` | top | PE4259 | RX_VU | LNA bypass switch, output side |
-| 66 | `U1304` | top | PE42442 | RX_VU | Preselector A: band selection, input side |
-| 67 | `U1305` | top | PE42442 | RX_VU | Preselector A: band selection, output side |
-| 68 | `U1306` | top | SKY13418-485LF | RX_VU | Preselector B, input side (straight, UHF low-pass, ADS-B) |
-| 69 | `U1307` | top | SKY13418-485LF | RX_VU | Preselector B, output side |
-| 70 | `U1308` | top | PE4259 | RX_VU | Direct or converted path |
-| 71 | `U1309` | top | PE4259 | RX_VU | Direct or converted path, after the converter |
-| 72 | `U1310` | bottom | SPF5043Z | RX_VU | IF amplifier |
-| 73 | `U1311` | bottom | PE4312 | RX_VU | Digital attenuator, 0-31.5 dB |
-| 74 | `U1312` | top | RFFC5072 | RX_VU | Synthesiser and mixer: converts 300 MHz-3 GHz down to the IF (170-300 MHz not covered) |
-| 75 | `U1313` | bottom | TCA6416ARTWR | RX_VU | I/O expander 0x20: the front end's switches, bias tee and converter control |
-| 76 | `U1314` | top | AP22652W6-7 | RX_VU | Bias-tee current limiter for `J961` (125 mA) |
-| 77 | `U1315` | bottom | LP5907MFX-2.8 | RX_VU | +2V8_RF LDO for the front end (Rev08 audit, P8) |
-| 78 | `U1501` | bottom | TCA6416ARTWR | STATUS | I/O expander 0x21: the status LEDs |
-| 79 | `U1502` | top | CH340X | STATUS | USB to UART bridge for the debug console |
-| 80 | `U1503` | top | USBLC6-2SC6 | STATUS | ESD on the USB data lines |
-| 81 | `U1504` | top | LP5907MFX-3.3 | STATUS | 3.3 V LDO for the USB bridge, from the cable |
-| 82 | `U1505` | bottom | SN74LVC1G17DCKR | STATUS | GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4 |
-| 83 | `U1506` | bottom | TCAN3403DDFRQ1 | STATUS | Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8 |
-| 84 | `Y401` | top | Si549 LVPECL 3V3 pinout C | CLOCK | Programmable master oscillator, 400 or 500 MHz |
-| 85 | `Y1201` | top | 25MHz | CONTROL | Crystal for the Ethernet PHY |
-| 86 | `Y1301` | top | 26MHz 1XXD26000MAA | RX_VU | TCXO, the RFFC5072's reference |
-| 87 | `FL1301` | top | TA1090EC | RX_VU | 1090 MHz SAW filter (ADS-B path) |
-| 88 | `FL1302` | top | HFCN-1000+ | RX_VU | High-pass after the mixer |
-| 89 | `FL1303` | top | LFCN-1000+ | RX_VU | Low-pass, UHF preselector |
-| 90 | `T701` | top | ADT2-1T+ | DAC_RADAR | AD9708 output balun |
-| 91 | `T801` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC1 output balun |
-| 92 | `T802` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC2 output balun |
-| 93 | `T1301` | top | TC1-1-13M+ | RX_VU | Mixer input balun |
-| 94 | `T1302` | top | TC4-1W+ | RX_VU | Mixer output balun |
+| 33 | `U1101` | top | XC7A50T-2FTG256I | CONTROL | The front-end FPGA: converters, RF switches, link to the Kria, Ethernet, housekeeping |
+| 34 | `U1102` | top | MT25QL128ABA1ESE | CONTROL | 128 Mbit SPI flash: the FPGA's bitstream |
+| 35 | `U1103` | top | 74LVC1G07 | CONTROL | Open-drain buffer on the FPGA's PROG_B |
+| 36 | `U1104` | top | TMP1075DR | CONTROL | Board temperature sensor, I2C 0x48 |
+| 37 | `U1105` | top | M24C02-FMN6TP | CONTROL | Board-ID EEPROM (revision, serial), I2C 0x50, write-protected unless `JP1101` is closed |
+| 38 | `U1108` | top | TPD4E05U06DQAR | CONTROL | ESD array on the Pmod lines |
+| 39 | `U1109` | top | TPD4E05U06DQAR | CONTROL | ESD array on the Pmod lines |
+| 40 | `U1110` | top | TPD4E05U06DQAR | CONTROL | ESD array on the JTAG lines |
+| 41 | `U1201` | top | RTL8211FSI-CG | CONTROL | Gigabit Ethernet PHY, SGMII to the FPGA |
+| 42 | `U401` | top | ADCLK948BCPZ | CLOCK | Clock fan-out: the converters' and the FPGA's clocks from the Si549 or `J401` |
+| 43 | `U501` | top | AD9484BCPZ-500 | ADC_RADAR | 8-bit 500 MSPS ADC: the radar IF, the wideband SDR and the VHF/UHF front end |
+| 44 | `U502` | top | AD8352ACPZ | ADC_RADAR | Differential driver for the AD9484, first stage |
+| 45 | `U503` | top | AD8352ACPZ | ADC_RADAR | Differential driver for the AD9484, second stage |
+| 46 | `U601` | top | AD9253BCPZ-125 | ADC_SDR | 14-bit quad ADC, two channels used: SDR receive A and HF (C) |
+| 47 | `U602` | top | AD8352ACPZ | ADC_SDR | Driver for the AD9253 channel A |
+| 48 | `U603` | top | AD8352ACPZ | ADC_SDR | Driver for the AD9253 channel B (HF) |
+| 49 | `U701` | top | AD9708AR | DAC_RADAR | 8-bit 125 MSPS DAC: the radar chirp |
+| 50 | `U801` | top | AD9767ASTZ | DAC_SDR | Dual 14-bit 125 MSPS DAC: SDR transmit A and HF |
+| 51 | `U901` | top | M3SWA2-34DR+ | ROUTING | SW1: SDR_RX_A or AERIS_IF_A to the AD9253 channel A |
+| 52 | `U902` | top | M3SWA2-34DR+ | ROUTING | SW2: AERIS_IF or the VHF/UHF front end to the AD9484 |
+| 53 | `U903` | top | M3SWA2-34DR+ | ROUTING | SW3: the AD9767 DAC1 to SDR_TX_A or AERIS_TX_A |
+| 54 | `U904` | top | M3SWA2-34DR+ | ROUTING | SW4: the AD9708 to AERIS_TX or SDR_TX_WB |
+| 55 | `U1001` | top | LMR33630ADDA | POWER | +12V to +5V0 buck, 3 A |
+| 56 | `U1002` | top | TPS563201 | POWER | +5V0 to +3V3_D buck, 3 A (Rev08 audit, P5) |
+| 57 | `U1003` | top | TPS562201 | POWER | +5V0 to +2V5 buck (FPGA LVDS banks, feeds +1V8_A) |
+| 58 | `U1004` | top | TPS562201 | POWER | +5V0 to +1V0 buck (FPGA core) |
+| 59 | `U1005` | top | TPS7A8300RGR | POWER | +2V5 to +1V8_A LDO (the ADCs' analogue supply) |
+| 60 | `U1006` | top | TPS7A8300RGR | POWER | +3V3_D to +1V8_D LDO (FPGA VCCAUX, the ADCs' outputs) |
+| 61 | `U1007` | top | TPS7A8300RGR | POWER | +5V0 to +3V3_A LDO (the DACs' analogue supply) |
+| 62 | `U1008` | top | LM2663M | POWER | -3V3 charge pump (the RF switches' negative supply) |
+| 63 | `U1009` | bottom | LM74502-Q1 | POWER | Input protection controller: reverse battery and over-voltage cut-off, with `Q1001`/`Q1003` |
+| 64 | `U1010` | bottom | TPS26631PWPR | KVPWR | KV260 12 V output eFuse: 8.0 V UVLO, 14.4 V OVP, 3.0 A limit (`R1043` 6.04 kohm, 2.77 to 3.19 A), auto-retry, with `Q1010`/`Q1011` reverse protection |
+| 65 | `U1301` | top | SPF5043Z | RX_VU | VHF/UHF low-noise amplifier |
+| 66 | `U1302` | top | PE4259 | RX_VU | LNA bypass switch, input side |
+| 67 | `U1303` | top | PE4259 | RX_VU | LNA bypass switch, output side |
+| 68 | `U1304` | top | PE42442 | RX_VU | Preselector A: band selection, input side |
+| 69 | `U1305` | top | PE42442 | RX_VU | Preselector A: band selection, output side |
+| 70 | `U1306` | top | SKY13418-485LF | RX_VU | Preselector B, input side (straight, UHF low-pass, ADS-B) |
+| 71 | `U1307` | top | SKY13418-485LF | RX_VU | Preselector B, output side |
+| 72 | `U1308` | top | PE4259 | RX_VU | Direct or converted path |
+| 73 | `U1309` | top | PE4259 | RX_VU | Direct or converted path, after the converter |
+| 74 | `U1310` | bottom | SPF5043Z | RX_VU | IF amplifier |
+| 75 | `U1311` | bottom | PE4312 | RX_VU | Digital attenuator, 0-31.5 dB |
+| 76 | `U1312` | top | RFFC5072 | RX_VU | Synthesiser and mixer: converts 300 MHz-3 GHz down to the IF (170-300 MHz not covered) |
+| 77 | `U1313` | bottom | TCA6416ARTWR | RX_VU | I/O expander 0x20: the front end's switches, bias tee and converter control |
+| 78 | `U1314` | top | AP22652W6-7 | RX_VU | Bias-tee current limiter for `J961` (125 mA) |
+| 79 | `U1315` | bottom | LP5907MFX-2.8 | RX_VU | +2V8_RF LDO for the front end (Rev08 audit, P8) |
+| 80 | `U1501` | bottom | TCA6416ARTWR | STATUS | I/O expander 0x21: the status LEDs |
+| 81 | `U1502` | top | CH340X | STATUS | USB to UART bridge for the debug console |
+| 82 | `U1503` | top | USBLC6-2SC6 | STATUS | ESD on the USB data lines |
+| 83 | `U1504` | top | LP5907MFX-3.3 | STATUS | 3.3 V LDO for the USB bridge, from the cable |
+| 84 | `U1505` | bottom | SN74LVC1G17DCKR | STATUS | GPS PPS Schmitt buffer, drives `J1502` pins 12 and 4 |
+| 85 | `U1506` | bottom | TCAN3403DDFRQ1 | STATUS | Vehicle CAN transceiver on `J1503` pins 3 and 2, listen-only by default; TXD from the NOR pair `Q1530`/`Q1531`, RXD divided to 1.2 V for `J9` pin 8 |
+| 86 | `Y401` | top | Si549 LVPECL 3V3 pinout C | CLOCK | Programmable master oscillator, 400 or 500 MHz |
+| 87 | `Y1201` | top | 25MHz | CONTROL | Crystal for the Ethernet PHY |
+| 88 | `Y1301` | top | 26MHz 1XXD26000MAA | RX_VU | TCXO, the RFFC5072's reference |
+| 89 | `FL1301` | top | TA1090EC | RX_VU | 1090 MHz SAW filter (ADS-B path) |
+| 90 | `FL1302` | top | HFCN-1000+ | RX_VU | High-pass after the mixer |
+| 91 | `FL1303` | top | LFCN-1000+ | RX_VU | Low-pass, UHF preselector |
+| 92 | `T701` | top | ADT2-1T+ | DAC_RADAR | AD9708 output balun |
+| 93 | `T801` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC1 output balun |
+| 94 | `T802` | top | ADT2-1T+ | DAC_SDR | AD9767 DAC2 output balun |
+| 95 | `T1301` | top | TC1-1-13M+ | RX_VU | Mixer input balun |
+| 96 | `T1302` | top | TC4-1W+ | RX_VU | Mixer output balun |
 
 ## 5. Typical uses
 
@@ -206,51 +208,41 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | Debug | USB-C `J1501` (lid off), 115,200 8N1; JTAG `J1101` | Boot banner, one status line a second, `r`/`w` register commands |
 | GPS time | GPS receiver on `J1503`; FFC from `J1502` to the KV260's `J9` | `kria_pps` timestamps the pulse; R5F core 0 disciplines the converters' clock to it |
 
-## 6. Power and grounding, installation
+## 6. Powering the KV260 together with the board
 
 ![Power and grounding wiring](img/power_wiring.png)
 
-Feed the entire two-board module through **`J1001`** alone. Connect **`J1004`** (right-angle JST VH at the back edge;
-pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack **`J12`** with the short jumper (`VHR-2N`, 18 AWG, ~15 cm to a
-`5.5 × 2.5 mm` centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (`5 A` rating) and
-`L1004` (`6 A` rating) is `1.89 A` typical, `4.12 A` at the KV260's `3.0 A` brick rating (`1.12 A` adapter + `3.0 A`
-KV260), and `4.98 A` worst-case at `U1010`'s `+7 %` (`3.86 A`) current limit.
+![Ground offset and earth loops](sim/ground_offset.png)
 
-- **In a vehicle:**
-  - Fit an upstream **regulated `12.0 V` DC-DC converter** (`>= 5 A`, output strictly **below `13.2 V`** so the KV260's
-    `MP5016` eFuse stays enabled) behind a **`5 A` inline harness fuse** (increased from `3 A`).
-  - Ground both boards **only through the adapter's `J1001` return**. Never run a second chassis ground wire to the
-    KV260 (by wire, mounting strap or shield).
-  - Return the CAN/GPS cable ground (`J1503` pins 1 and 4) from the **same chassis ground point** as the DC-DC
-    converter's negative lead.
+Feed the entire two-board module through `J1001` alone. Connect `J1004` (right-angle JST VH at the back edge; pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack `J12` with the short 18 AWG jumper (VHR-2N, 15 cm to a 5.5 x 2.5 mm centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (5 A rating) and `L1004` (6 A rating) is 1.89 A typical, 4.12 A at the KV260's 3.0 A brick rating (1.12 A adapter plus 3.0 A KV260), and 4.31 A worst case at `U1010`'s +7 % limit (3.19 A from `R1043` 6.04 kohm).
 
-- **At home / on a bench:**
-  - Use **one `12 V / 5 A` wall adapter** on `J1001`, preferably a **two-prong (Class II, double-insulated)** brick with
-    no mains earth pin.
-  - If using a three-prong earthed PSU, fit **clip-on ferrite clamps** on every external earthed cable attached to the
-    module (DisplayPort monitor lead, USB or Ethernet cable to an earthed PC, and antenna coax mast lead).
+With this single entry, **the KV260's own DC return runs through the BM20 ground contacts (`J101`/`J102`) by design**: the 22 parallel BM20 ground contacts plus the FFC and Pmod conductors present 1.3 mOhm (1.29 mOhm) against the jumper's 33 mOhm (33.1 mOhm), so 96 % of the KV260's return crosses the BM20 link. That is why `U1010` limits the KV260 to its brick's 3 A rating (2.98 A nominal, 2.77 to 3.19 A).
 
-**What the module tolerates (`_work/power/ground_offset.py`, `docs/sim/ground_offset.json`).** The inter-board ground
-bond (`BM20` contacts of `J101`/`J102` + FFC + Pmod) measures only `1.29 mΩ` typical (`3.79 mΩ` max contact R), with
-`BM20` carrying `94.3 %` of link current against a **`0.30 A` per-contact rating**:
+- In a vehicle:
+  - **Feed `J1001` from an upstream regulated 12.0 V DC-DC converter (>= 5 A, output strictly below 13.2 V)** so the KV260's `MP5016` eFuse stays enabled and Load Dump A (87 V) cannot overload `D1003`, behind a 5 A inline harness fuse.
+  - **Never run a second chassis ground wire to the KV260** (by wire, mounting strap or shield); both boards return through `J1001` alone. Return the CAN/GPS cable ground (`J1503` pins 1 and 4) from the same chassis ground point as the DC-DC converter's negative lead.
+- At home / on a bench:
+  - Use one 12 V / 5 A wall adapter on `J1001`, preferably a two-prong (Class II, double-insulated) brick with no mains earth pin.
+  - Ethernet on `J1201` to an earthed PC or switch no longer closes a DC or 50 Hz earth loop (`J1201`'s shield goes to ground through `R1218` 1 Mohm in parallel with `C1223` 1 nF 2 kV).
+  - **USB does close a ground loop** (its ground is a cable conductor): when connecting the debug USB-C `J1501` or the KV260's USB to an earthed PC while running an earthed supply, use a USB isolator or a laptop on battery.
+  - DisplayPort to an earthed monitor stays a loop (189 mA per BM20 contact with 1 V rms 50 Hz between earths, inside the 300 mA rating); fit clip-on ferrites on earthed cables.
 
-| Installation / Fault case | Inter-board link current | Per `BM20` contact | Against `0.30 A` rating |
+Inter-board BM20 ground currents (`_work/power/ground_offset.py`, `docs/sim/ground_offset.json`, 0.30 A per-contact rating):
+
+| Installation / Fault case | Inter-board link current | Per BM20 contact | Against 0.30 A rating |
 |---|---|---|---|
-| Separate grounds, same point (`1.0 m / 1.0 m`) | `-0.93 A` | `0.040 A` (`40 mA`) | Pass |
-| Separate grounds, same point (`0.3 m / 2.0 m`) | `-1.96 A` | `0.084 A` (`84 mA`) | Pass |
-| Separate grounds, `1.0 V` chassis offset (`1 m` typ) | `~10.2 A` | **`0.411 A`** (`411 mA`) | **FAIL** (exceeds `0.30 A` from `0.75 V`) |
-| Separate grounds, `1.0 V` offset (`1 m`, max contact R) | `~9.9 A` | **`0.355 A`** (`355 mA`) | **FAIL** (exceeds `0.30 A` from `0.85 V`) |
-| Separate grounds, `1.0 V` offset (`0.3 m` leads, typ) | `~17.7 A` | **`0.714 A`** (`714 mA`) | **FAIL** (exceeds `0.30 A` from `0.40 V`) |
-| Separate grounds, `1.0 V` offset (`3.0 m` leads, typ) | `~5.0 A` | `0.203 A` (`203 mA`) | Pass (`0.30 A` at `1.60 V`) |
-| Separate grounds, KV260 ground wire lost | `3.00 A` | `0.129 A` (`129 mA`) | Pass (surviving jack `4.12 A`) |
-| **Single power entry (`J1001` -> `J1004` -> `J12`)** | `-2.91 A` | **`0.125 A`** (`125 mA`) | **Pass** (independent of chassis offset) |
-| Home `50 Hz` earth loop (`0.1 V` / `1.0 V`, `0.289 Ω`) | `0.35 A` / `3.46 A` | `15 mA` / `148 mA` | Pass (`173 µV` / `1.73 mV` board drop) |
-
-**Honest limits.**
-- `L1004` gives `3 to 10 dB` of common-mode attenuation (`2.9 dB` at `65 kHz`, `9.5 dB` at `100 MHz`, `docs/sim/cm_noise.json`),
-  reducing SMPS switching common-mode noise on the DC lead, but it **does not remove earth loops** closed through
-  DisplayPort, USB/Ethernet or coax shields connected to earthed equipment (`PE`).
-- Unsuppressed Load Dump A (`87 V`) exceeds `D1003`'s `29.7 J` pulse rating (`116.5 J` in `docs/sim/power_audit.json`):
-  the upstream regulated `12 V` DC-DC converter is required in a vehicle.
+| Separate grounds, same point (1.0 m / 1.0 m) | -0.93 A | 40 mA | Pass |
+| Separate grounds, same point (0.3 m / 2.0 m) | -1.96 A | 84 mA | Pass |
+| Separate grounds, 1.0 V chassis offset (1 m typ) | 10.2 A | 411 mA | Fail (exceeds 0.30 A from 0.75 V) |
+| Separate grounds, 1.0 V offset (1 m, max contact R) | 9.9 A | 355 mA | Fail (exceeds 0.30 A from 0.85 V) |
+| Separate grounds, 1.0 V offset (0.3 m leads, typ) | 17.7 A | 714 mA | Fail (exceeds 0.30 A from 0.40 V) |
+| Separate grounds, 1.0 V offset (3.0 m leads, typ) | 5.0 A | 203 mA | Pass (0.30 A at 1.60 V) |
+| Separate grounds, KV260 ground wire lost | 3.00 A | 129 mA | Pass (surviving jack 4.12 A) |
+| Single entry, typical KV260 load (0.92 A) | -0.89 A | 38 mA | Pass |
+| Single entry, at `U1010` limit (3.19 A) | -3.09 A | 132 mA | Pass (independent of chassis offset) |
+| Single entry, contacts at 100 mOhm max | -2.88 A | 109 mA | Pass |
+| Single entry, one contact at half resistance (3.19 A / 0.92 A) | -3.09 A / -0.89 A | 254 mA / 73 mA | Pass (219 mA at 2 A with one at a third; 352 mA at 3.19 A/third) |
+| Single entry, jumper ground contact open (typ / max R) | -3.21 A | 138 mA / 122 mA | Pass |
+| Home, single entry, earthed monitor 50 Hz (1.0 V / 0.1 V) | 3.27 A / 0.33 A loop | 189 mA / 133 mA | Pass (4.05 mV / 405 uV adapter drop) |
 
 Levels, bands and the register map: [ROUTING_SPEC](ROUTING_SPEC.md), [RX_VU_SPEC](RX_VU_SPEC.md), [SIGNAL_INTEGRITY](SIGNAL_INTEGRITY.md), [FPGA_GATEWARE](FPGA_GATEWARE.md), [LINK_PROTOCOL](../fpga/link/LINK_PROTOCOL.md).

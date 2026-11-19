@@ -19,7 +19,7 @@ The two remaining phase 1 items that do not depend on AMD. Both are produced by 
 ```
 As drawn on POWER (docs/POWER_SPEC.md), updated for the Rev08 RF & power audit (18 November, AUDIT_Rev08.md §2.1):
 
-+12V_IN   1.89 A typ / 4.12 A rated / 4.98 A worst case at J1001 & L1004 (single entry)
++12V_IN   1.89 A typ / 4.12 A rated / 4.31 A worst case at J1001 & L1004 (single entry)
   ├── Adapter +12V (LM74502-Q1)  1117 mA (13.4 W) worst case; 973 mA (11.7 W) typical
   │     └── LMR33630 buck → +5V0    2409 mA   and directly: AD8352 drivers (via ferrites → +5V_IFR/+5V_IFS), fan
         ├── TPS563201 → +3V3_D  1890 mA  (3 A part, was TPS562201) digital: FPGA VCCO, PHY, CAN, DAC DVDD, clock, switches, LEDs
@@ -106,10 +106,8 @@ reverse-polarity MOSFET want ≥ 1.0 A, and 2 A costs nothing extra.
 
 **Rev08 single power entry ([POWER_SPEC.md](POWER_SPEC.md) §1.4):** `J1001` (`5 A` rating) and `L1004` (`6 A` rating)
 now feed both the adapter (`1.12 A` worst case) and the KV260 through `Q1010`/`U1010`/`J1004` (`0.92 A` idle, `3.00 A`
-brick rating, `3.61 A` nominal `ILIM` / `3.86 A` max `+7 %` tolerance): **`1.89 A` typical, `4.12 A` at the `3.0 A`
-KV260 rating, `4.72 A` at nominal `ILIM`, and `4.98 A` worst-case ceiling** (`<= 5 A`), eliminating inter-board vehicle
-chassis ground loops (`125 mA/contact` vs `411 mA/contact` with separate supplies). Use a single regulated `12.0 V, >= 5 A`
-(`output < 13.2 V`) converter upstream in the vehicle behind a `5 A` inline fuse.
+brick rating, `2.98 A` nominal `ILIM` / `3.19 A` max `+7 %` tolerance from `R1043 = 6.04 kΩ`): **`1.89 A` typical, `4.12 A` at the `3.0 A`
+KV260 rating, and `4.31 A` worst case** (`<= 5 A`), eliminating inter-board vehicle chassis ground loops (`132 mA/contact` at `3.19 A` vs `411 mA/contact` with separate supplies). Use a single regulated `12.0 V, >= 5 A` (`output < 13.2 V`) converter upstream in the vehicle behind a `5 A` inline fuse.
 
 ### 1.4 Confidence: 18 verified, 6 estimated
 

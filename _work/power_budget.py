@@ -268,9 +268,9 @@ def main():
     print(f"  jack and input protection rated for >= {round(i12*MARGIN/1000*2)/2:.1f} A")
     i12_a = i12 / 1000.0
     print(f"SINGLE POWER ENTRY (J1001 5 A / L1004 6 A -> F1001 + KV260 U1010 -> J1004):")
-    print(f"  adapter worst {i12_a:.2f} A + KV260 (0.92 A idle / 3.00 A rated / 3.61 A ILIM / 3.86 A +7 %)")
+    print(f"  adapter worst {i12_a:.2f} A + KV260 (0.92 A idle / 3.00 A rated / 2.98 A nom ILIM / 3.19 A +7 %)")
     print(f"  J1001 / L1004 total: 1.89 A typ, {i12_a + 3.00:.2f} A at KV260 rating, "
-          f"{i12_a + 18.0 / 4.99:.2f} A at nominal ILIM, {i12_a + 3.86:.2f} A worst case")
+          f"{i12_a + 18.0 / 6.04:.2f} A at nominal ILIM, {i12_a + 3.19:.2f} A worst case")
 
     print()
     n_e = sum(1 for *_, c, _ in LOADS if c == "E")
