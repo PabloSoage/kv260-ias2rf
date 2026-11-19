@@ -1,4 +1,4 @@
-# 3D Model Audit & Mapping (`CSI2-KRIA-KV260_Rev01.kicad_pcb`)
+# 3D Model Audit & Mapping (`KV260-IAS2RF.kicad_pcb`)
 
 ## 1. Audit Summary
 
@@ -15,7 +15,7 @@
 > being ours, is in the repository: `mech/models3d/USB_C_HRO_TYPE-C-31-E-17.wrl`. `J1502`, the 15-way FPC receptacle,
 > uses its EasyEDA model from the cache, and so does `J1503` (LCSC C160392, toned by `_work/rev08_final_models.py`: KiCad's has a pure white housing); `U1505`, `D1530`, `F1501` and the passives use KiCad's. In the single-power-entry update, `L1004` (`mech/models3d/CMC_9070_SMD-4P_9.0x7.0mm.step`, `_work/mech/cmc_9070_model.py`) and `J1004` (`mech/models3d/JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal.step`, `_work/mech/jst_vh_model.py`) use project parametric CAD models in `mech/models3d/`, while `U1010` uses KiCad 10's base `HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm.step`. The audit below is the Rev06 one (570 footprints).
 
-An automated audit of [CSI2-KRIA-KV260_Rev01.kicad_pcb](../CSI2-KRIA-KV260_Rev01.kicad_pcb) under **KiCad 10.0.6** (KiCad's stock `share/kicad/3dmodels` library) identified:
+An automated audit of [KV260-IAS2RF.kicad_pcb](../KV260-IAS2RF.kicad_pcb) under **KiCad 10.0.6** (KiCad's stock `share/kicad/3dmodels` library) identified:
 
 - **Total footprints:** 570
 - **Broken `${KICAD10_3DMODEL_DIR}` model references:** **19** footprint instances whose `.step` path does not exist in the KiCad 10 standard installation (`Xilinx_FTG256`, `Mini-Circuits_CD542_H2.84mm`, `Oscillator_SMD_SI570_SI571_Standard`, `L_Bourns_SRP7028A_7.3x6.6mm`, `BarrelJack_CUI_PJ-102AH_Horizontal`, `Fuse_1812_4532Metric`, `HTSOP-8-1EP_...`, `QFN-20-1EP_...`, `QFN-48-1EP_...`, `LFCSP-32-1EP_...`, `LFCSP-56-1EP_...`).
@@ -61,11 +61,11 @@ All **26** missing or broken functional component instances (across **14** uniqu
 ---
 
 ## 4. Verification Procedure
-All placements, orientations (`rotate_deg`), offsets (`offset_mm`), pin-1 polarity indicators, and board-edge connector protrusions were visually inspected by patching a temporary copy of `CSI2-KRIA-KV260_Rev01.kicad_pcb` outside the repository and running `kicad-cli pcb render` (top-down, bottom-side, isometric, and zoomed close-ups on `U1101`/`T701`/`Y401`/`U501`, `U1001`/`U1007`/`F1001`/`L1010–L1030`/`J1001`, `U1201`/`J1201`, `U901`–`U904`, and `J101`/`J102`). Real repository `*.kicad_pcb` files were left untouched.
+All placements, orientations (`rotate_deg`), offsets (`offset_mm`), pin-1 polarity indicators, and board-edge connector protrusions were visually inspected by patching a temporary copy of `KV260-IAS2RF.kicad_pcb` outside the repository and running `kicad-cli pcb render` (top-down, bottom-side, isometric, and zoomed close-ups on `U1101`/`T701`/`Y401`/`U501`, `U1001`/`U1007`/`F1001`/`L1010–L1030`/`J1001`, `U1201`/`J1201`, `U901`–`U904`, and `J101`/`J102`). Real repository `*.kicad_pcb` files were left untouched.
 
 The models in `mech/models3d/` are copies of KiCad 10's official 3D library (KiCad libraries licence: CC-BY-SA 4.0 with the KiCad libraries exception), kept here because the installed KiCad on the build machine has no 3D-model package; attribution: the KiCad Library Team.
 
-**Applied (14 Nov 2026, Rev06):** all 26 mappings are written into `CSI2-KRIA-KV260_Rev01.kicad_pcb`. Models in the repo are referenced as `${KIPRJMOD}/mech/models3d/...`; the EasyEDA ones as `${KIPRJMOD}/_work/mech/cache/models3d/...` (git-ignored: a fresh clone renders those parts without a body until `easyeda2kicad` fetches them again).
+**Applied (14 Nov 2026, Rev06):** all 26 mappings are written into `KV260-IAS2RF.kicad_pcb`. Models in the repo are referenced as `${KIPRJMOD}/mech/models3d/...`; the EasyEDA ones as `${KIPRJMOD}/_work/mech/cache/models3d/...` (git-ignored: a fresh clone renders those parts without a body until `easyeda2kicad` fetches them again).
 
 ## Blender renders: STEP placement and colours (14 November)
 

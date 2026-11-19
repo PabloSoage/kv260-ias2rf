@@ -1,5 +1,5 @@
 """
-Draw rev03/ADC_RADAR.kicad_sch from coordinates.
+Draw sheets/ADC_RADAR.kicad_sch from coordinates.
 
 The connections this drawing must make are listed, separately, in
 adc_radar_spec.py; _work/check_sheet.py verifies the one against the other
@@ -28,13 +28,13 @@ import schgen                                         # noqa: E402
 from adc_radar_spec import PARTS, DATA, AVDD, DRVDD   # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
-SHEET = os.path.join(ROOT, "rev03", "ADC_RADAR.kicad_sch")
+SHEET = os.path.join(ROOT, "sheets", "ADC_RADAR.kicad_sch")
 FILE_UUID = "f516a8bf-8a6f-57ae-bb4a-d2d154fceb63"          # keep the sheet's identity
 ROOT_UUID = "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 BLOCK_UUID = "098c3043-9761-501a-810e-811ea671fbd3"          # ADC_RADAR block in the root
 
 s = schgen.Sheet(SHEET, FILE_UUID, "ADC_RADAR - AD9484 radar ADC and its AD8352 drivers",
-                 "CSI2-KRIA-KV260_Rev01", f"/{ROOT_UUID}/{BLOCK_UUID}",
+                 "KV260-IAS2RF", f"/{ROOT_UUID}/{BLOCK_UUID}",
                  generator="_work/sheets/adc_radar.py", ref_base=500)
 s.lib("kv260-ias2rf", os.path.join(ROOT, "symbols", "kv260-ias2rf.kicad_sym"))
 

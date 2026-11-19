@@ -28,7 +28,7 @@ import add_ethernet as AE                                          # noqa: E402
 from add_esd import label                                          # noqa: E402
 from rev06_eth import highest                                      # noqa: E402
 
-AE.SHEET = os.path.join(ROOT, "rev03", "ROUTING.kicad_sch")
+AE.SHEET = os.path.join(ROOT, "sheets", "ROUTING.kicad_sch")
 C0402, L0805 = "Capacitor_SMD:C_0402_1005Metric", "Inductor_SMD:L_0805_2012Metric"
 IN, N1, N2, OUT = "IF_RX_C_AAF", "AAF_C_N1", "AAF_C_N2", "IF_RX_C"
 # ref -> (lib, value, footprint, description)

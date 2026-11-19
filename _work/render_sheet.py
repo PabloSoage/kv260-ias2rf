@@ -21,14 +21,14 @@ PAPER = {"A3": (420, 297), "A2": (594, 420), "A4": (297, 210), "A1": (841, 594)}
 name, out = sys.argv[1], sys.argv[2]
 tmp = tempfile.mkdtemp()
 subprocess.run([KICAD_CLI, "sch", "export", "svg", "-o", tmp,
-                os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")], check=True,
+                os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")], check=True,
                capture_output=True)
-svg = os.path.join(tmp, f"CSI2-KRIA-KV260_Rev01-{name}.svg" if name != "root"
-                   else "CSI2-KRIA-KV260_Rev01.svg")
+svg = os.path.join(tmp, f"KV260-IAS2RF-{name}.svg" if name != "root"
+                   else "KV260-IAS2RF.svg")
 page = pymupdf.open(svg)[0]
 paper = "A3"
-for line in open(os.path.join(ROOT, "rev03", f"{name}.kicad_sch") if name != "root" else
-                 os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch"), encoding="utf-8"):
+for line in open(os.path.join(ROOT, "sheets", f"{name}.kicad_sch") if name != "root" else
+                 os.path.join(ROOT, "KV260-IAS2RF.kicad_sch"), encoding="utf-8"):
     if "(paper" in line:
         paper = line.split('"')[1]
         break

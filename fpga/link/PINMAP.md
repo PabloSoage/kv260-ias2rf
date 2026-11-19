@@ -1,6 +1,6 @@
 # IAS1-to-RF Link Pin Map & Polarity Verification
 
-**Scope:** End-to-end hardware signal trace from the RF/DAQ front-end Artix-7 (`U1101`, `XC7A50T-FTG256`) across the adapter PCB (`CSI2-KRIA-KV260_Rev01`), board-to-board connector (`J101`), KV260 carrier IAS1 connector (`J8`), carrier-side buffers/translators (`U18`, `U19`, `U72`), SOM connector (`SOM240_1`), to the Kria K26 SOM (`XCK26-SFVC784-2LV-C`), plus the two Pmod headers (`J2` on KV260 carrier and `J1102` on the adapter board).
+**Scope:** End-to-end hardware signal trace from the RF/DAQ front-end Artix-7 (`U1101`, `XC7A50T-FTG256`) across the adapter PCB (`KV260-IAS2RF`), board-to-board connector (`J101`), KV260 carrier IAS1 connector (`J8`), carrier-side buffers/translators (`U18`, `U19`, `U72`), SOM connector (`SOM240_1`), to the Kria K26 SOM (`XCK26-SFVC784-2LV-C`), plus the two Pmod headers (`J2` on KV260 carrier and `J1102` on the adapter board).
 
 **Result (link pin check):** All five differential `LINK_*` pairs land **P-on-P and N-on-N** between Artix-7 and Kria K26. There is **no** polarity inversion on any differential pair and **no** pin/direction conflict on any of the four single-ended IAS1 signals (`HK_SCL`, `HK_SDA`, `FPGA_PROG_B`, `FPGA_IRQ`).
 
@@ -13,7 +13,7 @@ Every table entry is tagged with its verification basis:
 - **`[I]` Inferred** (none required for the pin map tables below; every link row is `[M]`).
 
 Primary sources inspected:
-1. Adapter schematics & PCB: `rev03/CONTROL.kicad_sch`, `rev03/IAS_LINK.kicad_sch`, `CSI2-KRIA-KV260_Rev01.kicad_pcb`
+1. Adapter schematics & PCB: `sheets/CONTROL.kicad_sch`, `sheets/IAS_LINK.kicad_sch`, `KV260-IAS2RF.kicad_pcb`
 2. Artix-7 package pins & delays: `_work/layout/xc7a50t_ftg256_pkg_delays.csv`, `_work/layout/lvds_skew.py`
 3. KV260 carrier schematic: AMD `XTP682` (`KV260_v2/038-05058-03-A1.pdf`, sheets 6, 8, 13, 17)
 4. Vivado Board Store & K26 package definitions (`Vivado 2026.1`):
@@ -30,7 +30,7 @@ All five pairs are AC-coupled with 100 nF capacitors (`C101`–`C110`) on the ad
 - **Artix -> Kria pairs (`LINK_RX_*`):** Driven by Artix Bank 34 (`VCCO = 2.5 V`, `LVDS_25`), received by K26 Bank 66 HP (`VCCO = 1.2 V`, `PL_1V2`, AC-coupled `DIFF_SSTL12` with `ODT = RTT_48` and `EQUALIZATION` enabled per `link-decisions.md` #3).
 - **Kria -> Artix pairs (`LINK_TX_*`):** Driven by K26 Bank 66 HP (`VCCO = 1.2 V`, `DIFF_SSTL12` with `OUTPUT_IMPEDANCE = RDRV_60_60`), received by Artix Bank 14 HR (`VCCO = 3.3 V`) as `LVDS_25` inputs **without** `DIFF_TERM` (`DIFF_TERM = FALSE`, external `100 ohm` differential termination `R105`, `R106` and `10k ohm` pull-ups to `+1V2` `R101`–`R104`, `Vcm = 1.2 V`).
 
-> **Pin-ordering note on `J101` / `J8`:** On `LINK_RX_D1` (pins 29/30) and `LINK_TX_D0` (pins 26/27), the lower connector pin number carries `_N` (`29`, `26`) and the higher pin number carries `_P` (`30`, `27`) on **both** the adapter (`J101` in `CSI2-KRIA-KV260_Rev01.kicad_pcb`) and the KV260 carrier (`J8` in `XTP682` sh. 13). P still lands on P and N still lands on N.
+> **Pin-ordering note on `J101` / `J8`:** On `LINK_RX_D1` (pins 29/30) and `LINK_TX_D0` (pins 26/27), the lower connector pin number carries `_N` (`29`, `26`) and the higher pin number carries `_P` (`30`, `27`) on **both** the adapter (`J101` in `KV260-IAS2RF.kicad_pcb`) and the KV260 carrier (`J8` in `XTP682` sh. 13). P still lands on P and N still lands on N.
 
 | Signal | Dir | Artix `U1101` Ball & Function (Bank / CC) | Adapter Coupling / Term | `J101` Pin | KV260 `J8` Pin & Net (`XTP682` sh.13) | `SOM240_1` Pin (`XTP682` sh.6) | K26 `SFVC784` Ball & Function (Bank / CC) | P-on-P? | Basis |
 | :--- | :---: | :--- | :--- | :---: | :--- | :---: | :--- | :---: | :---: |
@@ -50,7 +50,7 @@ All five pairs are AC-coupled with 100 nF capacitors (`C101`–`C110`) on the ad
 - **`LINK_TX_CLK_P/N` -> Artix `N13/P13` (`IO_L11P/N_T1_SRCC_14`):** `SRCC` (Single-Region Clock Capable) in Artix-7 Bank 14. Drives `BUFIO` + `BUFR` directly in Bank 14, and `LINK_TX_D0` (`M16/N16`, `IO_L7P/N_T1_14`) sits in the same `T1` byte group of Bank 14.
 
 ### Routed PCB & Package Delays (`[M]` / `[I]`)
-Measured by `_work/layout/lvds_skew.py` on `CSI2-KRIA-KV260_Rev01.kicad_pcb` (with `_work/layout/xc7a50t_ftg256_pkg_delays.csv`), K26 SOM trace delays (`k26c/2.0/part0_pins.xml`), and KV260 carrier estimate (`kv260_carrier/2.0/board.xml` / `XTP682`):
+Measured by `_work/layout/lvds_skew.py` on `KV260-IAS2RF.kicad_pcb` (with `_work/layout/xc7a50t_ftg256_pkg_delays.csv`), K26 SOM trace delays (`k26c/2.0/part0_pins.xml`), and KV260 carrier estimate (`kv260_carrier/2.0/board.xml` / `XTP682`):
 
 | Pair | Adapter PCB + Artix Pkg P / N (ps) | K26 SOM Min–Max P / N (ps) | K26 SOM Mid P / N (ps) | KV260 Carrier `J8 <-> SOM240_1` (ps) | End-to-End Total P / N (ps) | Skew vs Ref Clock (ps) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -83,7 +83,7 @@ All `J8`/`J101` single-ended I/Os operate at **`1.8 V`** (`+1V8_D` on adapter, `
 
 These two 12-pin Pmod headers are **independent** hardware ports (not wired to each other):
 - **`J2` (KV260 Carrier, `XTP682` sh. 17):** Connected to Kria K26 Bank 45 HD (`3.3 V` via `PMOD_HDA*`).
-- **`J1102` (Adapter Board, `rev03/CONTROL.kicad_sch` / `CSI2-KRIA-KV260_Rev01.kicad_pcb`):** Connected to Artix-7 Bank 15 (`3.3 V` HR) for radar SPI / PPS / strobe debug.
+- **`J1102` (Adapter Board, `sheets/CONTROL.kicad_sch` / `KV260-IAS2RF.kicad_pcb`):** Connected to Artix-7 Bank 15 (`3.3 V` HR) for radar SPI / PPS / strobe debug.
 
 ### 3a. KV260 Carrier Pmod `J2` -> Kria K26 (`[M]`)
 

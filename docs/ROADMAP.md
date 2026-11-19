@@ -99,7 +99,7 @@ the power `[E]` marks replaced by datasheet values.
 
 ### Done: the hierarchy skeleton
 
-`_work/rev03_build_hierarchy.py` created six sheets under `rev03/` and wired their interfaces into
+`_work/rev03_build_hierarchy.py` created six sheets under `sheets/` and wired their interfaces into
 the root, **108 interface signals** in total:
 
 | Sheet | Signals | Contents |

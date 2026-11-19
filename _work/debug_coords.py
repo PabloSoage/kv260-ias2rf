@@ -1,6 +1,6 @@
 import pathlib, re
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
-ERC = ROOT / "CSI2-KRIA-KV260_Rev01-erc.rpt"
+ERC = ROOT / "KV260-IAS2RF-erc.rpt"
 SCH = ROOT / "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
 erctxt = ERC.read_text(encoding="utf-8")
 els = erctxt.splitlines()

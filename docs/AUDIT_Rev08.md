@@ -469,3 +469,19 @@ the board before them.
 - In a car, the module needs a regulated 12 V converter upstream (12.0 V, at least 5 A, output under 13.2 V) behind
   a 5 A fuse. That converter is also what covers the unsuppressed load dump (test A), which exceeds `D1003`'s
   energy rating, as it did before this change.
+
+## 7. Addendum: the PSU board and the project name (19 November 2026)
+
+- **The PSU board** ([PSU_SPEC](PSU_SPEC.md), `psu/`) feeds both boards from the battery or a bench supply, each
+  by its own cable from one ground: 38 mA a BM20 ground contact at the worst load, against 132 mA through the
+  adapter's own single entry (`ground_offset.py`, section 7). With it, the adapter's KV260 branch (`U1010` to
+  `J1004`) is not needed. The PSU has its own audit (PSU_SPEC section 10, `_work/psu/psu_audit.py`): every IC pin
+  against its data sheet, every part against the worst voltage of its nets, every resistor's dissipation. It changed
+  one part (`R4`, an anti-surge resistor) and turned the two output connectors to face the board edge. ERC 0; DRC
+  with the zones refilled and schematic parity 0 errors, 0 unconnected.
+- **The project name.** The KiCad project kept the original's name, `CSI2-KRIA-KV260_Rev01`, and its sheets sat in
+  `rev03/`; both reached the exported sheets. It is now `KV260-IAS2RF.*` with the sheets in `sheets/`, and every
+  title block carries the revision (Rev08.1). The netlist is the same apart from the title block, and the board
+  re-checked after the rename: DRC with the zones refilled and schematic parity 0 errors, 0 unconnected, 0 parity
+  issues; ERC the same 7 `pin_to_pin` warnings. The original Allied Vision Altium project stays in `PCB/` under its
+  own name.

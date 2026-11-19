@@ -28,7 +28,7 @@ is `[V]` here was measured; what is `[?]` still gates schematic sign-off.
 
 ## 2. J8 / IAS1: verified pinout
 
-Extracted from `CSI2-KRIA-KV260_Rev01.kicad_pcb`, footprint `J8_IAS0` `[V]`. Both IAS connectors on
+Extracted from `KV260-IAS2RF.kicad_pcb`, footprint `J8_IAS0` `[V]`. Both IAS connectors on
 the adapter are the same part, `AVT_KHK_Lib:J-BM20B(0.8)-34DP`, 50.040 mm apart on the X axis and
 2.8 mm from the board edge `[V]`.
 
@@ -230,7 +230,7 @@ IAS connector.
 
 ![Clearance map under the adapter](img/kv260_clearance.svg)
 
-The map is drawn in the KiCad frame of `CSI2-KRIA-KV260_Rev01.kicad_pcb`, so it reads the way the
+The map is drawn in the KiCad frame of `KV260-IAS2RF.kicad_pcb`, so it reads the way the
 board is edited. Red means something on the carrier rises through the adapter's PCB. The adapter
 sits at **0.8 mm** above the carrier (the Hirose mated height), so any part taller than that
 collides, and nothing can be fitted on the adapter's underside.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Draw rev03/CLOCK.kicad_sch from coordinates.
+Draw sheets/CLOCK.kicad_sch from coordinates.
 
 The connections this drawing must make are listed, separately, in
 clock_spec.py; _work/check_sheet.py verifies the one against the other after
@@ -30,14 +30,14 @@ import schgen                      # noqa: E402
 from clock_spec import PARTS       # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
-SHEET = os.path.join(ROOT, "rev03", "CLOCK.kicad_sch")
+SHEET = os.path.join(ROOT, "sheets", "CLOCK.kicad_sch")
 FILE_UUID = "423bdb5f-8c25-5c72-9810-ebc4bd82ce94"          # keep the sheet's identity
 ROOT_UUID = "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 BLOCK_UUID = "86907de8-dbaa-540c-95d7-38c6f0e48980"          # CLOCK block in the root
 
 s = schgen.Sheet(SHEET, FILE_UUID,
                  "CLOCK - master XO, reference select, fan-out",
-                 "CSI2-KRIA-KV260_Rev01", f"/{ROOT_UUID}/{BLOCK_UUID}",
+                 "KV260-IAS2RF", f"/{ROOT_UUID}/{BLOCK_UUID}",
                  generator="_work/sheets/clock.py")
 s.lib("kv260-ias2rf", os.path.join(ROOT, "symbols", "kv260-ias2rf.kicad_sym"))
 

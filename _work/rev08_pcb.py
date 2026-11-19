@@ -79,7 +79,7 @@ def footprints(t):
 
 # ---------------------------------------------------------------- netlist
 def netlist():
-    sch = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+    sch = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
     out = os.path.join(tempfile.mkdtemp(), "rev08.net")
     subprocess.run([KICAD_CLI, "sch", "export", "netlist", "--format", "kicadsexpr", "-o", out, sch],
                    check=True, capture_output=True)

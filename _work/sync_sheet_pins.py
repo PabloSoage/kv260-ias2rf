@@ -27,7 +27,7 @@ import sys
 import uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
 DRY = "--dry-run" in sys.argv
 NS = uuid.UUID("9d3c7a10-2b84-4f61-8e05-c7a9b6d4e312")
 

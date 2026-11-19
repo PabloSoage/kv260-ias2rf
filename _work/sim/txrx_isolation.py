@@ -34,7 +34,7 @@ import json, math, os, re, sys
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-PCB = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+PCB = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 C0 = 299792458.0
 EEFF = {"F.Cu": 3.3, "B.Cu": 3.3, "In2.Cu": 4.1, "In5.Cu": 4.1}       # microstrip / stripline, 2116 at ~4.1
 # Kb at edge gaps 0.15, 0.25, 0.35, 0.55 mm (SIGNAL_INTEGRITY 3.5)

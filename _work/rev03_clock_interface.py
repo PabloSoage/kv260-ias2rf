@@ -29,11 +29,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = uuid.UUID("0f4e5d6c-7b8a-4912-a3b4-c5d6e7f80912")
 
 CHANGES = {
-    "rev03/CONVERTERS.kicad_sch": {
+    "sheets/CONVERTERS.kicad_sch": {
         "remove": ["CLK_DAC_P", "CLK_DAC_N"],
         "add": [("DACS_IQCLK", "input"), ("DACS_IQRESET", "input")],
     },
-    "rev03/CONTROL.kicad_sch": {
+    "sheets/CONTROL.kicad_sch": {
         "remove": [],
         "add": [("DACS_IQCLK", "output"), ("DACS_IQRESET", "output"),
                 ("CLK_SEL", "output"), ("XO_SCL", "output"), ("XO_SDA", "bidirectional")],

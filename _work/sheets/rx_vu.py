@@ -1,5 +1,5 @@
 """
-Draw rev03/RX_VU.kicad_sch (Rev08, the VHF/UHF receive front end) from rx_vu_spec.py with labdraw.py, and check it
+Draw sheets/RX_VU.kicad_sch (Rev08, the VHF/UHF receive front end) from rx_vu_spec.py with labdraw.py, and check it
 with _work/check_sheet.py rx_vu. The four filters are drawn as ladders along the bottom, the way they are analysed
 (_work/sim/rev08_filters_mc.py). The root block and the other sheets' Rev08 changes: _work/rev08_schematic.py.
 

@@ -1,5 +1,5 @@
 """
-Draw rev03/DAC_SDR.kicad_sch from coordinates. Connections: dac_sdr_spec.py,
+Draw sheets/DAC_SDR.kicad_sch from coordinates. Connections: dac_sdr_spec.py,
 checked by _work/check_sheet.py dac_sdr.
 
 Layout: port 1 data and the IQ controls in from the left, the tied-low pins

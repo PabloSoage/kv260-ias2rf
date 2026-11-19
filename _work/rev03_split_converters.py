@@ -21,7 +21,7 @@ the record of intent). That script is NOT re-run; this one makes the change:
   2. writes the four new child sheets, labels only;
   3. replaces the CONVERTERS block in the root with four blocks, on an A2
      root page (A3 had no room left), and registers them in the .kicad_pro;
-  4. deletes rev03/CONVERTERS.kicad_sch (it held labels only).
+  4. deletes sheets/CONVERTERS.kicad_sch (it held labels only).
 
 Then run _work/sync_sheet_pins.py for the CONTROL and ROUTING blocks.
 
@@ -116,8 +116,8 @@ def main():
             json.dump(pro, fh, indent=2)
             fh.write("\n")
 
-    print("4. rev03/CONVERTERS.kicad_sch")
-    old = os.path.join(ROOT, "rev03", "CONVERTERS.kicad_sch")
+    print("4. sheets/CONVERTERS.kicad_sch")
+    old = os.path.join(ROOT, "sheets", "CONVERTERS.kicad_sch")
     if os.path.exists(old):
         if re.search(r'\n\t\((symbol|wire)\b', open(old, encoding="utf-8").read()):
             raise SystemExit("ABORTED: CONVERTERS has drawn content")

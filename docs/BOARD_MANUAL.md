@@ -214,7 +214,14 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 
 ![Ground offset and earth loops](sim/ground_offset.png)
 
-Feed the entire two-board module through `J1001` alone. Connect `J1004` (right-angle JST VH at the back edge; pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack `J12` with the short 18 AWG jumper (VHR-2N, 15 cm to a 5.5 x 2.5 mm centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (5 A rating) and `L1004` (6 A rating) is 1.89 A typical, 4.12 A at the KV260's 3.0 A brick rating (1.12 A adapter plus 3.0 A KV260), and 4.31 A worst case at `U1010`'s +7 % limit (3.19 A from `R1043` 6.04 kohm).
+The two boards share their ground through the BM20 connectors (22 contacts rated 0.3 A each), so they must be fed from **one supply and one ground point**; two unrelated supplies (two earthed bricks, two car ground points) drive current through those contacts (AUDIT_Rev08 section 6). There are two ways to do it:
+
+| | Adapter's `J1001` | KV260's `J12` | Adapter's `J1004` |
+|---|---|---|---|
+| **A. The PSU board** (vehicle or bench; recommended) | from the PSU's `J2` | from the PSU's `J3` | unused (its branch can be left unfitted) |
+| **B. One 12 V / 5 A brick** (bench) | the brick | jumper from `J1004` | to `J12` |
+
+Never plug a second brick into `J12`. Option B in detail: feed the entire two-board module through `J1001` alone. Connect `J1004` (right-angle JST VH at the back edge; pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack `J12` with the short 18 AWG jumper (VHR-2N, 15 cm to a 5.5 x 2.5 mm centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (5 A rating) and `L1004` (6 A rating) is 1.89 A typical, 4.12 A at the KV260's 3.0 A brick rating (1.12 A adapter plus 3.0 A KV260), and 4.31 A worst case at `U1010`'s +7 % limit (3.19 A from `R1043` 6.04 kohm).
 
 With this single entry, **the KV260's own DC return runs through the BM20 ground contacts (`J101`/`J102`) by design**: the 22 parallel BM20 ground contacts plus the FFC and Pmod conductors present 1.3 mOhm (1.29 mOhm) against the jumper's 33 mOhm (33.1 mOhm), so 96 % of the KV260's return crosses the BM20 link. That is why `U1010` limits the KV260 to its brick's 3 A rating (2.98 A nominal, 2.77 to 3.19 A).
 

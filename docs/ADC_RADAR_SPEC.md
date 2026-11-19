@@ -1,6 +1,6 @@
 # ADC_RADAR sheet: specification and review guide
 
-*24 September 2026 · `rev03/ADC_RADAR.kicad_sch` · drawn by `_work/sheets/adc_radar.py` from the
+*24 September 2026 · `sheets/ADC_RADAR.kicad_sch` · drawn by `_work/sheets/adc_radar.py` from the
 connection list in `_work/sheets/adc_radar_spec.py`*
 
 The radar receive path: the 120 MHz IF from AERIS-10 into the AD9484, through two AD8352 drivers.

@@ -3,7 +3,7 @@
 import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
-PCB = ROOT / "CSI2-KRIA-KV260_Rev01.kicad_pcb"
+PCB = ROOT / "KV260-IAS2RF.kicad_pcb"
 
 text = PCB.read_text(encoding="utf-8")
 

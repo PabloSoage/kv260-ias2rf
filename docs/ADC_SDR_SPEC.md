@@ -1,6 +1,6 @@
 # ADC_SDR sheet: specification and review guide
 
-*24 September 2026 · `rev03/ADC_SDR.kicad_sch` · drawn by `_work/sheets/adc_sdr.py` from the
+*24 September 2026 · `sheets/ADC_SDR.kicad_sch` · drawn by `_work/sheets/adc_sdr.py` from the
 connection list in `_work/sheets/adc_sdr_spec.py`*
 
 The SDR receive path: two single-ended inputs into two channels of the AD9253, each through an

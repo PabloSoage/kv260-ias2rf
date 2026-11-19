@@ -62,7 +62,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import kv260_step_locate as sl        # noqa: E402
 
-PCB_FILE = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+PCB_FILE = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 
 STACK = 0.80        # [V] BM20B(0.8): 0.8 mm mated height; the STEP part is 0.80 tall
 PCB = 1.60          # [V] board thickness in the .kicad_pcb (1.61) and the stackup
@@ -570,7 +570,7 @@ def write_svg(path, grid, nx, ny, x0, y0, g, segs, conns):
            f'<rect x="{umin:.1f}" y="{vmin:.1f}" width="{w:.1f}" height="{h:.1f}" fill="none" '
            f'stroke="#bbb" stroke-width="0.2"/>'
            f'<text x="{umin+2:.1f}" y="{vmin-3:.1f}" font-size="3.2" fill="#222">KV260 clearance '
-           f'under the adapter, in the KiCad frame of CSI2-KRIA-KV260_Rev01.kicad_pcb '
+           f'under the adapter, in the KiCad frame of KV260-IAS2RF.kicad_pcb '
            f'({CELL} mm cells)</text>'
            + '<g clip-path="url(#map)">' + "".join(rects) + carrier + som + '</g>'
            + f'<path d="{outline}" fill="none" stroke="#000" stroke-width="0.35"/>'

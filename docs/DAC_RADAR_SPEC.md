@@ -1,6 +1,6 @@
 # DAC_RADAR sheet: specification and review guide
 
-*24 September 2026 · `rev03/DAC_RADAR.kicad_sch` · drawn by `_work/sheets/dac_radar.py` from the
+*24 September 2026 · `sheets/DAC_RADAR.kicad_sch` · drawn by `_work/sheets/dac_radar.py` from the
 connection list in `_work/sheets/dac_radar_spec.py`*
 
 The radar chirp DAC: AERIS-10's AD9708 and its reconstruction filter, with a balun added so the

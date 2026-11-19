@@ -1,5 +1,5 @@
 """
-Draw rev03/STATUS.kicad_sch (Rev08: status and rail LEDs, LED expander, debug USB bridge) from status_spec.py with
+Draw sheets/STATUS.kicad_sch (Rev08: status and rail LEDs, LED expander, debug USB bridge) from status_spec.py with
 labdraw.py, and check it with _work/check_sheet.py status. Root block: _work/rev08_schematic.py.
 
 Usage:  py _work/sheets/status.py

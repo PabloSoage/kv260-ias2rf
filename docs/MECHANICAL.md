@@ -71,7 +71,7 @@ Nothing on the adapter changes: H1–H5 and their positions are as in LAYOUT §2
 python _work/mech/step2glb.py KV260V2-Starter-Kit.stp _work/mech/cache/kv260.glb 0.08
 kicad-cli pcb export glb --subst-models --include-tracks --include-pads --include-zones \
   --include-silkscreen --include-soldermask --user-origin 0x0mm -o _work/mech/cache/board.glb \
-  CSI2-KRIA-KV260_Rev01.kicad_pcb
+  KV260-IAS2RF.kicad_pcb
 blender -b --factory-startup --python _work/mech/build_mount.py -- --stl mech
 blender -b _work/mech/cache/assembly.blend --python _work/mech/render_mount.py -- iso,iso_back,rj45,sma,side
 ```

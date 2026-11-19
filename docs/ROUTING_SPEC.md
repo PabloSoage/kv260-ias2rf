@@ -1,6 +1,6 @@
 # ROUTING sheet: specification and review guide
 
-*25 September 2026 · `rev03/ROUTING.kicad_sch` · drawn by `_work/sheets/routing.py` from the
+*25 September 2026 · `sheets/ROUTING.kicad_sch` · drawn by `_work/sheets/routing.py` from the
 connection list in `_work/sheets/routing_spec.py`*
 
 Four M3SWA2-34DR+ SPDT switches between the converters and the SMAs. Each converter port goes by

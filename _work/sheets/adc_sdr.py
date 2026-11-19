@@ -1,5 +1,5 @@
 """
-Draw rev03/ADC_SDR.kicad_sch from coordinates. Connections: adc_sdr_spec.py,
+Draw sheets/ADC_SDR.kicad_sch from coordinates. Connections: adc_sdr_spec.py,
 checked by _work/check_sheet.py adc_sdr.
 
 Layout: power rows on top; channel A's chain (U602) upper left, channel B's

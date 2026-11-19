@@ -1,5 +1,5 @@
 """
-Draw rev03/CONTROL.kicad_sch from coordinates. Connections: control_spec.py,
+Draw sheets/CONTROL.kicad_sch from coordinates. Connections: control_spec.py,
 checked by _work/check_sheet.py control.
 
 A1 page. The FPGA is four units, and an FPGA sheet is read by net name: every

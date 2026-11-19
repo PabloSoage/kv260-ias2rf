@@ -1,6 +1,6 @@
 # JLCPCB order: quote
 
-*10 November 2026, bare boards re-quoted on 8 layers on 12 November, parts, assembly and bare boards for the Ethernet option (140 × 132 mm) on 13 November, parts and assembly for Rev08 on 17 November, re-priced on 18 November and on 19 November for the single power entry · board CSI2-KRIA-KV260_Rev01 · not ordered yet*
+*10 November 2026, bare boards re-quoted on 8 layers on 12 November, parts, assembly and bare boards for the Ethernet option (140 × 132 mm) on 13 November, parts and assembly for Rev08 on 17 November, re-priced on 18 November and on 19 November for the single power entry · board KV260-IAS2RF · not ordered yet*
 
 What ordering the board from JLCPCB, made and assembled, would cost today. This is a budget, not an
 order: nothing was uploaded and no cart was created. How to enter the order is in

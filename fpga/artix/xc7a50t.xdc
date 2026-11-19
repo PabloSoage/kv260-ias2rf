@@ -1,4 +1,4 @@
-# Artix-7 Constraints for U1101 (XC7A50T-FTG256-2) on CSI2-KRIA-KV260_Rev01
+# Artix-7 Constraints for U1101 (XC7A50T-FTG256-2) on KV260-IAS2RF
 # Sources: fpga/link/PINMAP.md, docs/CONTROL_SPEC.md, _work/sheets/control_spec.py
 
 set_property CFGBVS VCCO [current_design]

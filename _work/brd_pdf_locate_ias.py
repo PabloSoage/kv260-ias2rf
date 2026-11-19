@@ -25,7 +25,7 @@ import sys
 import zlib
 from collections import defaultdict
 
-IAS_SEPARATION_MM = 50.040       # [V] from CSI2-KRIA-KV260_Rev01.kicad_pcb
+IAS_SEPARATION_MM = 50.040       # [V] from KV260-IAS2RF.kicad_pcb
 BOARD_MM_RANGE = (100.0, 180.0)  # a KV260 carrier is ~140 mm on its long side
 
 

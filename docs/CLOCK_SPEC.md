@@ -2,7 +2,7 @@
 
 *23 September 2026 · first sheet drawn for Rev03 · pilot for the drawing method · **reviewed and accepted 24 September 2026***
 
-`rev03/CLOCK.kicad_sch`, drawn by `_work/sheets/clock.py` from the connection list in
+`sheets/CLOCK.kicad_sch`, drawn by `_work/sheets/clock.py` from the connection list in
 `_work/sheets/clock_spec.py`, and checked against that list by `_work/check_sheet.py`.
 
 ---

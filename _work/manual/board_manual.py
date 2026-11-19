@@ -3,7 +3,7 @@ The board manual (REV08_PLAN section 11.3): a motherboard-style reference drawn 
 
     python _work/manual/board_manual.py
 
-Reads CSI2-KRIA-KV260_Rev01.kicad_pcb as text (board_parts.py), and writes
+Reads KV260-IAS2RF.kicad_pcb as text (board_parts.py), and writes
   docs/img/manual/board_top.svg|.png, board_bottom.svg|.png   line art with numbered callouts
   docs/BOARD_MANUAL.md                                        the tables, numbered as the drawings
 Checks, and exits 1 on any failure: every designator in CATALOG exists on the board with the value written
@@ -24,7 +24,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 import board_parts                                    # noqa: E402
 
-PCB = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+PCB = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 IMG = os.path.join(ROOT, "docs", "img", "manual")
 MD = os.path.join(ROOT, "docs", "BOARD_MANUAL.md")
 
@@ -291,7 +291,7 @@ def draw(parts, edge, side, nums):
              color="#c0392b")
     fig.text(0.58, 0.24, "Numbers: the tables of docs/BOARD_MANUAL.md. Shaded: the parts the tables describe.",
              fontsize=9, color="#334e68")
-    fig.text(0.58, 0.21, "Drawn by _work/manual/board_manual.py from CSI2-KRIA-KV260_Rev01.kicad_pcb.",
+    fig.text(0.58, 0.21, "Drawn by _work/manual/board_manual.py from KV260-IAS2RF.kicad_pcb.",
              fontsize=9, color="#334e68")
     os.makedirs(IMG, exist_ok=True)
     for ext in ("svg", "png"):
@@ -411,7 +411,18 @@ def md(parts, nums):
     w("")
     w("![Ground offset and earth loops](sim/ground_offset.png)")
     w("")
-    w("Feed the entire two-board module through `J1001` alone. Connect `J1004` (right-angle JST VH at the back edge; "
+    w("The two boards share their ground through the BM20 connectors (22 contacts rated 0.3 A each), so they must be fed "
+      "from **one supply and one ground point**; two unrelated supplies (two earthed bricks, two car ground points) drive "
+      "current through those contacts (AUDIT_Rev08 section 6). There are two ways to do it:")
+    w("")
+    w("| | Adapter's `J1001` | KV260's `J12` | Adapter's `J1004` |")
+    w("|---|---|---|---|")
+    w("| **A. The PSU board** (vehicle or bench; recommended) | from the PSU's `J2` | from the PSU's `J3` | unused (its "
+      "branch can be left unfitted) |")
+    w("| **B. One 12 V / 5 A brick** (bench) | the brick | jumper from `J1004` | to `J12` |")
+    w("")
+    w("Never plug a second brick into `J12`. Option B in detail: feed the entire two-board module through `J1001` "
+      "alone. Connect `J1004` (right-angle JST VH at the back edge; "
       "pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack `J12` with the short 18 AWG jumper (VHR-2N, 15 cm to a "
       "5.5 x 2.5 mm centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (5 A rating) and "
       "`L1004` (6 A rating) is 1.89 A typical, 4.12 A at the KV260's 3.0 A brick rating (1.12 A adapter plus 3.0 A KV260), "

@@ -5,8 +5,8 @@
 	(uuid "56c49378-41a8-4cbc-b1f4-3d0ea65d2366")
 	(paper "A2")
 	(title_block
-		(title "KV260-IAS2RF — Complete Connected System Architecture")
-		(rev "1.0")
+		(title "KV260-IAS2RF: complete connected system")
+		(rev "Rev08.1")
 		(company "KV260-IAS2RF")
 		(comment 1 "8-Layer RF/Radar/SDR Front-End for Kria KV260 (Apache-2.0)")
 	)
@@ -530,7 +530,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "CSI2-KRIA-KV260_Rev01-altium-import:GND_BAR"
+		(symbol "KV260-IAS2RF-altium-import:GND_BAR"
 			(power global)
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -649,7 +649,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "CSI2-KRIA-KV260_Rev01-altium-import:VCC5V-EXT_CIRCLE"
+		(symbol "KV260-IAS2RF-altium-import:VCC5V-EXT_CIRCLE"
 			(power global)
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -4597,7 +4597,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/IAS_LINK.kicad_sch"
+		(property "Sheetfile" "sheets/IAS_LINK.kicad_sch"
 			(at 25.4 69.38 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4749,7 +4749,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "2")
 				)
@@ -4785,7 +4785,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/CONTROL.kicad_sch"
+		(property "Sheetfile" "sheets/CONTROL.kicad_sch"
 			(at 157.48 193.84 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5637,7 +5637,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "3")
 				)
@@ -5673,7 +5673,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/CLOCK.kicad_sch"
+		(property "Sheetfile" "sheets/CLOCK.kicad_sch"
 			(at 25.4 107.48 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5775,7 +5775,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "4")
 				)
@@ -5811,7 +5811,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/ADC_RADAR.kicad_sch"
+		(property "Sheetfile" "sheets/ADC_RADAR.kicad_sch"
 			(at 320.04 97.32 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6083,7 +6083,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "5")
 				)
@@ -6119,7 +6119,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/ADC_SDR.kicad_sch"
+		(property "Sheetfile" "sheets/ADC_SDR.kicad_sch"
 			(at 320.04 143.04 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6281,7 +6281,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "6")
 				)
@@ -6317,7 +6317,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/DAC_RADAR.kicad_sch"
+		(property "Sheetfile" "sheets/DAC_RADAR.kicad_sch"
 			(at 320.04 178.6 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6429,7 +6429,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "7")
 				)
@@ -6465,7 +6465,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/DAC_SDR.kicad_sch"
+		(property "Sheetfile" "sheets/DAC_SDR.kicad_sch"
 			(at 320.04 237.02 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6677,7 +6677,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "8")
 				)
@@ -6713,7 +6713,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/ROUTING.kicad_sch"
+		(property "Sheetfile" "sheets/ROUTING.kicad_sch"
 			(at 459.74 145.58 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6835,7 +6835,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "9")
 				)
@@ -6871,7 +6871,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/POWER.kicad_sch"
+		(property "Sheetfile" "sheets/POWER.kicad_sch"
 			(at 25.4 290.36 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6913,7 +6913,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "10")
 				)
@@ -6949,7 +6949,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/RX_VU.kicad_sch"
+		(property "Sheetfile" "sheets/RX_VU.kicad_sch"
 			(at 459.74 173.52 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6991,7 +6991,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "11")
 				)
@@ -7087,7 +7087,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/STATUS.kicad_sch"
+		(property "Sheetfile" "sheets/STATUS.kicad_sch"
 			(at 459.74 204.00 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7139,7 +7139,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "12")
 				)
@@ -7315,7 +7315,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Sheetfile" "rev03/KVPWR.kicad_sch"
+		(property "Sheetfile" "sheets/KVPWR.kicad_sch"
 			(at 101.6 280.20 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7357,7 +7357,7 @@
 			)
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(page "13")
 				)

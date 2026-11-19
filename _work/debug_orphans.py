@@ -1,5 +1,5 @@
 import pathlib, re, collections
-t = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\CSI2-KRIA-KV260_Rev01-erc.rpt").read_text(encoding='utf-8').splitlines()
+t = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260\KV260-IAS2RF-erc.rpt").read_text(encoding='utf-8').splitlines()
 hits = []
 headers = ('[pin_not_connected]','[label_dangling]','[wire_dangling]','[unconnected_wire_endpoint]','[no_connect_dangling]','[isolated_pin_label]')
 i = 0

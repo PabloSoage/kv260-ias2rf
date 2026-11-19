@@ -6,7 +6,7 @@
 	(paper "A2")
 	(title_block
 		(title "POWER - 12 V input, protection, bucks, LDOs, -3V3")
-		(rev "1.0")
+		(rev "Rev08.1")
 		(company "KV260-IAS2RF")
 		(comment 1 "Automotive 12 V Input Protection, Bucks, LDOs & Fan Header")
 	)
@@ -6478,7 +6478,7 @@
 			(uuid "b1e20ad3-e01b-52af-8dbd-1a946e0fea41")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "J1001")
 					(unit 1)
@@ -6546,7 +6546,7 @@
 			(uuid "028e0a48-c002-5436-839d-d4265f15c2c9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1002")
 					(unit 1)
@@ -6615,7 +6615,7 @@
 			(uuid "5ae0ec6e-0dbe-566a-93e2-eb455e4d6098")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "F1001")
 					(unit 1)
@@ -6695,7 +6695,7 @@
 			(uuid "c76a7d04-0a8d-47b7-bc15-b864372e50e9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "Q1001")
 					(unit 1)
@@ -6764,7 +6764,7 @@
 			(uuid "64be3709-b2ce-5806-8423-87929fead28c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "D1001")
 					(unit 1)
@@ -6831,7 +6831,7 @@
 			(uuid "108d3815-8fa8-5c6b-ba50-887dc3e6335d")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1004")
 					(unit 1)
@@ -6902,7 +6902,7 @@
 			(uuid "8a662a5c-b4bc-5717-8b05-af554bd6495e")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1001")
 					(unit 1)
@@ -6969,7 +6969,7 @@
 			(uuid "4fc4e0dd-d7f6-5d53-ae74-899ccc1b8e37")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1005")
 					(unit 1)
@@ -7037,7 +7037,7 @@
 			(uuid "3d4e7feb-e960-5be2-bec7-8851801c25a3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1006")
 					(unit 1)
@@ -7104,7 +7104,7 @@
 			(uuid "bf52babf-5cbd-515b-949b-30c5c2e66043")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1007")
 					(unit 1)
@@ -7196,7 +7196,7 @@
 			(uuid "d5659fe4-984d-503e-9151-0214a402a64a")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1001")
 					(unit 1)
@@ -7263,7 +7263,7 @@
 			(uuid "51d6545e-ec01-5195-88bf-49bdd13b8608")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1008")
 					(unit 1)
@@ -7334,7 +7334,7 @@
 			(uuid "5099ad23-895a-59e0-afed-261c60039207")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1002")
 					(unit 1)
@@ -7401,7 +7401,7 @@
 			(uuid "c32695e1-7fa4-5092-8bb9-586b58a56b5c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1009")
 					(unit 1)
@@ -7472,7 +7472,7 @@
 			(uuid "91dcd1b4-dfa6-5fa1-a405-9cb5b2d07b86")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1003")
 					(unit 1)
@@ -7539,7 +7539,7 @@
 			(uuid "07b2a993-cd63-5e67-b952-6ffd3dd9dfe9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1010")
 					(unit 1)
@@ -7610,7 +7610,7 @@
 			(uuid "e8be5418-ccc8-561b-8928-913cac627773")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1004")
 					(unit 1)
@@ -7677,7 +7677,7 @@
 			(uuid "b1433573-faec-5329-9932-5bb8d971774c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1011")
 					(unit 1)
@@ -7748,7 +7748,7 @@
 			(uuid "9934fe90-a3b7-5500-8bbb-218153f8253c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1005")
 					(unit 1)
@@ -7817,7 +7817,7 @@
 			(uuid "71aa617b-6140-5dde-a27e-357a3c4acc6c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "L1001")
 					(unit 1)
@@ -7888,7 +7888,7 @@
 			(uuid "328bc98a-0ee9-5a14-a506-7c0954100bed")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1002")
 					(unit 1)
@@ -7959,7 +7959,7 @@
 			(uuid "b565a3da-d16a-5d85-810a-b2ed972a17b6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1003")
 					(unit 1)
@@ -8026,7 +8026,7 @@
 			(uuid "5938e596-5e3f-5381-8dc2-fc93c464d1ce")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1012")
 					(unit 1)
@@ -8097,7 +8097,7 @@
 			(uuid "63e99f7e-2f00-5427-8b9e-ca8158b04915")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1006")
 					(unit 1)
@@ -8164,7 +8164,7 @@
 			(uuid "bff7bdc7-5cfb-5b2f-be99-384345bb59b6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1013")
 					(unit 1)
@@ -8235,7 +8235,7 @@
 			(uuid "f3df4495-82cd-5294-86de-cfefb965c1d4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1007")
 					(unit 1)
@@ -8302,7 +8302,7 @@
 			(uuid "db5910df-969a-58fd-944f-7b81a53a1274")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1014")
 					(unit 1)
@@ -8373,7 +8373,7 @@
 			(uuid "f34740a5-41e3-5943-93c5-50c7265a98af")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1008")
 					(unit 1)
@@ -8440,7 +8440,7 @@
 			(uuid "b15420d8-8e64-506a-b1cd-b0ba39e5ca20")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1015")
 					(unit 1)
@@ -8511,7 +8511,7 @@
 			(uuid "a0c2e96d-9d7f-5778-abcf-9e5badfaa025")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1009")
 					(unit 1)
@@ -8578,7 +8578,7 @@
 			(uuid "1b5891e5-8ed9-5f27-a732-b8f32da0ac62")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1016")
 					(unit 1)
@@ -8646,7 +8646,7 @@
 			(uuid "12ddc654-be43-58f9-8173-6994f93962fe")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1017")
 					(unit 1)
@@ -8713,7 +8713,7 @@
 			(uuid "7ae83218-4652-53d6-8e1a-9814b2472297")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1018")
 					(unit 1)
@@ -8780,7 +8780,7 @@
 			(uuid "1acb1741-9b3a-58dd-bce6-3a6bcfd21ae9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1019")
 					(unit 1)
@@ -8863,7 +8863,7 @@
 			(uuid "69bf68ef-d7ef-51ef-a803-296f0efc5999")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1002")
 					(unit 1)
@@ -8930,7 +8930,7 @@
 			(uuid "b49c52df-c569-5228-b53c-c43cd1ad5110")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1020")
 					(unit 1)
@@ -9001,7 +9001,7 @@
 			(uuid "b048a94d-7185-5967-b8fb-d68fb68080c3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1010")
 					(unit 1)
@@ -9068,7 +9068,7 @@
 			(uuid "b89cb751-8c3b-5d21-b87d-8936687e92b2")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1021")
 					(unit 1)
@@ -9139,7 +9139,7 @@
 			(uuid "9cd78940-18e0-5de6-93f8-d1f1958c1a49")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1011")
 					(unit 1)
@@ -9206,7 +9206,7 @@
 			(uuid "be0e43af-057a-5592-868f-fbde2da6b33b")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1022")
 					(unit 1)
@@ -9277,7 +9277,7 @@
 			(uuid "ec4a70e0-f4e1-5891-bbe7-c6af0dc624c4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1010")
 					(unit 1)
@@ -9348,7 +9348,7 @@
 			(uuid "1e1da7b3-a978-5eab-8565-085b991d4844")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1012")
 					(unit 1)
@@ -9417,7 +9417,7 @@
 			(uuid "eab28fd6-f93f-59ee-90a3-2ee9906089e2")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "L1010")
 					(unit 1)
@@ -9488,7 +9488,7 @@
 			(uuid "0b44febc-6ca2-5407-9b88-10ddd47075ef")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1011")
 					(unit 1)
@@ -9559,7 +9559,7 @@
 			(uuid "f9345d0f-d080-53e7-ba07-df4eab9c9e6c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1012")
 					(unit 1)
@@ -9626,7 +9626,7 @@
 			(uuid "58f78531-fb52-5310-9c9b-c86845d29ac3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1023")
 					(unit 1)
@@ -9697,7 +9697,7 @@
 			(uuid "f0750147-d6b3-5b7c-b0b2-9f5f7c7fdd8c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1013")
 					(unit 1)
@@ -9764,7 +9764,7 @@
 			(uuid "52ae37a3-12ef-5d81-a958-aa285cbfb1d8")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1024")
 					(unit 1)
@@ -9835,7 +9835,7 @@
 			(uuid "1c762ada-8105-560b-95ff-ef12e7fe49c2")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1014")
 					(unit 1)
@@ -9902,7 +9902,7 @@
 			(uuid "23f6c26e-31be-545d-ba19-7633571addb8")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1025")
 					(unit 1)
@@ -9970,7 +9970,7 @@
 			(uuid "fba1e08f-6fac-5c06-88e2-3e995ba702f1")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1026")
 					(unit 1)
@@ -10037,7 +10037,7 @@
 			(uuid "75cac5f6-f5f4-5f9f-a1b0-b8397ae088a7")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1027")
 					(unit 1)
@@ -10104,7 +10104,7 @@
 			(uuid "ee7ba7e5-4483-5a3e-841d-7f4b116dbe4f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1028")
 					(unit 1)
@@ -10187,7 +10187,7 @@
 			(uuid "6dd1bc9e-b61d-52f6-ab09-ff08de931817")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1003")
 					(unit 1)
@@ -10254,7 +10254,7 @@
 			(uuid "953e3577-5154-5f16-8f24-669ffaeeb3e0")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1029")
 					(unit 1)
@@ -10325,7 +10325,7 @@
 			(uuid "c473f0ab-b0a3-5451-a2df-490ef15f0e90")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1020")
 					(unit 1)
@@ -10392,7 +10392,7 @@
 			(uuid "cf0ffa31-e0bf-5aa7-a8a6-599b919c6e4d")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1030")
 					(unit 1)
@@ -10463,7 +10463,7 @@
 			(uuid "7ca18b01-6285-5b6e-822c-9f6f5932efb3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1021")
 					(unit 1)
@@ -10530,7 +10530,7 @@
 			(uuid "1e7362c0-7db4-5d94-9954-232ae4a6bf3b")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1031")
 					(unit 1)
@@ -10601,7 +10601,7 @@
 			(uuid "ca5049f7-e5f4-5fd8-bf90-451f6b9c65ec")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1020")
 					(unit 1)
@@ -10672,7 +10672,7 @@
 			(uuid "7f67a4bd-2c48-586d-b585-deaf8e680e32")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1022")
 					(unit 1)
@@ -10741,7 +10741,7 @@
 			(uuid "cc6ab87b-60de-5909-855f-8ebe8774cdbc")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "L1020")
 					(unit 1)
@@ -10812,7 +10812,7 @@
 			(uuid "1683bc43-8041-51ff-8824-7f99ef51f9ef")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1021")
 					(unit 1)
@@ -10883,7 +10883,7 @@
 			(uuid "4117e3e0-96dd-51ba-a80e-ffef4a333475")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1022")
 					(unit 1)
@@ -10950,7 +10950,7 @@
 			(uuid "96167ed6-645d-5b99-9cfb-cd24fd344102")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1032")
 					(unit 1)
@@ -11021,7 +11021,7 @@
 			(uuid "172c9e23-14da-5357-a357-2d9b642b3de3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1023")
 					(unit 1)
@@ -11088,7 +11088,7 @@
 			(uuid "63f6254e-863d-55a4-b615-db17a40ca1f6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1033")
 					(unit 1)
@@ -11159,7 +11159,7 @@
 			(uuid "e49faa51-03b2-58f3-ae85-85b5233ce8f4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1024")
 					(unit 1)
@@ -11226,7 +11226,7 @@
 			(uuid "eb820c4c-ebfe-5f81-abdb-76a80ef23013")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1034")
 					(unit 1)
@@ -11294,7 +11294,7 @@
 			(uuid "82c8dc07-2db3-5162-b357-9129479e94b7")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1035")
 					(unit 1)
@@ -11361,7 +11361,7 @@
 			(uuid "e1af08ac-7af5-507b-bbbe-ca9bae2613e4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1036")
 					(unit 1)
@@ -11428,7 +11428,7 @@
 			(uuid "4c760ccf-5c3b-5fb9-b6c9-113ed0f93526")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1037")
 					(unit 1)
@@ -11511,7 +11511,7 @@
 			(uuid "b7e8fec6-b38d-5f9e-9fd3-849cbc674353")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1004")
 					(unit 1)
@@ -11578,7 +11578,7 @@
 			(uuid "eef8520b-7688-5f24-829b-45c0b4fcd8e5")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1038")
 					(unit 1)
@@ -11649,7 +11649,7 @@
 			(uuid "7416e5b4-15f4-5eda-a2ca-710d89df9c27")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1030")
 					(unit 1)
@@ -11716,7 +11716,7 @@
 			(uuid "a378dff7-c065-5f63-abd8-44060ae20cc3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1039")
 					(unit 1)
@@ -11787,7 +11787,7 @@
 			(uuid "886c8efc-4d7c-52bc-ba53-8188f622d888")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1031")
 					(unit 1)
@@ -11854,7 +11854,7 @@
 			(uuid "e60c3757-b11b-5c80-9805-cea0fa2f8a99")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1040")
 					(unit 1)
@@ -11925,7 +11925,7 @@
 			(uuid "fc1e49c5-6c9c-5f0c-9f7b-257d8b9069d6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1030")
 					(unit 1)
@@ -11996,7 +11996,7 @@
 			(uuid "af615973-a9dc-5649-b498-72383465da72")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1032")
 					(unit 1)
@@ -12065,7 +12065,7 @@
 			(uuid "2b104a7e-aa5c-545c-adb4-32092605399b")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "L1030")
 					(unit 1)
@@ -12136,7 +12136,7 @@
 			(uuid "5c364312-b7a4-5a71-aa7a-ab3952db424c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1031")
 					(unit 1)
@@ -12207,7 +12207,7 @@
 			(uuid "0f046b90-0721-55af-b7ab-6cfa6420c811")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1032")
 					(unit 1)
@@ -12274,7 +12274,7 @@
 			(uuid "060b9468-be46-5908-a2dc-be65ae7dae28")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1041")
 					(unit 1)
@@ -12345,7 +12345,7 @@
 			(uuid "f1211756-e8a6-581e-b050-9d9383775eb8")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1033")
 					(unit 1)
@@ -12412,7 +12412,7 @@
 			(uuid "c218d949-4342-5237-a272-228ef7dce966")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1042")
 					(unit 1)
@@ -12483,7 +12483,7 @@
 			(uuid "26ca5b9a-3fc2-53b2-8493-9ba9c95bc8a2")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1034")
 					(unit 1)
@@ -12550,7 +12550,7 @@
 			(uuid "b8c4a330-fd82-5992-bfc8-4c6f85132f99")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1043")
 					(unit 1)
@@ -12618,7 +12618,7 @@
 			(uuid "46a45b90-b636-5768-80e4-ba9eb5eed0e1")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1044")
 					(unit 1)
@@ -12685,7 +12685,7 @@
 			(uuid "866fd537-c314-54e8-bc57-f8e498c5d63f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1045")
 					(unit 1)
@@ -12752,7 +12752,7 @@
 			(uuid "78de11ca-91b5-5d40-9dab-339bdf585b3e")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1046")
 					(unit 1)
@@ -12880,7 +12880,7 @@
 			(uuid "55ac2046-7512-5d24-b8b8-59d17bfb00d0")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1005")
 					(unit 1)
@@ -12947,7 +12947,7 @@
 			(uuid "f90d08ec-2346-56b8-a44f-a01a545223a0")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1047")
 					(unit 1)
@@ -13018,7 +13018,7 @@
 			(uuid "a416b1d6-64ca-508d-afe4-044a25efbb0e")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1040")
 					(unit 1)
@@ -13085,7 +13085,7 @@
 			(uuid "1e5bfd52-c2e2-542f-97f4-52125e3ee047")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1048")
 					(unit 1)
@@ -13156,7 +13156,7 @@
 			(uuid "c788c6fd-0cdf-5777-bfb6-57bf90df6ee4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1041")
 					(unit 1)
@@ -13223,7 +13223,7 @@
 			(uuid "1ae374bd-aad7-5a41-8217-c17428d63713")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1049")
 					(unit 1)
@@ -13294,7 +13294,7 @@
 			(uuid "eee7a215-fbf2-590e-aee4-82ba35481b12")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1042")
 					(unit 1)
@@ -13365,7 +13365,7 @@
 			(uuid "60344949-dd07-5a9a-a2a1-df2a3e8524f4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1043")
 					(unit 1)
@@ -13432,7 +13432,7 @@
 			(uuid "13492adb-e40f-55e9-a39f-d2ef9785a7e9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1050")
 					(unit 1)
@@ -13499,7 +13499,7 @@
 			(uuid "e888ecf6-22fb-5697-b62c-dc83d37fcf6e")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1051")
 					(unit 1)
@@ -13566,7 +13566,7 @@
 			(uuid "c76cdeab-26b1-5937-8b76-367e6d7953ff")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1052")
 					(unit 1)
@@ -13694,7 +13694,7 @@
 			(uuid "dc3972e5-ae89-5f08-9374-070521cf497f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1006")
 					(unit 1)
@@ -13761,7 +13761,7 @@
 			(uuid "b1ab4d00-d5ae-52b7-a960-7dd5af61894a")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1053")
 					(unit 1)
@@ -13832,7 +13832,7 @@
 			(uuid "b189e577-06b2-5fff-8913-af92a4fb67f1")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1050")
 					(unit 1)
@@ -13899,7 +13899,7 @@
 			(uuid "b1640976-1a75-56b2-9479-c0b4557c9a27")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1054")
 					(unit 1)
@@ -13970,7 +13970,7 @@
 			(uuid "ff412502-bfc2-5d8e-a8ac-52a8e81cece7")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1051")
 					(unit 1)
@@ -14037,7 +14037,7 @@
 			(uuid "3d38631a-f73c-5cf5-8002-797f7f7fa157")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1055")
 					(unit 1)
@@ -14108,7 +14108,7 @@
 			(uuid "815d9c97-5e56-57f6-822c-a4c106796358")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1052")
 					(unit 1)
@@ -14179,7 +14179,7 @@
 			(uuid "ddd55a8b-22cf-5f89-ad0b-c58ef1179663")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1053")
 					(unit 1)
@@ -14246,7 +14246,7 @@
 			(uuid "5defc1e6-92e2-57c4-ab0c-c2dca6c6c1a3")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1056")
 					(unit 1)
@@ -14313,7 +14313,7 @@
 			(uuid "fcedd809-992b-5547-8bc9-ce1bdefb3f8c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1057")
 					(unit 1)
@@ -14380,7 +14380,7 @@
 			(uuid "c5e394f9-247a-5e5d-b648-25b4cee3da59")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1058")
 					(unit 1)
@@ -14508,7 +14508,7 @@
 			(uuid "046282c4-a98e-5c24-b613-0094d3270db6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1007")
 					(unit 1)
@@ -14575,7 +14575,7 @@
 			(uuid "9a9a269a-5085-5e44-8e8f-5ede12cd4804")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1059")
 					(unit 1)
@@ -14646,7 +14646,7 @@
 			(uuid "adc525f8-8cab-5595-916f-de723bb1ba8f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1060")
 					(unit 1)
@@ -14713,7 +14713,7 @@
 			(uuid "7d7fdfba-7406-5a40-8efe-772929267a3b")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1060")
 					(unit 1)
@@ -14784,7 +14784,7 @@
 			(uuid "4027cca9-1c35-5457-93c6-2c04ebe23456")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1061")
 					(unit 1)
@@ -14851,7 +14851,7 @@
 			(uuid "d8ba7aa7-ec04-584f-901a-d842a85c540e")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1061")
 					(unit 1)
@@ -14922,7 +14922,7 @@
 			(uuid "9be43845-f580-503d-85bc-000e26f4ab7c")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1062")
 					(unit 1)
@@ -14993,7 +14993,7 @@
 			(uuid "5a38c7b9-3120-5150-81d6-488544162eae")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1063")
 					(unit 1)
@@ -15060,7 +15060,7 @@
 			(uuid "7e94b27f-6b6f-5be1-9128-2725eb3abb93")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1062")
 					(unit 1)
@@ -15127,7 +15127,7 @@
 			(uuid "816e9532-45c0-58d3-9dc3-28aaf6491a56")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1063")
 					(unit 1)
@@ -15194,7 +15194,7 @@
 			(uuid "9633bd0a-d4a4-58c2-855e-f4b65686e8a9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1064")
 					(unit 1)
@@ -15283,7 +15283,7 @@
 			(uuid "edfce75d-b6cb-5b5c-ba21-8f1a7f4e81eb")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1008")
 					(unit 1)
@@ -15350,7 +15350,7 @@
 			(uuid "3b737138-70e0-588b-9b63-1555b676adac")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1065")
 					(unit 1)
@@ -15421,7 +15421,7 @@
 			(uuid "79cd6faa-5cab-5c33-a9d4-5e791627bdf4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1070")
 					(unit 1)
@@ -15488,7 +15488,7 @@
 			(uuid "9651d1ac-4aa3-54d7-9f66-f521ae8a7cb7")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1066")
 					(unit 1)
@@ -15555,7 +15555,7 @@
 			(uuid "bd19156d-25aa-5baa-8c19-c9bb2115647a")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1067")
 					(unit 1)
@@ -15626,7 +15626,7 @@
 			(uuid "32ce962f-b1f4-5433-8840-ffa0766e8ce6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1071")
 					(unit 1)
@@ -15697,7 +15697,7 @@
 			(uuid "3885f524-2a05-537c-bf1a-011d1ad176c9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1072")
 					(unit 1)
@@ -15764,7 +15764,7 @@
 			(uuid "3821d6ee-1139-5333-9a58-74e01bfc006d")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1068")
 					(unit 1)
@@ -15831,7 +15831,7 @@
 			(uuid "805e6f3d-0698-5d9e-a84c-48a7b635f45f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1069")
 					(unit 1)
@@ -15898,7 +15898,7 @@
 			(uuid "2e2cec8e-cd2c-5a32-8b06-32a794adf481")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1070")
 					(unit 1)
@@ -15965,7 +15965,7 @@
 			(uuid "e6d4fc60-333e-5119-a1dd-5513d850a8c6")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1071")
 					(unit 1)
@@ -16036,7 +16036,7 @@
 			(uuid "aaf187e3-ec33-5653-a31e-4f5e4963f755")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1080")
 					(unit 1)
@@ -16107,7 +16107,7 @@
 			(uuid "fdbaac37-e78f-551a-acff-266a678a2245")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1081")
 					(unit 1)
@@ -16174,7 +16174,7 @@
 			(uuid "f809c53e-922e-5583-a670-74130aa8bf00")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1072")
 					(unit 1)
@@ -16245,7 +16245,7 @@
 			(uuid "466d09d9-8f61-5f03-aa7f-cd1778f73bd0")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1080")
 					(unit 1)
@@ -16312,7 +16312,7 @@
 			(uuid "7806d7ad-1786-570b-8e9b-c58b8425ca3a")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1073")
 					(unit 1)
@@ -16380,7 +16380,7 @@
 			(uuid "0e2e24e9-11b6-596c-8b8b-1e5a16843569")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#FLG1074")
 					(unit 1)
@@ -16477,7 +16477,7 @@
 			(uuid "95b058c0-81bb-4631-82d3-5556b3a7b306")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "D1003")
 					(unit 1)
@@ -16544,7 +16544,7 @@
 			(uuid "cccd2473-7c32-4695-b5ee-2be36732cae9")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1101")
 					(unit 1)
@@ -16644,7 +16644,7 @@
 			(uuid "ab0ce1f0-5472-4af6-bf88-2b0a1846bad4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "Q1003")
 					(unit 1)
@@ -16783,7 +16783,7 @@
 			(uuid "ae0ef483-8a0e-4426-9b32-ab3c7c729b1e")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "U1009")
 					(unit 1)
@@ -16980,7 +16980,7 @@
 			(uuid "9d76fa63-5a2f-4e6f-8930-02602d51fb00")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1102")
 					(unit 1)
@@ -17051,7 +17051,7 @@
 			(uuid "54cfacb8-564b-4818-acaa-c5acc2edce7f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1091")
 					(unit 1)
@@ -17142,7 +17142,7 @@
 			(uuid "7ea1c226-bf62-4019-891e-93aaac8d0f2f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1090")
 					(unit 1)
@@ -17219,7 +17219,7 @@
 			(uuid "9eb21387-d34a-43e1-9002-289a4b975e6a")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1103")
 					(unit 1)
@@ -17290,7 +17290,7 @@
 			(uuid "9d490b9b-5942-4f1b-a298-5d4c2716ea44")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1004")
 					(unit 1)
@@ -17381,7 +17381,7 @@
 			(uuid "7a6c557a-2690-4c11-bca4-0bae96dfffb1")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "R1005")
 					(unit 1)
@@ -17458,7 +17458,7 @@
 			(uuid "35f87319-562e-4fba-ac70-3d01dd9c73af")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1104")
 					(unit 1)
@@ -17536,7 +17536,7 @@
 			(uuid "3c67bb41-4086-52e1-a439-29ae7e82cacf")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1075")
 					(unit 1)
@@ -17605,7 +17605,7 @@
 			(uuid "48cbdd8e-2d9c-4f3f-9f1b-fb90a43a6c7b")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "F1002")
 					(unit 1)
@@ -17673,7 +17673,7 @@
 			(uuid "4cecee2a-5424-4be7-ab05-e1a978d839a4")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1275")
 					(unit 1)
@@ -17752,7 +17752,7 @@
 			(uuid "c6cdb700-d279-4c2e-bada-846a20214cb7")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "C1092")
 					(unit 1)
@@ -17830,7 +17830,7 @@
 			(uuid "2c8cbc68-2932-41c9-8e0c-22f58d9aa61d")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1276")
 					(unit 1)
@@ -17899,7 +17899,7 @@
 			(uuid "5d4962b6-6d69-4b44-b456-41df0bdcb084")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "J1002")
 					(unit 1)
@@ -17977,7 +17977,7 @@
 			(uuid "b8f314d0-37f9-41b2-8f59-eedbd117065f")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1277")
 					(unit 1)
@@ -18044,7 +18044,7 @@
 			(uuid "d5f0d8b4-92d5-4165-b0bb-604c4abe12ac")
 		)
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366/178e9fd4-026b-514b-ade0-1bd1f53cb813"
 					(reference "#PWR1278")
 					(unit 1)

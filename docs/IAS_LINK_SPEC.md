@@ -1,6 +1,6 @@
 # IAS_LINK sheet: specification and review guide
 
-*25 September 2026 · `rev03/IAS_LINK.kicad_sch` · drawn by `_work/sheets/ias_link.py` from the
+*25 September 2026 · `sheets/IAS_LINK.kicad_sch` · drawn by `_work/sheets/ias_link.py` from the
 connection list in `_work/sheets/ias_link_spec.py`*
 
 The link to the Kria: the Hirose connector on IAS1 with its five LVDS pairs and four single-ended

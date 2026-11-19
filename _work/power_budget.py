@@ -45,13 +45,13 @@ LOADS = [
     ("+1V8_D", "XC7A50T VCCO_35, ADAR ribbon (35 lines), SPI, HK", 1.8, 30, "E",
      "static control lines, SPI a few MHz; Vivado to confirm"),
     ("+1V2", "Termination bias: 2 link pairs + CLK_FPGA, divider", 1.2, 1, "V",
-     "rev03/POWER: 1.10k/1.02k from +2V5. All three pairs are AC-coupled, so "
+     "sheets/POWER: 1.10k/1.02k from +2V5. All three pairs are AC-coupled, so "
      "the terminations draw no DC; 1 mA is the divider's own current"),
     ("+3V3_D", "XC7A50T VCCO, converter and Pmod banks", 3.3, 200, "E", "DS181"),
     ("+3V3_D", "QSPI config flash MT25QL128", 3.3, 35, "V",
      "MT25QL128 Table 42: 22 mA max in quad read at 133 MHz (boot), 35 mA max "
      "while programming (ICC4/ICC5); the larger is counted"),
-    ("+3V3_D", "DONE LED", 3.3, 4, "V", "rev03/CONTROL: (3.3 - 2.0) V / 330 ohm"),
+    ("+3V3_D", "DONE LED", 3.3, 4, "V", "sheets/CONTROL: (3.3 - 2.0) V / 330 ohm"),
 
     # ---- converters ---------------------------------------------------
     ("+1V8_A", "AD9484 AVDD", 1.8, 300, "V",
@@ -91,12 +91,12 @@ LOADS = [
     ("+5V0", "AD8352 radar drivers, x2 (via +5V_IFR)", 5.0, 78, "V",
      "AD8352 datasheet Rev. C, Table 1, POWER INTERFACE: quiescent current "
      "37 typ / 39 max mA per device at ENB 3 V. 2 x 39 = 78 mA. Drawn on "
-     "rev03/ADC_RADAR"),
+     "sheets/ADC_RADAR"),
     ("+5V0", "AD8352 SDR drivers, x2 (via +5V_IFS)", 5.0, 78, "V",
-     "Same figure, one AD8352 per AD9253 channel. Drawn on rev03/ADC_SDR"),
+     "Same figure, one AD8352 per AD9253 channel. Drawn on sheets/ADC_SDR"),
 
     # ---- clock ---------------------------------------------------------
-    # Clock, as drawn on rev03/CLOCK.kicad_sch (docs/CLOCK_SPEC.md). The
+    # Clock, as drawn on sheets/CLOCK.kicad_sch (docs/CLOCK_SPEC.md). The
     # ADCLK944 of the first plan became an ADCLK948 (2 selectable inputs),
     # and the TCXO a Si549 programmable XO: a TCXO cannot give 400-500 MHz.
     # Both sit on +3V3_CLK, a ferrite-filtered branch of +3V3_D.
@@ -170,7 +170,7 @@ LOADS = [
 # with its ADP151. Dropping a buck in front of each LDO keeps the LDO's noise
 # rejection where it matters while cutting the dissipation to something a
 # small package can actually shed.
-# As drawn on rev03/POWER (25 Sep). The +3V6 pre-regulator is gone: with the
+# As drawn on sheets/POWER (25 Sep). The +3V6 pre-regulator is gone: with the
 # AD8352s on 5 V, +3V3_A carries 100 mA and its LDO straight off +5V0
 # dissipates 0.17 W. +1V2 is a resistor divider (a "ldo" here: same sums).
 TREE = {

@@ -137,7 +137,7 @@ def arrays(sheet, items):
 
 
 def main():
-    c = Sheet("rev03/CONTROL.kicad_sch")
+    c = Sheet("sheets/CONTROL.kicad_sch")
     if "TPD4E05U06DQAR" in c.t: sys.exit("already added")
     arrays(c, [
         ("U1108", 425.45, 152.40, ("PMOD_CS", "PMOD_MOSI", "PMOD_MISO", "PMOD_SCLK")),
@@ -145,11 +145,11 @@ def main():
         ("U1110", 447.04, 180.34, ("JTAG_TCK", "JTAG_TMS", "JTAG_TDI", "JTAG_TDO")),
     ])
     c.save()
-    r = Sheet("rev03/ROUTING.kicad_sch")
+    r = Sheet("sheets/ROUTING.kicad_sch")
     tvs_on_sma(r, [(f"D9{k}", j) for k, j in zip(range(61, 71),
                ("J911", "J912", "J921", "J922", "J931", "J932", "J941", "J942", "J951", "J952"))])
     r.save()
-    k = Sheet("rev03/CLOCK.kicad_sch")
+    k = Sheet("sheets/CLOCK.kicad_sch")
     tvs_on_sma(k, [("D401", "J401"), ("D402", "J402")])
     k.save()
     print("added: U1108-U1110 (CONTROL), D961-D970 (ROUTING), D401-D402 (CLOCK)")

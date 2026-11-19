@@ -1,5 +1,5 @@
 """
-Draw rev03/POWER.kicad_sch from coordinates. Connections: power_spec.py,
+Draw sheets/POWER.kicad_sch from coordinates. Connections: power_spec.py,
 checked by _work/check_sheet.py power.
 
 A2 page. Top row: input protection, then the LMR33630 (12 V -> 5 V). Middle

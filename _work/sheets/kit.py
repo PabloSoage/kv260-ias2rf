@@ -19,7 +19,7 @@ import schgen                                         # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
 ROOT_UUID = "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
-PROJECT = "CSI2-KRIA-KV260_Rev01"
+PROJECT = "KV260-IAS2RF"
 
 R0402, C0402 = "Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metric"
 C0805, L0603 = "Capacitor_SMD:C_0805_2012Metric", "Inductor_SMD:L_0603_1608Metric"

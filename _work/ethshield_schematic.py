@@ -13,7 +13,7 @@ with C1223 (1 nF, 2 kV: keeps the RF and ESD bond), the usual termination of an 
   2. R1218 and C1223 stand to the left of J1201, each between ETH_SHIELD and GND; their pin 1s are joined by a
      wire with one label, and the SH pin reaches its label through a short wire (clear of pin 10's ground).
 
-Usage:  py _work/ethshield_schematic.py      (edits rev03/CONTROL.kicad_sch in place; refuses to run twice)
+Usage:  py _work/ethshield_schematic.py      (edits sheets/CONTROL.kicad_sch in place; refuses to run twice)
 """
 import os
 import re
@@ -25,7 +25,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import rev08_pcb as P                                    # noqa: E402
 
-SHEET = os.path.join(ROOT, "rev03", "CONTROL.kicad_sch")
+SHEET = os.path.join(ROOT, "sheets", "CONTROL.kicad_sch")
 NS = uuid.UUID("2b0f6a52-6f0e-4c3e-9d8c-1a7c5e3e1201")
 U = lambda name: str(uuid.uuid5(NS, name))
 SH_PIN = (718.82, 497.84)

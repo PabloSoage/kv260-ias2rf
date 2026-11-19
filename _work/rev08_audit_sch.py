@@ -38,7 +38,7 @@ def set_prop(blk, name, value):
 
 
 def power():
-    p = os.path.join(ROOT, "rev03", "POWER.kicad_sch")
+    p = os.path.join(ROOT, "sheets", "POWER.kicad_sch")
     t = open(p, encoding="utf-8").read()
     assert "TPS563201" not in t, "already applied"
     for ref, props in (("U1002", {"Value": "TPS563201"}), ("R1031", {"Value": "3.24k"}),

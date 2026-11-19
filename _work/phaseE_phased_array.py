@@ -96,7 +96,7 @@ for i in range(8):
 		(property "Footprint" "EasyEDA:CC-88-1_ADI" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(property "Datasheet" "~" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "{ref}")
 					(unit 1)
@@ -224,7 +224,7 @@ for name, sy in [("SMA_RF_IN", base_y - 60),]:
 		(property "Footprint" "Connector_Coaxial:SMA_Amphenol_132255-11" (at {sma_x} {sy} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(property "Datasheet" "~" (at {sma_x} {sy} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "J_SMA_RF")
 					(unit 1)

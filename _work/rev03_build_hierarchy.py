@@ -2,7 +2,7 @@
 """
 DO NOT RE-RUN. This script built the Rev03 hierarchy once (commit eae6713).
 Running it again would add a second set of sheet blocks to the root and
-overwrite the drawn sheets (rev03/CLOCK.kicad_sch since 23 September).
+overwrite the drawn sheets (sheets/CLOCK.kicad_sch since 23 September).
 Its tables are kept in step with the design as the record of intent;
 interface changes are applied by small scripts such as
 _work/rev03_clock_interface.py, followed by _work/sync_sheet_pins.py.
@@ -38,8 +38,8 @@ import sys
 import uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PRO = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+PRO = os.path.join(ROOT, "KV260-IAS2RF.kicad_pro")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
 DRY = "--dry-run" in sys.argv
 
 NS = uuid.UUID("6b1f0c2e-5a4d-4e8b-9c3a-7d2e1f0a4b56")     # stable UUIDs
@@ -111,7 +111,7 @@ def flip(d):
 
 SHEETS = {
     "IAS_LINK": {
-        "file": "rev03/IAS_LINK.kicad_sch",
+        "file": "sheets/IAS_LINK.kicad_sch",
         "desc": "Hirose IAS1, AC coupling, link terminations",
         "at": (30.0, 40.0),
         "labels":
@@ -121,7 +121,7 @@ SHEETS = {
              ("FPGA_PROG_B", "output"), ("FPGA_IRQ", "input")],
     },
     "CONTROL": {
-        "file": "rev03/CONTROL.kicad_sch",
+        "file": "sheets/CONTROL.kicad_sch",
         "desc": "Front-end FPGA, Pmod, AERIS-10 control IDC",
         "at": (110.0, 40.0),
         "labels":
@@ -137,7 +137,7 @@ SHEETS = {
     # CONVERTERS was split in four on 24 Sep (_work/rev03_split_converters.py):
     # one sheet held ~200 parts, too many to review in one sitting.
     "ADC_RADAR": {
-        "file": "rev03/ADC_RADAR.kicad_sch",
+        "file": "sheets/ADC_RADAR.kicad_sch",
         "desc": "AD9484 radar ADC, two AD8352 drivers",
         "at": (440.0, 40.0),
         "labels":
@@ -148,7 +148,7 @@ SHEETS = {
              ("CONV_SPI_CSB_R", "input"), ("IF_RX_B", "input")],
     },
     "ADC_SDR": {
-        "file": "rev03/ADC_SDR.kicad_sch",
+        "file": "sheets/ADC_SDR.kicad_sch",
         "desc": "AD9253 SDR ADC and its drivers",
         "at": (440.0, 130.0),
         "labels":
@@ -158,7 +158,7 @@ SHEETS = {
              ("CONV_SPI_CSB_S", "input"), ("IF_RX_A", "input"), ("IF_RX_C", "input")],
     },
     "DAC_RADAR": {
-        "file": "rev03/DAC_RADAR.kicad_sch",
+        "file": "sheets/DAC_RADAR.kicad_sch",
         "desc": "AD9708 radar chirp DAC, output balun",
         "at": (520.0, 40.0),
         "labels":
@@ -166,7 +166,7 @@ SHEETS = {
             [("IF_TX_B", "output")],
     },
     "DAC_SDR": {
-        "file": "rev03/DAC_SDR.kicad_sch",
+        "file": "sheets/DAC_SDR.kicad_sch",
         "desc": "AD9767 dual SDR DAC, output balun",
         "at": (520.0, 80.0),
         "labels":
@@ -174,14 +174,14 @@ SHEETS = {
             [("IF_TX_A", "output"), ("IF_TX_C", "output")],
     },
     "CLOCK": {
-        "file": "rev03/CLOCK.kicad_sch",
+        "file": "sheets/CLOCK.kicad_sch",
         "desc": "Si549 master XO, ADCLK948 reference select and fan-out",
         "at": (30.0, 140.0),
         "labels": [(n, "output") for n in CLOCKS] +
             [("CLK_SEL", "input"), ("XO_SCL", "input"), ("XO_SDA", "bidirectional")],
     },
     "ROUTING": {
-        "file": "rev03/ROUTING.kicad_sch",
+        "file": "sheets/ROUTING.kicad_sch",
         "desc": "4x SPDT channel routing, IF and clock SMAs",
         "at": (190.0, 140.0),
         "labels":
@@ -189,7 +189,7 @@ SHEETS = {
             [(f"SW_CTRL{i}", "input") for i in range(4)],
     },
     "POWER": {
-        "file": "rev03/POWER.kicad_sch",
+        "file": "sheets/POWER.kicad_sch",
         "desc": "12 V input, protection, buck/LDO tree (rails are global)",
         "at": (190.0, 40.0),
         "labels": [],
@@ -286,7 +286,7 @@ def main():
         print("--dry-run: nothing written.")
         return 0
 
-    os.makedirs(os.path.join(ROOT, "rev03"), exist_ok=True)
+    os.makedirs(os.path.join(ROOT, "sheets"), exist_ok=True)
     for name, spec in SHEETS.items():
         p = os.path.join(ROOT, spec["file"])
         with open(p, "w", encoding="utf-8", newline=chr(10)) as fh:

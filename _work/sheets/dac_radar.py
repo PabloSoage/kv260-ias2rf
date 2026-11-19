@@ -1,5 +1,5 @@
 """
-Draw rev03/DAC_RADAR.kicad_sch from coordinates. Connections: dac_radar_spec.py,
+Draw sheets/DAC_RADAR.kicad_sch from coordinates. Connections: dac_radar_spec.py,
 checked by _work/check_sheet.py dac_radar.
 
 Layout: data and clock labels into U701 from the left; reference, full-scale

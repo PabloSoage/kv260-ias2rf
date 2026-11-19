@@ -23,7 +23,7 @@ import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 OUT = os.path.dirname(os.path.abspath(__file__))
-BOARD = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+BOARD = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 LIB = os.path.join(ROOT, "footprints", "kv260-ias2rf.pretty")
 PRJ = "${KIPRJMOD}/footprints/kv260-ias2rf.3dshapes/"
 STOCK = "${KICAD10_3DMODEL_DIR}/"

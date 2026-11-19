@@ -17,7 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import schgen                                        # noqa: E402
 
-ROOT_SCH = os.path.join(os.path.dirname(HERE), "CSI2-KRIA-KV260_Rev01.kicad_sch")
+ROOT_SCH = os.path.join(os.path.dirname(HERE), "KV260-IAS2RF.kicad_sch")
 RELICS = {"PCB1", "MRK1", "MRK2", "MRK3", "MRK4", "MRK5", "MRK6", "T1", "T2", "LA1"}
 
 text = open(ROOT_SCH, encoding="utf-8").read()

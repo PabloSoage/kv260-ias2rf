@@ -17,7 +17,7 @@ sys.path.insert(0, WORK)
 import schgen                                        # noqa: E402
 from toolpaths import KICAD_CLI, stock_footprints   # noqa: E402
 
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
 FP_DIRS = {"kv260-ias2rf": os.path.join(ROOT, "footprints", "kv260-ias2rf.pretty")}
 STOCK_FP = stock_footprints()
 

@@ -225,7 +225,7 @@ def gen_symbol_instance(chip_key, lines_list):
         txt.append("\t\t\t(effects (font (size 1.27 1.27)))")
         txt.append("\t\t)")
     txt.append("\t\t(instances")
-    txt.append("\t\t\t(project \"CSI2-KRIA-KV260_Rev01\"")
+    txt.append("\t\t\t(project \"KV260-IAS2RF\"")
     txt.append("\t\t\t\t(path \"/56c49378-41a8-4cbc-b1f4-3d0ea65d2366\"")
     txt.append(f"\t\t\t\t\t(reference \"{spec['ref']}\")")
     txt.append("\t\t\t\t\t(unit 1)")

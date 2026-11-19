@@ -3,7 +3,7 @@
 Wire the Rev03 root sheet: every sheet pin gets a short wire and a net label,
 so the root reads as a block diagram whose connections are by name.
 
-What it does to CSI2-KRIA-KV260_Rev01.kicad_sch:
+What it does to KV260-IAS2RF.kicad_sch:
 
   1. removes the Rev01 IAS0 and IAS1 sheet blocks, the four power symbols
      beside them and their captions. Their child file,
@@ -36,11 +36,11 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import schgen                                        # noqa: E402
 
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
-PRO = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
+PRO = os.path.join(ROOT, "KV260-IAS2RF.kicad_pro")
 OLD_CHILD = "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
 ROOT_UUID = "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
-PROJECT = "CSI2-KRIA-KV260_Rev01"
+PROJECT = "KV260-IAS2RF"
 DRY = "--dry-run" in sys.argv
 NS = uuid.UUID("2f6e1c7a-94b3-4d0e-a1c8-5b7d3e9f0a61")
 T = "\t"

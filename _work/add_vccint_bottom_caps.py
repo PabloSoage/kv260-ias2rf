@@ -21,11 +21,11 @@ X0, Y = 101.6, 508.0                                 # an empty band between the
 
 
 def main():
-    c = E.Sheet("rev03/CONTROL.kicad_sch")
+    c = E.Sheet("sheets/CONTROL.kicad_sch")
     if '"C1184"' in c.t: sys.exit("already added")
     E.PWR = max(int(n) for n in re.findall(r"#PWR(\d+)", c.t + "".join(
-        open(os.path.join(E.ROOT, "rev03", f), encoding="utf-8").read()
-        for f in os.listdir(os.path.join(E.ROOT, "rev03")) if f.endswith(".kicad_sch"))))
+        open(os.path.join(E.ROOT, "sheets", f), encoding="utf-8").read()
+        for f in os.listdir(os.path.join(E.ROOT, "sheets")) if f.endswith(".kicad_sch"))))
     for k, ref in enumerate(REFS):
         x = X0 + 12.7 * k
         c.new.append(E.instance("Device:C", ref, "0.47u", "Capacitor_SMD:C_0402_1005Metric", x, Y, 0,

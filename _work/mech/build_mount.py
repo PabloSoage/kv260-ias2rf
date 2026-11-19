@@ -8,7 +8,7 @@ Needs, in _work/mech/cache/ (git-ignored):
              _work/mech/step2glb.py
   board.glb  kicad-cli pcb export glb --subst-models --include-tracks --include-pads --include-zones
              --include-silkscreen --include-soldermask --user-origin 0x0mm
-             -o _work/mech/cache/board.glb CSI2-KRIA-KV260_Rev01.kicad_pcb
+             -o _work/mech/cache/board.glb KV260-IAS2RF.kicad_pcb
 Writes _work/mech/cache/assembly.blend (for render_mount.py) and, with --stl DIR, the parts as STL.
 
 All dimensions in mm, in the KV260 model's frame: Z = 0 is the carrier's top face, the table is at

@@ -127,7 +127,7 @@ records the snapshot, size and SHA-256 of each file.
 | AD9708 DVDD | **3 mA** | Same, Digital Supply Current |
 | AD9767 AVDD | **75 mA** max | `AD9763_9765_9767.pdf` Rev. G, Table 1: IAVDD 71 typ / 75 max, both DACs at 20 mA full scale |
 | AD9767 DVDD | **19 mA** | Same table: 15 mA at 100 MSPS, scaled to 125 MSPS. Measured at 5 V, so an over-estimate at 3.3 V |
-| AD8352 ×4 | **2 × 78 mA** at 5 V | `ad8352.pdf` Rev. C, Table 1: quiescent current 37 typ / 39 max each. Two on `rev03/ADC_RADAR`, two on `rev03/ADC_SDR` |
+| AD8352 ×4 | **2 × 78 mA** at 5 V | `ad8352.pdf` Rev. C, Table 1: quiescent current 37 typ / 39 max each. Two on `sheets/ADC_RADAR`, two on `sheets/ADC_SDR` |
 | ADCLK948 | **330 mA** max | `ADCLK948.pdf` Rev. B, Table 4: IVCC 288 typ / 330 max, **with the outputs loaded**, so it includes the current into the 200 Ω pull-downs. Half the outputs are unused and open, so it is an upper bound |
 | Si549 | **153 mA** max | `Si549.pdf` Revision H: IDD LVPECL 107 typ / 153 max |
 | M3SWA2 ×4, VDD | **12 mA** | `M3SWA2-34DR+.pdf`, IDD 2.9 mA max each |

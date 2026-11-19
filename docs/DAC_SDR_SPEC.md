@@ -1,6 +1,6 @@
 # DAC_SDR sheet: specification and review guide
 
-*25 September 2026 · `rev03/DAC_SDR.kicad_sch` · drawn by `_work/sheets/dac_sdr.py` from the
+*25 September 2026 · `sheets/DAC_SDR.kicad_sch` · drawn by `_work/sheets/dac_sdr.py` from the
 connection list in `_work/sheets/dac_sdr_spec.py`*
 
 The SDR transmit DAC: the dual 14-bit AD9767 in interleaved mode, each DAC through the same output

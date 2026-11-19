@@ -107,7 +107,7 @@ for name, x, y, value in [
 		(property "Datasheet" "" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(pin "{value}" (uuid "{uuid.uuid4()}"))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "#PWR?")
 					(unit 1)
@@ -146,7 +146,7 @@ for sym_name, x, y, value in vcc_syms:
 		(property "Datasheet" "" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(pin "{value}" (uuid "{uuid.uuid4()}"))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "#PWR?")
 					(unit 1)

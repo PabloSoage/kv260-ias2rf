@@ -25,7 +25,7 @@ What this does:
   4. Reports which references ended up not matching the PCB.
 
 Verify afterwards with:
-    kicad-cli sch export netlist -o out.net CSI2-KRIA-KV260_Rev01.kicad_sch
+    kicad-cli sch export netlist -o out.net KV260-IAS2RF.kicad_sch
 
 Usage:  py _work/fix_multichannel_annotation.py [--dry-run]
 """
@@ -37,8 +37,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SHARED = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01-2.kicad_sch")
-PRO = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
-PCB = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+PRO = os.path.join(ROOT, "KV260-IAS2RF.kicad_pro")
+PCB = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 
 DRY = "--dry-run" in sys.argv
 QUOTE = chr(34)
@@ -87,7 +87,7 @@ def fix_root_uuid(dry):
     schematic, the shared sheet and the project file. So the declaration is
     the outlier and gets rewritten.
     """
-    root_sch = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+    root_sch = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
     text = open(root_sch, encoding="utf-8").read()
 
     m = re.search(r'\(uuid "([0-9a-f-]{36})"\)', text)
@@ -195,7 +195,7 @@ def main():
     print()
     print(f"Written: {SHARED}")
     fix_root_uuid(False)
-    print("Now run:  kicad-cli sch export netlist -o out.net CSI2-KRIA-KV260_Rev01.kicad_sch")
+    print("Now run:  kicad-cli sch export netlist -o out.net KV260-IAS2RF.kicad_sch")
     return 0
 
 

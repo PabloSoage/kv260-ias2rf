@@ -12,7 +12,7 @@ next to C1218/C1219, and their common node is made there from +3V3_D:
   C1222  100 nF ETH_VCM -> GND
   R1215, R1216  10 k  ETH_SGRX_FPGA_P/N -> ETH_VCM (were -> +1V2)
 
-Text edit of rev03/CONTROL.kicad_sch with add_ethernet.py's helpers. Refuses to run twice.
+Text edit of sheets/CONTROL.kicad_sch with add_ethernet.py's helpers. Refuses to run twice.
 Usage:  py _work/rev06_vcm.py
 """
 import os, re, sys

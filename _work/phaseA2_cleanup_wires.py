@@ -21,7 +21,7 @@ import pathlib, re, sys, datetime
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
 SCH  = ROOT / "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
-ERC  = ROOT / "CSI2-KRIA-KV260_Rev01-erc.rpt"
+ERC  = ROOT / "KV260-IAS2RF-erc.rpt"
 LOG  = ROOT / "_work" / "purgeA2_log.txt"
 
 KEEP_LABEL_PATTERNS = [

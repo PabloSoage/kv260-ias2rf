@@ -1,5 +1,5 @@
 """
-Draw rev03/IAS_LINK.kicad_sch from coordinates. Connections: ias_link_spec.py,
+Draw sheets/IAS_LINK.kicad_sch from coordinates. Connections: ias_link_spec.py,
 checked by _work/check_sheet.py ias_link.
 
 The Hirose connector splits every pair across its two rows of pins, so it is

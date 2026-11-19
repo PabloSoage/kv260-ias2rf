@@ -42,5 +42,5 @@ print(f"[ok] Convertidos {converted} labels a hierarchical_label")
 print("[ok] Checking with ERC...")
 import subprocess
 r = subprocess.run([r"E:\Program Files\KiCad\10.0\bin\kicad-cli.exe","sch","erc",
-    str(SCH.parent/"CSI2-KRIA-KV260_Rev01.kicad_sch")], capture_output=True, text=True)
+    str(SCH.parent/"KV260-IAS2RF.kicad_sch")], capture_output=True, text=True)
 print(r.stdout.strip().splitlines()[-1] if r.stdout else r.stderr.strip()[:200])

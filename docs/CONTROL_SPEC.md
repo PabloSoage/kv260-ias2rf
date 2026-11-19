@@ -1,6 +1,6 @@
 # CONTROL sheet: specification and review guide
 
-*25 September 2026, housekeeping devices added 2 October, Ethernet option 13 November · `rev03/CONTROL.kicad_sch` (A1) · drawn by `_work/sheets/control.py` from the
+*25 September 2026, housekeeping devices added 2 October, Ethernet option 13 November · `sheets/CONTROL.kicad_sch` (A1) · drawn by `_work/sheets/control.py` from the
 connection list in `_work/sheets/control_spec.py`*
 
 The front-end FPGA, **U1101 XC7A50T-2FTG256I** (AERIS-10's own part), with everything it needs to

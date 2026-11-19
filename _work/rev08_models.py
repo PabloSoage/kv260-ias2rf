@@ -4,7 +4,7 @@
 
 The LCSC land patterns of _work/footprints_rev08 came from easyeda2kicad with their EasyEDA models; when
 _work/rev08_footprints.py copied them into the library it dropped the model references. This script puts them
-back on the placed footprints of CSI2-KRIA-KV260_Rev01.kicad_pcb, with the offset, scale and rotation of the
+back on the placed footprints of KV260-IAS2RF.kicad_pcb, with the offset, scale and rotation of the
 source footprint, pointing at _work/mech/cache/models3d (outside git: EasyEDA's models are not redistributed,
 docs/3D_MODELS.md section 2), with pure white turned to an off-white ceramic tone. The model files are copied there from --models (the directory easyeda2kicad
 wrote them to).
@@ -21,7 +21,7 @@ import shutil
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PCB = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+PCB = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 SRC = os.path.join(ROOT, "_work", "footprints_rev08")
 CACHE = os.path.join(ROOT, "_work", "mech", "cache", "models3d")
 sys.path.insert(0, os.path.join(ROOT, "_work", "manual"))

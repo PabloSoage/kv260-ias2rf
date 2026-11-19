@@ -1,5 +1,5 @@
 """
-Draw rev03/ROUTING.kicad_sch from coordinates. Connections: routing_spec.py,
+Draw sheets/ROUTING.kicad_sch from coordinates. Connections: routing_spec.py,
 checked by _work/check_sheet.py routing.
 
 Four identical switch blocks in a 2 x 2 grid; the two unswitched SDR

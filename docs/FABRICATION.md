@@ -17,7 +17,7 @@ py _work/fab/make_fab.py
 the script names the folder without `DRAFT-`. The LVDS review of LAYOUT §6.2–6.3 and the
 calculator check above were closed on 10 Nov; the RF/high-speed review of 11 Nov
 ([SIGNAL_INTEGRITY.md](SIGNAL_INTEGRITY.md)) was checked the same way. The script copies the
-project's custom rules (`CSI2-KRIA-KV260_Rev01.kicad_dru`) with the board: without them the RF
+project's custom rules (`KV260-IAS2RF.kicad_dru`) with the board: without them the RF
 lines' 0.15 mm necks at 0.5 mm-pitch pins read as clearance errors.
 
 ---

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build the Rev03 board, CSI2-KRIA-KV260_Rev01.kicad_pcb, from the schematic:
+Build the Rev03 board, KV260-IAS2RF.kicad_pcb, from the schematic:
 outline, 6-layer stackup, every footprint with its nets, and a first
 placement. Routing is not attempted here.
 
@@ -45,9 +45,9 @@ import pcbdata as P                                  # noqa: E402
 schgen = P.schgen
 ROOT = P.ROOT
 _OUT = os.environ.get("BB_OUT", ROOT)
-BOARD = os.path.join(_OUT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+BOARD = os.path.join(_OUT, "KV260-IAS2RF.kicad_pcb")
 ORIGINAL = os.path.join(ROOT, "_deprecated", "CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb")
-PRO = os.path.join(_OUT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
+PRO = os.path.join(_OUT, "KV260-IAS2RF.kicad_pro")
 NS = uuid.UUID("0c5b7a4e-9d21-4f38-a6e0-3b1f2c8d7e95")
 T = "\t"
 
@@ -254,8 +254,8 @@ def schematic_positions(all_units=False):
     """ref -> (x, y) on its own sheet, from the rev03 .kicad_sch files: the
     first unit's; with all_units, ref -> [(x, y) of every unit]."""
     pos = {}
-    for fn in os.listdir(os.path.join(ROOT, "rev03")):
-        text = open(os.path.join(ROOT, "rev03", fn), encoding="utf-8").read()
+    for fn in os.listdir(os.path.join(ROOT, "sheets")):
+        text = open(os.path.join(ROOT, "sheets", fn), encoding="utf-8").read()
         for m in re.finditer(r"\n\t\(symbol\n", text):
             b = schgen._block(text, m.start() + 2)
             ref = re.search(r'\(property "Reference" "([^"]+)"', b).group(1)
@@ -309,8 +309,8 @@ def schematic_pins():
     positions of the symbol embedded in that file."""
     out = {}
     pin_re = re.compile(r'\(pin \w+ \w+\s*\(at ([-\d.]+) ([-\d.]+)[^)]*\).*?\(number "([^"]*)"', re.S)
-    for fn in os.listdir(os.path.join(ROOT, "rev03")):
-        text = open(os.path.join(ROOT, "rev03", fn), encoding="utf-8").read()
+    for fn in os.listdir(os.path.join(ROOT, "sheets")):
+        text = open(os.path.join(ROOT, "sheets", fn), encoding="utf-8").read()
         lib = {}                                   # (lib_id, unit) -> {number: (x, y)}
         i = text.find("(lib_symbols")
         if i >= 0:

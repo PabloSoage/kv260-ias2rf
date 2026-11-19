@@ -66,7 +66,7 @@ jrpi_instance = f"""	(symbol
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x20_P2.54mm_Vertical" (at {jrpi_x} {jrpi_y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(property "Datasheet" "~" (at {jrpi_x} {jrpi_y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "J_RPI")
 					(unit 1)

@@ -19,8 +19,8 @@ Usage:  py _work/rev07_aaf_pcb.py
 """
 import os, re, sys, uuid
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PCB = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
-SCH = os.path.join(ROOT, "rev03", "ROUTING.kicad_sch")
+PCB = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
+SCH = os.path.join(ROOT, "sheets", "ROUTING.kicad_sch")
 SHEET_UUID = "388f8fcb-a039-5966-b84c-c0dd05bb2489"      # the ROUTING sheet's instance in the root
 U = lambda: str(uuid.uuid4())
 
@@ -61,7 +61,7 @@ def make_fp(tpl, ref, value, x, y, rot, nets, sym):
     b = re.sub(r'\(property "Value" "[^"]+"', f'(property "Value" "{value}"', b)
     b = re.sub(r'\(path "[^"]+"\)', f'(path "/{SHEET_UUID}/{sym}")', b)
     b = re.sub(r'\(sheetname "[^"]+"\)', '(sheetname "/ROUTING/")', b)
-    b = re.sub(r'\(sheetfile "[^"]+"\)', '(sheetfile "rev03/ROUTING.kicad_sch")', b)
+    b = re.sub(r'\(sheetfile "[^"]+"\)', '(sheetfile "sheets/ROUTING.kicad_sch")', b)
     # text and pad angles carry the footprint's rotation
     b = re.sub(r'(\n\t\t\t\(at [-\d.]+ [-\d.]+) [-\d.]+\)', lambda m: m.group(1) + (f" {rot})" if rot else ")"), b)
 

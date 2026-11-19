@@ -1,6 +1,6 @@
 """Quantitative RF, Signal Integrity, Power, Thermal, and Mechanical Margin Audit.
 
-Part of the hardware review for CSI2-KRIA-KV260_Rev01. Computes closed-form
+Part of the hardware review for KV260-IAS2RF. Computes closed-form
 transmission-line impedances, reflection/loss margins, RF front-end cascades,
 clock phase-noise jitter limits, high-speed LVDS/SGMII skew budgets, PDN
 filtering, transient withstand margins, junction temperatures, and mechanical
@@ -267,7 +267,7 @@ def main() -> int:
         pcb_data = parse_pcb(str(repo_root))
         sch_data = parse_schematics(str(repo_root))
 
-    # Stackup heights extracted directly from CSI2-KRIA-KV260_Rev01.kicad_pcb (JLC08161H-2116C):
+    # Stackup heights extracted directly from KV260-IAS2RF.kicad_pcb (JLC08161H-2116C):
     # L1 (F.Cu, 0.035) --[0.1194, er=4.29]--> L2 (In1.Cu, GND) --[0.1300, er=4.17]--> L3 (In2.Cu, sig)
     # --[0.3658, er=4.29]--> L4 (In3.Cu, PWR split) --[0.1300, er=4.17]--> L5 (In4.Cu, GND)
     # --[0.3658, er=4.29]--> L6 (In5.Cu, sig) --[0.1300, er=4.17]--> L7 (In6.Cu, GND)

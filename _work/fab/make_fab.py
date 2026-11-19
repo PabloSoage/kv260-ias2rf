@@ -43,7 +43,7 @@ import pcbdata as P                                  # noqa: E402
 
 ROOT = P.ROOT
 CLI = P.KICAD_CLI
-NAME = "CSI2-KRIA-KV260_Rev01"
+NAME = "KV260-IAS2RF"
 BOARD = os.path.join(ROOT, NAME + ".kicad_pcb")
 OUT = os.path.join(ROOT, "fab")
 LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "In5.Cu", "In6.Cu", "B.Cu", "F.Paste", "B.Paste",
@@ -135,7 +135,7 @@ def main():
             shutil.copy2(os.path.join(ROOT, f), work)
     # the schematic, for the parity check, and the project's own libraries
     shutil.copy2(os.path.join(ROOT, NAME + ".kicad_sch"), work)
-    for d in ("rev03", "footprints", "symbols"):
+    for d in ("sheets", "footprints", "symbols"):
         if os.path.isdir(os.path.join(ROOT, d)):
             shutil.copytree(os.path.join(ROOT, d), os.path.join(work, d))
 

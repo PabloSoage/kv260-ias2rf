@@ -1,5 +1,5 @@
 """
-Draw rev03/KVPWR.kicad_sch (Rev08, 19 November: the single power entry, the KV260 fed through J1004) from
+Draw sheets/KVPWR.kicad_sch (Rev08, 19 November: the single power entry, the KV260 fed through J1004) from
 kvpwr_spec.py with labdraw.py, and check it with _work/check_sheet.py kvpwr. Root block and the POWER sheet's
 hierarchical labels: _work/kvpwr_schematic.py.
 

@@ -472,7 +472,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "CSI2-KRIA-KV260_Rev01.kicad_pro",
+    "filename": "KV260-IAS2RF.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -805,8 +805,8 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "CSI2-KRIA-KV260_Rev01.kicad_sch",
-        "name": "CSI2-KRIA-KV260_Rev01-1",
+        "filename": "KV260-IAS2RF.kicad_sch",
+        "name": "KV260-IAS2RF-1",
         "uuid": "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
       }
     ],
@@ -820,7 +820,7 @@
   "sheets": [
     [
       "56c49378-41a8-4cbc-b1f4-3d0ea65d2366",
-      "CSI2-KRIA-KV260_Rev01-1"
+      "KV260-IAS2RF-1"
     ],
     [
       "507b9e7f-0337-5c4e-b621-478c31de2af5",

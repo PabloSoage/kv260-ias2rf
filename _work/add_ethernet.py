@@ -31,7 +31,7 @@ oversampling" form (PG047, XAPP523; Artix-7 -2).
   PHYRSTB              10 k / 4.7 uF power-on reset
   unused               RGMII TX inputs tied to ground; INTB, CLKOUT, HSOP_CLK/HSON_CLK, NC(DBG) open
 
-Text edit of rev03/CONTROL.kicad_sch, as _work/add_esd.py. Run once; it refuses to run twice.
+Text edit of sheets/CONTROL.kicad_sch, as _work/add_esd.py. Run once; it refuses to run twice.
 
 Usage:  py _work/add_ethernet.py
 """
@@ -40,7 +40,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "_work"))
 from add_esd import lib_symbol, prop, label, noconn          # noqa: E402
 
-SHEET = os.path.join(ROOT, "rev03", "CONTROL.kicad_sch")
+SHEET = os.path.join(ROOT, "sheets", "CONTROL.kicad_sch")
 PROJ_LIB = os.path.join(ROOT, "symbols", "kv260-ias2rf.kicad_sym")
 U = lambda: str(uuid.uuid4())
 PWR = [1226]                                    # the highest #PWR in the project on 13 Nov

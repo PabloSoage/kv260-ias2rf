@@ -22,7 +22,7 @@ LINK_RX_D0_N skew meander that ran under the corner is moved:
   INTB               open, as before (the gateware polls MDIO)
 
 C1218-C1221 are fitted; C101, C102, C107, C108 stay fitted: IAS1 keeps both uplink lanes and its downlink.
-Text edit of rev03/CONTROL.kicad_sch with add_ethernet.py's helpers. Refuses to run twice.
+Text edit of sheets/CONTROL.kicad_sch with add_ethernet.py's helpers. Refuses to run twice.
 
 Usage:  py _work/rev06_eth.py
 """
@@ -44,9 +44,9 @@ DESC = {"C1218": "SGMII PHY -> FPGA, AC coupling (Rev06: own pins R3/T2)",
 
 def highest(tag):
     n = 0
-    for f in os.listdir(os.path.join(ROOT, "rev03")):
+    for f in os.listdir(os.path.join(ROOT, "sheets")):
         if f.endswith(".kicad_sch"):
-            for m in re.finditer(r'"' + tag + r'(\d+)"', open(os.path.join(ROOT, "rev03", f), encoding="utf-8").read()):
+            for m in re.finditer(r'"' + tag + r'(\d+)"', open(os.path.join(ROOT, "sheets", f), encoding="utf-8").read()):
                 n = max(n, int(m.group(1)))
     return n
 

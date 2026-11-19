@@ -5,7 +5,7 @@ Locate the IAS connectors in the official KV260 3D model.
 Registering the adapter board against the KV260 needs a common reference. The
 adapter gives us a very distinctive signature: its two Hirose BM20B(0.8)-34DP
 connectors sit exactly 50.040 mm apart, aligned on one axis (measured from
-CSI2-KRIA-KV260_Rev01.kicad_pcb: J8_IAS0 at 135.981, 85.604 and J8_IAS1 at
+KV260-IAS2RF.kicad_pcb: J8_IAS0 at 135.981, 85.604 and J8_IAS1 at
 186.021, 85.604).
 
 So the search is: find two objects in the model, at low height above the

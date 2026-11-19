@@ -27,7 +27,7 @@ X0, Y = 152.4, 508.0                                  # beside C1184-C1187 (add_
 
 
 def main():
-    c = E.Sheet("rev03/CONTROL.kicad_sch")
+    c = E.Sheet("sheets/CONTROL.kicad_sch")
     if '"R105"' in c.t: sys.exit("already added")
     for k, (ref, pair) in enumerate(NEW):
         x = X0 + 12.7 * k
@@ -39,7 +39,7 @@ def main():
                  f'\t\t(at {X0 - 2.54:.2f} {Y - 10.16:.2f} 0)\n\t\t(effects\n\t\t\t(font\n\t\t\t\t(size 1.27 1.27)\n'
                  f'\t\t\t)\n\t\t\t(justify left)\n\t\t)\n\t\t(uuid "{E.U()}")\n\t)')
     c.save()
-    s = E.Sheet("rev03/IAS_LINK.kicad_sch")
+    s = E.Sheet("sheets/IAS_LINK.kicad_sch")
     n = 0
     for ref in ("R101", "R102", "R103", "R104"):
         i = s.t.find(f'(property "Reference" "{ref}"'); st = s.t.rfind("\n\t(symbol", 0, i); en = s.t.find("\n\t)", i)

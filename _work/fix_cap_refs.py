@@ -1,5 +1,5 @@
 import pathlib, re
-for fname in ["FRONTEND.kicad_sch", "CSI2-KRIA-KV260_Rev01.kicad_pcb"]:
+for fname in ["FRONTEND.kicad_sch", "KV260-IAS2RF.kicad_pcb"]:
     f = pathlib.Path(fname)
     t = f.read_text(encoding="utf-8")
     before = len(t)

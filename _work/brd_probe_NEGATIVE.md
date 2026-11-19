@@ -13,7 +13,7 @@ the KV260's, closing R-04.
 
 The approach exploited a strong signature: on the adapter the two mating Hirose
 connectors are **50.040 mm apart on one axis, with identical Y**
-`[V, measured from CSI2-KRIA-KV260_Rev01.kicad_pcb]`. The carrier pair must
+`[V, measured from KV260-IAS2RF.kicad_pcb]`. The carrier pair must
 match. So:
 
 1. Find `J7` / `J8` as NUL-terminated, delimited refdes strings. **Worked**:

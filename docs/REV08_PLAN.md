@@ -56,7 +56,7 @@ is missing is everything between the antenna and that ADC: gain, filtering and l
 
 ## 1. Where the room is
 
-Measured from `CSI2-KRIA-KV260_Rev01.kicad_pcb` as text, per copper layer [V].
+Measured from `KV260-IAS2RF.kicad_pcb` as text, per copper layer [V].
 
 | Area | KiCad x, y (mm) | Size | Top | L3 / L6 / bottom | Limits |
 |---|---|---|---|---|---|

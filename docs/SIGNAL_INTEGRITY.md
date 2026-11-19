@@ -1,6 +1,6 @@
 # Signal and power integrity: 8-layer JLC08161H-2116C review
 
-*Current `main` baseline: `CSI2-KRIA-KV260_Rev01.kicad_pcb` (8-layer `JLC08161H-2116C` stackup) · figures and their data in [`docs/sim/`](sim/)*
+*Current `main` baseline: `KV260-IAS2RF.kicad_pcb` (8-layer `JLC08161H-2116C` stackup) · figures and their data in [`docs/sim/`](sim/)*
 
 > **Current 8-layer `JLC08161H-2116C` board (see §8+):** Sections 1–7 document the baseline SI checks and item-by-item copper audit (historical 6-layer comparison snapshots are archived in [`docs/history/README.md`](history/README.md)). Section 8 onwards measures the 8-layer routed board with the same full-wave scripts and governs wherever an earlier number changed.
 
@@ -59,7 +59,7 @@ Rebuilt by hand, not by the router:
 - the 64.9 Ω terminations of the long IF lines moved under their DC-block caps (R501, R601, R621):
   the 7–10 mm stubs to them are gone;
 - the RF50 net-class patterns now cover the auto-named nets (`Net-(J4*-In)`, `Net-(J9*-In)`,
-  `Net-(U90*-RFOUT*)`, U401's clock nets). A design rule (`CSI2-KRIA-KV260_Rev01.kicad_dru`) lets
+  `Net-(U90*-RFOUT*)`, U401's clock nets). A design rule (`KV260-IAS2RF.kicad_dru`) lets
   the 0.15 mm neck at a 0.5 mm-pitch pin keep the default clearance, and a second one keeps the
   ground pour 0.24 mm off the 0.1 mm ESD compensation sections (§7.1).
 

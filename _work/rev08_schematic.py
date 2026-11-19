@@ -31,7 +31,7 @@ import schgen                                                  # noqa: E402
 
 U = lambda: str(uuid.uuid4())
 T, NL = "\t", "\n"
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
 PROJ_LIB = os.path.join(ROOT, "symbols", "kv260-ias2rf.kicad_sym")
 R0402, C0402, C0805 = ("Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metric",
                        "Capacitor_SMD:C_0805_2012Metric")
@@ -40,9 +40,9 @@ LED0402 = "LED_SMD:LED_0402_1005Metric"
 
 def highest(tag):
     n = 0
-    for f in os.listdir(os.path.join(ROOT, "rev03")):
+    for f in os.listdir(os.path.join(ROOT, "sheets")):
         if f.endswith(".kicad_sch"):
-            for m in re.finditer(r'"' + tag + r'(\d+)"', open(os.path.join(ROOT, "rev03", f), encoding="utf-8").read()):
+            for m in re.finditer(r'"' + tag + r'(\d+)"', open(os.path.join(ROOT, "sheets", f), encoding="utf-8").read()):
                 n = max(n, int(m.group(1)))
     return n
 
@@ -211,11 +211,11 @@ def block(name, block_uuid, X, Y, W, pins, page):
            f'{T*2}(property "Sheetname" "{name}"{NL}{T*3}(at {X} {Y - 1:.2f} 0){NL}{T*3}(show_name no){NL}'
            f"{T*3}(do_not_autoplace no){NL}{T*3}(effects{NL}{T*4}(font{NL}{T*5}(size 1.524 1.524){NL}"
            f"{T*5}(bold yes){NL}{T*4}){NL}{T*4}(justify left bottom){NL}{T*3}){NL}{T*2}){NL}"
-           f'{T*2}(property "Sheetfile" "rev03/{name}.kicad_sch"{NL}{T*3}(at {X} {Y + H + 0.8:.2f} 0){NL}'
+           f'{T*2}(property "Sheetfile" "sheets/{name}.kicad_sch"{NL}{T*3}(at {X} {Y + H + 0.8:.2f} 0){NL}'
            f"{T*3}(show_name no){NL}{T*3}(do_not_autoplace no){NL}{T*3}(effects{NL}{T*4}(font{NL}"
            f"{T*5}(size 1.143 1.143){NL}{T*4}){NL}{T*4}(justify left top){NL}{T*3}){NL}{T*2}){NL}"
            + NL.join(sheet_pin(n, sh, X, Y + 2.54 * (k + 1), 180) for k, (n, sh) in enumerate(pins))
-           + f"{NL}{T*2}(instances{NL}{T*3}(project \"CSI2-KRIA-KV260_Rev01\"{NL}"
+           + f"{NL}{T*2}(instances{NL}{T*3}(project \"KV260-IAS2RF\"{NL}"
            f"{T*4}(path \"/{rx_vu.ROOT_UUID}\"{NL}{T*5}(page \"{page}\"){NL}{T*4}){NL}{T*3}){NL}{T*2}){NL}{T})")
     new = [out]
     for k, (n, _) in enumerate(pins):
@@ -252,7 +252,7 @@ def do_root():
 
 
 def do_control_hier():
-    s = Sheet("rev03/CONTROL.kicad_sch")
+    s = Sheet("sheets/CONTROL.kicad_sch")
     if 'hierarchical_label "PMOD_SPARE1"' in s.t:
         print("CONTROL: already done"); return
     # beside the existing local labels: a hierarchical label of the same name joins the net on this sheet
@@ -270,7 +270,7 @@ def do_control_hier():
 
 # ---------------------------------------------------------------- ROUTING
 def do_routing():
-    s = Sheet("rev03/ROUTING.kicad_sch")
+    s = Sheet("sheets/ROUTING.kicad_sch")
     if '"C927"' in s.t:
         print("ROUTING: already done"); return
     i = s.t.find('(property "Reference" "C926"'); st = s.t.rfind("\n\t(symbol", 0, i)
@@ -303,7 +303,7 @@ GND_PINS = (2, 3, 6, 9, 12, 16, 19, 25, 28, 31, 33)
 
 
 def do_ias_link():
-    s = Sheet("rev03/IAS_LINK.kicad_sch")
+    s = Sheet("sheets/IAS_LINK.kicad_sch")
     if '"J103"' in s.t:
         print("IAS_LINK: already done"); return
     # J102's pin positions: its symbol instance, Conn_02x17_Odd_Even (odd pins left at -5.08, even right at 7.62)

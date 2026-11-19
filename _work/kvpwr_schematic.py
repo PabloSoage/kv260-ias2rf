@@ -24,8 +24,8 @@ sys.path.insert(0, os.path.join(HERE, "sheets"))
 import kvpwr                                                       # noqa: E402
 
 ROOT = os.path.dirname(HERE)
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
-POWER = os.path.join(ROOT, "rev03", "POWER.kicad_sch")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
+POWER = os.path.join(ROOT, "sheets", "POWER.kicad_sch")
 T, NL = "\t", "\n"
 U = lambda: str(uuid.uuid4())
 
@@ -92,11 +92,11 @@ def root():
            f'{T*2}(property "Sheetname" "KVPWR"{NL}{T*3}(at {X} {Y - 1:.2f} 0){NL}{T*3}(show_name no){NL}'
            f"{T*3}(do_not_autoplace no){NL}{T*3}(effects{NL}{T*4}(font{NL}{T*5}(size 1.524 1.524){NL}"
            f"{T*5}(bold yes){NL}{T*4}){NL}{T*4}(justify left bottom){NL}{T*3}){NL}{T*2}){NL}"
-           f'{T*2}(property "Sheetfile" "rev03/KVPWR.kicad_sch"{NL}{T*3}(at {X} {Y + H + 0.8:.2f} 0){NL}'
+           f'{T*2}(property "Sheetfile" "sheets/KVPWR.kicad_sch"{NL}{T*3}(at {X} {Y + H + 0.8:.2f} 0){NL}'
            f"{T*3}(show_name no){NL}{T*3}(do_not_autoplace no){NL}{T*3}(effects{NL}{T*4}(font{NL}"
            f"{T*5}(size 1.143 1.143){NL}{T*4}){NL}{T*4}(justify left top){NL}{T*3}){NL}{T*2}){NL}"
            + NL.join(sheet_pin(n, kp, X, 269.24 + 2.54 * i, 180) for i, (n, _, kp) in enumerate(names))
-           + f"{NL}{T*2}(instances{NL}{T*3}(project \"CSI2-KRIA-KV260_Rev01\"{NL}"
+           + f"{NL}{T*2}(instances{NL}{T*3}(project \"KV260-IAS2RF\"{NL}"
            f"{T*4}(path \"/{kvpwr.ROOT_UUID}\"{NL}{T*5}(page \"13\"){NL}{T*4}){NL}{T*3}){NL}{T*2}){NL}{T})")
     new = [blk] + [wire((76.2, 269.24 + 2.54 * i), (X, 269.24 + 2.54 * i)) for i in range(len(names))]
     end = t.rstrip().rfind(")")

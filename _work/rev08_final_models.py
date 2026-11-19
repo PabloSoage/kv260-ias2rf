@@ -17,7 +17,7 @@ import re
 import shutil
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PCB = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+PCB = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 CACHE = os.path.join(ROOT, "_work", "mech", "cache", "models3d")
 FPC = "FPC-SMD_15P-P1.00_XUNPU_FPC-1.0FX-15PWCR-H20.wrl"
 JST_SRC, JST = "CONN-SMD_SR1.00-LS-6P.wrl", "JST_SH_BM06B-SRSS-TB_toned.wrl"

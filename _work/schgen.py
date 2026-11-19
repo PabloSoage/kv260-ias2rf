@@ -232,8 +232,8 @@ class Sheet:
         L = ["(kicad_sch", f"{T}(version 20260306)", f'{T}(generator "eeschema")',
              f'{T}(generator_version "10.0")', f'{T}(uuid "{self.file_uuid}")',
              f'{T}(paper "{self.paper}")', f"{T}(title_block", f'{T}{T}(title "{self.title}")',
-             f'{T}{T}(rev "1.0")', f'{T}{T}(company "KV260-IAS2RF")',
-             f'{T}{T}(comment 1 "KV260-IAS2RF Subsystem Schematic — Hardware Verified")',
+             f'{T}{T}(rev "{getattr(self, "rev", "Rev08.1")}")', f'{T}{T}(company "KV260-IAS2RF")',
+             f'{T}{T}(comment 1 "{getattr(self, "comment", "KV260-IAS2RF: verified by ERC, DRC and simulation; not yet built")}")',
              f"{T})", f"{T}(lib_symbols"]
         for s in self.libs.values():
             L.append(T + T + s.body.replace("\n", "\n" + T))

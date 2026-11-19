@@ -48,6 +48,7 @@ NOTES = [
 def setup():
     s = schgen.Sheet(PATH, FILE_UUID, "PSU - vehicle and bench power for the adapter and the KV260", "psu",
                      f"/{FILE_UUID}", paper="A1", generator="_work/psu/psu_sheet.py", ref_base=900)
+    s.rev, s.comment = "1.0 (project Rev08.1)", "PSU board: LTC4364 surge stopper, LM5177 buck-boost, two TPS26631 eFuses"
     s.lib("psu", os.path.join(PSU, "psu.kicad_sym"))
     D.s, D.S = s, S
     D.FLAGGED, D.flagged = {"+12V", "VCC_LTC"}, set()

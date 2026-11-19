@@ -1,6 +1,6 @@
 # Layout: board, rules, placement and routing
 
-*25 September 2026 · `CSI2-KRIA-KV260_Rev01.kicad_pcb` · built by `_work/layout/build_board.py`
+*25 September 2026 · `KV260-IAS2RF.kicad_pcb` · built by `_work/layout/build_board.py`
 from the schematic's netlist; placement refined and L4 drawn the same day*
 
 The Rev03 board exists. It has:
@@ -104,7 +104,7 @@ out the 1.0 mm-pitch BGA:
 | Via | 0.45 mm pad, 0.2 mm drill |
 | Copper to edge | 0.3 mm |
 | Zones on L2, L4, L5, L7 | 0.15 mm clearance; L4 kept 1 mm in from the edge |
-| Custom rules (`CSI2-KRIA-KV260_Rev01.kicad_dru`) | An RF50 track under 0.18 mm (the 0.15 mm neck at a 0.5 mm-pitch pin) keeps the default clearance; the ESD tuning sections keep 0.24 mm; an LVDS pair's two legs keep 0.10 mm to each other, and inside the FPGA's courtyard an LVDS track keeps 0.10 mm to everything but supply copper (the Power class's 0.15 mm holds: KiCad takes the larger of the two items' rules, so the rules are written for both orders) |
+| Custom rules (`KV260-IAS2RF.kicad_dru`) | An RF50 track under 0.18 mm (the 0.15 mm neck at a 0.5 mm-pitch pin) keeps the default clearance; the ESD tuning sections keep 0.24 mm; an LVDS pair's two legs keep 0.10 mm to each other, and inside the FPGA's courtyard an LVDS track keeps 0.10 mm to everything but supply copper (the Power class's 0.15 mm holds: KiCad takes the larger of the two items' rules, so the rules are written for both orders) |
 
 | Net class | Track | Applies to (patterns in the project file) |
 |---|---|---|
@@ -294,7 +294,7 @@ confirmed in JLCPCB's calculator, and the checks in [FABRICATION.md](FABRICATION
 
 ```
 py _work/layout/build_board.py        # rebuilds the board: overwrites any hand placement
-kicad-cli pcb drc --schematic-parity -o drc.rpt CSI2-KRIA-KV260_Rev01.kicad_pcb
+kicad-cli pcb drc --schematic-parity -o drc.rpt KV260-IAS2RF.kicad_pcb
 py _work/layout/check_placement.py drc.rpt   # passives' distance to their pins
 py _work/fab/make_fab.py                     # Gerbers, drill, BOM, CPL into fab/ (docs/FABRICATION.md)
 ```

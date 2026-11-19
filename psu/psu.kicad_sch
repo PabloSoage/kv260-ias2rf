@@ -6,9 +6,9 @@
 	(paper "A1")
 	(title_block
 		(title "PSU - vehicle and bench power for the adapter and the KV260")
-		(rev "1.0")
+		(rev "1.0 (project Rev08.1)")
 		(company "KV260-IAS2RF")
-		(comment 1 "KV260-IAS2RF Subsystem Schematic — Hardware Verified")
+		(comment 1 "PSU board: LTC4364 surge stopper, LM5177 buck-boost, two TPS26631 eFuses")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x02"

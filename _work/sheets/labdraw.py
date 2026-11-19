@@ -15,7 +15,7 @@ import schgen                                                     # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
 ROOT_UUID = "56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
-PROJECT = "CSI2-KRIA-KV260_Rev01"
+PROJECT = "KV260-IAS2RF"
 RAILS = {"+2V8_RF": "power:VCC", "+3V3_D": "power:+3V3", "+5V0": "power:+5V", "+12V": "power:+12V",
          "+1V8_D": "power:+1V8", "+1V0": "power:+1V0", "+3V3_USB": "power:+3V3", "VBUS_USB": "power:VBUS"}
 s = S = None
@@ -23,10 +23,10 @@ FLAGGED, flagged = set(), set()
 
 
 def setup(spec, name, title, paper, ref_base, flagged_nets):
-    """Start a sheet rev03/<name>.kicad_sch for the spec module. Returns (sheet, path, block uuid)."""
+    """Start a sheet sheets/<name>.kicad_sch for the spec module. Returns (sheet, path, block uuid)."""
     global s, S, FLAGGED, flagged
     S = spec
-    path = os.path.join(ROOT, "rev03", f"{name}.kicad_sch")
+    path = os.path.join(ROOT, "sheets", f"{name}.kicad_sch")
     block = schgen.uid("rev08", "sheet", name)
     s = schgen.Sheet(path, schgen.uid("rev08", name, "file"), title, PROJECT, f"/{ROOT_UUID}/{block}", paper=paper,
                      generator=f"_work/sheets/{name.lower()}.py", ref_base=ref_base)

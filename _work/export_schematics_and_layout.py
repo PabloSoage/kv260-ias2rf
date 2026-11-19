@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from toolpaths import KICAD_CLI
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCH_FILE = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
-PCB_FILE = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+SCH_FILE = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
+PCB_FILE = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 
 DOCS_DIR = os.path.join(ROOT, "docs")
 SCH_PDF = os.path.join(DOCS_DIR, "KV260-IAS2RF_schematic.pdf")
@@ -545,7 +545,7 @@ def export_layout():
     seg_layers = find_layers_with_segments(pcb_txt)
     print("   Copper layers with routed tracks:", seg_layers)
     stripped_txt = strip_copper_zones_from_pcb(pcb_txt, target_layers=None)
-    no_planes_pcb = os.path.join(tmp_dir, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
+    no_planes_pcb = os.path.join(tmp_dir, "KV260-IAS2RF.kicad_pcb")
     with open(no_planes_pcb, "w", encoding="utf-8") as f:
         f.write(stripped_txt)
 

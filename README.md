@@ -4,7 +4,7 @@
 DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
 been validated.** The hardware, dual-FPGA Vivado gateware, Enclosure v2 cooling, and full-system co-simulation are complete ([Status](#status)).
 
-> **Current `main` Hardware & Gateware Baseline:** **8-layer `JLC08161H-2116C`** RF front-end adapter PCB with dedicated-pin **1000BASE-T Ethernet (`U1201 RTL8211FSI`) + dual-lane `IAS1` (`~2.94 Gb/s` aggregate)**, failover in the dual-FPGA Vivado 2026.1 gateware ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)), `5 V` header `J1002` for filtered Enclosure v2 active cooling ([ENCLOSURE.md](docs/ENCLOSURE.md)), and `0` KiCad DRC / parity errors. Historical design evolution from initial drafts is archived in [docs/history/README.md](docs/history/README.md) and tagged `rev01`–`rev06`.
+> **Current `main` Hardware & Gateware Baseline:** **8-layer `JLC08161H-2116C`** RF front-end adapter PCB with dedicated-pin **1000BASE-T Ethernet (`U1201 RTL8211FSI`) + dual-lane `IAS1` (`~2.94 Gb/s` aggregate)**, failover in the dual-FPGA Vivado 2026.1 gateware ([docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)), `5 V` header `J1002` for filtered Enclosure v2 active cooling ([ENCLOSURE.md](docs/ENCLOSURE.md)), and `0` KiCad DRC / parity errors. Historical design evolution from initial drafts is archived in [docs/history/README.md](docs/history/README.md) and tagged `rev01` to `rev08.1`.
 
 ![The board, 3D render](docs/img/board_iso.png)
 
@@ -138,11 +138,11 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 
 - **[Schematic, all 12 sheets including full wired overview (PDF)](docs/KV260-IAS2RF_schematic.pdf)** · [High-res SVGs & 4K PNGs](docs/img/highres/README.md#1-schematics-sch)
 - **[Layout, all 8 copper layers + combined + transparent tracks (PDF)](docs/KV260-IAS2RF_layout.pdf)** · [Per-layer SVGs & 4K PNGs](docs/img/highres/README.md#2-8-layer-pcb-layout-layout)
-- **[Complete Project Documentation Book (PDF)](docs/KV260-IAS2RF_Documentation.pdf)** (reproducible locally via [`export_documentation.py`](export_documentation.py))
-- KiCad 10 sources: [`CSI2-KRIA-KV260_Rev01.kicad_pro`](CSI2-KRIA-KV260_Rev01.kicad_pro), the root
-  schematic and [`rev03/`](rev03/) (twelve hierarchical sheets), the 8-layer board
-  [`CSI2-KRIA-KV260_Rev01.kicad_pcb`](CSI2-KRIA-KV260_Rev01.kicad_pcb), and custom libraries in
-  [`symbols/`](symbols/) and [`footprints/`](footprints/). *(Root KiCad project filenames and `rev03/` directory names are preserved for tool/netlist continuity; see [docs/history/README.md](docs/history/README.md) for revision history.)*
+- **[Complete Project Documentation Book (PDF)](docs/KV260-IAS2RF_Documentation.pdf)**, and the same book lighter, with the normal renders instead of the 4K ones: [Lite PDF](docs/KV260-IAS2RF_Documentation-Lite.pdf) (both reproducible locally via [`export_documentation.py`](export_documentation.py), `--lite` for the second)
+- KiCad 10 sources: [`KV260-IAS2RF.kicad_pro`](KV260-IAS2RF.kicad_pro), the root
+  schematic and [`sheets/`](sheets/) (twelve hierarchical sheets), the 8-layer board
+  [`KV260-IAS2RF.kicad_pcb`](KV260-IAS2RF.kicad_pcb), and custom libraries in
+  [`symbols/`](symbols/) and [`footprints/`](footprints/). Every title block carries the revision, Rev08.1; the original Allied Vision Altium project the board started from stays in `PCB/` under its own name ([docs/history/README.md](docs/history/README.md)).
 
 | Sheet | Contents | Specification |
 |---|---|---|
@@ -177,6 +177,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `25,068` LUTs (`76.9%`), `28,881` FFs (`44.3%`), `18.0` BRAM36 (`24.0%`), `119` DSP48E1 (`99.2%`), `WNS = +0.076 ns` over every clock of both `CLK_FPGA` modes (`400` and `500 MHz`); `ias2rf_k26_bd` with the DSP suite, the GPS PPS block, the fusion grid and the KrakenSDR and HackRF Pro blocks uses `51,870` Slice LUTs (`44.3%`), `44,547` FFs (`19.0%`), `40` BRAM36 (`27.8%`), `229` DSP48E2 (`18.3%`), `WNS = +1.125 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
 | Final RF review (15 Nov) | Five limits found ([SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md)) and addressed ([§9.9](docs/SIGNAL_INTEGRITY.md)): a 30 MHz 7th-order anti-alias filter on the HF input J951 (≥ 60 dB from 50 MHz); the switch-free J951/J952 as the default HF ports; DAC clocks from `CLK_FPGA` ÷ 4 without an MMCM (clock uncertainty `0.165 → 0.035 ns`); no transmit copper within 1.5 mm of any receive line; the enclosure's honest rating below. Still to measure on the first board: TX→RX isolation, the RF switches at 1–5 MHz, the filter above 700 MHz, switcher spurs |
 | Rev08 front end and diagnostics (16–17 Nov) | VHF/UHF receive on `J961`, 30 MHz to 3 GHz: noise figure 2.0 dB and full scale −52 dBm at maximum gain in the direct VHF path, FM-reject ≥ 40 dB with real tolerances; `J961` launch `S11 ≤ −18.1 dB` to 1.1 GHz with its ESD diode and bias tee; no front-end copper within 1.5 mm of either ADC input or the clock tree ([REV08_PLAN §5.5, §11.7](docs/REV08_PLAN.md), [SIGNAL_INTEGRITY §9.10](docs/SIGNAL_INTEGRITY.md)). 14 status and rail LEDs, a USB-C debug console, the IAS0 camera pass-through, and the [board manual](docs/BOARD_MANUAL.md) |
+| Rev08.1 power and the PSU board (19 Nov) | One supply and one ground for both boards (sheet `KVPWR`, [POWER_SPEC §1.4](docs/POWER_SPEC.md), [AUDIT_Rev08 §6](docs/AUDIT_Rev08.md)); the [PSU board](docs/PSU_SPEC.md) feeds both from the battery through ISO 16750-2 Load Dump A/B, jump start and cranking Levels I, II and IV; its audit, ERC 0 and DRC 0 / 0 ([PSU_SPEC §10](docs/PSU_SPEC.md)) |
 | Mechanical fit | Registered on AMD's 3D model of the KV260: mounting holes land within `5 µm` ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 
 **Design & verification highlights** ([docs/LAYOUT.md](docs/LAYOUT.md), [docs/SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)):
@@ -218,7 +219,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | [docs/JLCPCB_QUOTE.md](docs/JLCPCB_QUOTE.md) | Itemized JLCPCB board, assembly, and LCSC BOM pricing |
 | [docs/img/highres/README.md](docs/img/highres/README.md) | Index of all 4K PNG renders and lossless SVG/PDF vector schematics, layouts, heatsinks, and Vivado FPGA views |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Staged development plan and exit criteria |
-| [docs/history/README.md](docs/history/README.md) | **Revision Archive.** Preserved engineering audit notes and stack/revision milestones (`rev01`–`rev06`) |
+| [docs/history/README.md](docs/history/README.md) | **Revision Archive.** Preserved engineering audit notes and stack/revision milestones (`rev01` to `rev08.1`) |
 
 ---
 
@@ -226,7 +227,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 
 | Path | Contents |
 |---|---|
-| `CSI2-KRIA-KV260_Rev01.*`, `rev03/` | KiCad 10 hardware source project (root + nine schematic sheets + 8-layer PCB) |
+| `KV260-IAS2RF.*`, `sheets/` | KiCad 10 hardware source project (root + twelve schematic sheets + 8-layer PCB) |
 | `fpga/` | Synthesizable Verilog gateware (`artix/`, `kria/`, `link/`, `eth/`), Vivado constraints/build scripts, and full-system XSim co-simulation ([`fpga/README.md`](fpga/README.md)) |
 | `sw/` | Linux PS software & control utilities |
 | `symbols/`, `footprints/`, `mech/` | Custom KiCad libraries, 3-D models, and Enclosure v2 STL files |
@@ -239,10 +240,10 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 Reproducing hardware checks, Vivado gateware, and offline PDF documentation:
 
 ```bash
-kicad-cli sch erc --severity-all CSI2-KRIA-KV260_Rev01.kicad_sch
-kicad-cli pcb drc --schematic-parity --refill-zones --severity-all CSI2-KRIA-KV260_Rev01.kicad_pcb
+kicad-cli sch erc --severity-all KV260-IAS2RF.kicad_sch
+kicad-cli pcb drc --schematic-parity --refill-zones --severity-all KV260-IAS2RF.kicad_pcb
 python _work/fab/make_fab.py                                      # fab/: Gerbers, drill, BOM, CPL
-python _work/layout/lvds_skew.py CSI2-KRIA-KV260_Rev01.kicad_pcb  # LVDS delays, skew and stubs
+python _work/layout/lvds_skew.py KV260-IAS2RF.kicad_pcb  # LVDS delays, skew and stubs
 python export_documentation.py                                    # docs/KV260-IAS2RF_Documentation.pdf
 ```
 
@@ -397,7 +398,7 @@ LM5177 four-switch buck-boost to 12.0 V, and one TPS26631 eFuse per output (2.0 
 the KV260's `J12`). Both boards keep running through ISO 16750-2 Load Dump A and B, a 24 V jump start and cranking
 Levels I, II and IV; with two cables, the BM20 link carries 38 mA a contact at the worst load instead of 132 mA.
 Design values, simulations (steady state, loop, input filter, vehicle events, thermal, conducted noise), layout and
-installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); KiCad project in `psu/`.
+installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); schematic [PDF](docs/KV260-IAS2RF_PSU_schematic.pdf); KiCad project in `psu/`.
 
 ![The PSU board, 3D render](docs/img/psu/psu_iso.png)
 

@@ -10,7 +10,7 @@ Always on from +5V0 (LMR33630, 3 A; the board draws about 1.6 A from it). The FP
 that can be escaped for a PWM or tach line, and HK_ALERT (TMP1075) would leave the fan off at power-up,
 which is the wrong failure. Placed near the input power section, at the board's IAS0 (J102) end.
 
-Text edit of rev03/POWER.kicad_sch with add_ethernet.py's helpers. Refuses to run twice.
+Text edit of sheets/POWER.kicad_sch with add_ethernet.py's helpers. Refuses to run twice.
 
 Usage:  py _work/rev06_fan.py
 """
@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(ROOT, "_work"))
 import add_ethernet as AE                                          # noqa: E402
 from rev06_eth import highest                                      # noqa: E402
 
-AE.SHEET = os.path.join(ROOT, "rev03", "POWER.kicad_sch")
+AE.SHEET = os.path.join(ROOT, "sheets", "POWER.kicad_sch")
 AE.POWER["+5V0"] = ("power:+5V", "+5V0")
 
 

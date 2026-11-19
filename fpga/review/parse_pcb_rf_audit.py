@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only S-expression audit parser for CSI2-KRIA-KV260_Rev01 KiCad files.
+"""Read-only S-expression audit parser for KV260-IAS2RF KiCad files.
 
 Extracts quantitative PCB geometry, stackup, zone/keepout, via/return-via,
 RF launch/trace, differential-pair length/skew, thermal-via, power-tree, and
@@ -122,8 +122,8 @@ def seg_bbox_crosses_split(p0: tuple[float, float], p1: tuple[float, float], rec
 
 
 def parse_pcb(root: str) -> dict[str, Any]:
-    pcb_path = os.path.join(root, "CSI2-KRIA-KV260_Rev01.kicad_pcb")
-    pro_path = os.path.join(root, "CSI2-KRIA-KV260_Rev01.kicad_pro")
+    pcb_path = os.path.join(root, "KV260-IAS2RF.kicad_pcb")
+    pro_path = os.path.join(root, "KV260-IAS2RF.kicad_pro")
     tree = load_sexpr(pcb_path)
     with open(pro_path, encoding="utf-8") as f:
         pro = json.load(f)
@@ -478,9 +478,9 @@ def parse_pcb(root: str) -> dict[str, Any]:
 
 
 def parse_schematics(root: str) -> dict[str, Any]:
-    """Extract all symbols (ref, value, footprint, DNP) and hierarchical/global labels from rev03/*.kicad_sch."""
+    """Extract all symbols (ref, value, footprint, DNP) and hierarchical/global labels from sheets/*.kicad_sch."""
     sheets = {}
-    for path in sorted(glob.glob(os.path.join(root, "rev03", "*.kicad_sch"))):
+    for path in sorted(glob.glob(os.path.join(root, "sheets", "*.kicad_sch"))):
         name = os.path.basename(path)
         tree = load_sexpr(path)
         syms = []

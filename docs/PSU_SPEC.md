@@ -174,6 +174,8 @@ regulators make.
 
 ## 7. The board (`psu/`, `_work/psu/psu_pcb.py`)
 
+Schematic: [KV260-IAS2RF_PSU_schematic.pdf](KV260-IAS2RF_PSU_schematic.pdf) (vector, one A1 sheet).
+
 4 layers: F.Cu the parts and the power pours, In1.Cu ground, In2.Cu the +12V plane, B.Cu ground and short signal
 links. The power runs in a U: `J1` top left, protection and filter along the top, the power stage along the bottom
 from right to left, the outputs bottom left, so the three cables leave one edge. The input loop (VIN capacitors, `Q3`,

@@ -4,7 +4,7 @@ import pathlib, re, uuid
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
 DST = ROOT / "FRONTEND.kicad_sch"
-PRO = ROOT / "CSI2-KRIA-KV260_Rev01.kicad_pro"
+PRO = ROOT / "KV260-IAS2RF.kicad_pro"
 
 text = DST.read_text(encoding="utf-8")
 lines = text.splitlines(keepends=False)
@@ -101,7 +101,7 @@ for ref, x, y, val in smas:
 		(property "Footprint" "Connector_Coaxial:SMA_Amphenol_132255-11" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(property "Datasheet" "~" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "{ref}")
 					(unit 1)
@@ -171,7 +171,7 @@ for ref, x, y, val, net1, net2 in caps:
 		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(property "Datasheet" "~" (at {x} {y} 0) (hide yes) (effects (font (size 1.27 1.27))))
 		(instances
-			(project "CSI2-KRIA-KV260_Rev01"
+			(project "KV260-IAS2RF"
 				(path "/56c49378-41a8-4cbc-b1f4-3d0ea65d2366"
 					(reference "{ref}")
 					(unit 1)

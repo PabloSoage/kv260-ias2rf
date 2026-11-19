@@ -35,7 +35,7 @@ sys.path.insert(0, HERE)
 import schgen                                        # noqa: E402
 from toolpaths import KICAD_CLI                      # noqa: E402
 
-ROOT_SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
+ROOT_SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
 POWER_NETS = {"GND", "+3V3_D", "+3V3_CLK", "+3V3_A", "+1V8_D", "+1V8_A", "+1V2", "+1V0",
               "+5V0", "+12V", "-3V3", "+2V5", "+3V6"}
 

@@ -29,8 +29,8 @@ import shutil
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCH = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_sch")
-PRO = os.path.join(ROOT, "CSI2-KRIA-KV260_Rev01.kicad_pro")
+SCH = os.path.join(ROOT, "KV260-IAS2RF.kicad_sch")
+PRO = os.path.join(ROOT, "KV260-IAS2RF.kicad_pro")
 DEPRECATED = os.path.join(ROOT, "_deprecated")
 
 DEAD = ["FRONTEND.kicad_sch", "PHASED_ARRAY.kicad_sch"]

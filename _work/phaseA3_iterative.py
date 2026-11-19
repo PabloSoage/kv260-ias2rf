@@ -2,7 +2,7 @@
 """Phase A3 - Hunt down orphan references. Iterative:
 1. Read the current .kicad_sch (phase A2 already applied).
 2. Quick in-memory inventory: ref -> (line_start,line_end).
-3. Read the ERC (CSI2-KRIA-KV260_Rev01-erc.rpt) and extract the refs cited in
+3. Read the ERC (KV260-IAS2RF-erc.rpt) and extract the refs cited in
    pin_not_connected / label_dangling / wire_dangling / no_connect_dangling
    / unconnected_wire_endpoint.
 4. Leave out the untouchable refs: J8 (Hirose), #PWR? (power symbols), TP* if
@@ -20,7 +20,7 @@ import pathlib, re, sys, subprocess, datetime, shutil, os
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
 SCH  = ROOT / "CSI2-KRIA-KV260_Rev01-2.kicad_sch"
-ERC  = ROOT / "CSI2-KRIA-KV260_Rev01-erc.rpt"
+ERC  = ROOT / "KV260-IAS2RF-erc.rpt"
 LOG  = ROOT / "_work" / "purgeA3_iter.log"
 KICAD_CLI = r"E:\Program Files\KiCad\10.0\bin\kicad-cli.exe"
 
@@ -32,7 +32,7 @@ def is_protected_label(name: str) -> bool:
     return any(re.match(p, name) for p in PROTECTED_LABEL_PATTERNS)
 
 def run_erc():
-    res = subprocess.run([KICAD_CLI, "sch", "erc", str(ROOT/"CSI2-KRIA-KV260_Rev01.kicad_sch")],
+    res = subprocess.run([KICAD_CLI, "sch", "erc", str(ROOT/"KV260-IAS2RF.kicad_sch")],
                          cwd=str(ROOT), capture_output=True, text=True, timeout=180)
     return res.stdout + res.stderr
 
