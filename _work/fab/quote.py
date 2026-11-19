@@ -144,7 +144,7 @@ def write_doc(rows, ns, today):
         cells = []
         for n in ns:
             if r[f"Cost{n}"] == "":
-                cells.append(f"{r[f'Buy{n}']} / — / —")
+                cells.append(f"{r[f'Buy{n}']} / n/a / n/a")
             else:
                 cells.append(f"{r[f'Buy{n}']} / {r[f'Unit{n}']:.4g} / {r[f'Cost{n}']:.2f}")
         out.append(f"| {code} | {mpn} | {r['Manufacturer']} | {r['Value']} | {r['Library']} | "

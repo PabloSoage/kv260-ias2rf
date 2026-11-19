@@ -150,7 +150,7 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 
 | | Item | Notes | Price `[E]` |
 |---|---|---|---|
-| ◆ | **Board design and fabrication** | 8 layers, short run with assembly. **Quoted 18 Nov 2026 (Rev08): ≈ $2,372 for two assembled boards, parts included** (≈ $2,030 on 10 Nov, 6 layers) ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)); the chip lines below are inside that figure | €400 – 800 |
+| ◆ | **Board design and fabrication** | 8 layers, short run with assembly. **Quoted 19 Nov 2026 (Rev08 single power entry): ≈ $2,440 for two assembled boards, parts included** (≈ $2,392 pre-KVPWR, ≈ $2,030 on 10 Nov, 6 layers) ([JLCPCB_QUOTE.md](JLCPCB_QUOTE.md)); the chip lines below are inside that figure | €400 – 800 |
 | ☐ | ADC **AD9253BCPZ-125** | 14 b, 2 of 4 channels at 62.5 MSPS, 1-lane | €40 |
 | ☐ | Clock: **ADCLK948BCPZ** (select + 1:8 fan-out) + **Si549** programmable XO | Si549 ordered configured: LVPECL, 3.3 V, 5×7 mm, pinout C. See docs/CLOCK_SPEC.md | €50 – 70 |
 | ☐ | Differential drivers **AD8352ACPZ** ×2 | The ones AERIS uses | €30 |
@@ -160,6 +160,8 @@ Sources: [HackRF Pro](https://greatscottgadgets.com/hackrf/pro/) ·
 | ☐ | Connectors: Hirose BM20B(0.8)-34DP ×2, SMA, Pmod | | €60 |
 | ☐ | FFC/Pmod cable to the KV260 | | €20 |
 | ☐ | 15-way 1 mm FFC, 100 mm, from `J1502` to the KV260's `J9` (GPS PPS) | Either type works (the board drives both positions pin 12 can land on, INTEGRATIONS §2.1): JUSHUO JS10A-15P-100-4-8 (same side, LCSC C2857591) or JS10B-15P-100-4-8 (reverse, C2857806). Not assembled | €2 |
+| ☐ | **KV260 single-entry power jumper (`J1004` to `J12`)** | Off-board, not assembled: JST `VHR-2N` 2-way housing + `2 × SVH-21T-P1.1` crimps, ~15 cm 18 AWG red/black wire, `5.5 × 2.5 mm` centre-positive barrel plug (nothing else on KV260 `J12`; `BOARD_MANUAL` §6) | €5 |
+| ☐ | **Bench `12 V / 5 A` brick + clip-on ferrite clamps** | Home/bench single entry on `J1001`: prefer a two-prong (Class II, unearthed) brick; fit ferrites on DisplayPort, USB, Ethernet and coax leads if using an earthed PSU (`POWER_SPEC` §1.4) | €30 |
 | | | **Subtotal** | **~€700 – 1,100** |
 
 **Prerequisites before ordering anything**
@@ -253,9 +255,9 @@ Applies from stage 1 onwards. **This is not an accessory: it is what makes the r
 |---|---|---|---|
 | ☑ | LiFePO4 + secondary alternator | | *already have* |
 | ☐ | **ISO 7637-2 protection** on the 12 V input | Load dump and cold crank. A bench TVS is not enough | €50 |
-| ☐ | Regulated 12 V DC/DC with input filter | Alternator ripple **will wreck your HF** | €80 |
+| ☐ | **Regulated `12.0 V, ≥ 5 A` DC/DC (output `< 13.2 V`)** with input filter | Feeds both boards through `J1001` (`POWER_SPEC` §1.4); keeps KV260 `MP5016` below its `13.2 V` cut-off, blocks unsuppressed Load Dump A, and keeps alternator ripple out of HF | €80 |
 | ☐ | IP-rated enclosure with filtered ventilation | The KV260's fansink needs clean air | €150 |
-| ☐ | Fused distribution with a master cut-off | Safety | €60 |
+| ☐ | Fused distribution with **`5 A` inline harness fuse** (was `3 A`) and master cut-off | Safety (`5 A` fuse sizes the single-entry `1.12 A` adapter + `3.6 A` KV260 branch through `J1001`; `BOARD_MANUAL` §6) | €60 |
 | ☐ | Shielded cable, ferrites, ground braid | **Problem number one of vehicle radio** | €100 |
 | ☐ | Touchscreen or tablet as the interface | | €150 |
 | ☐ | Anti-vibration mounting tray | | €80 |

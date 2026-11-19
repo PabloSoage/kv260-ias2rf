@@ -219,6 +219,14 @@ RULES = {
     ("MMBT3904", "SOT-23"): ("P", "MMBT3904", r"^MMBT3904(LT1G|-7-F|,215|$)"),
     ("Si549 LVPECL 3V3 pinout C", "Oscillator_SMD_SI570_SI571_Standard"): (
         "X", "Si549 ordering codes are built per configuration at Skyworks; not a catalogue part"),
+    # Single power entry (Rev08, 19 Nov 2026)
+    ("ZEGMCM9070-501T", "CMC_9070_SMD-4P_9.0x7.0mm"): ("P", "ZEGMCM9070-501T", r"^ZEGMCM9070-501T$"),
+    ("TPS26631PWPR", "HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP3.4x6.5mm_Mask2.96x2.96mm_ThermalVias"): (
+        "P", "TPS26631PWPR", r"^TPS26631PWPR$"),
+    ("SS34", "D_SMA"): ("P", "SS34 SMA", r"^SS34$"),
+    ("B2PS-VH", "JST_VH_B2PS-VH_1x02_P3.96mm_Horizontal"): ("P", "B2PS-VH", r"^B2PS-VH"),
+    ("22n", "C_0603_1608Metric"): ("C", "22n", "0603", 16, XR),
+    ("1u 100V", "C_1206_3216Metric"): ("C", "1u", "1206", 100, ("X7R",)),
 }
 # Where the part is not the drawn value, and why. Copied into the CSV's Note.
 NOTES = {
