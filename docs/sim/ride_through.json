@@ -1,0 +1,898 @@
+{
+ "standards": {
+  "iso16750_2_cranking": {
+   "Level I (warm crank)": {
+    "us": 8.0,
+    "ua": 9.5,
+    "tf": 0.005,
+    "t6": 0.015,
+    "t7": 0.05,
+    "t8": 1.0,
+    "tr": 0.04,
+    "std": "ISO 16750-2:2012 Clause 4.6.3 Table 5 (Level I)"
+   },
+   "Level II (cold crank, good battery)": {
+    "us": 4.5,
+    "ua": 6.5,
+    "tf": 0.005,
+    "t6": 0.015,
+    "t7": 0.05,
+    "t8": 10.0,
+    "tr": 0.1,
+    "std": "ISO 16750-2:2012 Clause 4.6.3 Table 5 (Level II)"
+   },
+   "Level III (cold crank, aged battery)": {
+    "us": 3.0,
+    "ua": 5.0,
+    "tf": 0.005,
+    "t6": 0.015,
+    "t7": 0.05,
+    "t8": 1.0,
+    "tr": 0.1,
+    "std": "ISO 16750-2:2012 Clause 4.6.3 Table 5 (Level III)"
+   },
+   "Level IV (cold crank, room temp)": {
+    "us": 6.0,
+    "ua": 6.5,
+    "tf": 0.005,
+    "t6": 0.015,
+    "t7": 0.05,
+    "t8": 10.0,
+    "tr": 0.1,
+    "std": "ISO 16750-2:2012 Clause 4.6.3 Table 5 (Level IV)"
+   }
+  },
+  "iso7637_2_pulse1": "ISO 7637-2:2011 Table 2 / Fig 5: -150 V, 10 Ohm, td=2 ms, t2=200 ms disconnect",
+  "iso16750_2_load_dump": "ISO 16750-2:2012 Tables 6-7: Test A 87 V (79-101 V), 1 Ohm, 400 ms; Test B 35 V, 0.5 Ohm, 400 ms"
+ },
+ "thresholds": {
+  "u1010": {
+   "uvlo_rising_v": 7.996,
+   "uvlo_falling_v": 7.476,
+   "ovp_rising_v": 14.439,
+   "ovp_falling_v": 13.5,
+   "iol_nom_a": 2.98,
+   "iol_max_a": 3.189,
+   "uvlo_ton_ms": 1.83,
+   "ovp_ton_ms": 1.24,
+   "tdvdt_12v_ms": 5.49
+  },
+  "kv260": {
+   "mp5016h_uvlo_r": 2.53,
+   "mp5016h_uvlo_f": 2.33,
+   "mp5016h_ovp_v": 13.2,
+   "mp8772_5v_min_11w": 5.48,
+   "mp8772_5v_min_36w": 5.62,
+   "mp8772_som475_36w": 5.32,
+   "vmin_v": 7.476,
+   "p_typ_w": 11.0,
+   "p_bound_w": 23.84
+  },
+  "adapter": {
+   "lm74502_vs_min": 3.2,
+   "lm74502_reverse_blocking": false,
+   "lmr33630_min_typ_v": 5.39,
+   "lmr33630_min_worst_v": 5.59,
+   "lmr33630_tps56x_floor_v": 5.06,
+   "vmin_v": 5.59,
+   "p_typ_w": 11.7,
+   "p_worst_w": 13.4
+  }
+ },
+ "u1010_thermal": {
+  "tdvdt_12v_ms": 5.49,
+  "slew_v_per_s": 2185.3,
+  "iol_knee_mf": 1.36,
+  "r_theta_ja_c_per_w": 32.2,
+  "p_reg_70c_w": 2.33,
+  "c_treg_noload_70c_mf": 74.4
+ },
+ "sm8s33a_load_dump_a": {
+  "v_clamp_peak_v": 43.76,
+  "energy_j": 141.7,
+  "wunsch_bell_limit_j": 130.7,
+  "ok": false
+ },
+ "holdup_events": [
+  {
+   "id": "pulse2a",
+   "label": "ISO 7637-2 Pulse 2a (+112 V, 2 Ohm, 50 us)",
+   "v0": 13.5,
+   "t_kv_ms": 1.35,
+   "t_adp_ms": 0.1,
+   "e_kv_typ_j": 0.015,
+   "e_kv_bnd_j": 0.032,
+   "c_kv_typ_mf": 0.24,
+   "c_kv_bnd_mf": 0.51,
+   "c_kv_5v62_mf": 0.32,
+   "c_adp_typ_mf": 0.02,
+   "c_adp_wst_mf": 0.02,
+   "u1010_ichg_a": 0.51,
+   "u1010_tchg_ms": 5.5,
+   "u1010_efet_j": 0.02,
+   "u1010_startup_ok": true,
+   "bank_part": "UHE1E102MHD6",
+   "bank_cans_typ": 1,
+   "bank_cans_bnd": 1,
+   "bank_packed_cm3": 3.1,
+   "fits_enclosure": true,
+   "note": "50 us spike + U1010 1.24 ms OVP_ton(dly) (PGTH=GND)"
+  },
+  {
+   "id": "pulse1_td",
+   "label": "ISO 7637-2 Pulse 1 spike alone (t_d = 2 ms)",
+   "v0": 13.5,
+   "t_kv_ms": 2.0,
+   "t_adp_ms": 2.0,
+   "e_kv_typ_j": 0.022,
+   "e_kv_bnd_j": 0.048,
+   "c_kv_typ_mf": 0.35,
+   "c_kv_bnd_mf": 0.75,
+   "c_kv_5v62_mf": 0.48,
+   "c_adp_typ_mf": 0.31,
+   "c_adp_wst_mf": 0.35,
+   "u1010_ichg_a": 0.76,
+   "u1010_tchg_ms": 5.5,
+   "u1010_efet_j": 0.03,
+   "u1010_startup_ok": true,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 1,
+   "bank_cans_bnd": 1,
+   "bank_packed_cm3": 10.2,
+   "fits_enclosure": false,
+   "note": "Negative pulse only; unrealistic unless supply reconnects immediately"
+  },
+  {
+   "id": "pulse1_t2",
+   "label": "ISO 7637-2 Pulse 1 full disconnect (t_2 = 200 ms)",
+   "v0": 13.5,
+   "t_kv_ms": 202.0,
+   "t_adp_ms": 200.0,
+   "e_kv_typ_j": 2.222,
+   "e_kv_bnd_j": 4.816,
+   "c_kv_typ_mf": 35.17,
+   "c_kv_bnd_mf": 76.22,
+   "c_kv_5v62_mf": 48.07,
+   "c_adp_typ_mf": 30.99,
+   "c_adp_wst_mf": 35.5,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 141.6,
+   "u1010_efet_j": 2.53,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 16,
+   "bank_cans_bnd": 24,
+   "bank_packed_cm3": 163.8,
+   "fits_enclosure": false,
+   "note": "Table 2 / Fig 5 supply off t2=200 ms + U1010 1.83 ms UVLO_ton"
+  },
+  {
+   "id": "load_dump_b",
+   "label": "ISO 16750-2 Load Dump B (35 V, 0.5 Ohm, 400 ms)",
+   "v0": 13.5,
+   "t_kv_ms": 401.0,
+   "t_adp_ms": 400.0,
+   "e_kv_typ_j": 4.411,
+   "e_kv_bnd_j": 9.56,
+   "c_kv_typ_mf": 69.82,
+   "c_kv_bnd_mf": 151.31,
+   "c_kv_5v62_mf": 95.43,
+   "c_adp_typ_mf": 61.99,
+   "c_adp_wst_mf": 70.99,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 281.1,
+   "u1010_efet_j": 5.03,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 30,
+   "bank_cans_bnd": 48,
+   "bank_packed_cm3": 307.2,
+   "fits_enclosure": false,
+   "note": "Table 7 max td=400 ms > OVP"
+  },
+  {
+   "id": "load_dump_a",
+   "label": "ISO 16750-2 Load Dump A (87 V, 1 Ohm, 400 ms)",
+   "v0": 13.5,
+   "t_kv_ms": 757.0,
+   "t_adp_ms": 485.0,
+   "e_kv_typ_j": 8.327,
+   "e_kv_bnd_j": 18.047,
+   "c_kv_typ_mf": 131.8,
+   "c_kv_bnd_mf": 285.64,
+   "c_kv_5v62_mf": 180.15,
+   "c_adp_typ_mf": 75.16,
+   "c_adp_wst_mf": 86.08,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 530.7,
+   "u1010_efet_j": 9.49,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 47,
+   "bank_cans_bnd": 80,
+   "bank_packed_cm3": 481.3,
+   "fits_enclosure": false,
+   "note": "Table 6 tail > OVP; D1003 fails on bare board (116.5 J > 29.7 J)"
+  },
+  {
+   "id": "jump_start",
+   "label": "ISO 16750-2 Jump Start (24 V, 60 s)",
+   "v0": 13.5,
+   "t_kv_ms": 60000.0,
+   "t_adp_ms": 60000.0,
+   "e_kv_typ_j": 660.0,
+   "e_kv_bnd_j": 1430.4,
+   "c_kv_typ_mf": 10446.39,
+   "c_kv_bnd_mf": 22640.18,
+   "c_kv_5v62_mf": 14278.88,
+   "c_adp_typ_mf": 9297.9,
+   "c_adp_wst_mf": 10648.87,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 42066.0,
+   "u1010_efet_j": 752.14,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 4489,
+   "bank_cans_bnd": 7083,
+   "bank_packed_cm3": 45967.4,
+   "fits_enclosure": false,
+   "note": "Clause 4.3.1.2 duration 60 s above OVP"
+  },
+  {
+   "id": "reverse",
+   "label": "ISO 16750-2 Reverse Battery (-14 V, 60 s)",
+   "v0": 13.5,
+   "t_kv_ms": 60000.0,
+   "t_adp_ms": 60000.0,
+   "e_kv_typ_j": 660.0,
+   "e_kv_bnd_j": 1430.4,
+   "c_kv_typ_mf": 10446.39,
+   "c_kv_bnd_mf": 22640.18,
+   "c_kv_5v62_mf": 14278.88,
+   "c_adp_typ_mf": 9297.9,
+   "c_adp_wst_mf": 10648.87,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 42066.0,
+   "u1010_efet_j": 752.14,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 4489,
+   "bank_cans_bnd": 7083,
+   "bank_packed_cm3": 45967.4,
+   "fits_enclosure": false,
+   "note": "Clause 4.7 service fault 60 s (module off, protected)"
+  },
+  {
+   "id": "crank_I",
+   "label": "ISO 16750-2 Cranking Level I (8.0 V / 9.5..11.5 V)",
+   "v0": 12.0,
+   "t_kv_ms": 0.0,
+   "t_adp_ms": 0.0,
+   "e_kv_typ_j": 0.0,
+   "e_kv_bnd_j": 0.0,
+   "c_kv_typ_mf": 0.0,
+   "c_kv_bnd_mf": 0.0,
+   "c_kv_5v62_mf": 0.0,
+   "c_adp_typ_mf": 0.0,
+   "c_adp_wst_mf": 0.0,
+   "u1010_ichg_a": 0.0,
+   "u1010_tchg_ms": 0.0,
+   "u1010_efet_j": 0.0,
+   "u1010_startup_ok": true,
+   "bank_part": "none",
+   "bank_cans_typ": 0,
+   "bank_cans_bnd": 0,
+   "bank_packed_cm3": 0.0,
+   "fits_enclosure": true,
+   "note": "Always >= 8.0 V > Vmin_KV 7.48 V and Vmin_adp 5.59 V: no hold-up needed"
+  },
+  {
+   "id": "crank_IV",
+   "label": "ISO 16750-2 Cranking Level IV (6.0 V, 6.5..8.5 V, 10 s)",
+   "v0": 12.0,
+   "t_kv_ms": 10120.0,
+   "t_adp_ms": 0.0,
+   "e_kv_typ_j": 111.32,
+   "e_kv_bnd_j": 241.261,
+   "c_kv_typ_mf": 2526.86,
+   "c_kv_bnd_mf": 5476.39,
+   "c_kv_5v62_mf": 3227.83,
+   "c_adp_typ_mf": 0.0,
+   "c_adp_wst_mf": 0.0,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 10175.3,
+   "u1010_efet_j": 181.93,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 538,
+   "bank_cans_bnd": 1166,
+   "bank_packed_cm3": 5509.1,
+   "fits_enclosure": false,
+   "note": "6.0 V > 5.59 V adapter stays on; KV260 bank discharged across 10 s"
+  },
+  {
+   "id": "crank_II",
+   "label": "ISO 16750-2 Cranking Level II (4.5 V, 6.5..8.5 V, 10 s)",
+   "v0": 12.0,
+   "t_kv_ms": 10120.0,
+   "t_adp_ms": 38.0,
+   "e_kv_typ_j": 111.32,
+   "e_kv_bnd_j": 241.261,
+   "c_kv_typ_mf": 2526.86,
+   "c_kv_bnd_mf": 5476.39,
+   "c_kv_5v62_mf": 3227.83,
+   "c_adp_typ_mf": 7.89,
+   "c_adp_wst_mf": 9.03,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 10175.3,
+   "u1010_efet_j": 181.93,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 540,
+   "bank_cans_bnd": 1168,
+   "bank_packed_cm3": 5529.6,
+   "fits_enclosure": false,
+   "note": "KV260 Q1010 blocks 10 s; adapter < 5.59 V 38 ms (if reverse-blocked)"
+  },
+  {
+   "id": "crank_III",
+   "label": "ISO 16750-2 Cranking Level III (3.0 V, 5.0..7.0 V, 1 s)",
+   "v0": 12.0,
+   "t_kv_ms": 1130.0,
+   "t_adp_ms": 1130.0,
+   "e_kv_typ_j": 12.43,
+   "e_kv_bnd_j": 26.939,
+   "c_kv_typ_mf": 282.15,
+   "c_kv_bnd_mf": 611.49,
+   "c_kv_5v62_mf": 360.42,
+   "c_adp_typ_mf": 234.51,
+   "c_adp_wst_mf": 268.59,
+   "u1010_ichg_a": 2.98,
+   "u1010_tchg_ms": 1136.2,
+   "u1010_efet_j": 20.31,
+   "u1010_startup_ok": false,
+   "bank_part": "UHE1E472MHD",
+   "bank_cans_typ": 118,
+   "bank_cans_bnd": 188,
+   "bank_packed_cm3": 1208.3,
+   "fits_enclosure": false,
+   "note": "5..7 V ripple < UVLO rising (8.00 V) for full 1.13 s"
+  }
+ ],
+ "holdup_solver_verification": [
+  {
+   "label": "Pulse 2a with 1 x 1 mF KV260 + 0.1 mF adp",
+   "ckv_mf": 1.0,
+   "c12_mf": 0.1,
+   "rev_block": true,
+   "vinj_min": 11.03,
+   "vinj_max": 51.66,
+   "v12_min": 10.95,
+   "v12_max": 17.83,
+   "vkv_min": 10.7,
+   "vkv_max": 13.54,
+   "q1010_vds_max": 38.23,
+   "vds_max": 32.88,
+   "e1003": 0.006,
+   "ovp_tripped": true,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": true,
+   "kv_running": false,
+   "adp_running": true
+  },
+  {
+   "label": "Pulse 1 (t2=200 ms) exact 8x4.7mF (37.6 mF) both rails",
+   "ckv_mf": 37.6,
+   "c12_mf": 37.6,
+   "rev_block": true,
+   "vinj_min": -44.56,
+   "vinj_max": 13.5,
+   "v12_min": 5.47,
+   "v12_max": 13.4,
+   "vkv_min": 7.39,
+   "vkv_max": 13.43,
+   "q1010_vds_max": 57.99,
+   "vds_max": 57.54,
+   "e1003": 0.201,
+   "ovp_tripped": false,
+   "uv_tripped": false,
+   "kv_uv_ok": false,
+   "adp_uv_ok": false,
+   "kv_running": false,
+   "adp_running": false
+  },
+  {
+   "label": "Pulse 1 (t2=200 ms) practical 9x4.7mF (42.3 mF) both rails",
+   "ckv_mf": 42.3,
+   "c12_mf": 42.3,
+   "rev_block": true,
+   "vinj_min": -44.56,
+   "vinj_max": 13.5,
+   "v12_min": 6.83,
+   "v12_max": 13.4,
+   "vkv_min": 8.28,
+   "vkv_max": 13.43,
+   "q1010_vds_max": 58.0,
+   "vds_max": 57.54,
+   "e1003": 0.201,
+   "ovp_tripped": false,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": true,
+   "kv_running": false,
+   "adp_running": true
+  },
+  {
+   "label": "Load Dump B (400 ms) 16x4.7mF (75.2 mF) KV + 16x4.7mF adp",
+   "ckv_mf": 75.2,
+   "c12_mf": 75.2,
+   "rev_block": true,
+   "vinj_min": 12.46,
+   "vinj_max": 35.15,
+   "v12_min": 12.53,
+   "v12_max": 17.53,
+   "vkv_min": 8.06,
+   "vkv_max": 13.49,
+   "q1010_vds_max": 26.91,
+   "vds_max": 22.03,
+   "e1003": 0.0,
+   "ovp_tripped": true,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": true,
+   "kv_running": false,
+   "adp_running": true
+  },
+  {
+   "label": "Cranking Level I (8.0 V, stock C = 47 uF / 28.6 uF)",
+   "ckv_mf": 0.05,
+   "c12_mf": 0.03,
+   "rev_block": false,
+   "vinj_min": 7.79,
+   "vinj_max": 11.97,
+   "v12_min": 7.67,
+   "v12_max": 11.89,
+   "vkv_min": 7.73,
+   "vkv_max": 11.93,
+   "q1010_vds_max": 0.0,
+   "vds_max": 0.0,
+   "e1003": 0.0,
+   "ovp_tripped": false,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": true,
+   "kv_running": true,
+   "adp_running": true
+  },
+  {
+   "label": "Cranking Level II (10.1 s) unblocked LM74502 (back-feed demo)",
+   "ckv_mf": 2700.0,
+   "c12_mf": 12.0,
+   "rev_block": false,
+   "vinj_min": 4.28,
+   "vinj_max": 11.97,
+   "v12_min": 4.06,
+   "v12_max": 11.89,
+   "vkv_min": 7.89,
+   "vkv_max": 11.93,
+   "q1010_vds_max": 7.64,
+   "vds_max": 0.0,
+   "e1003": 0.0,
+   "ovp_tripped": false,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": false,
+   "kv_running": true,
+   "adp_running": false
+  },
+  {
+   "label": "Cranking Level II (10.1 s) 2.70 F KV + 12 mF adp (rev-blocked)",
+   "ckv_mf": 2700.0,
+   "c12_mf": 12.0,
+   "rev_block": true,
+   "vinj_min": 4.5,
+   "vinj_max": 11.97,
+   "v12_min": 5.93,
+   "v12_max": 11.89,
+   "vkv_min": 7.89,
+   "vkv_max": 11.93,
+   "q1010_vds_max": 7.42,
+   "vds_max": 6.9,
+   "e1003": 0.0,
+   "ovp_tripped": false,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": true,
+   "kv_running": true,
+   "adp_running": true
+  },
+  {
+   "label": "Cranking Level III (1.13 s) 300 mF KV + 282 mF adp (rev-blocked)",
+   "ckv_mf": 300.0,
+   "c12_mf": 282.0,
+   "rev_block": true,
+   "vinj_min": 3.0,
+   "vinj_max": 11.97,
+   "v12_min": 6.25,
+   "v12_max": 11.89,
+   "vkv_min": 7.76,
+   "vkv_max": 11.93,
+   "q1010_vds_max": 8.91,
+   "vds_max": 8.87,
+   "e1003": 0.0,
+   "ovp_tripped": false,
+   "uv_tripped": false,
+   "kv_uv_ok": true,
+   "adp_uv_ok": true,
+   "kv_running": true,
+   "adp_running": true
+  }
+ ],
+ "converter_spec": {
+  "topology": "4-switch synchronous buck-boost (plus upstream active 36 V Load Dump A limiter such as LM5060-Q1 / TIDA-01167)",
+  "output_v": "12.0 V +-2 % (11.76-12.24 V < 13.2 V KV260 MP5016H OVP)",
+  "current_min_a": 5.0,
+  "power_min_w": 60.0,
+  "input_range_v": "4.3 to 36.0 V continuous (ISO 16750-2 Level II cranking min 4.5-0.2 V, Load Dump B 35 V, Jump Start 24 V 60 s)",
+  "reverse_v": "-14 V for 60 s (ISO 16750-2 4.7)",
+  "load_dump_a_87v": "Requires upstream 36 V active surge stopper (SM8S33A alone reaches 43.8 V / 141.7 J > 130.7 J limit)",
+  "startup_rise": "Monotonic 2-20 ms into U1010 dVdT (5.49 ms), no dwell in 7.48-8.00 V hysteresis"
+ },
+ "cots_modules": [
+  {
+   "part": "Bicker Elektronik DC160WS",
+   "url": "https://www.bicker.de/en/dc160ws",
+   "vin_v": "6.0-36.0 V",
+   "vout_v": "12.0 V +-3 % (11.64-12.36 V, jumper-selected), 120 mVpp ripple",
+   "iout_a": "8.3 A (100 W) free air, 13.3 A (160 W) chassis-cooled",
+   "temp_c": "-20 to +70 C",
+   "protections": "Reverse polarity, SCP, OTP, OVP (+28 V)",
+   "missed": [
+    "6.0 V min misses Level II cranking (4.5 V) and Level III (3.0 V); passes Level I and IV",
+    "36 V max needs upstream 36 V limiter for unsuppressed 87 V Load Dump A",
+    "-20 C lower rating vs -40 C; start-up rise time unstated in datasheet"
+   ]
+  },
+  {
+   "part": "Mini-Box DCDC-USB-200 (Dumb Mode)",
+   "url": "https://resources.mini-box.com/online/PWR-DCDC-USB-200/PWR-DCDC-USB-200-manual.pdf",
+   "vin_v": "6.0-34.0 V (electronic shutdown at 34 V, clamps 34-36 V)",
+   "vout_v": "12.0 V +-2.5 % (11.70-12.30 V)",
+   "iout_a": "6 A at 6 V in, 9-12 A at 9-18 V (forced air > 60 W or > 65 C)",
+   "temp_c": "-40 to +85 C (-20 to +65 C chassis)",
+   "protections": "15 A input limit, 20 A fuse, TVS; must set J7 Dumb Mode",
+   "missed": [
+    "6.0 V min misses Level II (4.5 V) and Level III (3.0 V)",
+    "34 V max trips 1 V short of 35 V Load Dump B and fails 87 V Load Dump A without upstream limiter",
+    "No active reverse-polarity blocking listed (fuse-only without external ideal diode)"
+   ]
+  }
+ ],
+ "converter_transients": [
+  {
+   "id": "pulse1_200ms",
+   "label": "ISO 7637-2 Pulse 1 (-150 V, t2 = 200 ms disconnect)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 13.43,
+    "e1003": 0.191,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.98,
+    "v12_min": 3.68,
+    "v12_max": 11.94,
+    "status": "Class C (reset)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.98,
+    "status": "Class C (reset)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.98,
+    "status": "Class C (reset)"
+   }
+  },
+  {
+   "id": "pulse2a",
+   "label": "ISO 7637-2 Pulse 2a (+112 V, 2 Ohm, 50 us)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 13.98,
+    "e1003": 0.015,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.87,
+    "vkv_max": 11.93,
+    "v12_min": 11.83,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.87,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 11.74,
+    "vkv_max": 11.95,
+    "status": "Class A (runs)"
+   }
+  },
+  {
+   "id": "pulse3a",
+   "label": "ISO 7637-2 Pulse 3a (-220 V, 50 Ohm, 0.1 us)",
+   "bare": {
+    "vkv_min": 13.39,
+    "vkv_max": 13.43,
+    "e1003": 0.0,
+    "status": "Class A at 12 V (UA 13.5 V > 13.2 V OVP)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.93,
+    "vkv_max": 11.93,
+    "v12_min": 11.89,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.93,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 11.93,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   }
+  },
+  {
+   "id": "pulse3b",
+   "label": "ISO 7637-2 Pulse 3b (+150 V, 50 Ohm, 0.1 us)",
+   "bare": {
+    "vkv_min": 13.39,
+    "vkv_max": 13.43,
+    "e1003": 0.0,
+    "status": "Class A at 12 V (UA 13.5 V > 13.2 V OVP)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.93,
+    "vkv_max": 11.93,
+    "v12_min": 11.89,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.93,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 11.93,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   }
+  },
+  {
+   "id": "load_dump_b",
+   "label": "ISO 16750-2 Load Dump B (35 V, 0.5 Ohm, 400 ms)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 14.44,
+    "e1003": 0.0,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.85,
+    "vkv_max": 11.93,
+    "v12_min": 11.82,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.85,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   }
+  },
+  {
+   "id": "load_dump_a",
+   "label": "ISO 16750-2 Load Dump A (87 V, 1 Ohm, 400 ms)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 14.56,
+    "e1003": 116.388,
+    "status": "FAIL (D1003 burns)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "v12_min": 11.84,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   }
+  },
+  {
+   "id": "jump_start",
+   "label": "ISO 16750-2 Jump Start (24 V, 60 s)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 14.5,
+    "e1003": 0.0,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.87,
+    "vkv_max": 11.93,
+    "v12_min": 11.83,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.87,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 11.87,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   }
+  },
+  {
+   "id": "reverse",
+   "label": "ISO 16750-2 Reverse Battery (-14 V, 60 s)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 13.43,
+    "e1003": 0.0,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 3.99,
+    "vkv_max": 11.93,
+    "v12_min": 3.93,
+    "v12_max": 11.89,
+    "status": "Class C (reset)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 3.99,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 3.99,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   }
+  },
+  {
+   "id": "crank_I",
+   "label": "ISO 16750-2 Cranking Level I (8.0 V / 9.5..11.5 V, 1 s)",
+   "bare": {
+    "vkv_min": 7.73,
+    "vkv_max": 11.93,
+    "e1003": 0.0,
+    "status": "Class A (runs)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "v12_min": 11.85,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   }
+  },
+  {
+   "id": "crank_IV",
+   "label": "ISO 16750-2 Cranking Level IV (6.0 V / 6.5..8.5 V, 10 s)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "e1003": 0.0,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "v12_min": 11.85,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "status": "Class A (runs)"
+   }
+  },
+  {
+   "id": "crank_II",
+   "label": "ISO 16750-2 Cranking Level II (4.5 V / 6.5..8.5 V, 10 s)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "e1003": 0.0,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 11.88,
+    "vkv_max": 11.93,
+    "v12_min": 11.85,
+    "v12_max": 11.89,
+    "status": "Class A (runs)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   }
+  },
+  {
+   "id": "crank_III",
+   "label": "ISO 16750-2 Cranking Level III (3.0 V / 5.0..7.0 V, 1 s)",
+   "bare": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "e1003": 0.0,
+    "status": "Class C (reset)"
+   },
+   "spec_4v3_36v": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "v12_min": 3.63,
+    "v12_max": 11.89,
+    "status": "Class C (reset)"
+   },
+   "bicker_dc160ws": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   },
+   "minibox_usb200": {
+    "vkv_min": 3.98,
+    "vkv_max": 11.93,
+    "status": "Class C (reset)"
+   }
+  }
+ ]
+}

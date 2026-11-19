@@ -152,7 +152,7 @@ Topology (`KVPWR` sheet). `J1001` passes both +12 V and return through `L1004` (
 | `L1004` | `ZEGMCM9070-501T` (C53154905, Coilmaster SMM9070-501 equiv.): 600 Ω at 100 MHz (450 Ω min), 6 A, 2 x 8 mΩ max (16 mΩ total), 80 V | Carries 1.89 A typ / 4.12 A rated / 4.31 A worst vs 6 A (0.057 W / 0.272 W / 0.297 W both windings). Pads 1-2 `GND`, 3-4 `+12V`, dotted ends on jack side |
 | `Q1010`, `Q1011` | `DMT10H015LFG` (100 V, 13.5 mΩ, source on `VIN_J`) + `2N7002` (>= 15 V VDS, Ciss <= 50 pF, VGS 20 V) | Reverse polarity to -60 V (SLVSE94G §8.3.5, §9.2.2.6). `Q1010` sees 57.3 V peak VDS in pulse 1 (0.011 W at 0.92 A, 0.122 W at 3.00 A, 0.137 W at 3.19 A) |
 | `U1010` | `TPS26631PWPR` (C2866319): `MODE` = `GND` (auto-retry), `SHDN` open (2.7 V internal enable), `PGTH` = `GND`, `IMON`/`FLT` open | Active current limit with 2x IOL pulse support (SLVSE94G §8.3.7.1.2). 0.026 W at 0.92 A, 0.279 W at 3.00 A, 0.315 W at 3.19 A |
-| `R1040`, `R1041`, `R1042` | 316 kΩ / 24.9 kΩ / 30.9 kΩ (Rsum = 371.8 kΩ): OVP 14.44 V rising / 13.48 V falling (±2 %), UVLO 8.00 V rising / 7.46 V falling | SLVSE94G §8.3.3 requires R1 >= 300 kΩ (316 kΩ) between `IN_SYS` and `UVLO` with reverse polarity. Equations 9-10 (§9.2.2.2) keep `+12V_KV` under KV260's 16 V `SMAJ16A` |
+| `R1040`, `R1041`, `R1042` | 316 kΩ / 24.9 kΩ / 30.9 kΩ (Rsum = 371.8 kΩ): OVP 14.44 V rising / 13.50 V falling (±2 %), UVLO 8.00 V rising / 7.48 V falling | SLVSE94G §8.3.3 requires R1 >= 300 kΩ (316 kΩ) between `IN_SYS` and `UVLO` with reverse polarity. Equations 9-10 (§9.2.2.2) keep `+12V_KV` under KV260's 16 V `SMAJ16A` |
 | `R1043` | 6.04 kΩ (0603, 1 %): IOL = 18 kΩ·A / 6.04 kΩ = 2.98 A (2.77 to 3.19 A at ±7 %) | SLVSE94G §8.3.7.1 Equation 5. Caps KV260 at its 3.0 A brick rating while 1.12 + 3.19 = 4.31 A stays within `J1001`'s 5 A rating |
 | `C1093` | 22 nF (0603) on `dVdT`: t_dVdT = 20.8e3 x 12 V x 22 nF = 5.49 ms | SLVSE94G §8.3.1 Equation 2: controlled soft-start slew into KV260 bulk capacitance |
 | `C1094`, `C1095` | 1 uF 100 V 1206 X7R (`IN_SYS`), 10 uF 25 V 1206 X7R (`+12V_KV` at `J1004`) | High-voltage ceramic buffer (>= 67 V abs max on `IN_SYS`) + output decoupling at jumper |
@@ -167,19 +167,136 @@ backward-Euler solver models `J1001 -> L1004 -> VIN_J -> F1001/LM74502 (+12V)` i
 | Pulse / Fault | `VIN_J` min..max | `Q1010` VDS max | `+12V_KV` min..max | `U1010` OVP / `SMAJ16A` | Result |
 |---|---|---|---|---|---|
 | ISO 7637-2 Pulse 1 (-150 V, 10 Ω, 2 ms) | -44.4..+13.4 V | 57.3 V (< 100 V) | 4.00..13.34 V | No trip / 0 J | **PASS** |
-| ISO 7637-2 Pulse 2a (+112 V, 2 Ω, 50 us) | +11.4..+58.5 V | 34.5 V | 7.86..14.03 V | OVP at 11.7 us / 0 J | **PASS** |
+| ISO 7637-2 Pulse 2a (+112 V, 2 Ω, 50 us) | +11.4..+58.8 V | 34.6 V | 7.60..13.88 V | OVP at 11.7 us / 0 J | **PASS** |
 | ISO 7637-2 Pulse 3a (-220 V, 50 Ω, 0.1 us) | +13.3..+13.4 V | 0 V | 13.29..13.34 V | No trip / 0 J | **PASS** |
 | ISO 7637-2 Pulse 3b (+150 V, 50 Ω, 0.1 us) | +13.3..+13.4 V | 0 V | 13.29..13.34 V | No trip / 0 J | **PASS** |
-| ISO 16750-2 Load Dump B (suppressed 35 V) | +6.4..+35.0 V | 31.1 V | 3.91..14.42 V | OVP at 475 us / 0 J | **PASS** |
+| ISO 16750-2 Load Dump B (suppressed 35 V) | +6.4..+35.0 V | 31.0 V | 3.99..14.45 V | OVP at 480 us / 0 J | **PASS** |
 | ISO 16750-2 Load Dump A (87 V unsuppressed) | +12.6..+55.8 V | 52.0 V | 3.78..14.55 V | OVP at 275 us / `D1003` 116.5 J (> 29.7 J) | **FAIL** (`D1003` energy) |
-| Jump start (24 V, 60 s, first 50 ms) | +13.4..+24.0 V | 20.0 V | 4.00..14.46 V | OVP at 113 us / 0 J | **PASS** |
+| Jump start (24 V, 60 s, first 50 ms) | +13.4..+24.0 V | 20.0 V | 4.00..14.49 V | OVP at 116 us / 0 J | **PASS** |
 | Reverse battery (-14 V, first 50 ms) | -30.3..+12.9 V | 43.3 V | 4.00..13.19 V | Reverse blocked / 0 J | **PASS** |
-| ISO 16750-2 Cranking Level II (4.5 V, 15 ms) | +4.3..+13.4 V | 5.9 V | 3.85..13.34 V | Survives sag / 0 J | **PASS** |
+| ISO 16750-2 Cranking Level II (4.5 V, 15 ms) | +4.3..+13.4 V | 5.4 V | 3.93..13.34 V | Survives sag / 0 J | **PASS** |
 
 In every fault, `+12V_KV` peaks at or below 14.55 V (never reaching the KV260 `SMAJ16A` clamp) and `VIN_J` stays inside
 `U1010`'s -60 to +67 V (75 V for 10 ms) limits. PASS means nothing is damaged, not that the KV260 keeps running: in
 every case but pulses 3a and 3b, `U1010` opens or the input falls away and the KV260 resets (ISO 16750-2 functional
 status C). The 4 V floor of `+12V_KV` in the plots is where the model's loads stop drawing, not a regulated level.
+
+#### Ride-through in the vehicle
+
+The bare adapter protects both boards from damage (except unsuppressed 87 V Load Dump A), not from reset. To see
+whether local capacitors could keep the system running or whether an upstream pre-regulator is required,
+`_work/power/ride_through.py` (`docs/sim/ride_through.json`) evaluates every vehicle event against the KV260 and
+adapter cut-off limits:
+
+![Vehicle ride-through with upstream converter](sim/ride_through.png)
+
+1. Standards and fault waveforms evaluated `[V]`:
+   - `ISO 16750-2:2012` Clause 4.6.3 Table 5 starting profiles (retained unchanged in `ISO 16750-2:2023` Table 11):
+     Level I (Us = 8.0 V, Ua = 9.5 to 11.5 V, tf = 5 ms, t6 = 15 ms, t7 = 50 ms, t8 = 1.0 s, tr = 40 ms), Level II
+     (Us = 4.5 V, Ua = 6.5 to 8.5 V, t8 = 10 s, tr = 100 ms), Level III (Us = 3.0 V, Ua = 5.0 to 7.0 V, t8 = 1.0 s,
+     tr = 100 ms), and Level IV (Us = 6.0 V, Ua = 6.5 to 8.5 V, t8 = 10 s, tr = 100 ms).
+   - `ISO 16750-2:2012` Tables 6 and 7 Load Dump Test A (87 V from 79 to 101 V, Ri = 1 Ω, td = 400 ms) and Test B
+     (35 V suppressed, Ri = 0.5 Ω, td = 400 ms); Clause 4.3.1.2 Jump Start (24 V, 60 s); Clause 4.7 Reverse Battery
+     (-14 V, 60 s).
+   - `ISO 7637-2:2011` Table 2 / Figure 5 Pulse 1 (-150 V, Ri = 10 Ω, td = 2 ms, with supply disconnected for
+     t2 = 200 ms; load dump migrated from `ISO 7637-2:2004` Pulse 5a/5b into `ISO 16750-2`) and Table 3 Pulse 2a
+     (+112 V, Ri = 2 Ω, td = 50 us), Pulse 3a (-220 V, Ri = 50 Ω, td = 0.1 us), and Pulse 3b (+150 V, Ri = 50 Ω,
+     td = 0.1 us).
+
+2. Operating floors (`Vmin`) and rail loads:
+   - KV260 (`XTP682` p. 3, `XTP713`, `DS986`, `DS987`): `U41` (`MP5016H`) UVLO falls at 2.33 V `[V]` and the downstream
+     `MP8772GQ-Z` 5 V buck (700 kHz, `toff_min` = 100 ns -> `Dmax` = 0.930, `R_HS` = 16 mΩ, `L1` = 9.7 mΩ) drops out at
+     5.48 V for 11 W `[E]` or 5.62 V at 36 W `[V]` (5.32 V at the 4.75 V `DS987` `VCC_SOM` floor). `U1010` cuts off
+     higher at 7.476 V `[V]` (7.48 V), setting `Vmin_KV` = 7.48 V with 11 W `[E]` typical load and 23.84 W `[V]`
+     (3.189 A x 7.476 V) worst-case `U1010` current-limit bound. Note that `MP5016H` OVP (`R134` = 274 kΩ) opens
+     above 13.2 V `[V]`, so even a steady 13.5 V `[V]` alternator bus drops the KV260 without upstream regulation.
+   - Adapter (`SNOSDE0A`, `SNVSAN3F`): `LM74502-Q1` (`Q1001`/`Q1003`) `VS` POR falls at 3.2 V `[V]` (3.9 V rising) and
+     has no reverse-current blocking comparator. Downstream `LMR33630ADDA` (`+5V0` = 5.016 V, `Dmax` = 0.98,
+     `R_HS max` = 160 mΩ, `L` DCR = 30 mΩ) drops out at `Vmin_adp` = 5.59 V `[V]` worst case at 2.409 A `[V]` (5.39 V
+     typ; 5.06 V at the `TPS56x` 4.5 V floor), drawing 11.7 W typical / 13.4 W worst case `[V]`.
+
+3. Hold-up energy (`E = P x t`), capacitance (`C = 2 x E / (V0^2 - Vmin^2)`), `U1010` start-up check, and Nichicon
+   `UHE` 25 V radial bank sizing (`CAT.8100M`: `UHE1E102MHD6` 1000 uF 25 V, 12.5 x 20 mm, 35 mΩ, 1.90 A rms;
+   `UHE1E472MHD` 4700 uF 25 V, 16 x 40 mm, 13 mΩ, 4.08 A rms; -40 to +105 C, 10,000 h at 105 C / 40,000 h at 85 C):
+
+| Event (V0 -> Vmin) | `E_KV` typ / bnd | `C_KV` typ / bnd (7.48 V) | `C_ADP` typ / wst (5.59 V) | `U1010` recharge | `UHE` 25 V cans (typ..bnd) | Fits case |
+|---|---|---|---|---|---|---|
+| Pulse 2a (+112 V, 1.35 ms) | 0.015 / 0.032 J | 0.24 / 0.51 mF | 0.02 / 0.02 mF | 5.5 ms (**PASS**) | 1..1 x `UHE1E102MHD6` (3.1 cm3) | Yes (above PCB) |
+| Pulse 1 spike alone (2 ms, unrealistic) | 0.022 / 0.048 J | 0.35 / 0.75 mF | 0.31 / 0.35 mF | 5.5 ms (**PASS**) | 1..1 x `UHE1E472MHD` (10.2 cm3) | No |
+| Pulse 1 disconnect (t2 = 200 ms) | 2.22 / 4.82 J | 35.17 / 76.22 mF | 30.99 / 35.50 mF | 141.6 ms (**FAIL**) | 16..24 x `UHE1E472MHD` (163.8 cm3) | No |
+| Load Dump B (35 V, 400 ms) | 4.41 / 9.56 J | 69.82 / 151.31 mF | 61.99 / 70.99 mF | 281.1 ms (**FAIL**) | 30..48 x `UHE1E472MHD` (307.2 cm3) | No |
+| Load Dump A (87 V, 757 ms > OVP) | 8.33 / 18.05 J | 131.80 / 285.64 mF | 75.16 / 86.08 mF | 530.7 ms (**FAIL**) | 47..80 x `UHE1E472MHD` (481.3 cm3) | No |
+| Jump Start (24 V, 60 s) | 660.0 / 1430.4 J | 10.45 / 22.64 F | 9.30 / 10.65 F | 42.1 s (**FAIL**) | 4489..7083 x `UHE1E472MHD` (46.0 L) | No |
+| Reverse Battery (-14 V, 60 s) | 660.0 / 1430.4 J | 10.45 / 22.64 F | 9.30 / 10.65 F | 42.1 s (**FAIL**) | 4489..7083 x `UHE1E472MHD` (46.0 L) | No |
+| Cranking Level I (8.0 V min, 1 s) | 0 / 0 J | 0 / 0 mF | 0 / 0 mF | 0 ms (**PASS**) | 0 cans | Yes (stock C) |
+| Cranking Level IV (6.0 V, 10 s) | 111.32 / 241.26 J | 2527 / 5476 mF | 0 / 0 mF | 10.2 s (**FAIL**) | 538..1166 x `UHE1E472MHD` (5.51 L) | No |
+| Cranking Level II (4.5 V, 10 s) | 111.32 / 241.26 J | 2527 / 5476 mF | 7.89 / 9.03 mF | 10.2 s (**FAIL**) | 540..1168 x `UHE1E472MHD` (5.53 L) | No |
+| Cranking Level III (3.0 V, 1 s) | 12.43 / 26.94 J | 282.15 / 611.49 mF | 234.51 / 268.59 mF | 1.14 s (**FAIL**) | 118..188 x `UHE1E472MHD` (1.21 L) | No |
+
+4. Why bulk hold-up fails thermal start-up, enclosure fit, and back-feed checks:
+   - `U1010` thermal SOA (`SLVSE94G`): `C1093` = 22 nF `[V]` sets a 2.19 V/ms ramp (5.49 ms to 12 V), hitting the 2.98 A
+     `IOL` knee above 1.36 mF. Larger banks charge under current limit at 18 W average FET dissipation (12 V x 2.98 A
+     triangular average). At 70 C (`RthetaJA` = 32.2 C/W `[V]`, steady thermal regulation power 2.33 W), `t(Treg_timeout)`
+     min = 2.30 s sets a no-load hard ceiling of 74.4 mF, while `SLVSE94G` Fig 6-18 18 W thermal shutdown trips at about
+     150 ms (25 C) to 45 ms (85 C) ahead of `tCL_PLIM` min = 129 ms. In practice, only small glitch banks around 1 mF
+     start cleanly through `U1010`.
+   - Enclosure pockets (`_work/mech/build_case.py`): tray cavities beneath the adapter are at most 7.6 mm deep
+     (`pk_kvpwr` is 15.9 x 24.8 x 2.8 mm) and headroom above the adapter is 16.35 mm under the v2 fan or 25.85 mm outside
+     the fan envelope. Only 1 x `UHE1E102MHD6` (12.5 x 20 mm, Pulse 2a) fits vertically outside the fan envelope; `UHE1E472MHD`
+     (16 x 40 mm) and 16 to 1168-can banks cannot fit in the enclosure.
+   - 4-node solver bank checks (`ride_through.json`): `Pulse 2a` with 1 mF on `+12V_KV` + 0.1 mF on `+12V` holds 10.70 to
+     13.54 V / 10.95 to 17.83 V. For `Pulse 1` (t2 = 200 ms), the closed-form 8 x 4.7 mF = 37.6 mF per rail still drops to
+     7.39 V on `+12V_KV` and 5.47 V on `+12V` because of IR drop and `U1010`'s 1.83 ms turn-on delay; 9 x 4.7 mF = 42.3 mF
+     per rail is needed to hold 8.28 V / 6.83 V. `Load Dump B` (400 ms) holds with 16 x 4.7 mF = 75.2 mF per rail (8.06 V /
+     12.53 V), and `Cranking Level I` rides through on stock 47 uF / 28.6 uF (7.73 V / 7.67 V). Because `LM74502-Q1` lacks
+     reverse-current blocking, an unmodified adapter bank back-feeds into the 4.5 V Level II cranking bus and drops `+12V`
+     to 4.06 V; adding upstream reverse blocking lets 2.70 F (KV260) + 12 mF (adapter) hold 7.89 V / 5.93 V across Level II,
+     and 300 mF + 282 mF hold 7.76 V / 6.25 V across Level III.
+
+5. Upstream automotive buck-boost converter specification (single external module before `J1001`):
+   - **Feed `J1001` from a 4-switch automotive buck-boost converter (4.3 to 36 V continuous input, regulated 12.0 V +-2 %
+     output strictly below KV260's 13.2 V `MP5016H` OVP, >= 5 A / 60 W) preceded by an active 36 V surge limiter for
+     unsuppressed 87 V Load Dump A.**
+   - Required parameters: 11.76 to 12.24 V output (<= 12.4 V max transient overshoot), -14 V for 60 s reverse-polarity
+     protection, and a monotonic 2 to 20 ms rise into `U1010`'s 5.49 ms `dVdT` ramp with no dwell inside the 7.48 to 8.00 V
+     hysteresis window. A passive `SM8S33A` TVS alone reaches 43.8 V and absorbs 141.7 J during 87 V Load Dump A, exceeding its
+     130.7 J Wunsch-Bell limit, so unsuppressed 87 V transients require an active surge stopper such as `LM5060-Q1`
+     (`TIDA-01167`). Reference buck-boost controllers meeting 4.3 to 36 V directly are `LM5118-Q1` (`TIDA-01179`) or
+     `LTM4607`.
+   - Never fit a 13.6 V or 13.8 V automotive battery stabiliser: KV260 `MP5016H` OVP opens permanently above 13.2 V.
+   - Comparison with real COTS DC-DC modules (every gap stated honestly):
+     - `Bicker Elektronik DC160WS` (`https://www.bicker.de/en/dc160ws`): 6.0 to 36.0 V in, 12.0 V +-3 % out (11.64 to 12.36 V,
+       120 mVpp), 8.3 A free air / 13.3 A chassis, -20 to +70 C, reverse polarity protection. Misses 4.5 V Level II and 3.0 V
+       Level III cranking (runs Level I and IV), needs an external 36 V limiter for 87 V Load Dump A, stops at -20 C rather
+       than -40 C, and does not specify start-up rise time.
+     - `Mini-Box DCDC-USB-200` in J7 Dumb Mode
+       (`https://resources.mini-box.com/online/PWR-DCDC-USB-200/PWR-DCDC-USB-200-manual.pdf`): 6.0 to 34.0 V in (electronic
+       shutdown at 34 V, clamps 34 to 36 V), 12.0 V +-2.5 % out (11.70 to 12.30 V), 6 A at 6 V / 9 to 12 A at 9 to 18 V,
+       -40 to +85 C open (-20 to +65 C cased). Misses 4.5 V Level II and 3.0 V Level III cranking, trips 1 V below 35 V Load
+       Dump B and fails 87 V Load Dump A without an external 36 V limiter, and lists fuse-only rather than active reverse
+       blocking.
+
+6. 4-node solver re-run with upstream converters (`docs/sim/ride_through.json`):
+
+| Event | Bare board (no converter) | Spec 4.3 to 36 V + 36 V limiter | `Bicker DC160WS` + 36 V limiter | `Mini-Box DCDC-USB-200` (no ext. limiter) |
+|---|---|---|---|---|
+| ISO 7637-2 Pulse 1 (t2 = 200 ms disconnect) | Class C (reset) | Class C (reset) | Class C (reset) | Class C (reset) |
+| ISO 7637-2 Pulse 2a (+112 V, 50 us) | Class C (reset) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) |
+| ISO 7637-2 Pulse 3a (-220 V, 0.1 us) | Class A at 12 V (13.5 V > 13.2 V OVP) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) |
+| ISO 7637-2 Pulse 3b (+150 V, 0.1 us) | Class A at 12 V (13.5 V > 13.2 V OVP) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) |
+| ISO 16750-2 Load Dump B (35 V, 400 ms) | Class C (reset) | **Class A** (runs) | **Class A** (runs) | Class C (reset at 34 V) |
+| ISO 16750-2 Load Dump A (87 V, 400 ms) | **FAIL** (`D1003` burns, 116.4 J) | **Class A** (runs) | **Class A** (runs) | Class C (reset) |
+| ISO 16750-2 Jump Start (24 V, 60 s) | Class C (reset) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) |
+| ISO 16750-2 Reverse Battery (-14 V, 60 s) | Class C (reset, protected) | Class C (reset) | Class C (reset) | Class C (reset) |
+| ISO 16750-2 Cranking Level I (8.0 V, 1 s) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) |
+| ISO 16750-2 Cranking Level IV (6.0 V, 10 s) | Class C (reset) | **Class A** (runs) | **Class A** (runs) | **Class A** (runs) |
+| ISO 16750-2 Cranking Level II (4.5 V, 10 s) | Class C (reset) | **Class A** (runs) | Class C (reset) | Class C (reset) |
+| ISO 16750-2 Cranking Level III (3.0 V, 1 s) | Class C (reset) | Class C (reset) | Class C (reset) | Class C (reset) |
+
+With the specified 4.3 to 36 V converter and upstream 36 V surge limiter, every continuous and over-voltage vehicle event
+including Level I/II/IV cold cranking, Jump Start, and Load Dump A/B stays Class A (no reset). Without external energy
+storage, disconnecting the supply for 200 ms (`ISO 7637-2` Pulse 1), prolonged -14 V reverse battery connection, and
+aged-battery Level III cranking down to 3.0 V still drop `+12V_KV` cleanly and restart once power returns (Class C).
 
 Common-mode noise at home (`_work/power/cm_noise.py`, `docs/sim/cm_noise.png`, `docs/sim/cm_noise.json`). ![Common-mode noise attenuation](sim/cm_noise.png) With an earthed SMPS brick (120 mV peak switching factor across 50 to 150 kHz, 5 mV VHF floor, 1.0 Ω PE bond `[E]`, 1.8 m DC cord) and earthed external cables (1.5 m monitor/PC lead, 5.0 m coax, board ground 0.5 mΩ + 5 nH `[E]`):
 
@@ -200,8 +317,11 @@ Limits, said plainly.
   switching CM current on the DC cord, and `R1218`/`C1223` isolate Ethernet `J1201`'s shield at DC/50 Hz, **but USB (`J1501`
   or KV260 USB to an earthed PC) and DisplayPort (to an earthed monitor) still close ground loops**: prefer a two-prong
   (Class II) bench brick, use a USB isolator or battery laptop on USB, and fit clip-on ferrites on earthed leads.
-- **In a vehicle, feed `J1001` from a regulated 12.0 V DC-DC converter (>= 5 A, < 13.2 V) behind a 5 A inline fuse**:
-  unsuppressed Load Dump A (87 V) exceeds `D1003`'s 29.7 J rating (116.5 J).
+- **In a vehicle, feed `J1001` from a 4.3 to 36 V automotive buck-boost converter (12.0 V +-2 % output strictly below
+  13.2 V, >= 5 A / 60 W, with an upstream 36 V active surge limiter and a 5 A inline fuse to `J1001`)**: unsuppressed
+  Load Dump A (87 V) exceeds `D1003`'s 29.7 J rating (116.5 J) on a bare board, and alternator voltages above 13.2 V
+  trip KV260 `MP5016H` OVP. With that converter, only disconnecting the supply (`ISO 7637-2` pulse 1, 200 ms off),
+  prolonged -14 V reverse polarity, or aged-battery 3.0 V Level III cranking still resets the module.
 
 ## 2. Decisions this sheet makes, for your approval
 

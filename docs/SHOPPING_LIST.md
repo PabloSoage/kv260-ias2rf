@@ -255,9 +255,9 @@ Applies from stage 1 onwards. **This is not an accessory: it is what makes the r
 |---|---|---|---|
 | ☑ | LiFePO4 + secondary alternator | | *already have* |
 | ☐ | **ISO 7637-2 protection** on the 12 V input | Load dump and cold crank. A bench TVS is not enough | €50 |
-| ☐ | **Regulated `12.0 V, ≥ 5 A` DC/DC (output `< 13.2 V`)** with input filter | Feeds both boards through `J1001` (`POWER_SPEC` §1.4); keeps KV260 `MP5016` below its `13.2 V` cut-off, blocks unsuppressed Load Dump A, and keeps alternator ripple out of HF | €80 |
+| ☐ | **Automotive `4.3-36 V` -> `12.0 V +-2 %` (`< 13.2 V`), `>= 5 A` (`60 W`) buck-boost DC/DC** + upstream `36 V` active surge limiter | Feeds both boards through `J1001` (`POWER_SPEC` §1.4); rides through Level I/II/IV cranking and blocks `87 V` unsuppressed Load Dump A (which exceeds a bare `SM8S33A`). Examples: `Bicker DC160WS` (`6-36 V`) or `Mini-Box DCDC-USB-200` (`6-34 V`, J7 Dumb Mode) both miss `4.5 V` Level II cranking and still need the external `36 V` Load Dump A limiter. **Never fit a `13.6 V` automotive stabiliser** (KV260 `MP5016H` OVP cuts off at `13.2 V`) | €80–150 |
 | ☐ | IP-rated enclosure with filtered ventilation | The KV260's fansink needs clean air | €150 |
-| ☐ | Fused distribution with **`5 A` inline harness fuse** (was `3 A`) and master cut-off | Safety (`5 A` fuse sizes the single-entry `1.12 A` adapter + `3.0 A` / `3.19 A` max KV260 branch = `4.31 A` worst through `J1001`; `BOARD_MANUAL` §6) | €60 |
+| ☐ | Fused distribution with **`5 A` inline harness fuse** (converter output to `J1001`) + **`15-20 A` battery-to-converter fuse** and master cut-off | Safety: the `5 A` fuse between converter output and `J1001` sizes the `1.12 A` adapter + `3.0 A` (`3.19 A` max) KV260 load (`4.31 A` worst); the `15-20 A` upstream fuse carries converter input current during low-voltage cranking (`BOARD_MANUAL` §6) | €60 |
 | ☐ | Shielded cable, ferrites, ground braid | **Problem number one of vehicle radio** | €100 |
 | ☐ | Touchscreen or tablet as the interface | | €150 |
 | ☐ | Anti-vibration mounting tray | | €80 |

@@ -391,7 +391,7 @@ def input_stage(kind, p_load=13.4, p_kv=11.0):
     """Single-entry topology:
     Source -> Ri -> harness 1 uH + L1004 (50 nH leak, 2x8 mOhm [V/E]) -> VIN_J (C_j 10 nF [E])
       |- Adapter: F1001 (40 mOhm) -> VIN_F (C1090 100 nF, D1003 SMCJ33CA) -> LM74502 FETs (27 mOhm) -> +12V (C12, D1001)
-      |- KV260:   Q1010 (13.5 mOhm) + U1010 TPS26631 (31 mOhm, OVP 14.4/13.5 V 11 us, UVLO 8.0/8.4 V, ILIM 3.0 A, RCB 0.17 us)
+      |- KV260:   Q1010 (13.5 mOhm) + U1010 TPS26631 (31 mOhm, OVP 14.4/13.5 V 11 us, UVLO 7.48/8.00 V, ILIM 3.0 A, RCB 0.17 us)
                   -> +12V_KV (C_kv 47 uF [E], SMAJ16A on KV260) -> constant-power load (off < 4 V).
     """
     src, ri, t_end, dt, disconnect = pulse(kind)
@@ -403,8 +403,8 @@ def input_stage(kind, p_load=13.4, p_kv=11.0):
     ron_adp = 2 * 0.0135
     ron_kv = 0.0135 + 0.031                   # Q1010 DMT10H015LFG (13.5 mOhm) + U1010 TPS26631 (31 mOhm) [V]
     ov_on, ov_off = 18.33, 18.0               # LM74502 R1004/R1005 [V]
-    kv_ov_on, kv_ov_off = 14.4, 13.5          # TPS26631 R1040/R1041/R1042 OVP [V]
-    kv_uv_off, kv_uv_on = 8.0, 8.4            # TPS26631 UVLO [V]
+    kv_ov_on, kv_ov_off = 14.439, 13.500      # TPS26631 R1040=316k/R1041=24.9k/R1042=30.9k (SLVSE94G 1.200/1.122 V) [V]
+    kv_uv_off, kv_uv_on = 7.476, 7.996        # TPS26631 UVLO falling/rising (SLVSE94G 1.122/1.200 V) [V]
     kv_ilim = 3.0                             # R1043 = 6.04 kOhm (2.98 A nom, 2.77..3.19 A at +-7 %) [V]
 
     il = (p_load + p_kv) / 13.5

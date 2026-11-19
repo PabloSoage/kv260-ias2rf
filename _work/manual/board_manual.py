@@ -423,8 +423,11 @@ def md(parts, nums):
       "brick's 3 A rating (2.98 A nominal, 2.77 to 3.19 A).")
     w("")
     w("- In a vehicle:")
-    w("  - **Feed `J1001` from an upstream regulated 12.0 V DC-DC converter (>= 5 A, output strictly below 13.2 V)** so the "
-      "KV260's `MP5016` eFuse stays enabled and Load Dump A (87 V) cannot overload `D1003`, behind a 5 A inline harness fuse.")
+    w("  - **Feed `J1001` from a 4.3 to 36 V automotive buck-boost converter (12.0 V +-2 % strictly below 13.2 V, >= 5 A / 60 W) "
+      "with an upstream 36 V Load Dump A (87 V) surge limiter and a 5 A inline fuse to `J1001`** (plus a 15 to 20 A fuse on the "
+      "battery feed; never fit a 13.6 V stabiliser, which trips the KV260's `MP5016H` OVP). With that converter in place, only "
+      "disconnecting the battery (`ISO 7637-2` pulse 1, 200 ms off), prolonged -14 V reverse battery, or extreme 3.0 V cranking "
+      "still resets the module (`POWER_SPEC` §1.4).")
     w("  - **Never run a second chassis ground wire to the KV260** (by wire, mounting strap or shield); both boards return "
       "through `J1001` alone. Return the CAN/GPS cable ground (`J1503` pins 1 and 4) from the same chassis ground point as the "
       "DC-DC converter's negative lead.")
