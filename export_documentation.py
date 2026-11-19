@@ -46,6 +46,8 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_OUT = REPO_ROOT / "docs" / "KV260-IAS2RF_Documentation.pdf"
+LITE_OUT = REPO_ROOT / "docs" / "KV260-IAS2RF_Documentation-Lite.pdf"
+PSU_SCH_PDF = REPO_ROOT / "docs" / "KV260-IAS2RF_PSU_schematic.pdf"
 
 A4_W, A4_H = fitz.paper_size("a4")  # ~595.28 x 841.89 pt
 MARGIN_X = 42
@@ -89,6 +91,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
             ("RF Switch Matrix & SMA Routing (M3SWA2-34DR+)", "docs/ROUTING_SPEC.md"),
             ("Front-End Artix-7 Control & Ethernet PHY", "docs/CONTROL_SPEC.md"),
             ("Power Tree, Sequencing & Protection", "docs/POWER_SPEC.md"),
+            ("PSU Board: Vehicle Supply for Both Boards (LTC4364 + LM5177)", "docs/PSU_SPEC.md"),
             ("KiCad Symbol Library Verification", "docs/SYMBOLS.md"),
         ],
     ),
@@ -1239,12 +1242,28 @@ def add_section_divider(master: fitz.Document, title: str, subtitle: str) -> int
     return len(master)
 
 
+def lite_render(rel: str) -> str | None:
+    """The normal-resolution render in docs/img/ of a 4K plate (None if there is none)."""
+    stem = Path(Path(rel).name.replace("_4k", "")).stem
+    for ext in (".png", ".jpg"):
+        cand = REPO_ROOT / "docs" / "img" / (stem + ext)
+        if cand.is_file():
+            return f"docs/img/{stem}{ext}"
+    return None
+
+
 def add_showcase_pages(
-    master: fitz.Document, packer: AssetPacker, tmp_dir: Path, user_css: str, has_ttf: bool
+    master: fitz.Document, packer: AssetPacker, tmp_dir: Path, user_css: str, has_ttf: bool, lite: bool = False
 ) -> list[tuple[int, str, int]]:
-    """Build two-up A4 visual plates from the 4K hardware/heatsink/enclosure renders."""
-    html_parts: list[str] = ["<h1>4K Hardware, Heatsink &amp; Enclosure v2 Visual Plates</h1>"]
-    for caption, rel in SHOWCASE_4K_RENDERS:
+    """Build two-up A4 visual plates from the 4K hardware/heatsink/enclosure renders (lite: the normal renders)."""
+    heading = "Hardware, Heatsink &amp; Enclosure v2 Visual Plates" if lite else \
+        "4K Hardware, Heatsink &amp; Enclosure v2 Visual Plates"
+    html_parts: list[str] = [f"<h1>{heading}</h1>"]
+    plates = SHOWCASE_4K_RENDERS
+    if lite:
+        plates = [(c.replace("4K ", ""), lite_render(r)) for c, r in SHOWCASE_4K_RENDERS]
+        plates = [(c, r) for c, r in plates if r]
+    for caption, rel in plates:
         info = packer.prepare(REPO_ROOT / rel)
         if info:
             asset, px_w, px_h = info
@@ -1255,11 +1274,13 @@ def add_showcase_pages(
                 f"<figure><img src='{asset}' width='{w_pt}' height='{h_pt}' alt='{html.escape(caption)}'/>"
                 f"<figcaption>{html.escape(caption)} ({html.escape(rel)})</figcaption></figure>"
             )
-    doc = render_html_pages("\n".join(html_parts), tmp_dir, "4K Hardware & Enclosure Gallery", user_css, has_ttf)
+    label = "Hardware & Enclosure Gallery" if lite else "4K Hardware & Enclosure Gallery"
+    doc = render_html_pages("\n".join(html_parts), tmp_dir, label, user_css, has_ttf)
     start_page = len(master) + 1
     master.insert_pdf(doc)
     doc.close()
-    return [(2, "4K Hardware, Heatsinks & Enclosure v2 Plates", start_page)]
+    return [(2, ("Hardware, Heatsinks & Enclosure v2 Plates" if lite else
+                 "4K Hardware, Heatsinks & Enclosure v2 Plates"), start_page)]
 
 
 def _embed_vector_document(master: fitz.Document, src: fitz.Document, title: str) -> int:
@@ -1288,6 +1309,21 @@ def _embed_vector_document(master: fitz.Document, src: fitz.Document, title: str
         lbl = f"{title} ({pno + 1}/{total_sheets})" if total_sheets > 1 else title
         _stamp_page_header(page, lbl)
     return start_page
+
+
+def rasterize_pdf(src_path: Path, out_path: Path, dpi: int, quality: int) -> Path:
+    """A copy of a PDF with every page as a JPEG at dpi (the Lite book's layout appendix)."""
+    src = fitz.open(str(src_path))
+    out = fitz.open()
+    for page in src:
+        pix = page.get_pixmap(dpi=dpi, alpha=False)
+        jpg = pix.tobytes("jpeg", jpg_quality=quality)
+        new = out.new_page(width=page.rect.width, height=page.rect.height)
+        new.insert_image(new.rect, stream=jpg)
+    out.save(str(out_path), garbage=4, deflate=True)
+    out.close()
+    src.close()
+    return out_path
 
 
 def insert_vector_pdf(master: fitz.Document, pdf_path: Path, toc: list[list], level: int, title: str) -> None:
@@ -1331,7 +1367,8 @@ def _render_toc_document(toc_entries: list[list], offset: int, tmp_dir: Path, us
     return render_html_pages("\n".join(rows_html), tmp_dir, "", user_css, has_ttf)
 
 
-def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: int, include_vectors: bool) -> None:
+def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: int, include_vectors: bool,
+                            lite: bool = False) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     _, has_ttf = _font_css()
     user_css = build_base_css(has_ttf)
@@ -1344,6 +1381,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
             ("Appendix B: Vector Heatsink Mechanical Map", 1),
             ("Appendix C: Vector 14-Page Hierarchical KiCad Schematic", 14),
             ("Appendix D: Vector 10-Sheet 8-Layer PCB Layout", 10),
+            ("Appendix E: Vector PSU Board Schematic", 1),
         ])
     add_cover_page(master)
     add_summary_page(master, summary)
@@ -1373,7 +1411,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
                 toc.append([2, doc_title, start_page])
 
             if part_title.startswith("Part V:"):
-                sub_toc = add_showcase_pages(master, packer, tmp_dir, user_css, has_ttf)
+                sub_toc = add_showcase_pages(master, packer, tmp_dir, user_css, has_ttf, lite)
                 for lvl, ttl, pg in sub_toc:
                     toc.append([lvl, ttl, pg])
 
@@ -1443,12 +1481,16 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
             )
             toc.append([1, "Appendix D: Vector 8-Layer PCB Layout", pnum])
             layout_start = len(master) + 1
+            layout_pdf = REPO_ROOT / "docs/KV260-IAS2RF_layout.pdf"
+            if lite:
+                layout_pdf = rasterize_pdf(layout_pdf, Path(tempfile.gettempdir()) / "kv260_layout_raster.pdf", 80, 55)
             insert_vector_pdf(
                 master,
-                REPO_ROOT / "docs/KV260-IAS2RF_layout.pdf",
+                layout_pdf,
                 toc,
                 2,
-                "10-Sheet 8-Layer PCB Vector Layout",
+                "10-Sheet 8-Layer PCB Layout" + (" (80 dpi; vector in docs/KV260-IAS2RF_layout.pdf)" if lite
+                                                  else " Vector Layout"),
             )
             layer_labels = [
                 "Page 1: L1 (F.Cu Top Signal)",
@@ -1466,6 +1508,14 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
             for off, lbl in enumerate(layer_labels):
                 if layout_start + off <= layout_end:
                     toc.append([3, lbl, layout_start + off])
+
+            pnum = add_section_divider(
+                master,
+                "Appendix E: PSU Board Schematic",
+                "The vehicle supply for both boards: LTC4364 surge stopper, LM5177 buck-boost, two TPS26631 (vector)",
+            )
+            toc.append([1, "Appendix E: Vector PSU Board Schematic", pnum])
+            insert_vector_pdf(master, PSU_SCH_PDF, toc, 2, "PSU Board Schematic (psu/psu.kicad_sch)")
 
         # Build Table of Contents and converge offset after insertion at page index 1
         toc_offset = 0
@@ -1500,6 +1550,8 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
         "author": "Pablo Soage",
         "subject": "8-Layer RF Front-End Adapter, Dual-FPGA Vivado Gateware, AERIS-10 Radar & Wideband SDR",
     })
+    if lite:
+        master.subset_fonts()
     master.save(str(out_path), garbage=4, deflate=True, clean=True)
     master.close()
     size_mb = out_path.stat().st_size / (1024.0 * 1024.0)
@@ -1512,8 +1564,20 @@ def main() -> int:
     parser.add_argument("--max-img-width", type=int, default=1600, help="Max raster image pixel width (default: 1600, about 220 dpi across A4)")
     parser.add_argument("--jpeg-quality", type=int, default=82, help="Embedded JPEG quality (default: 82)")
     parser.add_argument("--skip-vectors", action="store_true", help="Skip appending Vivado/KiCad vector PDF appendices")
+    parser.add_argument("--lite", action="store_true",
+                        help="The same book, lighter: the gallery from the normal renders instead of the 4K ones, "
+                             "rasters at 720 px and JPEG 52 (unless given); writes "
+                             "docs/KV260-IAS2RF_Documentation-Lite.pdf")
     args = parser.parse_args()
-    build_documentation_pdf(args.out, args.max_img_width, args.jpeg_quality, not args.skip_vectors)
+    out = args.out
+    if args.lite:
+        if out == DEFAULT_OUT:
+            out = LITE_OUT
+        if args.max_img_width == 1600:
+            args.max_img_width = 720
+        if args.jpeg_quality == 82:
+            args.jpeg_quality = 52
+    build_documentation_pdf(out, args.max_img_width, args.jpeg_quality, not args.skip_vectors, args.lite)
     for line in TABLE_REPORT:
         print(f"[table] {line}", file=sys.stderr)
     return 1 if TABLE_REPORT else 0
