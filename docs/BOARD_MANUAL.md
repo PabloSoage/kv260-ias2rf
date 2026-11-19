@@ -30,7 +30,7 @@ The thirteen SMAs are on the front edge (`J401`-`J952`) and the back wall (`J961
 | 14 | `J951` | top | SDR_RX_C | HF receive (SMA), no switch: a 30 MHz 7th-order elliptic low-pass, then the AD9253 channel B. Full scale about -3.0 dBm. The default HF input |
 | 15 | `J952` | top | SDR_TX_C | HF transmit (SMA), no switch: AD9767 DAC2. The default HF output |
 | 16 | `J961` | top | VU_ANT | VHF/UHF antenna (SMA, back wall): the Rev08 front end, direct 30-170 MHz and converted from 300 MHz to 3 GHz (170-300 MHz not covered: the converter's 300 MHz high-pass, AUDIT_Rev08 R1), into the AD9484 through SW2. Bias tee for an active antenna (off at power-up, 5 V or 3.3 V by `JP1301`, 125 mA limit; prefer 3.3 V where the antenna accepts it). Full scale -52 dBm at maximum gain, up to about +2 dBm with the attenuator and the LNA bypassed. No limiter: keep it away from a transmitter on the same vehicle (+25 dBm destroys the LNA) |
-| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH). Protected to 36.7 V transients, reverse battery and an 18.3 V over-voltage cut-off (POWER_SPEC section 1.1). About 11.7 W typical, 13.4 W worst case (docs/AUDIT_Rev08.md section 2.1) |
+| 17 | `J1001` | top | 12V IN | 12 V input, barrel jack (CUI PJ-102AH, 5 A). Single power entry for the whole module (`L1004` on both lines): feeds the adapter (11.7 W typ, 13.4 W / 1.12 A worst case; F1001 2 A PTC, 18.3 V OVP) and the KV260 through `U1010`/`J1004` (OVP 14.4 V, 3.6 A limit; up to 4.12 A rated / 4.98 A worst case combined). See POWER_SPEC section 1.4 and §6 |
 | 18 | `J1002` | top | FAN 5V | Enclosure fan, JST PH 2-pin: pin 1 +5 V (0.5 A PTC `F1002`), pin 2 GND |
 | 19 | `J1101` | top | JTAG 2x7 2mm | Xilinx JTAG for the XC7A50T and its flash (Platform Cable or any 2 mm 14-pin JTAG adapter) |
 | 20 | `J1102` | top | Pmod | Pmod from the KV260's `J2` (cable): SPI to the FPGA's register file, beam strobe, PPS and the debug UART. Pin by pin below |
@@ -205,5 +205,52 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | Standalone over Ethernet | RJ45 `J1201` to a PC; 12 V on `J1001` | The FPGA streams over UDP without the Kria |
 | Debug | USB-C `J1501` (lid off), 115,200 8N1; JTAG `J1101` | Boot banner, one status line a second, `r`/`w` register commands |
 | GPS time | GPS receiver on `J1503`; FFC from `J1502` to the KV260's `J9` | `kria_pps` timestamps the pulse; R5F core 0 disciplines the converters' clock to it |
+
+## 6. Power and grounding, installation
+
+![Power and grounding wiring](img/power_wiring.png)
+
+Feed the entire two-board module through **`J1001`** alone. Connect **`J1004`** (right-angle JST VH at the back edge;
+pin 1 `+12V_KV`, pin 2 `GND`) to the KV260's barrel jack **`J12`** with the short jumper (`VHR-2N`, 18 AWG, ~15 cm to a
+`5.5 × 2.5 mm` centre-positive plug) and **plug nothing else into `J12`**. Combined draw at `J1001` (`5 A` rating) and
+`L1004` (`6 A` rating) is `1.89 A` typical, `4.12 A` at the KV260's `3.0 A` brick rating (`1.12 A` adapter + `3.0 A`
+KV260), and `4.98 A` worst-case at `U1010`'s `+7 %` (`3.86 A`) current limit.
+
+- **In a vehicle:**
+  - Fit an upstream **regulated `12.0 V` DC-DC converter** (`>= 5 A`, output strictly **below `13.2 V`** so the KV260's
+    `MP5016` eFuse stays enabled) behind a **`5 A` inline harness fuse** (increased from `3 A`).
+  - Ground both boards **only through the adapter's `J1001` return**. Never run a second chassis ground wire to the
+    KV260 (by wire, mounting strap or shield).
+  - Return the CAN/GPS cable ground (`J1503` pins 1 and 4) from the **same chassis ground point** as the DC-DC
+    converter's negative lead.
+
+- **At home / on a bench:**
+  - Use **one `12 V / 5 A` wall adapter** on `J1001`, preferably a **two-prong (Class II, double-insulated)** brick with
+    no mains earth pin.
+  - If using a three-prong earthed PSU, fit **clip-on ferrite clamps** on every external earthed cable attached to the
+    module (DisplayPort monitor lead, USB or Ethernet cable to an earthed PC, and antenna coax mast lead).
+
+**What the module tolerates (`_work/power/ground_offset.py`, `docs/sim/ground_offset.json`).** The inter-board ground
+bond (`BM20` contacts of `J101`/`J102` + FFC + Pmod) measures only `1.29 mΩ` typical (`3.79 mΩ` max contact R), with
+`BM20` carrying `94.3 %` of link current against a **`0.30 A` per-contact rating**:
+
+| Installation / Fault case | Inter-board link current | Per `BM20` contact | Against `0.30 A` rating |
+|---|---|---|---|
+| Separate grounds, same point (`1.0 m / 1.0 m`) | `-0.93 A` | `0.040 A` (`40 mA`) | Pass |
+| Separate grounds, same point (`0.3 m / 2.0 m`) | `-1.96 A` | `0.084 A` (`84 mA`) | Pass |
+| Separate grounds, `1.0 V` chassis offset (`1 m` typ) | `~10.2 A` | **`0.411 A`** (`411 mA`) | **FAIL** (exceeds `0.30 A` from `0.75 V`) |
+| Separate grounds, `1.0 V` offset (`1 m`, max contact R) | `~9.9 A` | **`0.355 A`** (`355 mA`) | **FAIL** (exceeds `0.30 A` from `0.85 V`) |
+| Separate grounds, `1.0 V` offset (`0.3 m` leads, typ) | `~17.7 A` | **`0.714 A`** (`714 mA`) | **FAIL** (exceeds `0.30 A` from `0.40 V`) |
+| Separate grounds, `1.0 V` offset (`3.0 m` leads, typ) | `~5.0 A` | `0.203 A` (`203 mA`) | Pass (`0.30 A` at `1.60 V`) |
+| Separate grounds, KV260 ground wire lost | `3.00 A` | `0.129 A` (`129 mA`) | Pass (surviving jack `4.12 A`) |
+| **Single power entry (`J1001` -> `J1004` -> `J12`)** | `-2.91 A` | **`0.125 A`** (`125 mA`) | **Pass** (independent of chassis offset) |
+| Home `50 Hz` earth loop (`0.1 V` / `1.0 V`, `0.289 Ω`) | `0.35 A` / `3.46 A` | `15 mA` / `148 mA` | Pass (`173 µV` / `1.73 mV` board drop) |
+
+**Honest limits.**
+- `L1004` gives `3 to 10 dB` of common-mode attenuation (`2.9 dB` at `65 kHz`, `9.5 dB` at `100 MHz`, `docs/sim/cm_noise.json`),
+  reducing SMPS switching common-mode noise on the DC lead, but it **does not remove earth loops** closed through
+  DisplayPort, USB/Ethernet or coax shields connected to earthed equipment (`PE`).
+- Unsuppressed Load Dump A (`87 V`) exceeds `D1003`'s `29.7 J` pulse rating (`116.5 J` in `docs/sim/power_audit.json`):
+  the upstream regulated `12 V` DC-DC converter is required in a vehicle.
 
 Levels, bands and the register map: [ROUTING_SPEC](ROUTING_SPEC.md), [RX_VU_SPEC](RX_VU_SPEC.md), [SIGNAL_INTEGRITY](SIGNAL_INTEGRITY.md), [FPGA_GATEWARE](FPGA_GATEWARE.md), [LINK_PROTOCOL](../fpga/link/LINK_PROTOCOL.md).
