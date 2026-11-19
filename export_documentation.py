@@ -11,7 +11,7 @@ Combines:
   - Dedicated 4K hardware, heatsink placement, and Enclosure v2 visual plates
   - Lossless vector Vivado FPGA silicon floorplans & circuit schematics
   - Lossless vector heatsink mechanical map
-  - Lossless vector 11-sheet KiCad schematic PDF (normalized to uniform width)
+  - Lossless vector 12-sheet KiCad schematic PDF (normalized to uniform width)
   - Lossless vector 10-sheet 8-layer PCB layout PDF (L1-L8 + composite + tracks-only)
 
 Requirements:
@@ -1052,6 +1052,15 @@ def _unstick(pages: dict[str, tuple[int, float]], tables: list[int], splits: dic
             if j - 1 > max([0] + [s for s in splits[k] if s < j]):
                 splits[k].add(j - 1)
             return True
+    # If an earlier multi-page table is still uncut when a later element stalls Story, split that earlier table
+    # at its first placed page break so subsequent passes settle normally instead of restarting inside it.
+    for k in tables:
+        cuts = splits.get(k, set())
+        for j in range(1, len(_TABLES[k][2])):
+            cur, prev = pages.get(f"t{k}r{j}"), pages.get(f"t{k}r{j - 1}")
+            if cur is not None and prev is not None and cur[0] != prev[0] and j not in cuts:
+                splits.setdefault(k, set()).add(j)
+                return True
     return False
 
 
@@ -1333,7 +1342,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
         summary.extend([
             ("Appendix A: Vector Vivado FPGA Silicon Floorplans & Schematics", len(VECTOR_FPGA_PDFS)),
             ("Appendix B: Vector Heatsink Mechanical Map", 1),
-            ("Appendix C: Vector 13-Page Hierarchical KiCad Schematic", 13),
+            ("Appendix C: Vector 14-Page Hierarchical KiCad Schematic", 14),
             ("Appendix D: Vector 10-Sheet 8-Layer PCB Layout", 10),
         ])
     add_cover_page(master)
@@ -1394,17 +1403,17 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
 
             pnum = add_section_divider(
                 master,
-                "Appendix C: 13-Page Hierarchical KiCad Schematic",
-                "Complete connected overview + all 12 hierarchical schematic sheets (13 vector pages)",
+                "Appendix C: 14-Page Hierarchical KiCad Schematic",
+                "Complete connected overview + all 12 hierarchical schematic sheets (14 vector pages)",
             )
-            toc.append([1, "Appendix C: Vector 13-Page Hierarchical KiCad Schematic", pnum])
+            toc.append([1, "Appendix C: Vector 14-Page Hierarchical KiCad Schematic", pnum])
             sch_start = len(master) + 1
             insert_vector_pdf(
                 master,
                 REPO_ROOT / "docs/KV260-IAS2RF_schematic.pdf",
                 toc,
                 2,
-                "Complete 13-Page Hierarchical KiCad Schematic",
+                "Complete 14-Page Hierarchical KiCad Schematic",
             )
             sch_labels = [
                 "Sheet 1: ROOT Hierarchical Top",
@@ -1420,6 +1429,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
                 "Sheet 11: POWER (12V Buck/LDO/Inverter Tree)",
                 "Sheet 12: RX_VU (VHF/UHF Front End, RFFC5072 Converter)",
                 "Sheet 13: STATUS (LEDs, I/O Expanders, Debug USB-C)",
+                "Sheet 14: KVPWR (KV260 Power Feed: J1004 + U1010 eFuse + L1004 CMC)",
             ]
             sch_end = len(master)
             for off, lbl in enumerate(sch_labels):
