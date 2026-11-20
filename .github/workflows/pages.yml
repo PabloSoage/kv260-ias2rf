@@ -6,8 +6,8 @@ on:
     paths:
       - "site/**"
       - ".github/workflows/pages.yml"
-  release:
-    types: [published]
+  # a new release's PDFs reach the site on the next push to main, or run this by hand (the github-pages
+  # environment deploys from main only)
   workflow_dispatch:
 
 permissions:
