@@ -21,7 +21,7 @@ The thirteen SMAs are on the front edge (`J401`-`J952`) and the back wall (`J961
 | 5 | `J402` | top | CLK_OUT | Clock output (SMA), ADCLK948 Q3, LVPECL: to share the master clock with an instrument |
 | 6 | `J911` | top | SDR_RX_A | SDR receive A (SMA): through SW1's default throw to the AD9253 channel A. Full scale about -2.4 dBm; DC-blocked |
 | 7 | `J912` | top | AERIS_IF_A | Radar IF into the 14-bit AD9253 (SMA), through SW1's second throw |
-| 8 | `J921` | top | AERIS_IF | Radar IF from AERIS-10 (SMA): through SW2's default throw to the 500 MSPS AD9484. Full scale about -17.6 dBm |
+| 8 | `J921` | top | AERIS_IF | Radar IF from AERIS-10 (SMA): through SW2's default throw to the AD9484 (400 or 500 MSPS with the master clock). Full scale about -17.6 dBm |
 | 9 | `J922` | top | SDR_RX_WB | Wideband SDR receive (SMA), SW2's second throw. Not connected as built: `C926` is not fitted and the VHF/UHF front end takes the throw (`C927`); swap the two 0402s to use this port |
 | 10 | `J931` | top | SDR_TX_A | SDR transmit A (SMA): AD9767 DAC1 through SW3's default throw, 10 mA full scale |
 | 11 | `J932` | top | AERIS_TX_A | Radar chirp from the 14-bit AD9767 DAC1 (SMA), SW3's second throw |
@@ -139,7 +139,7 @@ The nine status LEDs stand in a column beside `J961`, seen through a window in t
 | 40 | `U1110` | top | TPD4E05U06DQAR | CONTROL | ESD array on the JTAG lines |
 | 41 | `U1201` | top | RTL8211FSI-CG | CONTROL | Gigabit Ethernet PHY, SGMII to the FPGA |
 | 42 | `U401` | top | ADCLK948BCPZ | CLOCK | Clock fan-out: the converters' and the FPGA's clocks from the Si549 or `J401` |
-| 43 | `U501` | top | AD9484BCPZ-500 | ADC_RADAR | 8-bit 500 MSPS ADC: the radar IF, the wideband SDR and the VHF/UHF front end |
+| 43 | `U501` | top | AD9484BCPZ-500 | ADC_RADAR | 8-bit ADC at 400 or 500 MSPS with the master clock: the radar IF, the wideband SDR and the VHF/UHF front end |
 | 44 | `U502` | top | AD8352ACPZ | ADC_RADAR | Differential driver for the AD9484, first stage |
 | 45 | `U503` | top | AD8352ACPZ | ADC_RADAR | Differential driver for the AD9484, second stage |
 | 46 | `U601` | top | AD9253BCPZ-125 | ADC_SDR | 14-bit quad ADC, two channels used: SDR receive A and HF (C) |

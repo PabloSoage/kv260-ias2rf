@@ -13,6 +13,7 @@ Combines:
   - Lossless vector heatsink mechanical map
   - Lossless vector 12-sheet KiCad schematic PDF (normalized to uniform width)
   - Lossless vector 10-sheet 8-layer PCB layout PDF (L1-L8 + composite + tracks-only)
+  - Lossless vector PSU board schematic and 5-page 4-layer layout
 
 Requirements:
   pip install pymupdf pillow
@@ -48,6 +49,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_OUT = REPO_ROOT / "docs" / "KV260-IAS2RF_Documentation.pdf"
 LITE_OUT = REPO_ROOT / "docs" / "KV260-IAS2RF_Documentation-Lite.pdf"
 PSU_SCH_PDF = REPO_ROOT / "docs" / "KV260-IAS2RF_PSU_schematic.pdf"
+PSU_LAY_PDF = REPO_ROOT / "docs" / "KV260-IAS2RF_PSU_layout.pdf"
 
 A4_W, A4_H = fitz.paper_size("a4")  # ~595.28 x 841.89 pt
 MARGIN_X = 42
@@ -1188,6 +1190,20 @@ def add_cover_page(master: fitz.Document) -> None:
     page.draw_line(fitz.Point(x0, y - 6), fitz.Point(x1, y - 6), color=rule, width=0.6)
 
 
+def fpga_facts() -> list[tuple[str, str]]:
+    """The two FPGA rows of the summary page, from the Vivado reports (_work/fpga_figures.py, the one source)."""
+    sys.path.insert(0, str(REPO_ROOT / "_work"))
+    import fpga_figures
+    rows = []
+    for (top, _dev, _rpt, _script, cap, f), label in zip(fpga_figures.figures(),
+                                                          ("Artix-7 (XC7A50T)", "Kria K26 (XCK26)")):
+        pct = fpga_figures.pct
+        rows.append((label, f"{'Full BD: ' if 'k26' in top else ''}{f['lut']:,} LUTs ({pct(f['lut'], cap['lut'])}), "
+                            f"{f['ff']:,} FFs ({pct(f['ff'], cap['ff'])}), {f['bram']:.1f} BRAM36 eq., "
+                            f"{f['dsp']} DSPs ({pct(f['dsp'], cap['dsp'])}), WNS = +{f['wns']:.3f} ns"))
+    return rows
+
+
 def add_summary_page(master: fitz.Document, part_summary: Iterable[tuple[str, int]]) -> None:
     """The platform summary and the book's structure, on the page after the cover."""
     page = master.new_page(width=A4_W, height=A4_H)
@@ -1203,8 +1219,7 @@ def add_summary_page(master: fitz.Document, part_summary: Iterable[tuple[str, in
     facts = [
         ("PCB & Stackup", "8-layer JLC08161H-2116C (140 x 132 mm, 0 DRC / 0 ERC, openEMS S11 = -30.9 dB @ 1 GHz)"),
         ("High-Speed Link", "2-lane IAS1 LVDS (2.0-2.5 Gb/s UL, 1.0 Gb/s DL) + dedicated-pin 1000BASE-T RTL8211FSI UDP"),
-        ("Artix-7 (XC7A50T)", "25,068 LUTs (76.9%), 28,881 FFs (44.3%), 18 BRAM36 eq. (24.0%), 119 DSPs (99.2%), WNS = +0.076 ns at 400 and 500 MHz"),
-        ("Kria K26 (XCK26)", "Full BD: 51,870 LUTs (44.3%), 44,547 FFs (19.0%), 40 BRAM36 eq. (27.8%), 229 DSPs (18.3%), WNS = +1.125 ns"),
+        *fpga_facts(),
         ("RF Missions", "AERIS-10 X-Band Radar (10.5 GHz, 20 km, 8x ADAR1000) + Wideband SDR (HF to 30 MHz, VHF/UHF 25 MHz to 1.1 GHz on J961)"),
         ("HF input", "J951: 30 MHz 7th-order elliptic anti-alias filter on the board, >= 60 dB from 50 MHz; no RF switch in the path"),
         ("Thermal & Mech.", "Enclosure v2 (50x15 mm filtered lid fan, HS1-HS3, 50 g FEA BGA <= 96 ue): rated 56 C ambient with the stock KV260, 71 C with a K26I SOM"),
@@ -1382,7 +1397,7 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
             ("Appendix B: Vector Heatsink Mechanical Map", 1),
             ("Appendix C: Vector 14-Page Hierarchical KiCad Schematic", 14),
             ("Appendix D: Vector 10-Sheet 8-Layer PCB Layout", 10),
-            ("Appendix E: Vector PSU Board Schematic", 1),
+            ("Appendix E: Vector PSU Board Schematic & 4-Layer Layout", 6),
         ])
     add_cover_page(master)
     add_summary_page(master, summary)
@@ -1512,11 +1527,23 @@ def build_documentation_pdf(out_path: Path, max_img_width: int, jpeg_quality: in
 
             pnum = add_section_divider(
                 master,
-                "Appendix E: PSU Board Schematic",
-                "The vehicle supply for both boards: LTC4364 surge stopper, LM5177 buck-boost, two TPS26631 (vector)",
+                "Appendix E: PSU Board Schematic & Layout",
+                "The vehicle supply for both boards: LTC4364 surge stopper, LM5177 buck-boost, two TPS26631; "
+                "schematic and the four copper layers (vector)",
             )
-            toc.append([1, "Appendix E: Vector PSU Board Schematic", pnum])
+            toc.append([1, "Appendix E: Vector PSU Board Schematic & 4-Layer Layout", pnum])
             insert_vector_pdf(master, PSU_SCH_PDF, toc, 2, "PSU Board Schematic (psu/psu.kicad_sch)")
+            psu_lay = PSU_LAY_PDF
+            if lite:                     # the vector file is a release asset
+                psu_lay = rasterize_pdf(psu_lay, Path(tempfile.gettempdir()) / "kv260_psu_layout_raster.pdf", 72, 45)
+            psu_start = len(master) + 1
+            insert_vector_pdf(master, psu_lay, toc, 2, "PSU Board 4-Layer Layout (psu/psu.kicad_pcb)"
+                              + (" (72 dpi; vector in docs/KV260-IAS2RF_PSU_layout.pdf)" if lite else ""))
+            for off, lbl in enumerate(["Page 1: L1 (F.Cu Parts & Power Pours)", "Page 2: L2 (In1.Cu Ground)",
+                                       "Page 3: L3 (In2.Cu +12V Plane)", "Page 4: L4 (B.Cu Ground & Short Runs)",
+                                       "Page 5: All 4 Layers, Translucent Overlay"]):
+                if psu_start + off <= len(master):
+                    toc.append([3, lbl, psu_start + off])
 
         # Build Table of Contents and converge offset after insertion at page index 1
         toc_offset = 0

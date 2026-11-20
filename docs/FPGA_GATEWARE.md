@@ -17,11 +17,11 @@ Complete RTL, post-route Vivado 2026.1 implementation, and full-system XSim co-s
 |  · 8x ADAR1000 Beamformer + 4x M3SWA2-34DR+ SW    |     Dedicated 1000BASE-T Ethernet (U1201 -> J1201)   |                                                    |
 |  · Dual-Path Mux + Debug UART (115.2k 8N1 Pmod)   | ---------------------------------------------------> |  PS8 (Quad Cortex-A53 @ 1.33 GHz + 4 GB DDR4):     |
 |                                                   |  192.168.10.2 UDP Port 0x4952 -> KV260 J10 (GEM3)    |   · Pulse compression, Doppler FFT, CFAR, Tracking |
-| Post-Route: 25,068 LUT (76.9%), 119 DSP, WNS +0.076ns|  + Pmod J1102<->J2 EMIO UART1 (/dev/ttyPS1)          |   · SDR demodulation & Linux host IO               |
+| Post-route figures: section 2.4                   |  + Pmod J1102<->J2 EMIO UART1 (/dev/ttyPS1)          |   · SDR demodulation & Linux host IO               |
 +---------------------------------------------------+     Failsafe Pmod J1102 <-> Carrier J2 (EMIO SPI0)   +----------------------------------------------------+
 ```
 
-High-resolution vector schematics & silicon die renders (`SVG` / `PDF` / `4K PNG`) live in [`img/highres/fpga/`](img/highres/fpga/).
+High-resolution vector schematics & silicon die renders (`SVG` / `PDF` / `4K PNG`) are in `fpga/` of the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip), a release asset.
 
 ---
 
@@ -35,13 +35,13 @@ The post-route floorplan below is plotted directly from Vivado 2026.1 placed lea
 
 ![Artix-7 XC7A50T-FTG256-2 Silicon Die Floorplan](img/fpga/artix7_silicon_floorplan.png)
 
-- **Vector / 4K Downloads:** [4K PNG](img/highres/fpga/artix7_silicon_floorplan_4k.png) · [Vector SVG](img/highres/fpga/artix7_silicon_floorplan.svg) · [Vector PDF](img/highres/fpga/artix7_silicon_floorplan.pdf)
+- **Vector / 4K Downloads:** `fpga/artix7_silicon_floorplan_4k.png`, `.svg` and `.pdf` in the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip)
 
 ### 2.2 Hierarchical Circuit Schematic
 
 ![Artix-7 XC7A50T-FTG256-2 Vivado Hierarchical Circuit Schematic](img/fpga/artix7_vivado_schematic.png)
 
-- **Vector / 4K Downloads:** [4K PNG](img/highres/fpga/artix7_vivado_schematic_4k.png) · [Vector SVG](img/highres/fpga/artix7_vivado_schematic.svg) · [Vector PDF](img/highres/fpga/artix7_vivado_schematic.pdf)
+- **Vector / 4K Downloads:** `fpga/artix7_vivado_schematic_4k.png`, `.svg` and `.pdf` in the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip)
 
 ### 2.3 Complete Module Inventory (`fpga/artix/` & `fpga/link/`)
 
@@ -62,22 +62,35 @@ The post-route floorplan below is plotted directly from Vivado 2026.1 placed lea
 | **Housekeeping & XADC/PPS** | [`fpga/artix/conv_spi.v`](../fpga/artix/conv_spi.v), [`hk_i2c_master.v`](../fpga/artix/hk_i2c_master.v), [`hk_xo_ctrl.v`](../fpga/artix/hk_xo_ctrl.v), [`hk_xadc_pps.v`](../fpga/artix/hk_xadc_pps.v), [`pmod_spi.v`](../fpga/artix/pmod_spi.v) | `cfgmclk`, `link_clk` (`125M`) | Auto-init 3-wire SPI for `AD9484`/`AD9253` (1-lane 16b DDR), open-drain `TMP1075`/`M24C02` I2C polling, `Si549` fractional N-delta I2C (`±50 ppm` `ENABLE_ETH` clamp) + `CLK_SEL`, 12-bit XADC temp/voltage monitor, 1-PPS period/ppm frequency counter & 64-bit ns timestamping, failsafe Pmod SPI slave |
 | **Debug UART Monitor (G-1)** | [`fpga/artix/dbg_uart.v`](../fpga/artix/dbg_uart.v) | `link_clk` (`125M`, constant in `400` & `500 MHz` modes) | `115,200` baud 8N1 (`div=1085` -> `115,207.4` baud, `+0.0064%` err) on `pmod_spare1` RX (`G15`, `PULLUP`) / `pmod_spare2` TX (`G11`): boot banner, 1 Hz `key=value` `STAT` line, interactive `r`/`w`/`s`/`h` CLI as 4th lossless CSR master |
 
-### 2.4 Artix-7 Post-Route Resource & Timing Closure (`reports_rev06/` & `reports/`)
+### 2.4 Artix-7 Post-Route Resource & Timing Closure (`reports_rev06/`)
 
-| Hierarchy / Metric | Total LUTs | FFs | RAMB36 | RAMB18 | DSP48E1 | Role |
+<a id="fpga-figures"></a>
+
+<!-- fpga-figures:begin -->
+| Design (Vivado 2026.1) | Device | LUTs | FFs | BRAM36 eq. | DSPs | WNS / WHS | Failing endpoints | Reports |
+|---|---|---|---|---|---|---|---|---|
+| `artix_top` | XC7A50T-FTG256-2 | 25,279 (77.5 %) | 28,970 (44.4 %) | 18.0 (24.0 %) | 119 (99.2 %) | +0.007 / +0.033 ns | 0 of 83,391 | [`artix/reports_rev06/`](../fpga/artix/reports_rev06/) from [`build_rev06.tcl`](../fpga/artix/build_rev06.tcl) |
+| `ias2rf_k26_bd_wrapper` | XCK26-SFVC784-2LV-c | 53,336 (45.5 %) | 46,896 (20.0 %) | 44.0 (30.6 %), 1 URAM | 229 (18.3 %) | +1.043 / +0.010 ns | 0 of 188,554 | [`kria/reports/`](../fpga/kria/reports/) from [`bd.tcl`](../fpga/kria/bd.tcl) |
+
+*Post-route, generated from the Vivado reports by `_work/fpga_figures.py` (artix_top: Thu Nov 19 04:24:55 2026; ias2rf_k26_bd_wrapper: Thu Nov 19 09:53:51 2026).*
+<!-- fpga-figures:end -->
+
+<!-- fpga-artix-hier:begin -->
+| Hierarchy | Total LUTs | FFs | RAMB36 | RAMB18 | DSP48E1 | Role |
 | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **`artix_top` (Total, `XC7A50T-FTG256-2`)** | **`25,147` (`77.1%`)** | **`28,990` (`44.5%`)** | **`13`** | **`10`** (`24.0%` BRAM) | **`119` (`99.2%`)** | Full integrated RF/Radar/SDR + Ethernet + IAS1 + Debug UART + Rev08 front-end control and the G-7 500 MSPS path |
-| `u_sdr_ddc` | `5,722` | `3,754` | `2` | `4` | `30` | Dual-channel wideband SDR DDC (`62.5`/`50.0 MSPS`) |
-| `u_ddc` (`ddc_wrapper` + `PLFM_RADAR` + `ddc_hb4`) | `3,512` | `6,502` | `0` | `0` | `79` | 400 -> 100 -> 25 MSPS AERIS-10 radar DDC, tunable NCO (G-4), anti-alias half-bands and CPI mark (G-8) |
-| `u_d2` + `u_d2_peak` | `4,224` | `6,663` | `0` | `4` | `8` | Rev08 G-7 D2: 500 MSPS AD9484 path (four-lane NCO, mixer, pruned CIC5, `ddc_hb4`) and its AGC peak detector |
-| `u_dbg_uart` | `1,686` | `653` | `0` | `0` | `0` | G-1 8N1 debug UART monitor, banner, 1 Hz `STAT` & 4th CSR master |
-| `u_ul_pcs_tx` | `1,263` | `959` | `0` | `0` | `0` | 2-lane `64b/66b` IAS1 uplink PCS |
-| `u_fe_ctrl` + `u_fe_agc` + `u_adcr_peak` | `1,110` | `795` | `0` | `0` | `1` | Rev08 G-2 to G-6: expanders, RFFC5072/PE4312 sequencer, LEDs, AGC and its AD9484 peak detector |
-| `gen_rev06_eth.*` (`mux`, `mac`, `mdio`, `phy`, `gen`) | `2,019` | `1,869` | `8` | `1` | `0` | `1000BASE-T` SGMII + UDP MAC + Dual-Path Failover |
-| `u_dl_pcs_rx` + `u_dl_train_fsm` | `769` | `723` | `0` | `0` | `0` | 1-lane `1.0 Gb/s` IAS1 downlink + eye trainer |
-| `u_xadc_pps` + `u_hk_i2c` + `u_clk_mode_ctrl` (`u_hk_xo`) + `u_pmod_spi` | `2,445` | `2,230` | `0` | `0` | `0` | Safe-boot MMCM DRP/Si549, XADC, 1-PPS, I2C, Pmod SPI |
-| `u_adc_cap` + `u_adcs_cap` + `u_conv_spi` | `942` | `1,007` | `0` | `0` | `0` | High-speed LVDS ADC capture & 3-wire init |
-| `u_dac_radar` + `u_dac_sdr` + `u_adar_ctrl` (`u_rf_switch` flattened into the top level in this build) | `883` | `602` | `3` | `1` | `1` | Non-MMCM DACs, `8x ADAR1000` beamformer, switches |
+| **`artix_top` (total)** | **25,279 (77.5 %)** | **28,970 (44.4 %)** | **13** | **10** | **119 (99.2 %)** | Everything below plus the top level's own logic |
+| `u_sdr_ddc` | 5,644 | 3,754 | 2 | 4 | 30 | Dual-channel wideband SDR DDC (62.5 / 50.0 MSPS) |
+| `u_ddc` | 3,400 | 6,496 | 0 | 0 | 79 | 400 -> 100 -> 25 MSPS AERIS-10 radar DDC, tunable NCO (G-4), anti-alias half-bands and CPI mark (G-8) |
+| `u_d2` + `u_d2_peak` | 4,373 | 6,649 | 0 | 4 | 8 | Rev08 G-7 D2: the 500 MSPS AD9484 path (four-lane NCO, mixer, pruned CIC5, `ddc_hb4`) and its AGC peak detector |
+| `u_dbg_uart` | 1,787 | 653 | 0 | 0 | 0 | G-1 8N1 debug UART monitor, banner, 1 Hz `STAT` and the fourth CSR master |
+| `u_ul_pcs_tx` | 1,281 | 959 | 0 | 0 | 0 | 2-lane `64b/66b` IAS1 uplink PCS |
+| `u_fe_agc` + `u_adcr_peak` | 705 | 556 | 0 | 0 | 1 | Rev08 G-2 to G-6: front-end AGC and its AD9484 peak detector (the expander and RFFC5072/PE4312 sequencer logic is flattened into the top level) |
+| `gen_rev06_eth.*` | 1,995 | 1,870 | 8 | 1 | 0 | `1000BASE-T` SGMII + UDP MAC + dual-path failover |
+| `u_dl_pcs_rx` + `u_dl_train_fsm` | 787 | 723 | 0 | 0 | 0 | 1-lane 1.0 Gb/s IAS1 downlink + eye trainer |
+| `u_xadc_pps` + `u_hk_i2c` + `u_clk_mode_ctrl` + `u_pmod_spi` | 2,513 | 2,274 | 0 | 0 | 0 | Safe-boot MMCM DRP / Si549, XADC, 1-PPS, I2C, Pmod SPI |
+| `u_adc_cap` + `u_adcs_cap` + `u_conv_spi` | 1,122 | 1,009 | 0 | 0 | 0 | High-speed LVDS ADC capture and 3-wire converter init |
+| `u_dac_radar` + `u_dac_sdr` + `u_adar_ctrl` + `u_rf_switch` | 914 | 624 | 3 | 1 | 1 | Non-MMCM DACs, `8x ADAR1000` beamformer, RF switches |
+<!-- fpga-artix-hier:end -->
 
 - **Timing (`fpga/artix/reports_rev06/timing_summary.rpt` & `pulse_width.rpt`, with post-route `phys_opt_design`):** Overall design worst slacks are `WNS = +0.007 ns` (`0 / 83,391` failing setup endpoints), `WHS = +0.033 ns` (`0 / 82,906` failing hold endpoints), and `WPWS = +0.008 ns` (`0 / 29,834` failing pulse-width endpoints) (Rev08 final re-audit, 19 November; the per-clock figures below are from the build of 18 November). Two changes closed it after the audit's gates had pushed it to `-0.186 ns`:
   - **`adc_capture`'s eye finder** rotates its pass mask instead of indexing it with `find_k`, which removes a 32:1 mux in front of `best_len`'s enable on `clk_trn_400`.
@@ -87,7 +100,7 @@ The post-route floorplan below is plotted directly from Vivado 2026.1 placed lea
   - **Build flow (`build_rev06.tcl`):** the post-place `phys_opt_design` runs an explicit pass list, `-fanout_opt -placement_opt -rewire -critical_cell_opt -critical_pin_opt -retime -shift_register_opt -bram_register_opt -hold_fix`, that is the default set without `-dsp_register_opt`. That pass pulled the AERIS mixer's `AREG` out of the DSP48 into a slice and left a fabric-to-multiplier path at `-0.146 ns` in the `2.5 ns` cycle. The post-route `phys_opt_design` runs with `-directive AggressiveExplore`: the AERIS CIC's combs sit within about `0.05 ns` of the `400 MHz` cycle and moved by that much between placements. `adc_peak`'s 128-bit window registers take power-up values and sit outside the reset branch (inside it, the reset still reached all 384 flip-flops as a hold condition). In the AERIS DDC the FIR output CDCs have their own reset copies. With G-7 the device is at 77 % of its LUTs and three more paths needed structure rather than placement luck: the AERIS CIC's comb stages 1 to 4 are whole 28-bit subtracts under a 4-cycle multicycle path (each loads once per output sample, 4 cycles after its source; bit-exact, 7 `clk_400m` cycles more latency), the AERIS DDC takes the ADC data through one more `clk_400m` register, and `fe_ctrl`'s step table has two cycles (`S_PREP2`, a 2-cycle multicycle path). The AERIS input register keeps the ADC MSB inverted, so the offset to two's complement inversion folds into it and the flop drives the mixers' 26 DSP48 A pins without a LUT, and the AD9484 IDDR pipe flops have no reset (the FIFO write is gated by `q_pipe_valid`), so each sits next to its ILOGIC for the half-cycle path at `500 MSPS`. The AERIS NCO's phase dither (17 Nov) adds its carry into the 8 address bits one stage later than the byte add that produces it: as one 16-bit carry chain in one stage it missed `400 MHz` by `0.66 ns`. The eye-scan trainer's clock comes through a `BUFGCTRL` from `clk_200m` (400 MHz mode) or `refclk_200m` (500 MHz, D2), declared as two generated clocks `clk_trn_400` and `clk_trn_500`, physically exclusive.
   - **AD9484 Radar Domain (`clk_adcr_dco` `5.000 ns` = `400 MSPS` only, Rev08 A-1):** Held in hardware reset when master clock is `500 MHz` (`RADAR_STATUS[0]`), so it is closed at `400 MSPS` (`clk_400m_unbuf` `2.500 ns`: `WNS = +0.118 ns`, `WHS = +0.075 ns`, `WPWS = +0.396 ns`; the trainer's `clk_trn_400`: `WNS = +0.138 ns`; `clk_100m_unbuf`: `WNS = +0.157 ns`; `clk_adcr_dco`: `WNS = +0.356 ns`). At `500 MHz` the G-7 D2 path takes the AD9484 instead: `clk_adcr_dco_500` (`4.000 ns`) `WNS = +0.080 ns`, its trainer clock `clk_trn_500` `WNS = +0.132 ns`.
   - **AD9253 SDR Bit-Clock Domain (`clk_adcs_dco_500` `2.000 ns` & `clk_adcs_dco_400` `2.500 ns`, Rev08 A-2):** Constrained for both master modes as physically exclusive `500 MHz` (`62.5 MSPS`) and `400 MHz` (`50.0 MSPS`) DDR bit clocks: `clk_adcs_dco_500` `WPWS = +0.529 ns` (`adcs_clk_div_1` `8.000 ns`: `WNS = +2.635 ns`, `WHS = +0.085 ns`, `WPWS = +2.870 ns`); `clk_adcs_dco_400` `WPWS = +1.029 ns` (`adcs_clk_div` `10.000 ns`: `WNS = +4.635 ns`, `WHS = +0.085 ns`, `WPWS = +3.870 ns`).
-  - **Master / Ethernet / IAS1 Domains:** `clk_fpga_500` (`WNS = +1.409 ns`), `link_clk_unbuf` (`125 MHz`, which also runs D2: `WNS = +0.193 ns`), `adcs_ddc_clk_unbuf` (`83.333 MHz`: `WNS = +1.033 ns`), `clk_dac_500` (`125 MHz`: `WNS = +0.484 ns`), `gen_rev06_eth.clk_312p5_u` (`WNS = +0.076 ns`), `gen_rev06_eth.clk_625_0_u`/`625_90_u` (`WPWS = +0.008 ns`), `clk_fpga_400` (`WNS = +1.909 ns`, `clk_dac_400` `WNS = +2.484 ns`), `dl_rx_clk` (`WNS = +0.392 ns`, `clk_link_tx` `WPWS = +0.529 ns`), `clk_cfgmclk` (`WNS = +0.668 ns`; constrained at the `100 MHz` worst case of `CFGMCLK`, where `fe_ctrl` sits). (`fpga/artix/reports/timing_summary.rpt` from `build.tcl` closes at `WNS = +0.035 ns`, `WHS = +0.054 ns`, `WPWS = +0.008 ns`, 19 November.)
+  - **Master / Ethernet / IAS1 Domains:** `clk_fpga_500` (`WNS = +1.409 ns`), `link_clk_unbuf` (`125 MHz`, which also runs D2: `WNS = +0.193 ns`), `adcs_ddc_clk_unbuf` (`83.333 MHz`: `WNS = +1.033 ns`), `clk_dac_500` (`125 MHz`: `WNS = +0.484 ns`), `gen_rev06_eth.clk_312p5_u` (`WNS = +0.076 ns`), `gen_rev06_eth.clk_625_0_u`/`625_90_u` (`WPWS = +0.008 ns`), `clk_fpga_400` (`WNS = +1.909 ns`, `clk_dac_400` `WNS = +2.484 ns`), `dl_rx_clk` (`WNS = +0.392 ns`, `clk_link_tx` `WPWS = +0.529 ns`), `clk_cfgmclk` (`WNS = +0.668 ns`; constrained at the `100 MHz` worst case of `CFGMCLK`, where `fe_ctrl` sits). (`build.tcl`, the same design with the default placement and no power reports, closed at `WNS = +0.035 ns`, `WHS = +0.054 ns` on 19 November; its reports are not kept, `build_rev06.tcl` is the build of record.)
 - **Non-MMCM `÷4` DAC Clock Jitter Reduction:** Driving `dac_clk` (`125 MHz @ 500M` / `100 MHz @ 400M`) from a glitch-free 2-bit Johnson divider on `fpga_clk_bufg -> BUFG` instead of an MMCM `CLKOUT` cuts Vivado `Clock Uncertainty` from `0.165 ns` down to **`0.035 ns`** (`4.7x` improvement) and eliminates MMCM `Discrete Jitter` (`0.124 ns -> 0.000 ns`) and `Phase Error` (`0.099 ns -> 0.000 ns`).
 - **Safe-Boot & Live `400 <-> 500 MHz` Mode Switch (`clk_mode_ctrl`):** On POR, `STARTUPE2 CFGMCLK` holds `mmcm_rst = 1` while `Y401` (`Si549`) programs and settles (`>= 30.7 ms` FCAL wait), configures both MMCMs via DRP (`DIVCLK_DIVIDE = 5` for `500 MHz`, `4` for `400 MHz`), and releases `mmcm_rst` (`XO_CTRL[14] xo_boot_done`, `[12] xo_boot_err`). `clk_mode_ctrl` also drives `radar_dis_cfg` high whenever switching or operating at `500 MHz`, holding `u_adc_cap` and `u_ddc` safely in reset and automatically retraining AD9484 when returning to `400 MHz`; at `500 MHz` the G-7 path D2 (§4.3) takes the AD9484 instead. Writing `XO_CTRL[2] prog_start` switches live between `500 MHz` and `400 MHz`; during the switch, `mmcm_rst` drops `link_clk`, so IAS1 link training and SGMII MAC/PHY reset and retrain cleanly, and `dac_rst` applies a glitchless reset to `dac_radar`/`dac_sdr`. `ADPLL_DELTA_M` writes to `XO_DELTA_M` are clamped to `±50.0 ppm` (`±429553`, latched in `XO_CTRL[13] xo_delta_clamped`) when `ENABLE_ETH=1`. While the uplink retrains (`ul_tx_gate` low), `dual_path_mux` drops whole bulk packets meant for IAS1 (`ias_drain`: not written, or popped unsent if the PCS has not taken their first word) and keeps `0x11` read-backs, so the first register read after a switch returns in about `3.7 us` instead of waiting about `40 us` behind a full `1024`-word FIFO of stale data; the ETH FIFO, and so `MIRROR_1P1` and `SPLIT` failover traffic, is not affected (`tb_dual_path_drain`, `tb_clk_mode_switch` `rd_max`). The mux counts IAS1 healthy only while that uplink may send (`ul_tx_allow`: the downlink up and the Kria's receiver up, its `link_up` bit in the downlink's status word), so if the Kria's receiver alone drops, `SPLIT` moves IAS1 traffic onto ETH instead of draining it; before the uplink first opens after a reset, IAS1 counts as healthy (`tb_rev06` Phase 2b).
 - **DRC & CDC (`drc.rpt` & `cdc.rpt`):** `0` DRC errors (`0` Critical/Error timing or methodology failures). `cdc.rpt` (`reports_rev06/`) reports `192` `CDC-1`, `12` `CDC-2`, `65` `CDC-3`, `2` `CDC-4`, `12` `CDC-5`, `40` `CDC-6`, `1` `CDC-7`, `2` `CDC-8`, `2` `CDC-9`, `61` `CDC-10`, `2` `CDC-11`, `156` `CDC-13`, `1` `CDC-14`, `759` `CDC-15` (covered by asynchronous clock groups & 2/3-stage Gray/toggle synchronizers across `link_clk`, `clk_cfgmclk`, `clk_adcr_dco`, `clk_adcs_dco_*`, and `clk_link_tx`). *(Top-level slice counts in `utilization.rpt` reflect Vivado cross-hierarchy LUT combining and `phys_opt_design` post-route optimization in `build.tcl` and `build_rev06.tcl`.)*
@@ -115,13 +128,13 @@ Sources: [`fpga/kria/top.v`](../fpga/kria/top.v), [`fpga/kria/kria_pl_link.v`](.
 
 ![Kria K26 XCK26-SFVC784-2LV-c Silicon Die Floorplan](img/fpga/kria_k26_silicon_floorplan.png)
 
-- **Vector / 4K Downloads:** [4K PNG](img/highres/fpga/kria_k26_silicon_floorplan_4k.png) · [Vector SVG](img/highres/fpga/kria_k26_silicon_floorplan.svg) · [Vector PDF](img/highres/fpga/kria_k26_silicon_floorplan.pdf)
+- **Vector / 4K Downloads:** `fpga/kria_k26_silicon_floorplan_4k.png`, `.svg` and `.pdf` in the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip)
 
 ### 3.2 Vivado IPI Block Design (`ias2rf_k26_bd`) & PL Link Circuit
 
 ![Kria K26 Vivado IPI Block Design Circuit Schematic](img/fpga/kria_k26_vivado_bd_schematic.png)
 
-- **Vector / 4K Downloads (combined PS + PL `ias2rf_k26_bd` & `kria_pl_link` schematic):** [4K PNG](img/highres/fpga/kria_k26_vivado_bd_schematic_4k.png) · [Vector SVG](img/highres/fpga/kria_k26_vivado_bd_schematic.svg) · [Vector PDF](img/highres/fpga/kria_k26_vivado_bd_schematic.pdf)
+- **Vector / 4K Downloads (combined PS + PL `ias2rf_k26_bd` & `kria_pl_link` schematic):** `fpga/kria_k26_vivado_bd_schematic_4k.png`, `.svg` and `.pdf` in the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip)
 
 ### 3.3 K26 Block Design & Post-Route Resources (`fpga/kria/reports/`)
 
@@ -150,7 +163,7 @@ Sources: [`fpga/kria/top.v`](../fpga/kria/top.v), [`fpga/kria/kria_pl_link.v`](.
 
 ![DSP Wideband SDR & 10.5 GHz Radar Pipelines](img/fpga/dsp_radar_sdr_pipeline_schematic.png)
 
-- **Vector / 4K Downloads:** [4K PNG](img/highres/fpga/dsp_radar_sdr_pipeline_schematic_4k.png) · [Vector SVG](img/highres/fpga/dsp_radar_sdr_pipeline_schematic.svg) · [Vector PDF](img/highres/fpga/dsp_radar_sdr_pipeline_schematic.pdf)
+- **Vector / 4K Downloads:** `fpga/dsp_radar_sdr_pipeline_schematic_4k.png`, `.svg` and `.pdf` in the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip)
 
 ### 4.1 Wideband SDR Architecture (`AD9253` + `AD9767` + `sdr_ddc.v`)
 

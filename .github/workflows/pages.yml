@@ -5,8 +5,9 @@ on:
     branches: ["main", "master"]
     paths:
       - "site/**"
-      - "docs/*.pdf"
       - ".github/workflows/pages.yml"
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -29,10 +30,13 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Copy documentation PDFs into site artifact
+      - name: Fetch the documentation PDFs from the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p site/docs
-          cp -f docs/*.pdf site/docs/
+          gh release download --repo "$GITHUB_REPOSITORY" --pattern "KV260-IAS2RF_*.pdf" --dir site/docs
+          ls -l site/docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

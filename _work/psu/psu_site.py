@@ -32,7 +32,23 @@ CLI = os.path.expandvars(r"%LOCALAPPDATA%\Programs\KiCad\10.0\bin\kicad-cli.exe"
 WORK = os.path.join(ROOT, "_site_psu")
 SITE = os.path.join(ROOT, "site")
 ASSETS = os.path.join(SITE, "assets")
-LAYERS = ["F.Cu", "B.Cu", "F.Mask", "B.Mask", "F.SilkS", "B.SilkS", "Edge.Cuts"]
+LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu", "F.Mask", "B.Mask", "F.SilkS", "B.SilkS", "Edge.Cuts"]
+LAYER_STACK = [                                    # the Layers tab of the site, top to bottom (psu.kicad_pcb stackup)
+    {"id": "F.Cu", "name": "L1 Top Copper (F.Cu)", "role": "2 oz parts and the power pours (VBAT, VS, switch nodes, +12V)",
+     "thickness_mm": 0.07, "color": "#d99b38"},
+    {"id": "In1.Cu", "name": "L2 Ground (In1.Cu)", "role": "0.5 oz solid ground under the power stage",
+     "thickness_mm": 0.0152, "color": "#4aa868"},
+    {"id": "In2.Cu", "name": "L3 +12V Plane (In2.Cu)", "role": "0.5 oz +12V output plane to J2 and J3",
+     "thickness_mm": 0.0152, "color": "#5c9ce6"},
+    {"id": "B.Cu", "name": "L4 Bottom Copper (B.Cu)", "role": "2 oz ground pour and short signal runs",
+     "thickness_mm": 0.07, "color": "#48b5c4"},
+    {"id": "F.Mask", "name": "Top Soldermask (F.Mask)", "role": "Green LPI mask", "thickness_mm": 0.01,
+     "color": "#197a3a"},
+    {"id": "F.SilkS", "name": "Top Silkscreen (F.SilkS)", "role": "Reference designators and pin-1 markers",
+     "thickness_mm": 0.01, "color": "#e6e6e0"},
+    {"id": "Edge.Cuts", "name": "Board Outline (Edge.Cuts)", "role": "110 x 70 mm, four M3 holes", "thickness_mm": 0,
+     "color": "#f0b429"},
+]
 LAYER_IDX = {"F.Cu": 0, "In1.Cu": 1, "In2.Cu": 6, "B.Cu": 7}       # the site draws 0..3 on top, 4..7 underneath
 FIGURES = [
     ("psu_design.png", "PSU operating points", "Efficiency, losses and MOSFET temperatures from 4.4 to 36 V input "
@@ -171,6 +187,7 @@ def main():
         "board_outline": {"xmin": 100, "ymin": 100, "xmax": 210, "ymax": 170, "width_mm": 110, "height_mm": 70,
                           "segments": [[[100, 100], [210, 100], [210, 170], [100, 170], [100, 100]]]},
         "thickness_mm": 1.6,
+        "layer_stack": LAYER_STACK,
         "counts": {"components": len(comps), "nets": len(tr), "pours": pours,
                    "audit_parts": len(audit["parts"]), "audit_issues": len(audit["issues"])},
         "components": comps,

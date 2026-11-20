@@ -1,6 +1,6 @@
 # KV260-IAS2RF: an RF front-end carrier for the AMD Kria KV260
 
-**Status (15 November 2026): schematic and layout complete, on 8 layers. The board is fully routed, with zero
+**Status (20 November 2026, Rev08.1): schematic and layout complete, on 8 layers. The board is fully routed, with zero
 DRC errors and zero schematic-parity problems. It has not been fabricated, and no hardware has
 been validated.** The hardware, dual-FPGA Vivado gateware, Enclosure v2 cooling, and full-system co-simulation are complete ([Status](#status)).
 
@@ -42,9 +42,9 @@ signal chains:
 |---|---|
 | Size | 119 × 132 mm, 140 × 132 with the RJ45's tab. It mounts on the KV260's IAS connectors and corner holes and overhangs to one side ([INTERFACE_SPEC §5.3](docs/INTERFACE_SPEC.md)) |
 | Stackup | 8 layers, JLCPCB `JLC08161H-2116C`: `L1 SIG – L2 GND – L3 SIG – L4 PWR (split) – L5 GND – L6 SIG – L7 GND – L8 SIG` ([LAYOUT §3](docs/LAYOUT.md)) |
-| Parts | 561 fitted, none DNP: 485 on the top face and 76 on the bottom (the Hirose connectors, the LVDS terminations and VCCINT caps under the FPGA, the switches' bias parts, the input protection) |
+| Parts | 785 fitted, the same count as the BOM and the placement file: 620 on the top face and 165 on the bottom (the Hirose connectors, the LVDS terminations and VCCINT caps under the FPGA, the switches' bias parts, the input protection) |
 | Front-end FPGA | Xilinx XC7A50T-2FTG256I (the same part as AERIS-10) with a 128 Mb QSPI flash, plus JTAG |
-| Radar ADC | AD9484, 8 bit, 400 MSPS, driven by two cascaded AD8352s |
+| Radar ADC | AD9484, 8 bit: 400 MSPS with the 400 MHz master clock (radar), 500 MSPS with the 500 MHz one (the D2 path), driven by two cascaded AD8352s |
 | SDR ADC | AD9253, 14 bit, two channels at 62.5 MSPS (one LVDS lane each) |
 | Radar DAC | AD9708, with reconstruction filter and balun |
 | SDR DAC | AD9767, dual 14 bit, two output chains |
@@ -93,7 +93,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | 5 | `J402` | top | CLK_OUT | Clock output (SMA), ADCLK948 Q3, LVPECL: to share the master clock with an instrument |
 | 6 | `J911` | top | SDR_RX_A | SDR receive A (SMA): through SW1's default throw to the AD9253 channel A. Full scale about -2.4 dBm; DC-blocked |
 | 7 | `J912` | top | AERIS_IF_A | Radar IF into the 14-bit AD9253 (SMA), through SW1's second throw |
-| 8 | `J921` | top | AERIS_IF | Radar IF from AERIS-10 (SMA): through SW2's default throw to the 500 MSPS AD9484. Full scale about -17.6 dBm |
+| 8 | `J921` | top | AERIS_IF | Radar IF from AERIS-10 (SMA): through SW2's default throw to the AD9484 (400 or 500 MSPS with the master clock). Full scale about -17.6 dBm |
 | 9 | `J922` | top | SDR_RX_WB | Wideband SDR receive (SMA), SW2's second throw. Not connected as built: `C926` is not fitted and the VHF/UHF front end takes the throw (`C927`); swap the two 0402s to use this port |
 | 10 | `J931` | top | SDR_TX_A | SDR transmit A (SMA): AD9767 DAC1 through SW3's default throw, 10 mA full scale |
 | 11 | `J932` | top | AERIS_TX_A | Radar chirp from the 14-bit AD9767 DAC1 (SMA), SW3's second throw |
@@ -136,9 +136,11 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 
 ## Schematics and layout
 
-- **[Schematic, all 12 sheets including full wired overview (PDF)](docs/KV260-IAS2RF_schematic.pdf)** · [High-res SVGs & 4K PNGs](docs/img/highres/README.md#1-schematics-sch)
-- **[Layout, all 8 copper layers + combined + transparent tracks (PDF)](docs/KV260-IAS2RF_layout.pdf)** · [Per-layer SVGs & 4K PNGs](docs/img/highres/README.md#2-8-layer-pcb-layout-layout)
-- **[Complete Project Documentation Book (PDF)](docs/KV260-IAS2RF_Documentation.pdf)**, and the same book lighter, with the normal renders instead of the 4K ones: [Lite PDF](docs/KV260-IAS2RF_Documentation-Lite.pdf) (both reproducible locally via [`export_documentation.py`](export_documentation.py), `--lite` for the second)
+The PDFs and the high-resolution files are not in the repository: they are assets of the [`rev08.1` release](https://github.com/PabloSoage/kv260-ias2rf/releases/tag/rev08.1) (each older tag has its own), and the books open in the [online reader](https://pablosoage.github.io/kv260-ias2rf/pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf).
+
+- **[Schematic, all 12 sheets including full wired overview (PDF)](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_schematic.pdf)** · [High-res SVGs & 4K PNGs](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip) ([index](docs/img/highres/README.md#1-schematics-sch))
+- **[Layout, all 8 copper layers + combined + transparent tracks (PDF)](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_layout.pdf)** · [Per-layer SVGs & 4K PNGs](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip) ([index](docs/img/highres/README.md#2-8-layer-pcb-layout-layout))
+- **[Complete Project Documentation Book (PDF)](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_Documentation.pdf)**, and the same book lighter, with the normal renders instead of the 4K ones: [Lite PDF](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_Documentation-Lite.pdf) (both reproducible locally via [`export_documentation.py`](export_documentation.py), `--lite` for the second)
 - KiCad 10 sources: [`KV260-IAS2RF.kicad_pro`](KV260-IAS2RF.kicad_pro), the root
   schematic and [`sheets/`](sheets/) (twelve hierarchical sheets), the 8-layer board
   [`KV260-IAS2RF.kicad_pcb`](KV260-IAS2RF.kicad_pcb), and custom libraries in
@@ -162,7 +164,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 
 ![Full wired circuit overview (all sheets connected)](docs/img/sch/ROOT.png)
 
-> *High-resolution vector PDF ([`FULL_CIRCUIT.pdf`](docs/img/highres/sch/FULL_CIRCUIT.pdf)) and 4K schematic PNGs are indexed in [docs/img/highres/README.md](docs/img/highres/README.md).*
+> *High-resolution vector PDF (`sch/FULL_CIRCUIT.pdf` in the [high-res archive](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip)) and 4K schematic PNGs are indexed in [docs/img/highres/README.md](docs/img/highres/README.md).*
 
 ---
 
@@ -174,7 +176,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | DRC, zones refilled | **0 errors, 0 unrouted connections, 0 schematic-parity problems** on the 8-layer `JLC08161H-2116C` board (`local/kvpwr`, 785 BOM parts; checked by `make_fab.py`) |
 | Signal and power integrity | Full-wave openEMS + ngspice verification ([SIGNAL_INTEGRITY.md](docs/SIGNAL_INTEGRITY.md)): SMA launch `S11 = -30.9 dB` at 1 GHz (`-13.7 dB` at 3 GHz) with ESD diode, LVDS eyes within `1–26 mV` of ideal except `LINK_RX_D0` (`-52 mV`), worst intra-pair skew `9 ps`, `VCCINT` impedance `41 / 63 mΩ` (`target 120 mΩ`), ESD protection on every SMA, Pmod and JTAG, GND via within `3 mm` of all `89` LVDS layer changes |
 | Planes | L2, L5, and L7 carry solid ground; L4 carries split power islands (`_work/layout/planechk.py`) |
-| Dual-FPGA Gateware & Vivado Timing | **Complete and routed in Vivado 2026.1** ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)): `artix_top` (`ENABLE_ETH=1`) uses `25,068` LUTs (`76.9%`), `28,881` FFs (`44.3%`), `18.0` BRAM36 (`24.0%`), `119` DSP48E1 (`99.2%`), `WNS = +0.076 ns` over every clock of both `CLK_FPGA` modes (`400` and `500 MHz`); `ias2rf_k26_bd` with the DSP suite, the GPS PPS block, the fusion grid and the KrakenSDR and HackRF Pro blocks uses `51,870` Slice LUTs (`44.3%`), `44,547` FFs (`19.0%`), `40` BRAM36 (`27.8%`), `229` DSP48E2 (`18.3%`), `WNS = +1.125 ns`; end-to-end XSim (`tb_system`) `S1..S6 PASS` |
+| Dual-FPGA gateware | Both designs place, route and meet timing in Vivado 2026.1; utilisation and slack in the [FPGA figures](#fpga-figures) table, generated from the Vivado reports. They pass the end-to-end XSim suite (`tb_system`, `S1..S6`) and the G-8 simulations ([FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md)) |
 | Final RF review (15 Nov) | Five limits found ([SIGNAL_INTEGRITY §9.8](docs/SIGNAL_INTEGRITY.md)) and addressed ([§9.9](docs/SIGNAL_INTEGRITY.md)): a 30 MHz 7th-order anti-alias filter on the HF input J951 (≥ 60 dB from 50 MHz); the switch-free J951/J952 as the default HF ports; DAC clocks from `CLK_FPGA` ÷ 4 without an MMCM (clock uncertainty `0.165 → 0.035 ns`); no transmit copper within 1.5 mm of any receive line; the enclosure's honest rating below. Still to measure on the first board: TX→RX isolation, the RF switches at 1–5 MHz, the filter above 700 MHz, switcher spurs |
 | Rev08 front end and diagnostics (16–17 Nov) | VHF/UHF receive on `J961`, 30 MHz to 3 GHz: noise figure 2.0 dB and full scale −52 dBm at maximum gain in the direct VHF path, FM-reject ≥ 40 dB with real tolerances; `J961` launch `S11 ≤ −18.1 dB` to 1.1 GHz with its ESD diode and bias tee; no front-end copper within 1.5 mm of either ADC input or the clock tree ([REV08_PLAN §5.5, §11.7](docs/REV08_PLAN.md), [SIGNAL_INTEGRITY §9.10](docs/SIGNAL_INTEGRITY.md)). 14 status and rail LEDs, a USB-C debug console, the IAS0 camera pass-through, and the [board manual](docs/BOARD_MANUAL.md) |
 | Rev08.1 power and the PSU board (19 Nov) | One supply and one ground for both boards (sheet `KVPWR`, [POWER_SPEC §1.4](docs/POWER_SPEC.md), [AUDIT_Rev08 §6](docs/AUDIT_Rev08.md)); the [PSU board](docs/PSU_SPEC.md) feeds both from the battery through ISO 16750-2 Load Dump A/B, jump start and cranking Levels I, II and IV; its audit, ERC 0 and DRC 0 / 0 ([PSU_SPEC §10](docs/PSU_SPEC.md)) |
@@ -205,7 +207,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 | [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | **Dual-FPGA Gateware.** Artix-7 + Kria K26 RTL, Vivado 2026.1 utilization/timing/floorplans/schematics, CSR map, wideband SDR & AERIS-10 radar DSP, and XSim e2e simulation |
 | [docs/HMI.md](docs/HMI.md) | **In-car HMI.** The ten touchscreen screens, a Slint application in Rust that runs on the KV260 (Linux KMS), a PC or a phone's browser, its data service and the PL's result streams behind it, and which job runs on the PL, the A53s, the R5F cores, the GPU and the VCU |
 | [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) | **Possible integrations.** USB GPS, a 77 GHz radar over CAN, engine live data through opendash (measured against an emulated ECU), a 3D LiDAR, their behaviour in fog, and `kria_bev_grid`, a fusion occupancy grid for the PL |
-| [docs/KV260-IAS2RF_Documentation.pdf](docs/KV260-IAS2RF_Documentation.pdf) | **Unified Offline Book.** Combined project manual with vector Vivado floorplans, 11-sheet schematic, 10-sheet 8-layer layout, 4K renders, and simulations (generated via [`export_documentation.py`](export_documentation.py)) |
+| [KV260-IAS2RF_Documentation.pdf](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_Documentation.pdf) (release asset) | **Unified Offline Book.** Every document of the project in one PDF, with the vector Vivado floorplans, the 14-page schematic (12 sheets), the 10-page 8-layer layout, the PSU board's schematic and 5-page 4-layer layout, 4K renders, and simulations (generated via [`export_documentation.py`](export_documentation.py)) |
 | [docs/SHOPPING_LIST.md](docs/SHOPPING_LIST.md) | Parts and checklist per stage, with indicative costs |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Master system architecture and BOM |
 | [docs/BLOCKERS_AND_RISKS.md](docs/BLOCKERS_AND_RISKS.md) | Engineering blockers closed, with evidence and sources, plus open risks |
@@ -267,7 +269,7 @@ sustain a converter stream in real time. It can.
 ## Where the project came from, and attribution
 
 This is a **fork** of the open hardware design
-[Allied Vision Adapter Board CSI-2 for Kria KV260](https://github.com/alliedvision), published
+[Allied Vision Adapter Board CSI-2 for Kria KV260](https://github.com/alliedvision/adapter_AMD_Xilinx_KRIA-KV260), published
 under the MIT licence (see [LICENSE](LICENSE)). What is kept from that design:
 
 - the board's mechanical fit to the KV260 (the outline was extended)
@@ -287,10 +289,16 @@ Both FPGAs carry complete, post-route verified Vivado 2026.1 gateware and end-to
 - **AERIS-10 X-Band Radar (`10.5 GHz` / `20 km` / `8× ADAR1000`):** `400 MSPS` `AD9484` IF capture into the verbatim `AERIS-10 / PLFM_RADAR` (`62d4c55`) 400 -> 100 MSPS I/Q DDC (`stream_id = 8'h01`), `AD9708` chirp DAC (`DAC_RADAR`), `ADF4382` LO + `8× ADAR1000` beamformer SPI controller (`u_adar_ctrl`), and `u_rf_switch` T/R sequencing.
 - **High-Speed Interconnect:** Dual-lane Clause-49 `64B/66B` `IAS1` LVDS (`1.0–1.25 Gb/s` per lane, `2.0–2.5 Gb/s` uplink + `0.5–1.0 Gb/s` downlink) plus dedicated-pin `1000BASE-T` SGMII/UDP over `U1201 RTL8211FSI` (`~2.94 Gb/s` combined).
 
-| Target FPGA (`Vivado 2026.1`) | Slice LUTs | Flip-Flops | BRAM36 eq. | DSP48 | Timing (`WNS` / `WHS`) |
-|---|---|---|---|---|---|
-| **`artix_top` (`XC7A50T-FTG256-2`, `ENABLE_ETH=1`)** | `17,450 / 32,600` (`53.5%`) | `19,029 / 65,200` (`29.2%`) | `16.0 / 75` (`21.3%`) | `110 / 120` (`91.7%`) | **`+0.071 ns` / `+0.014 ns`** (all clocks of both `CLK_FPGA` modes; AD9484 domain at `400 MSPS` only) |
-| **`ias2rf_k26_bd_wrapper` (`XCK26-SFVC784-2LV-c`)** | `11,038 / 117,120` (`9.4%`) | `18,210 / 234,240` (`7.8%`) | `3.0 / 144` (`2.1%`) | `0 / 1,248` | **`+0.814 ns` / `+0.011 ns`** |
+<a id="fpga-figures"></a>
+
+<!-- fpga-figures:begin -->
+| Design (Vivado 2026.1) | Device | LUTs | FFs | BRAM36 eq. | DSPs | WNS / WHS | Failing endpoints | Reports |
+|---|---|---|---|---|---|---|---|---|
+| `artix_top` | XC7A50T-FTG256-2 | 25,279 (77.5 %) | 28,970 (44.4 %) | 18.0 (24.0 %) | 119 (99.2 %) | +0.007 / +0.033 ns | 0 of 83,391 | [`artix/reports_rev06/`](fpga/artix/reports_rev06/) from [`build_rev06.tcl`](fpga/artix/build_rev06.tcl) |
+| `ias2rf_k26_bd_wrapper` | XCK26-SFVC784-2LV-c | 53,336 (45.5 %) | 46,896 (20.0 %) | 44.0 (30.6 %), 1 URAM | 229 (18.3 %) | +1.043 / +0.010 ns | 0 of 188,554 | [`kria/reports/`](fpga/kria/reports/) from [`bd.tcl`](fpga/kria/bd.tcl) |
+
+*Post-route, generated from the Vivado reports by `_work/fpga_figures.py` (artix_top: Thu Nov 19 04:24:55 2026; ias2rf_k26_bd_wrapper: Thu Nov 19 09:53:51 2026).*
+<!-- fpga-figures:end -->
 
 | Artix-7 Silicon Die Floorplan (`XC7A50T`) | Artix-7 Post-Route Vivado Circuit Schematic |
 |---|---|
@@ -399,7 +407,7 @@ LM5177 four-switch buck-boost to 12.0 V, and one TPS26631 eFuse per output (2.0 
 the KV260's `J12`). Both boards keep running through ISO 16750-2 Load Dump A and B, a 24 V jump start and cranking
 Levels I, II and IV; with two cables, the BM20 link carries 38 mA a contact at the worst load instead of 132 mA.
 Design values, simulations (steady state, loop, input filter, vehicle events, thermal, conducted noise), layout and
-installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); schematic [PDF](docs/KV260-IAS2RF_PSU_schematic.pdf); KiCad project in `psu/`.
+installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); schematic [PDF](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_PSU_schematic.pdf) and 4-layer layout [PDF](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_PSU_layout.pdf) (also in the 3-D explorer's Layers tab); KiCad project in `psu/`.
 
 ![The PSU board, 3D render](docs/img/psu/psu_iso.png)
 

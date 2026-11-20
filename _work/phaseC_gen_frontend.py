@@ -23,7 +23,12 @@ from __future__ import annotations
 import pathlib, re, uuid, json
 
 ROOT = pathlib.Path(r"E:\PCB\adapter_AMD_Xilinx_KRIA-KV260")
-EASY = pathlib.Path(r"C:\Users\pablo\KiCad\EasyEDA.kicad_sym")
+import os  # noqa: E402
+import sys  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from toolpaths import easyeda_symbols  # noqa: E402
+
+EASY = pathlib.Path(easyeda_symbols())
 OUT  = ROOT / "FRONTEND.kicad_sch"
 
 # ----------------------------------------------------------------------------

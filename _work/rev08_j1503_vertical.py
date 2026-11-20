@@ -22,7 +22,10 @@ import re
 import sys
 import uuid
 
-LIB = os.path.join(os.environ.get("KICAD_FP", r"C:\Users\pablo\AppData\Local\Programs\KiCad\10.0\share\kicad\footprints"),
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from toolpaths import stock_footprints  # noqa: E402
+
+LIB = os.path.join(stock_footprints(),
                    "Connector_JST.pretty", "JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical.kicad_mod")
 NAME = "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical"
 AT = (194.4, 113.275)            # pads at y 114.6 (local y 1.325), x 191.9 to 196.9 as before

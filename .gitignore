@@ -44,3 +44,13 @@ fpga/artix/.build_rev06/
 _render_psu/
 _site_psu/
 _work/psu/cache/
+
+# build.tcl writes here; build_rev06.tcl (reports_rev06/) is the build of record
+fpga/artix/reports/
+
+# Release assets, not tracked: the PDFs and the high-resolution files (see docs/img/highres/README.md)
+docs/*.pdf
+docs/img/highres/*
+!docs/img/highres/README.md
+_backup_original/
+_deprecated/

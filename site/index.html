@@ -19,7 +19,7 @@
 
     <nav class="nav-tabs" aria-label="Primary Views">
       <button class="nav-tab active" data-tab="explorer" type="button">3-D Explorer</button>
-      <button class="nav-tab" data-tab="layers" type="button">Layers (8-Cu)</button>
+      <button class="nav-tab" data-tab="layers" type="button">Layers</button>
       <button class="nav-tab" data-tab="hmi" type="button">Live HMI (WASM)</button>
       <button class="nav-tab" data-tab="mockups" type="button">Mock-ups</button>
       <button class="nav-tab" data-tab="gallery" type="button">Sim Gallery</button>
@@ -231,12 +231,18 @@
     </section>
 
     <!-- 2. 8-Layer PCB Stack-up & 2-D SVG Viewer -->
-    <section id="tab-layers" class="tab-panel" aria-label="8-Layer PCB Stack-up Viewer">
+    <section id="tab-layers" class="tab-panel" aria-label="PCB Stack-up Viewer">
       <div class="layers-grid">
         <aside class="dock">
           <div class="panel-card">
+            <div class="btn-grid" role="group" aria-label="Board">
+              <button class="btn btn-sm active" data-layer-board="main" aria-pressed="true" type="button">Adapter (8-Cu)</button>
+              <button class="btn btn-sm" data-layer-board="psu" aria-pressed="false" type="button">PSU Board (4-Cu)</button>
+            </div>
+          </div>
+          <div class="panel-card">
             <div class="control-row">
-              <h3>8-Layer Stack-up</h3>
+              <h3 id="layer-stack-title">8-Layer Stack-up</h3>
               <button id="btn-layer-peel" class="btn btn-sm btn-primary" type="button">Peel Stack</button>
             </div>
             <div class="control-row">
@@ -251,7 +257,7 @@
             <input id="range-layer-opacity" type="range" min="15" max="100" value="85">
             <div class="btn-grid">
               <button id="btn-layers-all" class="btn btn-sm" type="button">Show All</button>
-              <button id="btn-layers-cu" class="btn btn-sm" type="button">8 Copper Only</button>
+              <button id="btn-layers-cu" class="btn btn-sm" type="button">Copper Only</button>
             </div>
           </div>
           <div class="panel-card">
@@ -264,7 +270,7 @@
           <div class="layer-3d-wrap">
             <canvas id="layer-webgl-canvas" aria-label="3-D Layer Stack-up"></canvas>
             <div class="hud-top">
-              <div class="hud-pill">3-D Sequentially Peeled 8-Cu Stack-up (KiCad vector SVGs)</div>
+              <div id="layer-hud" class="hud-pill">3-D Sequentially Peeled 8-Cu Stack-up (KiCad vector SVGs)</div>
             </div>
           </div>
           <div class="layer-2d-wrap">
@@ -338,7 +344,7 @@
           <div class="doc-card">
             <div>
               <strong>Complete Hardware &amp; Software Documentation (PDF)</strong>
-              <p>307-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
+              <p>312-page compiled reference streamed cleanly on demand via vendored Mozilla PDF.js (HTTP byte ranges).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=1" target="_blank" rel="noopener">Open Documentation PDF</a>
@@ -354,7 +360,9 @@
               <a class="btn btn-sm btn-primary" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=148" target="_blank" rel="noopener">PSU_SPEC (p.148)</a>
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=155" target="_blank" rel="noopener">Enclosure (p.155)</a>
               <a class="btn btn-sm" href="#tab=explorer&amp;view=psu&amp;enc=open">PSU in 3-D Explorer</a>
+              <a class="btn btn-sm" href="#tab=layers&amp;board=psu">PSU Layers</a>
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_PSU_schematic.pdf#page=1" target="_blank" rel="noopener">PSU Schematic PDF</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_PSU_layout.pdf#page=1" target="_blank" rel="noopener">PSU Layout PDF</a>
             </div>
           </div>
           <div class="doc-card">
@@ -380,20 +388,20 @@
           <div class="doc-card">
             <div>
               <strong>Board Manual &amp; Project Overview</strong>
-              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.29).</p>
+              <p>Deep links into Documentation Book: Project Overview (p.6) and Connector/Board Manual (p.30).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=6" target="_blank" rel="noopener">Overview (p.6)</a>
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=29" target="_blank" rel="noopener">Board Manual (p.29)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=30" target="_blank" rel="noopener">Board Manual (p.30)</a>
             </div>
           </div>
           <div class="doc-card">
             <div>
               <strong>FPGA Co-Simulation &amp; Vehicle Integrations</strong>
-              <p>XSim <code>tb_system</code> verification (p.64), LVDS/pin map (p.74), CAN/GPS/LiDAR/Radar integrations (p.94), and Mechanical/Enclosure (p.219).</p>
+              <p>XSim <code>tb_system</code> verification (p.65), LVDS/pin map (p.74), CAN/GPS/LiDAR/Radar integrations (p.94), and Mechanical/Enclosure (p.219).</p>
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=64" target="_blank" rel="noopener">System Sim (p.64)</a>
+              <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=65" target="_blank" rel="noopener">System Sim (p.65)</a>
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=94" target="_blank" rel="noopener">Integrations (p.94)</a>
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=176" target="_blank" rel="noopener">SI (p.176)</a>
               <a class="btn btn-sm" href="pdf.html?file=docs/KV260-IAS2RF_Documentation.pdf#page=219" target="_blank" rel="noopener">Mechanical (p.219)</a>

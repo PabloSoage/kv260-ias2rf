@@ -1,6 +1,8 @@
 # High-Resolution (4K) & Vector Assets Gallery
 
-This directory provides **4K raster renders (`3840 × 2160` PNG)** and **lossless vector drawings (SVG / PDF)** for detailed inspection of the final **8-layer (`JLC08161H-2116C`) KV260-IAS2RF** hardware, thermal/heatsink mechanical integration, Vivado 2026.1 FPGA silicon floorplans & gateware schematics, Enclosure v2 CAD/CFD/FEA, and 8-layer signal/power integrity simulations.
+> These files are not in the repository. They come as [`KV260-IAS2RF_highres.zip`](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_highres.zip) on the `rev08.1` release (each older tag's release has its own); unzip it into `docs/img/highres/` and the links below resolve. The scripts that make them (`_work/export_schematics_and_layout.py`, the render and plot scripts) write them here.
+
+The archive provides **4K raster renders (`3840 × 2160` PNG)** and **lossless vector drawings (SVG / PDF)** for detailed inspection of the final **8-layer (`JLC08161H-2116C`) KV260-IAS2RF** hardware, thermal/heatsink mechanical integration, Vivado 2026.1 FPGA silicon floorplans & gateware schematics, Enclosure v2 CAD/CFD/FEA, and 8-layer signal/power integrity simulations.
 
 ---
 
@@ -24,13 +26,13 @@ This directory provides **4K raster renders (`3840 × 2160` PNG)** and **lossles
   - `RX_VU`: [`KV260-IAS2RF-RX_VU.svg`](sch/KV260-IAS2RF-RX_VU.svg) · [`RX_VU_4k.png`](sch/RX_VU_4k.png)
   - `STATUS`: [`KV260-IAS2RF-STATUS.svg`](sch/KV260-IAS2RF-STATUS.svg) · [`STATUS_4k.png`](sch/STATUS_4k.png)
 
-*(Full 14-page multi-sheet vector PDF: the root, the composite and the 12 sheets: [`docs/KV260-IAS2RF_schematic.pdf`](../../KV260-IAS2RF_schematic.pdf).)*
+*(Full 14-page multi-sheet vector PDF: the root, the composite and the 12 sheets: [`KV260-IAS2RF_schematic.pdf`](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_schematic.pdf).)*
 
 ---
 
 ## 2. 8-Layer PCB Layout (`layout/`)
 
-Every copper layer of the **JLC08161H-2116C** 8-layer stackup, plus composite views matching the 10-page vector layout PDF ([`docs/KV260-IAS2RF_layout.pdf`](../../KV260-IAS2RF_layout.pdf)):
+Every copper layer of the **JLC08161H-2116C** 8-layer stackup, plus composite views matching the 10-page vector layout PDF ([`docs/KV260-IAS2RF_layout.pdf`](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_layout.pdf)):
 
 - **L1 (`F.Cu`):** [`layer_01_L1_F_Cu.svg`](layout/layer_01_L1_F_Cu.svg) · [`layer_01_L1_F_Cu_4k.png`](layout/layer_01_L1_F_Cu_4k.png)
 - **L2 (`In1.Cu` GND):** [`layer_02_L2_In1_GND.svg`](layout/layer_02_L2_In1_GND.svg) · [`layer_02_L2_In1_GND_4k.png`](layout/layer_02_L2_In1_GND_4k.png)
@@ -43,17 +45,27 @@ Every copper layer of the **JLC08161H-2116C** 8-layer stackup, plus composite vi
 - **Combined 8 layers:** [`layer_09_all_8_layers.svg`](layout/layer_09_all_8_layers.svg) · [`layer_09_all_8_layers_4k.png`](layout/layer_09_all_8_layers_4k.png)
 - **Transparent tracks (GND & PWR copper pours removed):** [`layer_10_tracks_transparent.svg`](layout/layer_10_tracks_transparent.svg) · [`layer_10_tracks_transparent_4k.png`](layout/layer_10_tracks_transparent_4k.png)
 
+### PSU board, 4 layers (`psu_layout/`)
+
+The pages of `KV260-IAS2RF_PSU_layout.pdf`, from `psu/psu.kicad_pcb` with its zones refilled on a copy:
+
+- **L1 (`F.Cu`):** [`psu_01_L1_F_Cu.svg`](psu_layout/psu_01_L1_F_Cu.svg) · [`psu_01_L1_F_Cu_4k.png`](psu_layout/psu_01_L1_F_Cu_4k.png)
+- **L2 (`In1.Cu` GND):** [`psu_02_L2_In1_GND.svg`](psu_layout/psu_02_L2_In1_GND.svg) · [`psu_02_L2_In1_GND_4k.png`](psu_layout/psu_02_L2_In1_GND_4k.png)
+- **L3 (`In2.Cu` +12V):** [`psu_03_L3_In2_12V.svg`](psu_layout/psu_03_L3_In2_12V.svg) · [`psu_03_L3_In2_12V_4k.png`](psu_layout/psu_03_L3_In2_12V_4k.png)
+- **L4 (`B.Cu`):** [`psu_04_L4_B_Cu.svg`](psu_layout/psu_04_L4_B_Cu.svg) · [`psu_04_L4_B_Cu_4k.png`](psu_layout/psu_04_L4_B_Cu_4k.png)
+- **All four, translucent overlay:** [`psu_05_all_4_layers.svg`](psu_layout/psu_05_all_4_layers.svg) · [`psu_05_all_4_layers_4k.png`](psu_layout/psu_05_all_4_layers_4k.png)
+
 ---
 
 ## 3. Vivado 2026.1 FPGA Silicon Floorplans & Schematics (`fpga/`)
 
 Generated directly from post-route Vivado 2026.1 checkpoints ([`docs/FPGA_GATEWARE.md`](../../FPGA_GATEWARE.md)):
 
-- **Artix-7 `XC7A50T-FTG256-2` Silicon Die Floorplan (`25,068` Slice LUTs, `28,881` FFs, `119` DSP48E1, `18` BRAM36 eq.):**
+- **Artix-7 `XC7A50T-FTG256-2` Silicon Die Floorplan (utilisation in the [FPGA figures](../../FPGA_GATEWARE.md#fpga-figures) table):**
   - [`artix7_silicon_floorplan.pdf`](fpga/artix7_silicon_floorplan.pdf) · [`artix7_silicon_floorplan.svg`](fpga/artix7_silicon_floorplan.svg) · [`artix7_silicon_floorplan_4k.png`](fpga/artix7_silicon_floorplan_4k.png)
 - **Artix-7 `artix_top` Post-Route Circuit Schematic:**
   - [`artix7_vivado_schematic.pdf`](fpga/artix7_vivado_schematic.pdf) · [`artix7_vivado_schematic.svg`](fpga/artix7_vivado_schematic.svg) · [`artix7_vivado_schematic_4k.png`](fpga/artix7_vivado_schematic_4k.png)
-- **Kria K26 `XCK26-SFVC784-2LV-c` Silicon Die Floorplan (full `ias2rf_k26_bd` block design: `51,870` Slice LUTs, `44,547` FFs, `229` DSP48E2, `40` BRAM36 eq.):**
+- **Kria K26 `XCK26-SFVC784-2LV-c` Silicon Die Floorplan (full `ias2rf_k26_bd` block design; utilisation in the [FPGA figures](../../FPGA_GATEWARE.md#fpga-figures) table):**
   - [`kria_k26_silicon_floorplan.pdf`](fpga/kria_k26_silicon_floorplan.pdf) · [`kria_k26_silicon_floorplan.svg`](fpga/kria_k26_silicon_floorplan.svg) · [`kria_k26_silicon_floorplan_4k.png`](fpga/kria_k26_silicon_floorplan_4k.png)
 - **Kria K26 PS + PL `ias2rf_k26_bd` Block Design & PL Circuit Schematic:**
   - [`kria_k26_vivado_bd_schematic.pdf`](fpga/kria_k26_vivado_bd_schematic.pdf) · [`kria_k26_vivado_bd_schematic.svg`](fpga/kria_k26_vivado_bd_schematic.svg) · [`kria_k26_vivado_bd_schematic_4k.png`](fpga/kria_k26_vivado_bd_schematic_4k.png)

@@ -4,6 +4,7 @@ Where the external tools live, found the same way on every machine.
 kicad-cli: $KICAD_CLI if set, else kicad-cli on PATH, else the KiCad 10 install
 folders winget and the KiCad installer use (per user, then per machine).
 The stock footprints sit next to it in the same install.
+EasyEDA symbols: $EASYEDA_SYM if set, else ~/KiCad/EasyEDA.kicad_sym.
 
 Set KICAD_CLI only when KiCad is somewhere else (an untracked mise.local.toml
 [env] section is the place for it).
@@ -35,6 +36,12 @@ def stock_footprints():
     if not d:
         d = os.path.join(os.path.dirname(os.path.dirname(kicad_cli())), "share", "kicad", "footprints")
     return os.path.join(d, "")
+
+
+def easyeda_symbols():
+    """The EasyEDA symbol library the early sheet generators read: $EASYEDA_SYM if set, else
+    ~/KiCad/EasyEDA.kicad_sym (where easyeda2kicad writes it by default)."""
+    return os.environ.get("EASYEDA_SYM") or os.path.join(os.path.expanduser("~"), "KiCad", "EasyEDA.kicad_sym")
 
 
 KICAD_CLI = kicad_cli()

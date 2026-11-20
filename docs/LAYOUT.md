@@ -22,7 +22,8 @@ re-routed (9 of 19 as coupled 100 Ω pairs, the rest as matched 50 Ω legs), the
 under the FPGA's balls on the bottom face, and LINK_TX terminated at its receiver (§6.5).
 
 The original Allied Vision board is kept, untouched, as
-`_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb`.
+`_deprecated/CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb` in the tags up to `rev08`
+(`git checkout rev08 -- _deprecated`); the Allied Vision Altium sources stay in `PCB/`.
 
 ---
 

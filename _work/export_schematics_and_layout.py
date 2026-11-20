@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Export 100% vector KiCad schematics, full connected circuit composite,
-10-page vector 8-layer PCB layout PDF, vector SVGs, and high-res PNGs.
+10-page vector 8-layer PCB layout PDF, the 5-page PSU board layout PDF, vector SVGs, and high-res PNGs.
 
 Usage:
     D:/Tools/KiCadRoutingTools/.venv/Scripts/python.exe _work/export_schematics_and_layout.py
@@ -27,15 +27,17 @@ PCB_FILE = os.path.join(ROOT, "KV260-IAS2RF.kicad_pcb")
 DOCS_DIR = os.path.join(ROOT, "docs")
 SCH_PDF = os.path.join(DOCS_DIR, "KV260-IAS2RF_schematic.pdf")
 LAY_PDF = os.path.join(DOCS_DIR, "KV260-IAS2RF_layout.pdf")
+PSU_LAY_PDF = os.path.join(DOCS_DIR, "KV260-IAS2RF_PSU_layout.pdf")
 
 IMG_DIR = os.path.join(DOCS_DIR, "img")
 SCH_PNG_DIR = os.path.join(IMG_DIR, "sch")
 HR_SCH_DIR = os.path.join(IMG_DIR, "highres", "sch")
 HR_LAY_DIR = os.path.join(IMG_DIR, "highres", "layout")
+HR_PSU_DIR = os.path.join(IMG_DIR, "highres", "psu_layout")
 
 
 def ensure_dirs():
-    for d in (DOCS_DIR, IMG_DIR, SCH_PNG_DIR, HR_SCH_DIR, HR_LAY_DIR):
+    for d in (DOCS_DIR, IMG_DIR, SCH_PNG_DIR, HR_SCH_DIR, HR_LAY_DIR, HR_PSU_DIR):
         os.makedirs(d, exist_ok=True)
 
 
@@ -645,15 +647,97 @@ def export_layout():
     print(f"   Saved {LAY_PDF} ({sz_mb:.2f} MB, 10 vector pages)")
 
 
+def export_psu_layout():
+    """The PSU board (psu/psu.kicad_pcb, 4 layers) as a 5-page vector PDF: each copper layer with the outline, then
+    all four combined. Works on a copy of psu/ with its zones refilled; psu/ stays unfilled."""
+    print("[C] Exporting the 5-page vector PSU layout PDF + layer SVGs/PNGs...")
+    tmp_dir = os.path.join(ROOT, "_work", "_tmp_psu_layout")
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+    shutil.copytree(os.path.join(ROOT, "psu"), tmp_dir)
+    pcb = os.path.join(tmp_dir, "psu.kicad_pcb")
+    subprocess.run([KICAD_CLI, "pcb", "drc", "--refill-zones", "--save-board", "-o",
+                    os.path.join(tmp_dir, "drc.rpt"), pcb], capture_output=True, check=False)
+    pages = [
+        ("F.Cu,Edge.Cuts", "psu_01_L1_F_Cu", "PSU L1 - F.Cu (parts, power pours: VBAT, VS, switch nodes, +12V)",
+         "2 oz outer Cu | 0.21 mm to L2 GND"),
+        ("In1.Cu,Edge.Cuts", "psu_02_L2_In1_GND", "PSU L2 - In1.Cu (solid ground under the power stage)",
+         "0.5 oz inner Cu"),
+        ("In2.Cu,Edge.Cuts", "psu_03_L3_In2_12V", "PSU L3 - In2.Cu (+12V output plane to J2 and J3)",
+         "0.5 oz inner Cu | 1.07 mm core to L2"),
+        ("B.Cu,Edge.Cuts", "psu_04_L4_B_Cu", "PSU L4 - B.Cu (ground pour and short signal runs)",
+         "2 oz outer Cu | 1.6 mm board"),
+    ]
+    out = pymupdf.open()
+    toc = []
+    for idx, (lay_str, slug, title, sub) in enumerate(pages, start=1):
+        pdf_i = os.path.join(tmp_dir, f"{slug}.pdf")
+        run_kicad(["pcb", "export", "pdf", "--check-zones", "--include-border-title",
+                   "--mode-single", "--scale", "0", "--layers", lay_str, "-o", pdf_i, pcb])
+        run_kicad(["pcb", "export", "svg", "--check-zones", "--mode-single", "--page-size-mode", "2",
+                   "--fit-page-to-board", "--layers", lay_str, "-o", os.path.join(HR_PSU_DIR, f"{slug}.svg"), pcb])
+        d = pymupdf.open(pdf_i)
+        add_layout_banner(d[0], idx, len(pages) + 1, title, sub)
+        render_page_width(d[0], os.path.join(HR_PSU_DIR, f"{slug}_4k.png"), 3840)
+        out.insert_pdf(d)
+        d.close()
+        toc.append([1, f"{idx}. {title}", idx])
+
+    # Page 5: the four layers as translucent overlays (Multiply), bottom first, so every pour and track shows
+    n = len(pages) + 1
+    frame = os.path.join(tmp_dir, "frame.pdf")
+    run_kicad(["pcb", "export", "pdf", "--include-border-title", "--mode-single", "--scale", "0",
+               "--layers", "Edge.Cuts", "-o", frame, pcb])
+    d5 = pymupdf.open(frame)
+    p5 = d5[0]
+    styles = [("B.Cu", "#8E24AA", "L4 B.Cu (ground)", 0.35),
+              ("In2.Cu", "#0082C8", "L3 In2.Cu (+12V plane)", 0.35),
+              ("In1.Cu", "#808080", "L2 In1.Cu (ground)", 0.30),
+              ("F.Cu", "#E6194B", "L1 F.Cu (parts, pours)", 0.55)]
+    for ly, hx, _, al in styles:
+        raw_l = os.path.join(tmp_dir, f"ov_{ly}.pdf")
+        col_l = os.path.join(tmp_dir, f"ov_{ly}_col.pdf")
+        run_kicad(["pcb", "export", "pdf", "--check-zones", "--mode-single", "--scale", "0", "--layers", ly,
+                   "-o", raw_l, pcb])
+        recolor_kicad_layer_pdf(raw_l, hex_to_rgb01(hx), al, col_l)
+        ld = pymupdf.open(col_l)
+        p5.show_pdf_page(p5.rect, ld, 0)
+        ld.close()
+    add_layout_banner(p5, n, n, "PSU - All 4 Copper Layers, Translucent Overlay", "Multiply blend | vector")
+    leg = pymupdf.Rect(36, 512, 490, 534)                 # one row under the board, left of the title block
+    p5.draw_rect(leg, color=(0.25, 0.35, 0.50), fill=(0.98, 0.99, 1.0), width=0.8)
+    for i, (ly, hx, lbl, _) in enumerate(reversed(styles)):
+        x0 = 44 + i * 112
+        c = hex_to_rgb01(hx)
+        p5.draw_rect(pymupdf.Rect(x0, 518, x0 + 14, 528), color=c, fill=c)
+        p5.insert_text((x0 + 18, 527), lbl.split(" (")[0] + " " + lbl.split("(")[1].split(",")[0].rstrip(")"),
+                       fontsize=7.5, fontname="helv", color=(0.12, 0.14, 0.18))
+    with open(os.path.join(HR_PSU_DIR, "psu_05_all_4_layers.svg"), "w", encoding="utf-8") as f:
+        f.write(p5.get_svg_image(text_as_path=False))
+    render_page_width(p5, os.path.join(HR_PSU_DIR, "psu_05_all_4_layers_4k.png"), 3840)
+    out.insert_pdf(d5)
+    d5.close()
+    toc.append([1, f"{n}. PSU - All 4 Copper Layers, Translucent Overlay", n])
+    out.set_toc(toc)
+    out.save(PSU_LAY_PDF, garbage=4, deflate=True)
+    out.close()
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+    print(f"   Saved {PSU_LAY_PDF} ({os.path.getsize(PSU_LAY_PDF) / 2**20:.2f} MB, {n} vector pages)")
+
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--schematics-only", action="store_true")
     ap.add_argument("--layout-only", action="store_true")
+    ap.add_argument("--psu-layout-only", action="store_true")
     args = ap.parse_args()
     ensure_dirs()
+    if args.psu_layout_only:
+        export_psu_layout()
+        sys.exit(0)
     if not args.layout_only:
         export_schematics()
     if not args.schematics_only:
         export_layout()
+        export_psu_layout()
     print("DONE: Schematics & 10-page Vector Layout exported.")

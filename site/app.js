@@ -14,10 +14,10 @@ const BOARD_REG_ROTY = -Math.PI / 2;
 
 const DOC_PDF_PAGE_MAP = {
   "README.md": 6,
-  "docs/BOARD_MANUAL.md": 29,
-  "docs/FPGA_GATEWARE.md": 38,
-  "docs/SYSTEM_SIM.md": 64,
-  "fpga/SYSTEM_SIM.md": 64,
+  "docs/BOARD_MANUAL.md": 30,
+  "docs/FPGA_GATEWARE.md": 39,
+  "docs/SYSTEM_SIM.md": 65,
+  "fpga/SYSTEM_SIM.md": 65,
   "docs/LINK_PROTOCOL.md": 68,
   "docs/PINMAP.md": 74,
   "docs/HMI.md": 86,
@@ -36,7 +36,7 @@ const DOC_PDF_PAGE_MAP = {
   "docs/ENCLOSURE_V2_THERMAL.md": 237,
   "docs/FABRICATION.md": 259,
   "docs/JLCPCB_QUOTE.md": 262,
-  "fpga/README.md": 62,
+  "fpga/README.md": 63,
   "fpga/eth/REV06.md": 78,
   "fpga/eth/REDUNDANCY.md": 80,
   "sw/README.md": 85,
@@ -1873,7 +1873,7 @@ function psuAnalysisHtml(c) {
 // 8-Layer PCB Stack-up + Sequential Peel Animation
 // ---------------------------------------------------------------------------
 
-function svgToCanvasTexture(svgText, hexColor) {
+function svgToCanvasTexture(svgText, hexColor, height = 1500) {
   return new Promise((resolve) => {
     const img = new Image();
     const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
@@ -1881,7 +1881,7 @@ function svgToCanvasTexture(svgText, hexColor) {
     img.onload = () => {
       const cvs = document.createElement("canvas");
       cvs.width = 1600;
-      cvs.height = 1500;
+      cvs.height = height;
       const ctx = cvs.getContext("2d");
       ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
       ctx.globalCompositeOperation = "source-in";
@@ -1906,13 +1906,6 @@ function svgToCanvasTexture(svgText, hexColor) {
 }
 
 async function initLayerViewer() {
-  const listEl = $("#layer-list");
-  const allLayers = [
-    ...catalogue.layer_stack,
-    { id: "B.Mask", name: "Bottom Soldermask", color: "#2d7d3a" },
-    { id: "B.SilkS", name: "Bottom Silkscreen", color: "#d6dbe0" },
-  ];
-
   const canvas = $("#layer-webgl-canvas");
   layerRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   layerRenderer.setClearColor(0x000000, 0);
@@ -1942,55 +1935,7 @@ async function initLayerViewer() {
   new ResizeObserver(resizeLayers).observe(canvas.parentElement);
   resizeLayers();
 
-  const wM = (catalogue.board_outline.width_mm || 140.0) * 0.001;
-  const hM = (catalogue.board_outline.height_mm || 132.0) * 0.001;
-  const geom = new THREE.PlaneGeometry(wM, hM);
-  geom.rotateX(-Math.PI / 2);
-
-  for (let i = 0; i < allLayers.length; i++) {
-    const L = allLayers[i];
-    L.svgPath = L.svg || `assets/layers/${L.id.replace(/\./g, "_")}.svg`;
-    let tex = null;
-    try {
-      const r = await fetch(L.svgPath);
-      if (r.ok) tex = await svgToCanvasTexture(await r.text(), L.color);
-    } catch (_) { /* ignore */ }
-
-    const mat = new THREE.MeshBasicMaterial({
-      map: tex,
-      color: tex ? 0xffffff : L.color,
-      transparent: true,
-      opacity: 0.85,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    });
-    const mesh = new THREE.Mesh(geom, mat);
-    layerPlanesGroup.add(mesh);
-
-    const entry = { meta: L, mesh, visible: true, index: i };
-    layerEntries.push(entry);
-
-    const row = document.createElement("div");
-    row.className = `layer-row ${L.id === layerActiveId ? "active" : ""}`;
-    row.dataset.layerId = L.id;
-    row.innerHTML = `
-      <div style="display:flex;align-items:center;gap:7px;min-width:0;">
-        <span class="layer-swatch" style="background:${L.color}"></span>
-        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><strong>${escapeHtml(L.id)}</strong> &middot; ${escapeHtml(L.name)}</span>
-      </div>
-      <input type="checkbox" checked aria-label="Toggle ${escapeHtml(L.id)}">
-    `;
-    row.querySelector("input").addEventListener("change", (ev) => {
-      ev.stopPropagation();
-      entry.visible = ev.target.checked;
-      updateLayerStackVisuals(performance.now());
-    });
-    row.addEventListener("click", () => select2dLayer(L.id));
-    listEl.appendChild(row);
-  }
-
-  updateLayerStackVisuals();
-  select2dLayer("F.Cu");
+  await loadLayerBoard("main");
 
   const tickLayers = (now) => {
     requestAnimationFrame(tickLayers);
@@ -2007,6 +1952,119 @@ async function initLayerViewer() {
     }
   };
   requestAnimationFrame(tickLayers);
+}
+
+// The Layers tab shows one board at a time: the adapter (8 copper layers) or the PSU board (4).
+const LAYER_BOARDS = {
+  main: {
+    title: "8-Layer Stack-up",
+    hud: "3-D Sequentially Peeled 8-Cu Stack-up (KiCad vector SVGs)",
+    dir: "assets/layers",
+    stack: () => [
+      ...catalogue.layer_stack,
+      { id: "B.Mask", name: "Bottom Soldermask", color: "#2d7d3a" },
+      { id: "B.SilkS", name: "Bottom Silkscreen", color: "#d6dbe0" },
+    ],
+    outline: () => catalogue.board_outline,
+  },
+  psu: {
+    title: "PSU 4-Layer Stack-up",
+    hud: "3-D Sequentially Peeled 4-Cu Stack-up of the PSU board (KiCad vector SVGs)",
+    dir: "assets/psu_layers",
+    stack: () => [
+      ...(psuData?.layer_stack || []),
+      { id: "B.Mask", name: "Bottom Soldermask", color: "#2d7d3a" },
+      { id: "B.SilkS", name: "Bottom Silkscreen", color: "#d6dbe0" },
+    ],
+    outline: () => psuData?.board_outline,
+  },
+};
+let layerBoard = "main";
+let layerLoadToken = 0;
+
+async function loadLayerBoard(board) {
+  if (board === "psu" && !psuData?.layer_stack) board = "main";
+  const cfg = LAYER_BOARDS[board];
+  const token = ++layerLoadToken;
+  layerBoard = board;
+  document.querySelectorAll("[data-layer-board]").forEach((b) => {
+    const on = b.dataset.layerBoard === board;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+  $("#layer-stack-title").textContent = cfg.title;
+  $("#layer-hud").textContent = cfg.hud;
+
+  const outline = cfg.outline() || {};
+  const wMm = outline.width_mm || 140.0;
+  const hMm = outline.height_mm || 132.0;
+  const allLayers = cfg.stack().map((L) => ({ ...L, svgPath: L.svg || `${cfg.dir}/${L.id.replace(/\./g, "_")}.svg` }));
+  const texH = Math.round(1600 * hMm / wMm);
+  const textures = await Promise.all(allLayers.map(async (L) => {
+    try {
+      const r = await fetch(L.svgPath);
+      if (r.ok) return await svgToCanvasTexture(await r.text(), L.color, texH);
+    } catch (_) { /* ignore */ }
+    return null;
+  }));
+  if (token !== layerLoadToken) {
+    textures.forEach((t) => t?.dispose());
+    return;
+  }
+
+  for (const e of layerEntries) {
+    e.mesh.material.map?.dispose();
+    e.mesh.material.dispose();
+    layerPlanesGroup.remove(e.mesh);
+  }
+  layerEntries.length = 0;
+  const listEl = $("#layer-list");
+  listEl.innerHTML = "";
+
+  const geom = new THREE.PlaneGeometry(wMm * 0.001, hMm * 0.001);
+  geom.rotateX(-Math.PI / 2);
+  for (let i = 0; i < allLayers.length; i++) {
+    const L = allLayers[i];
+    const tex = textures[i];
+    const mat = new THREE.MeshBasicMaterial({
+      map: tex,
+      color: tex ? 0xffffff : L.color,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const mesh = new THREE.Mesh(geom, mat);
+    layerPlanesGroup.add(mesh);
+
+    const entry = { meta: L, mesh, visible: true, index: i };
+    layerEntries.push(entry);
+
+    const row = document.createElement("div");
+    row.className = "layer-row";
+    row.dataset.layerId = L.id;
+    row.title = L.role || "";
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:7px;min-width:0;">
+        <span class="layer-swatch" style="background:${L.color}"></span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><strong>${escapeHtml(L.id)}</strong> &middot; ${escapeHtml(L.name)}</span>
+      </div>
+      <input type="checkbox" checked aria-label="Toggle ${escapeHtml(L.id)}">
+    `;
+    row.querySelector("input").addEventListener("change", (ev) => {
+      ev.stopPropagation();
+      entry.visible = ev.target.checked;
+      updateLayerStackVisuals(performance.now());
+    });
+    row.addEventListener("click", () => select2dLayer(L.id));
+    listEl.appendChild(row);
+  }
+  l2dZoom = 1;
+  l2dPan = { x: 0, y: 0 };
+  apply2dTransform();
+  select2dLayer(layerEntries.some((e) => e.meta.id === layerActiveId) ? layerActiveId : "F.Cu");
+  if (state.tab === "layers") startLayerPeel();
+  syncHash();
 }
 
 function startLayerPeel() {
@@ -2166,6 +2224,7 @@ function syncHash() {
   if (state.enclosureMode !== "closed") p.set("enc", state.enclosureMode);
   if (state.somLiftMm > 0) p.set("som", String(state.somLiftMm));
   if (state.activeNet) p.set("net", state.activeNet);
+  if (state.tab === "layers" && layerBoard !== "main") p.set("board", layerBoard);
   if (state.theme !== "dark") p.set("theme", state.theme);
   simCtrl?.getHashParams(p);
   const str = p.toString();
@@ -2195,7 +2254,11 @@ function applyHashParams() {
     if (p.get("net")) { state.activeNet = p.get("net"); rebuildNetHighlightBoxes(); touched = true; }
     if (simCtrl?.applyHashParams(p)) touched = true;
     if (p.get("part")) { selectPart(p.get("part"), false); touched = true; }
-    if (p.get("layer")) { select2dLayer(p.get("layer")); touched = true; }
+    if (p.get("board") === "psu") {
+      const lay = p.get("layer");
+      loadLayerBoard("psu").then(() => { if (lay) select2dLayer(lay); });
+      touched = true;
+    } else if (p.get("layer")) { select2dLayer(p.get("layer")); touched = true; }
     if (p.get("cam")) { setCameraPreset(p.get("cam"), true); touched = true; }
     if (touched && (p.get("part") || view || p.has("explode") || p.has("sim")) && state.tab === "explorer") {
       const stg = $("#explorer-stage");
@@ -2417,6 +2480,9 @@ function wireUiEvents() {
   });
 
   $("#btn-layer-peel").addEventListener("click", startLayerPeel);
+  document.querySelectorAll("[data-layer-board]").forEach((b) => {
+    b.addEventListener("click", () => { if (b.dataset.layerBoard !== layerBoard) loadLayerBoard(b.dataset.layerBoard); });
+  });
   $("#btn-all-nets")?.addEventListener("click", () => {
     state.allNets = !state.allNets;
     const b = $("#btn-all-nets");

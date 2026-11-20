@@ -179,7 +179,7 @@ regulators make.
 
 ## 7. The board (`psu/`, `_work/psu/psu_pcb.py`)
 
-Schematic: [KV260-IAS2RF_PSU_schematic.pdf](KV260-IAS2RF_PSU_schematic.pdf) (vector, one A1 sheet).
+Schematic: [KV260-IAS2RF_PSU_schematic.pdf](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_PSU_schematic.pdf) (vector, one A1 sheet); layout: [KV260-IAS2RF_PSU_layout.pdf](https://github.com/PabloSoage/kv260-ias2rf/releases/download/rev08.1/KV260-IAS2RF_PSU_layout.pdf) (vector, the four copper layers and their overlay). Both are assets of the release.
 
 4 layers: F.Cu the parts and the power pours, In1.Cu ground, In2.Cu the +12V plane, B.Cu ground and short signal
 links. The power runs in a U: `J1` top left, protection and filter along the top, the power stage along the bottom

@@ -17,7 +17,6 @@ find_kicad_cli() {
   fi
   for p in \
     "${LOCALAPPDATA:-}/Programs/KiCad/10.0/bin/kicad-cli.exe" \
-    "/c/Users/${USERNAME:-}/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe" \
     "/c/Program Files/KiCad/10.0/bin/kicad-cli.exe"; do
     if [ -x "$p" ]; then
       echo "$p"
@@ -94,6 +93,18 @@ echo "[5/7] Optimizing board.glb and building kv260.glb + enclosure.glb..."
 node "$SITE_DIR/scripts/build_assets.mjs" "$RAW_GLB" "$KV_CONN_GLB"
 
 echo "[6/7] Building Rust core (site/core) and Slint WebAssembly HMI..."
+# Panic and debug strings carry source paths: map the machine's own folders (cargo registry, this checkout, the
+# temporary target dir) to neutral prefixes, in both spellings rustc may use on Windows.
+remap() {
+  local dir="$1" to="$2" out
+  out="--remap-path-prefix=$dir=$to"
+  if command -v cygpath >/dev/null 2>&1; then
+    out="$out --remap-path-prefix=$(cygpath -w "$dir")=$to --remap-path-prefix=$(cygpath -m "$dir")=$to"
+  fi
+  echo "$out"
+}
+RUSTFLAGS="${RUSTFLAGS:-} $(remap "${CARGO_HOME:-$HOME/.cargo}" /cargo) $(remap "$ROOT_DIR" /src) $(remap "$TMP_DIR" /build)"
+export RUSTFLAGS
 mkdir -p "$SITE_DIR/core/pkg"
 CARGO_TARGET_DIR="$TMP_DIR/core_target" cargo build \
   --manifest-path "$SITE_DIR/core/Cargo.toml" \

@@ -46,6 +46,7 @@ schgen = P.schgen
 ROOT = P.ROOT
 _OUT = os.environ.get("BB_OUT", ROOT)
 BOARD = os.path.join(_OUT, "KV260-IAS2RF.kicad_pcb")
+# not on main any more: `git checkout rev08 -- _deprecated` restores it
 ORIGINAL = os.path.join(ROOT, "_deprecated", "CSI2-KRIA-KV260_Rev01_AlliedVision.kicad_pcb")
 PRO = os.path.join(_OUT, "KV260-IAS2RF.kicad_pro")
 NS = uuid.UUID("0c5b7a4e-9d21-4f38-a6e0-3b1f2c8d7e95")

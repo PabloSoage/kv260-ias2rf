@@ -115,7 +115,7 @@ Linux kernel `bonding` (`mode=0` `balance-rr`, `mode=1` `active-backup`, `mode=4
 
 ### 3.2 Open-Source `verilog-ethernet` (MIT) vs Current `artix_top` Utilization
 
-From `fpga/artix/reports/utilization.rpt`, `fpga/eth/test/reports/utilization.rpt`, `fpga/kria/reports/utilization.rpt`, and Vivado `get_parts`:
+From `fpga/artix/reports_rev06/utilization.rpt`, `fpga/eth/test/reports/utilization.rpt`, `fpga/kria/reports/utilization.rpt`, and Vivado `get_parts`:
 
 | Resource | `XC7A50T-FTG256-2` Available | Current `artix_top` | `sgmii_lvds` PoC | Custom 8b10b/PCS + `verilog-ethernet` (MIT `eth_mac_1g` + `udp` + `64 KB` replay FIFO) | Projected Artix-7 Total (% Used) | Kria `kria_top` Baseline |
 |---|---|---|---|---|---|---|
