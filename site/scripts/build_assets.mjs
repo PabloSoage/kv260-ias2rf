@@ -23,14 +23,16 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SITE_DIR = path.dirname(HERE);
 const ROOT_DIR = path.dirname(SITE_DIR);
 const ASSETS_DIR = path.join(SITE_DIR, "assets");
-// `--psu <raw_psu.glb>` builds only site/assets/psu_board.glb (the PSU board, from _work/psu/psu_site.py)
+// `--psu <raw_psu.glb>` builds only site/assets/psu_board.glb (the PSU board, from _work/psu/psu_site.py);
+// `--psu-case` only site/assets/psu_case.glb (its enclosure, from mech/psu_case_{tray,lid}.stl)
 const PSU_MODE = process.argv[2] === "--psu";
 const RAW_BOARD_PATH = PSU_MODE ? process.argv[3] : process.argv[2];
 const KV260_CONN_PATH = PSU_MODE ? "" : process.argv[3] || "";
 
-if (!RAW_BOARD_PATH || !fs.existsSync(RAW_BOARD_PATH)) {
+if (process.argv[2] !== "--psu-case" && (!RAW_BOARD_PATH || !fs.existsSync(RAW_BOARD_PATH))) {
   console.error("Usage: node site/scripts/build_assets.mjs <raw_board.glb> [kv260_conn.glb]\n" +
-    "       node site/scripts/build_assets.mjs --psu <raw_psu.glb>");
+    "       node site/scripts/build_assets.mjs --psu <raw_psu.glb>\n" +
+    "       node site/scripts/build_assets.mjs --psu-case");
   process.exit(1);
 }
 
@@ -1333,7 +1335,24 @@ function buildEnclosureGlb() {
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
-if (PSU_MODE) {
+// The PSU board's enclosure (_work/psu/psu_case.py): its STLs are in the board's own frame (KiCad x, -y, height),
+// which the crease-smooth reader maps to the PSU board GLB's frame (x, height, y)
+function buildPsuCaseGlb() {
+  const gb = new GlbBuilder();
+  const mCase = gb.addMaterial("psu_case_asa", [0.028, 0.030, 0.035, 1.0], 0.04, 0.70);
+  const nodes = [];
+  for (const [name, file] of [["PSU_CASE_TRAY", "psu_case_tray.stl"], ["PSU_CASE_LID", "psu_case_lid.stl"]]) {
+    const g = readBinaryStlCreaseSmooth(path.join(ROOT_DIR, "mech", file), false, 30);
+    nodes.push(gb.addNode({ name, mesh: gb.addMesh(name, gb.addOptimizedPrimitives(g.positions, g.normals, g.indices, mCase, 0)) }));
+  }
+  const outPath = path.join(ASSETS_DIR, "psu_case.glb");
+  gb.save(outPath, [gb.addNode({ name: "PSU_CASE_ROOT", children: nodes })]);
+  console.log(`Built psu_case.glb (${(fs.statSync(outPath).size / 1e6).toFixed(2)} MB)`);
+}
+
+if (process.argv[2] === "--psu-case") {
+  buildPsuCaseGlb();
+} else if (PSU_MODE) {
   buildBoardGlb(JSON.parse(fs.readFileSync(path.join(ASSETS_DIR, "psu.json"), "utf8")), RAW_BOARD_PATH, "psu_board.glb");
 } else {
   const compJson = JSON.parse(fs.readFileSync(path.join(ASSETS_DIR, "components.json"), "utf8"));

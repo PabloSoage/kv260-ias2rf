@@ -92,6 +92,7 @@ PARTS: list[tuple[str, list[tuple[str, str]]]] = [
             ("Front-End Artix-7 Control & Ethernet PHY", "docs/CONTROL_SPEC.md"),
             ("Power Tree, Sequencing & Protection", "docs/POWER_SPEC.md"),
             ("PSU Board: Vehicle Supply for Both Boards (LTC4364 + LM5177)", "docs/PSU_SPEC.md"),
+            ("PSU Board Enclosure: Honeycomb Case, Thermal & FEA", "docs/PSU_ENCLOSURE.md"),
             ("KiCad Symbol Library Verification", "docs/SYMBOLS.md"),
         ],
     ),
@@ -1566,7 +1567,7 @@ def main() -> int:
     parser.add_argument("--skip-vectors", action="store_true", help="Skip appending Vivado/KiCad vector PDF appendices")
     parser.add_argument("--lite", action="store_true",
                         help="The same book, lighter: the gallery from the normal renders instead of the 4K ones, "
-                             "rasters at 720 px and JPEG 48 (unless given); writes "
+                             "rasters at 720 px and JPEG 44 (unless given); writes "
                              "docs/KV260-IAS2RF_Documentation-Lite.pdf")
     args = parser.parse_args()
     out = args.out
@@ -1576,7 +1577,7 @@ def main() -> int:
         if args.max_img_width == 1600:
             args.max_img_width = 720
         if args.jpeg_quality == 82:
-            args.jpeg_quality = 48
+            args.jpeg_quality = 44
     build_documentation_pdf(out, args.max_img_width, args.jpeg_quality, not args.skip_vectors, args.lite)
     for line in TABLE_REPORT:
         print(f"[table] {line}", file=sys.stderr)

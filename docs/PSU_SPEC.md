@@ -147,6 +147,11 @@ case air (the hot car), each part's loss over its pads and its data-sheet juncti
 | 6.0 V weak battery, worst load, continuous | 5.2 W | Q3 106 C (150), U2 103 C (125), Q5 and Q6 100 C |
 | Cranking Level IV, 10 s at 6.5 V from 13.5 V | 4.6 W | Q3 90 C, U2 88 C |
 
+These are for 70 C air around the board. In its enclosure ([PSU_ENCLOSURE.md](PSU_ENCLOSURE.md)) at 70 C ambient the
+board warms its own air: 82 C seen by the board at 13.5 V (U2 99 C, Q3 98 C, C17 92 C), 97 C at 6.0 V (U2 130 C,
+over its 125 C). The vented case holds U2 to 125 C at 6.0 V and the worst load up to 65 C ambient; the car
+running (13.5 V) stays within every rating to 85 C ambient.
+
 ## 6. Conducted noise (`psu_emi.py`, `docs/sim/psu_emi.png`)
 
 Into the vehicle harness, CISPR 25 voltage method, Class 5 peak limits as TI SLLA569B (April 2025) Table 3 gives
@@ -210,6 +215,8 @@ lets the pours show through. `_work/psu/psu_render.py` renders these views from 
   CAN cable's ground (`J1503`). `J2` to the adapter's `J1001` and `J3` to the KV260's `J12`, each by its own 18 AWG
   cable (1 m or less, the two about the same length), nothing else on `J12`.
 - **Bench:** any 12 to 24 V supply of 60 W on `J1`, preferably two-prong (Class II); the same two cables.
+- **Enclosure:** the printed ASA case in [PSU_ENCLOSURE.md](PSU_ENCLOSURE.md): four M3 x 25 screws hold the board and
+  close it, four ears with M5 slots mount it floor down, so the vents in its long walls stay vertical.
 - **The adapter's KV260 branch** (`U1010`, `Q1010`, `Q1011`, `R1040` to `R1043`, `C1093` to `C1095`, `D1004`,
   `J1004`) is not needed with this board and can be left unfitted. It stays on the board for use with a plain brick
   and the jumper. `U1010` is TPS26631PWPR (LCSC C2866319); the same part on a 250-piece reel, TPS26631PWPT
@@ -218,6 +225,9 @@ lets the pours show through. `_work/psu/psu_render.py` renders these views from 
 
 ## 9. Limits, said plainly
 
+- In the vented enclosure, a battery held at 6.0 V with both boards at their worst draw takes U2 past its 125 C at
+  ambients above 65 C (53 C sealed). At 13.5 V the limit is not reached below 85 C; the input electrolytics' life
+  is then the measure: 2.5 times their rating at 70 C ambient, 0.9 times at 85 C ([PSU_ENCLOSURE.md](PSU_ENCLOSURE.md)).
 - Disconnecting the battery (ISO 7637-2 pulse 1, 200 ms), a reverse battery and cranking Level III (3.0 V) still
   reset both boards: there is nothing to run from. Nothing is damaged.
 - Cranking Level II at both boards' worst draw at once resets them (section 4.4); the typical load runs.

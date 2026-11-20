@@ -14,40 +14,41 @@ const BOARD_REG_ROTY = -Math.PI / 2;
 
 const DOC_PDF_PAGE_MAP = {
   "README.md": 6,
-  "docs/BOARD_MANUAL.md": 28,
-  "docs/FPGA_GATEWARE.md": 37,
-  "docs/SYSTEM_SIM.md": 63,
-  "fpga/SYSTEM_SIM.md": 63,
-  "docs/LINK_PROTOCOL.md": 67,
-  "docs/PINMAP.md": 73,
-  "docs/HMI.md": 85,
-  "docs/INTEGRATIONS.md": 93,
-  "docs/IAS_LINK_SPEC.md": 113,
-  "docs/CLOCK_SPEC.md": 117,
-  "docs/CONTROL_SPEC.md": 131,
-  "docs/POWER_SPEC.md": 138,
-  "docs/POWER_AND_STACKUP.md": 138,
-  "docs/LAYOUT.md": 159,
-  "docs/SIGNAL_INTEGRITY.md": 169,
-  "docs/AUDIT_Rev08.md": 197,
-  "docs/3D_MODELS.md": 208,
-  "docs/MECHANICAL.md": 212,
-  "docs/ENCLOSURE.md": 216,
-  "docs/ENCLOSURE_V2_THERMAL.md": 230,
-  "docs/FABRICATION.md": 252,
-  "docs/JLCPCB_QUOTE.md": 255,
-  "fpga/README.md": 61,
-  "fpga/eth/REV06.md": 77,
-  "fpga/eth/REDUNDANCY.md": 79,
-  "sw/README.md": 84,
-  "docs/ADC_RADAR_SPEC.md": 120,
-  "docs/ADC_SDR_SPEC.md": 123,
-  "docs/DAC_RADAR_SPEC.md": 125,
-  "docs/DAC_SDR_SPEC.md": 127,
-  "docs/ROUTING_SPEC.md": 129,
-  "docs/PSU_SPEC.md": 147,
-  "docs/SYMBOLS.md": 154,
-  "docs/img/highres/README.md": 263,
+  "docs/BOARD_MANUAL.md": 29,
+  "docs/FPGA_GATEWARE.md": 38,
+  "docs/SYSTEM_SIM.md": 64,
+  "fpga/SYSTEM_SIM.md": 64,
+  "docs/LINK_PROTOCOL.md": 68,
+  "docs/PINMAP.md": 74,
+  "docs/HMI.md": 86,
+  "docs/INTEGRATIONS.md": 94,
+  "docs/IAS_LINK_SPEC.md": 114,
+  "docs/CLOCK_SPEC.md": 118,
+  "docs/CONTROL_SPEC.md": 132,
+  "docs/POWER_SPEC.md": 139,
+  "docs/POWER_AND_STACKUP.md": 139,
+  "docs/LAYOUT.md": 166,
+  "docs/SIGNAL_INTEGRITY.md": 176,
+  "docs/AUDIT_Rev08.md": 204,
+  "docs/3D_MODELS.md": 215,
+  "docs/MECHANICAL.md": 219,
+  "docs/ENCLOSURE.md": 223,
+  "docs/ENCLOSURE_V2_THERMAL.md": 237,
+  "docs/FABRICATION.md": 259,
+  "docs/JLCPCB_QUOTE.md": 262,
+  "fpga/README.md": 62,
+  "fpga/eth/REV06.md": 78,
+  "fpga/eth/REDUNDANCY.md": 80,
+  "sw/README.md": 85,
+  "docs/ADC_RADAR_SPEC.md": 121,
+  "docs/ADC_SDR_SPEC.md": 124,
+  "docs/DAC_RADAR_SPEC.md": 126,
+  "docs/DAC_SDR_SPEC.md": 128,
+  "docs/ROUTING_SPEC.md": 130,
+  "docs/PSU_SPEC.md": 148,
+  "docs/SYMBOLS.md": 161,
+  "docs/img/highres/README.md": 270,
+  "docs/PSU_ENCLOSURE.md": 155,
 };
 
 function docToPdfHref(docPath) {
@@ -161,6 +162,9 @@ const netPulseGroup = new THREE.Group();
 const psuGroup = new THREE.Group(); // the PSU board, beside the assembly; KiCad mm map to (x, -, y) as on the adapter
 const psuPulseGroup = new THREE.Group();
 let psuModel = null;
+let psuCaseModel = null; // its enclosure (assets/psu_case.glb): tray and lid, in the board's own frame
+const psuCaseNodes = {};
+const PSU_TRAY_BOTTOM_M = 0.0085; // the tray's underside is 8.5 mm below the board's
 const PSU_CENTRE_MM = [155, 135];
 const psuNet = (n) => String(n || "").startsWith("PSU:");
 const netLabel = (n) => String(n || "").replace(/^PSU:/, "");
@@ -879,6 +883,17 @@ async function loadModelsWithProgress() {
       });
       psuGroup.add(psuModel);
       await bakePcbSurfaceTextures(psuModel, psuData.board_outline, "assets/psu_layers");
+      try {
+        const cGltf = await loadGlb("assets/psu_case.glb", "psucase", "psu_case.glb");
+        psuCaseModel = cGltf.scene;
+        psuCaseModel.traverse((o) => {
+          if (o.name === "PSU_CASE_TRAY") psuCaseNodes.tray = o;
+          if (o.name === "PSU_CASE_LID") psuCaseNodes.lid = o;
+        });
+        psuGroup.add(psuCaseModel);
+      } catch (err) {
+        console.warn("PSU enclosure not loaded", err);
+      }
       placePsuBeside();
     } catch (err) {
       console.warn("PSU board not loaded", err);
@@ -898,8 +913,9 @@ function placePsuBeside() {
   for (const o of [adapterGroup, kv260Model, enclosureModel]) if (o) box.expandByObject(o);
   psuGroup.visible = wasVisible;
   const [cx, cy] = PSU_CENTRE_MM;
-  const halfW = 0.055;
-  psuGroup.position.set(box.max.x + 0.04 + halfW - cx * 0.001, box.min.y, (box.min.z + box.max.z) / 2 - cy * 0.001);
+  const halfW = 0.071; // the enclosure's cable shelf reaches 70.5 mm left of the board's centre
+  psuGroup.position.set(box.max.x + 0.04 + halfW - cx * 0.001, box.min.y + PSU_TRAY_BOTTOM_M,
+    (box.min.z + box.max.z) / 2 - cy * 0.001);
   applyAnimatedScene();
   refreshPsuPickerBounds();
   applyAnimatedScene();
@@ -1034,6 +1050,15 @@ function applyAnimatedScene() {
   const yBottom = -0.045 * t - hideSlide;
   const yLid = anim.lidOpen * 0.085 + 0.150 * t + hideSlide;
   const yAdpHs = 0.105 * t;
+  // the PSU's enclosure follows the same Closed / Open Lid / No Case buttons and the explode slider
+  const psuCaseVis = showPsu && !!psuCaseModel && anim.caseVisFade > 0.02;
+  if (psuCaseModel) {
+    psuCaseModel.visible = psuCaseVis;
+    if (psuCaseNodes.tray) psuCaseNodes.tray.position.y = -0.02 * t - hideSlide * 0.6;
+    if (psuCaseNodes.lid) psuCaseNodes.lid.position.y = anim.lidOpen * 0.045 + 0.05 * t + hideSlide;
+  }
+  // a closed lid hides the PSU's parts from the pointer, as the main case does the adapter's
+  const psuPick = showPsu && !(psuCaseVis && anim.lidOpen < 0.5 && t < 0.2);
 
   if (enclosureModel) enclosureModel.visible = showEnc || showThermal;
   if (encNodes.ENCLOSURE_BOTTOM_GROUP) {
@@ -1068,7 +1093,7 @@ function applyAnimatedScene() {
       (caseVis ? 1 << 5 : 0) |
       (caseVis ? 1 << 6 : 0) |
       (showThermal ? 1 << 7 : 0) |
-      (showPsu ? 1 << 8 : 0);
+      (psuPick ? 1 << 8 : 0);
     const offsets = new Float32Array([
       yBoard,
       0.0,
@@ -1335,15 +1360,29 @@ function wireViewportPicking(canvas) {
     }
   });
 
+  // A click selects (or, on empty space, clears); an orbit, pan or pinch never does, even one that ends where it
+  // started: the press counts the farthest the pointer went, how long it lasted and how many pointers took part
+  const downPointers = new Set();
   canvas.addEventListener("pointerdown", (ev) => {
-    downPos = { x: ev.clientX, y: ev.clientY };
+    downPointers.add(ev.pointerId);
+    if (downPointers.size > 1) { if (downPos) downPos.multi = true; return; }
+    downPos = { x: ev.clientX, y: ev.clientY, t: performance.now(), far: 0, multi: false };
   });
+  canvas.addEventListener("pointermove", (ev) => {
+    if (downPos && downPointers.has(ev.pointerId)) {
+      downPos.far = Math.max(downPos.far, Math.hypot(ev.clientX - downPos.x, ev.clientY - downPos.y));
+    }
+  });
+  canvas.addEventListener("pointercancel", (ev) => { downPointers.delete(ev.pointerId); downPos = null; });
 
   canvas.addEventListener("pointerup", (ev) => {
+    downPointers.delete(ev.pointerId);
     if (!downPos || !state.ready) return;
-    const moved = Math.hypot(ev.clientX - downPos.x, ev.clientY - downPos.y);
-    downPos = null;
-    if (moved > 5) return;
+    const press = downPos;
+    if (downPointers.size === 0) downPos = null;
+    else return;
+    const moved = Math.max(press.far, Math.hypot(ev.clientX - press.x, ev.clientY - press.y));
+    if (moved > 5 || press.multi || ev.button !== 0 || performance.now() - press.t > 450) return;
     const { nx, ny } = getNdc(ev);
     const found = pickAtNdc(nx, ny);
     if (found) selectPart(found.id, false);
@@ -1600,6 +1639,7 @@ function selectPart(id, shouldFocus = true, autoHighlightNet = true) {
   state.selectedId = id;
   const pcbPart = entry.kind === "board" || entry.kind === "psu";
   if (entry.kind === "psu" && !psuGroup.visible) setIsolate("psu", true);
+  if (entry.kind === "psu" && psuCaseModel && state.enclosureMode === "closed") setEnclosure("open");
   if (autoHighlightNet && !applyingHash) {
     if (pcbPart) {
       const picked = pickPrimaryNetForComponent(entry.data);

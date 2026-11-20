@@ -200,6 +200,7 @@ Every connector, LED, switch and chip, numbered as in the drawing; the bottom si
 |---|---|
 | **[docs/BOARD_MANUAL.md](docs/BOARD_MANUAL.md)** | **Board manual.** Every connector, LED, switch, jumper, test point and chip, with drawings of both sides, the Pmod pin-out, troubleshooting by LED and typical uses |
 | **[docs/PSU_SPEC.md](docs/PSU_SPEC.md)** | **PSU board.** The battery-to-both-boards supply (`psu/`): LTC4364 surge stopper and LM5177 buck-boost, its simulations (steady state, loop, ISO 7637-2 and 16750-2 events, thermal, conducted noise) and installation |
+| [docs/PSU_ENCLOSURE.md](docs/PSU_ENCLOSURE.md) | The PSU board's printed enclosure: honeycomb tray and lid, coupled thermal model (vents or sealed, ASA or PETG-CF), CalculiX FEA and renders |
 | **[docs/VEHICLE_PLATFORM.md](docs/VEHICLE_PLATFORM.md)** | **System view.** Complete vehicle platform: LiDAR, SDR, radar, OBD2 |
 | [docs/FPGA_GATEWARE.md](docs/FPGA_GATEWARE.md) | **Dual-FPGA Gateware.** Artix-7 + Kria K26 RTL, Vivado 2026.1 utilization/timing/floorplans/schematics, CSR map, wideband SDR & AERIS-10 radar DSP, and XSim e2e simulation |
 | [docs/HMI.md](docs/HMI.md) | **In-car HMI.** The ten touchscreen screens, a Slint application in Rust that runs on the KV260 (Linux KMS), a PC or a phone's browser, its data service and the PL's result streams behind it, and which job runs on the PL, the A53s, the R5F cores, the GPU and the VCU |
@@ -408,8 +409,22 @@ installation: [docs/PSU_SPEC.md](docs/PSU_SPEC.md); schematic [PDF](docs/KV260-I
 
 ![PSU board temperature at 70 C air](docs/sim/psu_thermal.png)
 
-The PSU board is also in the [3-D explorer](https://pablosoage.github.io/kv260-ias2rf/#view=psu), with every part's
+The PSU board is also in the [3-D explorer](https://pablosoage.github.io/kv260-ias2rf/#view=psu&enc=open), with every part's
 nets, its audit row and its thermal results.
+
+### Its enclosure
+
+A printed ASA case in the main enclosure's honeycomb: four M3 screws hold the board and close it, honeycomb vents in
+the long walls, a cable-tie shelf under the connectors and four M5 ears. The coupled board-and-shell thermal model
+shows the vents are needed (they take 11 C off the LM5177 at the worst load) and rates it, with the car running, to
+85 C ambient; CalculiX checks it under 50 g shocks, cable pulls and 300 N on the lid
+([docs/PSU_ENCLOSURE.md](docs/PSU_ENCLOSURE.md)).
+
+| Closed | Exploded |
+|---|---|
+| ![PSU enclosure](docs/img/psu/case_closed.png) | ![PSU enclosure, exploded](docs/img/psu/case_exploded.png) |
+
+![PSU enclosure thermal](docs/sim/psu_case_thermal.png)
 
 ### Powering the two boards
 

@@ -52,6 +52,7 @@ def main():
         t = re.sub(r"(\(p\.)(\d+)(\))", lambda x: x.group(1) + str(remap.get(int(x.group(2)), int(x.group(2))))
                    + x.group(3), t)
         t = t.replace("PSUPAGE", str(new["docs/PSU_SPEC.md"]))
+        t = t.replace("PSUCASEPAGE", str(new["docs/PSU_ENCLOSURE.md"]))
         t = re.sub(r"\b\d{3}-page compiled reference", f"{total}-page compiled reference", t)
         open(p, "w", encoding="utf-8", newline="\n").write(t)
     print(f"book {total} pages; {len(new)} documents; moved: "

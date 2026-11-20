@@ -1287,7 +1287,7 @@ export function createSimController(ctx) {
       bodyHtml = `
         <div class="control-row">
           <span class="badge" style="border-color:#f59e0b;color:#f59e0b;background:rgba(245,158,11,0.14)">RF AND POWER AUDIT</span>
-          <a class="mono" style="font-size:10px;color:var(--cyan);text-decoration:none" href="pdf.html?file=docs%2FKV260-IAS2RF_Documentation.pdf#page=197" target="_blank" rel="noopener">AUDIT_Rev08.md (p.197)</a>
+          <a class="mono" style="font-size:10px;color:var(--cyan);text-decoration:none" href="pdf.html?file=docs%2FKV260-IAS2RF_Documentation.pdf#page=204" target="_blank" rel="noopener">AUDIT_Rev08.md (p.204)</a>
         </div>
         <div class="sim-highlight-box">
           <strong>Pre-Order RF &amp; Power Audit Closure (18-19 Nov 2026)</strong>
